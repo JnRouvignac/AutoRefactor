@@ -100,7 +100,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             // To do this, we should visit the whole block and check the target type
             removeParamParentheses(node);
             return false;
-        } else if (node.getBody() instanceof Block) {
+        }
+        if (node.getBody() instanceof Block) {
             final List<Statement> statements= ASTNodes.asList((Block) node.getBody());
 
             if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement) {
@@ -157,7 +158,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         || calledExpression instanceof ThisExpression) {
                     replaceByMethodReference(node, mi);
                     return false;
-                } else if (calledExpression instanceof FieldAccess) {
+                }
+                if (calledExpression instanceof FieldAccess) {
                     final FieldAccess fieldAccess= (FieldAccess) calledExpression;
                     if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                         replaceByMethodReference(node, mi);
@@ -208,7 +210,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
         if (calledExpression == null) {
             return (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
-        } else if (calledExpression instanceof SimpleName) {
+        }
+        if (calledExpression instanceof SimpleName) {
             return ((SimpleName) calledExpression).resolveBinding().getKind() == IBinding.TYPE;
         }
 

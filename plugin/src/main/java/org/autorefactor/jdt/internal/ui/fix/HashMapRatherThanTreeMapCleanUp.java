@@ -98,9 +98,8 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
     protected String getSubstitutingClassName(String origRawType) {
         if (TreeMap.class.getCanonicalName().equals(origRawType)) {
             return HashMap.class.getCanonicalName();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

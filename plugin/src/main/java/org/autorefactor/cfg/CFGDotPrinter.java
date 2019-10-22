@@ -154,19 +154,17 @@ public class CFGDotPrinter {
         }
         CFGSubGraph subGraph= subGraphs.get(node);
         if (subGraph == null) {
-            if (ASTNodes.isLoop(node) || node instanceof IfStatement || node instanceof SwitchStatement
-                    || node instanceof MethodDeclaration || node instanceof TryStatement
-                    || node instanceof CatchClause) {
-                // Such statements need their own subgraph to ease reading the CFG
-                subGraph= new CFGSubGraph(ASTPrintHelper.codeExcerpt(node), node.getStartPosition());
-                subGraphs.put(node, subGraph);
-                // Builds all sub graphs all the way to the top node
-                CFGSubGraph parentSubGraph= getSubGraph(subGraphs, node.getParent());
-                if (parentSubGraph != null) {
-                    parentSubGraph.subGraphs.add(subGraph);
-                }
-            } else {
+            if (!ASTNodes.isLoop(node) && !(node instanceof IfStatement) && !(node instanceof SwitchStatement)
+                    && !(node instanceof MethodDeclaration) && !(node instanceof TryStatement) && !(node instanceof CatchClause)) {
                 return getSubGraph(subGraphs, node.getParent());
+            }
+            // Such statements need their own subgraph to ease reading the CFG
+            subGraph= new CFGSubGraph(ASTPrintHelper.codeExcerpt(node), node.getStartPosition());
+            subGraphs.put(node, subGraph);
+            // Builds all sub graphs all the way to the top node
+            CFGSubGraph parentSubGraph= getSubGraph(subGraphs, node.getParent());
+            if (parentSubGraph != null) {
+                parentSubGraph.subGraphs.add(subGraph);
             }
         }
         return subGraph;

@@ -165,7 +165,8 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.EQUALS)) {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, isAssertTrue, failureMessage,
                         isRewriteNeeded);
-            } else if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.NOT_EQUALS)) {
+            }
+            if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.NOT_EQUALS)) {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
                         failureMessage, isRewriteNeeded);
             }
@@ -202,7 +203,8 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         if (replace) {
             r.replace(nodeToReplace, invokeFail(nodeToReplace, originalMethod, failureMessage));
             return false;
-        } else if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+        }
+        if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
             r.remove(nodeToReplace.getParent());
             return false;
         }
@@ -215,9 +217,8 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final List<Expression> args= ASTNodes.arguments(originalMethod);
         if (args.size() == 1 || args.size() == 2) {
             return invokeMethod(b, originalMethod, "fail", null, null, failureMessage); //$NON-NLS-1$
-        } else {
-            throw new NotImplementedException(node);
         }
+        throw new NotImplementedException(node);
     }
 
     private boolean maybeRefactorComparison(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
@@ -234,10 +235,9 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                     b.copy(actualAndExpected.getFirst()), b.copy(actualAndExpected.getSecond()), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
-        } else {
-            return maybeRefactorToAssertEquals(nodeToReplace, originalMethod, isAssertEquals,
-                    actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
         }
+        return maybeRefactorToAssertEquals(nodeToReplace, originalMethod, isAssertEquals,
+                actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
     }
 
     /**
@@ -262,17 +262,20 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, expectedValue, failureMessage)));
             return false;
-        } else if (ASTNodes.is(expectedValue, NullLiteral.class)) {
+        }
+        if (ASTNodes.is(expectedValue, NullLiteral.class)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, actualValue, failureMessage)));
             return false;
-        } else if ((ASTNodes.isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isConstant(expectedValue)
+        }
+        if ((ASTNodes.isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isConstant(expectedValue)
                 && !isVariableNamedExpected(expectedValue)) {
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"), //$NON-NLS-1$
                     b.copy(expectedValue), b.copy(actualValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
-        } else if (isRewriteNeeded) {
+        }
+        if (isRewriteNeeded) {
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"), //$NON-NLS-1$
                     b.copy(actualValue), b.copy(expectedValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
@@ -309,9 +312,8 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         if (nodeToReplace instanceof Statement) {
             // The new node should be also a statement
             return b.toStatement(newMethod);
-        } else {
-            return newMethod;
         }
+        return newMethod;
     }
 
     private MethodInvocation invokeAssertNull(final MethodInvocation originalMethod, final boolean isPositive,

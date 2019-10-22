@@ -114,15 +114,17 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     protected String getSubstitutingClassName(String origRawType) {
         if (HashMap.class.getCanonicalName().equals(origRawType)) {
             return HashSet.class.getCanonicalName();
-        } else if (TreeMap.class.getCanonicalName().equals(origRawType)) {
-            return TreeSet.class.getCanonicalName();
-        } else if (AbstractMap.class.getCanonicalName().equals(origRawType)) {
-            return AbstractSet.class.getCanonicalName();
-        } else if (Map.class.getCanonicalName().equals(origRawType)) {
-            return Set.class.getCanonicalName();
-        } else {
-            return null;
         }
+        if (TreeMap.class.getCanonicalName().equals(origRawType)) {
+            return TreeSet.class.getCanonicalName();
+        }
+        if (AbstractMap.class.getCanonicalName().equals(origRawType)) {
+            return AbstractSet.class.getCanonicalName();
+        }
+        if (Map.class.getCanonicalName().equals(origRawType)) {
+            return Set.class.getCanonicalName();
+        }
+        return null;
     }
 
     @Override
@@ -181,33 +183,34 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
             return true;
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        }
+        if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+        }
+        if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             if (ASTNodes.isPassive((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
-            } else {
-                return false;
             }
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            return isReturnValueLost(mi);
-        } else {
-            // Here are the following cases:
-            //
-            // HashMap.clone()
-            // HashMap.containsValue(Object)
-            // HashMap.values()
-            // HashMap.entrySet()
-            // AbstractMap.equals(Object)
-            // HashMap.get(Object)
-            // AbstractMap.hashCode()
-            // AbstractMap.toString()
-            // HashMap.keySet()
-            // HashMap.putAll(Map)
             return false;
         }
+        if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            return isReturnValueLost(mi);
+        }
+        // Here are the following cases:
+        //
+        // HashMap.clone()
+        // HashMap.containsValue(Object)
+        // HashMap.values()
+        // HashMap.entrySet()
+        // AbstractMap.equals(Object)
+        // HashMap.get(Object)
+        // AbstractMap.hashCode()
+        // AbstractMap.toString()
+        // HashMap.keySet()
+        // HashMap.putAll(Map)
+        return false;
     }
 
     private boolean isReturnValueLost(final ASTNode node) {

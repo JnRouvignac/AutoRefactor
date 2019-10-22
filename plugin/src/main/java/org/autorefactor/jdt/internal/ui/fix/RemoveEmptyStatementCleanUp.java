@@ -81,7 +81,8 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
                 this.ctx.getRefactorings().remove(node);
                 return false;
-            } else if (isElseEmpty) {
+            }
+            if (isElseEmpty) {
                 this.ctx.getRefactorings().remove(node.getElseStatement());
                 return false;
             }
@@ -152,7 +153,8 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     private boolean isEmptyCode(final Statement emptyCode) {
         if (emptyCode instanceof EmptyStatement) {
             return true;
-        } else if (emptyCode instanceof Block) {
+        }
+        if (emptyCode instanceof Block) {
             final Block block= (Block) emptyCode;
             return block.statements() == null || block.statements().isEmpty();
         }

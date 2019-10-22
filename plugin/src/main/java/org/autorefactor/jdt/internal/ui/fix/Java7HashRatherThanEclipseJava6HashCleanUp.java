@@ -284,7 +284,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
         if (exprStatement != null) {
             return isAssignmentValid(data, exprStatement);
-        } else if (varStatement != null && data.getTempVar() == null) {
+        }
+        if (varStatement != null && data.getTempVar() == null) {
             @SuppressWarnings("unchecked")
             final List<VariableDeclarationFragment> fragments= varStatement.fragments();
 
@@ -330,7 +331,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
             if (isGivenVariable(field, data.getResultId())) {
                 return isHashValid(data, resultComputation);
-            } else if (data.getTempVar() != null && isGivenVariable(field, data.getTempVar().getIdentifier())) {
+            }
+            if (data.getTempVar() != null && isGivenVariable(field, data.getTempVar().getIdentifier())) {
                 final SimpleName fieldToFind= isDoubleToLongBitsMethod(data, resultComputation);
 
                 if (fieldToFind != null && data.getStmtIterator().hasNext()) {
@@ -389,7 +391,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final ParenthesizedExpression newHashWithoutBrackets= (ParenthesizedExpression) newHash;
 
             return isNewHashValid(data, newHashWithoutBrackets.getExpression());
-        } else if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
+        }
+        if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
             final SimpleName fieldName= getField(newHash);
 
             if (!data.getPrimeId().equals(fieldName.getIdentifier())
@@ -440,13 +443,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
         if (simpleName != null) {
             return simpleName;
-        } else if (fieldName != null) {
+        }
+        if (fieldName != null) {
             final ThisExpression te= ASTNodes.as(fieldName.getExpression(), ThisExpression.class);
 
             if (te != null) {
                 if (te.getQualifier() == null) {
                     return fieldName.getName();
-                } else if (te.getQualifier().isSimpleName()) {
+                }
+                if (te.getQualifier().isSimpleName()) {
                     SimpleName qualifier= (SimpleName) te.getQualifier();
                     TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
 
@@ -502,7 +507,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                         if (data.isTempValueUsed()) {
                             data.getFields().add(againFieldName);
                             return true;
-                        } else if (data.getTempVar().getIdentifier().equals(fieldName)) {
+                        }
+                        if (data.getTempVar().getIdentifier().equals(fieldName)) {
                             data.setTempValueUsed(true);
                             return true;
                         }
@@ -525,7 +531,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         if (isFieldNull != null && !isFieldNull.hasExtendedOperands()
                 && ASTNodes.hasOperator(isFieldNull, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
             return isObjectValid(data, condition, isFieldNull);
-        } else if (booleanField != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
+        }
+        if (booleanField != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
                 && !booleanField.getIdentifier().equals(data.getPrimeId())
                 && !booleanField.getIdentifier().equals(data.getResultId()) && hashForTrue != null
                 && hashForFalse != null) {

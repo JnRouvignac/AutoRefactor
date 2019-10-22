@@ -352,7 +352,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool);
             return b.return0(b.infixExpression(leftOp, getConditionalOperator(elseBool.booleanValue()),
                     b.parenthesizeIfNeeded(b.copy(thenExpression))));
-        } else if (thenBool != null && elseBool == null) {
+        }
+        if (thenBool != null && elseBool == null) {
             final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())),
                     thenBool.booleanValue());
             return b.return0(b.infixExpression(leftOp, getConditionalOperator(thenBool.booleanValue()),
@@ -433,7 +434,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 orientedCondition= b.negate(condition, Copy.COPY);
             }
             return getExpression(orientedCondition, expressionTypeName, booleanName);
-        } else if ((ASTNodes.isPrimitive(thenExpression) || ASTNodes.isPrimitive(elseExpression))
+        }
+        if ((ASTNodes.isPrimitive(thenExpression) || ASTNodes.isPrimitive(elseExpression))
                 && ("boolean".equals(expressionTypeName) //$NON-NLS-1$
                         || Boolean.class.getCanonicalName().equals(expressionTypeName))) {
             // If both expressions are primitive, there cannot be any NPE
@@ -442,15 +444,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
                     return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
-                } else {
-                    return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
                 }
-            } else if (thenLiteral == null && elseLiteral != null) {
+                return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
+            }
+            if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
                     return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
-                } else {
-                    return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
                 }
+                return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
             }
         }
         return null;
@@ -459,7 +460,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     private Expression getExpression(Expression condition, String expressionTypeName, Name booleanName) {
         if (boolean.class.getSimpleName().equals(expressionTypeName)) {
             return condition;
-        } else if (getJavaMinorVersion() >= 4 && Boolean.class.getCanonicalName().equals(expressionTypeName)) {
+        }
+        if (getJavaMinorVersion() >= 4 && Boolean.class.getCanonicalName().equals(expressionTypeName)) {
             return b.invoke(booleanName, "valueOf", condition); //$NON-NLS-1$
         }
         return null;
@@ -474,13 +476,12 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private boolean isSimpleNameAlreadyUsed(String simpleName, CompilationUnit cu) {
         for (ImportDeclaration id : ASTNodes.imports(cu)) {
-            if (id.getName() instanceof QualifiedName) {
-                QualifiedName f= (QualifiedName) id.getName();
-                if (simpleName.equals(f.getName().getIdentifier())) {
-                    return true;
-                }
-            } else {
+            if (!(id.getName() instanceof QualifiedName)) {
                 throw new NotImplementedException(id.getName());
+            }
+            QualifiedName f= (QualifiedName) id.getName();
+            if (simpleName.equals(f.getName().getIdentifier())) {
+                return true;
             }
         }
         return false;
@@ -518,8 +519,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     ReturnStatement.class);
 
             return elseRs == null || withThenReturnStatement(node, thenRs, elseRs);
-        } else {
-            return noThenReturnStatement(node);
         }
+        return noThenReturnStatement(node);
     }
 }

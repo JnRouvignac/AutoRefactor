@@ -117,7 +117,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
             return false;
-        } else if (matcher.matchOpposite(duplicateExpression, secondIf.getExpression())) {
+        }
+        if (matcher.matchOpposite(duplicateExpression, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
                     secondIf.getThenStatement());
             return false;

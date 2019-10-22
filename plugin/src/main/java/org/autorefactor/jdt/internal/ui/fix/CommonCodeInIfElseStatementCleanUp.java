@@ -220,12 +220,12 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                         // => revert if statement
                         r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.move(((IfStatement) parent).getElseStatement())));
                         break;
-                    } else if (allRemovable(areCasesRemovable, i)) {
+                    }
+                    if (allRemovable(areCasesRemovable, i)) {
                         r.remove(parent);
                         break;
-                    } else {
-                        r.replace(((IfStatement) parent).getThenStatement(), b.block());
                     }
+                    r.replace(((IfStatement) parent).getThenStatement(), b.block());
                 }
             }
 

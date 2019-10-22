@@ -89,7 +89,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
                     || is(node, InfixExpression.Operator.NOT_EQUALS, value, -1)) {
                 replaceWithStringContains(node, indexOf, false);
                 return false;
-            } else if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.LESS : InfixExpression.Operator.GREATER, value, 0)
+            }
+            if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.LESS : InfixExpression.Operator.GREATER, value, 0)
                     || is(node, InfixExpression.Operator.EQUALS, value, -1)) {
                 replaceWithStringContains(node, indexOf, true);
                 return false;

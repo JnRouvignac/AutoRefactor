@@ -125,16 +125,20 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         final ASTNode parent= node.getParent();
         if (nextSibling != null) {
             return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
-        } else if (parent instanceof AbstractTypeDeclaration) {
+        }
+        if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
             return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
-        } else if (parent instanceof AnonymousClassDeclaration) {
+        }
+        if (parent instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
             return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
-        } else if (parent instanceof CompilationUnit) {
+        }
+        if (parent instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) parent;
             return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
-        } else if (parent instanceof TypeDeclarationStatement) {
+        }
+        if (parent instanceof TypeDeclarationStatement) {
             return true;
         }
         throw new NotImplementedException(node,

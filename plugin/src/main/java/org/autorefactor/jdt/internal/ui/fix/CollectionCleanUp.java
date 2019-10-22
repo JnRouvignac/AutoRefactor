@@ -167,9 +167,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 final MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
                 if (constant != null) {
                     return constant.equals(0);
-                } else {
-                    return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
                 }
+                return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
             }
             return false;
         }

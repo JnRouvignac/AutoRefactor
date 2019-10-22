@@ -114,10 +114,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         protected Boolean isSubTypeCompatible(Binding other) {
             if (typeBinding == null) {
                 return false;
-            } else if (other instanceof SingleBinding) {
+            }
+            if (other instanceof SingleBinding) {
                 SingleBinding o= (SingleBinding) other;
                 return typeBinding.isSubTypeCompatible(o.typeBinding);
-            } else if (other instanceof MultiBinding) {
+            }
+            if (other instanceof MultiBinding) {
                 MultiBinding o= (MultiBinding) other;
                 for (ITypeBinding otherTypeBinding : o.typeBindings) {
                     if (otherTypeBinding == null || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
@@ -125,9 +127,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     }
                 }
                 return true;
-            } else {
-                throw new NotImplementedException(null, other);
             }
+            throw new NotImplementedException(null, other);
         }
 
         @Override
@@ -154,12 +155,14 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 for (ITypeBinding typeBinding : typeBindings) {
                     if (typeBinding == null) {
                         return null;
-                    } else if (typeBinding.isSubTypeCompatible(o.typeBinding)) {
+                    }
+                    if (typeBinding.isSubTypeCompatible(o.typeBinding)) {
                         anySubTypeCompatible= true;
                     }
                 }
                 return anySubTypeCompatible;
-            } else if (other instanceof MultiBinding) {
+            }
+            if (other instanceof MultiBinding) {
                 MultiBinding o= (MultiBinding) other;
                 boolean anySubTypeCompatible= false;
                 for (ITypeBinding typeBinding : typeBindings) {
@@ -169,15 +172,15 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     for (ITypeBinding otherTypeBinding : o.typeBindings) {
                         if (otherTypeBinding == null) {
                             return null;
-                        } else if (typeBinding.isSubTypeCompatible(otherTypeBinding)) {
+                        }
+                        if (typeBinding.isSubTypeCompatible(otherTypeBinding)) {
                             anySubTypeCompatible= true;
                         }
                     }
                 }
                 return anySubTypeCompatible;
-            } else {
-                throw new NotImplementedException(null, other);
             }
+            throw new NotImplementedException(null, other);
         }
 
         @Override
@@ -362,11 +365,11 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private MergeDirection mergeDirection(Binding[] typeBindings, int start, int end) {
         if (canMergeTypesDown(typeBindings, start, end)) {
             return MergeDirection.DOWN;
-        } else if (canMergeTypesUp(typeBindings, start, end)) {
-            return MergeDirection.UP;
-        } else {
-            return MergeDirection.NONE;
         }
+        if (canMergeTypesUp(typeBindings, start, end)) {
+            return MergeDirection.UP;
+        }
+        return MergeDirection.NONE;
     }
 
     private boolean canMergeTypesDown(final Binding[] types, int start, int end) {

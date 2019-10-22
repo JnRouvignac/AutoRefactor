@@ -126,11 +126,11 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     protected String getSubstitutingClassName(String origRawType) {
         if (ArrayList.class.getCanonicalName().equals(origRawType) || LinkedList.class.getCanonicalName().equals(origRawType)) {
             return HashSet.class.getCanonicalName();
-        } else if (AbstractList.class.getCanonicalName().equals(origRawType) || List.class.getCanonicalName().equals(origRawType)) {
-            return Set.class.getCanonicalName();
-        } else {
-            return null;
         }
+        if (AbstractList.class.getCanonicalName().equals(origRawType) || List.class.getCanonicalName().equals(origRawType)) {
+            return Set.class.getCanonicalName();
+        }
+        return null;
     }
 
     @Override

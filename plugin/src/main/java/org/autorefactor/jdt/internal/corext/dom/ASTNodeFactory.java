@@ -407,7 +407,8 @@ public class ASTNodeFactory {
     public <T extends ASTNode> T copy(T nodeToCopy) {
         if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
-        } else if (isValidInCurrentAST(nodeToCopy)) {
+        }
+        if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
         }
         return copySubtree(nodeToCopy);
@@ -466,22 +467,28 @@ public class ASTNodeFactory {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
             return type;
-        } else if (typeBinding.isPrimitive()) {
+        }
+        if (typeBinding.isPrimitive()) {
             return type(typeBinding.getName());
-        } else if (typeBinding.isClass() || typeBinding.isInterface() || typeBinding.isEnum()
+        }
+        if (typeBinding.isClass() || typeBinding.isInterface() || typeBinding.isEnum()
                 || typeBinding.isAnnotation() || typeBinding.isNullType() || typeBinding.isRawType()) {
             return type(typeNameDecider.useSimplestPossibleName(typeBinding));
-        } else if (typeBinding.isArray()) {
+        }
+        if (typeBinding.isArray()) {
             return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider), typeBinding.getDimensions());
-        } else if (typeBinding.isWildcardType()) {
+        }
+        if (typeBinding.isWildcardType()) {
             final WildcardType type= ast.newWildcardType();
             if (typeBinding.getBound() != null) {
                 type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
             }
             return type;
-        } else if (typeBinding.isTypeVariable()) {
+        }
+        if (typeBinding.isTypeVariable()) {
             return type(typeBinding.getName());
-        } else if (typeBinding.isCapture()) {
+        }
+        if (typeBinding.isCapture()) {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,
                         "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: " //$NON-NLS-1$

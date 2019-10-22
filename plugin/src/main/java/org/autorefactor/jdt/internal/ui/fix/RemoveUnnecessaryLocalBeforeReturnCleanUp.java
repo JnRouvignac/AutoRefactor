@@ -115,16 +115,15 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             final TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
             if (tryStatement == null) {
                 return false;
-            } else {
-                if (tryStatement.getFinally() != null) {
-                    final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
-                            varToSearch, tryStatement.getFinally(), true).find();
-                    if (!variableUseVisitor.getUses().isEmpty()) {
-                        return true;
-                    }
-                }
-                return isUsedAfterReturn(varToSearch, tryStatement);
             }
+            if (tryStatement.getFinally() != null) {
+                final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
+                        varToSearch, tryStatement.getFinally(), true).find();
+                if (!variableUseVisitor.getUses().isEmpty()) {
+                    return true;
+                }
+            }
+            return isUsedAfterReturn(varToSearch, tryStatement);
         }
 
         private void removeVariable(final ReturnStatement node, final VariableDeclarationStatement vds,

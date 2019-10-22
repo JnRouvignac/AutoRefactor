@@ -319,13 +319,15 @@ public final class ForLoopHelper {
             if (zero != null && zero == 0) {
                 if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
                     return buildForLoopContent((Name) loopVariable, rightOp, zero, collectionOnSize, arrayOnLength);
-                } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
+                }
+                if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
                     return buildForLoopContent((Name) loopVariable, leftOp, zero, collectionOnSize, arrayOnLength);
                 }
             } else if (collectionOnSize != null || arrayOnLength != null) {
                 if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
                     return buildForLoopContent((Name) loopVariable, rightOp, zero, collectionOnSize, arrayOnLength);
-                } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
+                }
+                if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
                     return buildForLoopContent((Name) loopVariable, leftOp, zero, collectionOnSize, arrayOnLength);
                 }
             }

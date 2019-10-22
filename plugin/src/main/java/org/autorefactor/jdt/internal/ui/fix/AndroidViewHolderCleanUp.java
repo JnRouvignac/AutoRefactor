@@ -242,12 +242,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 } else if (ancestor instanceof Assignment) {
                     viewVariableAssignment= (Assignment) ancestor;
                     final Expression lhs= viewVariableAssignment.getLeftHandSide();
-                    if (lhs.getNodeType() == ASTNode.SIMPLE_NAME) {
-                        viewVariableName= (SimpleName) lhs;
-                    } else {
+                    if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
                         resetData();
                         return true;
                     }
+                    viewVariableName= (SimpleName) lhs;
                     viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
                 }
                 return false;
@@ -279,7 +278,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         private Expression getInflateExpression() {
             if (this.viewVariableDeclFragment != null) {
                 return this.viewVariableDeclFragment.getInitializer();
-            } else if (this.viewVariableAssignment != null) {
+            }
+            if (this.viewVariableAssignment != null) {
                 return this.viewVariableAssignment.getRightHandSide();
             }
             return null;
@@ -313,15 +313,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 } else if (ancestor instanceof Assignment) {
                     final Assignment as= (Assignment) ancestor;
                     final Expression lhs= as.getLeftHandSide();
-                    if (lhs.getNodeType() == ASTNode.SIMPLE_NAME) {
-                        variable= (SimpleName) lhs;
-                    } else {
+                    if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
                         // Only simple names are handled.
                         // Using anything else than simple name is unexpected,
                         // and even so, it is unexpected that simple names
                         // would not mixed with qualified names, etc.
                         return false;
                     }
+                    variable= (SimpleName) lhs;
                     findViewByIdExpression= as.getRightHandSide();
                 } else {
                     return false;

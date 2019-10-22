@@ -75,9 +75,8 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
         final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
         if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
-        } else {
-            return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
         }
+        return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
     }
 
     private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,

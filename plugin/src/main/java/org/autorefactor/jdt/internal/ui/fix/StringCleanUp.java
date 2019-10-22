@@ -81,7 +81,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 // If node is already a String, no need to call toString()
                 r.replace(node, b.move(stringExpression));
                 return false;
-            } else if (parent.getNodeType() == ASTNode.INFIX_EXPRESSION) {
+            }
+            if (parent.getNodeType() == ASTNode.INFIX_EXPRESSION) {
                 // If node is in a String context, no need to call toString()
                 final InfixExpression ie= (InfixExpression) node.getParent();
                 final Expression leftOp= ie.getLeftOperand();
@@ -94,10 +95,12 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     // Node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
                     return false;
-                } else if (leftOpIsString && ASTNodes.usesGivenSignature(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+                }
+                if (leftOpIsString && ASTNodes.usesGivenSignature(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     r.replace(rmi, replaceToString(rmi.getExpression()));
                     return false;
-                } else if (rightOpIsString && node.equals(lmi)) {
+                }
+                if (rightOpIsString && node.equals(lmi)) {
                     r.replace(lmi, replaceToString(lmi.getExpression()));
                     return false;
                 }
@@ -201,9 +204,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= ctx.getASTBuilder();
         if (expression != null) {
             return b.move(expression);
-        } else {
-            return b.this0();
         }
+        return b.this0();
     }
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {

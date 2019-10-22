@@ -112,9 +112,8 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     protected String getSubstitutingClassName(String origRawType) {
         if (Vector.class.getCanonicalName().equals(origRawType)) {
             return ArrayList.class.getCanonicalName();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

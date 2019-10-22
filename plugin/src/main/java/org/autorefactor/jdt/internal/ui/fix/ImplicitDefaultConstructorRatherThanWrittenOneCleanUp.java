@@ -82,11 +82,13 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                         isPublicClass= true;
                         isPackageClass= false;
                         break;
-                    } else if (modifier.isProtected()) {
+                    }
+                    if (modifier.isProtected()) {
                         isProtectedClass= true;
                         isPackageClass= false;
                         break;
-                    } else if (modifier.isPrivate()) {
+                    }
+                    if (modifier.isPrivate()) {
                         isPrivateClass= true;
                         isPackageClass= false;
                         break;
@@ -96,12 +98,11 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
             for (MethodDeclaration methodDeclaration : node.getMethods()) {
                 if (methodDeclaration.isConstructor()) {
-                    if (uniqueConstructor == null) {
-                        uniqueConstructor= methodDeclaration;
-                    } else {
+                    if (uniqueConstructor != null) {
                         // Too much constructors
                         return true;
                     }
+                    uniqueConstructor= methodDeclaration;
                 }
             }
 
@@ -136,7 +137,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
         if (statements == null || statements.isEmpty()) {
             return true;
-        } else if (statements.size() == 1) {
+        }
+        if (statements.size() == 1) {
             final SuperConstructorInvocation superStatement= ASTNodes.as(statements.get(0), SuperConstructorInvocation.class);
 
             return superStatement != null && (superStatement.arguments() == null || superStatement.arguments().isEmpty());

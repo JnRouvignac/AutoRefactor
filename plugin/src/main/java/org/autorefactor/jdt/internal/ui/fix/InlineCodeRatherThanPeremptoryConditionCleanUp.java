@@ -93,10 +93,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
                     if (!finallyStatements.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
-                    } else {
-                        InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings().remove(node);
-                        return false;
                     }
+                    InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings().remove(node);
+                    return false;
                 }
             }
 
@@ -115,14 +114,14 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
             if (Boolean.TRUE.equals(constantCondition)) {
                 return maybeInlineBlock(node, thenStatement);
-            } else if (Boolean.FALSE.equals(constantCondition)) {
+            }
+            if (Boolean.FALSE.equals(constantCondition)) {
                 if (elseStatement != null) {
                     return maybeInlineBlock(node, elseStatement);
-                } else {
-                    r.remove(node);
-                    setResult(false);
-                    return false;
                 }
+                r.remove(node);
+                setResult(false);
+                return false;
             }
             return true;
         }
@@ -133,19 +132,16 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 removeForwardCode(node, unconditionnalStatement);
                 setResult(false);
                 return false;
-            } else {
-                final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
-
-                final Set<String> followingVariableNames= new HashSet<>();
-                for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                    followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
-                }
-
-                if (!ifVariableNames.removeAll(followingVariableNames)) {
-                    replaceBlockByPlainCode(node, unconditionnalStatement);
-                    setResult(false);
-                    return false;
-                }
+            }
+            final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
+            final Set<String> followingVariableNames= new HashSet<>();
+            for (Statement statement : ASTNodes.getNextSiblings(node)) {
+                followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+            }
+            if (!ifVariableNames.removeAll(followingVariableNames)) {
+                replaceBlockByPlainCode(node, unconditionnalStatement);
+                setResult(false);
+                return false;
             }
             return true;
         }
@@ -156,7 +152,8 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         if (constantCondition != null) {
             return constantCondition;
-        } else if (condition instanceof InfixExpression) {
+        }
+        if (condition instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) condition;
             final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 

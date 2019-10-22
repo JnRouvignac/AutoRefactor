@@ -159,17 +159,23 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     private String getMethodName(final String typeName, final String invokedMethodName) {
         if (Boolean.class.getCanonicalName().equals(typeName) && "booleanValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "valueOf"; //$NON-NLS-1$
-        } else if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseByte"; //$NON-NLS-1$
-        } else if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseDouble"; //$NON-NLS-1$
-        } else if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseFloat"; //$NON-NLS-1$
-        } else if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseLong"; //$NON-NLS-1$
-        } else if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseShort"; //$NON-NLS-1$
-        } else if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
+        }
+        if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseInt"; //$NON-NLS-1$
         }
         return null;
@@ -184,7 +190,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
                     Long.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName())) {
                 replaceWithValueOf(node, typeBinding);
                 return false;
-            } else if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
+            }
+            if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
                 return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }

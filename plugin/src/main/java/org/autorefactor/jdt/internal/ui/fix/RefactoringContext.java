@@ -139,7 +139,8 @@ public class RefactoringContext {
         for (Comment comment : ASTNodes.getCommentList(astRoot)) {
             if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
                 return true;
-            } else if (position < comment.getStartPosition()) {
+            }
+            if (position < comment.getStartPosition()) {
                 // Since comment list is "arranged in order of increasing source position"
                 // it is impossible for this position to be surrounded by a comment
                 return false;

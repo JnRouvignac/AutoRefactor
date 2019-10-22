@@ -102,11 +102,14 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
     private boolean isPrimitiveDefaultValue(Object val) {
         if (val instanceof Short || val instanceof Integer || val instanceof Long) {
             return ((Number) val).longValue() == 0;
-        } else if (val instanceof Double || val instanceof Float) {
+        }
+        if (val instanceof Double || val instanceof Float) {
             return ((Number) val).doubleValue() == 0;
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return Boolean.FALSE.equals(val);
-        } else if (val instanceof Character) {
+        }
+        if (val instanceof Character) {
             return ((Character) val).charValue() == '\u0000';
         }
         return false;

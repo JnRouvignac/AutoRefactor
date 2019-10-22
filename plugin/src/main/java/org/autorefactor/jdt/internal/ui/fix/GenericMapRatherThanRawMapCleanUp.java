@@ -218,7 +218,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             return true;
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) { //$NON-NLS-1$
+        }
+        if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -268,19 +269,17 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "entrySet")) { //$NON-NLS-1$
-            if (isExprReceived(mi)) {
-                final ITypeBinding newTargetType= ASTNodes.getTargetType(mi);
-
-                if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
-                    final ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
-
-                    if (isParameterizedTypeWithNbArguments(newElementType, 2)) {
-                        return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
-                                && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
-                    }
-                }
-            } else {
+            if (!isExprReceived(mi)) {
                 return true;
+            }
+            final ITypeBinding newTargetType= ASTNodes.getTargetType(mi);
+            if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
+                final ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
+
+                if (isParameterizedTypeWithNbArguments(newElementType, 2)) {
+                    return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
+                            && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
+                }
             }
         } else if (ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "ceilingKey", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "floorKey", Object.class.getCanonicalName()) //$NON-NLS-1$
@@ -414,9 +413,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         final ASTNode parent= node.getParent();
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
-        } else {
-            return !(parent instanceof ExpressionStatement);
         }
+        return !(parent instanceof ExpressionStatement);
     }
 
     private boolean resolveDestinationTypeCompatibleWithKey(final MethodInvocation mi) {

@@ -210,17 +210,22 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return false;
-        } else if (emptyLineAtStartMatcher.find()) {
+        }
+        if (emptyLineAtStartMatcher.find()) {
             return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
-        } else if (emptyLineAtEndMatcher.find()) {
+        }
+        if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
-        } else if (allTagsEmpty(ASTNodes.tags(node))) {
+        }
+        if (allTagsEmpty(ASTNodes.tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return false;
-        } else if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
+        }
+        if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*")); //$NON-NLS-1$ $NON-NLS-2$
             return false;
-        } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
+        }
+        if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             if (hasOverrideAnnotation(nextNode)) {
                 // {@inheritDoc} tag is redundant with @Override annotation
@@ -275,7 +280,8 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private Name getTypeName(IExtendedModifier extendedModifier) {
         if (extendedModifier instanceof MarkerAnnotation) {
             return ((MarkerAnnotation) extendedModifier).getTypeName();
-        } else if (extendedModifier instanceof NormalAnnotation) {
+        }
+        if (extendedModifier instanceof NormalAnnotation) {
             return ((NormalAnnotation) extendedModifier).getTypeName();
         }
         return null;
@@ -368,11 +374,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 || TagElement.TAG_VERSION.equals(tagName)) {
             // TODO JNR a return tag repeating the return type of the method is useless
             return anyTextElementNotEmpty(tag.fragments(), throwIfUnknown);
-        } else if (TagElement.TAG_EXCEPTION.equals(tagName) || TagElement.TAG_PARAM.equals(tagName) || TagElement.TAG_THROWS.equals(tagName)) {
+        }
+        if (TagElement.TAG_EXCEPTION.equals(tagName) || TagElement.TAG_PARAM.equals(tagName) || TagElement.TAG_THROWS.equals(tagName)) {
             // TODO JNR a @throws tag repeating the checked exceptions of the method is
             // useless
             return !isTagEmptyOrWithSimpleNameOnly(tag);
-        } else if (!TagElement.TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
+        }
+        if (!TagElement.TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
             throw new NotImplementedException(tag, "for tagName " + tagName); //$NON-NLS-1$
         }
         return true;
@@ -418,14 +426,16 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return false;
-        } else if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
+        }
+        if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
                 && !ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             final ASTNode previousNode= getPreviousSibling(nextNode);
             if (previousNode != null && isSameLineNumber(node, previousNode)) {
                 this.ctx.getRefactorings().toJavadoc(node, previousNode);
                 return false;
-            } else if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
+            }
+            if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
                 this.ctx.getRefactorings().toJavadoc(node, nextNode);
                 return false;
             }
@@ -506,7 +516,8 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private boolean hasJavadoc(ASTNode node) {
         if (node instanceof BodyDeclaration) {
             return ((BodyDeclaration) node).getJavadoc() != null;
-        } else if (node instanceof PackageDeclaration) {
+        }
+        if (node instanceof PackageDeclaration) {
             return ((PackageDeclaration) node).getJavadoc() != null;
         }
         return false;

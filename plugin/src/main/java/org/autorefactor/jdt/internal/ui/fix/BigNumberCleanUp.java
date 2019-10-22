@@ -90,17 +90,19 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                     // Only instantiation from double, not from integer
                     ctx.getRefactorings().replace(arg0, getStringLiteral(token));
                     return false;
-                } else if (getJavaMinorVersion() >= 5) {
+                }
+                if (getJavaMinorVersion() >= 5) {
                     if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                         return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                    } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                        return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                    } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                        return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                    } else {
-                        ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
-                        return false;
                     }
+                    if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+                        return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+                    }
+                    if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+                        return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+                    }
+                    ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
+                    return false;
                 }
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
@@ -111,11 +113,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (literalValue.matches("0+")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                } else if (literalValue.matches("0+1")) { //$NON-NLS-1$
+                }
+                if (literalValue.matches("0+1")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                } else if (literalValue.matches("0+10")) { //$NON-NLS-1$
+                }
+                if (literalValue.matches("0+10")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                } else if (literalValue.matches("\\d+")) { //$NON-NLS-1$
+                }
+                if (literalValue.matches("\\d+")) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
                     return false;
                 }

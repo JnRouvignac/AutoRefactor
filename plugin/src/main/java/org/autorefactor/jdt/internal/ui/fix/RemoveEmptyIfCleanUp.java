@@ -71,7 +71,8 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
         if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
             r.remove(elseStatement);
             return false;
-        } else if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
+        }
+        if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
             final ASTNodeFactory b= this.ctx.getASTBuilder();
 
             final Expression condition= node.getExpression();

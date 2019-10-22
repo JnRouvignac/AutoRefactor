@@ -94,22 +94,21 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             if (o1.isAnnotation()) {
                 if (o2.isAnnotation()) {
                     return 0;
-                } else {
-                    return -1;
                 }
-            } else if (o2.isAnnotation()) {
-                return 1;
-            } else {
-                final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-                final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
-                if (i1 == -1) {
-                    throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
-                }
-                if (i2 == -1) {
-                    throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2); //$NON-NLS-1$
-                }
-                return i1 - i2;
+                return -1;
             }
+            if (o2.isAnnotation()) {
+                return 1;
+            }
+            final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+            final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+            if (i1 == -1) {
+                throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
+            }
+            if (i2 == -1) {
+                throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2); //$NON-NLS-1$
+            }
+            return i1 - i2;
         }
     }
 

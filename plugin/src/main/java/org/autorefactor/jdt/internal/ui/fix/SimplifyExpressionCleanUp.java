@@ -142,7 +142,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         final int compareTo= OperatorEnum.compareTo(innerExpression, parent);
         if (compareTo < 0) {
             return node;
-        } else if (compareTo > 0) {
+        }
+        if (compareTo > 0) {
             return innerExpression;
         }
         if (
@@ -290,7 +291,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
         if (leftBoolean != null) {
             return replace(node, leftBoolean.booleanValue(), rightExpression);
-        } else if (rightBoolean != null) {
+        }
+        if (rightBoolean != null) {
             return replace(node, rightBoolean.booleanValue(), leftExpression);
         }
 
@@ -308,13 +310,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
-        if (leftOppositeExpression == null) {
-            if (rightOppositeExpression != null) {
-                final InfixExpression.Operator reverseOp= getReverseOperator(node);
-                r.replace(node, b.infixExpression(b.copy(leftExpression), reverseOp, b.copy(rightOppositeExpression)));
-                return false;
-            }
-        } else {
+        if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 r.replace(node,
                         b.infixExpression(b.copy(leftOppositeExpression), getAppropriateOperator(node), b.copy(rightOppositeExpression)));
@@ -324,6 +320,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             }
             return false;
         }
+        if (rightOppositeExpression != null) {
+            final InfixExpression.Operator reverseOp= getReverseOperator(node);
+            r.replace(node, b.infixExpression(b.copy(leftExpression), reverseOp, b.copy(rightOppositeExpression)));
+            return false;
+        }
 
         return true;
     }
@@ -331,17 +332,15 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private InfixExpression.Operator getAppropriateOperator(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.NOT_EQUALS)) {
             return InfixExpression.Operator.XOR;
-        } else {
-            return node.getOperator();
         }
+        return node.getOperator();
     }
 
     private InfixExpression.Operator getReverseOperator(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
             return InfixExpression.Operator.XOR;
-        } else {
-            return InfixExpression.Operator.EQUALS;
         }
+        return InfixExpression.Operator.EQUALS;
     }
 
     private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
@@ -447,7 +446,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             if (e instanceof InstanceofExpression) {
                 final Expression expression= ((InstanceofExpression) e).getLeftOperand();
                 return expression.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
-            } else if (e instanceof MethodInvocation) {
+            }
+            if (e instanceof MethodInvocation) {
                 final MethodInvocation expression= (MethodInvocation) e;
                 if (expression.getExpression() != null && expression.getExpression().resolveConstantExpressionValue() != null
                         && ASTNodes.arguments(expression).size() == 1

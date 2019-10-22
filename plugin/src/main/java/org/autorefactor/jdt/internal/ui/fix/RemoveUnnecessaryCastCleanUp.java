@@ -145,13 +145,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 if (node.equals(lo)) {
                     return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
                             && !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
-                } else {
-                    final boolean integralDivision= isIntegralDivision(ie);
-                    return ((isNotRefactored(lo) && isStringConcat(ie))
-                            || (integralDivision ? canRemoveCastInIntegralDivision(node, ie)
-                                    : isAssignmentCompatibleInInfixExpression(node, ie)))
-                            && !isIntegralDividedByFloatingPoint(node, ie);
                 }
+                final boolean integralDivision= isIntegralDivision(ie);
+                return ((isNotRefactored(lo) && isStringConcat(ie))
+                        || (integralDivision ? canRemoveCastInIntegralDivision(node, ie)
+                                : isAssignmentCompatibleInInfixExpression(node, ie)))
+                        && !isIntegralDividedByFloatingPoint(node, ie);
             }
         }
         return false;
@@ -204,17 +203,23 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     private int toPseudoEnum(String name) {
         if (byte.class.getSimpleName().equals(name) || Byte.class.getCanonicalName().equals(name)) {
             return 1;
-        } else if (short.class.getSimpleName().equals(name) || Short.class.getCanonicalName().equals(name)) {
+        }
+        if (short.class.getSimpleName().equals(name) || Short.class.getCanonicalName().equals(name)) {
             return 2;
-        } else if (char.class.getSimpleName().equals(name) || Character.class.getCanonicalName().equals(name)) {
+        }
+        if (char.class.getSimpleName().equals(name) || Character.class.getCanonicalName().equals(name)) {
             return 3;
-        } else if (int.class.getSimpleName().equals(name) || Integer.class.getCanonicalName().equals(name)) {
+        }
+        if (int.class.getSimpleName().equals(name) || Integer.class.getCanonicalName().equals(name)) {
             return 4;
-        } else if (long.class.getSimpleName().equals(name) || Long.class.getCanonicalName().equals(name)) {
+        }
+        if (long.class.getSimpleName().equals(name) || Long.class.getCanonicalName().equals(name)) {
             return 5;
-        } else if (float.class.getSimpleName().equals(name) || Float.class.getCanonicalName().equals(name)) {
+        }
+        if (float.class.getSimpleName().equals(name) || Float.class.getCanonicalName().equals(name)) {
             return 6;
-        } else if (double.class.getSimpleName().equals(name) || Double.class.getCanonicalName().equals(name)) {
+        }
+        if (double.class.getSimpleName().equals(name) || Double.class.getCanonicalName().equals(name)) {
             return 7;
         }
         throw new NotImplementedException(null, "for type '" + name + "'"); //$NON-NLS-1$ $NON-NLS-2$

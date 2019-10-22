@@ -642,14 +642,13 @@ public class CFGBuilder {
             final CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(entryBlock);
             final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
             if (!liveAfterBody.liveEdges.isEmpty()) {
-                if (node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
+                if (!(node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
                                                                                                     // Tests
-                        || "void".equals(node.getReturnType2().resolveBinding().getName())) { //$NON-NLS-1$
-                    buildEdges(liveAfterBody, exitBlock);
-                } else {
+                        || "void".equals(node.getReturnType2().resolveBinding().getName()))) {
                     throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
                             + "for a constructor or a non void method return type."); //$NON-NLS-1$
                 }
+                buildEdges(liveAfterBody, exitBlock);
             }
             if (!this.edgesToBuild.isEmpty()) {
                 throw new IllegalStateException(node,
@@ -845,9 +844,8 @@ public class CFGBuilder {
             liveBeforeFinally.addAll(liveAfterTry);
             liveBeforeFinally.addAll(liveAfterCatchClauses);
             return buildCFG(node.getFinally(), liveBeforeFinally, throwers);
-        } else {
-            return liveAfterCatchClauses.copyLiveBasicBlock();
         }
+        return liveAfterCatchClauses.copyLiveBasicBlock();
     }
 
     /**
@@ -1151,11 +1149,10 @@ public class CFGBuilder {
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
         List<CFGBasicBlock> results= new LinkedList<>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
-            if (decl.getNodeType() == TYPE_DECLARATION) {
-                results.addAll(buildCFG((TypeDeclaration) decl));
-            } else {
+            if (decl.getNodeType() != TYPE_DECLARATION) {
                 throw new NotImplementedException(node);
             }
+            results.addAll(buildCFG((TypeDeclaration) decl));
         }
         return results;
     }

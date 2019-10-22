@@ -407,14 +407,14 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private boolean isSameReference(Expression expr1, Expression expr2) {
             if (expr1 == null || expr2 == null) {
                 return false;
-            } else if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
-                return ASTNodes.isSameVariable(expr1, expr2);
-            } else {
-                final MethodInvocation mi1= (MethodInvocation) expr1;
-                final MethodInvocation mi2= (MethodInvocation) expr2;
-                return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
-                        && isSameReference(mi1.getExpression(), mi2.getExpression());
             }
+            if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
+                return ASTNodes.isSameVariable(expr1, expr2);
+            }
+            final MethodInvocation mi1= (MethodInvocation) expr1;
+            final MethodInvocation mi2= (MethodInvocation) expr2;
+            return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
+                    && isSameReference(mi1.getExpression(), mi2.getExpression());
         }
     }
 }

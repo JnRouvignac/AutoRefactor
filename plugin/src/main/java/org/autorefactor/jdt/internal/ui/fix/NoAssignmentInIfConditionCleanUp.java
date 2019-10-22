@@ -99,9 +99,11 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 final Assignment rightAs= ASTNodes.as(ie.getRightOperand(), Assignment.class);
                 if (leftAs != null) {
                     return moveAssignmentBeforeIfStatement(node, leftAs);
-                } else if (rightAs != null) {
+                }
+                if (rightAs != null) {
                     return moveAssignmentBeforeIfStatement(node, rightAs);
-                } else if (leftIe != null) {
+                }
+                if (leftIe != null) {
                     return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
                 }
             }
@@ -119,7 +121,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
-            } else if (!isAnElseIf(node)) {
+            }
+            if (!isAnElseIf(node)) {
                 r.insertBefore(b.toStatement(b.move(a)), node);
                 r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);

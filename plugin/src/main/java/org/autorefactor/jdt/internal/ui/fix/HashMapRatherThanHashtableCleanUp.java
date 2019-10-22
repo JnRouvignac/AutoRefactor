@@ -105,9 +105,8 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     protected String getSubstitutingClassName(String origRawType) {
         if (Hashtable.class.getCanonicalName().equals(origRawType)) {
             return HashMap.class.getCanonicalName();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

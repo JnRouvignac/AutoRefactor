@@ -95,7 +95,8 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         final AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
         if (thisQualifierName instanceof SimpleName) {
             return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
-        } else if (thisQualifierName instanceof QualifiedName) {
+        }
+        if (thisQualifierName instanceof QualifiedName) {
             final QualifiedName qn= (QualifiedName) thisQualifierName;
             return ASTNodes.isEqual(qn.getName(), ancestor.getName())
                     && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
@@ -110,7 +111,8 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
             final AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
             final ITypeBinding enclosingTypeBinding= c.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
-        } else if (currentType instanceof AbstractTypeDeclaration) {
+        }
+        if (currentType instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
             final ITypeBinding enclosingTypeBinding= ed.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());

@@ -135,13 +135,12 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
                         ITypeBinding actualArgTypeArg= actualArgTypeArgs[j];
                         int typeArgIndex= typeArguments.indexOf(actualArgTypeArg);
-                        if (typeParamIndex != -1 && typeArgIndex != -1) {
-                            // The type parameter is matching
-                            typeParameters.remove(typeParamIndex);
-                            typeArguments.remove(typeArgIndex);
-                        } else {
+                        if (!(typeParamIndex != -1 && typeArgIndex != -1)) {
                             return false;
                         }
+                        // The type parameter is matching
+                        typeParameters.remove(typeParamIndex);
+                        typeArguments.remove(typeArgIndex);
                     }
                 }
             }

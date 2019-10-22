@@ -92,9 +92,8 @@ public final class Release {
         if ("JavaSE".equals(this.releaseName)) { //$NON-NLS-1$
             if (this.version.length >= 2) {
                 return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 12;
-            } else {
-                return 9 <= this.version[0] && this.version[0] <= 12;
             }
+            return 9 <= this.version[0] && this.version[0] <= 12;
         }
 
         return false;
@@ -128,7 +127,8 @@ public final class Release {
             final int requiredNb= requiredRelease.version[i];
             if (nb < requiredNb) {
                 return false;
-            } else if (nb > requiredNb) {
+            }
+            if (nb > requiredNb) {
                 return true;
             }
         }

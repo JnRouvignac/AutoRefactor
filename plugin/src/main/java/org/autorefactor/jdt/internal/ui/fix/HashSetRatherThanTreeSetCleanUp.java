@@ -101,9 +101,8 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
     protected String getSubstitutingClassName(String origRawType) {
         if (TreeSet.class.getCanonicalName().equals(origRawType)) {
             return HashSet.class.getCanonicalName();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

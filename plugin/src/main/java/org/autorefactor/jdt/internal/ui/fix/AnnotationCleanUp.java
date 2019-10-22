@@ -81,7 +81,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (values.isEmpty()) {
             r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
             return false;
-        } else if (values.size() == 1) {
+        }
+        if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
                 r.replace(node, b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
@@ -217,7 +218,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Long toLong(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).longValue();
-        } else if (javaObj instanceof Long) {
+        }
+        if (javaObj instanceof Long) {
             return (Long) javaObj;
         }
         return null;
@@ -226,9 +228,11 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Float toFloat(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).floatValue();
-        } else if (javaObj instanceof Long) {
+        }
+        if (javaObj instanceof Long) {
             return ((Long) javaObj).floatValue();
-        } else if (javaObj instanceof Float) {
+        }
+        if (javaObj instanceof Float) {
             return (Float) javaObj;
         }
         return null;
@@ -237,11 +241,14 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Double toDouble(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).doubleValue();
-        } else if (javaObj instanceof Long) {
+        }
+        if (javaObj instanceof Long) {
             return ((Long) javaObj).doubleValue();
-        } else if (javaObj instanceof Float) {
+        }
+        if (javaObj instanceof Float) {
             return ((Float) javaObj).doubleValue();
-        } else if (javaObj instanceof Double) {
+        }
+        if (javaObj instanceof Double) {
             return (Double) javaObj;
         }
         return null;

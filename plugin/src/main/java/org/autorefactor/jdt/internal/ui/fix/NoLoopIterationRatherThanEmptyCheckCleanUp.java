@@ -128,13 +128,17 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
                 return value == 0;
-            } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER)) {
+            }
+            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER)) {
                 return isArrayOnLeft && value == 0;
-            } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER_EQUALS)) {
+            }
+            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER_EQUALS)) {
                 return isArrayOnLeft && value == 1;
-            } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS)) {
+            }
+            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS)) {
                 return !isArrayOnLeft && value == 0;
-            } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS_EQUALS)) {
+            }
+            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS_EQUALS)) {
                 return !isArrayOnLeft && value == 1;
             }
         }

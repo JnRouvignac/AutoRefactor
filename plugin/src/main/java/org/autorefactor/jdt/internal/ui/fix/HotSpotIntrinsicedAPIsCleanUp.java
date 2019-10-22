@@ -165,9 +165,11 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
-        } else if (Utils.equalNotNull(expr1Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr1Value, 0)) {
             return b.copy(expr2);
-        } else if (Utils.equalNotNull(expr2Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
         return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
@@ -180,9 +182,11 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
-        } else if (Utils.equalNotNull(expr1Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
-        } else if (Utils.equalNotNull(expr2Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
         return b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
@@ -195,9 +199,11 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value + 1);
-        } else if (Utils.equalNotNull(expr1Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
-        } else if (Utils.equalNotNull(expr2Value, 0)) {
+        }
+        if (Utils.equalNotNull(expr2Value, 0)) {
             return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 

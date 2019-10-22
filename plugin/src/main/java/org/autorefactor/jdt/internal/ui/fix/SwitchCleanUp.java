@@ -419,7 +419,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                     if (!previousSectionFallsthrough(switchStructure, comparedIndex)) {
                         mergeCases(Merge.AFTER_SWITCH_CASES, referenceCase, comparedCase);
                         return false;
-                    } else if (referenceIndex == 0 || !previousSectionFallsthrough(switchStructure, referenceIndex)) {
+                    }
+                    if (referenceIndex == 0 || !previousSectionFallsthrough(switchStructure, referenceIndex)) {
                         mergeCases(Merge.BEFORE_SWITCH_CASES, comparedCase, referenceCase);
                         return false;
                     }

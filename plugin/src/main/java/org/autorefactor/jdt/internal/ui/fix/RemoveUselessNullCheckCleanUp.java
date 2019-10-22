@@ -96,7 +96,8 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                         && ASTNodes.match(matcher, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
                     if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS) && ASTNodes.is(thenAs.getRightHandSide(), NullLiteral.class)) {
                         return maybeReplaceWithStraightAssign(node, condition, elseAs);
-                    } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.is(elseAs.getRightHandSide(), NullLiteral.class)) {
+                    }
+                    if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.is(elseAs.getRightHandSide(), NullLiteral.class)) {
                         return maybeReplaceWithStraightAssign(node, condition, thenAs);
                     }
                 } else {
@@ -105,7 +106,8 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     if (thenRS != null && elseRS != null) {
                         if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
                             return maybeReplaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
-                        } else if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
+                        }
+                        if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
                             return maybeReplaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                         }
                     }
@@ -139,7 +141,8 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getLeftOperand());
                 setResult(false);
                 return false;
-            } else if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
+            }
+            if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
                     && ASTNodes.match(matcher, condition.getRightOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getRightOperand());
                 setResult(false);
@@ -163,7 +166,8 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     replaceWithStraightReturn(node, condition.getLeftOperand());
                     setResult(false);
                     return false;
-                } else if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
+                }
+                if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
                         && ASTNodes.match(matcher, condition.getRightOperand(), rs.getExpression())) {
                     ctx.getRefactorings().remove(toRemove);
                     replaceWithStraightReturn(node, condition.getRightOperand());

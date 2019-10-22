@@ -105,7 +105,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             }
 
             return maybeRefactorAppending(node);
-        } else if (ASTNodes.usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
+        }
+        if (ASTNodes.usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
             final Expression lastExpression= readAppendMethod(node.getExpression(), allAppendedStrings,
@@ -249,7 +250,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private boolean isValuedStringLiteralOrConstant(Expression expression) {
         if (expression instanceof StringLiteral) {
             return !isEmptyString(expression);
-        } else if (expression instanceof Name && ASTNodes.hasType(expression, String.class.getCanonicalName())) {
+        }
+        if (expression instanceof Name && ASTNodes.hasType(expression, String.class.getCanonicalName())) {
             Name name= (Name) expression;
             return name.resolveConstantExpressionValue() != null;
         }
@@ -294,9 +296,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         if (ASTNodes.hasType(ASTNodes.arg0(mi), expectedType.getQualifiedName(),
                 Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).getQualifiedName())) {
             return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arg0(mi));
-        } else {
-            return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arg0(mi));
         }
+        return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arg0(mi));
     }
 
     /**

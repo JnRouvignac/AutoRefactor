@@ -149,11 +149,11 @@ public class TypeNameDecider {
     private ITypeBinding getAnyTypeBinding(final ASTNode parsedNode) {
         if (parsedNode instanceof Expression) {
             return ((Expression) parsedNode).resolveTypeBinding();
-        } else if (parsedNode instanceof VariableDeclaration) {
-            return ((VariableDeclaration) parsedNode).resolveBinding().getType();
-        } else {
-            throw new NotImplementedException(parsedNode);
         }
+        if (parsedNode instanceof VariableDeclaration) {
+            return ((VariableDeclaration) parsedNode).resolveBinding().getType();
+        }
+        throw new NotImplementedException(parsedNode);
     }
 
     private static TreeSet<String> getImportedTypes(CompilationUnit cu) {
@@ -232,7 +232,8 @@ public class TypeNameDecider {
                 if ("*".equals(elementBeforeName) && i + 1 == elementBeforeNames.length) { //$NON-NLS-1$
                     if (i + 1 == names.length) {
                         return name;
-                    } else if (i + 2 == names.length && typeBinding.getDeclaringClass() != null) {
+                    }
+                    if (i + 2 == names.length && typeBinding.getDeclaringClass() != null) {
                         return names[i] + "." + names[i + 1]; //$NON-NLS-1$
                     }
                 }

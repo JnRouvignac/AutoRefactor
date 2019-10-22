@@ -230,7 +230,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (ASTNodes.usesGivenSignature(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
-        } else if (ASTNodes.usesGivenSignature(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        }
+        if (ASTNodes.usesGivenSignature(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
         }

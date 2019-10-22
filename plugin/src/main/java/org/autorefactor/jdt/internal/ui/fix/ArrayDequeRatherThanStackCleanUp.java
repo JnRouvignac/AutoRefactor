@@ -111,11 +111,11 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     protected String getSubstitutingClassName(String origRawType) {
         if (Stack.class.getCanonicalName().equals(origRawType)) {
             return ArrayDeque.class.getCanonicalName();
-        } else if (Vector.class.getCanonicalName().equals(origRawType)) {
-            return Collection.class.getCanonicalName();
-        } else {
-            return null;
         }
+        if (Vector.class.getCanonicalName().equals(origRawType)) {
+            return Collection.class.getCanonicalName();
+        }
+        return null;
     }
 
     @Override

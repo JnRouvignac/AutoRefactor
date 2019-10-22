@@ -127,11 +127,11 @@ public class PrepareApplyRefactoringsJob extends Job {
         final int nbPartitions= nbWorkItems / 10;
         if (nbPartitions >= nbCores) {
             return nbCores;
-        } else if (nbPartitions > 0) {
-            return nbPartitions;
-        } else {
-            return 1;
         }
+        if (nbPartitions > 0) {
+            return nbPartitions;
+        }
+        return 1;
     }
 
     private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements, IProgressMonitor monitor) {
@@ -205,7 +205,8 @@ public class PrepareApplyRefactoringsJob extends Job {
         if (javaElement instanceof ICompilationUnit || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
             return getIJavaProject(javaElement.getParent());
-        } else if (javaElement instanceof IJavaProject) {
+        }
+        if (javaElement instanceof IJavaProject) {
             return (IJavaProject) javaElement;
         }
         throw new NotImplementedException(null, javaElement);

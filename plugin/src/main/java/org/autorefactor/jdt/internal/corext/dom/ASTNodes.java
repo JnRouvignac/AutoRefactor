@@ -391,7 +391,8 @@ public final class ASTNodes {
         if (expression != null) {
             if (exprClass.isAssignableFrom(expression.getClass())) {
                 return (T) expression;
-            } else if (expression instanceof ParenthesizedExpression) {
+            }
+            if (expression instanceof ParenthesizedExpression) {
                 return as(((ParenthesizedExpression) expression).getExpression(), exprClass);
             }
         }
@@ -891,9 +892,8 @@ public final class ASTNodes {
         IMethodBinding methodBinding= mi.resolveMethodBinding();
         if (methodBinding != null) {
             return methodBinding.getDeclaringClass();
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -930,7 +930,8 @@ public final class ASTNodes {
         final String fqn= qualifiedName.getFullyQualifiedName();
         if ("Boolean.TRUE".equals(fqn)) { //$NON-NLS-1$
             return true;
-        } else if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
+        }
+        if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
             return false;
         }
         return null;
@@ -1040,7 +1041,8 @@ public final class ASTNodes {
             final ASTNode parent= node.getParent();
             if (parent instanceof ParenthesizedExpression) {
                 return getTargetType(parent);
-            } else if (parent instanceof ReturnStatement) {
+            }
+            if (parent instanceof ReturnStatement) {
                 final ReturnStatement returnStatement= (ReturnStatement) parent;
                 if (returnStatement.getExpression().equals(node)) {
                     final MethodDeclaration method= getAncestorOrNull(returnStatement, MethodDeclaration.class);
@@ -1096,10 +1098,9 @@ public final class ASTNodes {
                     if (discriminentType.isPrimitive() || discriminentType.isEnum()
                             || hasType(discriminentType, String.class.getCanonicalName())) {
                         return discriminentType;
-                    } else {
-                        return node.getAST()
-                                .resolveWellKnownType(Bindings.getUnboxedTypeName(discriminentType.getQualifiedName()));
                     }
+                    return node.getAST()
+                            .resolveWellKnownType(Bindings.getUnboxedTypeName(discriminentType.getQualifiedName()));
                 }
             }
         }
@@ -1226,10 +1227,12 @@ public final class ASTNodes {
         if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
             return getSibling(node, typeDecl, lookForPrevious);
-        } else if (parent instanceof AnonymousClassDeclaration) {
+        }
+        if (parent instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
             return getSibling(node, classDecl, lookForPrevious);
-        } else if (parent instanceof CompilationUnit) {
+        }
+        if (parent instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) parent;
             final List<AbstractTypeDeclaration> types= types(cu);
             final int index= types.indexOf(node);
@@ -1476,49 +1479,48 @@ public final class ASTNodes {
      *         byte code ignoring parentheses, false otherwise
      */
     public static boolean isHardCoded(final Expression expression) {
-        if (expression != null) {
-            switch (expression.getNodeType()) {
-            case ASTNode.BOOLEAN_LITERAL:
-            case ASTNode.CHARACTER_LITERAL:
-            case ASTNode.NUMBER_LITERAL:
-            case ASTNode.STRING_LITERAL:
-            case ASTNode.NULL_LITERAL:
-                return true;
+        if (expression == null) {
+            return false;
+        }
+        switch (expression.getNodeType()) {
+        case ASTNode.BOOLEAN_LITERAL:
+        case ASTNode.CHARACTER_LITERAL:
+        case ASTNode.NUMBER_LITERAL:
+        case ASTNode.STRING_LITERAL:
+        case ASTNode.NULL_LITERAL:
+            return true;
 
-            case ASTNode.INFIX_EXPRESSION:
-                InfixExpression infixExpression= (InfixExpression) expression;
+        case ASTNode.INFIX_EXPRESSION:
+            InfixExpression infixExpression= (InfixExpression) expression;
 
-                if (!isHardCoded(infixExpression.getLeftOperand()) || !isHardCoded(infixExpression.getRightOperand())) {
-                    return false;
-                } else if (infixExpression.hasExtendedOperands()) {
-                    for (Object operand : infixExpression.extendedOperands()) {
-                        if (!isHardCoded((Expression) operand)) {
-                            return false;
-                        }
+            if (!isHardCoded(infixExpression.getLeftOperand()) || !isHardCoded(infixExpression.getRightOperand())) {
+                return false;
+            } else if (infixExpression.hasExtendedOperands()) {
+                for (Object operand : infixExpression.extendedOperands()) {
+                    if (!isHardCoded((Expression) operand)) {
+                        return false;
                     }
                 }
-
-                return true;
-
-            case ASTNode.PREFIX_EXPRESSION:
-                PrefixExpression prefixExpression= (PrefixExpression) expression;
-                return isHardCoded(prefixExpression.getOperand());
-
-            case ASTNode.POSTFIX_EXPRESSION:
-                PostfixExpression postfixExpression= (PostfixExpression) expression;
-                return isHardCoded(postfixExpression.getOperand());
-
-            case ASTNode.CAST_EXPRESSION:
-                return isHardCoded(((CastExpression) expression).getExpression());
-
-            case ASTNode.PARENTHESIZED_EXPRESSION:
-                return isHardCoded(((ParenthesizedExpression) expression).getExpression());
-
-            default:
-                return expression.resolveConstantExpressionValue() != null || isEnumConstant(expression);
             }
-        } else {
-            return false;
+
+            return true;
+
+        case ASTNode.PREFIX_EXPRESSION:
+            PrefixExpression prefixExpression= (PrefixExpression) expression;
+            return isHardCoded(prefixExpression.getOperand());
+
+        case ASTNode.POSTFIX_EXPRESSION:
+            PostfixExpression postfixExpression= (PostfixExpression) expression;
+            return isHardCoded(postfixExpression.getOperand());
+
+        case ASTNode.CAST_EXPRESSION:
+            return isHardCoded(((CastExpression) expression).getExpression());
+
+        case ASTNode.PARENTHESIZED_EXPRESSION:
+            return isHardCoded(((ParenthesizedExpression) expression).getExpression());
+
+        default:
+            return expression.resolveConstantExpressionValue() != null || isEnumConstant(expression);
         }
     }
 
@@ -1742,7 +1744,8 @@ public final class ASTNodes {
             if (hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && checkNoExtendedOperands(ie)) {
                 if (is(ie.getLeftOperand(), NullLiteral.class)) {
                     return ie.getRightOperand();
-                } else if (is(ie.getRightOperand(), NullLiteral.class)) {
+                }
+                if (is(ie.getRightOperand(), NullLiteral.class)) {
                     return ie.getLeftOperand();
                 }
             }
@@ -2136,10 +2139,8 @@ public final class ASTNodes {
     public static boolean isEqual(Name name1, Name name2) {
         if (name1 instanceof SimpleName && name2 instanceof SimpleName) {
             return isEqual((SimpleName) name1, (SimpleName) name2);
-        } else if (name1 instanceof QualifiedName && name2 instanceof QualifiedName) {
-            return isEqual((QualifiedName) name1, (QualifiedName) name2);
         }
-        return false;
+        return name1 instanceof QualifiedName && name2 instanceof QualifiedName && isEqual((QualifiedName) name1, (QualifiedName) name2);
     }
 
     /**

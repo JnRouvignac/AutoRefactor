@@ -199,31 +199,39 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         if (expression instanceof ParenthesizedExpression) {
             final ParenthesizedExpression parenthesizedExpression= (ParenthesizedExpression) expression;
             return isNotNull(parenthesizedExpression.getExpression());
-        } else if (expression instanceof ConditionalExpression) {
+        }
+        if (expression instanceof ConditionalExpression) {
             final ConditionalExpression prefixExpression= (ConditionalExpression) expression;
             return isNotNull(prefixExpression.getThenExpression()) && isNotNull(prefixExpression.getElseExpression());
-        } else if (getLiteralClass().equals(expression.getClass())) {
+        }
+        if (getLiteralClass().equals(expression.getClass())) {
             return true;
-        } else if (expression instanceof QualifiedName) {
+        }
+        if (expression instanceof QualifiedName) {
             final QualifiedName qualifiedName= (QualifiedName) expression;
             return ASTNodes.hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
                     && (ASTNodes.isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
                             || ASTNodes.isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
-        } else if (expression instanceof InfixExpression) {
+        }
+        if (expression instanceof InfixExpression) {
             final InfixExpression infixExpression= (InfixExpression) expression;
             return getInfixInSafeOperators().contains(infixExpression.getOperator());
-        } else if (expression instanceof PrefixExpression) {
+        }
+        if (expression instanceof PrefixExpression) {
             final PrefixExpression prefixExpression= (PrefixExpression) expression;
             return getPrefixInSafeOperators().contains(prefixExpression.getOperator());
-        } else if (expression instanceof PostfixExpression) {
+        }
+        if (expression instanceof PostfixExpression) {
             final PostfixExpression postfixExpression= (PostfixExpression) expression;
             return getPostfixInSafeOperators().contains(postfixExpression.getOperator());
-        } else if (expression instanceof CastExpression) {
+        }
+        if (expression instanceof CastExpression) {
             final CastExpression castExpression= (CastExpression) expression;
             return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
                     || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
                             && isNotNull(castExpression.getExpression()));
-        } else if (expression instanceof MethodInvocation) {
+        }
+        if (expression instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) expression;
             return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
         }
@@ -301,7 +309,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                     if (method != null && method.getReturnType2() != null) {
                         if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
                             return true;
-                        } else if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
+                        }
+                        if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
                             if (!isVarReturned) {
                                 isVarReturned= true;
                                 autoBoxingCount++;
@@ -335,7 +344,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         private boolean isOfType(final Name name) {
             if (ASTNodes.hasType(name.resolveTypeBinding(), getPrimitiveTypeName())) {
                 return true;
-            } else if (ASTNodes.hasType(name.resolveTypeBinding(), getWrapperFullyQualifiedName())) {
+            }
+            if (ASTNodes.hasType(name.resolveTypeBinding(), getWrapperFullyQualifiedName())) {
                 autoBoxingCount++;
                 return true;
             }

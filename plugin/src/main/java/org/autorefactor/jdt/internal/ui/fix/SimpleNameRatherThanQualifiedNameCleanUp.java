@@ -327,7 +327,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 if (fqn.equals(FQN.CANNOT_REPLACE_SIMPLE_NAME)) {
                     // Something got wrong while computing the FQNs => bail out
                     return Collections.emptyList();
-                } else if (bestMatches.isEmpty()) {
+                }
+                if (bestMatches.isEmpty()) {
                     // We now have a best match
                     bestMatches.add(fqn);
                 } else if (bestMatches.get(0).fromImport()) {
