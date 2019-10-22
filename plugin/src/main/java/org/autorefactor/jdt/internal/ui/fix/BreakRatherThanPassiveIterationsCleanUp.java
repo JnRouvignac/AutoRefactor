@@ -69,6 +69,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(final Assignment node) {
+            if (!ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN)) {
+                hasSideEffect= true;
+                return interruptVisit();
+            }
+
             return visitVar(node.getLeftHandSide());
         }
 
@@ -242,7 +247,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                 } else if (statement instanceof ExpressionStatement) {
                     final Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
 
-                    if (assignment == null || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
+                    if (assignment == null || !ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                         return true;
                     }
                 } else {

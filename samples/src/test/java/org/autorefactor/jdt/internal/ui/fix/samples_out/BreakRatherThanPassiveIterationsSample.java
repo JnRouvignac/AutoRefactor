@@ -241,4 +241,16 @@ public class BreakRatherThanPassiveIterationsSample {
 
         return result;
     }
+
+    public String doNotRefactorWithSpecialAssignment(int[] array) {
+        int tenFactor = 0;
+
+        for (int i : array) {
+            if (i == 10) {
+                tenFactor += 1;
+            }
+        }
+
+        return "The result: " + tenFactor;
+    }
 }
