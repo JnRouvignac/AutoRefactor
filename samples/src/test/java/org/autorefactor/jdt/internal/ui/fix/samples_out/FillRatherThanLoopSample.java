@@ -169,4 +169,12 @@ public class FillRatherThanLoopSample {
 
         return array;
     }
+
+    public int[] doNotRefactorSpecialAssignment(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] += 123;
+        }
+
+        return array;
+    }
 }

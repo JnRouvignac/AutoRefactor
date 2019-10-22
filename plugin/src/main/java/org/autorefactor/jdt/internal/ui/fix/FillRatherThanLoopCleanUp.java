@@ -106,7 +106,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (loopContent != null && loopContent.getLoopVariable() != null && loopContent.getContainerType() == ContainerType.ARRAY && statements.size() == 1) {
             final Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
 
-            if (assignment != null && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
+            if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
                 final ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
 
                 if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
