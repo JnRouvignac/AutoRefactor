@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016-2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2016-2019 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,9 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule {
@@ -64,18 +61,8 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(QualifiedName node) {
-        final ASTNode parent= ASTNodes.getUnparenthesedExpression(node.getParent());
-        if (parent instanceof VariableDeclarationFragment) {
-            final ITypeBinding typeBinding= ASTNodes.resolveTypeBinding((VariableDeclarationFragment) parent);
-            return replaceBooleanObjectByPrimitive(node, typeBinding);
-        } else if (parent instanceof Assignment) {
-            final ITypeBinding typeBinding= ((Assignment) parent).resolveTypeBinding();
-            return replaceBooleanObjectByPrimitive(node, typeBinding);
-        }
-        return true;
-    }
+        final ITypeBinding typeBinding= ASTNodes.getTargetType(node);
 
-    private boolean replaceBooleanObjectByPrimitive(final QualifiedName node, final ITypeBinding typeBinding) {
         if (typeBinding != null && typeBinding.isPrimitive()) {
             if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
                 return replaceWithBooleanLiteral(node, true);
@@ -83,6 +70,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
                 return replaceWithBooleanLiteral(node, false);
             }
         }
+
         return true;
     }
 

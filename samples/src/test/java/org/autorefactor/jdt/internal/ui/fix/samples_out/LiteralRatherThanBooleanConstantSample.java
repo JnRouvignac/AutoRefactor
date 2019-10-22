@@ -32,7 +32,9 @@ public class LiteralRatherThanBooleanConstantSample {
         boolean bo1 = true;
         boolean bo2 = false;
         bo1 = true;
-        bo2 = false;
+        if (true) {
+            bo2 = false;
+        }
         return bo1 && bo2;
     }
 

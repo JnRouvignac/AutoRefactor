@@ -32,7 +32,9 @@ public class LiteralRatherThanBooleanConstantSample {
         boolean bo1 = Boolean.TRUE;
         boolean bo2 = Boolean.FALSE;
         bo1 = Boolean.TRUE;
-        bo2 = Boolean.FALSE;
+        if (Boolean.TRUE) {
+            bo2 = Boolean.FALSE;
+        }
         return bo1 && bo2;
     }
 
