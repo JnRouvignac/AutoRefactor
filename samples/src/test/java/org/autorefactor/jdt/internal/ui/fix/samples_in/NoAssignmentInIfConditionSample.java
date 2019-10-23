@@ -124,7 +124,7 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
-    public boolean doNotRefactorSingleStatementBlock(int i, int j) {
+    public boolean refactorSingleStatementBlock(int i, int j) {
         if (i > 0)
             if ((i = j) < 10)
                 return true;

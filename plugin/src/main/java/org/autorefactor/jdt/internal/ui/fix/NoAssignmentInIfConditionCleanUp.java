@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
@@ -84,10 +85,6 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(IfStatement node) {
-            if (!(node.getParent() instanceof Block)) {
-                return true;
-            }
-
             final InfixExpression ie= ASTNodes.as(node.getExpression(), InfixExpression.class);
             return moveAssignmentBeforeIfStatementIfPossible(node, ie);
         }
@@ -128,8 +125,16 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             }
 
             if (!isAnElseIf(node)) {
-                r.insertBefore(b.toStatement(b.move(assignment)), node);
                 r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
+                Statement newAssignment= b.toStatement(b.move(assignment));
+
+                if (node.getParent() instanceof Block) {
+                    r.insertBefore(newAssignment, node);
+                } else {
+                    Block newBlock= b.block(newAssignment, b.move(node));
+                    r.replace(node, newBlock);
+                }
+
                 setResult(false);
                 return false;
             }
