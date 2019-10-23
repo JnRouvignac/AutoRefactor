@@ -66,6 +66,27 @@ public class NoAssignmentInIfConditionSample {
     }
 
     public void moveAssignmentBeforeIfAndMergeWithDeclaration(Queue<Integer> q) {
+        Integer i= q.poll();
+        // Keep this comment
+        if (i != null) {
+            System.out.println("Value=" + i);
+        } else {
+            System.out.println("Empty");
+        }
+    }
+
+    public void moveAssignmentBelowDeclaration(Queue<Integer> q) {
+        Integer i = q.poll();
+        i = q.poll();
+        // Keep this comment
+        if (i != null) {
+            System.out.println("Value=" + i);
+        } else {
+            System.out.println("Empty");
+        }
+    }
+
+    public void erasePassiveValue(Queue<Integer> q) {
         Integer i = q.poll();
         // Keep this comment
         if (i != null) {
@@ -89,7 +110,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     public void moveAssignmentBeforeIfAtStartOfInfixExpression(String s, int i) {
-        final char c = s.charAt(i);
+        final char c= s.charAt(i);
         // Keep this comment
         if (c == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");

@@ -72,6 +72,26 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
+    public void moveAssignmentBelowDeclaration(Queue<Integer> q) {
+        Integer i = q.poll();
+        // Keep this comment
+        if ((i = q.poll()) != null) {
+            System.out.println("Value=" + i);
+        } else {
+            System.out.println("Empty");
+        }
+    }
+
+    public void erasePassiveValue(Queue<Integer> q) {
+        Integer i = 0;
+        // Keep this comment
+        if ((i = q.poll()) != null) {
+            System.out.println("Value=" + i);
+        } else {
+            System.out.println("Empty");
+        }
+    }
+
     public void doNotRefactor(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");

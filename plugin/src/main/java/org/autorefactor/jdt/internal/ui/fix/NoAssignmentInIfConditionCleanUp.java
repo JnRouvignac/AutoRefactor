@@ -97,6 +97,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 final InfixExpression leftIe= ASTNodes.as(ie.getLeftOperand(), InfixExpression.class);
                 final Assignment leftAs= ASTNodes.as(ie.getLeftOperand(), Assignment.class);
                 final Assignment rightAs= ASTNodes.as(ie.getRightOperand(), Assignment.class);
+
                 if (leftAs != null) {
                     return moveAssignmentBeforeIfStatement(node, leftAs);
                 }
@@ -107,27 +108,32 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                     return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
                 }
             }
+
             return true;
         }
 
-        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
+        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment) {
             final Refactorings r= ctx.getRefactorings();
             final ASTNodeFactory b= ctx.getASTBuilder();
+
             final VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-            final Expression lhs= ASTNodes.getUnparenthesedExpression(a.getLeftHandSide());
+            final Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
             final VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
-            if (vdf != null) {
-                r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, a.getRightHandSide());
-                r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
+
+            if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
+                r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());
+                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
             }
+
             if (!isAnElseIf(node)) {
-                r.insertBefore(b.toStatement(b.move(a)), node);
-                r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
+                r.insertBefore(b.toStatement(b.move(assignment)), node);
+                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
             }
+
             return true;
         }
 
@@ -140,6 +146,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
+
             return null;
         }
 
