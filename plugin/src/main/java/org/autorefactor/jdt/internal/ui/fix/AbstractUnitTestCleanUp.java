@@ -56,12 +56,7 @@ import org.eclipse.jdt.core.dom.Statement;
  */
 public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     /**
-     * The OBJECT constant.
-     */
-    protected static final String OBJECT= Object.class.getCanonicalName();
-
-    /**
-     * The OBJECT constant.
+     * The scan of the class imports.
      */
     private final Set<String> staticImports= new HashSet<>();
 
@@ -170,7 +165,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
                         failureMessage, isRewriteNeeded);
             }
-        } else if (ASTNodes.usesGivenSignature(conditionMi, OBJECT, "equals", OBJECT)) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(conditionMi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             if (canUseAssertNotEquals() || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         ASTNodes.arg0(conditionMi));
