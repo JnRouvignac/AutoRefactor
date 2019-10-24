@@ -97,6 +97,16 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
+    public void moveAssignmentWithoutParenthesis(Queue<Boolean> q) {
+        Boolean b = q.poll();
+        // Keep this comment
+        if (b) {
+            System.out.println("Value=" + b);
+        } else {
+            System.out.println("Empty");
+        }
+    }
+
     public void doNotRefactor(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
@@ -120,9 +130,36 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
-    public void doNotMoveAssignmentBeforeIfInsideInfixExpression(String s, int i, char c) {
+    public void moveNotConditionalAssignment(String s, int i, boolean isValid) {
+        final char c = s.charAt(i);
         // Keep this comment
+        if (isValid | c == 'A') {
+            System.out.println("valid or A");
+        } else {
+            System.out.println("Not A, B or C");
+        }
+    }
+
+    public void moveAssignmentInComplexExpression(String s, int i, boolean isValid) {
+        final char c = s.charAt(i);
+        // Keep this comment
+        if (!(isValid | (i == 10 & c == 'A'))) {
+            System.out.println("valid or A");
+        } else {
+            System.out.println("Not A, B or C");
+        }
+    }
+
+    public void doNotMoveAssignmentBeforeIfInsideInfixExpression(String s, int i, char c) {
         if (c == 'A' || (c = s.charAt(i)) == 'A' || c == 'B' || c == 'C') {
+            System.out.println("A, B or C");
+        } else {
+            System.out.println("Not A, B or C");
+        }
+    }
+
+    public void doNotMoveAssignmentAfterActiveCondition(String s, int i, char c) {
+        if (i++ == 10 || (c = s.charAt(i)) == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");
         } else {
             System.out.println("Not A, B or C");
