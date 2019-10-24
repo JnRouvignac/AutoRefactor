@@ -33,10 +33,9 @@ import static org.testng.Assert.*;
 import org.testng.Assert;
 
 public class TestNGAssertSample {
-
     private static final int FOURTYTWO = 42;
 
-    public void shouldRefactorWithPrimitives(int i1, int i2) throws Exception {
+    public void shouldRefactorWithPrimitives(int i1, int i2) {
         // Keep this comment
         Assert.assertEquals(i1, i2);
         Assert.assertEquals(i1, i2, "Failure message to keep");
@@ -57,7 +56,49 @@ public class TestNGAssertSample {
         assertNotEquals(i1, i2, "Failure message to keep");
     }
 
-    public void shouldRefactorFailures() throws Exception {
+    public void shouldRefactorWithDoubles(double d1, double d2) {
+        // Keep this comment
+        Assert.assertEquals(d1, d2, .0);
+        Assert.assertEquals(d1, d2, .0, "Failure message to keep");
+        Assert.assertNotEquals(d1, d2, .0);
+        Assert.assertNotEquals(d1, d2, .0, "Failure message to keep");
+        Assert.assertEquals(d1, d2, .0);
+        Assert.assertEquals(d1, d2, .0, "Failure message to keep");
+        Assert.assertNotEquals(d1, d2, .0);
+        Assert.assertNotEquals(d1, d2, .0, "Failure message to keep");
+
+        assertEquals(d1, d2, .0);
+        assertEquals(d1, d2, .0, "Failure message to keep");
+        assertNotEquals(d1, d2, .0);
+        assertNotEquals(d1, d2, .0, "Failure message to keep");
+        assertEquals(d1, d2, .0);
+        assertEquals(d1, d2, .0, "Failure message to keep");
+        assertNotEquals(d1, d2, .0);
+        assertNotEquals(d1, d2, .0, "Failure message to keep");
+    }
+
+    public void shouldRefactorWithFloats(float f1, float f2) {
+        // Keep this comment
+        Assert.assertEquals(f1, f2, .0F);
+        Assert.assertEquals(f1, f2, .0F, "Failure message to keep");
+        Assert.assertNotEquals(f1, f2, .0F);
+        Assert.assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        Assert.assertEquals(f1, f2, .0F);
+        Assert.assertEquals(f1, f2, .0F, "Failure message to keep");
+        Assert.assertNotEquals(f1, f2, .0F);
+        Assert.assertNotEquals(f1, f2, .0F, "Failure message to keep");
+
+        assertEquals(f1, f2, .0F);
+        assertEquals(f1, f2, .0F, "Failure message to keep");
+        assertNotEquals(f1, f2, .0F);
+        assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        assertEquals(f1, f2, .0F);
+        assertEquals(f1, f2, .0F, "Failure message to keep");
+        assertNotEquals(f1, f2, .0F);
+        assertNotEquals(f1, f2, .0F, "Failure message to keep");
+    }
+
+    public void shouldRefactorFailures() {
         // Keep this comment
         Assert.fail();
         Assert.fail("Failure message to keep");
@@ -70,10 +111,10 @@ public class TestNGAssertSample {
         fail("Failure message to keep");
     }
 
-    public void shouldRemoveDeadChecks() throws Exception {
+    public void shouldRemoveDeadChecks() {
     }
 
-    public void shouldRefactorNegatedConditions(boolean b) throws Exception {
+    public void shouldRefactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertFalse(b);
         Assert.assertFalse(b, "Failure message to keep");
@@ -86,7 +127,7 @@ public class TestNGAssertSample {
         assertTrue(b, "Failure message to keep");
     }
 
-    public void shouldRefactorWithObjectReferences(Object o1, Object o2) throws Exception {
+    public void shouldRefactorWithObjectReferences(Object o1, Object o2) {
         // Keep this comment
         Assert.assertSame(o1, o2);
         Assert.assertSame(o1, o2, "Failure message to keep");
@@ -107,7 +148,7 @@ public class TestNGAssertSample {
         assertNotSame(o1, o2, "Failure message to keep");
     }
 
-    public void shouldRefactorWithObjects(Object o1, Object o2) throws Exception {
+    public void shouldRefactorWithObjects(Object o1, Object o2) {
         // Keep this comment
         Assert.assertEquals(o1, o2);
         Assert.assertEquals(o1, o2, "Failure message to keep");
@@ -128,7 +169,7 @@ public class TestNGAssertSample {
         assertNotEquals(o1, o2, "Failure message to keep");
     }
 
-    public void shouldRefactorNullCheckFirstArg(Object o) throws Exception {
+    public void shouldRefactorNullCheckFirstArg(Object o) {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull(o, "Failure message to keep");
@@ -149,7 +190,7 @@ public class TestNGAssertSample {
         assertNotNull(o, "Failure message to keep");
     }
 
-    public void shouldRefactorNullCheckSecondArg(Object o) throws Exception {
+    public void shouldRefactorNullCheckSecondArg(Object o) {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull(o, "Failure message to keep");
@@ -170,7 +211,7 @@ public class TestNGAssertSample {
         assertNotNull(o, "Failure message to keep");
     }
 
-    public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
+    public void shouldRefactorNullCheckFirstArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull(o, "Failure message to keep");
@@ -183,7 +224,7 @@ public class TestNGAssertSample {
         assertNotNull(o, "Failure message to keep");
     }
 
-    public void shouldRefactorNullCheckSecondArgWithEquals(Object o) throws Exception {
+    public void shouldRefactorNullCheckSecondArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull(o, "Failure message to keep");
@@ -196,7 +237,7 @@ public class TestNGAssertSample {
         assertNotNull(o, "Failure message to keep");
     }
 
-    public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
+    public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(o, 42);
         Assert.assertEquals(o, 42, "Failure message to keep");
@@ -209,7 +250,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, 42, "Failure message to keep");
     }
 
-    public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
+    public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(o, 42);
         Assert.assertEquals(o, 42, "Failure message to keep");
         Assert.assertNotEquals(o, 42);
@@ -221,7 +262,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, 42, "Failure message to keep");
     }
 
-    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(o, FOURTYTWO);
         Assert.assertEquals(o, FOURTYTWO, "Failure message to keep");
@@ -234,7 +275,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, FOURTYTWO, "Failure message to keep");
     }
 
-    public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+    public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(o, FOURTYTWO);
         Assert.assertEquals(o, FOURTYTWO, "Failure message to keep");
         Assert.assertNotEquals(o, FOURTYTWO);
@@ -246,7 +287,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, FOURTYTWO, "Failure message to keep");
     }
 
-    public void shouldMoveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) throws Exception {
+    public void shouldMoveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) {
         // Keep this comment
         Assert.assertEquals(o, expected);
         Assert.assertEquals(o, expected, "Failure message to keep");
@@ -263,7 +304,7 @@ public class TestNGAssertSample {
         assertEquals(o, expceted);
     }
 
-    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {
+    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) {
         // Keep this comment
         Assert.assertNotEquals(i1, i2);
         Assert.assertNotEquals(i1, i2, "Failure message to keep");
@@ -276,7 +317,7 @@ public class TestNGAssertSample {
         assertEquals(i1, i2, "Failure message to keep");
     }
 
-    public void shouldRefactorIfSameObjectThenFail(Object o1, Object o2) throws Exception {
+    public void shouldRefactorIfSameObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         Assert.assertNotSame(o1, o2);
         Assert.assertNotSame(o1, o2, "Failure message to keep");
@@ -289,7 +330,7 @@ public class TestNGAssertSample {
         assertSame(o1, o2, "Failure message to keep");
     }
 
-    public void shouldRefactorIfNullThenFail(Object o1) throws Exception {
+    public void shouldRefactorIfNullThenFail(Object o1) {
         // Keep this comment
         Assert.assertNotNull(o1);
         Assert.assertNotNull(o1, "Failure message to keep");
@@ -310,7 +351,7 @@ public class TestNGAssertSample {
         assertNull(o1, "Failure message to keep");
     }
 
-    public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
+    public void shouldRefactorIfObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         Assert.assertNotEquals(o1, o2);
         Assert.assertNotEquals(o1, o2, "Failure message to keep");
@@ -323,7 +364,7 @@ public class TestNGAssertSample {
         assertEquals(o1, o2, "Failure message to keep");
     }
 
-    public void shouldRefactorIfLiteralThenFail(int i) throws Exception {
+    public void shouldRefactorIfLiteralThenFail(int i) {
         // Keep this comment
         Assert.assertNotEquals(i, 42);
         Assert.assertNotEquals(i, 42, "Failure message to keep");
@@ -344,7 +385,7 @@ public class TestNGAssertSample {
         assertEquals(i, 42, "Failure message to keep");
     }
 
-    public void shouldRefactorIfConstantThenFail(int i) throws Exception {
+    public void shouldRefactorIfConstantThenFail(int i) {
         // Keep this comment
         Assert.assertNotEquals(i, FOURTYTWO);
         Assert.assertNotEquals(i, FOURTYTWO, "Failure message to keep");
@@ -365,7 +406,7 @@ public class TestNGAssertSample {
         assertEquals(i, FOURTYTWO, "Failure message to keep");
     }
 
-    public void shouldRefactorIfExpectedThenFail(int i, int expected) throws Exception {
+    public void shouldRefactorIfExpectedThenFail(int i, int expected) {
         // Keep this comment
         Assert.assertNotEquals(i, expected);
         Assert.assertNotEquals(i, expected, "Failure message to keep");
@@ -386,7 +427,7 @@ public class TestNGAssertSample {
         assertEquals(i, expected, "Failure message to keep");
     }
 
-    public void shouldRefactorIfNearlyExpectedThenFail(int i, int expectedI) throws Exception {
+    public void shouldRefactorIfNearlyExpectedThenFail(int i, int expectedI) {
         // Keep this comment
         Assert.assertNotEquals(i, expectedI);
         Assert.assertNotEquals(i, expectedI, "Failure message to keep");
@@ -407,7 +448,7 @@ public class TestNGAssertSample {
         assertEquals(i, expectedI, "Failure message to keep");
     }
 
-    public void doNotRefactorBecauseOfElseStatement(int i1, int i2, Object o1) throws Exception {
+    public void doNotRefactorBecauseOfElseStatement(int i1, int i2, Object o1) {
         if (i1 == i2) {
             Assert.fail();
         } else {

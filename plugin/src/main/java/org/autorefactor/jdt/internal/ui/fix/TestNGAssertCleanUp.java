@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -184,22 +185,25 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpression,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            final Expression failureMessage) {
-        if (failureMessage == null) {
-            if (copyOfActual == null) {
-                return b.invoke(copyOfExpression, methodName);
-            }
-            if (copyOfExpected == null) {
-                return b.invoke(copyOfExpression, methodName, copyOfActual);
-            }
-            return b.invoke(copyOfExpression, methodName, copyOfActual, copyOfExpected);
+            Expression delta, final Expression failureMessage) {
+        List<Expression> arguments= new ArrayList<>(4);
+
+        if (copyOfActual != null) {
+            arguments.add(copyOfActual);
         }
-        if (copyOfActual == null) {
-            return b.invoke(copyOfExpression, methodName, b.copy(failureMessage));
+
+        if (copyOfExpected != null) {
+            arguments.add(copyOfExpected);
         }
-        if (copyOfExpected == null) {
-            return b.invoke(copyOfExpression, methodName, copyOfActual, b.copy(failureMessage));
+
+        if (delta != null) {
+            arguments.add(delta);
         }
-        return b.invoke(copyOfExpression, methodName, copyOfActual, copyOfExpected, b.copy(failureMessage));
+
+        if (failureMessage != null) {
+            arguments.add(b.copy(failureMessage));
+        }
+
+        return b.invoke(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
     }
 }
