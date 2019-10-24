@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2017 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2019 Fabrice Tiercelin - Change the parsing of condition
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +27,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -34,9 +38,14 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -85,37 +94,102 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(IfStatement node) {
-            final InfixExpression ie= ASTNodes.as(node.getExpression(), InfixExpression.class);
-            return moveAssignmentBeforeIfStatementIfPossible(node, ie);
+            return moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
         }
 
-        private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, InfixExpression ie) {
-            if (ie != null) {
-                final InfixExpression leftIe= ASTNodes.as(ie.getLeftOperand(), InfixExpression.class);
-                final Assignment leftAs= ASTNodes.as(ie.getLeftOperand(), Assignment.class);
-                final Assignment rightAs= ASTNodes.as(ie.getRightOperand(), Assignment.class);
+        private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, Expression expression, List<Expression> evaluatedExpression) {
+            final Assignment assignment= ASTNodes.as(expression, Assignment.class);
 
-                if (leftAs != null) {
-                    return moveAssignmentBeforeIfStatement(node, leftAs);
-                }
-                if (rightAs != null) {
-                    return moveAssignmentBeforeIfStatement(node, rightAs);
-                }
-                if (leftIe != null) {
-                    return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
+            if (assignment != null) {
+                return moveAssignmentBeforeIfStatement(node, assignment, evaluatedExpression);
+            }
+
+            final PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
+
+            if (pe != null && ASTNodes.hasOperator(pe,
+                    PrefixExpression.Operator.NOT,
+                    PrefixExpression.Operator.COMPLEMENT,
+                    PrefixExpression.Operator.MINUS,
+                    PrefixExpression.Operator.PLUS)) {
+                return moveAssignmentBeforeIfStatementIfPossible(node, pe.getOperand(), evaluatedExpression);
+            }
+
+            final InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
+
+            if (ie != null) {
+                List<Expression> operands= ASTNodes.allOperands(ie);
+                boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
+                        InfixExpression.Operator.EQUALS,
+                        InfixExpression.Operator.NOT_EQUALS,
+                        InfixExpression.Operator.PLUS,
+                        InfixExpression.Operator.MINUS,
+                        InfixExpression.Operator.DIVIDE,
+                        InfixExpression.Operator.TIMES,
+                        InfixExpression.Operator.XOR,
+                        InfixExpression.Operator.GREATER,
+                        InfixExpression.Operator.GREATER_EQUALS,
+                        InfixExpression.Operator.LEFT_SHIFT,
+                        InfixExpression.Operator.LESS,
+                        InfixExpression.Operator.LESS_EQUALS,
+                        InfixExpression.Operator.REMAINDER,
+                        InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
+                        InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+                        InfixExpression.Operator.AND,
+                        InfixExpression.Operator.OR);
+
+                for (Expression operand : operands) {
+                    if (!moveAssignmentBeforeIfStatementIfPossible(node, operand, evaluatedExpression)) {
+                        return false;
+                    }
+
+                    if (!isAllOperandsEvaluated || !ASTNodes.isPassive(operand)) {
+                        break;
+                    }
+
+                    evaluatedExpression.add(operand);
                 }
             }
 
             return true;
         }
 
-        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment) {
-            final Refactorings r= ctx.getRefactorings();
-            final ASTNodeFactory b= ctx.getASTBuilder();
+        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
+            final Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
+
+            if (!evaluatedExpression.isEmpty()) {
+                final Name mame= ASTNodes.as(lhs, Name.class);
+                final FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
+                IVariableBinding variableBinding;
+
+                if (fieldAccess != null) {
+                    variableBinding= fieldAccess.resolveFieldBinding();
+                } else if (mame != null) {
+                    IBinding binding= mame.resolveBinding();
+
+                    if (!(binding instanceof IVariableBinding)) {
+                        return true;
+                    }
+
+                    variableBinding= (IVariableBinding) binding;
+                } else {
+                    return true;
+                }
+
+                for (Expression expression : evaluatedExpression) {
+                    final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(variableBinding,
+                            expression, true).find();
+
+                    if (!variableUseVisitor.getUses().isEmpty()) {
+                        return true;
+                    }
+                }
+            }
 
             final VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-            final Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
             final VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
+
+            final Refactorings r= ctx.getRefactorings();
+            final ASTNodeFactory b= ctx.getASTBuilder();
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
                 r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());

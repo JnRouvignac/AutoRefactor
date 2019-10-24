@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2019 Fabrice Tiercelin - Change the parsing of condition
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,5 +136,14 @@ public class NoAssignmentInIfConditionSample {
                 return true;
         }
         return false;
+    }
+
+    public void doNotRefactorConditionalAnd(Queue<Boolean> q, boolean isValid) {
+        Boolean i;
+        if (isValid && (i = q.poll())) {
+            System.out.println("Value=" + i);
+        } else {
+            System.out.println("Empty");
+        }
     }
 }
