@@ -1325,15 +1325,15 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_name;
+    public static String CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_description;
+    public static String CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_reason;
+    public static String CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_reason;
     /**
      * Automatically filled.
      */

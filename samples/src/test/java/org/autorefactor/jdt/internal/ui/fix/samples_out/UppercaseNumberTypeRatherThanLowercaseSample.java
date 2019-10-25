@@ -23,23 +23,26 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.ui.fix.samples_in;
+package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-public class CapitalizeLongLiteralSample {
+public class UppercaseNumberTypeRatherThanLowercaseSample {
+    private long usual = 101L;
+    private long octal = 0121L;
+    private long hex = 0xdafdafdafL;
+    private long binary = 0b1110010111L;
 
-    private long usual = 101l;
-    private long octal = 0121l;
-    private long hex = 0xdafdafdafl;
-    private long binary = 0b1110010111l;
+    private float usualFloat = 101F;
+    private float octalFloat = 0121F;
 
-    public long refactorIt() {
-        long localVar = 11l;
-        return localVar + 333l;
+    public float refactorIt() {
+        long localVar = 11L;
+        float localFloat = 11F;
+        return localVar + 333L + localFloat + 11F;
     }
 
-    public long doNotRefactor() {
+    public float doNotRefactor() {
         long l = 11L;
-        return l + 101L;
+        float f = 11F;
+        return l + 101L + f + 11F;
     }
-
 }

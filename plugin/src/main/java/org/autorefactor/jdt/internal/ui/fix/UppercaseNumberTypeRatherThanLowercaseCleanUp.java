@@ -33,14 +33,14 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
  *
  * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
  */
-public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
+public class UppercaseNumberTypeRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_name;
     }
 
     /**
@@ -49,7 +49,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_description;
     }
 
     /**
@@ -58,25 +58,26 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_reason;
     }
 
     @Override
     public boolean visit(NumberLiteral node) {
         final String token= node.getToken();
-        if (token.endsWith("l")) { //$NON-NLS-1$
-            replaceLong(node, token);
+
+        if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ $NON-NLS-2$
+            useUppercase(node, token);
             return false;
         }
+
         return true;
     }
 
-    private void replaceLong(final NumberLiteral node, final String token) {
+    private void useUppercase(final NumberLiteral node, final String token) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final NumberLiteral replacement= b.numberLiteral();
-        final String newToken= token.substring(0, token.length() - 1) + "L"; //$NON-NLS-1$
-        replacement.setToken(newToken);
+        final String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
+        final NumberLiteral replacement= b.number(newToken);
         ctx.getRefactorings().replace(node, replacement);
     }
 }
