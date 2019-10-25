@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.JavaConstants;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -91,16 +92,20 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                     ctx.getRefactorings().replace(arg0, getStringLiteral(token));
                     return false;
                 }
+
                 if (getJavaMinorVersion() >= 5) {
                     if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                         return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                     }
+
                     if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
                         return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
                     }
+
                     if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                         return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                     }
+
                     ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
                     return false;
                 }
@@ -114,12 +119,15 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 if (literalValue.matches("0+")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 }
+
                 if (literalValue.matches("0+1")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
                 }
+
                 if (literalValue.matches("0+10")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                 }
+
                 if (literalValue.matches("\\d+")) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
                     return false;
@@ -155,16 +163,19 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
+
         if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
             final Expression arg0= ASTNodes.arg0(node);
+
             if (arg0 instanceof NumberLiteral) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+
                 if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node,
-                            getClassInstanceCreatorNode((Name) node.getExpression(), token));
+                            getClassInstanceCreatorNode(node.getExpression(), token));
                 } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -174,12 +185,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else {
                     return true;
                 }
+
                 return false;
             }
         } else if (!(node.getParent() instanceof PrefixExpression)
                 || !ASTNodes.hasOperator((PrefixExpression) node.getParent(), PrefixExpression.Operator.NOT)) {
             return maybeReplaceEquals(true, node, node);
         }
+
         return true;
     }
 
@@ -187,6 +200,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Expression arg0= ASTNodes.arg0(mi);
+
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
                     final ASTNodeFactory b= this.ctx.getASTBuilder();
@@ -194,9 +208,11 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else {
                     this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -213,9 +229,19 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private ASTNode getClassInstanceCreatorNode(final Name className, final String numberLiteral) {
+    private ASTNode getClassInstanceCreatorNode(final Expression expression, final String numberLiteral) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
+
+        String fullyQualifiedName;
+        if (expression instanceof Name) {
+            fullyQualifiedName= ((Name) expression).getFullyQualifiedName();
+        } else if (expression instanceof FieldAccess) {
+            fullyQualifiedName= ((FieldAccess) expression).getName().getFullyQualifiedName();
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        return b.new0(fullyQualifiedName, b.string(numberLiteral));
     }
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
