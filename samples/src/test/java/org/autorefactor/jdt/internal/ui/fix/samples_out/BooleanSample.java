@@ -455,6 +455,18 @@ public class BooleanSample {
         }
     }
 
+    public int directlyPassOppositeBoolean() {
+        // Keep this comment
+        {
+            aMethodThatAcceptsABoolean(booleanPrimitive);
+            aMethodThatAcceptsABoolean(!booleanPrimitive);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else
+                return 10;
+        }
+    }
+
     public void doNotMoveActiveExpression(List<Integer> modifiableList) {
         if (modifiableList.add(1)) {
             aMethodThatAcceptsABoolean(modifiableList.contains(1));
