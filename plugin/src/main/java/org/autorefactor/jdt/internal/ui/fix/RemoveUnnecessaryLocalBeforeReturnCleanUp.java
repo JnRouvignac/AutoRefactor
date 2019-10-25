@@ -101,6 +101,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             } else {
                 final Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
                 if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
+                        && as.getLeftHandSide() instanceof Name
                         && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
                                 node)) {
                     replaceReturnStatement(node, previousSibling, as.getRightHandSide());
