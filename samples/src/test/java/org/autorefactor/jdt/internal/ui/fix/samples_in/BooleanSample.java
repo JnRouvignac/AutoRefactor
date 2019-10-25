@@ -613,7 +613,7 @@ public class BooleanSample {
 
     public int directlyPassOppositeBoolean() {
         // Keep this comment
-        if (booleanPrimitive) {
+        if (this.booleanPrimitive) {
             aMethodThatAcceptsABoolean(true);
             aMethodThatAcceptsABoolean(false);
             if (aMethodThatReturnsBoolean()) {

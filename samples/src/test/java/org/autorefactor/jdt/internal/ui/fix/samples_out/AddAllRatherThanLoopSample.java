@@ -76,7 +76,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
 
     public void replaceLoopWithFieldList() {
         // Keep this comment
-        addAll(innerList);
+        addAll(this.innerList);
     }
 
     public void replaceForeachWithFieldList() {
