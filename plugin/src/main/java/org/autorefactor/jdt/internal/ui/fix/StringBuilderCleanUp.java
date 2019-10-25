@@ -45,6 +45,7 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -251,9 +252,17 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         if (expression instanceof StringLiteral) {
             return !isEmptyString(expression);
         }
-        if (expression instanceof Name && ASTNodes.hasType(expression, String.class.getCanonicalName())) {
-            Name name= (Name) expression;
-            return name.resolveConstantExpressionValue() != null;
+
+        if (ASTNodes.hasType(expression, String.class.getCanonicalName())) {
+            if (expression instanceof Name) {
+                Name name= (Name) expression;
+                return name.resolveConstantExpressionValue() != null;
+            }
+
+            if (expression instanceof FieldAccess) {
+                FieldAccess fieldAccess= (FieldAccess) expression;
+                return fieldAccess.resolveConstantExpressionValue() != null;
+            }
         }
 
         return false;

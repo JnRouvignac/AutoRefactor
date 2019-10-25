@@ -30,6 +30,7 @@ import java.io.IOException;
 import javax.management.JMX;
 
 public class StringBuilderSample {
+    private static final String CONSTANT = "CONSTANT";
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
         // Keep this comment
@@ -75,6 +76,12 @@ public class StringBuilderSample {
         // Keep this comment
         sbuf.append("<").append(JMX.DEFAULT_VALUE_FIELD).append(">").append(text);
         sbui.append("<").append(JMX.DEFAULT_VALUE_FIELD).append(">").append(text);
+    }
+
+    public void useConcatenationWithStringConstantField(StringBuffer sbuf, StringBuilder sbui, String text) {
+        // Keep this comment
+        sbuf.append("<").append(CONSTANT).append(">").append(text);
+        sbui.append("<").append(CONSTANT).append(">").append(text);
     }
 
     public void doNotUseConcatenationWithAnyConstant(StringBuffer sbuf, StringBuilder sbui, String text) {
