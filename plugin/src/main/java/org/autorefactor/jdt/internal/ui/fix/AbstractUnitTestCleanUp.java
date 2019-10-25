@@ -85,7 +85,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
      * @param methodName     methodName.
      * @param copyOfActual   The copy of the actual value or null.
      * @param copyOfExpected The copy of the expected value or null.
-     * @param delta TODO
+     * @param delta          The delta or null
      * @param failureMessage The original failure message or null.
      * @return The method invocation object.
      */
@@ -335,18 +335,6 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         return invokeMethod(b, originalMethod, methodName, copyOfActual, null, null, failureMessage);
     }
 
-    /**
-     * Invoke the method.
-     *
-     * @param b              The builder.
-     * @param originalMethod The copy of the original method.
-     * @param methodName     methodName.
-     * @param copyOfActual   The copy of the actual value or null.
-     * @param copyOfExpected The copy of the expected value or null.
-     * @param delta TODO
-     * @param failureMessage The original failure message or null.
-     * @return The method invocation object.
-     */
     private MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             Expression delta, final Expression failureMessage) {
