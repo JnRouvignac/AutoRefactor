@@ -25,29 +25,18 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
@@ -86,7 +75,20 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final Type type= node.getType();
-        return !type.isParameterizedType() || node.getAnonymousClassDeclaration() != null || !parentAllowsDiamondOperator(node) || !canUseDiamondOperator(node, type) || maybeRemoveAllTypeArguments((ParameterizedType) type);
+
+        if (type.isParameterizedType()
+                && node.getAnonymousClassDeclaration() == null
+                && ASTNodes.getTargetType(node) != null
+                && canUseDiamondOperator(node, type)) {
+            final List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
+
+            if (!typeArguments.isEmpty()) {
+                this.ctx.getRefactorings().remove(typeArguments);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -101,20 +103,20 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
         ITypeBinding typeBinding= type.resolveBinding();
         IMethodBinding ctorBinding= node.resolveConstructorBinding();
+
         if (typeBinding == null || ctorBinding == null) {
             return false;
         }
-        List<ITypeBinding> typeArguments= new ArrayList<>();
-        Collections.addAll(typeArguments, typeBinding.getTypeArguments());
+
+        List<ITypeBinding> typeArguments= new ArrayList<>(Arrays.asList(typeBinding.getTypeArguments()));
         ITypeBinding typeDecl= typeBinding.getTypeDeclaration();
-        List<ITypeBinding> typeParameters= new ArrayList<>();
-        Collections.addAll(typeParameters, typeDecl.getTypeParameters());
+        List<ITypeBinding> typeParameters= new ArrayList<>(Arrays.asList(typeDecl.getTypeParameters()));
 
         IMethodBinding methodDecl= ctorBinding.getMethodDeclaration();
         ITypeBinding[] actualCtorParamTypes= ctorBinding.getParameterTypes();
         ITypeBinding[] declMethodParamTypes= methodDecl.getParameterTypes();
-
         int limit= Math.min(declMethodParamTypes.length, args.size());
+
         for (int i= 0; i < limit; i++) {
             ITypeBinding declParamType= declMethodParamTypes[i];
             ITypeBinding actualParamType= actualCtorParamTypes[i];
@@ -135,9 +137,11 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
                         ITypeBinding actualArgTypeArg= actualArgTypeArgs[j];
                         int typeArgIndex= typeArguments.indexOf(actualArgTypeArg);
-                        if (!(typeParamIndex != -1 && typeArgIndex != -1)) {
+
+                        if (typeParamIndex == -1 || typeArgIndex == -1) {
                             return false;
                         }
+
                         // The type parameter is matching
                         typeParameters.remove(typeParamIndex);
                         typeArguments.remove(typeArgIndex);
@@ -148,31 +152,5 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
         // All the type parameters are matching
         return typeParameters.isEmpty();
-    }
-
-    private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
-        final ASTNode parentInfo= ASTNodes.getParent(node, ParenthesizedExpression.class);
-        final StructuralPropertyDescriptor locationInParent= parentInfo.getLocationInParent();
-
-        switch (parentInfo.getParent().getNodeType()) {
-        case ASSIGNMENT:
-            return Assignment.RIGHT_HAND_SIDE_PROPERTY.equals(locationInParent);
-        case RETURN_STATEMENT:
-            return ReturnStatement.EXPRESSION_PROPERTY.equals(locationInParent);
-        case VARIABLE_DECLARATION_FRAGMENT:
-            return VariableDeclarationFragment.INITIALIZER_PROPERTY.equals(locationInParent);
-        case METHOD_INVOCATION: // TODO some of them can be refactored
-        default:
-            return false;
-        }
-    }
-
-    private boolean maybeRemoveAllTypeArguments(ParameterizedType pt) {
-        final List<Type> typeArguments= ASTNodes.typeArguments(pt);
-        if (!typeArguments.isEmpty()) {
-            this.ctx.getRefactorings().remove(typeArguments);
-            return false;
-        }
-        return true;
     }
 }
