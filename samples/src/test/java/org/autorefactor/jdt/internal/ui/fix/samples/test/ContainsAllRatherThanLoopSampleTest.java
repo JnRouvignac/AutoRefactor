@@ -147,6 +147,18 @@ public class ContainsAllRatherThanLoopSampleTest {
     }
 
     @Test
+    public void replaceForeachHoldResultInFieldWhenDataAreGood() {
+        // Given: NA
+
+        // When
+        actual1 = sampleIn.replaceForeachHoldResultInField(collection, goodData);
+        actual2 = sampleOut.replaceForeachHoldResultInField(collection, goodData);
+
+        // Then
+        assertEquals(actual1, actual2);
+    }
+
+    @Test
     public void replaceForCounterWhenDataAreGood() {
         // Given: NA
 
@@ -321,6 +333,18 @@ public class ContainsAllRatherThanLoopSampleTest {
         // When
         actual1 = sampleIn.replaceForeachHoldResultInVariableCannotRemoveVariable(collection, badData);
         actual2 = sampleOut.replaceForeachHoldResultInVariableCannotRemoveVariable(collection, badData);
+
+        // Then
+        assertEquals(actual1, actual2);
+    }
+
+    @Test
+    public void replaceForeachHoldResultInFieldWhenDataAreBad() {
+        // Given: NA
+
+        // When
+        actual1 = sampleIn.replaceForeachHoldResultInField(collection, badData);
+        actual2 = sampleOut.replaceForeachHoldResultInField(collection, badData);
 
         // Then
         assertEquals(actual1, actual2);

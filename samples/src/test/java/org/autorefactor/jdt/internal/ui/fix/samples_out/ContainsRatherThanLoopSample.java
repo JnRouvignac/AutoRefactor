@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ContainsRatherThanLoopSample {
+    private boolean resultField;
+
     public boolean replaceForeach(List<String> col, String toFind) {
         // Keep this comment
         return col.contains(toFind);
@@ -105,6 +107,12 @@ public class ContainsRatherThanLoopSample {
         ;
         result = col.contains(toFind);
         return result;
+    }
+
+    public boolean replaceForeachHoldResultInField(List<String> col, String toFind) {
+        // Keep this comment
+        resultField = col.contains(toFind);
+        return resultField;
     }
 
     public void replaceForeachWithoutVarDeclarationNorReturn(List<String> col, String toFind) {

@@ -35,6 +35,7 @@ import java.util.List;
 public class ContainsAllRatherThanLoopSample {
     private List<Long> collectionToAnalyzeField = new ArrayList<>();
     private List<Long> dataToSearchField = new ArrayList<>();
+    private boolean resultField;
 
     public boolean replaceForeach(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
         // Keep this comment
@@ -121,6 +122,13 @@ public class ContainsAllRatherThanLoopSample {
         // Keep this comment too
         result = collectionToAnalyze.containsAll(dataToSearch);
         return result;
+    }
+
+    public boolean replaceForeachHoldResultInField(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+
+        // Keep this comment
+        this.resultField = collectionToAnalyze.containsAll(dataToSearch);
+        return this.resultField;
     }
 
     public void replaceForeachWithoutVarDeclarationNorReturn(List<Long> collectionToAnalyze, List<Long> dataToSearch) {

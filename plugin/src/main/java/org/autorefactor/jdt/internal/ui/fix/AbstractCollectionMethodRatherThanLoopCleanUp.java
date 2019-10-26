@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -219,10 +220,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             if (previousStatement != null) {
                 boolean previousStmtIsPreviousSibling= previousStatement.equals(ASTNodes.getPreviousSibling(forNode));
                 Assignment as= ASTNodes.asExpression(uniqueThenStatement, Assignment.class);
-                Pair<Name, Expression> innerInit= ForLoopHelper.decomposeInitializer(as);
-                Name initName= innerInit.getFirst();
+                Pair<Expression, Expression> innerInit= ForLoopHelper.decomposeInitializer(as);
+                Expression initName= innerInit.getFirst();
                 Expression init2= innerInit.getSecond();
-                Pair<Name, Expression> outerInit= getInitializer(previousStatement);
+                Pair<Expression, Expression> outerInit= getInitializer(previousStatement);
 
                 if (ASTNodes.isSameVariable(outerInit.getFirst(), initName)) {
                     Boolean isPositive= signCollectionContains((BooleanLiteral) init2,
@@ -241,7 +242,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         }
 
         private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
-                Statement previousStatement, boolean previousStmtIsPreviousSibling, Name initName, boolean isPositive) {
+                Statement previousStatement, boolean previousStmtIsPreviousSibling, Expression initName, boolean isPositive) {
             ASTNodeFactory b= ctx.getASTBuilder();
 
             Statement replacement;
@@ -257,7 +258,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             ctx.getRefactorings().replace(forNode, replacement);
 
             if (previousStmtIsPreviousSibling) {
-                ctx.getRefactorings().remove(previousStatement);
+                ctx.getRefactorings().removeButKeepComment(previousStatement);
             }
         }
 
@@ -269,7 +270,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             return null;
         }
 
-        private Pair<Name, Expression> getInitializer(Statement statement) {
+        private Pair<Expression, Expression> getInitializer(Statement statement) {
             if (statement instanceof VariableDeclarationStatement) {
                 return uniqueVariableDeclarationFragmentName(statement);
             }
@@ -277,8 +278,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             if (statement instanceof ExpressionStatement) {
                 Assignment as= ASTNodes.asExpression(statement, Assignment.class);
 
-                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && as.getLeftHandSide() instanceof Name) {
-                    return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
+                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && (as.getLeftHandSide() instanceof Name || as.getLeftHandSide() instanceof FieldAccess)) {
+                    return Pair.of(as.getLeftHandSide(), as.getRightHandSide());
                 }
             }
 
@@ -313,7 +314,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     Expression loopElement= null;
                     IfStatement is;
                     if (statements.size() == 2) {
-                        Pair<Name, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
+                        Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
                         loopElement= loopVarPair.getFirst();
                         MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
 
@@ -338,7 +339,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     Expression loopElement= null;
                     IfStatement is;
                     if (statements.size() == 2) {
-                        Pair<Name, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
+                        Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
                         loopElement= loopVarPair.getFirst();
                         MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
 
@@ -374,11 +375,11 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     b.copySubtree(loopContent.getLoopVariable()));
         }
 
-        private Pair<Name, Expression> uniqueVariableDeclarationFragmentName(Statement statement) {
+        private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(Statement statement) {
             VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(ASTNodes.as(statement, VariableDeclarationStatement.class));
 
             if (vdf != null) {
-                return Pair.of((Name) vdf.getName(), vdf.getInitializer());
+                return Pair.of(vdf.getName(), vdf.getInitializer());
             }
 
             return Pair.empty();
