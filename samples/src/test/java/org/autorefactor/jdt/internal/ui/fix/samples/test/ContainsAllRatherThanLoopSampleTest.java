@@ -38,11 +38,11 @@ public class ContainsAllRatherThanLoopSampleTest {
 
     public org.autorefactor.jdt.internal.ui.fix.samples_in.ContainsAllRatherThanLoopSample sampleIn;
     public org.autorefactor.jdt.internal.ui.fix.samples_out.ContainsAllRatherThanLoopSample sampleOut;
-    
+
     private List<Long> collection;
     private List<Long> goodData;
     private List<Long> badData;
-    
+
     private boolean actual1;
     private boolean actual2;
 
@@ -65,7 +65,7 @@ public class ContainsAllRatherThanLoopSampleTest {
     @Test
     public void replaceForeachWhenDataAreGood() {
         // Given: NA
-        
+
         // When
         actual1 = sampleIn.replaceForeach(collection, goodData);
         actual2 = sampleOut.replaceForeach(collection, goodData);
@@ -73,7 +73,7 @@ public class ContainsAllRatherThanLoopSampleTest {
         // Then
         assertEquals(actual1, actual2);
     }
-    
+
     @Test
     public void replaceForeachNextStatementAfterIfWhenDataAreGood() {
         // Given: NA
@@ -151,8 +151,8 @@ public class ContainsAllRatherThanLoopSampleTest {
         // Given: NA
 
         // When
-        actual1 = sampleIn.replaceForCounter(collection, goodData);
-        actual2 = sampleOut.replaceForCounter(collection, goodData);
+        actual1 = sampleIn.replaceForCounter();
+        actual2 = sampleOut.replaceForCounter();
 
         // Then
         assertEquals(actual1, actual2);
@@ -245,7 +245,7 @@ public class ContainsAllRatherThanLoopSampleTest {
     @Test
     public void replaceForeachWhenDataAreBad() {
         // Given: NA
-        
+
         // When
         actual1 = sampleIn.replaceForeach(collection, badData);
         actual2 = sampleOut.replaceForeach(collection, badData);
@@ -253,7 +253,7 @@ public class ContainsAllRatherThanLoopSampleTest {
         // Then
         assertEquals(actual1, actual2);
     }
-    
+
     @Test
     public void replaceForeachNextStatementAfterIfWhenDataAreBad() {
         // Given: NA
@@ -321,18 +321,6 @@ public class ContainsAllRatherThanLoopSampleTest {
         // When
         actual1 = sampleIn.replaceForeachHoldResultInVariableCannotRemoveVariable(collection, badData);
         actual2 = sampleOut.replaceForeachHoldResultInVariableCannotRemoveVariable(collection, badData);
-
-        // Then
-        assertEquals(actual1, actual2);
-    }
-
-    @Test
-    public void replaceForCounterWhenDataAreBad() {
-        // Given: NA
-
-        // When
-        actual1 = sampleIn.replaceForCounter(collection, badData);
-        actual2 = sampleOut.replaceForCounter(collection, badData);
 
         // Then
         assertEquals(actual1, actual2);

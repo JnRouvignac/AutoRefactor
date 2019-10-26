@@ -153,9 +153,9 @@ public class ContainsAllRatherThanLoopSample {
         return true;
     }
 
-    public boolean replaceForCounter(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+    public boolean replaceForCounter() {
         // Keep this comment
-        return collectionToAnalyze.containsAll(dataToSearch);
+        return this.collectionToAnalyzeField.containsAll(this.dataToSearchField);
     }
 
     public boolean replaceForCounterInvertedCondition(List<Long> collectionToAnalyze, List<Long> dataToSearch) {

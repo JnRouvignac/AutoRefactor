@@ -214,11 +214,11 @@ public class ContainsAllRatherThanLoopSample {
         return true;
     }
 
-    public boolean replaceForCounter(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+    public boolean replaceForCounter() {
         // Keep this comment
-        for (int i = 0; i < dataToSearch.size(); i++) {
-            Long number = dataToSearch.get(i);
-            if (!collectionToAnalyze.contains(number)) {
+        for (int i = 0; i < this.dataToSearchField.size(); i++) {
+            Long number = this.dataToSearchField.get(i);
+            if (!this.collectionToAnalyzeField.contains(number)) {
                 return false;
             }
         }
