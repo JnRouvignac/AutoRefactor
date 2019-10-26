@@ -50,15 +50,15 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckSample {
                 return false;
         } else if (!aText.equals(other.aText))
             return false;
-        if (anObservable == null) {
-            if (other.anObservable != null)
+        if (null == anObservable) {
+            if (null != other.anObservable)
                 return false;
         } else if (!anObservable.equals(other.anObservable))
             return false;
-        if (textById == null) {
+        if (this.textById == null) {
             if (other.textById != null)
                 return false;
-        } else if (!textById.equals(other.textById))
+        } else if (!this.textById.equals(other.textById))
             return false;
         return true;
     }

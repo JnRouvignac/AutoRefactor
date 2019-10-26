@@ -52,7 +52,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckSample {
         if (!Objects.equals(anObservable, other.anObservable)) {
             return false;
         }
-        if (!Objects.equals(textById, other.textById)) {
+        if (!Objects.equals(this.textById, other.textById)) {
             return false;
         }
         return true;
