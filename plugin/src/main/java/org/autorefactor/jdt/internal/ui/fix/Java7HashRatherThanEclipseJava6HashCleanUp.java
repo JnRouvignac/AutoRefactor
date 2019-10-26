@@ -627,7 +627,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         }
 
         r.replace(statements.get(0),
-                b.return0(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()), "hash", copyOfFields)));
+                b.return0(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()), "hash", copyOfFields))); //$NON-NLS-1$
 
         for (int i= 1; i < statements.size(); i++) {
             r.remove(statements.get(i));
