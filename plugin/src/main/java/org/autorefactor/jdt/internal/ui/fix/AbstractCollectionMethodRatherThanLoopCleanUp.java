@@ -220,7 +220,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             if (previousStatement != null) {
                 boolean previousStmtIsPreviousSibling= previousStatement.equals(ASTNodes.getPreviousSibling(forNode));
                 Assignment as= ASTNodes.asExpression(uniqueThenStatement, Assignment.class);
-                Pair<Expression, Expression> innerInit= ForLoopHelper.decomposeInitializer(as);
+                Pair<Expression, Expression> innerInit= ASTNodes.decomposeInitializer(as);
                 Expression initName= innerInit.getFirst();
                 Expression init2= innerInit.getSecond();
                 Pair<Expression, Expression> outerInit= getInitializer(previousStatement);

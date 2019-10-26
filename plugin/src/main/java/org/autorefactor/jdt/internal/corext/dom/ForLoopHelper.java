@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -40,8 +39,6 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** Helper class for dealing with loops. */
 public final class ForLoopHelper {
@@ -203,7 +200,7 @@ public final class ForLoopHelper {
             Expression firstInit= initializers.get(0);
 
             if (updaters.isEmpty()) {
-                final Pair<Expression, Expression> initPair= decomposeInitializer(firstInit);
+                final Pair<Expression, Expression> initPair= ASTNodes.decomposeInitializer(firstInit);
                 final Expression init= initPair.getFirst();
                 final MethodInvocation condMi= ASTNodes.as(node.getExpression(), MethodInvocation.class);
                 final MethodInvocation initMi= ASTNodes.as(initPair.getSecond(), MethodInvocation.class);
@@ -214,7 +211,7 @@ public final class ForLoopHelper {
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
             } else if (updaters.size() == 1 && ASTNodes.isPrimitive(firstInit, int.class.getSimpleName())) {
-                final Pair<Expression, Expression> initPair= decomposeInitializer(firstInit);
+                final Pair<Expression, Expression> initPair= ASTNodes.decomposeInitializer(firstInit);
                 final Expression init= initPair.getFirst();
                 final Expression startValue= initPair.getSecond();
                 Long zero= ASTNodes.integerLiteral(startValue);
@@ -274,44 +271,6 @@ public final class ForLoopHelper {
         }
 
         return null;
-    }
-
-    /**
-     * Decomposes an initializer into a {@link Pair} with the name of the
-     * initialized variable and the initializing expression.
-     *
-     * @param init the initializer to decompose
-     * @return a {@link Pair} with the name of the initialized variable and the
-     *         initializing expression, or {@code null} if the initializer could not
-     *         be decomposed
-     */
-    public static Pair<Expression, Expression> decomposeInitializer(Expression init) {
-        if (init instanceof VariableDeclarationExpression) {
-            final VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
-            final List<VariableDeclarationFragment> fragments= ASTNodes.fragments(vde);
-
-            if (fragments.size() == 1) {
-                final VariableDeclarationFragment fragment= fragments.get(0);
-                return Pair.of((Name) fragment.getName(), fragment.getInitializer());
-            }
-        } else if (init instanceof Assignment) {
-            final Assignment as= (Assignment) init;
-
-            if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                final Name name= ASTNodes.as(as.getLeftHandSide(), Name.class);
-                final FieldAccess fieldAccess= ASTNodes.as(as.getLeftHandSide(), FieldAccess.class);
-
-                if (name != null) {
-                    return Pair.of(name, as.getRightHandSide());
-                }
-
-                if (fieldAccess != null) {
-                    return Pair.of(fieldAccess, as.getRightHandSide());
-                }
-            }
-        }
-
-        return Pair.empty();
     }
 
     private static ForLoopContent getIndexOnIterable(final Expression condition, Expression loopVariable, Long zero, Expression collectionOnSize, Expression arrayOnLength) {

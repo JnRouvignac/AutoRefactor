@@ -52,6 +52,7 @@ import java.util.TreeSet;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -2543,5 +2544,43 @@ public final class ASTNodes {
         default:
             return false;
         }
+    }
+
+    /**
+     * Decomposes an initializer into a {@link Pair} with the name of the
+     * initialized variable and the initializing expression.
+     *
+     * @param init the initializer to decompose
+     * @return a {@link Pair} with the name of the initialized variable and the
+     *         initializing expression, or {@code null} if the initializer could not
+     *         be decomposed
+     */
+    public static Pair<Expression, Expression> decomposeInitializer(Expression init) {
+        if (init instanceof VariableDeclarationExpression) {
+            final VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
+            final List<VariableDeclarationFragment> fragments= fragments(vde);
+
+            if (fragments.size() == 1) {
+                final VariableDeclarationFragment fragment= fragments.get(0);
+                return Pair.of(fragment.getName(), fragment.getInitializer());
+            }
+        } else if (init instanceof Assignment) {
+            final Assignment as= (Assignment) init;
+
+            if (hasOperator(as, Assignment.Operator.ASSIGN)) {
+                final Name name= as(as.getLeftHandSide(), Name.class);
+                final FieldAccess fieldAccess= as(as.getLeftHandSide(), FieldAccess.class);
+
+                if (name != null) {
+                    return Pair.of(name, as.getRightHandSide());
+                }
+
+                if (fieldAccess != null) {
+                    return Pair.of(fieldAccess, as.getRightHandSide());
+                }
+            }
+        }
+
+        return Pair.empty();
     }
 }
