@@ -170,7 +170,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             if (canUseAssertNotEquals() || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         ASTNodes.arg0(conditionMi));
-                return maybeRefactorToAssertEquals(nodeToReplace, originalMethod, isAssertTrue,
+                return maybeRefactorToEquality(nodeToReplace, originalMethod, isAssertTrue,
                         actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
             }
         } else if (constantValue instanceof Boolean) {
@@ -232,12 +232,12 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
         }
-        return maybeRefactorToAssertEquals(nodeToReplace, originalMethod, isAssertEquals,
+        return maybeRefactorToEquality(nodeToReplace, originalMethod, isAssertEquals,
                 actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
     }
 
     /**
-     * Maybe refactor the assert equals.
+     * Maybe refactor the assert null or equals.
      *
      * @param nodeToReplace   The node to replace
      * @param originalMethod  The node
@@ -248,7 +248,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
      * @param isRewriteNeeded True if is the rewriting is needed.
      * @return The return
      */
-    protected boolean maybeRefactorToAssertEquals(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
+    protected boolean maybeRefactorToEquality(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
             final boolean isAssertEquals, final Expression actualValue, final Expression expectedValue,
             final Expression failureMessage, final boolean isRewriteNeeded) {
         final Refactorings r= this.ctx.getRefactorings();
