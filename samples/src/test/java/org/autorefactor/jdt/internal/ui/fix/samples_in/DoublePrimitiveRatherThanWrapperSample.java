@@ -223,16 +223,28 @@ public class DoublePrimitiveRatherThanWrapperSample {
         Double anotherDouble = assignedDouble;
     }
 
-    public void replaceWrapperAssignedOnDoubleField() {
+    public void replaceWrapperAssignedOnDoubleVariable() {
         // Keep this comment
         Double assignedDouble = Double.MIN_VALUE;
         doubleField = assignedDouble;
     }
 
-    public void replaceWrapperAssignedOnWrapperField() {
+    public void replaceWrapperAssignedOnWrapperVariable() {
         // Keep this comment
         Double assignedDouble = Double.MIN_VALUE;
         wrapperField = assignedDouble;
+    }
+
+    public void replaceWrapperAssignedOnDoubleField() {
+        // Keep this comment
+        Double assignedDouble = Double.MIN_VALUE;
+        this.doubleField = assignedDouble;
+    }
+
+    public void replaceWrapperAssignedOnWrapperField() {
+        // Keep this comment
+        Double assignedDouble = Double.MIN_VALUE;
+        this.wrapperField = assignedDouble;
     }
 
     public void doNotReplaceWrapperAssignedOnObjectField() {

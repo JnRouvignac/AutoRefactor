@@ -47,6 +47,8 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -294,12 +296,20 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                     return isNotNull(assignment.getRightHandSide());
                 }
 
-                return assignment.getRightHandSide().equals(node) && assignment.getLeftHandSide() instanceof Name
-                        && isOfType((Name) assignment.getLeftHandSide());
+                if (assignment.getRightHandSide().equals(node)) {
+                    if (assignment.getLeftHandSide() instanceof Name) {
+                        return isOfType(((Name) assignment.getLeftHandSide()).resolveTypeBinding());
+                    }
+                    if (assignment.getLeftHandSide() instanceof FieldAccess) {
+                        return isOfType(((FieldAccess) assignment.getLeftHandSide()).resolveTypeBinding());
+                    }
+                }
+
+                return false;
 
             case VARIABLE_DECLARATION_FRAGMENT:
                 final VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
-                return fragment.getInitializer().equals(node) && isOfType(fragment.getName());
+                return fragment.getInitializer().equals(node) && isOfType(fragment.getName().resolveTypeBinding());
 
             case RETURN_STATEMENT:
                 final ReturnStatement returnStatement= (ReturnStatement) parentNode;
@@ -341,11 +351,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             }
         }
 
-        private boolean isOfType(final Name name) {
-            if (ASTNodes.hasType(name.resolveTypeBinding(), getPrimitiveTypeName())) {
+        private boolean isOfType(final ITypeBinding resolveTypeBinding) {
+            if (ASTNodes.hasType(resolveTypeBinding, getPrimitiveTypeName())) {
                 return true;
             }
-            if (ASTNodes.hasType(name.resolveTypeBinding(), getWrapperFullyQualifiedName())) {
+            if (ASTNodes.hasType(resolveTypeBinding, getWrapperFullyQualifiedName())) {
                 autoBoxingCount++;
                 return true;
             }
