@@ -95,7 +95,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
             final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
-                    && ASTNodes.match(astMatcher, ASTNodes.arg0(miContains), ASTNodes.arg0(miAddOrRemove))) {
+                    && ASTNodes.match(astMatcher, ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 

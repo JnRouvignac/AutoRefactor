@@ -396,9 +396,10 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         @Override
         public boolean visit(MethodInvocation node) {
+            final MethodInvocation node1= node;
             if (isSameReference(node.getExpression(), mapExpression)
                     && ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    && ASTNodes.isSameVariable(ASTNodes.arg0(node), forEachParameter.getName())) {
+                    && ASTNodes.isSameVariable(ASTNodes.arguments(node1).get(0), forEachParameter.getName())) {
                 addResult(node);
             }
             return true;

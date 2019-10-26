@@ -106,7 +106,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
             if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-                final Expression arg0= ASTNodes.arg0(mi);
+                final Expression arg0= ASTNodes.arguments(mi).get(0);
                 final Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
                 final Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);

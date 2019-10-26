@@ -168,7 +168,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-            final Expression arg0= ASTNodes.arg0(node);
+            final MethodInvocation node1= node;
+            final Expression arg0= ASTNodes.arguments(node1).get(0);
 
             if (arg0 instanceof NumberLiteral) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
@@ -199,7 +200,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
         if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final Expression arg0= ASTNodes.arg0(mi);
+            final Expression arg0= ASTNodes.arguments(mi).get(0);
 
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
@@ -246,7 +247,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(ASTNodes.arg0(node))); //$NON-NLS-1$
+        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
         return b.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
     }

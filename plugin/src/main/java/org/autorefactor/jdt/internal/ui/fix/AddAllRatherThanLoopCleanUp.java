@@ -122,10 +122,10 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (getVariableUseCount(foreachVariable, node.getBody()) == 1
                 && mi != null && mi.arguments().size() == 1) {
             if (ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
-                if (ASTNodes.isSameLocalVariable(node.getParameter(), ASTNodes.arg0(mi))) {
+                if (ASTNodes.isSameLocalVariable(node.getParameter(), ASTNodes.arguments(mi).get(0))) {
                     return maybeReplaceForCollection(node, mi, iterable);
                 }
-            } else if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, ASTNodes.arg0(mi))) {
+            } else if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, ASTNodes.arguments(mi).get(0))) {
                 return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, mi);
             }
         }
@@ -151,7 +151,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
-                final Expression addArg0= ASTNodes.arg0(mi);
+                final Expression addArg0= ASTNodes.arguments(mi).get(0);
 
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
@@ -243,7 +243,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
         return ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) //$NON-NLS-1$
                 && (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess)
-                && ASTNodes.isSameLocalVariable(ASTNodes.arg0(getMI), loopContent.getLoopVariable())
+                && ASTNodes.isSameLocalVariable(ASTNodes.arguments(getMI).get(0), loopContent.getLoopVariable())
                 && ASTNodes.isSameVariable(loopContent.getContainerVariable(), getMI.getExpression());
     }
 

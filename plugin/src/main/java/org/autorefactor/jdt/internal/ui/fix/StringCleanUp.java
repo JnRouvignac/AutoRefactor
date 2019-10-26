@@ -105,72 +105,81 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             }
-        } else if (isStringValueOf && ASTNodes.hasType(ASTNodes.arg0(node), String.class.getCanonicalName())) {
-            if (ASTNodes.arg0(node) instanceof StringLiteral || ASTNodes.arg0(node) instanceof InfixExpression) {
-                r.replace(node, b.parenthesizeIfNeeded(b.move(ASTNodes.arg0(node))));
-                return false;
-            }
-        } else if ((isToStringForPrimitive(node) || isStringValueOf) && parent.getNodeType() == ASTNode.INFIX_EXPRESSION) {
-            // If node is in a String context, no need to call toString()
-            final InfixExpression ie= (InfixExpression) node.getParent();
-            final Expression lo= ie.getLeftOperand();
-            final Expression ro= ie.getRightOperand();
-            if (node.equals(lo)) {
-                if (ASTNodes.hasType(ro, String.class.getCanonicalName())) {
-                    replaceStringValueOfByArg0(lo, node);
+        } else {
+            final MethodInvocation node1= node;
+            if (isStringValueOf && ASTNodes.hasType(ASTNodes.arguments(node1).get(0), String.class.getCanonicalName())) {
+                final MethodInvocation node2= node;
+                final MethodInvocation node3= node;
+                if (ASTNodes.arguments(node2).get(0) instanceof StringLiteral || ASTNodes.arguments(node3).get(0) instanceof InfixExpression) {
+                    final MethodInvocation node4= node;
+                    r.replace(node, b.parenthesizeIfNeeded(b.move(ASTNodes.arguments(node4).get(0))));
                     return false;
                 }
-            } else if (node.equals(ro)) {
-                if (ASTNodes.hasType(lo, String.class.getCanonicalName())
-                        // Do not refactor left and right operand at the same time
-                        // to avoid compilation errors post cleanup
-                        && !r.hasBeenRefactored(lo)) {
-                    replaceStringValueOfByArg0(ro, node);
+            } else if ((isToStringForPrimitive(node) || isStringValueOf) && parent.getNodeType() == ASTNode.INFIX_EXPRESSION) {
+                // If node is in a String context, no need to call toString()
+                final InfixExpression ie= (InfixExpression) node.getParent();
+                final Expression lo= ie.getLeftOperand();
+                final Expression ro= ie.getRightOperand();
+                if (node.equals(lo)) {
+                    if (ASTNodes.hasType(ro, String.class.getCanonicalName())) {
+                        replaceStringValueOfByArg0(lo, node);
+                        return false;
+                    }
+                } else if (node.equals(ro)) {
+                    if (ASTNodes.hasType(lo, String.class.getCanonicalName())
+                            // Do not refactor left and right operand at the same time
+                            // to avoid compilation errors post cleanup
+                            && !r.hasBeenRefactored(lo)) {
+                        replaceStringValueOfByArg0(ro, node);
+                        return false;
+                    }
+                } else {
+                    // Left or right operation is necessarily a string, so just replace
+                    replaceStringValueOfByArg0(node, node);
                     return false;
                 }
-            } else {
-                // Left or right operation is necessarily a string, so just replace
-                replaceStringValueOfByArg0(node, node);
-                return false;
-            }
-        } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final MethodInvocation leftInvocation= ASTNodes.as(node.getExpression(), MethodInvocation.class);
-            final MethodInvocation rightInvocation= ASTNodes.as(ASTNodes.arg0(node), MethodInvocation.class);
+            } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+                final MethodInvocation leftInvocation= ASTNodes.as(node.getExpression(), MethodInvocation.class);
+                final MethodInvocation node2= node;
+                final MethodInvocation rightInvocation= ASTNodes.as(ASTNodes.arguments(node2).get(0), MethodInvocation.class);
 
-            if (leftInvocation != null && rightInvocation != null
-                    && ((ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                            && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
-                            || (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
-                                    && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
-                final Expression leftExpression= leftInvocation.getExpression();
-                final Expression rightExpression= rightInvocation.getExpression();
-                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
-                return false;
-            }
-        } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
-            final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
-
-            final Expression leftExpression= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
-            final Expression rightExpression= getReducedStringExpression(ASTNodes.arg0(node), isRefactoringNeeded);
-
-            if (isRefactoringNeeded.get()) {
-                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
-                return false;
-            }
-        } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
-            StringLiteral stringLiteral= ASTNodes.as(ASTNodes.arg0(node), StringLiteral.class);
-
-            if (stringLiteral != null) {
-                String value= stringLiteral.getLiteralValue();
-
-                if (value.length() == 1) {
-                    CharacterLiteral replacement= b.charLiteral();
-                    replacement.setCharValue(value.charAt(0));
-                    r.replace(stringLiteral, replacement);
+                if (leftInvocation != null && rightInvocation != null
+                        && ((ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                                && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
+                                || (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
+                                        && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
+                    final Expression leftExpression= leftInvocation.getExpression();
+                    final Expression rightExpression= rightInvocation.getExpression();
+                    r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
                     return false;
+                }
+            } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
+                final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
+
+                final Expression leftExpression= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
+                final MethodInvocation node2= node;
+                final Expression rightExpression= getReducedStringExpression(ASTNodes.arguments(node2).get(0), isRefactoringNeeded);
+
+                if (isRefactoringNeeded.get()) {
+                    r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
+                    return false;
+                }
+            } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
+                final MethodInvocation node2= node;
+                StringLiteral stringLiteral= ASTNodes.as(ASTNodes.arguments(node2).get(0), StringLiteral.class);
+
+                if (stringLiteral != null) {
+                    String value= stringLiteral.getLiteralValue();
+
+                    if (value.length() == 1) {
+                        CharacterLiteral replacement= b.charLiteral();
+                        replacement.setCharValue(value.charAt(0));
+                        r.replace(stringLiteral, replacement);
+                        return false;
+                    }
                 }
             }
         }
@@ -192,11 +201,11 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
-        final ITypeBinding actualType= ASTNodes.arg0(mi).resolveTypeBinding();
+        final ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
         if (!expectedType.equals(actualType) && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.move(ASTNodes.arg0(mi))));
+            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.move(ASTNodes.arguments(mi).get(0))));
         } else {
-            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(ASTNodes.arg0(mi))));
+            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(ASTNodes.arguments(mi).get(0))));
         }
     }
 

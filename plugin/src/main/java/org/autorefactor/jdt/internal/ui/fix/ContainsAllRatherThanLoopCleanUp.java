@@ -65,7 +65,8 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     @Override
     protected Expression getExpressionToFind(MethodInvocation condition, Expression forVar) {
         Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arg0(condition));
+        final MethodInvocation node= condition;
+        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(node).get(0));
 
         if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
             return expression;

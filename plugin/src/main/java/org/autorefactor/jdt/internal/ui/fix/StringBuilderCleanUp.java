@@ -97,7 +97,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 && ASTNodes.arguments(node).size() == 1
                 // Most expensive check comes last
                 && isStringBuilderOrBuffer(node.getExpression())) {
-            final MethodInvocation embeddedMI= ASTNodes.as(ASTNodes.arg0(node), MethodInvocation.class);
+            final MethodInvocation node1= node;
+            final MethodInvocation embeddedMI= ASTNodes.as(ASTNodes.arguments(node1).get(0), MethodInvocation.class);
 
             if (ASTNodes.usesGivenSignature(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
@@ -302,11 +303,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
     private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
         final ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
-        if (ASTNodes.hasType(ASTNodes.arg0(mi), expectedType.getQualifiedName(),
+        if (ASTNodes.hasType(ASTNodes.arguments(mi).get(0), expectedType.getQualifiedName(),
                 Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).getQualifiedName())) {
-            return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arg0(mi));
+            return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arguments(mi).get(0));
         }
-        return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arg0(mi));
+        return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arguments(mi).get(0));
     }
 
     /**

@@ -152,7 +152,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(ASTNodes.arg0(node)));
+        final MethodInvocation node1= node;
+        this.ctx.getRefactorings().replace(node, b.copy(ASTNodes.arguments(node1).get(0)));
         return false;
     }
 
