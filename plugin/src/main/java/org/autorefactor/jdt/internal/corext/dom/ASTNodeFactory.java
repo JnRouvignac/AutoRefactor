@@ -492,12 +492,12 @@ public class ASTNodeFactory {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,
                         "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: " //$NON-NLS-1$
-                                + "\"Note that per construction, it can only contain one class or array type, "
-                                + "at most, and then it is located in first position.\"");
+                                + "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
+                                + "at most, and then it is located in first position.\""); //$NON-NLS-1$
             }
             return toType(typeBinding.getWildcard(), typeNameDecider);
         }
-        throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'"); //$NON-NLS-1$ $NON-NLS-2$
+        throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private Type copyType(final Type type) {
@@ -951,15 +951,6 @@ public class ASTNodeFactory {
     }
 
     /**
-     * Builds a new {@link NumberLiteral} instance.
-     *
-     * @return a new number literal
-     */
-    public NumberLiteral numberLiteral() {
-        return ast.newNumberLiteral();
-    }
-
-    /**
      * Builds a new {@link CharacterLiteral} instance.
      *
      * @return a new character literal
@@ -1053,7 +1044,7 @@ public class ASTNodeFactory {
         }
 
         if (names.length == 1) {
-            String[] simpleNames= names[0].split("\\.");
+            String[] simpleNames= names[0].split("\\."); //$NON-NLS-1$
             if (simpleNames.length == 1) {
                 return simpleName(simpleNames[0]);
             }
@@ -1102,6 +1093,7 @@ public class ASTNodeFactory {
         return cic;
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {
         if (!isEmptyRangeCopy(toAdd)) {
             Collections.addAll(whereToAdd, toAdd);
@@ -1416,6 +1408,7 @@ public class ASTNodeFactory {
      * @param block      the block of the method
      * @return a new method declaration
      */
+    @SuppressWarnings("unchecked")
     public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
             List<SingleVariableDeclaration> parameters, Block block) {
         final MethodDeclaration md= ast.newMethodDeclaration();

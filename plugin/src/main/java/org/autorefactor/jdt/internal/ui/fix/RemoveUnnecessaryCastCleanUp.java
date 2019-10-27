@@ -85,7 +85,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(CastExpression node) {
         final NumberLiteral literal= ASTNodes.as(node.getExpression(), NumberLiteral.class);
-        if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ $NON-NLS-2$
+        if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ //$NON-NLS-2$
             if (ASTNodes.hasType(node.getType().resolveBinding(), long.class.getSimpleName())) {
                 createPrimitive(node, literal, 'L');
                 return false;
@@ -113,8 +113,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final NumberLiteral numberLiteral= b.numberLiteral();
-        numberLiteral.setToken(literal.getToken() + postfix);
+        final NumberLiteral numberLiteral= b.number(literal.getToken() + postfix);
 
         ctx.getRefactorings().replace(node, numberLiteral);
     }
@@ -222,7 +221,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         if (double.class.getSimpleName().equals(name) || Double.class.getCanonicalName().equals(name)) {
             return 7;
         }
-        throw new NotImplementedException(null, "for type '" + name + "'"); //$NON-NLS-1$ $NON-NLS-2$
+        throw new NotImplementedException(null, "for type '" + name + "'"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private boolean isAnyRefactored(final List<Expression> operands) {
