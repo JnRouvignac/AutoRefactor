@@ -123,7 +123,7 @@ public class CFGEdgeBuilder {
             throw new IllegalStateException(this.condition, "targetBlock is mandatory"); //$NON-NLS-1$
         }
         if (built != null) {
-            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ $NON-NLS-2$
+            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (condition != null) {
             built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);

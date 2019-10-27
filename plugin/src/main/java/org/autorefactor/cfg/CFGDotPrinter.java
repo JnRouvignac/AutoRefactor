@@ -173,16 +173,16 @@ public class CFGDotPrinter {
     private StringBuilder appendDigraph(final CFGBasicBlock block, final StringBuilder sb) {
         final String fileName= block.getFileName();
         final String className= fileName.substring(0, fileName.indexOf('.'));
-        sb.append("digraph ").append(className).append(" {\n"); //$NON-NLS-1$ $NON-NLS-2$
-        sb.append("label=\"").append(className).append("\";\n"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        sb.append("digraph ").append(className).append(" {\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("label=\"").append(className).append("\";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         return sb;
     }
 
     private StringBuilder appendSubgraph(final CFGSubGraph graph, final StringBuilder sb) {
         final String blockCodeExcerpt= escape(graph.codeExcerpt);
-        String clusterName= blockCodeExcerpt.replaceAll("\\W", "_"); //$NON-NLS-1$ $NON-NLS-2$
-        sb.append("subgraph cluster_").append(graph.startPosition).append("_").append(clusterName).append(" {\n"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-        sb.append("label=\"").append(blockCodeExcerpt).append("\";\n"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        String clusterName= blockCodeExcerpt.replaceAll("\\W", "_"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("subgraph cluster_").append(graph.startPosition).append("_").append(clusterName).append(" {\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append("label=\"").append(blockCodeExcerpt).append("\";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         return sb;
     }
 
@@ -190,7 +190,7 @@ public class CFGDotPrinter {
         edge.getSourceBlock().appendDotNodeId(sb).append(" -> "); //$NON-NLS-1$
         edge.getTargetBlock().appendDotNodeId(sb);
         if (edge.getCondition() != null) {
-            sb.append(" [label=\"").append(edge.getEvaluationResult()).append("\"];"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+            sb.append(" [label=\"").append(edge.getEvaluationResult()).append("\"];"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         sb.append("\n"); //$NON-NLS-1$
         return true;
@@ -198,14 +198,14 @@ public class CFGDotPrinter {
 
     private void appendDotNode(CFGBasicBlock block, StringBuilder sb) {
         if (block.isEntryBlock()) {
-            sb.append("Entry [style=\"filled\" fillcolor=\"red\"   fontcolor=\"white\"];\n"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+            sb.append("Entry [style=\"filled\" fillcolor=\"red\"   fontcolor=\"white\"];\n"); //$NON-NLS-1$
         } else if (block.isExitBlock()) {
-            sb.append("Exit  [style=\"filled\" fillcolor=\"black\" fontcolor=\"white\"];\n"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+            sb.append("Exit  [style=\"filled\" fillcolor=\"black\" fontcolor=\"white\"];\n"); //$NON-NLS-1$
         } else {
             block.appendDotNodeId(sb);
-            sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\""); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+            sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\""); //$NON-NLS-1$ //$NON-NLS-2$
             if (block.isDecision()) {
-                sb.append(",shape=\"triangle\""); //$NON-NLS-1$ $NON-NLS-2$
+                sb.append(",shape=\"triangle\""); //$NON-NLS-1$
             }
             sb.append("];\n"); //$NON-NLS-1$
             // block.appendDotNodeSourcePosition(sb);
@@ -213,6 +213,6 @@ public class CFGDotPrinter {
     }
 
     private String escape(String s) {
-        return s != null ? s.replaceAll("\"", "\\\"") : null; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        return s != null ? s.replaceAll("\"", "\\\"") : null; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

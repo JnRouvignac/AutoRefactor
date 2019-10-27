@@ -69,7 +69,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     public static SourceLocation fromPositions(int startPos, int endPos) {
         if (startPos > endPos) {
             throw new IllegalArgumentException(
-                    "start position (" + startPos + ") should be situated before end position (" + startPos + ")"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                    "start position (" + startPos + ") should be situated before end position (" + startPos + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         return new SourceLocation(startPos, endPos - startPos);
     }
@@ -222,6 +222,6 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
     @Override
     public String toString() {
-        return "SourceLocation [offset=" + offset + ", length=" + length + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        return "SourceLocation [offset=" + offset + ", length=" + length + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

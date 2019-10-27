@@ -354,7 +354,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
-        String message= "Visitor " + v.getClass().getName() + " is badly behaved:" //$NON-NLS-1$ $NON-NLS-2$
+        String message= "Visitor " + v.getClass().getName() + " is badly behaved:" //$NON-NLS-1$ //$NON-NLS-2$
                 + " it reported doing a refactoring, but it did not actually contribute any refactoring."; //$NON-NLS-1$
         ctx.getLogger().error(message, new AutoRefactorException(node, message));
     }
@@ -364,7 +364,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             // Let the user cancel the current operation
             throw (OperationCanceledException) e;
         }
-        String message= "Visitor " + v.getClass().getName() + " is faulty," //$NON-NLS-1$ $NON-NLS-2$
+        String message= "Visitor " + v.getClass().getName() + " is faulty," //$NON-NLS-1$ //$NON-NLS-2$
                 + " it will be disabled for the rest of this run."; //$NON-NLS-1$
         ctx.getLogger().error(message, new UnhandledException(node, message, e));
     }
@@ -392,7 +392,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         });
         for (Method m : mm) {
             System.out.println("@Override"); //$NON-NLS-1$
-            System.out.print("public " + m.getReturnType() + " "); //$NON-NLS-1$ $NON-NLS-2$
+            System.out.print("public " + m.getReturnType() + " "); //$NON-NLS-1$ //$NON-NLS-2$
             System.out.print(m.getName() + "("); //$NON-NLS-1$
             Class<?>[] paramTypes= m.getParameterTypes();
             for (int i= 0; i < paramTypes.length; i++) {
@@ -408,7 +408,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             final boolean isPrevisit2= is("preVisit2", m); //$NON-NLS-1$
             if (isVisit || isEndVisit) {
                 System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors("); //$NON-NLS-1$
-                System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", "); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 System.out.println(m.getParameterTypes()[0].getSimpleName() + ".class);"); //$NON-NLS-1$
             }
             System.out.print("\tfor (Iterator<ASTVisitor> iter = "); //$NON-NLS-1$
@@ -427,16 +427,16 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             System.out.println("\t\tfinal ASTVisitor v = iter.next();"); //$NON-NLS-1$
             System.out.println("\t\ttry {"); //$NON-NLS-1$
             if (isPrevisit2) {
-                System.out.println("\t\t\tif (!v." + m.getName() + "(node)) {"); //$NON-NLS-1$ $NON-NLS-2$
+                System.out.println("\t\t\tif (!v." + m.getName() + "(node)) {"); //$NON-NLS-1$ //$NON-NLS-2$
                 System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;"); //$NON-NLS-1$
                 System.out.println("\t\t\t}"); //$NON-NLS-1$
             } else if (Boolean.TYPE.equals(m.getReturnType())) {
                 System.out.println("\t\t\tif (isJavaVersionSupported(v)"); //$NON-NLS-1$
-                System.out.println("\t\t\t\t\t&& !continueVisiting(v." + m.getName() + "(node), v, node)) {"); //$NON-NLS-1$ $NON-NLS-2$
+                System.out.println("\t\t\t\t\t&& !continueVisiting(v." + m.getName() + "(node), v, node)) {"); //$NON-NLS-1$ //$NON-NLS-2$
                 System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;"); //$NON-NLS-1$
                 System.out.println("\t\t\t}"); //$NON-NLS-1$
             } else {
-                System.out.println("\t\t\tv." + m.getName() + "(node);"); //$NON-NLS-1$ $NON-NLS-2$
+                System.out.println("\t\t\tv." + m.getName() + "(node);"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             System.out.println("\t\t} catch (Exception e) {"); //$NON-NLS-1$
             System.out.println("\t\t\tlogFaultyVisitor(v, node, e);"); //$NON-NLS-1$

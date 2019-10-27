@@ -161,7 +161,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                     return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
                 }
 
-                throw new NotImplementedException(expression, "for primitive type \"" + type + "\"."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                throw new NotImplementedException(expression, "for primitive type \"" + type + "\"."); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             return false;

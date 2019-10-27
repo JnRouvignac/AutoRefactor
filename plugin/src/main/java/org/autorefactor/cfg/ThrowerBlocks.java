@@ -83,7 +83,7 @@ class ThrowerBlocks {
 
     @Override
     public String toString() {
-        return "potentialThrowingBlocks=" + potentialThrowingBlocks + " potentialThrowingEdges=" //$NON-NLS-1$ $NON-NLS-2$
+        return "potentialThrowingBlocks=" + potentialThrowingBlocks + " potentialThrowingEdges=" //$NON-NLS-1$ //$NON-NLS-2$
                 + potentialThrowingEdges;
     }
 }

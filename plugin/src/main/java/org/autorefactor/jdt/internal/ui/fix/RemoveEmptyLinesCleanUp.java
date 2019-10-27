@@ -105,12 +105,12 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         }
 
         boolean result= true;
-        final String newline= "(?:" + NEWLINE_PATTERN + ")"; //$NON-NLS-1$ $NON-NLS-2$
-        Matcher m= Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
+        final String newline= "(?:" + NEWLINE_PATTERN + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        Matcher m= Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                 .matcher(source);
         while (m.find()) {
             final String matchedString= m.group(0);
-            if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) { //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+            if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 r.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
                 result= false;
             }
@@ -120,11 +120,11 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         }
 
         int afterLastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, source.length() - 1) + 1;
-        if (substringMatchesAny(source, afterLastNonWsIndex, "\r\n", "\r", "\n")) { //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        if (substringMatchesAny(source, afterLastNonWsIndex, "\r\n", "\r", "\n")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return true;
         }
 
-        Matcher endOfFileMatcher= Pattern.compile(newline + "(" + "\\s*?" + "(" + newline + "\\s*?)+)").matcher(source) //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+        Matcher endOfFileMatcher= Pattern.compile(newline + "(" + "\\s*?" + "(" + newline + "\\s*?)+)").matcher(source) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 .region(afterLastNonWsIndex, source.length());
         if (endOfFileMatcher.find()) {
             r.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));

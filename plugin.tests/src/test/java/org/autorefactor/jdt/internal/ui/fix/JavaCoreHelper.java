@@ -57,7 +57,7 @@ public final class JavaCoreHelper {
     private static final Path[] EMPTY_PATHS= {};
 
     public static IPackageFragment getPackageFragment(String packageName) throws Exception {
-        final IJavaProject javaProject= createJavaProject("projectName", "bin"); //$NON-NLS-1$ $NON-NLS-2$
+        final IJavaProject javaProject= createJavaProject("projectName", "bin"); //$NON-NLS-1$ //$NON-NLS-2$
         final IPackageFragmentRoot root= addSourceContainer(javaProject, "/testRoot"); //$NON-NLS-1$
         addToClasspath(javaProject, getClasspathEntries(root));
         return root.createPackageFragment(packageName, true, null);
@@ -95,7 +95,7 @@ public final class JavaCoreHelper {
             String version= getNodeByNodeName(children, "version").getTextContent(); //$NON-NLS-1$
             String sep= File.separator;
             final String jarPath= m2Repo + sep + toPath(groupId) + sep + artifactId + sep + version + sep + artifactId
-                    + "-" + version + ".jar"; //$NON-NLS-1$ $NON-NLS-2$
+                    + "-" + version + ".jar"; //$NON-NLS-1$ //$NON-NLS-2$
             entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
         }
     }
@@ -118,8 +118,8 @@ public final class JavaCoreHelper {
         if (m2Repo.exists() && m2Repo.isDirectory()) {
             return m2Repo.getPath();
         }
-        throw new RuntimeException("Cannot determine maven repository." + " Tried \"" + m2Settings + "\" file" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
-                + " and \"" + m2Repo + "\" directory."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        throw new RuntimeException("Cannot determine maven repository." + " Tried \"" + m2Settings + "\" file" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + " and \"" + m2Repo + "\" directory."); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static Node getNodeByNodeName(NodeList nodes, String nodeName) {

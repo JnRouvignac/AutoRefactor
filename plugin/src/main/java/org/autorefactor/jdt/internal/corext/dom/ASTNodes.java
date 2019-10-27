@@ -934,7 +934,7 @@ public final class ASTNodes {
         if (ancestor != null) {
             return ancestor;
         }
-        throw new IllegalStateException(node, "Could not find any ancestor for " + ancestorClass + "and node " + node); //$NON-NLS-1$ $NON-NLS-2$
+        throw new IllegalStateException(node, "Could not find any ancestor for " + ancestorClass + "and node " + node); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -974,7 +974,7 @@ public final class ASTNodes {
         final ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
         if (ancestor == null) {
             throw new IllegalStateException(node,
-                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ $NON-NLS-2$
+                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ //$NON-NLS-2$
                             + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node); //$NON-NLS-1$
         }
         return ancestor;
@@ -2454,7 +2454,7 @@ public final class ASTNodes {
             final int line= cu.getLineNumber(position);
             final int column= cu.getColumnNumber(position) + 1;
             if (cu.getTypeRoot() != null) {
-                return cu.getTypeRoot().getElementName() + ":" + line + ":" + column; //$NON-NLS-1$ $NON-NLS-2$
+                return cu.getTypeRoot().getElementName() + ":" + line + ":" + column; //$NON-NLS-1$ //$NON-NLS-2$
             }
             // It was not created from a file
             return line + ":" + column; //$NON-NLS-1$

@@ -100,9 +100,9 @@ public class AllCleanUpRulesTest {
     private void testRefactoring0() throws Exception {
         final File samplesDir= new File(SAMPLES_ALL_BASE_DIR);
         final File sampleIn= new File(samplesDir, "samples_in/" + sampleName); //$NON-NLS-1$
-        assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ //$NON-NLS-2$
         final File sampleOut= new File(samplesDir, "samples_out/" + sampleName); //$NON-NLS-1$
-        assertTrue(sampleName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue(sampleName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 
         final String sampleInSource= readAll(sampleIn);
         final String sampleOutSource= readAll(sampleOut);
@@ -115,7 +115,7 @@ public class AllCleanUpRulesTest {
     }
 
     private void given(final String sampleInSource, final String sampleOutSource) {
-        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ $NON-NLS-2$
+        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
         final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertNotEquals(sampleName + ": verify nothing;", expected, actual); //$NON-NLS-1$
     }
@@ -134,7 +134,7 @@ public class AllCleanUpRulesTest {
     }
 
     private void then(final String sampleOutSource, final IDocument doc) {
-        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ $NON-NLS-2$
+        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
         final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertEquals(sampleName + ": wrong output;", expected, actual); //$NON-NLS-1$
     }

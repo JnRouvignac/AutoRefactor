@@ -216,7 +216,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
      * @return The simple name of the class.
      */
     public String getSimpleName(final String fullyQualifiedName) {
-        return fullyQualifiedName.replaceFirst("^(?:.*\\.)?([^.]*)$", "$1"); //$NON-NLS-1$ $NON-NLS-2$
+        return fullyQualifiedName.replaceFirst("^(?:.*\\.)?([^.]*)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -226,7 +226,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
      * @return The package of the class.
      */
     public String getPackageName(final String fullyQualifiedName) {
-        return fullyQualifiedName.replaceFirst("^(.*)\\.[^.]+$", "$1"); //$NON-NLS-1$ $NON-NLS-2$
+        return fullyQualifiedName.replaceFirst("^(.*)\\.[^.]+$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private void filterLocallyUsedNames(final CompilationUnit node, final Map<String, String> importsByClassname,

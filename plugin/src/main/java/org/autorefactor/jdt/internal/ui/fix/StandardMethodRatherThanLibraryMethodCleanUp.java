@@ -100,21 +100,21 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
-                        Object.class.getCanonicalName())
-                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
-                        String.class.getCanonicalName())) {
-            replaceUtilClass(node, classesToUseWithImport, importsToAdd);
-            return false;
-        }
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final Name javaUtilObjects= classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
-                : b.name("java", "util", "Objects"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        final Name javaUtilObjects= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
-        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
+                        Object.class.getCanonicalName())
+                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
+                        String.class.getCanonicalName())) {
+            replaceUtilClass(node, classesToUseWithImport, importsToAdd, javaUtilObjects);
+            return false;
+        }
+
+        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
                         Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
@@ -124,17 +124,17 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node,
-                    b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ $NON-NLS-2$
+                    b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ //$NON-NLS-2$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
-        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ $NON-NLS-2$
-                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
+                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs= new ArrayList<Expression>(node.arguments().size());
@@ -148,7 +148,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             if (node.getExpression() != null) {
@@ -162,13 +162,13 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || ASTNodes.usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                || ASTNodes.usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         Object.class.getCanonicalName())
-                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
@@ -179,7 +179,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             } else if (ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier= b.lambda();
                 messageSupplier
-                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$ $NON-NLS-2$
+                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$ //$NON-NLS-2$
                 r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
             } else {
                 return true;
@@ -201,11 +201,10 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
     }
 
     private void replaceUtilClass(final MethodInvocation node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+            final Set<String> importsToAdd, Name javaUtilObjects) {
         final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(node.getExpression(), b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()));
+        r.replace(node.getExpression(), javaUtilObjects);
         importsToAdd.add(Objects.class.getCanonicalName());
     }
 }

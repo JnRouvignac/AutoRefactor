@@ -67,8 +67,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error") //$NON-NLS-1$ $NON-NLS-2$
-                && maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace") //$NON-NLS-1$ $NON-NLS-2$
+        return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error") //$NON-NLS-1$ //$NON-NLS-2$
+                && maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace") //$NON-NLS-1$ //$NON-NLS-2$
                 && maybeRefactorMethod(node, "warn"); //$NON-NLS-1$
     }
 
@@ -103,7 +103,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 hasLiteral= true;
                 final String literal= (String) string.resolveConstantExpressionValue();
 
-                if (literal != null && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ $NON-NLS-2$
+                if (literal != null && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ //$NON-NLS-2$
                     return true;
                 }
 
@@ -113,7 +113,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 messageBuilder.append("{}"); //$NON-NLS-1$
 
                 if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-                    params.add(b.invoke("String", "valueOf", b.copy(string))); //$NON-NLS-1$ $NON-NLS-2$
+                    params.add(b.invoke("String", "valueOf", b.copy(string))); //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
                     params.add(b.copy(string));
                 }

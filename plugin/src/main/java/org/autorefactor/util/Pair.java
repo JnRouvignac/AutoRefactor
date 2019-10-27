@@ -111,6 +111,6 @@ public final class Pair<F, S> {
 
     @Override
     public String toString() {
-        return "FIRST: " + first + " SECOND: " + second; //$NON-NLS-1$ $NON-NLS-2$
+        return "FIRST: " + first + " SECOND: " + second; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

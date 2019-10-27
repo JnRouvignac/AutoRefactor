@@ -83,7 +83,7 @@ public class RefactoringRulesTest {
     public static Collection<Object[]> data() {
         Collection<Object[]> samples= samples(SAMPLES_BASE_DIR, WHITELIST, BLACKLIST);
         for (Object[] sample : samples) {
-            sample[0]= ((String) sample[0]).replace("Sample.java", ""); //$NON-NLS-1$ $NON-NLS-2$
+            sample[0]= ((String) sample[0]).replace("Sample.java", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return samples;
     }
@@ -106,14 +106,14 @@ public class RefactoringRulesTest {
     private void testRefactoring0() throws Exception {
         final String sampleName= testName + "Sample.java"; //$NON-NLS-1$
         final File sampleIn= new File(SAMPLES_BASE_DIR, "samples_in/" + sampleName); //$NON-NLS-1$
-        assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ //$NON-NLS-2$
         final File sampleOut= new File(SAMPLES_BASE_DIR, "samples_out/" + sampleName); //$NON-NLS-1$
-        assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 
         final String refactoringClassname= testName + "CleanUp"; //$NON-NLS-1$
         final RefactoringRule refactoring= getRefactoringClass(refactoringClassname);
-        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist.\n" //$NON-NLS-1$ $NON-NLS-2$
-                + "Make sure you added it to the method getAllCleanUpRules() " + "of the " + AllCleanUpRules.class //$NON-NLS-1$ $NON-NLS-2$
+        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist.\n" //$NON-NLS-1$ //$NON-NLS-2$
+                + "Make sure you added it to the method getAllCleanUpRules() " + "of the " + AllCleanUpRules.class //$NON-NLS-1$ //$NON-NLS-2$
                 + ".", refactoring); //$NON-NLS-1$
 
         final String sampleInSource= readAll(sampleIn);
@@ -127,7 +127,7 @@ public class RefactoringRulesTest {
     }
 
     private void given(final String sampleInSource, final String sampleOutSource) {
-        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ $NON-NLS-2$
+        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
         final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertNotEquals(testName + ": verify nothing;", expected, actual); //$NON-NLS-1$
     }
@@ -147,7 +147,7 @@ public class RefactoringRulesTest {
     }
 
     private void then(final String sampleOutSource, final IDocument doc) {
-        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ $NON-NLS-2$
+        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
         final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertEquals(testName + ": wrong output;", expected, actual); //$NON-NLS-1$
     }

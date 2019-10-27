@@ -73,6 +73,6 @@ class LineAndColumn {
 
     @Override
     public String toString() {
-        return "LineAndColumn [startPosition=" + startPosition + ", lineNo=" + lineNo + ", colNo=" + colNo + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+        return "LineAndColumn [startPosition=" + startPosition + ", lineNo=" + lineNo + ", colNo=" + colNo + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

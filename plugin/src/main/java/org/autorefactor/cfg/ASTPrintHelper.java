@@ -54,10 +54,10 @@ public final class ASTPrintHelper {
         final String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
         final String codeExcerpt;
         if (nodeLines[0].matches("\\s*\\{\\s*")) { //$NON-NLS-1$
-            codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ $NON-NLS-2$
+            codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             codeExcerpt= nodeLines[0];
         }
-        return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ $NON-NLS-2$
+        return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

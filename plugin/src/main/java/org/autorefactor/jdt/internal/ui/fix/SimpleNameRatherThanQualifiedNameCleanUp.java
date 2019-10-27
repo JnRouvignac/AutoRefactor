@@ -175,7 +175,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             if (equals(CANNOT_REPLACE_SIMPLE_NAME)) {
                 return "CANNOT_REPLACE_SIMPLE_NAME"; //$NON-NLS-1$
             }
-            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)"); //$NON-NLS-1$ $NON-NLS-2$
+            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -379,7 +379,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "(simpleNames=" + simpleNames + ")"; //$NON-NLS-1$ $NON-NLS-2$
+            return getClass().getSimpleName() + "(simpleNames=" + simpleNames + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -503,7 +503,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     if (!pkgName.equals(typeNameMatch.getPackageName())) {
                         // Sanity check failed
                         throw new IllegalStateException("Expected package '" + typeNameMatch.getPackageName() //$NON-NLS-1$
-                                + "' to be equal to '" + pkgName + "'"); //$NON-NLS-1$ $NON-NLS-2$
+                                + "' to be equal to '" + pkgName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                     QName qname= QName.valueOf(typeNameMatch.getFullyQualifiedName());
                     types.addName(FQN.fromImport(qname, true));

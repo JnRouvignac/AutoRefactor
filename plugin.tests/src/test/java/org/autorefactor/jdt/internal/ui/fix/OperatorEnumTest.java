@@ -77,7 +77,7 @@ public class OperatorEnumTest {
     }
 
     public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-        assertEquals("Expected but did not get: " + op1 + " == " + op2, 0, OperatorEnum.compareTo(op1, op2)); //$NON-NLS-1$ $NON-NLS-2$
+        assertEquals("Expected but did not get: " + op1 + " == " + op2, 0, OperatorEnum.compareTo(op1, op2)); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Test
@@ -89,8 +89,8 @@ public class OperatorEnumTest {
     }
 
     public void compareDifferentPrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-        assertTrue("Expected but did not get: " + op1 + " > " + op2, OperatorEnum.compareTo(op1, op2) > 0); //$NON-NLS-1$ $NON-NLS-2$
-        assertTrue("Expected but did not get: " + op1 + " < " + op2, OperatorEnum.compareTo(op2, op1) < 0); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue("Expected but did not get: " + op1 + " > " + op2, OperatorEnum.compareTo(op1, op2) > 0); //$NON-NLS-1$ //$NON-NLS-2$
+        assertTrue("Expected but did not get: " + op1 + " < " + op2, OperatorEnum.compareTo(op2, op1) < 0); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Test

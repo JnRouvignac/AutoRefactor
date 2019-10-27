@@ -140,10 +140,10 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         public String toString() {
             final StringBuilder sb= new StringBuilder();
             for (Expression expression : constantExprs) {
-                sb.append("new case ").append(expression).append(":\n"); //$NON-NLS-1$ $NON-NLS-2$
+                sb.append("new case ").append(expression).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             for (SwitchCase existingCase : existingCases) {
-                sb.append("existing case ").append(existingCase.getExpression()).append(":\n"); //$NON-NLS-1$ $NON-NLS-2$
+                sb.append("existing case ").append(existingCase.getExpression()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             for (Statement statement : statements) {
                 sb.append("    ").append(statement); //$NON-NLS-1$

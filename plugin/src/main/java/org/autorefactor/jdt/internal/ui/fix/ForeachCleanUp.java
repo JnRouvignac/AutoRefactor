@@ -51,7 +51,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "" + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
+        return "" + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops" //$NON-NLS-1$ //$NON-NLS-2$
                 + " (applicable to arrays or Iterable)." //$NON-NLS-1$
                 + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet()."; //$NON-NLS-1$
     }

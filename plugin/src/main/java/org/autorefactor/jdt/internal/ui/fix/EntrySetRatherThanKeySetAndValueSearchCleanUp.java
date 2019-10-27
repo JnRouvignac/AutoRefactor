@@ -249,7 +249,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         final int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
         final Variable entryVar= new Variable(
-                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b); //$NON-NLS-1$ $NON-NLS-2$
+                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b); //$NON-NLS-1$ //$NON-NLS-2$
         final TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
 
         final MethodInvocation getValueMi0= getValueMis.get(0);

@@ -79,7 +79,7 @@ public class VariableAccess {
 
     private void toString(final StringBuilder sb) {
         sb.append(this.type);
-        sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ $NON-NLS-2$
+        sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ //$NON-NLS-2$
         if ((this.accessType & DECL_INIT) != 0) {
             sb.append("DECL_INIT"); //$NON-NLS-1$
         }

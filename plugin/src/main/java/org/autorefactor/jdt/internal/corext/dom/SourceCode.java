@@ -68,8 +68,8 @@ public class SourceCode {
         @Override
         public String toString() {
             final CompilationUnit astRoot= sourceCode.astRoot;
-            return "[(" + astRoot.getLineNumber(getStartPosition()) + "," + astRoot.getColumnNumber(getStartPosition()) //$NON-NLS-1$ $NON-NLS-2$
-                    + ")" + " => (" + astRoot.getLineNumber(getEndPosition()) + "," //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+            return "[(" + astRoot.getLineNumber(getStartPosition()) + "," + astRoot.getColumnNumber(getStartPosition()) //$NON-NLS-1$ //$NON-NLS-2$
+                    + ")" + " => (" + astRoot.getLineNumber(getEndPosition()) + "," //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     + astRoot.getColumnNumber(getEndPosition()) + ")]"; //$NON-NLS-1$
         }
     }

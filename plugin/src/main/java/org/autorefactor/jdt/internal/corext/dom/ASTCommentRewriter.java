@@ -268,7 +268,7 @@ public class ASTCommentRewriter {
         if (commentStart < nodeStart) {
             // Assume comment is situated exactly before target node for javadoc
             final String spaceAtStart= getSpaceAtStart(source, lineComment);
-            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart)); //$NON-NLS-1$ $NON-NLS-2$
+            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart)); //$NON-NLS-1$ //$NON-NLS-2$
             commentEdits.add(new InsertEdit(SourceLocation.getEndPosition(lineComment), getSpaceAtEnd(source, lineComment) + "*/")); //$NON-NLS-1$
             replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
         } else {
@@ -302,12 +302,12 @@ public class ASTCommentRewriter {
 
     private String getSpaceAtStart(String source, final LineComment lineComment) {
         final char firstChar= source.charAt(lineComment.getStartPosition() + "//".length()); //$NON-NLS-1$
-        return !Character.isWhitespace(firstChar) ? " " : ""; //$NON-NLS-1$ $NON-NLS-2$
+        return !Character.isWhitespace(firstChar) ? " " : ""; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private String getSpaceAtEnd(String source, final LineComment lineComment) {
         final char lastChar= source.charAt(SourceLocation.getEndPosition(lineComment) - 1);
-        return !Character.isWhitespace(lastChar) ? " " : ""; //$NON-NLS-1$ $NON-NLS-2$
+        return !Character.isWhitespace(lastChar) ? " " : ""; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private void deleteLineCommentAfterNode(List<TextEdit> commentEdits, String source, LineComment lineComment) {
@@ -345,7 +345,7 @@ public class ASTCommentRewriter {
         final SourceLocation indentLoc= getIndentForJavadoc(lineComment, source, lineStarts);
         if (isFirst) {
             // TODO JNR how to obey configured indentation?
-            replacementText= "/**" + lineSeparator + indentLoc.substring(source) + " *"; //$NON-NLS-1$ $NON-NLS-2$
+            replacementText= "/**" + lineSeparator + indentLoc.substring(source) + " *"; //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             replacementText= " *"; //$NON-NLS-1$
         }

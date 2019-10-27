@@ -110,7 +110,7 @@ public final class TestHelper {
         final CodeFormatter codeFormatter= createCodeFormatter(getJava7Options());
 
         final TextEdit edit= codeFormatter.format(K_COMPILATION_UNIT, source, 0, source.length(), // source to format
-                0, System.getProperty("line.separator") // initial indentation and line separator $NON-NLS-1$
+                0, System.getProperty("line.separator") // initial indentation and line separator //$NON-NLS-1$
         );
 
         try {
@@ -154,7 +154,7 @@ public final class TestHelper {
         final Collection<String> results= new ArrayList<>();
         for (Class<?> clazz : clazzes) {
             final String name= clazz.getSimpleName();
-            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ $NON-NLS-2$
+            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return results;
     }

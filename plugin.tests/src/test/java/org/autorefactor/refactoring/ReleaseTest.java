@@ -34,9 +34,9 @@ public class ReleaseTest {
     public Object[][] getIsCompatibleWith() {
         return new Object[][] {
                 // @formatter:off
-                { "1.2.0", "1.2", true }, { "1.2", "1.2.0", true }, { "1.2.3", "1.2", true }, { "1.7", "1.2.3", true }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$
-                { "1.7", "1.2.0", true }, { "1.7.1", "1.2", true }, { "1.2", "1.2.3", false }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
-                { "1.2", "1.7.1", false }, { "1.2.1", "1.7", false } //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                { "1.2.0", "1.2", true }, { "1.2", "1.2.0", true }, { "1.2.3", "1.2", true }, { "1.7", "1.2.3", true }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+                { "1.7", "1.2.0", true }, { "1.7.1", "1.2", true }, { "1.2", "1.2.3", false }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                { "1.2", "1.7.1", false }, { "1.2.1", "1.7", false } //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 // @formatter:on
         };
     }

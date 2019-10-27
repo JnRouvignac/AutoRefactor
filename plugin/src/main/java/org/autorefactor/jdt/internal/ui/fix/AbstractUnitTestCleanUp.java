@@ -186,7 +186,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
-        final String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ $NON-NLS-2$
+        final String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                 invokeMethod(b, originalMethod, methodName, b.copy(condition), null, null, failureMessage)));
@@ -281,9 +281,9 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             Expression delta= null;
 
             if (ASTNodes.hasType(actualValue, double.class.getCanonicalName()) && ASTNodes.hasType(expectedValue, double.class.getCanonicalName())) {
-                delta= b.number(".0");
+                delta= b.number(".0"); //$NON-NLS-1$
             } else if (ASTNodes.hasType(actualValue, float.class.getCanonicalName()) && ASTNodes.hasType(expectedValue, float.class.getCanonicalName())) {
-                delta= b.number(".0F");
+                delta= b.number(".0F"); //$NON-NLS-1$
             }
 
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"), //$NON-NLS-1$
@@ -311,7 +311,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     }
 
     private String getAssertName(final boolean isPositive, final String assertType) {
-        return "assert" + (isPositive ? "" : "Not") + assertType; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        return "assert" + (isPositive ? "" : "Not") + assertType; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     private boolean isComparingObjects(final InfixExpression ie) {

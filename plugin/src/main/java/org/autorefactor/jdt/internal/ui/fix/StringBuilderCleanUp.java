@@ -518,7 +518,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName())) {
                 return b.copy(expression.getSecond());
             }
-            return b.invoke("String", "valueOf", getTypedExpression(b, expression)); //$NON-NLS-1$ $NON-NLS-2$
+            return b.invoke("String", "valueOf", getTypedExpression(b, expression)); //$NON-NLS-1$ //$NON-NLS-2$
 
         default: // >= 2
             boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
@@ -526,7 +526,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             List<Expression> concatenateStrings= new ArrayList<Expression>(appendedStrings.size());
             for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
                 if (isFirstAndNotAString) {
-                    concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue))); //$NON-NLS-1$ $NON-NLS-2$
+                    concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue))); //$NON-NLS-1$ //$NON-NLS-2$
                     isFirstAndNotAString= false;
                 } else {
                     concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));

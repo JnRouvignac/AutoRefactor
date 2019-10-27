@@ -218,7 +218,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {
-        return "toString".equals(node.getName().getIdentifier()) // fast-path $NON-NLS-1$
+        return "toString".equals(node.getName().getIdentifier()) // fast-path //$NON-NLS-1$
                 && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$

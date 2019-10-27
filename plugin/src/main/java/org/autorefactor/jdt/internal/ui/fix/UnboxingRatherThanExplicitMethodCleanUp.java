@@ -68,7 +68,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null
-                && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
+                && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ //$NON-NLS-2$
                         || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$

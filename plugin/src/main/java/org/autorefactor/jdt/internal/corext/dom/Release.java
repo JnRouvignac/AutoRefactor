@@ -174,6 +174,6 @@ public final class Release {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + releaseName + " " + Arrays.toString(version) + ")"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        return getClass().getSimpleName() + "(" + releaseName + " " + Arrays.toString(version) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

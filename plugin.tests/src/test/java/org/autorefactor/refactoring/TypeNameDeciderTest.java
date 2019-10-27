@@ -59,12 +59,12 @@ public class TypeNameDeciderTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] { { Map.class.getCanonicalName(), imports(), Map.class.getCanonicalName() },
                 { Map.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map" }, //$NON-NLS-1$
-                { Map.class.getCanonicalName(), imports("java.util.*"), "Map" }, //$NON-NLS-1$ $NON-NLS-2$
+                { Map.class.getCanonicalName(), imports("java.util.*"), "Map" }, //$NON-NLS-1$ //$NON-NLS-2$
                 { Entry.class.getCanonicalName(), imports(), Entry.class.getCanonicalName() },
                 { Entry.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map.Entry" }, //$NON-NLS-1$
-                { Entry.class.getCanonicalName(), imports("java.util.*"), "Map.Entry" }, //$NON-NLS-1$ $NON-NLS-2$
+                { Entry.class.getCanonicalName(), imports("java.util.*"), "Map.Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
                 { Entry.class.getCanonicalName(), imports(Entry.class.getCanonicalName()), "Entry" }, //$NON-NLS-1$
-                { Entry.class.getCanonicalName(), imports("java.util.Map.*"), "Entry" }, //$NON-NLS-1$ $NON-NLS-2$
+                { Entry.class.getCanonicalName(), imports("java.util.Map.*"), "Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
                 { Callable.class.getCanonicalName(), imports("java.util.*"), Callable.class.getCanonicalName() }, }); //$NON-NLS-1$
     }
 

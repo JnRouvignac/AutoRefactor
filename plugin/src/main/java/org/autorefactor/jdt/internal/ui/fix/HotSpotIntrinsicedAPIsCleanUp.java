@@ -86,7 +86,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            return "System.arraycopy(" + srcArrayExpression + ", " + srcPos + ", " + destArrayExpression + ", " + destPos + ", " //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
+            return "System.arraycopy(" + srcArrayExpression + ", " + srcPos + ", " + destArrayExpression + ", " + destPos + ", " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                     + length + ")"; //$NON-NLS-1$
         }
     }
@@ -260,9 +260,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
-                        .toStatement(b.invoke("System", "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$ $NON-NLS-2$
-                b.catch0("IndexOutOfBoundsException", "e", //$NON-NLS-1$ $NON-NLS-2$
-                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage"))))); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        .toStatement(b.invoke("System", "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$ //$NON-NLS-2$
+                b.catch0("IndexOutOfBoundsException", "e", //$NON-NLS-1$ //$NON-NLS-2$
+                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         this.ctx.getRefactorings().replace(node, tryS);
         return false;

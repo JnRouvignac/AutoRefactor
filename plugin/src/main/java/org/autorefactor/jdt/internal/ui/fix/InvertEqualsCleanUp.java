@@ -88,7 +88,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
             final Expression arg0) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ $NON-NLS-2$
+        final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
         this.ctx.getRefactorings().replace(node,
                 b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expression)));
     }

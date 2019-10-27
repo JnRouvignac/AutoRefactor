@@ -257,7 +257,7 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            return "LivenessState [liveBasicBlock=" + liveBasicBlock + ", liveEdges=" + liveEdges + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+            return "LivenessState [liveBasicBlock=" + liveBasicBlock + ", liveEdges=" + liveEdges + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -644,7 +644,7 @@ public class CFGBuilder {
             if (!liveAfterBody.liveEdges.isEmpty()) {
                 if (!(node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
                                                                                                     // Tests
-                        || "void".equals(node.getReturnType2().resolveBinding().getName()))) {
+                        || "void".equals(node.getReturnType2().resolveBinding().getName()))) { //$NON-NLS-1$
                     throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
                             + "for a constructor or a non void method return type."); //$NON-NLS-1$
                 }
@@ -1653,8 +1653,8 @@ public class CFGBuilder {
     private CFGBasicBlock getCFGBasicBlock(ASTNode node, LivenessState state, boolean isDecision) {
         final Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
         if (isNotEmpty(toBuild)) {
-            throw new IllegalStateException(node, "No edges to build should exist for node \"" + node
-                    + "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild);
+            throw new IllegalStateException(node, "No edges to build should exist for node \"" + node //$NON-NLS-1$
+                    + "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild); //$NON-NLS-1$
         }
         if (!state.requireNewBlock()) {
             // TODO JNR add nodes to the basicBlock they belong to

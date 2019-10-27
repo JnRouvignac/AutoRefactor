@@ -131,6 +131,6 @@ public class Variable {
 
     @Override
     public String toString() {
-        return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+        return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

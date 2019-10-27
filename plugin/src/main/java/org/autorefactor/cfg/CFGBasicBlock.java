@@ -276,7 +276,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
             sb.append("Exit"); //$NON-NLS-1$
         } else {
             LineAndColumn lal= this.lineAndColumn;
-            sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn()); //$NON-NLS-1$ $NON-NLS-2$
+            sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return sb;
     }
@@ -291,7 +291,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     StringBuilder appendDotNodeLabel(StringBuilder sb) {
         sb.append(this.codeExcerpt).append("\\n("); //$NON-NLS-1$
         LineAndColumn lal= this.lineAndColumn;
-        sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")"); //$NON-NLS-1$ $NON-NLS-2$
+        sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
         return sb;
     }
 

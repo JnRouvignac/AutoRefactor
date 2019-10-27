@@ -121,8 +121,8 @@ public class ApplyRefactoringsJob extends Job {
                 } catch (OperationCanceledException e) {
                     throw e;
                 } catch (Exception e) {
-                    final String msg= "Exception when applying refactorings to file \"" + compilationUnit.getPath()
-                            + "\": " + e.getMessage();
+                    final String msg= "Exception when applying refactorings to file \"" + compilationUnit.getPath() //$NON-NLS-1$
+                            + "\": " + e.getMessage(); //$NON-NLS-1$
                     throw new UnhandledException(null, msg, e);
                 }
             }
@@ -169,7 +169,7 @@ public class ApplyRefactoringsJob extends Job {
                  * - applying automated cleanups to such files
                  */
                 environment.getLogger()
-                        .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system." //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system." //$NON-NLS-1$ //$NON-NLS-2$
                                 + " Automated refactorings will not be applied to it."); //$NON-NLS-1$
                 return null;
             }
@@ -235,9 +235,9 @@ public class ApplyRefactoringsJob extends Job {
 
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
-                final String errorMsg= "An infinite loop has been detected for file " + ASTNodes.getFileName(astRoot) + "." //$NON-NLS-1$ $NON-NLS-2$
+                final String errorMsg= "An infinite loop has been detected for file " + ASTNodes.getFileName(astRoot) + "." //$NON-NLS-1$ //$NON-NLS-2$
                         + " A possible cause is that code is being incorrectly" //$NON-NLS-1$
-                        + " refactored one way then refactored back to what it was." + " Fix the code before pursuing." //$NON-NLS-1$ $NON-NLS-2$
+                        + " refactored one way then refactored back to what it was." + " Fix the code before pursuing." //$NON-NLS-1$ //$NON-NLS-2$
                         + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
                 environment.getLogger().error(errorMsg, new IllegalStateException(astRoot, errorMsg));
                 break;

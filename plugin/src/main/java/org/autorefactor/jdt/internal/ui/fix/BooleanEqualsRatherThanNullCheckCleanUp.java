@@ -109,7 +109,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
             final boolean isAndExpression, final boolean isPositiveExpression) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
-        final Name booleanConstant= b.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ $NON-NLS-2$
+        final Name booleanConstant= b.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
         final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpression)); //$NON-NLS-1$
 
         Expression newExpression= null;

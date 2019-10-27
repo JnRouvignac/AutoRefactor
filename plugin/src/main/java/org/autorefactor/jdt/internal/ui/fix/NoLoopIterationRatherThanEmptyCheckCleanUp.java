@@ -151,11 +151,11 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         QualifiedName name= ASTNodes.as(operand, QualifiedName.class);
 
         if (fieldAccess != null) {
-            if (ASTNodes.isSameVariable(fieldAccess.getExpression(), container) && "length".equals(fieldAccess.getName().getIdentifier())) {
+            if (ASTNodes.isSameVariable(fieldAccess.getExpression(), container) && "length".equals(fieldAccess.getName().getIdentifier())) { //$NON-NLS-1$
                 return fieldAccess.getExpression();
             }
         } else if (name != null) {
-            if (ASTNodes.isSameVariable(name.getQualifier(), container) && "length".equals(name.getName().getIdentifier())) {
+            if (ASTNodes.isSameVariable(name.getQualifier(), container) && "length".equals(name.getName().getIdentifier())) { //$NON-NLS-1$
                 return name.getQualifier();
             }
         }

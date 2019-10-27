@@ -126,12 +126,12 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
     private void assertSize(final List<Expression> args, final int expectedSize) {
         if (args == null) {
-            throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ $NON-NLS-2$
+            throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (args.size() != expectedSize) {
             final Expression node= !args.isEmpty() ? args.get(0) : null;
             throw new IllegalArgumentException(node,
-                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
     }
 }

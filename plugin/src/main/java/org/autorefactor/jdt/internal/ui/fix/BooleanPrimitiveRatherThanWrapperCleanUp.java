@@ -111,7 +111,7 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public String[] getSafeInConstants() {
-        return new String[] { "TRUE", "FALSE" }; //$NON-NLS-1$ $NON-NLS-2$
+        return new String[] { "TRUE", "FALSE" }; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override

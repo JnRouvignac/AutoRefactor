@@ -180,22 +180,22 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
         if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeRange", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "forEach", Consumer.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeIf", Predicate.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "forEach", Consumer.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeIf", Predicate.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "sort", Comparator.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "trimToSize") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "setSize", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "capacity") //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "setSize", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "capacity") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeAllElements") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeAllElements") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ //$NON-NLS-2$
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
@@ -238,17 +238,17 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
             return resolveTypeCompatibleIfPossible(ASTNodes.arguments(mi).get(1).resolveTypeBinding());
         }
-        if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "element") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getFirst") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getLast") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peek") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peekFirst") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peekLast") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "poll") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pollFirst") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pollLast") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pop") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "removeFirst") //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "element") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getFirst") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getLast") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peek") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peekFirst") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "peekLast") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "poll") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pollFirst") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pollLast") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "pop") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "removeFirst") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "removeLast") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "firstElement") || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "pop") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "peek")) { //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "firstElement") || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ //$NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "pop") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "peek")) { //$NON-NLS-1$ //$NON-NLS-2$
             if (isExprReceived(mi)) {
                 ITypeBinding newElementType= ASTNodes.getTargetType(mi);
                 return resolveTypeCompatible(newElementType);
@@ -256,9 +256,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "descendingIterator") //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "iterator") || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "listIterator") //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "iterator") || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "listIterator") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "listIterator", int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "spliterator") || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "elements")) { //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "spliterator") || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "elements")) { //$NON-NLS-1$ //$NON-NLS-2$
             if (isExprReceived(mi)) {
                 ITypeBinding newElementType= ASTNodes.getTargetType(mi);
                 return resolveTypeCompatibleIfPossible(newElementType);

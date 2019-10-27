@@ -175,9 +175,9 @@ public final class ForLoopHelper {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType=" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                    + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable=" //$NON-NLS-1$ $NON-NLS-2$
-                    + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable //$NON-NLS-1$ $NON-NLS-2$
+            return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable=" //$NON-NLS-1$ //$NON-NLS-2$
+                    + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable //$NON-NLS-1$ //$NON-NLS-2$
                     + ", isLoopingForward=" + isLoopingForward //$NON-NLS-1$
                     + ")"; //$NON-NLS-1$
         }
