@@ -116,7 +116,7 @@ public final class AllCleanUpRules {
                 new SetRatherThanListCleanUp(), new HashMapRatherThanTreeMapCleanUp(),
                 new HashSetRatherThanTreeSetCleanUp(), new UseStringContainsCleanUp(), new CommentsCleanUp(),
                 new RemoveFieldsDefaultValuesCleanUp(), new StaticConstantRatherThanInstanceConstantCleanUp(),
-                new RemoveOverridenAssignmentCleanUp(), new Java7HashRatherThanEclipseJava6HashCleanUp(),
+                new RemoveOverriddenAssignmentCleanUp(), new Java7HashRatherThanEclipseJava6HashCleanUp(),
                 new HotSpotIntrinsicedAPIsCleanUp(), new AnnotationCleanUp(), new TryWithResourceCleanUp(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for
                 // the project

@@ -34,14 +34,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
+public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
     }
 
     /**
@@ -50,7 +50,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
     }
 
     /**
@@ -59,7 +59,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
     }
 
     @Override
@@ -76,6 +76,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
 
                 while (stmtToInspect != null && !isOverridden && !isRead) {
                     final Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
+
                     if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
                         if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
                             isOverridden= true;
@@ -85,7 +86,6 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
                     }
 
                     isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getUses().isEmpty();
-
                     stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
                 }
 
@@ -95,6 +95,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 }

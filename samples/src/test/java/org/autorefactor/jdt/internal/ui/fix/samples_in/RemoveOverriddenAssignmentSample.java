@@ -23,29 +23,29 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.ui.fix.samples_out;
+package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class RemoveOverridenAssignmentSample {
+public class RemoveOverriddenAssignmentSample {
     public boolean removeUselessInitialization() {
         // Keep this comment
-        boolean reassignedVar;
+        boolean reassignedVar = true;
         reassignedVar = "\n".equals(System.lineSeparator());
         return reassignedVar;
     }
 
     public long removeInitForLong() {
         // Keep this comment
-        long reassignedVar;
+        long reassignedVar = 0;
         reassignedVar = System.currentTimeMillis();
         return reassignedVar;
     }
 
     public String removeInitForString() {
         // Keep this comment
-        String reassignedVar;
+        String reassignedVar = "";
         reassignedVar = System.lineSeparator();
         return reassignedVar;
     }
@@ -141,7 +141,7 @@ public class RemoveOverridenAssignmentSample {
 
     public boolean removePassiveInitialization(int i) {
         // Keep this comment
-        boolean reassignedPassiveVar;
+        boolean reassignedPassiveVar = i > 0;
         reassignedPassiveVar = "\n".equals(System.lineSeparator());
         return reassignedPassiveVar;
     }

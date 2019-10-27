@@ -1121,15 +1121,15 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_name;
+    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_description;
+    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_reason;
+    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
     /**
      * Automatically filled.
      */
