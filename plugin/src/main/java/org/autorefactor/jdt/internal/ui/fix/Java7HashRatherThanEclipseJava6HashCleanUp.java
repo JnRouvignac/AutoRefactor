@@ -619,15 +619,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
         @SuppressWarnings("unchecked")
         final List<Statement> statements= node.getBody().statements();
-
-        final List<Expression> copyOfFields= new ArrayList<Expression>(data.getFields().size());
-
-        for (Expression simpleName : data.getFields()) {
-            copyOfFields.add(b.copy(simpleName));
-        }
+        final Name objectsClassName= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
         r.replace(statements.get(0),
-                b.return0(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()), "hash", copyOfFields))); //$NON-NLS-1$
+                b.return0(b.invoke(objectsClassName, "hash", b.copy(data.getFields())))); //$NON-NLS-1$
 
         for (int i= 1; i < statements.size(); i++) {
             r.remove(statements.get(i));

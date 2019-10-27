@@ -402,9 +402,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final UnionType result= this.ctx.getAST().newUnionType();
         final List<Type> unionedTypes= ASTNodes.types(result);
-        for (Type unionedType : allTypes) {
-            unionedTypes.add(b.copy(unionedType));
-        }
+        unionedTypes.addAll(b.copy(allTypes));
         return result;
     }
 

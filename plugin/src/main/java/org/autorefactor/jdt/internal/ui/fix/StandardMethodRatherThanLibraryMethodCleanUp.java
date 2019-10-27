@@ -137,13 +137,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
-            final List<Expression> copyOfArgs= new ArrayList<Expression>(node.arguments().size());
-
-            for (Object expression : node.arguments()) {
-                copyOfArgs.add(b.copy((Expression) expression));
-            }
-
-            r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs)); //$NON-NLS-1$
+            r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
