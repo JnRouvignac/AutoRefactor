@@ -126,7 +126,7 @@ public final class AllCleanUpRules {
                 new AndroidViewHolderCleanUp(), new LogParametersRatherThanLogMessageCleanUp(),
                 new NamedMethodRatherThanLogLevelParameterCleanUp(), new EnumMapRatherThanHashMapCleanUp(),
                 new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
-                new UppercaseNumberTypeRatherThanLowercaseCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
+                new UppercaseNumberSuffixRatherThanLowercaseCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
 
                 // Those cleanups should end the list because they clean the previous
                 // changes

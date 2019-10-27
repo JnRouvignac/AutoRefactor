@@ -33,14 +33,14 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
  *
  * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
  */
-public class UppercaseNumberTypeRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
+public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
     }
 
     /**
@@ -49,7 +49,7 @@ public class UppercaseNumberTypeRatherThanLowercaseCleanUp extends AbstractClean
      * @return the description.
      */
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
     }
 
     /**
@@ -58,14 +58,14 @@ public class UppercaseNumberTypeRatherThanLowercaseCleanUp extends AbstractClean
      * @return the reason.
      */
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberTypeRatherThanLowercaseCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
     }
 
     @Override
     public boolean visit(NumberLiteral node) {
         final String token= node.getToken();
 
-        if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ $NON-NLS-2$
+        if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$
             useUppercase(node, token);
             return false;
         }
