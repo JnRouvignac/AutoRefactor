@@ -41,6 +41,9 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -56,16 +59,14 @@ import org.eclipse.jdt.core.dom.Statement;
  */
 public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     /**
+     * Can use assert not equals.
+     */
+    protected boolean canUseAssertNotEquals;
+
+    /**
      * The scan of the class imports.
      */
     private final Set<String> staticImports= new HashSet<>();
-
-    /**
-     * Return true if assertNotEquals can be used.
-     *
-     * @return True if assertNotEquals can be used.
-     */
-    protected abstract boolean canUseAssertNotEquals();
 
     /**
      * Get the actual value and then the expected value.
@@ -92,6 +93,26 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     protected abstract MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             Expression delta, final Expression failureMessage);
+
+    /**
+     * Resolve the type binding.
+     *
+     * @param node The node
+     * @return the type binding.
+     */
+    protected ITypeBinding resolveTypeBinding(final ImportDeclaration node) {
+        IBinding resolveBinding= node.resolveBinding();
+
+        if (resolveBinding instanceof ITypeBinding) {
+            return (ITypeBinding) resolveBinding;
+        }
+
+        if (resolveBinding instanceof IMethodBinding) {
+            return ((IMethodBinding) resolveBinding).getDeclaringClass();
+        }
+
+        return null;
+    }
 
     @Override
     public abstract boolean visit(MethodInvocation node);
@@ -167,7 +188,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                         failureMessage, isRewriteNeeded);
             }
         } else if (ASTNodes.usesGivenSignature(conditionMi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            if (canUseAssertNotEquals() || isAssertTrue) {
+            if (canUseAssertNotEquals || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         ASTNodes.arguments(conditionMi).get(0));
                 return maybeRefactorToEquality(nodeToReplace, originalMethod, isAssertTrue,

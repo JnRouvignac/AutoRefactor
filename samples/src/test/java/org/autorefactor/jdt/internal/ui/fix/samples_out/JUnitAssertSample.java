@@ -180,27 +180,39 @@ public class JUnitAssertSample {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull("Failure message to keep", o);
+        Assert.assertNotNull(o);
+        Assert.assertNotNull("Failure message to keep", o);
 
         assertNull(o);
         assertNull("Failure message to keep", o);
+        assertNotNull(o);
+        assertNotNull("Failure message to keep", o);
     }
 
     public void refactorNullCheckSecondArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertNull(o);
         Assert.assertNull("Failure message to keep", o);
+        Assert.assertNotNull(o);
+        Assert.assertNotNull("Failure message to keep", o);
 
         assertNull(o);
         assertNull("Failure message to keep", o);
+        assertNotNull(o);
+        assertNotNull("Failure message to keep", o);
     }
 
     public void moveLiteralAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(42, o);
         Assert.assertEquals("Failure message to keep", 42, o);
+        Assert.assertNotEquals(42, o);
+        Assert.assertNotEquals("Failure message to keep", 42, o);
 
         assertEquals(42, o);
         assertEquals("Failure message to keep", 42, o);
+        assertNotEquals(42, o);
+        assertNotEquals("Failure message to keep", 42, o);
     }
 
     public void moveLongLiteral(long l) {
@@ -245,76 +257,108 @@ public class JUnitAssertSample {
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(42, o);
         Assert.assertEquals("Failure message to keep", 42, o);
+        Assert.assertNotEquals(42, o);
+        Assert.assertNotEquals("Failure message to keep", 42, o);
 
         assertEquals(42, o);
         assertEquals("Failure message to keep", 42, o);
+        assertNotEquals(42, o);
+        assertNotEquals("Failure message to keep", 42, o);
     }
 
     public void moveConstantAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(FOURTYTWO, o);
         Assert.assertEquals("Failure message to keep", FOURTYTWO, o);
+        Assert.assertNotEquals(FOURTYTWO, o);
+        Assert.assertNotEquals("Failure message to keep", FOURTYTWO, o);
 
         assertEquals(FOURTYTWO, o);
         assertEquals("Failure message to keep", FOURTYTWO, o);
+        assertNotEquals(FOURTYTWO, o);
+        assertNotEquals("Failure message to keep", FOURTYTWO, o);
     }
 
     public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(FOURTYTWO, o);
         Assert.assertEquals("Failure message to keep", FOURTYTWO, o);
+        Assert.assertNotEquals(FOURTYTWO, o);
+        Assert.assertNotEquals("Failure message to keep", FOURTYTWO, o);
 
         assertEquals(FOURTYTWO, o);
         assertEquals("Failure message to keep", FOURTYTWO, o);
+        assertNotEquals(FOURTYTWO, o);
+        assertNotEquals("Failure message to keep", FOURTYTWO, o);
     }
 
     public void moveExpectedObjectAsExpectedArgWithEquals(Object o, int expected) {
         // Keep this comment
         Assert.assertEquals(expected, o);
         Assert.assertEquals("Failure message to keep", expected, o);
+        Assert.assertNotEquals(expected, o);
+        Assert.assertNotEquals("Failure message to keep", expected, o);
 
         assertEquals(expected, o);
         assertEquals("Failure message to keep", expected, o);
+        assertNotEquals(expected, o);
+        assertNotEquals("Failure message to keep", expected, o);
 
         // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(expceted, o);
+        assertNotEquals(expceted, o);
     }
 
     public void doNotRefactorExpectedObjectAsExpectedArgWithEquals(Object o, int expected) {
         Assert.assertEquals(expected, o);
         Assert.assertEquals("Failure message to keep", expected, o);
+        Assert.assertNotEquals(expected, o);
+        Assert.assertNotEquals("Failure message to keep", expected, o);
 
         assertEquals(expected, o);
         assertEquals("Failure message to keep", expected, o);
+        assertNotEquals(expected, o);
+        assertNotEquals("Failure message to keep", expected, o);
 
         int expceted = 0;
         assertEquals(expceted, o);
+        assertNotEquals(expceted, o);
     }
 
     public void moveExpectedLongAsExpectedArgWithEquals(long l, long expected) {
         // Keep this comment
         Assert.assertEquals(expected, l);
         Assert.assertEquals("Failure message to keep", expected, l);
+        Assert.assertNotEquals(expected, l);
+        Assert.assertNotEquals("Failure message to keep", expected, l);
 
         assertEquals(expected, l);
         assertEquals("Failure message to keep", expected, l);
+        assertNotEquals(expected, l);
+        assertNotEquals("Failure message to keep", expected, l);
 
         // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(expceted, l);
+        assertNotEquals(expceted, l);
     }
 
     public void moveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) {
         // Keep this comment
         Assert.assertEquals(expected, d, .0);
         Assert.assertEquals("Failure message to keep", expected, d, .0);
+        Assert.assertNotEquals(expected, d, .0);
+        Assert.assertNotEquals("Failure message to keep", expected, d, .0);
 
         assertEquals(expected, d, .0);
         assertEquals("Failure message to keep", expected, d, .0);
+        assertNotEquals(expected, d, .0);
+        assertNotEquals("Failure message to keep", expected, d, .0);
 
         // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(expceted, d);
+        assertNotEquals(expceted, d);
     }
 
     public void refactorIfOnBoolean(boolean b) {

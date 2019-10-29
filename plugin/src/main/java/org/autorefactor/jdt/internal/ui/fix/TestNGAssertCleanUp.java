@@ -34,7 +34,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -50,8 +49,6 @@ import org.eclipse.jdt.core.dom.Statement;
  * </p>
  */
 public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
-    private boolean canUseAssertNotEquals;
-
     /**
      * Get the name.
      *
@@ -87,46 +84,24 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(CompilationUnit node) {
-        // New file: reset the value
         canUseAssertNotEquals= false;
-        return super.visit(node);
-    }
 
-    @Override
-    public boolean visit(ImportDeclaration node) {
-        if (!canUseAssertNotEquals) {
-            // We have not found testng yet for this file, go on looking for it
-            canUseAssertNotEquals= canUseAssertNotEquals(node);
-        }
-        return super.visit(node);
-    }
+        for (Object object : node.imports()) {
+            ImportDeclaration importDeclaration= (ImportDeclaration) object;
+            final ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
 
-    private boolean canUseAssertNotEquals(final ImportDeclaration node) {
-        final ITypeBinding typeBinding= resolveTypeBinding(node);
-        if (ASTNodes.hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
-            for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
-                if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
-                    return true;
+            if (ASTNodes.hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
+                for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
+                    if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
+                        canUseAssertNotEquals= true;
+                        return super.visit(node);
+                    }
                 }
             }
         }
-        return false;
-    }
 
-    @Override
-    protected boolean canUseAssertNotEquals() {
-        return canUseAssertNotEquals;
-    }
-
-    private ITypeBinding resolveTypeBinding(final ImportDeclaration node) {
-        IBinding resolveBinding= node.resolveBinding();
-        if (resolveBinding instanceof ITypeBinding) {
-            return (ITypeBinding) resolveBinding;
-        }
-        if (resolveBinding instanceof IMethodBinding) {
-            return ((IMethodBinding) resolveBinding).getDeclaringClass();
-        }
-        return null;
+        // New file: reset the value
+        return super.visit(node);
     }
 
     @Override
@@ -173,15 +148,19 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     public boolean visit(IfStatement node) {
         final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+
         if (node.getElseStatement() == null && statements.size() == 1) {
             final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+
             if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
             }
+
             if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
             }
         }
+
         return true;
     }
 

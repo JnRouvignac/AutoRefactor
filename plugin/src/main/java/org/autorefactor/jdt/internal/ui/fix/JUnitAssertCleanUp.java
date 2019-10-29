@@ -31,8 +31,12 @@ import java.util.List;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -70,14 +74,31 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    protected boolean canUseAssertNotEquals() {
-        return true;
-    }
-
-    @Override
     protected Pair<Expression, Expression> getActualAndExpected(final Expression leftValue,
             final Expression rightValue) {
         return Pair.of(rightValue, leftValue);
+    }
+
+    @Override
+    public boolean visit(CompilationUnit node) {
+        canUseAssertNotEquals= false;
+
+        for (Object object : node.imports()) {
+            ImportDeclaration importDeclaration= (ImportDeclaration) object;
+            final ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
+
+            if (ASTNodes.hasType(typeBinding, "org.junit.Assert")) { //$NON-NLS-1$
+                for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
+                    if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
+                        canUseAssertNotEquals= true;
+                        return super.visit(node);
+                    }
+                }
+            }
+        }
+
+        // New file: reset the value
+        return super.visit(node);
     }
 
     @Override
