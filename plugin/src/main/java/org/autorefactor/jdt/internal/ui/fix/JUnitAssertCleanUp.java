@@ -71,7 +71,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     protected boolean canUseAssertNotEquals() {
-        return false;
+        return true;
     }
 
     @Override
@@ -97,26 +97,37 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
         }
+
         if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(1), args.get(0), false);
         }
+
         if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
         }
+
         if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(1), args.get(0), false);
         }
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorToEquality(node, node, true, args.get(1), args.get(0), null, false);
+
+        for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
+            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+                return maybeRefactorToEquality(node, node, true, args.get(1), args.get(0), null, false);
+            }
+
+            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+                return maybeRefactorToEquality(node, node, true, args.get(2), args.get(1), args.get(0), false);
+            }
+
+            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+                return maybeRefactorToEquality(node, node, false, args.get(1), args.get(0), null, false);
+            }
+
+            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+                return maybeRefactorToEquality(node, node, false, args.get(2), args.get(1), args.get(0), false);
+            }
         }
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-                || ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), double.class.getSimpleName(), //$NON-NLS-1$ //$NON-NLS-2$
-                        double.class.getSimpleName())) {
-            return maybeRefactorToEquality(node, node, true, args.get(2), args.get(1), args.get(0), false);
-        }
+
         return true;
     }
 

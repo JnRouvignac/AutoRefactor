@@ -32,7 +32,7 @@ import org.junit.Assert;
 public class JUnitAssertSample {
     private static final int FOURTYTWO = 42;
 
-    public void shouldRefactorWithPrimitives(int i1, int i2) {
+    public void refactorWithPrimitives(int i1, int i2) {
         // Keep this comment
         Assert.assertTrue(i1 == i2);
         Assert.assertTrue("Failure message to keep", i1 == i2);
@@ -45,7 +45,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", i1 != i2);
     }
 
-    public void shouldRefactorWithDoubles(double d1, double d2) {
+    public void refactorWithDoubles(double d1, double d2) {
         // Keep this comment
         Assert.assertTrue(d1 == d2);
         Assert.assertTrue("Failure message to keep", d1 == d2);
@@ -58,7 +58,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", d1 != d2);
     }
 
-    public void shouldRefactorWithFloats(float f1, float f2) {
+    public void refactorWithFloats(float f1, float f2) {
         // Keep this comment
         Assert.assertTrue(f1 == f2);
         Assert.assertTrue("Failure message to keep", f1 == f2);
@@ -71,7 +71,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", f1 != f2);
     }
 
-    public void shouldRefactorFailures() {
+    public void refactorFailures() {
         // Keep this comment
         Assert.assertTrue(false);
         Assert.assertTrue("Failure message to keep", false);
@@ -84,7 +84,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", true);
     }
 
-    public void shouldRemoveDeadChecks() {
+    public void removeDeadChecks() {
         Assert.assertTrue(true);
         Assert.assertTrue("Useless message", true);
         Assert.assertFalse(false);
@@ -96,7 +96,7 @@ public class JUnitAssertSample {
         assertFalse("Useless message", false);
     }
 
-    public void shouldRefactorNegatedConditions(boolean b) {
+    public void refactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertTrue(!b);
         Assert.assertTrue("Failure message to keep", !b);
@@ -109,7 +109,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", !b);
     }
 
-    public void shouldRefactorWithObjectReferences(Object o1, Object o2) {
+    public void refactorWithObjectReferences(Object o1, Object o2) {
         // Keep this comment
         Assert.assertTrue(o1 == o2);
         Assert.assertTrue("Failure message to keep", o1 == o2);
@@ -130,7 +130,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", o1 == o2);
     }
 
-    public void shouldRefactorWithObjects(Object o1, Object o2) {
+    public void refactorWithObjects(Object o1, Object o2) {
         // Keep this comment
         Assert.assertTrue(o1.equals(o2));
         Assert.assertTrue("Failure message to keep", o1.equals(o2));
@@ -143,7 +143,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", !(o1.equals(o2)));
     }
 
-    public void shouldRefactorNullCheckFirstArg(Object o) {
+    public void refactorNullCheckFirstArg(Object o) {
         // Keep this comment
         Assert.assertTrue(null == o);
         Assert.assertTrue("Failure message to keep", null == o);
@@ -164,7 +164,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", null == o);
     }
 
-    public void shouldRefactorNullCheckSecondArg(Object o) {
+    public void refactorNullCheckSecondArg(Object o) {
         // Keep this comment
         Assert.assertTrue(o == null);
         Assert.assertTrue("Failure message to keep", o == null);
@@ -185,7 +185,7 @@ public class JUnitAssertSample {
         assertFalse("Failure message to keep", o == null);
     }
 
-    public void shouldRefactorNullCheckFirstArgWithEquals(Object o) {
+    public void refactorNullCheckFirstArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(null, o);
         Assert.assertEquals("Failure message to keep", null, o);
@@ -194,7 +194,7 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", null, o);
     }
 
-    public void shouldRefactorNullCheckSecondArgWithEquals(Object o) {
+    public void refactorNullCheckSecondArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(o, null);
         Assert.assertEquals("Failure message to keep", o, null);
@@ -203,13 +203,52 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", o, null);
     }
 
-    public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) {
+    public void moveLiteralAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(o, 42);
         Assert.assertEquals("Failure message to keep", o, 42);
 
         assertEquals(o, 42);
         assertEquals("Failure message to keep", o, 42);
+    }
+
+    public void moveLongLiteral(long l) {
+        // Keep this comment
+        Assert.assertEquals(l, 42L);
+        Assert.assertEquals("Failure message to keep", l, 42L);
+        Assert.assertNotEquals(l, 42L);
+        Assert.assertNotEquals("Failure message to keep", l, 42L);
+
+        assertEquals(l, 42L);
+        assertEquals("Failure message to keep", l, 42L);
+        assertNotEquals(l, 42L);
+        assertNotEquals("Failure message to keep", l, 42L);
+    }
+
+    public void moveIntegerLiteral(int i) {
+        // Keep this comment
+        Assert.assertEquals(i, 42);
+        Assert.assertEquals("Failure message to keep", i, 42);
+        Assert.assertNotEquals(i, 42);
+        Assert.assertNotEquals("Failure message to keep", i, 42);
+
+        assertEquals(i, 42);
+        assertEquals("Failure message to keep", i, 42);
+        assertNotEquals(i, 42);
+        assertNotEquals("Failure message to keep", i, 42);
+    }
+
+    public void moveCharacterLiteral(char c) {
+        // Keep this comment
+        Assert.assertEquals(c, 'a');
+        Assert.assertEquals("Failure message to keep", c, 'a');
+        Assert.assertNotEquals(c, 'a');
+        Assert.assertNotEquals("Failure message to keep", c, 'a');
+
+        assertEquals(c, 'a');
+        assertEquals("Failure message to keep", c, 'a');
+        assertNotEquals(c, 'a');
+        assertNotEquals("Failure message to keep", c, 'a');
     }
 
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
@@ -220,7 +259,7 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", 42, o);
     }
 
-    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) {
+    public void moveConstantAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(o, FOURTYTWO);
         Assert.assertEquals("Failure message to keep", o, FOURTYTWO);
@@ -237,7 +276,7 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", FOURTYTWO, o);
     }
 
-    public void shouldMoveExpectedObjectAsExpectedArgWithEquals(Object o, int expected) {
+    public void moveExpectedObjectAsExpectedArgWithEquals(Object o, int expected) {
         // Keep this comment
         Assert.assertEquals(o, expected);
         Assert.assertEquals("Failure message to keep", o, expected);
@@ -261,7 +300,7 @@ public class JUnitAssertSample {
         assertEquals(expceted, o);
     }
 
-    public void shouldMoveExpectedLongAsExpectedArgWithEquals(long l, long expected) {
+    public void moveExpectedLongAsExpectedArgWithEquals(long l, long expected) {
         // Keep this comment
         Assert.assertEquals(l, expected);
         Assert.assertEquals("Failure message to keep", l, expected);
@@ -274,7 +313,7 @@ public class JUnitAssertSample {
         assertEquals(l, expceted);
     }
 
-    public void shouldMoveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) {
+    public void moveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) {
         // Keep this comment
         Assert.assertEquals(d, expected);
         Assert.assertEquals("Failure message to keep", d, expected);
@@ -287,7 +326,7 @@ public class JUnitAssertSample {
         assertEquals(d, expceted);
     }
 
-    public void shouldRefactorIfOnBoolean(boolean b) {
+    public void refactorIfOnBoolean(boolean b) {
         // Keep this comment
         if (b) {
             Assert.fail();
@@ -304,7 +343,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) {
+    public void refactorIfPrimitiveThenFail(int i1, int i2) {
         // Keep this comment
         if (i1 != i2) {
             Assert.fail();
@@ -321,7 +360,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfSameObjectThenFail(Object o1, Object o2) {
+    public void refactorIfSameObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         if (o1 == o2) {
             Assert.fail();
@@ -350,7 +389,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfNullThenFail(Object o1) {
+    public void refactorIfNullThenFail(Object o1) {
         // Keep this comment
         if (o1 == null) {
             Assert.fail();
@@ -403,7 +442,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfObjectThenFail(Object o1, Object o2) {
+    public void refactorIfObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         if (!o1.equals(o2)) {
             Assert.fail();
@@ -420,7 +459,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfLiteralThenFail(int i) {
+    public void refactorIfLiteralThenFail(int i) {
         // Keep this comment
         if (i == 42) {
             Assert.fail();
@@ -473,7 +512,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfConstantThenFail(int i) {
+    public void refactorIfConstantThenFail(int i) {
         // Keep this comment
         if (i == FOURTYTWO) {
             Assert.fail();
@@ -526,7 +565,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfExpectedThenFail(int i, int expected) {
+    public void refactorIfExpectedThenFail(int i, int expected) {
         // Keep this comment
         if (i == expected) {
             Assert.fail();
@@ -579,7 +618,7 @@ public class JUnitAssertSample {
         }
     }
 
-    public void shouldRefactorIfNearlyExpectedThenFail(int i, int expectedI) {
+    public void refactorIfNearlyExpectedThenFail(int i, int expectedI) {
         // Keep this comment
         if (i == expectedI) {
             Assert.fail();
