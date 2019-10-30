@@ -100,7 +100,7 @@ public class MergeConditionalBlocksSample {
         // Keep this comment
         if ((((i == 0) || (i == 1)) || (i == 2)) || (i == 3)) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate" + (i * 10 * 1));
         } else {
             // Keep this comment also
             System.out.println("Different");
@@ -112,7 +112,7 @@ public class MergeConditionalBlocksSample {
         // Keep this comment
         if (((i == 0) || (i == 1 || i == 2)) || (i > 10)) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate " + (i + 123 + 0));
         } else {
             // Keep this comment also
             System.out.println("Different");

@@ -115,16 +115,16 @@ public class MergeConditionalBlocksSample {
         // Keep this comment
         if (i == 0) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate" + (i * 10 * 1));
         } else if (i == 1) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate" + (i * 1 * 10));
         } else if (i == 2)
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate" + (i * 10));
         else if (i == 3) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate" + (10 * i));
         } else {
             // Keep this comment also
             System.out.println("Different");
@@ -136,13 +136,13 @@ public class MergeConditionalBlocksSample {
         // Keep this comment
         if (i == 0) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate " + (i + 123 + 0));
         } else if (i == 1 || i == 2) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate " + (i + 0 + 123));
         } else if (i > 10) {
             // Keep this comment too
-            System.out.println("Duplicate");
+            System.out.println("Duplicate " + (123 + i));
         } else {
             // Keep this comment also
             System.out.println("Different");

@@ -53,6 +53,7 @@ import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
@@ -717,8 +718,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean isOperandsMatching(final InfixExpression ie1, final InfixExpression ie2, final boolean equal) {
-        final List<Expression> operands1= ASTNodes.allOperands(ie1);
-        final List<Expression> operands2= ASTNodes.allOperands(ie2);
+        final List<Expression> operands1 = getConsistentOperands(ie1);
+        final List<Expression> operands2 = getConsistentOperands(ie2);
 
         if (operands1.size() != operands2.size()) {
             return false;
@@ -769,5 +770,35 @@ public class ASTSemanticMatcher extends ASTMatcher {
         }
 
         return operands1.isEmpty() && operands2.isEmpty();
+    }
+
+    private List<Expression> getConsistentOperands(final InfixExpression ie) {
+        final List<Expression> operands= ASTNodes.allOperands(ie);
+
+        for (Iterator<Expression> iterator= operands.iterator(); iterator.hasNext() && operands.size() > 1;) {
+            final Expression operand= iterator.next();
+
+            final Long numberLiteral= ASTNodes.integerLiteral(operand);
+            final BooleanLiteral booleanLiteral= ASTNodes.as(operand, BooleanLiteral.class);
+            final QualifiedName booleanConstant= ASTNodes.as(operand, QualifiedName.class);
+
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND)) {
+                if (ASTNodes.isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE") || (booleanLiteral != null && Boolean.TRUE.equals(booleanLiteral.booleanValue()))) { //$NON-NLS-1$
+                    iterator.remove();
+                }
+            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_OR)) {
+                if (ASTNodes.isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE") || (booleanLiteral != null && Boolean.FALSE.equals(booleanLiteral.booleanValue()))) { //$NON-NLS-1$
+                    iterator.remove();
+                }
+            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS)) {
+                if (numberLiteral != null && numberLiteral == 0) {
+                    iterator.remove();
+                }
+            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.TIMES) && numberLiteral != null && numberLiteral == 1) {
+                iterator.remove();
+            }
+        }
+
+        return operands;
     }
 }
