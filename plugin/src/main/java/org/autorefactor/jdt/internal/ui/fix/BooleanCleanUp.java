@@ -342,17 +342,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isElseStatementOfParent(IfStatement node) {
-        final ASTNode parent= node.getParent();
-
-        if (parent instanceof IfStatement) {
-            final IfStatement is= (IfStatement) parent;
-            return is.getElseStatement().equals(node);
-        }
-
-        return false;
-    }
-
     private boolean maybeReplace(IfStatement node, Assignment a, ITypeBinding typeBinding, Expression rightHandSide) {
         if (typeBinding != null) {
             final String expressionTypeName= typeBinding.getQualifiedName();
@@ -562,7 +551,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
                     // Make sure to keep curly braces if the node is an else statement
                     ctx.getRefactorings().replace(node,
-                            isElseStatementOfParent(node) ? copyStatement : toSingleStatement(copyStatement));
+                            ASTNodes.isInElse(node) ? copyStatement : toSingleStatement(copyStatement));
                     return false;
                 }
             }

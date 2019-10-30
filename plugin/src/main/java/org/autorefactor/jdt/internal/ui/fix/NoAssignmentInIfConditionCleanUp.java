@@ -34,7 +34,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -198,7 +197,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 return false;
             }
 
-            if (!isAnElseIf(node)) {
+            if (!ASTNodes.isInElse(node)) {
                 r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
                 Statement newAssignment= b.toStatement(b.move(assignment));
 
@@ -227,11 +226,6 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             }
 
             return null;
-        }
-
-        private boolean isAnElseIf(IfStatement node) {
-            final ASTNode parent= node.getParent();
-            return parent instanceof IfStatement && node.equals(((IfStatement) parent).getElseStatement());
         }
     }
 }
