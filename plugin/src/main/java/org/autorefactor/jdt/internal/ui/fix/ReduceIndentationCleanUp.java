@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -151,7 +152,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        if (node.getElseStatement() != null && ASTNodes.canHaveSiblings(node)) {
+        if (node.getElseStatement() != null && !ASTNodes.isInElse(node)) {
             if (ASTNodes.fallsThrough(node.getThenStatement())) {
                 if (ASTNodes.fallsThrough(node.getElseStatement())) {
                     if (ASTNodes.getNextSiblings(node).isEmpty()) {
@@ -188,28 +189,57 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+        final List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
-        for (int i= statements.size() - 1; i >= 0; i--) {
-            r.insertAfter(b.move(statements.get(i)), node);
+        if (ASTNodes.canHaveSiblings(node)) {
+            for (int i= statementsToMove.size() - 1; i >= 0; i--) {
+                r.insertAfter(b.move(statementsToMove.get(i)), node);
+            }
+
+            r.replace(node.getExpression(), b.negate(node.getExpression()));
+            r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
+            r.remove(node.getElseStatement());
+        } else {
+            final List<Statement> copyOfStatements= new ArrayList<Statement>();
+
+            for (Statement statement : statementsToMove) {
+                copyOfStatements.add(b.move(statement));
+            }
+
+            r.replace(node.getExpression(), b.negate(node.getExpression()));
+            r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
+            copyOfStatements.add(0, b.move(node));
+
+            Block block= b.block(copyOfStatements);
+            r.replace(node, block);
         }
-
-        r.replace(node.getExpression(), b.negate(node.getExpression()));
-        r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
-        r.remove(node.getElseStatement());
     }
 
     private void moveElseStatement(IfStatement node) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final List<Statement> statements= ASTNodes.asList(node.getElseStatement());
+        final List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 
-        for (int i= statements.size() - 1; i >= 0; i--) {
-            r.insertAfter(b.move(statements.get(i)), node);
+        if (ASTNodes.canHaveSiblings(node)) {
+            for (int i= statementsToMove.size() - 1; i >= 0; i--) {
+                r.insertAfter(b.move(statementsToMove.get(i)), node);
+            }
+
+            r.remove(node.getElseStatement());
+        } else {
+            final List<Statement> copyOfStatements= new ArrayList<Statement>();
+
+            for (Statement statement : statementsToMove) {
+                copyOfStatements.add(b.move(statement));
+            }
+
+            r.remove(node.getElseStatement());
+            copyOfStatements.add(0, b.move(node));
+
+            Block block= b.block(copyOfStatements);
+            r.replace(node, block);
         }
-
-        r.remove(node.getElseStatement());
     }
 
     private boolean hasVariableConflict(IfStatement node, final Statement statementInBlock) {

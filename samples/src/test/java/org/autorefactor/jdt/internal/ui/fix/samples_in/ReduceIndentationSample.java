@@ -126,6 +126,33 @@ public class ReduceIndentationSample {
         }
     }
 
+    public int refactorThenInUnbrackettedForLoop(int[] integers) {
+        for (int integer : integers)
+            if (integer > 0) {
+                // Keep this comment too
+                integer = integer + 1;
+            } else {
+                // Keep this comment
+                return 0;
+            }
+
+        return -1;
+    }
+
+    public int refactorElseInUnbrackettedForLoop(double[] reals) {
+        for (double real : reals)
+            if (real > 0) {
+                // Keep this comment
+                return 0;
+            } else {
+                // Keep this comment too
+                real = real + 1;
+                System.out.println("New value: " + real);
+            }
+
+        return -1;
+    }
+
     public int refactorGreatestIndentation(boolean isActive, boolean isVisible) {
         // Keep this comment
         if (isActive) {
