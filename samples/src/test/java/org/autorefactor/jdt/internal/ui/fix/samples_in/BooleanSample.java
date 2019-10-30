@@ -538,6 +538,28 @@ public class BooleanSample {
         }
     }
 
+    public void mergeCodeInIfStatement(int i) {
+        if (i % 2 == 0) {
+            // Keep this comment
+            if (i > 0) {
+                aMethodThatAcceptsABoolean(true);
+            } else {
+                aMethodThatAcceptsABoolean(false);
+            }
+        }
+    }
+
+    public void mergeCodeInElseStatement(int i) {
+        // Keep this comment
+        if (i % 2 == 0) {
+            System.out.println("i is even");
+        } else if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
     public void doNotDuplicateExpression(int i) {
         if (i > 0) {
             aMethodThatAcceptsABoolean(true);

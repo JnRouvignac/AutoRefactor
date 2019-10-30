@@ -405,6 +405,22 @@ public class BooleanSample {
         aMethodThatAcceptsABoolean(i > 0);
     }
 
+    public void mergeCodeInIfStatement(int i) {
+        if (i % 2 == 0) {
+            // Keep this comment
+            aMethodThatAcceptsABoolean(i > 0);
+        }
+    }
+
+    public void mergeCodeInElseStatement(int i) {
+        // Keep this comment
+        if (i % 2 == 0) {
+            System.out.println("i is even");
+        } else {
+            aMethodThatAcceptsABoolean(i > 0);
+        }
+    }
+
     public void doNotDuplicateExpression(int i) {
         if (i > 0) {
             aMethodThatAcceptsABoolean(true);
