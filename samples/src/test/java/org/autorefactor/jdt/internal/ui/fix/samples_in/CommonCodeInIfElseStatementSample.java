@@ -371,10 +371,10 @@ public class CommonCodeInIfElseStatementSample {
         } else if (i > 0) {
             // Keep this comment
             i++;
-            if (isEnabled && isValid) {
-                i++;
-            } else {
+            if (!isEnabled || !isValid) {
                 j++;
+            } else {
+                i++;
             }
         } else {
             return "Do completely other stuff";

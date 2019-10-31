@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
@@ -53,7 +52,6 @@ import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
@@ -636,8 +634,13 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return safeSubtreeMatch(node, ((PrefixExpression) other).getOperand());
         }
 
-        if (node instanceof BooleanLiteral && other instanceof BooleanLiteral) {
-            return ((BooleanLiteral) node).booleanValue() ^ ((BooleanLiteral) other).booleanValue();
+        if (other instanceof ASTNode) {
+            Boolean value= ASTNodes.booleanConstant(node);
+            Boolean otherValue= ASTNodes.booleanConstant((ASTNode) other);
+
+            if (value != null && otherValue != null) {
+                return value ^ otherValue;
+            }
         }
 
         if (!(node instanceof InfixExpression) || !(other instanceof InfixExpression)) {
@@ -646,11 +649,6 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
         final InfixExpression ie1= (InfixExpression) node;
         final InfixExpression ie2= (InfixExpression) other;
-
-        if (ie1.hasExtendedOperands() ^ ie2.hasExtendedOperands()
-                || (ie1.hasExtendedOperands() && ie1.extendedOperands().size() != ie2.extendedOperands().size())) {
-            return false;
-        }
 
         final Expression leftOperand1= ie1.getLeftOperand();
         final Expression rightOperand1= ie1.getRightOperand();
@@ -779,15 +777,14 @@ public class ASTSemanticMatcher extends ASTMatcher {
             final Expression operand= iterator.next();
 
             final Long numberLiteral= ASTNodes.integerLiteral(operand);
-            final BooleanLiteral booleanLiteral= ASTNodes.as(operand, BooleanLiteral.class);
-            final QualifiedName booleanConstant= ASTNodes.as(operand, QualifiedName.class);
+            Boolean booleanValue= ASTNodes.booleanConstant(operand);
 
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND)) {
-                if (ASTNodes.isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE") || (booleanLiteral != null && Boolean.TRUE.equals(booleanLiteral.booleanValue()))) { //$NON-NLS-1$
+                if (Boolean.TRUE.equals(booleanValue)) {
                     iterator.remove();
                 }
             } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_OR)) {
-                if (ASTNodes.isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE") || (booleanLiteral != null && Boolean.FALSE.equals(booleanLiteral.booleanValue()))) { //$NON-NLS-1$
+                if (Boolean.FALSE.equals(booleanValue)) {
                     iterator.remove();
                 }
             } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS)) {

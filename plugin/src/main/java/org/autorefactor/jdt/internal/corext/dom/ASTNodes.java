@@ -2604,4 +2604,33 @@ public final class ASTNodes {
 
         return false;
     }
+
+    /**
+     * Returns a boolean constant value, if present.
+     *
+     * @param node The node
+     * @return a boolean constant value, if present.
+     */
+    public static Boolean booleanConstant(final ASTNode node) {
+        if (!(node instanceof Expression)) {
+            return null;
+        }
+
+        Expression expression= (Expression) node;
+
+        final BooleanLiteral booleanLiteral= as(expression, BooleanLiteral.class);
+        final QualifiedName booleanConstant= as(expression, QualifiedName.class);
+
+        if (booleanLiteral != null) {
+            return booleanLiteral.booleanValue();
+        } else if (booleanConstant != null) {
+            if (isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
+                return Boolean.TRUE;
+            } else if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+                return Boolean.FALSE;
+            }
+        }
+
+        return null;
+    }
 }
