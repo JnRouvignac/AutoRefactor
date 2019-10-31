@@ -86,7 +86,6 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
             if (node.getParent() instanceof Statement) {
                 return isLastStatement((Statement) node.getParent());
             }
-            return false;
         }
         return false;
     }
