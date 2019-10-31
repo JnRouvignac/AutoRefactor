@@ -281,7 +281,7 @@ public class CommonCodeInIfElseStatementSample {
         }
         // Keep this comment
         i++;
-        if (isEnabled && true) {
+        if (Boolean.TRUE && isEnabled && isValid) {
             i++;
         } else {
             j++;

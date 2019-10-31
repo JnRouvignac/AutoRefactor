@@ -684,8 +684,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
         final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
 
         if (ie2.getOperator().equals(reverseOp)) {
-            if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND,
-                            InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_OR)) {
+            if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR,
+                    InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
                 return isOperandsMatching(ie1, ie2, false);
             }
             if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {

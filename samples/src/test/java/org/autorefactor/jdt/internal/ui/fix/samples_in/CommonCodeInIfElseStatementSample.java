@@ -363,7 +363,7 @@ public class CommonCodeInIfElseStatementSample {
         if (isValid) {
             // Keep this comment
             i++;
-            if (isEnabled && true) {
+            if (Boolean.TRUE && isEnabled && isValid) {
                 i++;
             } else {
                 j++;
@@ -371,10 +371,10 @@ public class CommonCodeInIfElseStatementSample {
         } else if (i > 0) {
             // Keep this comment
             i++;
-            if (false || !isEnabled) {
-                ++j;
-            } else {
+            if (isEnabled && isValid) {
                 i++;
+            } else {
+                j++;
             }
         } else {
             return "Do completely other stuff";
