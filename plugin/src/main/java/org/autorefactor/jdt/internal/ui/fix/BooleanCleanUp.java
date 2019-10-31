@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -342,10 +343,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeReplace(IfStatement node, Assignment a, ITypeBinding typeBinding, Expression rightHandSide) {
+    private boolean maybeReplace(IfStatement node, Assignment assignment, ITypeBinding typeBinding, Expression rightHandSide) {
         if (typeBinding != null) {
             final String expressionTypeName= typeBinding.getQualifiedName();
-            final Expression newE= newExpressionOrNull(expressionTypeName, node.getExpression(), a.getRightHandSide(),
+            final Expression newE= newExpressionOrNull(expressionTypeName, node.getExpression(), assignment.getRightHandSide(),
                     rightHandSide);
 
             if (newE != null) {
@@ -356,18 +357,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         }
 
         return true;
-    }
-
-    private Statement toSingleStatement(final Statement statement) {
-        if (statement instanceof Block) {
-            final List<Statement> statements= ASTNodes.asList(statement);
-
-            if (statements.size() == 1) {
-                return statements.get(0);
-            }
-        }
-
-        return statement;
     }
 
     private ReturnStatement getReturnStatement(IfStatement node, Boolean thenBool, Boolean elseBool,
@@ -540,19 +529,34 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
             if (ASTNodes.match(matcher, node.getThenStatement(), node.getElseStatement())
                     && (matcher.matches.size() <= 1 || ifCondition instanceof Name || ifCondition instanceof FieldAccess)) {
-                // Then and else statement are matching, bar the boolean values
+                // Then and else statements are matching, bar the boolean values
                 // which are opposite
                 final Statement copyStatement= b.copySubtree(node.getThenStatement());
-                // Identify the node that need to be replaced after the copy
+                // Identify the node that needs to be replaced after the copy
                 final BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
                 if (ASTNodes.match(matcher2, copyStatement, node.getElseStatement())) {
+                    Refactorings r = ctx.getRefactorings();
+
                     copyStatement.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
-                    // Make sure to keep curly braces if the node is an else statement
-                    ctx.getRefactorings().replace(node,
-                            ASTNodes.isInElse(node) ? copyStatement : toSingleStatement(copyStatement));
-                    return false;
+
+                    if (!ASTNodes.canHaveSiblings(node)) {
+                        // Make sure to keep curly braces if the node is an else statement
+                        r.replace(node, copyStatement);
+                        return false;
+                    }
+
+                    if (!ASTNodes.hasVariableConflict(node, node.getThenStatement())) {
+                        final List<Statement> statementsToMove= ASTNodes.asList(copyStatement);
+
+                        for (int i= statementsToMove.size() - 1; i > 0; i--) {
+                            r.insertAfter(statementsToMove.get(i), node);
+                        }
+
+                        r.replace(node, statementsToMove.get(0));
+                        return false;
+                    }
                 }
             }
         }

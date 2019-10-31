@@ -2582,4 +2582,26 @@ public final class ASTNodes {
 
         return false;
     }
+
+    /**
+     * Returns true if variables are declared with the same identifier after the given statement.
+     *
+     * @param node The start
+     * @param statementInBlock The statement with variables
+     * @return true if variables are declared with the same identifier after the given statement.
+     */
+    public static boolean hasVariableConflict(Statement node, final Statement statementInBlock) {
+        final Set<String> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
+
+        for (Statement statement : getNextSiblings(node)) {
+            final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(existingVariableNames);
+            varOccurrenceVisitor.visitNode(statement);
+
+            if (varOccurrenceVisitor.isVarUsed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

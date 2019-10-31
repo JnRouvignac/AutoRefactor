@@ -653,6 +653,29 @@ public class BooleanSample {
         }
     }
 
+    public int refactorWithFollowingCode(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(false);
+        } else {
+            aMethodThatAcceptsABoolean(true);
+        }
+        return 42;
+    }
+
+    public int doNotRefactorWithNameConflict(boolean bo) {
+        if (bo) {
+            boolean b = true;
+            aMethodThatAcceptsABoolean(b);
+        } else {
+            boolean b = false;
+            aMethodThatAcceptsABoolean(b);
+        }
+
+        int b = 42;
+        return b;
+    }
+
     public void doNotMoveActiveExpression(List<Integer> modifiableList) {
         if (modifiableList.add(1)) {
             aMethodThatAcceptsABoolean(modifiableList.contains(1));

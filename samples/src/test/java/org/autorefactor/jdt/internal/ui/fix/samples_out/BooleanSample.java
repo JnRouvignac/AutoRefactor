@@ -438,49 +438,60 @@ public class BooleanSample {
 
     public int directlyPassBooleanAmongOtherCode(boolean bo) {
         // Keep this comment
-        {
-            aMethodThatAcceptsABoolean(bo);
-            if (aMethodThatReturnsBoolean()) {
-                return 0;
-            } else {
-                return 10;
-            }
+        aMethodThatAcceptsABoolean(bo);
+        if (aMethodThatReturnsBoolean()) {
+            return 0;
+        } else {
+            return 10;
         }
     }
 
     public int directlyPassBooleanAmongOtherBoolean(boolean bo, int i) {
         // Keep this comment
-        {
-            aMethodThatAcceptsABoolean(true);
-            aMethodThatAcceptsABoolean(bo);
-            aMethodThatAcceptsABoolean(true);
-            i++;
-        }
+        aMethodThatAcceptsABoolean(true);
+        aMethodThatAcceptsABoolean(bo);
+        aMethodThatAcceptsABoolean(true);
+        i++;
         return i;
     }
 
     public int directlyPassOppositeBoolean(boolean bo) {
         // Keep this comment
-        {
-            aMethodThatAcceptsABoolean(bo);
-            aMethodThatAcceptsABoolean(!bo);
-            if (aMethodThatReturnsBoolean()) {
-                return 0;
-            } else
-                return 10;
-        }
+        aMethodThatAcceptsABoolean(bo);
+        aMethodThatAcceptsABoolean(!bo);
+        if (aMethodThatReturnsBoolean()) {
+            return 0;
+        } else
+            return 10;
     }
 
     public int directlyPassOppositeBoolean() {
         // Keep this comment
-        {
-            aMethodThatAcceptsABoolean(this.booleanPrimitive);
-            aMethodThatAcceptsABoolean(!this.booleanPrimitive);
-            if (aMethodThatReturnsBoolean()) {
-                return 0;
-            } else
-                return 10;
+        aMethodThatAcceptsABoolean(this.booleanPrimitive);
+        aMethodThatAcceptsABoolean(!this.booleanPrimitive);
+        if (aMethodThatReturnsBoolean()) {
+            return 0;
+        } else
+            return 10;
+    }
+
+    public int refactorWithFollowingCode(boolean bo) {
+        // Keep this comment
+        aMethodThatAcceptsABoolean(!bo);
+        return 42;
+    }
+
+    public int doNotRefactorWithNameConflict(boolean bo) {
+        if (bo) {
+            boolean b = true;
+            aMethodThatAcceptsABoolean(b);
+        } else {
+            boolean b = false;
+            aMethodThatAcceptsABoolean(b);
         }
+
+        int b = 42;
+        return b;
     }
 
     public void doNotMoveActiveExpression(List<Integer> modifiableList) {

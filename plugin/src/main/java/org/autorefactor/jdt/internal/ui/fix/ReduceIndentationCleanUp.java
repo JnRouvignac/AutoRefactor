@@ -27,12 +27,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -172,11 +170,11 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
                         return false;
                     }
-                } else if (!hasVariableConflict(node, node.getElseStatement())) {
+                } else if (!ASTNodes.hasVariableConflict(node, node.getElseStatement())) {
                     moveElseStatement(node);
                     return false;
                 }
-            } else if (ASTNodes.fallsThrough(node.getElseStatement()) && !hasVariableConflict(node, node.getThenStatement()) && !(node.getElseStatement() instanceof IfStatement)) {
+            } else if (ASTNodes.fallsThrough(node.getElseStatement()) && !ASTNodes.hasVariableConflict(node, node.getThenStatement()) && !(node.getElseStatement() instanceof IfStatement)) {
                 moveThenStatement(node);
                 return false;
             }
@@ -200,7 +198,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
             r.remove(node.getElseStatement());
         } else {
-            final List<Statement> copyOfStatements= new ArrayList<Statement>();
+            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
                 copyOfStatements.add(b.move(statement));
@@ -228,7 +226,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
             r.remove(node.getElseStatement());
         } else {
-            final List<Statement> copyOfStatements= new ArrayList<Statement>();
+            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
                 copyOfStatements.add(b.move(statement));
@@ -240,20 +238,5 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             Block block= b.block(copyOfStatements);
             r.replace(node, block);
         }
-    }
-
-    private boolean hasVariableConflict(IfStatement node, final Statement statementInBlock) {
-        final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(statementInBlock, false);
-
-        for (Statement statement : ASTNodes.getNextSiblings(node)) {
-            final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames);
-            varOccurrenceVisitor.visitNode(statement);
-
-            if (varOccurrenceVisitor.isVarUsed()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
