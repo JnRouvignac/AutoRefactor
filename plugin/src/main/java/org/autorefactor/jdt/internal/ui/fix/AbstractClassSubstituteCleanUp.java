@@ -50,6 +50,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -478,7 +479,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
             if (!canBeSharedInOtherThread()) {
-                final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
+                final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varDecl.resolveBinding(), node, true).find();
                 if (!variableUseVisitor.getUses().isEmpty()) {
                     isUsedInAnnonymousClass= true;

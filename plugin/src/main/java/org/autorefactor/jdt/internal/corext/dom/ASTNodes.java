@@ -54,7 +54,6 @@ import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -146,38 +145,6 @@ public final class ASTNodes {
          */
         public int compare(ASTNode o1, ASTNode o2) {
             return o1.getStartPosition() - o2.getStartPosition();
-        }
-    }
-
-    private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private final Set<String> variableNames= new HashSet<>();
-        private final ASTNode startNode;
-        private final boolean includeInnerScopes;
-
-        private VariableDeclarationIdentifierVisitor(ASTNode startNode, boolean includeInnerScopes) {
-            this.startNode= startNode;
-            this.includeInnerScopes= includeInnerScopes;
-        }
-
-        private Set<String> getVariableNames() {
-            return variableNames;
-        }
-
-        @Override
-        public boolean visit(SingleVariableDeclaration node) {
-            variableNames.add(node.getName().getIdentifier());
-            return true;
-        }
-
-        @Override
-        public boolean visit(VariableDeclarationFragment node) {
-            variableNames.add(node.getName().getIdentifier());
-            return true;
-        }
-
-        @Override
-        public boolean visit(Block node) {
-            return startNode == node || includeInnerScopes;
         }
     }
 
@@ -2474,7 +2441,7 @@ public final class ASTNodes {
         if (node == null) {
             return Collections.emptySet();
         }
-        final VariableDeclarationIdentifierVisitor visitor= new VariableDeclarationIdentifierVisitor(node,
+        final VarDeclarationIdentifierVisitor visitor= new VarDeclarationIdentifierVisitor(node,
                 includeInnerScopes);
         node.accept(visitor);
         return visitor.getVariableNames();

@@ -45,6 +45,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Variable;
 import org.autorefactor.util.IllegalStateException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -243,7 +244,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        final VariableDefinitionsUsesVisitor keyUseVisitor= new VariableDefinitionsUsesVisitor(parameter);
+        final VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
         int keyUses= keyUseVisitor.getUses().size();
 

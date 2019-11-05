@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -85,7 +86,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
                         }
                     }
 
-                    isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getUses().isEmpty();
+                    isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getUses().isEmpty();
                     stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
                 }
 

@@ -35,6 +35,7 @@ import java.util.Set;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -199,7 +200,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
         if (variableBinding != null) {
-            final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(variableBinding,
+            final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                     toVisit, true).find();
             return variableUseVisitor.getUses().size();
         }

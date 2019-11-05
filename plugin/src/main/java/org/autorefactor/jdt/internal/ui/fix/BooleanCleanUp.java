@@ -38,6 +38,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -322,7 +323,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 VariableDeclarationFragment vdf= getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
 
                 if (vdf != null) {
-                    final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
+                    final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                             vdf.resolveBinding(), node.getExpression(), true).find();
 
                     if (variableUseVisitor.getUses().isEmpty()) {

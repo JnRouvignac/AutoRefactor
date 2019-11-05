@@ -34,6 +34,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -173,7 +174,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
     private VariableDeclarationFragment newFragment(List<Statement> tryStatements,
             VariableDeclarationFragment existingFragment, List<ASTNode> nodesToRemove) {
-        final VariableDefinitionsUsesVisitor visitor= new VariableDefinitionsUsesVisitor(existingFragment).find();
+        final VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
         final List<SimpleName> definitions= visitor.getDefinitions();
 
         final ASTNodeFactory b= ctx.getASTBuilder();

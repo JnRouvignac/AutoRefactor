@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.ui.fix;
+package org.autorefactor.jdt.internal.corext.dom;
 
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
@@ -34,7 +34,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -46,8 +45,8 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-/** Visitor collecting all definitions and uses of a variable. */
-public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
+/** Visitor collecting all definitions and uses of a local variable. */
+public final class VarDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
     private final boolean includeInnerScopes;
@@ -60,7 +59,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
-    public VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
+    public VarDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
         this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration), true);
     }
 
@@ -72,7 +71,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      * @param scopeNode       the {@link ASTNode} which is the scope of the search
      * @param includeInnerScopes True if the sub blocks should be analyzed
      */
-    public VariableDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode, boolean includeInnerScopes) {
+    public VarDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode, boolean includeInnerScopes) {
         this.variableBinding= variableBinding;
         this.scopeNode= scopeNode;
         this.includeInnerScopes= includeInnerScopes;
@@ -104,7 +103,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @return this visitor
      */
-    public VariableDefinitionsUsesVisitor find() {
+    public VarDefinitionsUsesVisitor find() {
         if (variableBinding != null && scopeNode != null) {
             scopeNode.accept(this);
         }
