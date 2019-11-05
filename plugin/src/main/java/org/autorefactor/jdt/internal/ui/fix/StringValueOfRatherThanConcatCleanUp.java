@@ -86,7 +86,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
         if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
                 && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
             final ASTNodeFactory b= this.ctx.getASTBuilder();
-            final MethodInvocation newInvoke= b.invoke("String", "valueOf", b.copy(variable)); //$NON-NLS-1$ //$NON-NLS-2$
+            final MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.copy(variable)); //$NON-NLS-1$
 
             if (node.hasExtendedOperands()) {
                 List<Expression> extendedOperands= ASTNodes.extendedOperands(node);

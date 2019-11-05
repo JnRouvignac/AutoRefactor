@@ -76,7 +76,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "StringBuilder"; //$NON-NLS-1$
+        return StringBuilder.class.getSimpleName();
     }
 
     @Override

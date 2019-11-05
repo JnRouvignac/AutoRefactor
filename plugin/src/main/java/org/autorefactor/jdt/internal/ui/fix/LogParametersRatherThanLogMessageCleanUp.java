@@ -113,7 +113,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 messageBuilder.append("{}"); //$NON-NLS-1$
 
                 if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-                    params.add(b.invoke("String", "valueOf", b.copy(string))); //$NON-NLS-1$ //$NON-NLS-2$
+                    params.add(b.invoke(String.class.getSimpleName(), "valueOf", b.copy(string))); //$NON-NLS-1$
                 } else {
                     params.add(b.copy(string));
                 }

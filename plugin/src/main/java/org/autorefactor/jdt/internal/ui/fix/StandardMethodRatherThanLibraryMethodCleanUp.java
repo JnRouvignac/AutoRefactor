@@ -173,7 +173,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             } else if (ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier= b.lambda();
                 messageSupplier
-                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$ //$NON-NLS-2$
+                        .setBody(b.invoke(b.simpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
                 r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
             } else {
                 return true;

@@ -260,9 +260,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
-                        .toStatement(b.invoke("System", "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$ //$NON-NLS-2$
-                b.catch0("IndexOutOfBoundsException", "e", //$NON-NLS-1$ //$NON-NLS-2$
-                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        .toStatement(b.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
+                b.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
+                        b.throw0(b.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
         this.ctx.getRefactorings().replace(node, tryS);
         return false;

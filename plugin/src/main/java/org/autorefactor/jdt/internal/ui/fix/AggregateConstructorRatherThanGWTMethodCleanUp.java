@@ -106,12 +106,12 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         if (node.arguments().isEmpty()) {
-            return maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "ArrayList") //$NON-NLS-1$ //$NON-NLS-2$
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "LinkedList") //$NON-NLS-1$ //$NON-NLS-2$
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "HashMap") //$NON-NLS-1$ //$NON-NLS-2$
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "TreeMap") //$NON-NLS-1$ //$NON-NLS-2$
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "LinkedHashMap") //$NON-NLS-1$ //$NON-NLS-2$
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "IdentityHashMap"); //$NON-NLS-1$ //$NON-NLS-2$
+            return maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", ArrayList.class.getSimpleName()) //$NON-NLS-1$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", LinkedList.class.getSimpleName()) //$NON-NLS-1$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", HashMap.class.getSimpleName()) //$NON-NLS-1$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", TreeMap.class.getSimpleName()) //$NON-NLS-1$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", LinkedHashMap.class.getSimpleName()) //$NON-NLS-1$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", IdentityHashMap.class.getSimpleName()); //$NON-NLS-1$
         }
 
         if (node.arguments().size() == 1) {
@@ -148,7 +148,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                 final Refactorings r= this.ctx.getRefactorings();
 
                 final Type type= b.getAST().newParameterizedType(
-                        b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName())); //$NON-NLS-1$
+                        b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName()));
                 r.replace(node, b.new0(type, b.copy(arg)));
                 importsToAdd.add(EnumMap.class.getCanonicalName());
                 return false;

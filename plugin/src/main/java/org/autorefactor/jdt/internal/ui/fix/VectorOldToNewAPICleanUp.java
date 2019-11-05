@@ -109,7 +109,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
         if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            r.replace(arg0, b.cast(b.type("Object"), b.move(arg0))); //$NON-NLS-1$
+            r.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.move(arg0)));
         }
     }
 

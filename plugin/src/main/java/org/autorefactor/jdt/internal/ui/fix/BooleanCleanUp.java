@@ -499,11 +499,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private Name getBooleanName(ASTNode node) {
-        if (!isSimpleNameAlreadyUsed("Boolean", ASTNodes.getAncestor(node, CompilationUnit.class))) { //$NON-NLS-1$
-            return b.simpleName("Boolean"); //$NON-NLS-1$
+        if (!isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), ASTNodes.getAncestor(node, CompilationUnit.class))) {
+            return b.simpleName(Boolean.class.getSimpleName());
         }
 
-        return b.simpleName(Boolean.class.getCanonicalName());
+        return b.name(Boolean.class.getCanonicalName());
     }
 
     private boolean isSimpleNameAlreadyUsed(String simpleName, CompilationUnit cu) {
