@@ -175,7 +175,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     private VariableDeclarationFragment newFragment(List<Statement> tryStatements,
             VariableDeclarationFragment existingFragment, List<ASTNode> nodesToRemove) {
         final VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
-        final List<SimpleName> definitions= visitor.getDefinitions();
+        final List<SimpleName> definitions= visitor.getWrites();
 
         final ASTNodeFactory b= ctx.getASTBuilder();
         if (!tryStatements.isEmpty()) {

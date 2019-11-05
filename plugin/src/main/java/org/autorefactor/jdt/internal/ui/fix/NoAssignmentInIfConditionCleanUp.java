@@ -179,7 +179,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                     final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                             expression, true).find();
 
-                    if (!variableUseVisitor.getUses().isEmpty()) {
+                    if (!variableUseVisitor.getReads().isEmpty()) {
                         return true;
                     }
                 }

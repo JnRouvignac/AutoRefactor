@@ -202,7 +202,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (variableBinding != null) {
             final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                     toVisit, true).find();
-            return variableUseVisitor.getUses().size();
+            return variableUseVisitor.getReads().size();
         }
         return 0;
     }

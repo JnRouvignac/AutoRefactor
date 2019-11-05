@@ -246,7 +246,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         final VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
-        int keyUses= keyUseVisitor.getUses().size();
+        int keyUses= keyUseVisitor.getReads().size();
 
         final int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
         final Variable entryVar= new Variable(

@@ -481,7 +481,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (!canBeSharedInOtherThread()) {
                 final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varDecl.resolveBinding(), node, true).find();
-                if (!variableUseVisitor.getUses().isEmpty()) {
+                if (!variableUseVisitor.getReads().isEmpty()) {
                     isUsedInAnnonymousClass= true;
                     return interruptVisit();
                 }

@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /**
- * Visitor collecting all definitions of a variable.
+ * Visitor collecting all definitions of any variable.
  */
 public class VarDeclarationIdentifierVisitor extends ASTVisitor {
     private final Set<String> variableNames= new HashSet<>();

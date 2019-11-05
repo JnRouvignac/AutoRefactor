@@ -326,7 +326,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                             vdf.resolveBinding(), node.getExpression(), true).find();
 
-                    if (variableUseVisitor.getUses().isEmpty()) {
+                    if (variableUseVisitor.getReads().isEmpty()) {
                         final ITypeBinding typeBinding= vds.getType().resolveBinding();
                         return maybeReplace(node, thenA, typeBinding, vdf.getInitializer());
                     }

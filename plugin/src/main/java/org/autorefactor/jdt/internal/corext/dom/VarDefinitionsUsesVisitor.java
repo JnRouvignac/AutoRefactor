@@ -50,8 +50,8 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
     private final boolean includeInnerScopes;
-    private final List<SimpleName> definitions= new ArrayList<>();
-    private final List<SimpleName> uses= new ArrayList<>();
+    private final List<SimpleName> writes= new ArrayList<>();
+    private final List<SimpleName> reads= new ArrayList<>();
 
     /**
      * Builds from a {@link VariableDeclaration} and infers the variable binding and
@@ -115,19 +115,19 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
         if (ASTNodes.isSameLocalVariable(variableBinding, node)) {
             switch (node.getParent().getNodeType()) {
             case ASSIGNMENT:
-                addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
+                addWriteOrRead(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
                 break;
 
             case VARIABLE_DECLARATION_FRAGMENT:
-                addDefinitionOrUse(node, VariableDeclarationFragment.NAME_PROPERTY);
+                addWriteOrRead(node, VariableDeclarationFragment.NAME_PROPERTY);
                 break;
 
             case SINGLE_VARIABLE_DECLARATION:
-                addDefinitionOrUse(node, SingleVariableDeclaration.NAME_PROPERTY);
+                addWriteOrRead(node, SingleVariableDeclaration.NAME_PROPERTY);
                 break;
 
             default:
-                uses.add(node);
+                reads.add(node);
                 break;
             }
         }
@@ -139,11 +139,11 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
         return scopeNode == node || includeInnerScopes;
     }
 
-    private void addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
+    private void addWriteOrRead(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
         if (node.getLocationInParent() == definitionPropertyDescriptor) {
-            definitions.add(node);
+            writes.add(node);
         } else {
-            uses.add(node);
+            reads.add(node);
         }
     }
 
@@ -152,8 +152,8 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @return all the definitions found.
      */
-    public List<SimpleName> getDefinitions() {
-        return definitions;
+    public List<SimpleName> getWrites() {
+        return writes;
     }
 
     /**
@@ -161,7 +161,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @return all the uses found.
      */
-    public List<SimpleName> getUses() {
-        return uses;
+    public List<SimpleName> getReads() {
+        return reads;
     }
 }
