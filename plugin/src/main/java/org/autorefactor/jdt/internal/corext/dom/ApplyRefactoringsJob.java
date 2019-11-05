@@ -149,8 +149,9 @@ public class ApplyRefactoringsJob extends Job {
      *                           project
      * @param monitor            the progress monitor of the current job
      * @param hasToSave          hasToSave
-     * @return
+     *
      * @return TextEdit
+     *
      * @throws Exception if any problem occurs
      */
     public List<TextEdit> applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
