@@ -31,7 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.autorefactor.environment.Environment;
 import org.autorefactor.util.NotImplementedException;
@@ -136,15 +138,15 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements, IProgressMonitor monitor) {
         try {
-            final Queue<RefactoringUnit> results= new ConcurrentLinkedQueue<>();
+            final Set<RefactoringUnit> results= new ConcurrentSkipListSet<>();
             addAll(results, javaElements, monitor);
-            return results;
+            return new ConcurrentLinkedQueue<>(results);
         } catch (Exception e) {
             throw new UnhandledException(null, e);
         }
     }
 
-    private void addAll(Queue<RefactoringUnit> results, List<IJavaElement> javaElements, IProgressMonitor monitor)
+    private void addAll(Set<RefactoringUnit> results, List<IJavaElement> javaElements, IProgressMonitor monitor)
             throws JavaModelException {
         final SubMonitor subMonitor= SubMonitor.convert(monitor, javaElements.size());
         for (IJavaElement javaElement : javaElements) {
@@ -168,14 +170,14 @@ public class PrepareApplyRefactoringsJob extends Job {
         }
     }
 
-    private void addAll(final Queue<RefactoringUnit> results, ICompilationUnit[] cus, JavaProjectOptions options)
+    private void addAll(final Set<RefactoringUnit> results, ICompilationUnit[] cus, JavaProjectOptions options)
             throws JavaModelException {
         for (ICompilationUnit cu : cus) {
             add(results, cu, options);
         }
     }
 
-    private void add(final Queue<RefactoringUnit> results, ICompilationUnit cu, JavaProjectOptions options)
+    private void add(final Set<RefactoringUnit> results, ICompilationUnit cu, JavaProjectOptions options)
             throws JavaModelException {
         if (!cu.isConsistent()) {
             cu.makeConsistent(null);

@@ -25,10 +25,12 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 
 /** Work item for the {@link ApplyRefactoringsJob}. */
-public class RefactoringUnit {
+public class RefactoringUnit implements Comparable {
     private final ICompilationUnit compilationUnit;
     private final JavaProjectOptions options;
 
@@ -54,5 +56,53 @@ public class RefactoringUnit {
     @Override
     public String toString() {
         return getCompilationUnit().toString();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (equals(o)) {
+            return 0;
+        }
+
+        if (o == null || !(o instanceof RefactoringUnit)) {
+            return 1;
+        }
+
+        RefactoringUnit other= (RefactoringUnit) o;
+
+        if (this.compilationUnit == null) {
+            if (other.compilationUnit == null) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else if (other.compilationUnit == null) {
+            return -1;
+        }
+
+        return compilationUnit.getElementName().compareTo(other.compilationUnit.getElementName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(compilationUnit);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        RefactoringUnit other= (RefactoringUnit) obj;
+        return Objects.equals(compilationUnit, other.compilationUnit);
     }
 }
