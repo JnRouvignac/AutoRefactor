@@ -1068,9 +1068,7 @@ public final class ASTNodes {
         }
 
         return parent instanceof Block
-                || (parent instanceof SwitchStatement && node.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY)
-                || (parent instanceof TryStatement && node.getLocationInParent() == TryStatement.BODY_PROPERTY)
-                || (parent instanceof CatchClause && node.getLocationInParent() == CatchClause.BODY_PROPERTY);
+                || (parent instanceof SwitchStatement && node.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY);
     }
 
     /**
@@ -1142,7 +1140,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static List<Statement> getNextSiblings(Statement startNode) {
-        if (startNode.getParent() instanceof Block) {
+        if (canHaveSiblings(startNode)) {
             final List<Statement> statements= asList((Statement) startNode.getParent());
             final int indexOfNode= statements.indexOf(startNode);
             final int siblingIndex= indexOfNode + 1;

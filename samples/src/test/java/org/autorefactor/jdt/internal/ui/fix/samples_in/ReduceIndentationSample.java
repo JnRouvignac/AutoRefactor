@@ -264,7 +264,7 @@ public class ReduceIndentationSample {
         return i;
     }
 
-    public int doNotRefactorWithoutNameConfusion(int i) {
+    public int doNotRefactorWithNameConfusion(int i) {
         if (i > 0) {
             return 0;
         } else {
@@ -273,6 +273,22 @@ public class ReduceIndentationSample {
         }
 
         System.out.println("Today: " + j);
+
+        return i;
+    }
+
+    public int doNotRefactorWithNameConfusion(int i, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            if (i > 0) {
+                return 0;
+            } else {
+                int j = 123;
+                i = i + j;
+            }
+
+            System.out.println("Today: " + j);
+        }
 
         return i;
     }
