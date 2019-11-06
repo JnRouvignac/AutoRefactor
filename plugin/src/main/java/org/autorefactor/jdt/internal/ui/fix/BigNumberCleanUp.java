@@ -118,7 +118,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
                     // Only instantiation from double, not from integer
-                    ctx.getRefactorings().replace(arg0, getStringLiteral(literalValue.replace("_", "")));
+                    ctx.getRefactorings().replace(arg0, getStringLiteral(literalValue.replace("_", ""))); //$NON-NLS-1$ //$NON-NLS-2$
                     return false;
                 }
 
