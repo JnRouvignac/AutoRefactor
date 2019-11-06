@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ReduceIndentationSample {
-    private Date j = new Date();
+    private Date conflictingName = new Date();
 
     public int refactor(List<Date> events) {
         // Keep this comment
@@ -239,17 +239,17 @@ public class ReduceIndentationSample {
         if (i > 0) {
             return 0;
         } else {
-            int j = 123;
-            i = i + j;
+            int conflictingName = 123;
+            i = i + conflictingName;
         }
 
-        int j = 321;
+        int conflictingName = 321;
 
-        return i + j;
+        return i + conflictingName;
     }
 
     public int refactorWithoutNameConflict(int i) {
-        System.out.println("Today: " + j);
+        System.out.println("Today: " + conflictingName);
 
         // Keep this comment
         if (i > 0) {
@@ -257,8 +257,8 @@ public class ReduceIndentationSample {
             return 0;
         } else {
             // Keep this comment also
-            int j = 123;
-            i = i + j;
+            int conflictingName = 123;
+            i = i + conflictingName;
         }
 
         return i;
@@ -268,11 +268,11 @@ public class ReduceIndentationSample {
         if (i > 0) {
             return 0;
         } else {
-            int j = 123;
-            i = i + j;
+            int conflictingName = 123;
+            i = i + conflictingName;
         }
 
-        System.out.println("Today: " + j);
+        System.out.println("Today: " + conflictingName);
 
         return i;
     }
@@ -283,11 +283,11 @@ public class ReduceIndentationSample {
             if (i > 0) {
                 return 0;
             } else {
-                int j = 123;
-                i = i + j;
+                int conflictingName = 123;
+                i = i + conflictingName;
             }
 
-            System.out.println("Today: " + j);
+            System.out.println("Today: " + conflictingName);
         }
 
         return i;
