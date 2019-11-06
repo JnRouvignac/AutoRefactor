@@ -134,7 +134,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
         Composite spacer= new Composite(ruleGroup, SWT.NULL);
         spacer.setLayoutData(new GridData(0, 5));
 
-        rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
+        rules= new ArrayList<>(allRefactoringRules.size());
 
         for (RefactoringRule refactoringRule : allRefactoringRules) {
             final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
@@ -169,7 +169,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      * @param allRefactoringRules all the cleanup rules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields= new ArrayList<FieldEditor>(allRefactoringRules.size());
+        fields= new ArrayList<>(allRefactoringRules.size());
     }
 
     private void invalidateToggleRules(final Composite ruleGroup) {

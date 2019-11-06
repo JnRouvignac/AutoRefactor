@@ -118,7 +118,7 @@ public class PrepareApplyRefactoringsJob extends Job {
      * for stateful cleanups.
      */
     private List<RefactoringRule> clone(List<RefactoringRule> refactorings) throws Exception {
-        final List<RefactoringRule> res= new ArrayList<RefactoringRule>(refactorings.size());
+        final List<RefactoringRule> res= new ArrayList<>(refactorings.size());
         for (RefactoringRule refactoring : refactorings) {
             res.add(refactoring.getClass().newInstance());
         }

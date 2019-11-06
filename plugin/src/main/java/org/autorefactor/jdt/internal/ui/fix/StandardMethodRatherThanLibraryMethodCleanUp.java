@@ -186,7 +186,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
     }
 
     private List<Expression> copyArguments(final ASTNodeFactory b, final MethodInvocation node) {
-        final List<Expression> copyOfArgs= new ArrayList<Expression>(node.arguments().size());
+        final List<Expression> copyOfArgs= new ArrayList<>(node.arguments().size());
 
         for (Object expression : node.arguments()) {
             copyOfArgs.add(b.copy((Expression) expression));

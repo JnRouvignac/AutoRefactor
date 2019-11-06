@@ -557,7 +557,7 @@ public final class ASTNodes {
      */
     public static List<Expression> allOperands(InfixExpression node) {
         final List<Expression> extOps= extendedOperands(node);
-        final List<Expression> results= new ArrayList<Expression>(2 + extOps.size());
+        final List<Expression> results= new ArrayList<>(2 + extOps.size());
         results.add(node.getLeftOperand());
         results.add(node.getRightOperand());
         results.addAll(extOps);
@@ -1444,7 +1444,8 @@ public final class ASTNodes {
 
             if (!isHardCoded(infixExpression.getLeftOperand()) || !isHardCoded(infixExpression.getRightOperand())) {
                 return false;
-            } else if (infixExpression.hasExtendedOperands()) {
+            }
+            if (infixExpression.hasExtendedOperands()) {
                 for (Object operand : infixExpression.extendedOperands()) {
                     if (!isHardCoded((Expression) operand)) {
                         return false;
@@ -2593,10 +2594,12 @@ public final class ASTNodes {
 
         if (booleanLiteral != null) {
             return booleanLiteral.booleanValue();
-        } else if (booleanConstant != null) {
+        }
+        if (booleanConstant != null) {
             if (isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
                 return Boolean.TRUE;
-            } else if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+            }
+            if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
                 return Boolean.FALSE;
             }
         }

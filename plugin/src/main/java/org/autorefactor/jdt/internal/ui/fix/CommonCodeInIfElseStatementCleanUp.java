@@ -203,7 +203,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
                 r.removeButKeepComment(node);
             } else {
-                List<Statement> orderedStatements= new ArrayList<Statement>(oneCaseToRemove.size());
+                List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
                 for (Statement stmtToRemove : oneCaseToRemove) {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }
@@ -232,7 +232,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             if (node.getParent() instanceof Block) {
                 insertIdenticalCode(node, oneCaseToRemove, b, r);
             } else {
-                List<Statement> orderedStatements= new ArrayList<Statement>(oneCaseToRemove.size() + 1);
+                List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
                 for (Statement stmtToRemove : oneCaseToRemove) {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }

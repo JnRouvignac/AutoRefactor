@@ -145,7 +145,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
      *         elements
      */
     public List<RefactoringRule> getSelectedRefactorings() {
-        final ArrayList<RefactoringRule> results= new ArrayList<>();
+        final List<RefactoringRule> results= new ArrayList<>();
         for (Object o : tableViewer.getCheckedElements()) {
             results.add((RefactoringRule) o);
         }

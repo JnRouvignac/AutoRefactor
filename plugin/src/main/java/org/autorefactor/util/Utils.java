@@ -25,36 +25,13 @@
  */
 package org.autorefactor.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /** Utility class containing miscellaneous helper methods. */
 public final class Utils {
     private Utils() {
-        // Utility class ctor is private
-    }
-
-    /**
-     * Creates a <i>mutable</i>, empty {@code ArrayList} instance.
-     *
-     * @param <E> the type of elements in the list
-     * @return a new, empty {@code ArrayList}
-     */
-    public static <E> ArrayList<E> newArrayList() {
-        return new ArrayList<>();
-    }
-
-    /**
-     * Creates a <i>mutable</i>, empty {@code HashMap} instance.
-     *
-     * @param <K> the key of elements in the map
-     * @param <V> the value of elements in the map
-     * @return a new, empty {@code HashMap}
-     */
-    public static <K, V> HashMap<K, V> newHashMap() {
-        return new HashMap<>();
+        // Utility class constructor is private
     }
 
     /**

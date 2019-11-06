@@ -73,10 +73,10 @@ public class RefactoringUnit implements Comparable {
         if (this.compilationUnit == null) {
             if (other.compilationUnit == null) {
                 return 0;
-            } else {
-                return 1;
             }
-        } else if (other.compilationUnit == null) {
+            return 1;
+        }
+        if (other.compilationUnit == null) {
             return -1;
         }
 

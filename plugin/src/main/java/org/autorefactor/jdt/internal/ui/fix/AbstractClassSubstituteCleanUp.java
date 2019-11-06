@@ -377,7 +377,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             final MethodInvocation mi= (MethodInvocation) parentNode;
             if (isObjectPassedInParameter(node, mi) || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
                 return false;
-            } else if (!isMethodReturningExistingClass(mi)) {
+            }
+            if (!isMethodReturningExistingClass(mi)) {
                 return true;
             }
             return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,

@@ -138,7 +138,7 @@ public final class AllCleanUpRules {
     }
 
     private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
-        final List<RefactoringRule> results= new ArrayList<RefactoringRule>(refactorings.length);
+        final List<RefactoringRule> results= new ArrayList<>(refactorings.length);
         for (RefactoringRule r : refactorings) {
             if (r != null) {
                 results.add(r);

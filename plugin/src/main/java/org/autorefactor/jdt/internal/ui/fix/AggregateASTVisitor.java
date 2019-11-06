@@ -253,7 +253,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     private void put(Map<Class<?>, List<ASTVisitor>> map, Class<?> key, ASTVisitor value) {
         List<ASTVisitor> visitors= map.get(key);
         if (visitors == null) {
-            visitors= new ArrayList<ASTVisitor>(1);
+            visitors= new ArrayList<>(1);
             map.put(key, visitors);
         }
         visitors.add(value);

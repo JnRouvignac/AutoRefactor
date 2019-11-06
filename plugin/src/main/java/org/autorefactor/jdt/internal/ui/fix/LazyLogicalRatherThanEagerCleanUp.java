@@ -25,14 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
@@ -68,8 +66,6 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
             List<Expression> allOperands= ASTNodes.allOperands(node);
             boolean isFirst= true;
-            List<Expression> copyOfOperands= new ArrayList<>(allOperands.size());
-            final ASTNodeFactory b= ctx.getASTBuilder();
 
             for (Expression expression : allOperands) {
                 if (!ASTNodes.hasType(expression, boolean.class.getSimpleName(), Boolean.class.getCanonicalName())) {
@@ -81,24 +77,26 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
                 } else if (!ASTNodes.isPassive(expression)) {
                     return true;
                 }
-
-                copyOfOperands.add(b.copy(expression));
             }
 
-            replaceWithLazyOperator(node, copyOfOperands, b);
+            replaceWithLazyOperator(node, allOperands);
             return false;
         }
+
         return true;
     }
 
-    private void replaceWithLazyOperator(InfixExpression node, List<Expression> copyOfOperands,
-            final ASTNodeFactory b) {
-        final Operator lazyOperator;
+    private void replaceWithLazyOperator(InfixExpression node, List<Expression> allOperands) {
+        final ASTNodeFactory b= ctx.getASTBuilder();
+
+        final InfixExpression.Operator lazyOperator;
+
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_AND;
         } else {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
         }
-        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, copyOfOperands));
+
+        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, b.copy(allOperands)));
     }
 }

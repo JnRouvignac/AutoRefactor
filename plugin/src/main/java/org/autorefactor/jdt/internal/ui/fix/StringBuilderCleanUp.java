@@ -523,7 +523,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         default: // >= 2
             boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
 
-            List<Expression> concatenateStrings= new ArrayList<Expression>(appendedStrings.size());
+            List<Expression> concatenateStrings= new ArrayList<>(appendedStrings.size());
             for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
                 if (isFirstAndNotAString) {
                     concatenateStrings.add(b.invoke(String.class.getSimpleName(), "valueOf", getTypedExpression(b, typeAndValue))); //$NON-NLS-1$

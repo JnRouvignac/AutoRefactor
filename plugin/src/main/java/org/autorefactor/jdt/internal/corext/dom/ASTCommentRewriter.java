@@ -142,7 +142,7 @@ public class ASTCommentRewriter {
      */
     public void addEdits(IDocument document, TextEdit edits) {
         final String source= document.get();
-        final List<TextEdit> commentEdits= new ArrayList<TextEdit>(nbEdits());
+        final List<TextEdit> commentEdits= new ArrayList<>(nbEdits());
         addRemovalEdits(commentEdits, source);
         addReplacementEdits(commentEdits);
         addBlockCommentToJavadocEdits(commentEdits);

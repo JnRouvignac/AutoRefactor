@@ -52,7 +52,7 @@ public class CodePathCollector {
         if (block.isExitBlock()) {
             // This is the end of this path,
             // let's take a copy of the stack
-            results.add(new ArrayList<CFGBasicBlock>(stack));
+            results.add(new ArrayList<>(stack));
             return;
         }
         if (stack.contains(block)) {

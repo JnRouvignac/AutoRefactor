@@ -139,7 +139,7 @@ public final class TestHelper {
         final Collection<String> whitelist= toSampleNames(whitelistRules);
         final Collection<String> blacklist= toSampleNames(blacklistRules);
 
-        final List<Object[]> output= new ArrayList<Object[]>(sampleFiles.length);
+        final List<Object[]> output= new ArrayList<>(sampleFiles.length);
         for (File file : sampleFiles) {
             final String fileName= file.getName();
 

@@ -818,7 +818,7 @@ public class CFGBuilder {
             if (throwingBlocksInTry.isEmpty()) {
                 // TODO JNR dead code found!!
             }
-            final List<CFGEdgeBuilder> liveBeforeCatchClause= new ArrayList<CFGEdgeBuilder>(throwingBlocksInTry.size());
+            final List<CFGEdgeBuilder> liveBeforeCatchClause= new ArrayList<>(throwingBlocksInTry.size());
             for (CFGBasicBlock throwingBlockInTry : throwingBlocksInTry) {
                 // TODO JNR if a Statement throws an exception, it must break the current
                 // basicBlock
@@ -1146,6 +1146,7 @@ public class CFGBuilder {
      * @return the list of basic blocks representing CFGs for each method in this
      *         compilation unit
      */
+    @SuppressWarnings("unchecked")
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
         List<CFGBasicBlock> results= new LinkedList<>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {

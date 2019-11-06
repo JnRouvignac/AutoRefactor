@@ -141,7 +141,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         Composite spacer= new Composite(ruleGroup, SWT.NULL);
         spacer.setLayoutData(new GridData(0, 5));
 
-        rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
+        rules= new ArrayList<>(allRefactoringRules.size());
         for (RefactoringRule refactoringRule : allRefactoringRules) {
             final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
@@ -164,7 +164,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
      * @param allRefactoringRules allCleanupRules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields= new ArrayList<FieldEditor>(1 + allRefactoringRules.size());
+        fields= new ArrayList<>(1 + allRefactoringRules.size());
 
         fields.add(new BooleanFieldEditor(DEBUG_MODE_ON.getName(), DEBUG_MODE_ON.getDescription(), fieldEditorParent));
     }

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Pair;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -87,9 +87,9 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         final Set<String> previousVarIds= new HashSet<>();
         final Set<String> caseVarIds= new HashSet<>();
-        final List<Pair<List<Expression>, List<Statement>>> switchStructure= Utils.newArrayList();
-        List<Expression> caseExprs= Utils.newArrayList();
-        List<Statement> caseStatements= Utils.newArrayList();
+        final List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
+        List<Expression> caseExprs= new ArrayList<>();
+        List<Statement> caseStatements= new ArrayList<>();
 
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
@@ -111,8 +111,8 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     caseVarIds.clear();
 
                     switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-                    caseExprs= Utils.newArrayList();
-                    caseStatements= Utils.newArrayList();
+                    caseExprs= new ArrayList<>();
+                    caseStatements= new ArrayList<>();
                 }
 
                 if (((SwitchCase) statement).isDefault()) {
@@ -186,7 +186,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             } else if (caseStructure.getFirst().size() == 1) {
                 newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
             } else {
-                final List<Expression> equalities= Utils.newArrayList();
+                final List<Expression> equalities= new ArrayList<>();
 
                 for (Expression value : caseStructure.getFirst()) {
                     equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
