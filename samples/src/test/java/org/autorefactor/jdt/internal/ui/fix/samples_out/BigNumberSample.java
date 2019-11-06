@@ -142,4 +142,8 @@ public class BigNumberSample {
     public static BigDecimal doNotRefactorCorrectUseOfBigDecimalCtorWithStringArg() {
         return new BigDecimal("5.4");
     }
+
+    public static BigDecimal removeUnderscoreFromLiterals() {
+        return new BigDecimal("1000.0");
+    }
 }

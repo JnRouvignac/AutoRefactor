@@ -85,7 +85,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
             final Expression arg0= ASTNodes.arguments(node).get(0);
 
             if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
-                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "").replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
                 if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
@@ -115,6 +115,12 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 }
 
                 final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
+                if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
+                    // Only instantiation from double, not from integer
+                    ctx.getRefactorings().replace(arg0, getStringLiteral(literalValue.replace("_", "")));
+                    return false;
+                }
 
                 if (literalValue.matches("0+")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
