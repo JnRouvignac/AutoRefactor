@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class TernaryOperatorRatherThanDuplicateConditionsSample {
-
     private static int staticField = 0;
 
     public void replaceDuplicateConditionsWithEagerOperator(boolean b1, boolean b2, boolean b3) {
@@ -80,6 +79,28 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
         boolean newBoolean1 = b1 && b2 || !b1 && b3 && b4;
     }
 
+    public void replaceDuplicateConditionsWithOtherCondition(boolean b1, boolean b2, boolean b3, boolean unrevelantCondition) {
+        boolean newBoolean1 = unrevelantCondition || (b1 && b2) || (!b1 && b3);
+        boolean newBoolean2 = unrevelantCondition || (b1 && !b2) || (b3 && !b1);
+        boolean newBoolean3 = unrevelantCondition || (b1 && b2) || (!b3 && !b1);
+        boolean newBoolean4 = unrevelantCondition || (b1 && !b2) || (!b3 && !b1);
+        boolean newBoolean5 = unrevelantCondition || (!b1 && b2) || (b3 && b1);
+        boolean newBoolean6 = unrevelantCondition || (!b1 && !b2) || (b3 && b1);
+        boolean newBoolean7 = unrevelantCondition || (!b1 && b2) || (!b3 && b1);
+        boolean newBoolean8 = unrevelantCondition || (!b1 && !b2) || (!b3 && b1);
+    }
+
+    public void replaceDuplicateConditionsWithOtherConditionAfter(boolean b1, boolean b2, boolean b3, boolean unrevelantCondition) {
+        boolean newBoolean1 = (b1 && b2) || (!b1 && b3) || unrevelantCondition;
+        boolean newBoolean2 = (b1 && !b2) || (b3 && !b1) || unrevelantCondition;
+        boolean newBoolean3 = (b1 && b2) || (!b3 && !b1) || unrevelantCondition;
+        boolean newBoolean4 = (b1 && !b2) || (!b3 && !b1) || unrevelantCondition;
+        boolean newBoolean5 = (!b1 && b2) || (b3 && b1) || unrevelantCondition;
+        boolean newBoolean6 = (!b1 && !b2) || (b3 && b1) || unrevelantCondition;
+        boolean newBoolean7 = (!b1 && b2) || (!b3 && b1) || unrevelantCondition;
+        boolean newBoolean8 = (!b1 && !b2) || (!b3 && b1) || unrevelantCondition;
+    }
+
     public void doNoReplaceDuplicateConditionsWithWrappers(Boolean b1, Boolean b2, Boolean b3) {
         boolean newBoolean1 = b1 && b2 || !b1 && b3;
         boolean newBoolean2 = b1 && !b2 || !b1 && b3;
@@ -93,8 +114,8 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
 
     public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
         // Keep this comment
-        boolean newBoolean1 = (i1 == i2 * 2) && !(i3 == i4) || !(i1 == 2 * i2) && (i5 == i6);
-        boolean newBoolean2 = (i1 + 1 == i2) && (i3 == i4) || !(1 + i1 == i2) && !(i5 == i6);
+        boolean newBoolean1 = (i1 == i2 * 2) && !(i3 == i4) || !(i1 == 2 * i2 * 1) && (i5 == i6);
+        boolean newBoolean2 = (i1 + 1 + 0 == i2) && (i3 == i4) || !(1 + i1 == i2) && !(i5 == i6);
         boolean newBoolean3 = (i1 < i2) && (i3 == i4) || (i1 >= i2) && !(i5 == i6);
     }
 
