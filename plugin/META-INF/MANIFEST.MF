@@ -21,3 +21,4 @@ Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.jdt.internal.ui.fix;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.preferences;x-friends:="org.autorefactor.plugin.ui",
  org.autorefactor.util;x-friends:="org.autorefactor.plugin.ui"
+Automatic-Module-Name: org.autorefactor.plugin

@@ -14,3 +14,4 @@ Import-Package: org.autorefactor,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.jface.text
+Automatic-Module-Name: org.autorefactor.plugin.tests
