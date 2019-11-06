@@ -1067,7 +1067,10 @@ public final class ASTNodes {
             return canHaveSiblings((LabeledStatement) parent);
         }
 
-        return parent instanceof Block;
+        return parent instanceof Block
+                || (parent instanceof SwitchStatement && node.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY)
+                || (parent instanceof TryStatement && node.getLocationInParent() == TryStatement.BODY_PROPERTY)
+                || (parent instanceof CatchClause && node.getLocationInParent() == CatchClause.BODY_PROPERTY);
     }
 
     /**

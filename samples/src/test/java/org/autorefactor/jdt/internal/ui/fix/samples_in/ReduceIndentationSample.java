@@ -153,6 +153,73 @@ public class ReduceIndentationSample {
         return -1;
     }
 
+    public int refactorElseInSwitch(int discriminant, boolean isVisible) {
+        switch (discriminant) {
+        case 0:
+            if (isVisible) {
+                // Keep this comment
+                return 0;
+            } else {
+                // Keep this comment too
+                discriminant = discriminant + 1;
+                System.out.println("New value: " + discriminant);
+            }
+        }
+
+        return -1;
+    }
+
+    public int refactorElseInTry(int discriminant, boolean isVisible) {
+        try {
+            if (isVisible) {
+                // Keep this comment
+                return 0;
+            } else {
+                // Keep this comment too
+                discriminant = discriminant + 1;
+                System.out.println("New value: " + discriminant);
+            }
+        } finally {
+            System.out.println("Finally");
+        }
+
+        return -1;
+    }
+
+    public int refactorElseInCatch(int discriminant, boolean isVisible) {
+        try {
+            System.out.println("Very dangerous code");
+        } catch (Exception e) {
+            if (isVisible) {
+                // Keep this comment
+                return 0;
+            } else {
+                // Keep this comment too
+                discriminant = discriminant + 1;
+                System.out.println("New value: " + discriminant);
+            }
+        }
+
+        return -1;
+    }
+
+    public int refactorElseInFinally(int discriminant, boolean isVisible) {
+        try {
+            System.out.println("Very dangerous code");
+        } finally {
+            if (isVisible) {
+                // Keep this comment
+                return 0;
+            } else {
+                // Keep this comment too
+                discriminant = discriminant + 1;
+                System.out.println("New value: " + discriminant);
+            }
+        }
+
+        return -1;
+    }
+
     public int refactorGreatestIndentation(boolean isActive, boolean isVisible) {
         // Keep this comment
         if (isActive) {
