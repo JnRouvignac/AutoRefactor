@@ -26,22 +26,22 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class IfRatherThanWhileAndFallsThroughSample {
-    public void replaceWhileByIf(boolean b) {
-        while (b) {
+    public void replaceWhileByIf(boolean isValid) {
+        while (isValid) {
             System.out.println("foo");
             return;
         }
     }
 
-    public void replaceWhileThrowingExceptions(boolean b) {
-        while (b) {
+    public void replaceWhileThrowingExceptions(boolean isEnabled) {
+        while (isEnabled) {
             System.out.println("foo");
             throw new NullPointerException();
         }
     }
 
-    public void replaceWhileByIfAndRemoveBreak(boolean b) {
-        while (b) {
+    public void replaceWhileByIfAndRemoveBreak(boolean isVisible) {
+        while (isVisible) {
             System.out.println("foo");
             break;
         }

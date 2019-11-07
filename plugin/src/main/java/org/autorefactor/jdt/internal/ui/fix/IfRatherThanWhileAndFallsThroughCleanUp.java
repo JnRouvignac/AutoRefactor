@@ -25,23 +25,20 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -53,6 +50,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
     }
@@ -62,6 +60,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
     }
@@ -71,6 +70,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
     }
@@ -83,9 +83,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
             if (breakVisitor.canBeRefactored()) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
+
                 for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
                     ctx.getRefactorings().remove(breakStatement);
                 }
+
                 ctx.getRefactorings().replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
                 return false;
             }
@@ -108,15 +110,15 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         final Statement lastStatement= statements.get(statements.size() - 1);
         switch (lastStatement.getNodeType()) {
-        case RETURN_STATEMENT:
-        case THROW_STATEMENT:
+        case ASTNode.RETURN_STATEMENT:
+        case ASTNode.THROW_STATEMENT:
             return true;
 
-        case BREAK_STATEMENT:
+        case ASTNode.BREAK_STATEMENT:
             final BreakStatement breakStatement= (BreakStatement) lastStatement;
             return breakStatement.getLabel() == null;
 
-        case IF_STATEMENT:
+        case ASTNode.IF_STATEMENT:
             final IfStatement ifStatement= (IfStatement) lastStatement;
             final Statement thenStatement= ifStatement.getThenStatement();
             final Statement elseStatement= ifStatement.getElseStatement();
@@ -146,10 +148,15 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(BreakStatement aBreak) {
-            Statement parent= ASTNodes.getAncestorOrNull(aBreak, Statement.class);
-            while (parent != root && (ASTNodes.getNextSiblings(parent) == null || ASTNodes.getNextSiblings(parent).isEmpty())) {
-                parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
+            if (aBreak.getLabel() != null) {
+                canBeRefactored= false;
+                return interruptVisit();
             }
+
+            Statement parent= aBreak;
+            do {
+                parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
+            } while ((parent != root) && ((ASTNodes.getNextSiblings(parent) == null) || ASTNodes.getNextSiblings(parent).isEmpty()));
 
             if (parent != root) {
                 canBeRefactored= false;
@@ -188,6 +195,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
+            return false;
+        }
+
+        @Override
+        public boolean visit(LambdaExpression node) {
             return false;
         }
     }
