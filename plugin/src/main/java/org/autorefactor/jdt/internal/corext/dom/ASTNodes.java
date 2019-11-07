@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import static org.eclipse.jdt.core.dom.ASTNode.BLOCK;
 import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
@@ -2569,6 +2570,10 @@ public final class ASTNodes {
         case BREAK_STATEMENT:
         case CONTINUE_STATEMENT:
             return true;
+
+        case BLOCK:
+            final Block block= (Block) lastStatement;
+            return fallsThrough(block);
 
         case IF_STATEMENT:
             final IfStatement ifStatement= (IfStatement) lastStatement;
