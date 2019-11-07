@@ -33,9 +33,9 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
@@ -161,14 +161,14 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        ConditionalExpression newConditionalExpression= b.conditionalExpression(b.copy(basicExpression),
-                b.copy(thenExpression), b.copy(elseExpression));
+        ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.copy(basicExpression),
+                b.copy(thenExpression), b.copy(elseExpression)));
 
         if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
             r.replace(node, newConditionalExpression);
         } else {
             List<Expression> operands= b.copy(previousOperands);
-            operands.add(b.parenthesizeIfNeeded(newConditionalExpression));
+            operands.add(newConditionalExpression);
             operands.addAll(b.copy(nextOperands));
             r.replace(node, b.infixExpression(node.getOperator(), operands));
         }

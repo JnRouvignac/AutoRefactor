@@ -32,47 +32,47 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
 
     public void replaceDuplicateConditionsWithEagerOperator(boolean b1, boolean b2, boolean b3) {
         // Keep this comment
-        boolean newBoolean1 = b1 ? b2 : b3;
-        boolean newBoolean2 = b1 ? !b2 : b3;
-        boolean newBoolean3 = b1 ? b2 : !b3;
-        boolean newBoolean4 = b1 ? !b2 : !b3;
-        boolean newBoolean5 = b1 ? b3 : b2;
-        boolean newBoolean6 = b1 ? b3 : !b2;
-        boolean newBoolean7 = b1 ? !b3 : b2;
-        boolean newBoolean8 = b1 ? !b3 : !b2;
+        boolean newBoolean1 = (b1 ? b2 : b3);
+        boolean newBoolean2 = (b1 ? !b2 : b3);
+        boolean newBoolean3 = (b1 ? b2 : !b3);
+        boolean newBoolean4 = (b1 ? !b2 : !b3);
+        boolean newBoolean5 = (b1 ? b3 : b2);
+        boolean newBoolean6 = (b1 ? b3 : !b2);
+        boolean newBoolean7 = (b1 ? !b3 : b2);
+        boolean newBoolean8 = (b1 ? !b3 : !b2);
     }
 
     public void replaceDuplicateConditionsWithPrimitiveTypes(boolean b1, boolean b2, boolean b3) {
         // Keep this comment
-        boolean newBoolean1 = b1 ? b2 : b3;
-        boolean newBoolean2 = b1 ? !b2 : b3;
-        boolean newBoolean3 = b1 ? b2 : !b3;
-        boolean newBoolean4 = b1 ? !b2 : !b3;
-        boolean newBoolean5 = b1 ? b3 : b2;
-        boolean newBoolean6 = b1 ? b3 : !b2;
-        boolean newBoolean7 = b1 ? !b3 : b2;
-        boolean newBoolean8 = b1 ? !b3 : !b2;
+        boolean newBoolean1 = (b1 ? b2 : b3);
+        boolean newBoolean2 = (b1 ? !b2 : b3);
+        boolean newBoolean3 = (b1 ? b2 : !b3);
+        boolean newBoolean4 = (b1 ? !b2 : !b3);
+        boolean newBoolean5 = (b1 ? b3 : b2);
+        boolean newBoolean6 = (b1 ? b3 : !b2);
+        boolean newBoolean7 = (b1 ? !b3 : b2);
+        boolean newBoolean8 = (b1 ? !b3 : !b2);
     }
 
     public void replaceDuplicateConditionsWithPermutedBooleans(boolean b1, boolean b2, boolean b3) {
         // Keep this comment
-        boolean newBoolean1 = b1 ? b2 : b3;
-        boolean newBoolean2 = b1 ? !b2 : b3;
-        boolean newBoolean3 = b1 ? b2 : !b3;
-        boolean newBoolean4 = b1 ? !b2 : !b3;
-        boolean newBoolean5 = b1 ? b3 : b2;
-        boolean newBoolean6 = b1 ? b3 : !b2;
-        boolean newBoolean7 = b1 ? !b3 : b2;
-        boolean newBoolean8 = b1 ? !b3 : !b2;
+        boolean newBoolean1 = (b1 ? b2 : b3);
+        boolean newBoolean2 = (b1 ? !b2 : b3);
+        boolean newBoolean3 = (b1 ? b2 : !b3);
+        boolean newBoolean4 = (b1 ? !b2 : !b3);
+        boolean newBoolean5 = (b1 ? b3 : b2);
+        boolean newBoolean6 = (b1 ? b3 : !b2);
+        boolean newBoolean7 = (b1 ? !b3 : b2);
+        boolean newBoolean8 = (b1 ? !b3 : !b2);
 
-        newBoolean1 = b1 ? b2 : b3;
-        newBoolean2 = b1 ? !b2 : b3;
-        newBoolean3 = b1 ? b2 : !b3;
-        newBoolean4 = b1 ? !b2 : !b3;
-        newBoolean5 = b1 ? b3 : b2;
-        newBoolean6 = b1 ? b3 : !b2;
-        newBoolean7 = b1 ? !b3 : b2;
-        newBoolean8 = b1 ? !b3 : !b2;
+        newBoolean1 = (b1 ? b2 : b3);
+        newBoolean2 = (b1 ? !b2 : b3);
+        newBoolean3 = (b1 ? b2 : !b3);
+        newBoolean4 = (b1 ? !b2 : !b3);
+        newBoolean5 = (b1 ? b3 : b2);
+        newBoolean6 = (b1 ? b3 : !b2);
+        newBoolean7 = (b1 ? !b3 : b2);
+        newBoolean8 = (b1 ? !b3 : !b2);
     }
 
     public void doNoReplaceDuplicateConditionsWithOtherCondition(boolean b1, boolean b2, boolean b3, boolean b4) {
@@ -114,9 +114,9 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
 
     public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
         // Keep this comment
-        boolean newBoolean1 = (i1 == i2 * 2) ? !(i3 == i4) : (i5 == i6);
-        boolean newBoolean2 = (i1 + 1 + 0 == i2) ? (i3 == i4) : !(i5 == i6);
-        boolean newBoolean3 = (i1 < i2) ? (i3 == i4) : !(i5 == i6);
+        boolean newBoolean1 = ((i1 == i2 * 2) ? !(i3 == i4) : (i5 == i6));
+        boolean newBoolean2 = ((i1 + 1 + 0 == i2) ? (i3 == i4) : !(i5 == i6));
+        boolean newBoolean3 = ((i1 < i2) ? (i3 == i4) : !(i5 == i6));
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
