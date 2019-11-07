@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class RemoveUselessNullCheckSample {
-
     private final String DEFAULT = "";
     private String s;
 
@@ -80,6 +79,17 @@ public class RemoveUselessNullCheckSample {
         } else {
             st = null;
         }
+        return st;
+    }
+
+    public String refactorLocalVariable5(String s, boolean isValid) throws Exception {
+        String st = null;
+        if (isValid)
+            if (s != null) {
+                st = s;
+            } else {
+                st = null;
+            }
         return st;
     }
 

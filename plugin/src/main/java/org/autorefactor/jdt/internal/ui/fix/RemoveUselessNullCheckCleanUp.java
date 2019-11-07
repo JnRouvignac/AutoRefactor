@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -48,6 +49,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_name;
     }
@@ -57,6 +59,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_description;
     }
@@ -66,6 +69,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_reason;
     }
@@ -89,24 +93,29 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             final InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
             final Statement thenStatement= getThenStatement(node);
             final Statement elseStatement= getElseStatement(node, thenStatement);
-            if (condition != null && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
+
+            if ((condition != null) && !condition.hasExtendedOperands() && (thenStatement != null) && (elseStatement != null)) {
                 final Assignment thenAs= ASTNodes.asExpression(thenStatement, Assignment.class);
                 final Assignment elseAs= ASTNodes.asExpression(elseStatement, Assignment.class);
+
                 if (ASTNodes.hasOperator(thenAs, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAs, Assignment.Operator.ASSIGN)
                         && ASTNodes.match(matcher, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
                     if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS) && ASTNodes.is(thenAs.getRightHandSide(), NullLiteral.class)) {
                         return maybeReplaceWithStraightAssign(node, condition, elseAs);
                     }
+
                     if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.is(elseAs.getRightHandSide(), NullLiteral.class)) {
                         return maybeReplaceWithStraightAssign(node, condition, thenAs);
                     }
                 } else {
                     final ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
                     final ReturnStatement elseRS= ASTNodes.as(elseStatement, ReturnStatement.class);
-                    if (thenRS != null && elseRS != null) {
+
+                    if ((thenRS != null) && (elseRS != null)) {
                         if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
                             return maybeReplaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
                         }
+
                         if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
                             return maybeReplaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                         }
@@ -119,6 +128,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
 
         private Statement getThenStatement(IfStatement node) {
             final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+
             if (thenStatements.size() == 1) {
                 return thenStatements.get(0);
             }
@@ -128,9 +138,11 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
 
         private Statement getElseStatement(IfStatement node, Statement thenStatement) {
             final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+
             if (elseStatements.size() == 1) {
                 return elseStatements.get(0);
             }
+
             if (ASTNodes.is(thenStatement, ReturnStatement.class)) {
                 return ASTNodes.getNextSibling(node);
             }
@@ -145,6 +157,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                 setResult(false);
                 return false;
             }
+
             if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
                     && ASTNodes.match(matcher, condition.getRightOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getRightOperand());
@@ -164,17 +177,17 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
         private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement rs,
                 ReturnStatement otherRs, Statement toRemove) {
             if (ASTNodes.is(otherRs.getExpression(), NullLiteral.class)) {
+
                 if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)
                         && ASTNodes.match(matcher, condition.getLeftOperand(), rs.getExpression())) {
-                    ctx.getRefactorings().remove(toRemove);
-                    replaceWithStraightReturn(node, condition.getLeftOperand());
+                    replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
                     setResult(false);
                     return false;
                 }
+
                 if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
                         && ASTNodes.match(matcher, condition.getRightOperand(), rs.getExpression())) {
-                    ctx.getRefactorings().remove(toRemove);
-                    replaceWithStraightReturn(node, condition.getRightOperand());
+                    replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
                     setResult(false);
                     return false;
                 }
@@ -183,9 +196,12 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        private void replaceWithStraightReturn(IfStatement node, Expression returnedExpression) {
+        private void replaceWithStraightReturn(IfStatement node, Expression returnedExpression, Statement toRemove) {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.return0(b.copy(returnedExpression)));
+            final Refactorings r= ctx.getRefactorings();
+
+            r.remove(toRemove);
+            r.replace(node, b.return0(b.copy(returnedExpression)));
         }
     }
 }
