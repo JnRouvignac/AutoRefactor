@@ -181,12 +181,11 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final boolean isRewriteNeeded) {
         if (conditionIe != null) {
             if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.EQUALS)) {
-                return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, isAssertTrue, failureMessage,
-                        isRewriteNeeded);
+                return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, isAssertTrue, failureMessage);
             }
             if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.NOT_EQUALS)) {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
-                        failureMessage, isRewriteNeeded);
+                        failureMessage);
             }
         } else if (ASTNodes.usesGivenSignature(conditionMi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             if (canUseAssertNotEquals || isAssertTrue) {
@@ -246,8 +245,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRefactorComparison(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
-            final InfixExpression ie, final boolean isAssertEquals, final Expression failureMessage,
-            final boolean isRewriteNeeded) {
+            final InfixExpression ie, final boolean isAssertEquals, final Expression failureMessage) {
         final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(ie.getLeftOperand(),
                 ie.getRightOperand());
 
