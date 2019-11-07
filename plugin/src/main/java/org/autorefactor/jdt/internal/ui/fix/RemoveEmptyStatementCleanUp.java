@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
@@ -50,6 +50,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
     }
@@ -59,6 +60,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
     }
@@ -68,6 +70,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
     }
@@ -78,12 +81,19 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             final boolean isThenEmpty= isEmptyCode(node.getThenStatement());
             final boolean isElseEmpty= isEmptyCode(node.getElseStatement());
 
-            if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
-                this.ctx.getRefactorings().remove(node);
+            final Refactorings r= ctx.getRefactorings();
+
+            if (isThenEmpty && (isElseEmpty || (node.getElseStatement() == null))) {
+                if (ASTNodes.canHaveSiblings(node)) {
+                    r.remove(node);
+                } else {
+                    r.replace(node, ctx.getASTBuilder().block());
+                }
+
                 return false;
             }
             if (isElseEmpty) {
-                this.ctx.getRefactorings().remove(node.getElseStatement());
+                r.remove(node.getElseStatement());
                 return false;
             }
         }
@@ -98,7 +108,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final ForStatement node) {
-        return node.getExpression() == null || Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue()) || !arePassive(node.initializers()) || !ASTNodes.isPassive(node.getExpression()) || maybeRemoveStmtWithEmptyBody(node, node.getBody());
+        return (node.getExpression() == null) || Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue()) || !arePassive(node.initializers()) || !ASTNodes.isPassive(node.getExpression()) || maybeRemoveStmtWithEmptyBody(node, node.getBody());
     }
 
     @Override
@@ -113,20 +123,26 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        return maybeRemoveCode(node);
+        if (ASTNodes.canHaveSiblings(node) && isEmptyCode(node)) {
+            this.ctx.getRefactorings().remove(node);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public boolean visit(final EmptyStatement node) {
-        return maybeRemoveCode(node);
-    }
+        if (isEmptyCode(node)) {
+            final Refactorings r= ctx.getRefactorings();
 
-    private boolean maybeRemoveCode(final Statement node) {
-        final ASTNode parent= node.getParent();
-
-        if (parent instanceof Block && isEmptyCode(node)) {
-            this.ctx.getRefactorings().remove(node);
-            return false;
+            if (ASTNodes.canHaveSiblings(node)) {
+                r.remove(node);
+                return false;
+            } else if (node instanceof EmptyStatement) {
+                r.replace(node, ctx.getASTBuilder().block());
+                return false;
+            }
         }
 
         return true;
@@ -146,8 +162,15 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
         if (isEmptyCode(emptyCode)) {
-            this.ctx.getRefactorings().remove(node);
-            return false;
+            final Refactorings r= ctx.getRefactorings();
+
+            if (ASTNodes.canHaveSiblings(node)) {
+                r.remove(node);
+                return false;
+            } else if (node instanceof EmptyStatement) {
+                r.replace(node, ctx.getASTBuilder().block());
+                return false;
+            }
         }
 
         return true;
@@ -157,9 +180,10 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
         if (emptyCode instanceof EmptyStatement) {
             return true;
         }
+
         if (emptyCode instanceof Block) {
             final Block block= (Block) emptyCode;
-            return block.statements() == null || block.statements().isEmpty();
+            return (block.statements() == null) || block.statements().isEmpty();
         }
 
         return false;

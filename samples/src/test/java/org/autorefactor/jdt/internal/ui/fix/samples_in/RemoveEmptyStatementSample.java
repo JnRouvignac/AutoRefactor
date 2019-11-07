@@ -110,69 +110,70 @@ public class RemoveEmptyStatementSample {
     }
 
     public void doNotRemoveEmptyStatement(boolean b) {
-        if (b);
-        else System.out.println(b);
         if (b) {}
         else System.out.println(b);
     }
 
     public void doNotRemoveWithMethodCall(List<String> filledList) {
-        if (filledList.remove("foo"));
         if (filledList.remove("foo")) {}
     }
 
     public boolean doNotRemoveWithAssignment(boolean b1, boolean b2) {
-        if (b1 = true);
         if (b2 = true) {}
         return b1;
     }
 
     public int doNotRemoveWithIncrement(int i) {
-        if (i-- == 0);
         if (--i == 0) {}
         return i;
     }
 
     public int doNotRemoveWhileWithIncrement(int i) {
-        while (i++ == 100);
         while (++i == 100) {}
         return i;
     }
 
     public void doNotRemoveInfiniteWhile() {
-        while (true);
+        while (true) {
+        }
     }
 
     public int doNotRemoveDoWhileWithIncrement(int i) {
-        do; while (i++ == 100);
+        do {} while (i++ == 100);
         do {} while (++i == 100);
         return i;
     }
 
     public void doNotRemoveInfiniteDoWhile() {
-        do; while (true);
+        do {
+        } while (true);
     }
 
-    public void doNotRemoveInfiniteForLoop() {
-        for (;;);
+    public void replaceStatementInLoopByBlock() {
+        for (int i = 0;;i++);
+    }
+
+    public void replaceStatementInIfByBlock(List<String> filledList) {
+        if (filledList.remove("foo"))
+            ;
     }
 
     public void doNotRemoveAnotherInfiniteForLoop() {
-        for (int i = 0;;i++) {}
+        for (int i = 0;;i++) {
+        }
     }
 
     public void doNotRemoveForLoopWithEternalCondition() {
-        for (;true;);
+        for (;true;) {
+        }
     }
 
     public int doNotRemoveForWithExternalVar(int myValue) {
-        for (myValue = 0; myValue < 1000; myValue = myValue * myValue);
         for (myValue = 0; myValue < 1000; myValue = myValue * myValue) {}
         return myValue;
     }
 
     public int doNotRemoveForWithDecrement(List<String> filledList, int init) {
-        for (String aString : filledList.toArray(new String[init--]));
         for (String aString : filledList.toArray(new String[init--])) {}
         return init;
     }
@@ -193,7 +194,6 @@ public class RemoveEmptyStatementSample {
     }
 
     public int doNotRemoveForWithActiveIterator(ActiveIteratorList<String> activeList) {
-        for (String aString : activeList);
         for (String aString : activeList) {}
 
         return activeList.getReadCount();
