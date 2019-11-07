@@ -1140,9 +1140,16 @@ public final class ASTNodes {
      * @return the next statements in the same block if it exists, empty list
      *         otherwise
      */
+    @SuppressWarnings("unchecked")
     public static List<Statement> getNextSiblings(Statement startNode) {
         if (canHaveSiblings(startNode)) {
-            final List<Statement> statements= asList((Statement) startNode.getParent());
+            final List<Statement> statements;
+            if (startNode.getParent() instanceof SwitchStatement) {
+                statements= ((SwitchStatement) startNode.getParent()).statements();
+            } else {
+                statements= asList((Statement) startNode.getParent());
+            }
+
             final int indexOfNode= statements.indexOf(startNode);
             final int siblingIndex= indexOfNode + 1;
             if ((0 <= siblingIndex) && (siblingIndex < statements.size())) {
@@ -1222,15 +1229,23 @@ public final class ASTNodes {
         return null;
     }
 
-    private static Statement getSibling(Statement node, boolean isPrevious) {
-        if (node.getParent() instanceof Block) {
-            final List<Statement> statements= asList((Statement) node.getParent());
-            final int indexOfNode= statements.indexOf(node);
+    @SuppressWarnings("unchecked")
+    private static Statement getSibling(Statement startNode, boolean isPrevious) {
+        if (canHaveSiblings(startNode)) {
+            final List<Statement> statements;
+            if (startNode.getParent() instanceof SwitchStatement) {
+                statements= ((SwitchStatement) startNode.getParent()).statements();
+            } else {
+                statements= asList((Statement) startNode.getParent());
+            }
+
+            final int indexOfNode= statements.indexOf(startNode);
             final int siblingIndex= isPrevious ? indexOfNode - 1 : indexOfNode + 1;
             if ((0 <= siblingIndex) && (siblingIndex < statements.size())) {
                 return statements.get(siblingIndex);
             }
         }
+
         return null;
     }
 

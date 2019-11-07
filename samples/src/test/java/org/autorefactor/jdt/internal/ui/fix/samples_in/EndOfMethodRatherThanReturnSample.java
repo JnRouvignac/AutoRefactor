@@ -47,6 +47,25 @@ public class EndOfMethodRatherThanReturnSample {
         }
     }
 
+    public void removeUselessReturnWithSwitch(int i) {
+        switch (i) {
+        case 0:
+            System.out.println("Keep this line");
+            return;
+        }
+    }
+
+    public void doNotRemoveUselessReturnInMiddleOfSwitch(int i) {
+        switch (i) {
+        case 0:
+            System.out.println("I'm not the last statement");
+            return;
+        case 1:
+            System.out.println("Do some stuff");
+            break;
+        }
+    }
+
     public void removeUselessReturnWithIfElse(boolean b) {
         if (b) {
             System.out.println("Keep this line");
