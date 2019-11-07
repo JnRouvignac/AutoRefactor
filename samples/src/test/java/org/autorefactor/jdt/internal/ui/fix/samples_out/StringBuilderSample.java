@@ -214,6 +214,14 @@ public class StringBuilderSample {
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
     }
 
+    public void replaceAppendByBlock(StringBuilder builder, StringBuffer buffer, boolean isValid) {
+        if (isValid) {
+        }
+
+        if (isValid) {
+        }
+    }
+
     public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
         buf.append(o.toString());
     }
