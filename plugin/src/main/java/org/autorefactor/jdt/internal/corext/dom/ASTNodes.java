@@ -1056,20 +1056,33 @@ public final class ASTNodes {
     }
 
     /**
+     * Returns the statement at the same level as its siblings.
+     *
+     * @param node the start node
+     * @return the statement at the same level
+     */
+    public static Statement statementAtLevel(Statement node) {
+        final ASTNode parent= node.getParent();
+
+        if (parent instanceof LabeledStatement) {
+            return statementAtLevel((LabeledStatement) parent);
+        }
+
+        return node;
+    }
+
+    /**
      * Returns true if a sibling may exist.
      *
      * @param node the start node
      * @return true if a sibling may exist
      */
     public static boolean canHaveSiblings(Statement node) {
-        final ASTNode parent= node.getParent();
-
-        if (parent instanceof LabeledStatement) {
-            return canHaveSiblings((LabeledStatement) parent);
-        }
+        final ASTNode statementAtLevel= statementAtLevel(node);
+        final ASTNode parent= statementAtLevel.getParent();
 
         return (parent instanceof Block)
-                || ((parent instanceof SwitchStatement) && (node.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY));
+                || ((parent instanceof SwitchStatement) && (statementAtLevel.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY));
     }
 
     /**
@@ -1090,7 +1103,13 @@ public final class ASTNodes {
      * @return the previous statement in the same block if it exists, null otherwise
      */
     public static Statement getPreviousSibling(Statement startNode) {
-        return getSibling(startNode, true);
+        List<Statement> siblings= getSiblings(startNode, false);
+
+        if (siblings.isEmpty()) {
+            return null;
+        }
+
+        return siblings.get(siblings.size() - 1);
     }
 
     /**
@@ -1130,7 +1149,13 @@ public final class ASTNodes {
      * @return the next statement in the same block if it exists, null otherwise
      */
     public static Statement getNextSibling(Statement startNode) {
-        return getSibling(startNode, false);
+        List<Statement> siblings= getSiblings(startNode, true);
+
+        if (siblings.isEmpty()) {
+            return null;
+        }
+
+        return siblings.get(0);
     }
 
     /**
@@ -1140,22 +1165,45 @@ public final class ASTNodes {
      * @return the next statements in the same block if it exists, empty list
      *         otherwise
      */
-    @SuppressWarnings("unchecked")
     public static List<Statement> getNextSiblings(Statement startNode) {
-        if (canHaveSiblings(startNode)) {
+        return getSiblings(startNode, true);
+    }
+
+    /**
+     * Returns the previous statements in the same block if it exists.
+     *
+     * @param startNode the start node
+     * @return the previous statements in the same block if it exists, empty list
+     *         otherwise
+     */
+    public static List<Statement> getPreviousSiblings(Statement startNode) {
+        return getSiblings(startNode, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Statement> getSiblings(Statement startNode, boolean isForward) {
+        final Statement statementAtLevel= statementAtLevel(startNode);
+
+        if (canHaveSiblings(statementAtLevel)) {
             final List<Statement> statements;
-            if (startNode.getParent() instanceof SwitchStatement) {
-                statements= ((SwitchStatement) startNode.getParent()).statements();
+            if (statementAtLevel.getParent() instanceof SwitchStatement) {
+                statements= ((SwitchStatement) statementAtLevel.getParent()).statements();
             } else {
-                statements= asList((Statement) startNode.getParent());
+                statements= asList((Statement) statementAtLevel.getParent());
             }
 
-            final int indexOfNode= statements.indexOf(startNode);
-            final int siblingIndex= indexOfNode + 1;
+            final int indexOfNode= statements.indexOf(statementAtLevel);
+            final int siblingIndex= indexOfNode + (isForward ? 1 : -1);
+
             if ((0 <= siblingIndex) && (siblingIndex < statements.size())) {
-                return statements.subList(siblingIndex, statements.size());
+                if (isForward) {
+                    return statements.subList(siblingIndex, statements.size());
+                } else {
+                    return statements.subList(0, siblingIndex + 1);
+                }
             }
         }
+
         return Collections.emptyList();
     }
 
@@ -1226,26 +1274,6 @@ public final class ASTNodes {
             previous= child;
             returnNext= child.equals(node);
         }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Statement getSibling(Statement startNode, boolean isPrevious) {
-        if (canHaveSiblings(startNode)) {
-            final List<Statement> statements;
-            if (startNode.getParent() instanceof SwitchStatement) {
-                statements= ((SwitchStatement) startNode.getParent()).statements();
-            } else {
-                statements= asList((Statement) startNode.getParent());
-            }
-
-            final int indexOfNode= statements.indexOf(startNode);
-            final int siblingIndex= isPrevious ? indexOfNode - 1 : indexOfNode + 1;
-            if ((0 <= siblingIndex) && (siblingIndex < statements.size())) {
-                return statements.get(siblingIndex);
-            }
-        }
-
         return null;
     }
 
