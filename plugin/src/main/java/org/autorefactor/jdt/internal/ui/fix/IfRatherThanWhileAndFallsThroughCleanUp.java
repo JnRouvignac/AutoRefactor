@@ -31,8 +31,10 @@ import java.util.List;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -82,18 +84,27 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
             breakVisitor.visitNode(node);
 
             if (breakVisitor.canBeRefactored()) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
-
-                for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
-                    ctx.getRefactorings().remove(breakStatement);
-                }
-
-                ctx.getRefactorings().replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
+                replaceByIf(node, breakVisitor);
                 return false;
             }
         }
 
         return true;
+    }
+
+    private void replaceByIf(WhileStatement node, final BreakVisitor breakVisitor) {
+        final ASTNodeFactory b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
+
+        for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
+            if (ASTNodes.canHaveSiblings(breakStatement)) {
+                r.remove(breakStatement);
+            } else {
+                r.replace(breakStatement, b.block());
+            }
+        }
+
+        r.replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
     }
 
     /**
@@ -117,6 +128,10 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         case ASTNode.BREAK_STATEMENT:
             final BreakStatement breakStatement= (BreakStatement) lastStatement;
             return breakStatement.getLabel() == null;
+
+        case ASTNode.BLOCK:
+            final Block block= (Block) lastStatement;
+            return isEndingWithExit(block);
 
         case ASTNode.IF_STATEMENT:
             final IfStatement ifStatement= (IfStatement) lastStatement;

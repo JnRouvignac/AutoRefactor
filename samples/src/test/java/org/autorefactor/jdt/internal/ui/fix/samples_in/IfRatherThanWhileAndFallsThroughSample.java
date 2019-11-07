@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class IfRatherThanWhileAndFallsThroughSample {
     public void replaceWhileByIf(boolean isValid) {
+        // Keep this comment
         while (isValid) {
             System.out.println("foo");
             return;
@@ -34,6 +35,7 @@ public class IfRatherThanWhileAndFallsThroughSample {
     }
 
     public void replaceWhileThrowingExceptions(boolean isEnabled) {
+        // Keep this comment
         while (isEnabled) {
             System.out.println("foo");
             throw new NullPointerException();
@@ -41,9 +43,20 @@ public class IfRatherThanWhileAndFallsThroughSample {
     }
 
     public void replaceWhileByIfAndRemoveBreak(boolean isVisible) {
+        // Keep this comment
         while (isVisible) {
             System.out.println("foo");
             break;
+        }
+    }
+
+    public void replaceWhileByIfAndReplaceBreaksByBlocks(boolean isVisible, int i) {
+        // Keep this comment
+        while (isVisible) {
+            if (i > 0)
+                break;
+            else
+                break;
         }
     }
 
@@ -55,6 +68,7 @@ public class IfRatherThanWhileAndFallsThroughSample {
     }
 
     public void replaceWhileWithComplexCode(boolean b1, boolean b2) {
+        // Keep this comment
         while (b1) {
             System.out.println("foo");
             if (b2) {
@@ -79,6 +93,7 @@ public class IfRatherThanWhileAndFallsThroughSample {
     }
 
     public void replaceWhileButOnlyRemoveBreakForTheWhileLoop(boolean b, int magicValue) {
+        // Keep this comment
         while (b) {
             for (int i = 0; i < 10; i++) {
                 if (i == magicValue) {
