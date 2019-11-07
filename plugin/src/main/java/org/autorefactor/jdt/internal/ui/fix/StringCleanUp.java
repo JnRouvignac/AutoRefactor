@@ -194,6 +194,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
+
         return stringExpression;
     }
 
@@ -214,6 +215,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         if (expression != null) {
             return b.move(expression);
         }
+
         return b.this0();
     }
 

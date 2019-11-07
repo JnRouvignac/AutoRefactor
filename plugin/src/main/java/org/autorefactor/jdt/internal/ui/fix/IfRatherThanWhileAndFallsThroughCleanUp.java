@@ -90,6 +90,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
                 return false;
             }
         }
+
         return true;
     }
 

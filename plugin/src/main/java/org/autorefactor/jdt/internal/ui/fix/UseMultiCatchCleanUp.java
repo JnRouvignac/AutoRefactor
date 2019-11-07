@@ -126,6 +126,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                         return false;
                     }
                 }
+
                 return true;
             }
             throw new NotImplementedException(null, other);
@@ -160,6 +161,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                         anySubTypeCompatible= true;
                     }
                 }
+
                 return anySubTypeCompatible;
             }
             if (other instanceof MultiBinding) {
@@ -178,6 +180,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                         }
                     }
                 }
+
                 return anySubTypeCompatible;
             }
             throw new NotImplementedException(null, other);
@@ -192,6 +195,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 }
                 sb.append(typeBinding.getName());
             }
+
             return sb.toString();
         }
     }
@@ -236,6 +240,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
+
             return false;
         }
 
@@ -251,6 +256,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 return super.match(mi1, mi2)
                         && isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
             }
+
             return false;
         }
 
@@ -261,6 +267,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 return super.match(mi1, mi2)
                         && isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
             }
+
             return false;
         }
 
@@ -271,6 +278,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 return super.match(cic1, cic2)
                         && isSameMethodBinding(cic1.resolveConstructorBinding(), cic2.resolveConstructorBinding());
             }
+
             return false;
         }
 
@@ -293,6 +301,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     return isSameVariable0(other, pairedVariables.getValue());
                 }
             }
+
             return false;
         }
 
@@ -321,10 +330,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                         r.remove(catchClause1);
                         r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
                     }
+
                     return false;
                 }
             }
         }
+
         return true;
     }
 
@@ -333,6 +344,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         for (int i= 0; i < catchClauses.size(); i++) {
             results[i]= resolveBinding(catchClauses.get(i));
         }
+
         return results;
     }
 
@@ -349,6 +361,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             for (int j= 0; j < types.size(); j++) {
                 typeBindings[j]= types.get(j).resolveBinding();
             }
+
             return new MultiBinding(typeBindings);
 
         default:
@@ -369,6 +382,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         if (canMergeTypesUp(typeBindings, start, end)) {
             return MergeDirection.UP;
         }
+
         return MergeDirection.NONE;
     }
 
@@ -380,6 +394,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -391,6 +406,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

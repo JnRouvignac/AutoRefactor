@@ -72,6 +72,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
             if (parent instanceof QualifiedName || parent instanceof FieldAccess) {
                 return false;
             }
+
             return false;
         }
     }

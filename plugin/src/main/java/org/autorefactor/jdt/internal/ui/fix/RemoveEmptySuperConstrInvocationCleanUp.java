@@ -63,6 +63,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
             ctx.getRefactorings().replace(node, null);
             return false;
         }
+
         return true;
     }
 }

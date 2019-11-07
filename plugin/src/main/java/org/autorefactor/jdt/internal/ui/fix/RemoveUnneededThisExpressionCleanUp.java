@@ -76,6 +76,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().remove(node.getExpression());
             return false;
         }
+
         return true;
     }
 

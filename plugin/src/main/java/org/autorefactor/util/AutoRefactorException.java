@@ -80,6 +80,7 @@ public class AutoRefactorException extends RuntimeException {
         if (!sourceLocation.isEmpty()) {
             return sourceLocation + ":" + message; //$NON-NLS-1$
         }
+
         return message;
     }
 }

@@ -133,6 +133,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -160,6 +161,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 setResult(true);
                 return false;
             }
+
             return true;
         }
 
@@ -279,6 +281,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -288,6 +291,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             replaceWithSwitchStatement(node, switchExpression, cases, remainingStatement);
             return false;
         }
+
         return true;
     }
 
@@ -312,6 +316,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 results.add(new SwitchCaseSection(filteredExprs, sourceCase.statements));
             }
         }
+
         return results;
     }
 
@@ -364,6 +369,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         if (statement instanceof IfStatement) {
             return extractVariableAndValues(((IfStatement) statement).getExpression());
         }
+
         return null;
     }
 
@@ -400,6 +406,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
+
         return null;
     }
 
@@ -427,6 +434,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 

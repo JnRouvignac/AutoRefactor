@@ -72,6 +72,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
                 return false;
             }
         }
+
         return true;
     }
 

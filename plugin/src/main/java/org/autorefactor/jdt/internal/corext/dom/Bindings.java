@@ -127,6 +127,7 @@ public final class Bindings {
         if (boxed == null) {
             return type;
         }
+
         return boxed;
     }
 }

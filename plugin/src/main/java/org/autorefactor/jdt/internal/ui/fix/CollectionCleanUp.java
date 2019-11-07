@@ -124,6 +124,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
+
             return true;
         }
 
@@ -137,6 +138,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 setResult(false);
                 return false;
             }
+
             return true;
         }
 
@@ -168,8 +170,10 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 }
+
                 return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
             }
+
             return false;
         }
     }

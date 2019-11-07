@@ -91,6 +91,7 @@ public class Refactorings {
                 if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
                     return new SourceRange(node.getStartPosition(), node.getLength());
                 }
+
                 return super.computeSourceRange(node);
             }
         });
@@ -181,6 +182,7 @@ public class Refactorings {
             listRewrite= rewrite.getListRewrite(node, listProperty);
             listRewriteCache.put(key, listRewrite);
         }
+
         return listRewrite;
     }
 
@@ -259,10 +261,12 @@ public class Refactorings {
                             return false;
                         }
                     }
+
                     return !currIter.hasNext();
                 } // else iterate until finding the correct node
             }
         }
+
         return true;
     }
 

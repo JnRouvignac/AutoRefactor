@@ -111,6 +111,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
         if (fOptions.isEnabled(KEY)) {
             fStatus= new RefactoringStatus();
         }
+
         return new RefactoringStatus();
     }
 

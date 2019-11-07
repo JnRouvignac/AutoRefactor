@@ -90,6 +90,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                     // Add the missing onPause() method to the class.
                     r.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
                 }
+
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -104,9 +105,11 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                     r.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
                             createOnPauseMethodDeclaration());
                 }
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -132,6 +135,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return null;
     }
 
@@ -142,6 +146,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 setResult(true);
                 return false;
             }
+
             return true;
         }
     }

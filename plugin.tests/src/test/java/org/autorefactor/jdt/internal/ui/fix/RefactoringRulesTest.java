@@ -85,6 +85,7 @@ public class RefactoringRulesTest {
         for (Object[] sample : samples) {
             sample[0]= ((String) sample[0]).replace("Sample.java", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
+
         return samples;
     }
 
@@ -159,6 +160,7 @@ public class RefactoringRulesTest {
                 return refactoring;
             }
         }
+
         return null;
     }
 }

@@ -110,6 +110,7 @@ public class PrepareApplyRefactoringsJob extends Job {
                 job.schedule();
             }
         }
+
         return Status.OK_STATUS;
     }
 
@@ -122,6 +123,7 @@ public class PrepareApplyRefactoringsJob extends Job {
         for (RefactoringRule refactoring : refactorings) {
             res.add(refactoring.getClass().newInstance());
         }
+
         return res;
     }
 
@@ -133,6 +135,7 @@ public class PrepareApplyRefactoringsJob extends Job {
         if (nbPartitions > 0) {
             return nbPartitions;
         }
+
         return 1;
     }
 
@@ -194,6 +197,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
             javaProjects.put(javaProject, options);
         }
+
         return options;
     }
 

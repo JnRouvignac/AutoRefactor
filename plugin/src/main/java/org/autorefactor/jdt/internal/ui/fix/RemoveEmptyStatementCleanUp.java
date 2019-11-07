@@ -87,6 +87,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -139,6 +140,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 
@@ -147,6 +149,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().remove(node);
             return false;
         }
+
         return true;
     }
 
@@ -158,6 +161,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             final Block block= (Block) emptyCode;
             return block.statements() == null || block.statements().isEmpty();
         }
+
         return false;
     }
 }

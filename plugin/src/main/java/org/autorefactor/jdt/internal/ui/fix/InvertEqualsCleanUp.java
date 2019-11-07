@@ -81,6 +81,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

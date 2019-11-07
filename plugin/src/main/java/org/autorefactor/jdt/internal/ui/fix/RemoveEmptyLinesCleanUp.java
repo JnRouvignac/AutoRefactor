@@ -130,6 +130,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             r.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));
             return false;
         }
+
         return true;
     }
 
@@ -139,6 +140,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -161,6 +163,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return -1;
     }
 
@@ -170,6 +173,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
                 return i;
             }
         }
+
         return fromIndex;
     }
 
@@ -266,6 +270,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -284,6 +289,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         if (matcher.find(fromIndex)) {
             return matcher.start();
         }
+
         return -1;
     }
 }

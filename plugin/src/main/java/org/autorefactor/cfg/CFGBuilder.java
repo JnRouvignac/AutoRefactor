@@ -348,6 +348,7 @@ public class CFGBuilder {
                 throwers.addThrow(cic, declaredThrows);
                 return declaredThrows.length > 0;
             }
+
             return false;
         case CONDITIONAL_EXPRESSION:
             ConditionalExpression coe= (ConditionalExpression) node;
@@ -363,6 +364,7 @@ public class CFGBuilder {
                 throwers.addThrow(fa, newException(node, NullPointerException.class.getCanonicalName()));
                 mightThrow= true;
             }
+
             return mightThrow;
         case INFIX_EXPRESSION:
             InfixExpression ie= (InfixExpression) node;
@@ -382,6 +384,7 @@ public class CFGBuilder {
                 throwers.addThrow(mi, declaredThrows);
                 return declaredThrows.length > 0;
             }
+
             return false;
         case SIMPLE_NAME:
             SimpleName sn= (SimpleName) node;
@@ -390,6 +393,7 @@ public class CFGBuilder {
                 throwers.addThrow(sn, newException(node, NullPointerException.class.getCanonicalName()));
                 return true;
             }
+
             return false;
         case QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) node;
@@ -420,6 +424,7 @@ public class CFGBuilder {
                 throwers.addThrow(smi, declaredThrows);
                 return declaredThrows.length > 0;
             }
+
             return false;
         case THIS_EXPRESSION:
             ThisExpression te= (ThisExpression) node;
@@ -442,6 +447,7 @@ public class CFGBuilder {
             typeBinding= new TypeNameDecider(node).resolveTypeBinding(fullyQualifiedName);
             typeBindingsCache.put(typeBinding.getQualifiedName(), typeBinding);
         }
+
         return typeBinding;
     }
 
@@ -456,6 +462,7 @@ public class CFGBuilder {
                 mightThrow= true;
             }
         }
+
         return mightThrow;
     }
 
@@ -467,6 +474,7 @@ public class CFGBuilder {
                 mightThrow= true;
             }
         }
+
         return mightThrow;
     }
 
@@ -666,6 +674,7 @@ public class CFGBuilder {
                     // TODO JNR
                 }
             }
+
             return entryBlock;
         } finally {
             this.exitBlock= null;
@@ -785,8 +794,10 @@ public class CFGBuilder {
             // node.bodyDeclarations()) {
             // buildCFG(bodyDeclaration);
             // }
+
             return results;
         }
+
         return Collections.emptyList();
     }
 
@@ -845,6 +856,7 @@ public class CFGBuilder {
             liveBeforeFinally.addAll(liveAfterCatchClauses);
             return buildCFG(node.getFinally(), liveBeforeFinally, throwers);
         }
+
         return liveAfterCatchClauses.copyLiveBasicBlock();
     }
 
@@ -1093,6 +1105,7 @@ public class CFGBuilder {
         if (n != null) {
             return ((LabeledStatement) n).getBody();
         }
+
         return null;
     }
 
@@ -1104,6 +1117,7 @@ public class CFGBuilder {
         if (n != null) {
             return (Statement) n;
         }
+
         return null;
     }
 
@@ -1155,6 +1169,7 @@ public class CFGBuilder {
             }
             results.addAll(buildCFG((TypeDeclaration) decl));
         }
+
         return results;
     }
 
@@ -1218,6 +1233,7 @@ public class CFGBuilder {
         } finally {
             moveAllEdgesToBuild(node, liveState);
         }
+
         return liveState.nextStmtWillCreateNewBlock();
     }
 
@@ -1294,6 +1310,7 @@ public class CFGBuilder {
                 throw new NotImplementedException(statement);
             }
         }
+
         return liveState;
     }
 
@@ -1394,6 +1411,7 @@ public class CFGBuilder {
             } else {
                 result.add(elseEdge);
             }
+
             return result.nextStmtWillCreateNewBlock();
         } finally {
             moveAllEdgesToBuild(node, state);
@@ -1508,6 +1526,7 @@ public class CFGBuilder {
             // New block was created for current node
             return new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
         }
+
         return state;
     }
 
@@ -1562,6 +1581,7 @@ public class CFGBuilder {
         if (n != null) {
             return (Statement) n;
         }
+
         return null;
     }
 
@@ -1632,6 +1652,7 @@ public class CFGBuilder {
             return new LivenessState(currentBlock, new CFGEdgeBuilder(currentBlock));
             // TODO JNR create a new CFGBasicBlock from here to catch / finally / exit
         }
+
         return getInBlockStmtResult(state, basicBlock);
     }
 
@@ -1728,6 +1749,7 @@ public class CFGBuilder {
                 result++;
             }
         }
+
         return result;
     }
 

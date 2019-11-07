@@ -111,6 +111,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 }

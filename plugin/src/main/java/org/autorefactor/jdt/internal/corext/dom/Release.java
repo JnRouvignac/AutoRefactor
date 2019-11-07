@@ -85,6 +85,7 @@ public final class Release {
         if (!release.isVersionValid()) {
             throw new IllegalArgumentException(null, "Invalid version for " + release); //$NON-NLS-1$
         }
+
         return release;
     }
 
@@ -93,6 +94,7 @@ public final class Release {
             if (this.version.length >= 2) {
                 return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 12;
             }
+
             return 9 <= this.version[0] && this.version[0] <= 12;
         }
 
@@ -106,6 +108,7 @@ public final class Release {
             final String nb= versionNumbers[i];
             result[i]= Integer.parseInt(nb);
         }
+
         return result;
     }
 
@@ -132,6 +135,7 @@ public final class Release {
                 return true;
             }
         }
+
         return this.version.length >= requiredRelease.version.length;
     }
 
@@ -169,6 +173,7 @@ public final class Release {
         if (this.version.length >= i + 1) {
             return this.version[i];
         }
+
         return 0;
     }
 

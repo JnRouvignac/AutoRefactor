@@ -92,6 +92,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         } else {
             return true;
         }
+
         return false;
     }
 

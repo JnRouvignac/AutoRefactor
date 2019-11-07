@@ -129,6 +129,7 @@ public class ApplyRefactoringsJob extends Job {
         } finally {
             loopMonitor.done();
         }
+
         return Status.OK_STATUS;
     }
 
@@ -179,6 +180,7 @@ public class ApplyRefactoringsJob extends Job {
         } finally {
             bufferManager.disconnect(path, locationKind, null);
         }
+
         return textEdits;
     }
 
@@ -303,6 +305,7 @@ public class ApplyRefactoringsJob extends Job {
         while (iter.hasNext()) {
             sb.append(", ").append(iter.next().getClass().getName()); //$NON-NLS-1$
         }
+
         return sb.toString();
     }
 }

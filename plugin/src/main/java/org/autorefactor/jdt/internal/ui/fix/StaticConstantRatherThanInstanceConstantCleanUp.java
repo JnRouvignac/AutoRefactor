@@ -108,6 +108,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
                 results.add((Modifier) em);
             }
         }
+
         return results;
     }
 }

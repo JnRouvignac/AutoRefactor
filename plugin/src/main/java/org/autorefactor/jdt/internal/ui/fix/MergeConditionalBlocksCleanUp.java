@@ -75,6 +75,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
                     && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
         }
+
         return true;
     }
 
@@ -84,6 +85,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             refactorBlocks(node.getExpression(), subNode, remainingStatements, isPositive);
             return false;
         }
+
         return true;
     }
 

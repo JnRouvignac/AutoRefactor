@@ -130,6 +130,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
         if (AbstractList.class.getCanonicalName().equals(origRawType) || List.class.getCanonicalName().equals(origRawType)) {
             return Set.class.getCanonicalName();
         }
+
         return null;
     }
 

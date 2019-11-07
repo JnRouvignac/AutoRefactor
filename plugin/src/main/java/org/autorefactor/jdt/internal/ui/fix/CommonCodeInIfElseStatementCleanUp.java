@@ -255,6 +255,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

@@ -114,6 +114,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
+
             return true;
         }
 
@@ -127,6 +128,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
                 setResult(false);
                 return false;
             }
+
             return true;
         }
 
@@ -153,8 +155,10 @@ public class MapCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 }
+
                 return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceMap); //$NON-NLS-1$
             }
+
             return false;
         }
     }

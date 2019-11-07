@@ -106,6 +106,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
         if (Hashtable.class.getCanonicalName().equals(origRawType)) {
             return HashMap.class.getCanonicalName();
         }
+
         return null;
     }
 
@@ -115,6 +116,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
         if (ASTNodes.usesGivenSignature(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             methodCallsToRefactor.add(mi);
         }
+
         return true;
     }
 

@@ -95,6 +95,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 if (o2.isAnnotation()) {
                     return 0;
                 }
+
                 return -1;
             }
             if (o2.isAnnotation()) {
@@ -108,6 +109,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             if (i2 == -1) {
                 throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2); //$NON-NLS-1$
             }
+
             return i1 - i2;
         }
     }
@@ -126,6 +128,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         if (Modifier.isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
             return removeProtectedModifier(node);
         }
+
         return ensureModifiersOrder(node);
     }
 
@@ -138,6 +141,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 result= false;
             }
         }
+
         return result;
     }
 
@@ -163,6 +167,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 : isFinalClassWithoutInheritance(node.getParent()))) {
             return removeProtectedModifier(node);
         }
+
         return ensureModifiersOrder(node);
     }
 
@@ -183,6 +188,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -194,6 +200,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 result= false;
             }
         }
+
         return result;
     }
 
@@ -218,6 +225,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         for (VariableDeclarationExpression resource : ASTNodes.resources(node)) {
             result&= removeFinalModifier(ASTNodes.modifiers(resource));
         }
+
         return result;
     }
 
@@ -260,6 +268,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 result= false;
             }
         }
+
         return result;
     }
 
@@ -276,6 +285,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 result= false;
             }
         }
+
         return result;
     }
 
@@ -286,6 +296,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 results.add((Modifier) em);
             }
         }
+
         return results;
     }
 }

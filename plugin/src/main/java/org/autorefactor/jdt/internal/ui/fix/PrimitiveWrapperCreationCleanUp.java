@@ -179,6 +179,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
             return "parseInt"; //$NON-NLS-1$
         }
+
         return null;
     }
 
@@ -196,6 +197,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
                 return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }
+
         return true;
     }
 
@@ -212,6 +214,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         } else {
             replaceWithValueOf(node, typeBinding);
         }
+
         return false;
     }
 

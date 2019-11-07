@@ -101,6 +101,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
         if (LinkedList.class.getCanonicalName().equals(origRawType)) {
             return ArrayList.class.getCanonicalName();
         }
+
         return null;
     }
 

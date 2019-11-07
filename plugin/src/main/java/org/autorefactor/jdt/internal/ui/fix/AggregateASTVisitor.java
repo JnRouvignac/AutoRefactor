@@ -264,6 +264,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         if (result != null) {
             return result;
         }
+
         return Collections.emptyList();
     }
 
@@ -350,6 +351,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             // => do not let other visitors visit this node
             return false;
         }
+
         return true;
     }
 
@@ -1666,6 +1668,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1683,6 +1686,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1700,6 +1704,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1717,6 +1722,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1734,6 +1740,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1751,6 +1758,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1768,6 +1776,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1785,6 +1794,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1802,6 +1812,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1819,6 +1830,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1836,6 +1848,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1853,6 +1866,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1870,6 +1884,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1887,6 +1902,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1904,6 +1920,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1921,6 +1938,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1938,6 +1956,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1955,6 +1974,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1972,6 +1992,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -1989,6 +2010,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2006,6 +2028,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2023,6 +2046,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2040,6 +2064,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2057,6 +2082,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2074,6 +2100,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2091,6 +2118,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2108,6 +2136,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2125,6 +2154,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2142,6 +2172,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2159,6 +2190,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2176,6 +2208,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2193,6 +2226,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2210,6 +2244,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2227,6 +2262,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2244,6 +2280,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2261,6 +2298,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2278,6 +2316,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2295,6 +2334,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2312,6 +2352,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2329,6 +2370,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2346,6 +2388,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2363,6 +2406,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2380,6 +2424,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2397,6 +2442,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2414,6 +2460,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2431,6 +2478,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2448,6 +2496,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2465,6 +2514,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2482,6 +2532,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2499,6 +2550,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2516,6 +2568,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2533,6 +2586,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2550,6 +2604,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2567,6 +2622,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2584,6 +2640,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2601,6 +2658,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2618,6 +2676,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2635,6 +2694,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2652,6 +2712,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2669,6 +2730,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2686,6 +2748,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2703,6 +2766,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2720,6 +2784,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2737,6 +2802,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2754,6 +2820,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2771,6 +2838,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2788,6 +2856,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2805,6 +2874,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2822,6 +2892,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2839,6 +2910,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2856,6 +2928,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2873,6 +2946,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2890,6 +2964,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2907,6 +2982,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2924,6 +3000,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2941,6 +3018,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2958,6 +3036,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2975,6 +3054,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -2992,6 +3072,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3009,6 +3090,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3026,6 +3108,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3043,6 +3126,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3060,6 +3144,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3077,6 +3162,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3094,6 +3180,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3111,6 +3198,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3128,6 +3216,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3145,6 +3234,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3162,6 +3252,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 
@@ -3179,6 +3270,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 iter.remove();
             }
         }
+
         return true;
     }
 

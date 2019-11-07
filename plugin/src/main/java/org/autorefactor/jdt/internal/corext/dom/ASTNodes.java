@@ -180,6 +180,7 @@ public final class ASTNodes {
                 activityLevel= ExprActivity.ACTIVE;
                 return interruptVisit();
             }
+
             return true;
         }
 
@@ -199,6 +200,7 @@ public final class ASTNodes {
                                     || mayCallImplicitToString(node.extendedOperands())))) {
                 activityLevel= ExprActivity.CAN_BE_ACTIVE;
             }
+
             return true;
         }
 
@@ -210,6 +212,7 @@ public final class ASTNodes {
                     }
                 }
             }
+
             return false;
         }
 
@@ -261,6 +264,7 @@ public final class ASTNodes {
         if (node instanceof Expression) {
             return getUnparenthesedExpression((Expression) node);
         }
+
         return node;
     }
 
@@ -276,6 +280,7 @@ public final class ASTNodes {
         if (expression.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
             return getUnparenthesedExpression(((ParenthesizedExpression) expression).getExpression());
         }
+
         return expression;
     }
 
@@ -364,6 +369,7 @@ public final class ASTNodes {
                 return as(((ParenthesizedExpression) expression).getExpression(), exprClass);
             }
         }
+
         return null;
     }
 
@@ -393,6 +399,7 @@ public final class ASTNodes {
         if ((exprs != null) && (exprs.size() == 1)) {
             return as(exprs.iterator().next(), exprClass);
         }
+
         return null;
     }
 
@@ -412,6 +419,7 @@ public final class ASTNodes {
         if (es != null) {
             return as(es.getExpression(), exprClass);
         }
+
         return null;
     }
 
@@ -840,6 +848,7 @@ public final class ASTNodes {
         if (methodBinding != null) {
             return methodBinding.getDeclaringClass();
         }
+
         return null;
     }
 
@@ -860,6 +869,7 @@ public final class ASTNodes {
         if (hasType(qn, Boolean.class.getCanonicalName())) {
             return getBooleanObject(qn);
         }
+
         return null;
     }
 
@@ -881,6 +891,7 @@ public final class ASTNodes {
         if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
             return false;
         }
+
         return null;
     }
 
@@ -925,6 +936,7 @@ public final class ASTNodes {
         if (ancestorClass.isAssignableFrom(parent.getClass())) {
             return (T) parent;
         }
+
         return getAncestorOrNull(parent, ancestorClass);
     }
 
@@ -945,6 +957,7 @@ public final class ASTNodes {
                     "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ //$NON-NLS-2$
                             + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node); //$NON-NLS-1$
         }
+
         return ancestor;
     }
 
@@ -972,6 +985,7 @@ public final class ASTNodes {
                 return parent;
             }
         }
+
         return getFirstAncestorOrNull(parent, ancestorClasses);
     }
 
@@ -1046,6 +1060,7 @@ public final class ASTNodes {
                             || hasType(discriminentType, String.class.getCanonicalName())) {
                         return discriminentType;
                     }
+
                     return node.getAST()
                             .resolveWellKnownType(Bindings.getUnboxedTypeName(discriminentType.getQualifiedName()));
                 }
@@ -1128,6 +1143,7 @@ public final class ASTNodes {
         if (parent instanceof Statement) {
             return getPreviousStatement((Statement) parent);
         }
+
         return null;
     }
 
@@ -1222,6 +1238,7 @@ public final class ASTNodes {
         if (parent instanceof Statement) {
             return getNextStatement((Statement) parent);
         }
+
         return null;
     }
 
@@ -1243,6 +1260,7 @@ public final class ASTNodes {
                 return types.get(index + 1);
             }
         }
+
         return null;
     }
 
@@ -1274,6 +1292,7 @@ public final class ASTNodes {
             previous= child;
             returnNext= child.equals(node);
         }
+
         return null;
     }
 
@@ -1290,6 +1309,7 @@ public final class ASTNodes {
                 return varBinding.getType();
             }
         }
+
         return null;
     }
 
@@ -1384,6 +1404,7 @@ public final class ASTNodes {
                 }
             }
         }
+
         return false;
     }
 
@@ -1436,6 +1457,7 @@ public final class ASTNodes {
             final ITypeBinding typeBinding= expression.resolveTypeBinding();
             return (typeBinding != null) && typeBinding.isArray();
         }
+
         return false;
     }
 
@@ -1458,6 +1480,7 @@ public final class ASTNodes {
                 return ((IVariableBinding) binding).isEnumConstant();
             }
         }
+
         return false;
     }
 
@@ -1575,6 +1598,7 @@ public final class ASTNodes {
             final IVariableBinding bnd= (IVariableBinding) binding;
             return !bnd.isField() && !bnd.isEnumConstant();
         }
+
         return false;
     }
 
@@ -1719,6 +1743,7 @@ public final class ASTNodes {
                 return implementedType;
             }
         }
+
         return null;
     }
 
@@ -1742,6 +1767,7 @@ public final class ASTNodes {
                 }
             }
         }
+
         return null;
     }
 
@@ -1760,6 +1786,7 @@ public final class ASTNodes {
         if (!hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
             throw new NotImplementedException(node, "for extended operands"); //$NON-NLS-1$
         }
+
         return true;
     }
 
@@ -1932,6 +1959,7 @@ public final class ASTNodes {
                 return parameterizedTypesMatch(implementedType, erasure, methodBinding);
             }
         }
+
         return isInstanceOf && concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
     }
 
@@ -1946,6 +1974,7 @@ public final class ASTNodes {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -1967,6 +1996,7 @@ public final class ASTNodes {
                 }
             }
         }
+
         return false;
     }
 
@@ -1986,6 +2016,7 @@ public final class ASTNodes {
         for (int i= 0; (i < genericTypeParams.length) && (i < typeParams.length); i++) {
             results.put(genericTypeParams[i], typeParams[i]);
         }
+
         return results;
     }
 
@@ -2034,6 +2065,7 @@ public final class ASTNodes {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -2073,6 +2105,7 @@ public final class ASTNodes {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2106,6 +2139,7 @@ public final class ASTNodes {
                 return overridenMethod;
             }
         }
+
         return null;
     }
 
@@ -2118,6 +2152,7 @@ public final class ASTNodes {
                 return methodBinding;
             }
         }
+
         return null;
     }
 
@@ -2132,6 +2167,7 @@ public final class ASTNodes {
         if ((name1 instanceof SimpleName) && (name2 instanceof SimpleName)) {
             return isEqual((SimpleName) name1, (SimpleName) name2);
         }
+
         return (name1 instanceof QualifiedName) && (name2 instanceof QualifiedName) && isEqual((QualifiedName) name1, (QualifiedName) name2);
     }
 
@@ -2176,6 +2212,7 @@ public final class ASTNodes {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -2325,6 +2362,7 @@ public final class ASTNodes {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -2400,6 +2438,7 @@ public final class ASTNodes {
         if (instanceOf(parent, includedClasses)) {
             return getParent(parent, includedClasses);
         }
+
         return node;
     }
 
@@ -2412,6 +2451,7 @@ public final class ASTNodes {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2431,6 +2471,7 @@ public final class ASTNodes {
         if (instanceOf(parent, ignoredClasses)) {
             return getParentIgnoring(parent, ignoredClasses);
         }
+
         return parent;
     }
 
@@ -2448,8 +2489,10 @@ public final class ASTNodes {
             if (cu.getTypeRoot() != null) { // added for unit tests
                 return cu.getTypeRoot().getElementName();
             }
+
             return "FakeClass.java"; //$NON-NLS-1$
         }
+
         return null;
     }
 
@@ -2472,6 +2515,7 @@ public final class ASTNodes {
             // It was not created from a file
             return line + ":" + column; //$NON-NLS-1$
         }
+
         return ""; //$NON-NLS-1$
     }
 

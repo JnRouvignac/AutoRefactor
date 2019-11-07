@@ -130,6 +130,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 
@@ -187,9 +188,11 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                     return b.declareFragment(b.move(existingFragment.getName()),
                             b.move(assignResource.getRightHandSide()));
                 }
+
                 return null;
             }
         }
+
         return containsOnly(definitions, existingFragment.getName()) ? b.move(existingFragment) : null;
     }
 
@@ -202,6 +205,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

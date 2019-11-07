@@ -305,6 +305,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 otherVarDecls.addAll(subVarDecls);
             }
         }
+
         return true;
     }
 
@@ -371,6 +372,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                     return true;
                 }
             }
+
             return false;
 
         case METHOD_INVOCATION:
@@ -381,6 +383,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (!isMethodReturningExistingClass(mi)) {
                 return true;
             }
+
             return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
                     methodCallsToRefactor);
 
@@ -404,6 +407,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 }
             }
         }
+
         return Object.class.getCanonicalName();
     }
 
@@ -447,6 +451,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (ASTNodes.hasType(typeBinding, getExistingClassCanonicalName())) {
                 objectInstantiations.add(instanceCreation);
             }
+
             return true;
         }
     }
@@ -474,6 +479,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (aVariable.getIdentifier().equals(varDeclName.getIdentifier()) && !aVariable.equals(varDeclName)) {
                 varOccurrences.add(aVariable);
             }
+
             return true;
         }
 
@@ -487,6 +493,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                     return interruptVisit();
                 }
             }
+
             return true;
         }
     }

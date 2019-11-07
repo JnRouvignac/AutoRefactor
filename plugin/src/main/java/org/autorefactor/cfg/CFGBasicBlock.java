@@ -278,6 +278,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
             LineAndColumn lal= this.lineAndColumn;
             sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn()); //$NON-NLS-1$ //$NON-NLS-2$
         }
+
         return sb;
     }
 

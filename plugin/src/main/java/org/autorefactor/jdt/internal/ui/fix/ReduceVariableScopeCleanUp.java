@@ -398,6 +398,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             final VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
             return this.ctx.getASTBuilder().copy(vds.getType());
         }
+
         return getType(node.getParent());
     }
 
@@ -442,6 +443,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

@@ -88,6 +88,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             for (String name : fullyQualifiedName.split("\\.")) { //$NON-NLS-1$
                 qname= new QName(qname, name);
             }
+
             return qname;
         }
 
@@ -175,6 +176,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             if (equals(CANNOT_REPLACE_SIMPLE_NAME)) {
                 return "CANNOT_REPLACE_SIMPLE_NAME"; //$NON-NLS-1$
             }
+
             return fullyQualifiedName + (fromImport ? " (imported)" : " (member)"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
@@ -238,6 +240,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     QName enclosingTypeQName= QName.valueOf(enclosingTypeBinding.getQualifiedName());
                     return existsInAnyEnclosingType(matches, fullyQualifiedName, enclosingTypeQName);
                 }
+
                 return false;
             }
         }
@@ -250,6 +253,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 }
                 enclosingTypeQName= enclosingTypeQName.qualifier;
             }
+
             return false;
         }
 
@@ -298,6 +302,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 }
                 enclosingType= ASTNodes.getFirstAncestorOrNull(enclosingType, ancestorClasses);
             }
+
             return null;
         }
 
@@ -354,6 +359,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     bestMatches.add(fqn);
                 }
             }
+
             return bestMatches;
         }
 
@@ -370,6 +376,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     throw new NotImplementedException(node, node);
                 }
             }
+
             return null;
         }
 
@@ -536,6 +543,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
             node.accept(new NamesCollector());
         }
+
         return true;
     }
 
@@ -566,6 +574,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 // We cannot determine the FQN, so we cannot safely replace it
                 types.cannotReplaceSimpleName(node.getName().getIdentifier());
             }
+
             return true;
         }
 
@@ -580,6 +589,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 // We cannot determine the FQN, so we cannot safely replace it
                 methods.cannotReplaceSimpleName(simpleName);
             }
+
             return true;
         }
 
@@ -596,6 +606,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     fields.cannotReplaceSimpleName(simpleName);
                 }
             }
+
             return true;
         }
     }
@@ -615,6 +626,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 } // else this is a field access like other.fieldName
             }
         }
+
         return null;
     }
 
@@ -631,6 +643,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 return false;
             }
         }
+
         return true;
     }
 
@@ -712,6 +725,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             ctx.getRefactorings().replace(node, b.copy(node.getName()));
             return false;
         }
+
         return true;
     }
 }

@@ -45,6 +45,7 @@ public final class Utils {
         if (obj1 == null) {
             return obj2 == null;
         }
+
         return obj1.equals(obj2);
     }
 

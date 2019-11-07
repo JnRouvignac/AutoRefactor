@@ -71,6 +71,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
             throw new IllegalArgumentException(
                     "start position (" + startPos + ") should be situated before end position (" + startPos + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
+
         return new SourceLocation(startPos, endPos - startPos);
     }
 
@@ -200,6 +201,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         if (offsetDiff != 0) {
             return offsetDiff;
         }
+
         return this.length - sourceRange.getLength();
     }
 

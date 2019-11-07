@@ -136,6 +136,7 @@ public class AutoRefactorFix implements ICleanUpFix {
                 iter.remove();
             }
         }
+
         return refactorings;
     }
 

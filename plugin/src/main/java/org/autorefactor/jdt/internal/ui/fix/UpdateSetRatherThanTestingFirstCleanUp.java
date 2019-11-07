@@ -76,6 +76,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
         if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
         }
+
         return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
     }
 
@@ -109,9 +110,11 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
                             negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.move(miAddOrRemove));
                     r.remove(firstStatement);
                 }
+
                 return false;
             }
         }
+
         return true;
     }
 }

@@ -155,6 +155,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                 }
             }
         }
+
         return false;
     }
 

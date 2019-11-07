@@ -78,6 +78,7 @@ public class CFGDotPrinter {
             if (cmp != 0) {
                 return cmp;
             }
+
             return e1.getTargetBlock().compareTo(e2.getTargetBlock());
         }
     }
@@ -167,6 +168,7 @@ public class CFGDotPrinter {
                 parentSubGraph.subGraphs.add(subGraph);
             }
         }
+
         return subGraph;
     }
 

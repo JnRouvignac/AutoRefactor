@@ -130,6 +130,7 @@ public class CFGEdgeBuilder {
         } else {
             built= buildEdge(sourceBlock, targetBlock);
         }
+
         return built;
     }
 
@@ -185,6 +186,7 @@ public class CFGEdgeBuilder {
         } else {
             sb.append("?"); //$NON-NLS-1$
         }
+
         return sb.append("]").toString(); //$NON-NLS-1$
     }
 }

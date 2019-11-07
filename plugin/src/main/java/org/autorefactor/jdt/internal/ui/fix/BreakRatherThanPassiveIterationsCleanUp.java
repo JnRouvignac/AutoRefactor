@@ -107,6 +107,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                 hasSideEffect= true;
                 return interruptVisit();
             }
+
             return true;
         }
 
@@ -118,6 +119,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                     }
                 }
             }
+
             return false;
         }
 

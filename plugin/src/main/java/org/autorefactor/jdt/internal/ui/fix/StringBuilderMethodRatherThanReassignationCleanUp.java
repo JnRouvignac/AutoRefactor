@@ -78,6 +78,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
                 return false;
             }
         }
+
         return true;
     }
 

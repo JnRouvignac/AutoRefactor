@@ -277,6 +277,7 @@ public enum OperatorEnum {
             // Uncomparable results
             return 0;
         }
+
         return OperatorEnum.compareTo(op1, op2);
     }
 

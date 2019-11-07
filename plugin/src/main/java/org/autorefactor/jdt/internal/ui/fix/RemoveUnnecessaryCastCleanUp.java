@@ -107,6 +107,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
             ctx.getRefactorings().replace(node, b.move(node.getExpression()));
             return false;
         }
+
         return true;
     }
 
@@ -152,6 +153,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                         && !isIntegralDividedByFloatingPoint(node, ie);
             }
         }
+
         return false;
     }
 
@@ -178,6 +180,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         if (isAnyRefactored(previousOperands)) {
             return null;
         }
+
         return getTypeBinding(previousOperands);
     }
 
@@ -190,6 +193,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 maxTypeBinding= typeBinding;
             }
         }
+
         return maxTypeBinding;
     }
 
@@ -230,6 +234,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -264,6 +269,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                     || (ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
                     || (ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
         }
+
         return false;
     }
 

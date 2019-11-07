@@ -235,6 +235,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
                 field.store();
             }
         }
+
         return super.performOk();
     }
 }

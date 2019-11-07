@@ -237,6 +237,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             final MethodInvocation mi= (MethodInvocation) expression;
             return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
         }
+
         return false;
     }
 
@@ -271,6 +272,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                     return interruptVisit();
                 }
             }
+
             return true;
         }
 

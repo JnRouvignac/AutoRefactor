@@ -58,6 +58,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
             if (value != null) {
                 return Integer.parseInt(value);
             }
+
             return null;
         } catch (NumberFormatException e) {
             throw new UnhandledException(null, e);
@@ -104,6 +105,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
         if (result == null) {
             result= asInteger(DefaultCodeFormatterConstants.FORMATTER_LINE_SPLIT);
         }
+
         return result != null ? result : 80;
     }
 

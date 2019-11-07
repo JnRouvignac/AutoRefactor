@@ -135,6 +135,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 staticImports.add(node.getName().getFullyQualifiedName());
             }
         }
+
         return true;
     }
 
@@ -200,6 +201,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         } else if (isRewriteNeeded) {
             return refactorToAssertTrueOrFalse(nodeToReplace, originalMethod, failureMessage, condition, isAssertTrue);
         }
+
         return true;
     }
 
@@ -225,6 +227,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             r.remove(nodeToReplace.getParent());
             return false;
         }
+
         return true;
     }
 
@@ -253,6 +256,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
         }
+
         return maybeRefactorToEquality(nodeToReplace, originalMethod, isAssertEquals,
                 actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
     }
@@ -345,6 +349,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             // The new node should be also a statement
             return b.toStatement(newMethod);
         }
+
         return newMethod;
     }
 
@@ -368,6 +373,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         } else {
             qualifiedMethod= b.copyExpression(originalMethod);
         }
+
         return invokeQualifiedMethod(b, qualifiedMethod, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
     }
 

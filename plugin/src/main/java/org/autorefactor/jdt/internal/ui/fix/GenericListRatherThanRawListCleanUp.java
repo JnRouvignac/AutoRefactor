@@ -168,6 +168,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 return resolveTypeCompatible(actualParameter.getTypeArguments()[0]);
             }
         }
+
         return true;
     }
 
@@ -253,6 +254,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 ITypeBinding newElementType= ASTNodes.getTargetType(mi);
                 return resolveTypeCompatible(newElementType);
             }
+
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "descendingIterator") //$NON-NLS-1$
@@ -263,6 +265,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 ITypeBinding newElementType= ASTNodes.getTargetType(mi);
                 return resolveTypeCompatibleIfPossible(newElementType);
             }
+
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
@@ -293,6 +296,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         }
+
         return !(parent instanceof ExpressionStatement);
     }
 
@@ -308,6 +312,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             elementType= newElementType;
             return true;
         }
+
         return false;
     }
 

@@ -180,6 +180,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
                 return true;
             }
         }
+
         return false;
     }
 }

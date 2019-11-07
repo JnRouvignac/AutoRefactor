@@ -82,6 +82,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
         while (isVariableDeclaration(node)) {
             node= node.getParent();
         }
+
         return node;
     }
 
@@ -107,6 +108,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
         if (variableBinding != null && scopeNode != null) {
             scopeNode.accept(this);
         }
+
         return this;
     }
 
@@ -131,6 +133,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
                 break;
             }
         }
+
         return true;
     }
 

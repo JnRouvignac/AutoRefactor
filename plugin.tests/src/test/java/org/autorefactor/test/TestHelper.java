@@ -96,6 +96,7 @@ public final class TestHelper {
                 reader.close();
             }
         }
+
         return sb.toString();
     }
 
@@ -147,6 +148,7 @@ public final class TestHelper {
                 output.add(new Object[] { fileName });
             }
         }
+
         return output;
     }
 
@@ -156,6 +158,7 @@ public final class TestHelper {
             final String name= clazz.getSimpleName();
             results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ //$NON-NLS-2$
         }
+
         return results;
     }
 }

@@ -164,6 +164,7 @@ public class ASTCommentRewriter {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -182,6 +183,7 @@ public class ASTCommentRewriter {
                 if (!overlaps.get()) {
                     overlaps.set(range.overlapsWith(toSourceLoc(edit)));
                 }
+
                 return !overlaps.get();
             }
         });
@@ -254,6 +256,7 @@ public class ASTCommentRewriter {
         while (matcher.find()) {
             lineStarts.add(matcher.end());
         }
+
         return lineStarts;
     }
 
@@ -322,6 +325,7 @@ public class ASTCommentRewriter {
         while (Character.isWhitespace(source.charAt(commentStart - result - 1))) {
             ++result;
         }
+
         return result;
     }
 
@@ -403,6 +407,7 @@ public class ASTCommentRewriter {
         if (matcher.matches()) {
             return indentLoc;
         }
+
         return SourceLocation.fromPositions(0, 0);
     }
 
@@ -432,6 +437,7 @@ public class ASTCommentRewriter {
             start= i;
             i--;
         }
+
         return start;
     }
 
@@ -450,6 +456,7 @@ public class ASTCommentRewriter {
                 break;
             }
         }
+
         return end;
     }
 }

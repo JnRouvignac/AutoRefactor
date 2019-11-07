@@ -57,6 +57,7 @@ public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher 
 
             return b;
         }
+
         return null;
     }
 }

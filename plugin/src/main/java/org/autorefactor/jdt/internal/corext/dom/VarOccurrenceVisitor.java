@@ -36,6 +36,7 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
             varUsed= true;
             return interruptVisit();
         }
+
         return true;
     }
 

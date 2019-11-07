@@ -191,6 +191,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         for (Object expression : node.arguments()) {
             copyOfArgs.add(b.copy((Expression) expression));
         }
+
         return copyOfArgs;
     }
 

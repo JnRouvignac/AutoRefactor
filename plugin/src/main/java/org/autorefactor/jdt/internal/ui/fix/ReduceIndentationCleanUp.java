@@ -58,6 +58,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             if (node.getElseStatement() != null) {
                 computeGreatestIndentation(node.getElseStatement());
             }
+
             return false;
         }
 
@@ -101,6 +102,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             if (node.getFinally() != null) {
                 computeGreatestIndentation(node.getFinally());
             }
+
             return false;
         }
 

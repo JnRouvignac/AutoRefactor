@@ -128,6 +128,7 @@ public final class JavaCoreHelper {
                 return node;
             }
         }
+
         return null;
     }
 
@@ -139,6 +140,7 @@ public final class JavaCoreHelper {
                 sb.setCharAt(i, '/');
             }
         }
+
         return sb.toString();
     }
 
@@ -151,6 +153,7 @@ public final class JavaCoreHelper {
                 results.add(item);
             }
         }
+
         return results;
     }
 

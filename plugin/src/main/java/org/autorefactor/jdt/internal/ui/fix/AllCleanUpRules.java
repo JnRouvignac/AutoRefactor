@@ -54,6 +54,7 @@ public final class AllCleanUpRules {
                 iter.remove();
             }
         }
+
         return refactorings;
     }
 
@@ -144,6 +145,7 @@ public final class AllCleanUpRules {
                 results.add(r);
             }
         }
+
         return results;
     }
 }

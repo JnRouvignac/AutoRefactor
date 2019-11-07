@@ -69,6 +69,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
             ctx.getRefactorings().remove(node);
             return false;
         }
+
         return true;
     }
 
@@ -87,6 +88,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
                 return isLastStatement((Statement) node.getParent());
             }
         }
+
         return false;
     }
 }

@@ -627,6 +627,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                         && ASTNodes.hasOperator((PrefixExpression) other, PrefixExpression.Operator.NOT)) {
                     return matchOpposite(pe.getOperand(), ((PrefixExpression) other).getOperand());
                 }
+
                 return safeSubtreeMatch(pe.getOperand(), other);
             }
         } else if (other instanceof PrefixExpression

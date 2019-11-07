@@ -101,6 +101,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
                             b.move(thenInnerIfStatement.getThenStatement()), b.move(elseInnerIfStatement.getThenStatement())))));
             return false;
         }
+
         return true;
     }
 }

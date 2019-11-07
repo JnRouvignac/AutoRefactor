@@ -204,6 +204,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
                     toVisit, true).find();
             return variableUseVisitor.getReads().size();
         }
+
         return 0;
     }
 
@@ -224,6 +225,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             ITypeBinding colTypeArgument= jucTypeBinding.getTypeArguments()[0];
             return componentType.isSubTypeCompatible(colTypeArgument);
         }
+
         return false;
     }
 

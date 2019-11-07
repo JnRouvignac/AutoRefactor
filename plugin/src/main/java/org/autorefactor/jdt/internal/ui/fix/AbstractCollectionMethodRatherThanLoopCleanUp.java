@@ -157,6 +157,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     }
                 }
             }
+
             return true;
         }
 

@@ -82,6 +82,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
                 return false;
             }
         }
+
         return true;
     }
 

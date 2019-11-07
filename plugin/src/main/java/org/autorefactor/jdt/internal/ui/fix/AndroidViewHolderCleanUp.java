@@ -192,6 +192,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -205,6 +206,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
             viewItemsFieldDecls.add(item.toFieldDecl(b, typeNameDecider));
         }
+
         return result;
     }
 
@@ -249,8 +251,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     viewVariableName= (SimpleName) lhs;
                     viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
                 }
+
                 return false;
             }
+
             return true;
         }
 
@@ -272,6 +276,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                         // Check whether inflate is inside a conditional assignment
                         || (inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION);
             }
+
             return false;
         }
 
@@ -282,6 +287,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
             if (this.viewVariableAssignment != null) {
                 return this.viewVariableAssignment.getRightHandSide();
             }
+
             return null;
         }
 
@@ -325,6 +331,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 } else {
                     return false;
                 }
+
                 return true;
             }
 
@@ -352,6 +359,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     items.add(item);
                 }
             }
+
             return true;
         }
     }

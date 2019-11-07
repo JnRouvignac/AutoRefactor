@@ -49,6 +49,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
                 useLombok= true;
                 return interruptVisit();
             }
+
             return true;
         }
 

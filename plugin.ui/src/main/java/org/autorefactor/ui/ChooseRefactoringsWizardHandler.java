@@ -78,6 +78,7 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
                 }
             });
         }
+
         return null;
     }
 }

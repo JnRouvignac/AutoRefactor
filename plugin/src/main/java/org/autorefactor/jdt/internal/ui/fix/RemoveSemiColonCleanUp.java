@@ -161,6 +161,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 result= false;
             }
         }
+
         return result;
     }
 
@@ -180,6 +181,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 nextStart= SourceLocation.getEndPosition(comment);
             }
         }
+
         return results;
     }
 
@@ -194,6 +196,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             final CompilationUnit cu= (CompilationUnit) root;
             return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
         }
+
         return Collections.emptyList();
     }
 
@@ -211,6 +214,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 it.remove();
             }
         }
+
         return comments;
     }
 

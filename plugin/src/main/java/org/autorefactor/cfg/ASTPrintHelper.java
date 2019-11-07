@@ -46,6 +46,7 @@ public final class ASTPrintHelper {
                 sb.append(", "); //$NON-NLS-1$
             }
         }
+
         return sb.toString();
     }
 
@@ -58,6 +59,7 @@ public final class ASTPrintHelper {
         } else {
             codeExcerpt= nodeLines[0];
         }
+
         return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

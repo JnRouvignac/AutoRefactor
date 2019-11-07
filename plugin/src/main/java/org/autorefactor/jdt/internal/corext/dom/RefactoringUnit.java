@@ -74,6 +74,7 @@ public class RefactoringUnit implements Comparable {
             if (other.compilationUnit == null) {
                 return 0;
             }
+
             return 1;
         }
         if (other.compilationUnit == null) {

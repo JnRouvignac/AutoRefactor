@@ -69,6 +69,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().replace(node, b.doWhile(b.copy(node.getExpression()), b.copy(node.getBody())));
             return false;
         }
+
         return true;
     }
 }

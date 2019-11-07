@@ -459,6 +459,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             } else {
                 orientedCondition= b.negate(condition, Copy.COPY);
             }
+
             return getExpression(orientedCondition, expressionTypeName, booleanName);
         }
 
@@ -472,6 +473,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 if (thenLiteral) {
                     return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
                 }
+
                 return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
             }
 
@@ -479,6 +481,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 if (elseLiteral) {
                     return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
                 }
+
                 return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
             }
         }

@@ -335,6 +335,7 @@ public class ASTNodeFactory {
         if (typeName.indexOf('.') == -1) {
             return simpleType(typeName);
         }
+
         return qualifiedType(typeName.split("\\.")); //$NON-NLS-1$
     }
 
@@ -343,6 +344,7 @@ public class ASTNodeFactory {
         if (primitiveTypeCode != null) {
             return ast.newPrimitiveType(primitiveTypeCode);
         }
+
         return ast.newSimpleType(ast.newSimpleName(name));
     }
 
@@ -357,6 +359,7 @@ public class ASTNodeFactory {
             for (int i= 1; i < names.length; i++) {
                 type= ast.newQualifiedType(type, ast.newSimpleName(names[i]));
             }
+
             return type;
         }
     }
@@ -411,6 +414,7 @@ public class ASTNodeFactory {
         if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
         }
+
         return copySubtree(nodeToCopy);
     }
 
@@ -466,6 +470,7 @@ public class ASTNodeFactory {
             for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
+
             return type;
         }
         if (typeBinding.isPrimitive()) {
@@ -483,6 +488,7 @@ public class ASTNodeFactory {
             if (typeBinding.getBound() != null) {
                 type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
             }
+
             return type;
         }
         if (typeBinding.isTypeVariable()) {
@@ -495,6 +501,7 @@ public class ASTNodeFactory {
                                 + "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
                                 + "at most, and then it is located in first position.\""); //$NON-NLS-1$
             }
+
             return toType(typeBinding.getWildcard(), typeNameDecider);
         }
         throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -528,6 +535,7 @@ public class ASTNodeFactory {
                     newTypeArgs.add(copy((Type) typeArg));
                 }
             }
+
             return copyOfType;
         }
 
@@ -560,6 +568,7 @@ public class ASTNodeFactory {
             throw new IllegalArgumentException(nodes.get(0),
                     "The provided nodes are not valid for doing a range copy: " + nodes); //$NON-NLS-1$
         }
+
         return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
 
@@ -578,6 +587,7 @@ public class ASTNodeFactory {
             throw new IllegalArgumentException(nodes.get(0),
                     "The provided nodes are not valid for doing a range move: " + nodes); //$NON-NLS-1$
         }
+
         return refactorings.createMoveTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
 
@@ -597,6 +607,7 @@ public class ASTNodeFactory {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -829,6 +840,7 @@ public class ASTNodeFactory {
         while (it.hasNext()) {
             ASTNodes.extendedOperands(ie).add(it.next());
         }
+
         return ie;
     }
 
@@ -1026,6 +1038,7 @@ public class ASTNodeFactory {
         for (ListIterator<T> it= nodes.listIterator(); it.hasNext();) {
             it.set(move(it.next()));
         }
+
         return nodes;
     }
 

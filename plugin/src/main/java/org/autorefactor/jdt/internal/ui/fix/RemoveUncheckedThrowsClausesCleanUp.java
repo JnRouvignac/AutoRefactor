@@ -71,8 +71,10 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
             for (ASTNode n : nodesToRemove) {
                 ctx.getRefactorings().replace(n, null);
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -92,6 +94,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
                 result.add(n);
             }
         }
+
         return result;
     }
 

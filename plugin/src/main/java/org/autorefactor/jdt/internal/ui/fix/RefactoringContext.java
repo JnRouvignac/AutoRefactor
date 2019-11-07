@@ -146,6 +146,7 @@ public class RefactoringContext {
                 return false;
             }
         }
+
         return false;
     }
 

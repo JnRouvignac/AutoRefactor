@@ -113,6 +113,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
+
             return true;
         }
 
@@ -121,6 +122,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             if (thenStatements.size() == 1) {
                 return thenStatements.get(0);
             }
+
             return null;
         }
 
@@ -132,6 +134,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.is(thenStatement, ReturnStatement.class)) {
                 return ASTNodes.getNextSibling(node);
             }
+
             return null;
         }
 
@@ -148,6 +151,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                 setResult(false);
                 return false;
             }
+
             return true;
         }
 
@@ -175,6 +179,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             }
+
             return true;
         }
 

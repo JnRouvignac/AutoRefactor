@@ -50,6 +50,7 @@ public class OperatorEnumTest {
                 }
             }
         }
+
         return results.iterator();
     }
 
@@ -65,6 +66,7 @@ public class OperatorEnumTest {
                 }
             }
         }
+
         return results.iterator();
     }
 

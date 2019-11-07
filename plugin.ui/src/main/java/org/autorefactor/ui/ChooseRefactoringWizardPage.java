@@ -149,6 +149,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         for (Object o : tableViewer.getCheckedElements()) {
             results.add((RefactoringRule) o);
         }
+
         return results;
     }
 
@@ -255,6 +256,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                     styledString.setStyle(matchIndex, matchLength, underlineStyler);
                     return styledString.getStyleRanges();
                 }
+
                 return null;
             }
 

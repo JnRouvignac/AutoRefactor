@@ -85,6 +85,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 

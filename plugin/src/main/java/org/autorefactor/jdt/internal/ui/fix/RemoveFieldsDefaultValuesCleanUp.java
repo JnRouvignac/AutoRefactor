@@ -86,6 +86,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
                 visitSubtree= false;
             }
         }
+
         return visitSubtree;
     }
 
@@ -96,6 +97,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         if (parent instanceof TypeDeclaration) {
             return !((TypeDeclaration) parent).isInterface();
         }
+
         return parent instanceof AnonymousClassDeclaration || parent instanceof EnumDeclaration;
     }
 
@@ -112,6 +114,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         if (val instanceof Character) {
             return ((Character) val).charValue() == '\u0000';
         }
+
         return false;
     }
 

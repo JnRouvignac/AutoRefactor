@@ -146,6 +146,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             } else {
                 this.ctx.getRefactorings().toJavadoc(node);
             }
+
             return false;
         }
         final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
@@ -161,6 +162,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().replace(node, replacement);
             return false;
         }
+
         return true;
     }
 
@@ -172,6 +174,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (commentContent.length() + (isJavadoc ? 7 : 6) < commentLineLength) {
             return (isJavadoc ? "/** " : "/* ") + commentContent + " */"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
+
         return null;
     }
 
@@ -183,6 +186,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (node instanceof Javadoc) {
             return finder.getCoveringNode();
         }
+
         return finder.getCoveredNode();
     }
 
@@ -193,6 +197,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (coveringNode != node) {
             return coveringNode;
         }
+
         return getCoveringNode(start, length + 1);
     }
 
@@ -265,6 +270,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -274,6 +280,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return ASTNodes.hasType(getTypeName(modifier), Override.class.getCanonicalName());
             }
         }
+
         return false;
     }
 
@@ -284,6 +291,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (extendedModifier instanceof NormalAnnotation) {
             return ((NormalAnnotation) extendedModifier).getTypeName();
         }
+
         return null;
     }
 
@@ -293,6 +301,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -329,8 +338,10 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return comment.substring(0, endOfFirstLine) + "." + comment.substring(endOfFirstLine); //$NON-NLS-1$
                 // TODO JNR do the replace here, not outside this method
             }
+
             return matcher.group(1) + "." + matcher.group(2) + afterFirstTag; //$NON-NLS-1$
         }
+
         return null;
     }
 
@@ -356,6 +367,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -383,6 +395,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (!TagElement.TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
             throw new NotImplementedException(tag, "for tagName " + tagName); //$NON-NLS-1$
         }
+
         return true;
     }
 
@@ -417,6 +430,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 throw new NotImplementedException(node, fragment);
             }
         }
+
         return false;
     }
 
@@ -440,6 +454,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -472,6 +487,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return null;
     }
 
@@ -510,6 +526,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 continue;
             }
         }
+
         return bestComment != null && bestComment != comment;
     }
 
@@ -520,6 +537,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (node instanceof PackageDeclaration) {
             return ((PackageDeclaration) node).getJavadoc() != null;
         }
+
         return false;
     }
 
@@ -553,6 +571,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 throw new NotImplementedException(comment);
             }
         }
+
         return true;
     }
 

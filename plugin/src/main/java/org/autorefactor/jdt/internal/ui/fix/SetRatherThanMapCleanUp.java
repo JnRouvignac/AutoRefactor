@@ -124,6 +124,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         if (Map.class.getCanonicalName().equals(origRawType)) {
             return Set.class.getCanonicalName();
         }
+
         return null;
     }
 
@@ -168,6 +169,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
             } else {
                 newTypes= new Type[0];
             }
+
             return b.genericType(substitutingType, newTypes);
         }
 
@@ -193,6 +195,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
                 methodCallsToRefactor.add(mi);
                 return true;
             }
+
             return false;
         }
         if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$

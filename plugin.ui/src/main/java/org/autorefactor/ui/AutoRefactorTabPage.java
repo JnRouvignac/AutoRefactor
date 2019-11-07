@@ -203,6 +203,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
         if (fields != null) {
             return fields.size();
         }
+
         return 0;
     }
 

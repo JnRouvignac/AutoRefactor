@@ -193,6 +193,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         }
+
         return true;
     }
 
@@ -414,6 +415,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         }
+
         return !(parent instanceof ExpressionStatement);
     }
 
@@ -431,6 +433,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
         }
+
         return true;
     }
 
@@ -440,6 +443,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
         }
+
         return true;
     }
 
@@ -450,6 +454,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
         }
+
         return true;
     }
 
@@ -469,6 +474,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             keyType= newElementType;
             return true;
         }
+
         return false;
     }
 
@@ -483,6 +489,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             valueType= newElementType;
             return true;
         }
+
         return false;
     }
 

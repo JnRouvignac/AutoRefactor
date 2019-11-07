@@ -362,6 +362,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 fieldToFind= fieldName;
             }
         }
+
         return fieldToFind;
     }
 

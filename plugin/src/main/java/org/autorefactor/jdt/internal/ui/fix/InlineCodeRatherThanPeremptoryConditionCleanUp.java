@@ -123,6 +123,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 setResult(false);
                 return false;
             }
+
             return true;
         }
 
@@ -143,6 +144,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 setResult(false);
                 return false;
             }
+
             return true;
         }
     }

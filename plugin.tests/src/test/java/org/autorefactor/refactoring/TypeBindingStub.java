@@ -60,6 +60,7 @@ class TypeBindingStub implements ITypeBinding {
         if (Character.isUpperCase(names[length - 1].charAt(0)) && Character.isUpperCase(names[length - 2].charAt(0))) {
             return new TypeBindingStub(joinAsString(names, length - 1, ".")); //$NON-NLS-1$
         }
+
         return null;
     }
 
@@ -69,6 +70,7 @@ class TypeBindingStub implements ITypeBinding {
         for (int i= 1; i < limit; i++) {
             sb.append(separator).append(names[i]);
         }
+
         return sb.toString();
     }
 

@@ -90,6 +90,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
                 return false;
             }
         }
+
         return true;
     }
 

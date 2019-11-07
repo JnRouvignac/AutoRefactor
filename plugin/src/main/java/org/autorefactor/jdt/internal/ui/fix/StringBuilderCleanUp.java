@@ -119,6 +119,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -134,6 +135,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorAppending(node);
             }
         }
+
         return true;
     }
 
@@ -154,9 +156,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 } else {
                     replaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
                 }
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -189,11 +193,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     isInstanceCreationToRewrite.set(true);
                     isRefactoringNeeded.set(true);
                 }
+
                 return cic;
             } else {
                 return expression;
             }
         }
+
         return null;
     }
 
@@ -246,6 +252,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -307,6 +314,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).getQualifiedName())) {
             return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arguments(mi).get(0));
         }
+
         return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arguments(mi).get(0));
     }
 
@@ -391,6 +399,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
             tempStringLiterals.clear();
         }
+
         return result;
     }
 
@@ -401,6 +410,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         } else {
             newExpression= b.infixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
         }
+
         return newExpression;
     }
 
@@ -471,6 +481,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         } else if (typeAndValue.getFirst() == null) {
             expression= b.copy(typeAndValue.getSecond());
         }
+
         return expression;
     }
 
@@ -485,6 +496,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -504,6 +516,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             }
             canRemoveEmptyStrings= canNowRemoveEmptyStrings;
         }
+
         return replaceNeeded;
     }
 
@@ -518,6 +531,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName())) {
                 return b.copy(expression.getSecond());
             }
+
             return b.invoke(String.class.getSimpleName(), "valueOf", getTypedExpression(b, expression)); //$NON-NLS-1$
 
         default: // >= 2
@@ -532,6 +546,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));
                 }
             }
+
             return b.infixExpression(InfixExpression.Operator.PLUS, concatenateStrings);
         }
     }

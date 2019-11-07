@@ -162,6 +162,7 @@ public class TypeNameDecider {
             Name importName= importDecl.getName();
             results.add(importName.getFullyQualifiedName());
         }
+
         return results;
     }
 
@@ -237,12 +238,14 @@ public class TypeNameDecider {
                         return names[i] + "." + names[i + 1]; //$NON-NLS-1$
                     }
                 }
+
                 return fqn;
             }
         }
         if (i == elementBeforeNames.length && names.length == i + 1 && typeBinding.getDeclaringClass() != null) {
             return names[i - 1] + "." + names[i]; //$NON-NLS-1$
         }
+
         return fqn;
     }
 
@@ -252,6 +255,7 @@ public class TypeNameDecider {
         for (int i= 0; i < simpleNames.length; i++) {
             result[i]= simpleNames[i].toCharArray();
         }
+
         return result;
     }
 }

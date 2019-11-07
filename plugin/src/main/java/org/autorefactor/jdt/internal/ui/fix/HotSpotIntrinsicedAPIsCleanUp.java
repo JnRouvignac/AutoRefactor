@@ -119,6 +119,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 
@@ -155,6 +156,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return null;
     }
 
@@ -172,6 +174,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
+
         return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
     }
 
@@ -189,6 +192,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
+
         return b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
     }
 
@@ -318,6 +322,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 return getVariableBinding(pe.getOperand());
             }
         }
+
         return null;
     }
 

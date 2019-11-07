@@ -106,6 +106,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return result;
     }
 
@@ -119,6 +120,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         for (IMethodBinding element : elements) {
             results.put(element.getName(), element);
         }
+
         return results;
     }
 
@@ -180,9 +182,11 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                 for (int i= 0; i < javaObjArray.length; i++) {
                     result&= equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i]);
                 }
+
                 return result;
             }
         }
+
         return false;
     }
 
@@ -194,6 +198,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                 return (byte) i;
             }
         }
+
         return null;
     }
 
@@ -205,6 +210,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                 return (short) i;
             }
         }
+
         return null;
     }
 
@@ -212,6 +218,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (javaObj instanceof Integer) {
             return (Integer) javaObj;
         }
+
         return null;
     }
 
@@ -222,6 +229,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (javaObj instanceof Long) {
             return (Long) javaObj;
         }
+
         return null;
     }
 
@@ -235,6 +243,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (javaObj instanceof Float) {
             return (Float) javaObj;
         }
+
         return null;
     }
 
@@ -251,6 +260,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (javaObj instanceof Double) {
             return (Double) javaObj;
         }
+
         return null;
     }
 }

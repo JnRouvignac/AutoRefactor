@@ -95,8 +95,10 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
                     setResult(false);
                     return false;
                 }
+
                 return true;
             }
+
             return false;
         }
 

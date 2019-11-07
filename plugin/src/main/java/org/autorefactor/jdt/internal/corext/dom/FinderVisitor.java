@@ -62,6 +62,7 @@ public class FinderVisitor<R> extends ASTVisitor {
         if (nodeToVisit != null) {
             nodeToVisit.accept(this);
         }
+
         return resultFound ? result : defaultResult;
     }
 

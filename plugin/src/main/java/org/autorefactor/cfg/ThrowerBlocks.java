@@ -45,6 +45,7 @@ class ThrowerBlocks {
                 results.add(entry.getKey());
             }
         }
+
         return results;
     }
 
@@ -57,6 +58,7 @@ class ThrowerBlocks {
                 results.put(entry.getKey(), bindings);
             }
         }
+
         return results;
     }
 
@@ -68,6 +70,7 @@ class ThrowerBlocks {
                 results.add(entry.getKey());
             }
         }
+
         return results;
     }
 
@@ -78,6 +81,7 @@ class ThrowerBlocks {
                 results.add(thrownType);
             }
         }
+
         return results;
     }
 

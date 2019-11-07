@@ -162,6 +162,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                                 || innerExpression instanceof PostfixExpression))) {
             return node;
         }
+
         return innerExpression;
     }
 
@@ -186,6 +187,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             return innerExpression instanceof ConditionalExpression || innerExpression instanceof Assignment
                     || innerExpression instanceof InstanceofExpression || innerExpression instanceof InfixExpression;
         }
+
         return false;
     }
 
@@ -236,6 +238,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -318,6 +321,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 final InfixExpression.Operator reverseOp= getReverseOperator(node);
                 r.replace(node, b.infixExpression(b.copy(leftOppositeExpression), reverseOp, b.copy(rightExpression)));
             }
+
             return false;
         }
         if (rightOppositeExpression != null) {
@@ -333,6 +337,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.NOT_EQUALS)) {
             return InfixExpression.Operator.XOR;
         }
+
         return node.getOperator();
     }
 
@@ -340,6 +345,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
             return InfixExpression.Operator.XOR;
         }
+
         return InfixExpression.Operator.EQUALS;
     }
 
@@ -371,6 +377,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpression(node.getOperator(), b.move(remainingOperands)));
         }
+
         return false;
     }
 
@@ -407,6 +414,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             final InfixExpression ie= (InfixExpression) node.getParent();
             return shouldHaveParentheses(childOp, ie.getOperator());
         }
+
         return false;
     }
 
@@ -418,6 +426,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -459,6 +468,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return false;
     }
 }

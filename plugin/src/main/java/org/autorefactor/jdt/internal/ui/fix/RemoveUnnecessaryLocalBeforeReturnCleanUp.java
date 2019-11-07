@@ -110,6 +110,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -125,6 +126,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                     return true;
                 }
             }
+
             return isUsedAfterReturn(varToSearch, tryStatement);
         }
 

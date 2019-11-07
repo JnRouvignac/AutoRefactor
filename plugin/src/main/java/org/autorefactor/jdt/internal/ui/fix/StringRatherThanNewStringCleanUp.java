@@ -73,6 +73,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 }

@@ -145,6 +145,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
             return InfixExpression.Operator.LESS_EQUALS;
         }
+
         return operator;
     }
 }

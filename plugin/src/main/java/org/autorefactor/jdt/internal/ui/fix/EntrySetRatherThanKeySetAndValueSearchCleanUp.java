@@ -120,6 +120,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
                         + Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
             }
+
             return ancestor;
         }
 
@@ -178,6 +179,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
+
                     return true;
                 }
             }.collect(namingScope);
@@ -196,6 +198,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
+
                     return true;
                 }
             }.collect(scope);
@@ -356,6 +359,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 return false;
             }
         }
+
         return true;
     }
 
@@ -379,6 +383,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 return false;
             }
         }
+
         return true;
     }
 
@@ -403,6 +408,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     && ASTNodes.isSameVariable(ASTNodes.arguments(node1).get(0), forEachParameter.getName())) {
                 addResult(node);
             }
+
             return true;
         }
 
