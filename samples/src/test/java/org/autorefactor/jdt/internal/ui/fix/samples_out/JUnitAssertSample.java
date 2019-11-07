@@ -87,6 +87,26 @@ public class JUnitAssertSample {
     public void removeDeadChecks() {
     }
 
+    public void replaceAssertByBlocks(boolean b) {
+        if (b) {
+        }
+        if (b) {
+        }
+        if (b) {
+        }
+        if (b) {
+        }
+
+        if (b) {
+        }
+        if (b) {
+        }
+        if (b) {
+        }
+        if (b) {
+        }
+    }
+
     public void refactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertFalse(b);

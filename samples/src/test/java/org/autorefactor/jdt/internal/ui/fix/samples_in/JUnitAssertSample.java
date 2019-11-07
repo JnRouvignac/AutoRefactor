@@ -96,6 +96,26 @@ public class JUnitAssertSample {
         assertFalse("Useless message", false);
     }
 
+    public void replaceAssertByBlocks(boolean b) {
+        if (b)
+            Assert.assertTrue(true);
+        if (b)
+            Assert.assertTrue("Useless message", true);
+        if (b)
+            Assert.assertFalse(false);
+        if (b)
+            Assert.assertFalse("Useless message", false);
+
+        if (b)
+            assertTrue(true);
+        if (b)
+            assertTrue("Useless message", true);
+        if (b)
+            assertFalse(false);
+        if (b)
+            assertFalse("Useless message", false);
+    }
+
     public void refactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertTrue(!b);
