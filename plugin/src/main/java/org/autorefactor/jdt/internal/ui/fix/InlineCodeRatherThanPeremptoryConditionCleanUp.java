@@ -49,6 +49,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
     }
@@ -58,6 +59,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
     }
@@ -67,6 +69,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
     }
@@ -94,7 +97,15 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     if (!finallyStatements.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
                     }
-                    InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings().remove(node);
+                    final Refactorings r= InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
+
+                    if (ASTNodes.canHaveSiblings(node)) {
+                        r.remove(node);
+                    } else {
+                        r.replace(node, InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getASTBuilder().block());
+                    }
+
+                    setResult(false);
                     return false;
                 }
             }
@@ -119,7 +130,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 if (elseStatement != null) {
                     return maybeInlineBlock(node, elseStatement);
                 }
-                r.remove(node);
+
+                if (ASTNodes.canHaveSiblings(node)) {
+                    r.remove(node);
+                } else {
+                    r.replace(node, InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getASTBuilder().block());
+                }
+
                 setResult(false);
                 return false;
             }
@@ -177,7 +194,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
+        if ((unconditionnalStatement instanceof Block) && (sourceNode.getParent() instanceof Block)) {
             r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));

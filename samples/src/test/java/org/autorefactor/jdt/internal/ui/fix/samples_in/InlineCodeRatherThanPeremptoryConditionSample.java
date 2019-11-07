@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 
 public class InlineCodeRatherThanPeremptoryConditionSample {
-
     public int removeImpossibleIfClauses() {
         int i = 0;
         int j = 0;
@@ -66,6 +65,16 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
             j++;
 
         return i + j;
+    }
+
+    public int replaceIfByBlock(int i) {
+        if (i < 0)
+            if (false) {
+                // Keep this comment
+                i++;
+            }
+
+        return i;
     }
 
     public int doNotRefactorWithVariableConflict() {
