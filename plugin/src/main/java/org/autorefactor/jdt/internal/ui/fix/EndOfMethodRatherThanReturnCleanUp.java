@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -41,6 +42,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name;
     }
@@ -50,6 +52,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_description;
     }
@@ -59,14 +62,22 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_reason;
     }
 
     @Override
     public boolean visit(ReturnStatement node) {
-        if (node.getExpression() == null && isLastStatement(node)) {
-            ctx.getRefactorings().remove(node);
+        if ((node.getExpression() == null) && isLastStatement(node)) {
+            final Refactorings r= ctx.getRefactorings();
+
+            if (ASTNodes.canHaveSiblings(node)) {
+                r.remove(node);
+            } else {
+                r.replace(node, ctx.getASTBuilder().block());
+            }
+
             return false;
         }
 
@@ -80,8 +91,8 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
             if (node.getParent() instanceof MethodDeclaration) {
                 return true;
             }
-            if (node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement
-                    || node.getParent() instanceof ForStatement || node.getParent() instanceof EnhancedForStatement) {
+            if ((node.getParent() instanceof WhileStatement) || (node.getParent() instanceof DoStatement)
+                    || (node.getParent() instanceof ForStatement) || (node.getParent() instanceof EnhancedForStatement)) {
                 return false;
             }
             if (node.getParent() instanceof Statement) {

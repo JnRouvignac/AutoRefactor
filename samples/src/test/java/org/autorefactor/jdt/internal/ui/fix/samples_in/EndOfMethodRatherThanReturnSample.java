@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class EndOfMethodRatherThanReturnSample {
-
     public void removeUselessReturn() {
         return;
     }
@@ -45,6 +44,12 @@ public class EndOfMethodRatherThanReturnSample {
             System.out.println("Keep this line");
             return;
         }
+    }
+
+    public void replaceByBlock(boolean b) {
+        System.out.println("Keep this line");
+        if (b)
+            return;
     }
 
     public void removeUselessReturnWithSwitch(int i) {
