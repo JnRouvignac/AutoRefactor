@@ -73,6 +73,15 @@ public class ORConditionRatherThanRedundantClausesSample {
         boolean newBoolean7 = firstList.remove("lorem") || condition || redundantCondition;
     }
 
+    public void removeWithoutParenthesis(boolean redundantCondition, boolean condition, List<String> firstList) {
+        // Keep this comment
+        boolean newBoolean3 = firstList.remove("lorem") || condition || !redundantCondition;
+        boolean newBoolean4 = firstList.remove("lorem") || !condition || redundantCondition;
+        boolean newBoolean5 = firstList.remove("lorem") || condition || redundantCondition;
+        boolean newBoolean6 = firstList.remove("lorem") || condition || redundantCondition;
+        boolean newBoolean7 = firstList.remove("lorem") || condition || redundantCondition;
+    }
+
     public void removeDuplicateConditionsAmongOtherExpressions(boolean redundantCondition, boolean condition, List<String> myList) {
         // Keep this comment
         boolean newBoolean1 = redundantCondition || myList.remove("lorem") && condition;
