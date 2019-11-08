@@ -32,14 +32,12 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -79,13 +77,18 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(WhileStatement node) {
-        if (isEndingWithExit(node.getBody())) {
-            final BreakVisitor breakVisitor= new BreakVisitor(node);
-            breakVisitor.visitNode(node);
+        if (ASTNodes.fallsThrough(node.getBody())) {
+            final ContinueVisitor continueVisitor= new ContinueVisitor(node);
+            continueVisitor.visitNode(node);
 
-            if (breakVisitor.canBeRefactored()) {
-                replaceByIf(node, breakVisitor);
-                return false;
+            if (continueVisitor.canBeRefactored()) {
+                final BreakVisitor breakVisitor= new BreakVisitor(node);
+                breakVisitor.visitNode(node);
+
+                if (breakVisitor.canBeRefactored()) {
+                    replaceByIf(node, breakVisitor);
+                    return false;
+                }
             }
         }
 
@@ -105,43 +108,6 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         }
 
         r.replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
-    }
-
-    /**
-     * Return true if the statement falls through.
-     *
-     * @param statement the statement
-     * @return true if the statement falls through.
-     */
-    private boolean isEndingWithExit(final Statement statement) {
-        final List<Statement> statements= ASTNodes.asList(statement);
-        if (statements.isEmpty()) {
-            return false;
-        }
-
-        final Statement lastStatement= statements.get(statements.size() - 1);
-        switch (lastStatement.getNodeType()) {
-        case ASTNode.RETURN_STATEMENT:
-        case ASTNode.THROW_STATEMENT:
-            return true;
-
-        case ASTNode.BREAK_STATEMENT:
-            final BreakStatement breakStatement= (BreakStatement) lastStatement;
-            return breakStatement.getLabel() == null;
-
-        case ASTNode.BLOCK:
-            final Block block= (Block) lastStatement;
-            return isEndingWithExit(block);
-
-        case ASTNode.IF_STATEMENT:
-            final IfStatement ifStatement= (IfStatement) lastStatement;
-            final Statement thenStatement= ifStatement.getThenStatement();
-            final Statement elseStatement= ifStatement.getElseStatement();
-            return isEndingWithExit(thenStatement) && isEndingWithExit(elseStatement);
-
-        default:
-            return false;
-        }
     }
 
     private class BreakVisitor extends InterruptibleVisitor {
@@ -205,6 +171,55 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(SwitchStatement node) {
+            return false;
+        }
+
+        @Override
+        public boolean visit(AnonymousClassDeclaration node) {
+            return false;
+        }
+
+        @Override
+        public boolean visit(LambdaExpression node) {
+            return false;
+        }
+    }
+
+    private class ContinueVisitor extends InterruptibleVisitor {
+        private final WhileStatement root;
+        private boolean canBeRefactored= true;
+
+        public ContinueVisitor(final WhileStatement root) {
+            this.root= root;
+        }
+
+        public boolean canBeRefactored() {
+            return canBeRefactored;
+        }
+
+        @Override
+        public boolean visit(ContinueStatement node) {
+            canBeRefactored= false;
+            return interruptVisit();
+        }
+
+        @Override
+        public boolean visit(WhileStatement node) {
+            return root.equals(node);
+        }
+
+        @Override
+        public boolean visit(DoStatement node) {
+            return false;
+        }
+
+        @Override
+        public boolean visit(ForStatement node) {
+            return false;
+        }
+
+        @Override
+        public boolean visit(EnhancedForStatement node) {
             return false;
         }
 

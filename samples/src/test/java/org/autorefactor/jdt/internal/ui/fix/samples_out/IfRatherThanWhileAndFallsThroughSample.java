@@ -65,6 +65,17 @@ public class IfRatherThanWhileAndFallsThroughSample {
         }
     }
 
+    public void doNotReplaceWhileUsingContinue(boolean b1, boolean b2) {
+        while (b1) {
+            if (b2) {
+                System.out.println("bar");
+                continue;
+            }
+            System.out.println("foo");
+            return;
+        }
+    }
+
     public void replaceWhileWithComplexCode(boolean b1, boolean b2) {
         // Keep this comment
         if (b1) {
