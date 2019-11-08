@@ -307,6 +307,7 @@ public class CFGBuilder {
         if (node == null) {
             return false;
         }
+
         switch (node.getNodeType()) {
         case ARRAY_ACCESS:
             ArrayAccess aa= (ArrayAccess) node;
@@ -314,19 +315,23 @@ public class CFGBuilder {
             addVariableAccess(basicBlock, aa.getIndex(), flags, throwers);
             throwers.addThrow(aa, newException(node, ArrayIndexOutOfBoundsException.class.getCanonicalName()));
             return true;
+
         case ARRAY_CREATION:
             ArrayCreation ac= (ArrayCreation) node;
             boolean acMightThrow1= addVariableAccess(basicBlock, ac.getInitializer(), flags, throwers);
             boolean acMightThrow2= addVariableAccesses(basicBlock, ac.dimensions(), flags, throwers);
             return acMightThrow1 || acMightThrow2;
+
         case ARRAY_INITIALIZER:
             ArrayInitializer ai= (ArrayInitializer) node;
             return addVariableAccesses(basicBlock, ai.expressions(), flags, throwers);
+
         case ASSIGNMENT:
             Assignment a= (Assignment) node;
             boolean aMightThrow1= addVariableAccess(basicBlock, a.getLeftHandSide(), VariableAccess.WRITE, throwers);
             boolean aMightThrow2= addVariableAccess(basicBlock, a.getRightHandSide(), VariableAccess.READ, throwers);
             return aMightThrow1 || aMightThrow2;
+
         case BOOLEAN_LITERAL:
         case CHARACTER_LITERAL:
         case NULL_LITERAL:
@@ -335,14 +340,17 @@ public class CFGBuilder {
         case TYPE_LITERAL:
             // Nothing to do
             return false;
+
         case CAST_EXPRESSION:
             CastExpression cae= (CastExpression) node;
             return addVariableAccess(basicBlock, cae.getExpression(), flags, throwers);
+
         case CLASS_INSTANCE_CREATION:
             ClassInstanceCreation cic= (ClassInstanceCreation) node;
             addVariableAccess(basicBlock, cic.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, cic.arguments(), flags, throwers);
             IMethodBinding cicBinding= cic.resolveConstructorBinding();
+
             if (cicBinding != null) {
                 ITypeBinding[] declaredThrows= cicBinding.getExceptionTypes();
                 throwers.addThrow(cic, declaredThrows);
@@ -350,35 +358,42 @@ public class CFGBuilder {
             }
 
             return false;
+
         case CONDITIONAL_EXPRESSION:
             ConditionalExpression coe= (ConditionalExpression) node;
             boolean mightThrow1= addVariableAccess(basicBlock, coe.getExpression(), flags, throwers);
             boolean mightThrow2= addVariableAccess(basicBlock, coe.getThenExpression(), flags, throwers);
             boolean mightThrow3= addVariableAccess(basicBlock, coe.getElseExpression(), flags, throwers);
             return mightThrow1 || mightThrow2 || mightThrow3;
+
         case FIELD_ACCESS:
             FieldAccess fa= (FieldAccess) node;
             boolean mightThrow= addVariableAccess(basicBlock, fa.getExpression(), flags, throwers);
             basicBlock.addVariableAccess(new VariableAccess(fa, flags));
+
             if (is(flags, VariableAccess.READ)) {
                 throwers.addThrow(fa, newException(node, NullPointerException.class.getCanonicalName()));
                 mightThrow= true;
             }
 
             return mightThrow;
+
         case INFIX_EXPRESSION:
             InfixExpression ie= (InfixExpression) node;
             boolean ieMightThrow1= addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
             boolean ieMightThrow2= addVariableAccess(basicBlock, ie.getRightOperand(), flags, throwers);
             return ieMightThrow1 || ieMightThrow2;
+
         case INSTANCEOF_EXPRESSION:
             InstanceofExpression ioe= (InstanceofExpression) node;
             return addVariableAccess(basicBlock, ioe.getLeftOperand(), flags, throwers);
+
         case METHOD_INVOCATION:
             MethodInvocation mi= (MethodInvocation) node;
             addVariableAccess(basicBlock, mi.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, mi.arguments(), flags, throwers);
             IMethodBinding methodBinding= mi.resolveMethodBinding();
+
             if (methodBinding != null) {
                 ITypeBinding[] declaredThrows= methodBinding.getExceptionTypes();
                 throwers.addThrow(mi, declaredThrows);
@@ -386,39 +401,48 @@ public class CFGBuilder {
             }
 
             return false;
+
         case SIMPLE_NAME:
             SimpleName sn= (SimpleName) node;
             basicBlock.addVariableAccess(new VariableAccess(sn, flags));
+
             if (is(flags, VariableAccess.READ)) {
                 throwers.addThrow(sn, newException(node, NullPointerException.class.getCanonicalName()));
                 return true;
             }
 
             return false;
+
         case QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) node;
             basicBlock.addVariableAccess(new VariableAccess(qn, flags));
             throwers.addThrow(qn, newException(node, NullPointerException.class.getCanonicalName()));
             return true;
+
         case PARENTHESIZED_EXPRESSION:
             ParenthesizedExpression pe= (ParenthesizedExpression) node;
             return addVariableAccess(basicBlock, pe.getExpression(), flags, throwers);
+
         case POSTFIX_EXPRESSION:
             PostfixExpression poe= (PostfixExpression) node;
             return addVariableAccess(basicBlock, poe.getOperand(), flags, throwers);
+
         case PREFIX_EXPRESSION:
             PrefixExpression pre= (PrefixExpression) node;
             return addVariableAccess(basicBlock, pre.getOperand(), flags, throwers);
+
         case SUPER_FIELD_ACCESS:
             SuperFieldAccess sfa= (SuperFieldAccess) node;
             boolean sfaMightThrow1= addVariableAccess(basicBlock, sfa.getQualifier(), flags, throwers);
             boolean sfaMightThrow2= addVariableAccess(basicBlock, sfa.getName(), flags, throwers);
             return sfaMightThrow1 || sfaMightThrow2;
+
         case SUPER_METHOD_INVOCATION:
             SuperMethodInvocation smi= (SuperMethodInvocation) node;
             addVariableAccess(basicBlock, smi.getQualifier(), flags, throwers);
             addVariableAccess(basicBlock, smi.getName(), flags, throwers);
             IMethodBinding sMethodBinding= smi.resolveMethodBinding();
+
             if (sMethodBinding != null) {
                 ITypeBinding[] declaredThrows= sMethodBinding.getExceptionTypes();
                 throwers.addThrow(smi, declaredThrows);
@@ -426,12 +450,15 @@ public class CFGBuilder {
             }
 
             return false;
+
         case THIS_EXPRESSION:
             ThisExpression te= (ThisExpression) node;
             // TODO JNR remember use of "this" here
             return addVariableAccess(basicBlock, te.getQualifier(), flags, throwers);
+
         case VARIABLE_DECLARATION_EXPRESSION:
             return addDeclarations(basicBlock, (VariableDeclarationExpression) node, throwers);
+
         default:
             throw new NotImplementedException(node);
         }
@@ -650,8 +677,7 @@ public class CFGBuilder {
             final CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(entryBlock);
             final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
             if (!liveAfterBody.liveEdges.isEmpty()) {
-                if (!(node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
-                                                                                                    // Tests
+                if (!((node.getReturnType2() == null) || (node.getReturnType2().resolveBinding() == null /* added for unit Tests */)
                         || "void".equals(node.getReturnType2().resolveBinding().getName()))) { //$NON-NLS-1$
                     throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
                             + "for a constructor or a non void method return type."); //$NON-NLS-1$
@@ -1082,10 +1108,9 @@ public class CFGBuilder {
      *
      * @param node     the node for which to build a CFG.
      * @param state    the blocks liveness state before current node
-     * @param throwers the thrower blocks information
      * @return the blocks liveness state after current node
      */
-    public LivenessState buildCFG(BreakStatement node, LivenessState state, ThrowerBlocks throwers) {
+    public LivenessState buildCFG(BreakStatement node, LivenessState state) {
         final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         final Statement targetStatement;
         if (node.getLabel() != null) {
@@ -1099,7 +1124,7 @@ public class CFGBuilder {
 
     private Statement findLabeledParentStatement(ASTNode node) {
         ASTNode n= node;
-        while (n != null && n.getNodeType() != LABELED_STATEMENT) {
+        while ((n != null) && (n.getNodeType() != LABELED_STATEMENT)) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1111,7 +1136,7 @@ public class CFGBuilder {
 
     private Statement findBreakableParentStatement(ASTNode node) {
         ASTNode n= node;
-        while (n != null && !ASTNodes.isBreakable(n)) {
+        while ((n != null) && !ASTNodes.isBreakable(n)) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1248,20 +1273,20 @@ public class CFGBuilder {
                 liveState= buildCFG((Block) statement, liveState, throwers);
                 break;
             case BREAK_STATEMENT:
-                liveState= buildCFG((BreakStatement) statement, liveState, throwers);
+                liveState= buildCFG((BreakStatement) statement, liveState);
                 break;
             case CONSTRUCTOR_INVOCATION:
             case SUPER_CONSTRUCTOR_INVOCATION:
                 liveState= buildCFG(statement, liveState, throwers);
                 break;
             case CONTINUE_STATEMENT:
-                liveState= buildCFG((ContinueStatement) statement, liveState, throwers);
+                liveState= buildCFG((ContinueStatement) statement, liveState);
                 break;
             case DO_STATEMENT:
                 liveState= buildCFG((DoStatement) statement, liveState, throwers);
                 break;
             case EMPTY_STATEMENT:
-                liveState= buildCFG((EmptyStatement) statement, liveState, throwers);
+                liveState= buildCFG((EmptyStatement) statement, liveState);
                 break;
             case ENHANCED_FOR_STATEMENT:
                 liveState= buildCFG((EnhancedForStatement) statement, liveState, throwers);
@@ -1513,10 +1538,9 @@ public class CFGBuilder {
      *
      * @param node     the node for which to build a CFG.
      * @param state    the blocks liveness state before current node
-     * @param throwers the thrower blocks information
      * @return the blocks liveness state after current node
      */
-    public LivenessState buildCFG(EmptyStatement node, LivenessState state, ThrowerBlocks throwers) {
+    public LivenessState buildCFG(EmptyStatement node, LivenessState state) {
         CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         return getInBlockStmtResult(state, basicBlock);
     }
@@ -1558,10 +1582,9 @@ public class CFGBuilder {
      *
      * @param node     the node for which to build a CFG.
      * @param state    the blocks liveness state before current node
-     * @param throwers the thrower blocks information
      * @return the blocks liveness state after current node
      */
-    public LivenessState buildCFG(ContinueStatement node, LivenessState state, ThrowerBlocks throwers) {
+    public LivenessState buildCFG(ContinueStatement node, LivenessState state) {
         final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         final Statement targetStatement;
         if (node.getLabel() != null) {
@@ -1575,7 +1598,7 @@ public class CFGBuilder {
 
     private Statement findContinuableParentStatement(ASTNode node) {
         ASTNode n= node;
-        while (n != null && !ASTNodes.isLoop(n)) {
+        while ((n != null) && !ASTNodes.isLoop(n)) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1744,7 +1767,7 @@ public class CFGBuilder {
         int result= 0;
         for (int i= 0; i < s.length(); i++) {
             if (s.charAt(i) == '\t') {
-                result+= tabSize - i % tabSize;
+                result+= tabSize - (i % tabSize);
             } else {
                 result++;
             }
@@ -1754,10 +1777,10 @@ public class CFGBuilder {
     }
 
     private boolean isNotEmpty(final Collection<?> col) {
-        return col != null && !col.isEmpty();
+        return (col != null) && !col.isEmpty();
     }
 
     private boolean isNotEmpty(final Map<?, ?> col) {
-        return col != null && !col.isEmpty();
+        return (col != null) && !col.isEmpty();
     }
 }
