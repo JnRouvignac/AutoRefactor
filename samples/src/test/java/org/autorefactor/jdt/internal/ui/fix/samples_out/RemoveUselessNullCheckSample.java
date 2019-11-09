@@ -27,19 +27,21 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class RemoveUselessNullCheckSample {
     private final String DEFAULT = "";
     private String s;
 
-    public String refactorLocalVariable1(String s) throws Exception {
+    public String refactorLocalVariable1(String s) {
         String st;
         st = s;
         return st;
     }
 
-    public String doNotRefactorLocalVariable(String s) throws Exception {
+    public String doNotRefactorLocalVariable(String s) {
         String st;
         if (s == null) {
             st = DEFAULT;
@@ -49,7 +51,7 @@ public class RemoveUselessNullCheckSample {
         return st;
     }
 
-    public String doNotRefactorActiveExpression(List<String> s) throws Exception {
+    public String doNotRefactorActiveExpression(List<String> s) {
         String result;
         if (s.remove(0) == null) {
             result = null;
@@ -59,32 +61,32 @@ public class RemoveUselessNullCheckSample {
         return result;
     }
 
-    public String refactorLocalVariable2(String s) throws Exception {
+    public String refactorLocalVariable2(String s) {
         String st;
         st = s;
         return st;
     }
 
-    public String refactorLocalVariable3(String s) throws Exception {
+    public String refactorLocalVariable3(String s) {
         String st;
         st = s;
         return st;
     }
 
-    public String refactorLocalVariable4(String s) throws Exception {
+    public String refactorLocalVariable4(String s) {
         String st;
         st = s;
         return st;
     }
 
-    public String refactorLocalVariable5(String s, boolean isValid) throws Exception {
+    public String refactorLocalVariable5(String s, boolean isValid) {
         String st = null;
         if (isValid)
             st = s;
         return st;
     }
 
-    public void doNotRefactorFieldAssignXXX(String s, RemoveUselessNullCheckSample other) throws Exception {
+    public void doNotRefactorFieldAssignXXX(String s, RemoveUselessNullCheckSample other) {
         if (s == null) {
             this.s = null;
         } else {
@@ -92,7 +94,7 @@ public class RemoveUselessNullCheckSample {
         }
     }
 
-    public void doNotRefactorFieldAssign(String s) throws Exception {
+    public void doNotRefactorFieldAssign(String s) {
         if (s == null) {
             this.s = DEFAULT;
         } else {
@@ -100,23 +102,23 @@ public class RemoveUselessNullCheckSample {
         }
     }
 
-    public void refactorFieldAssign1(String s) throws Exception {
+    public void refactorFieldAssign1(String s) {
         this.s = s;
     }
 
-    public void refactorFieldAssign2(String s) throws Exception {
+    public void refactorFieldAssign2(String s) {
         this.s = s;
     }
 
-    public void refactorFieldAssign3(String s) throws Exception {
+    public void refactorFieldAssign3(String s) {
         this.s = s;
     }
 
-    public void refactorFieldAssign4(String s) throws Exception {
+    public void refactorFieldAssign4(String s) {
         this.s = s;
     }
 
-    public String doNotRefactorReturn1(String s) throws Exception {
+    public String doNotRefactorReturn1(String s) {
         if (null != s) {
             return s;
         } else {
@@ -124,7 +126,7 @@ public class RemoveUselessNullCheckSample {
         }
     }
 
-    public Collection<?> doNotRefactorReturn2(Collection<?> c) throws Exception {
+    public Collection<?> doNotRefactorReturn2(Collection<?> c) {
         if (c == null) {
             return Collections.emptySet();
         } else {
@@ -132,36 +134,42 @@ public class RemoveUselessNullCheckSample {
         }
     }
 
-    public String refactorReturn1(String s) throws Exception {
+    public String refactorReturn1(String s) {
         return s;
     }
 
-    public String refactorReturn2(String s) throws Exception {
+    public String refactorReturn2(String s) {
         return s;
     }
 
-    public String refactorReturn3(String s) throws Exception {
+    public String refactorReturn3(String s) {
         return s;
     }
 
-    public String refactorReturn4(String s) throws Exception {
+    public String refactorReturn4(String s) {
         return s;
     }
 
-    public String refactorReturnNoElse1(String s) throws Exception {
+    public String refactorReturnNoElse1(String s) {
         return s;
     }
 
-    public String refactorReturnNoElse2(String s) throws Exception {
+    public String refactorReturnNoElse2(String s) {
         return s;
     }
 
-    public String refactorReturnNoElse3(String s) throws Exception {
+    public String refactorReturnNoElse3(String s) {
         return s;
     }
 
-    public String refactorReturnNoElse4(String s) throws Exception {
+    public String refactorReturnNoElse4(String s) {
         return s;
     }
 
+    public Date doNotRefactorActiveExpression(Map<Integer, Date> s) {
+        if (null != s.remove(0)) {
+            return s.remove(0);
+        }
+        return null;
+    }
 }
