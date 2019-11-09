@@ -68,6 +68,7 @@ public final class AllCleanUpRules {
                 new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
                 new FloatPrimitiveRatherThanWrapperCleanUp(), new CharPrimitiveRatherThanWrapperCleanUp(),
                 new BytePrimitiveRatherThanWrapperCleanUp(), new AssignRatherThanFilterThenAssignAnywayCleanUp(),
+                new AssignRatherThanTernaryFilterThenAssignAnywayCleanUp(),
                 new VectorOldToNewAPICleanUp(), new PrimitiveWrapperCreationCleanUp(),
                 new AutoBoxingRatherThanExplicitMethodCleanUp(), new UnboxingRatherThanExplicitMethodCleanUp(),
                 new BracketsRatherThanArrayInstantiationCleanUp(), new LambdaExpressionRatherThanComparatorCleanUp(),
