@@ -75,7 +75,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
                     && !secondCondition.hasExtendedOperands() && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
                     && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
                     && ASTNodes.isPassive(secondCondition.getLeftOperand()) && ASTNodes.isPassive(secondCondition.getRightOperand())) {
-                final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+                final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
                 return maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                         secondCondition.getLeftOperand(), firstCondition.getRightOperand(),

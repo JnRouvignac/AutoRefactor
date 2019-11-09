@@ -459,13 +459,13 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (nullCheckedExpression != null) {
             if (e instanceof InstanceofExpression) {
                 final Expression expression= ((InstanceofExpression) e).getLeftOperand();
-                return expression.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
+                return expression.subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression);
             }
             if (e instanceof MethodInvocation) {
                 final MethodInvocation expression= (MethodInvocation) e;
                 if ((expression.getExpression() != null) && (expression.getExpression().resolveConstantExpressionValue() != null)
                         && (ASTNodes.arguments(expression).size() == 1)
-                        && ASTNodes.arguments(expression).get(0).subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression)) {
+                        && ASTNodes.arguments(expression).get(0).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
                     // Did we invoke java.lang.Object.equals() or
                     // java.lang.String.equalsIgnoreCase()?
                     return ASTNodes.usesGivenSignature(expression, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$

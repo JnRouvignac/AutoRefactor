@@ -174,7 +174,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         }
         if (condition instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) condition;
-            final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+            final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.isPassive(ie.getLeftOperand())) {
                 if (ASTNodes.match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {

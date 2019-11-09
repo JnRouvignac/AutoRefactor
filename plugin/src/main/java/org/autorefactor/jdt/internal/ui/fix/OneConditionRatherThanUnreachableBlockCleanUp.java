@@ -63,7 +63,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     @Override
     public boolean visit(IfStatement node) {
         final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
-        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
         if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
                 && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(matcher, node.getExpression(), secondIf.getExpression())

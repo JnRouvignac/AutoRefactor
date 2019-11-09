@@ -220,7 +220,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private boolean match(final Expression firstField, final Expression secondField, final Expression thisObject,
             final ASTNode otherObject) {
-        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
         return ASTNodes.match(matcher, thisObject, firstField) && ASTNodes.match(matcher, otherObject, secondField);
     }
 

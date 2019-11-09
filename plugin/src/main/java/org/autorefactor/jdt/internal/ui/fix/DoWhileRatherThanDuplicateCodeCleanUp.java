@@ -73,7 +73,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         }
 
         final List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
-        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
         Statement previousStatement= ASTNodes.getPreviousSibling(node);
         int i= whileStatements.size() - 1;

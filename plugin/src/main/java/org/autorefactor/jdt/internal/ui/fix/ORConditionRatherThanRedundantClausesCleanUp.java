@@ -97,7 +97,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                 && ASTNodes.isPassive(redundantOperand)
                 && (complexCondition != null)
                 && ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-            final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+            final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
             List<Expression> operands= ASTNodes.allOperands(complexCondition);
 
             for (int i= 0; i < operands.size(); i++) {

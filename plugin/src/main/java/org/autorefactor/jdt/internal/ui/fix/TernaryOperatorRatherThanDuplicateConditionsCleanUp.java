@@ -91,7 +91,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
                         && isBooleanAndPassive(firstCondition.getRightOperand())
                         && isBooleanAndPassive(secondCondition.getLeftOperand())
                         && isBooleanAndPassive(secondCondition.getRightOperand())) {
-                    ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+                    ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
                     if (!maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                             secondCondition.getLeftOperand(), firstCondition.getRightOperand(),

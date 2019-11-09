@@ -93,7 +93,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
         if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Statement firstStatement= Utils.getFirst(statements);
             final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
-            final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
+            final ASTSemanticMatcher astMatcher= ASTSemanticMatcher.INSTANCE;
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
                     && ASTNodes.match(astMatcher, ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {

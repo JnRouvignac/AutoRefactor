@@ -111,7 +111,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
             final Expression duplicateExpression, final Expression notDuplicateExpression) {
-        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
         if (ASTNodes.match(matcher, duplicateExpression, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),

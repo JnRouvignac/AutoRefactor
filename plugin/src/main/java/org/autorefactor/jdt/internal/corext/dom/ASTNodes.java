@@ -2220,7 +2220,7 @@ public final class ASTNodes {
             return false;
         }
 
-        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
         for (int codeLine= 0; codeLine < referenceStatements.size(); codeLine++) {
             if (!match(matcher, referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
@@ -2239,7 +2239,7 @@ public final class ASTNodes {
      * @return true if the two provided nodes structurally match, false otherwise
      */
     public static boolean match(ASTNode node1, ASTNode node2) {
-        return match(new ASTSemanticMatcher(), node1, node2);
+        return match(ASTSemanticMatcher.INSTANCE, node1, node2);
     }
 
     /**
