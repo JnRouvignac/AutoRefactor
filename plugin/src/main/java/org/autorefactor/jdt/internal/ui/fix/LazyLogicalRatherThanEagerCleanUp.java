@@ -39,6 +39,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
     }
@@ -48,6 +49,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
     }
@@ -57,6 +59,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
     }
@@ -97,6 +100,6 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
         }
 
-        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, b.copy(allOperands)));
+        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, b.move(allOperands)));
     }
 }

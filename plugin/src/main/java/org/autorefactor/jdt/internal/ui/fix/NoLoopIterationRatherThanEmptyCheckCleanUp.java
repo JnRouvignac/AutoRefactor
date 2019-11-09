@@ -48,6 +48,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name;
     }
@@ -57,6 +58,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_description;
     }
@@ -66,6 +68,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
     }
@@ -75,8 +78,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         if (node.getElseStatement() == null) {
             List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
-            if (statements != null
-                    && statements.size() == 1) {
+            if ((statements != null)
+                    && (statements.size() == 1)) {
                 Expression container= getContainer(statements);
 
                 if (ASTNodes.isArray(container) && ASTNodes.isPassive(container)) {
@@ -107,7 +110,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
     private boolean isConditionValid(Expression expression, Expression container) {
         InfixExpression condition= ASTNodes.as(expression, InfixExpression.class);
-        return condition != null
+        return (condition != null)
                 && !condition.hasExtendedOperands() && ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
                         InfixExpression.Operator.GREATER,
                         InfixExpression.Operator.GREATER_EQUALS,
@@ -122,24 +125,24 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         Expression array= getArray(container, arrayOperand);
         Long literal= ASTNodes.integerLiteral(literalOperand);
 
-        if (array != null
-                && literal != null) {
+        if ((array != null)
+                && (literal != null)) {
             long value= literal;
 
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
                 return value == 0;
             }
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER)) {
-                return isArrayOnLeft && value == 0;
+                return isArrayOnLeft && (value == 0);
             }
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER_EQUALS)) {
-                return isArrayOnLeft && value == 1;
+                return isArrayOnLeft && (value == 1);
             }
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS)) {
-                return !isArrayOnLeft && value == 0;
+                return !isArrayOnLeft && (value == 0);
             }
             if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS_EQUALS)) {
-                return !isArrayOnLeft && value == 1;
+                return !isArrayOnLeft && (value == 1);
             }
         }
 
@@ -185,10 +188,10 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         final Refactorings r= ctx.getRefactorings();
 
         if (operands.size() == 2) {
-            r.replace(condition, b.copy(operands.get(0)));
+            r.replace(condition, b.move(operands.get(0)));
         } else {
             operands.remove(operands.size() - 1);
-            InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.copy(operands));
+            InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.move(operands));
 
             r.replace(condition, newCondition);
         }

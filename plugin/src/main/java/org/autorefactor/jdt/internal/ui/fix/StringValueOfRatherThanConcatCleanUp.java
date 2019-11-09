@@ -43,6 +43,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
     }
@@ -83,16 +86,16 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
             final Expression variable) {
         StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
 
-        if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
+        if ((stringLiteral != null) && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
                 && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
             final ASTNodeFactory b= this.ctx.getASTBuilder();
-            final MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.copy(variable)); //$NON-NLS-1$
+            final MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.move(variable)); //$NON-NLS-1$
 
             if (node.hasExtendedOperands()) {
                 List<Expression> extendedOperands= ASTNodes.extendedOperands(node);
                 List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
                 newOperands.add(newInvoke);
-                newOperands.addAll(b.copy(extendedOperands));
+                newOperands.addAll(b.move(extendedOperands));
 
                 ctx.getRefactorings().replace(node, b.infixExpression(InfixExpression.Operator.PLUS, newOperands));
             } else {

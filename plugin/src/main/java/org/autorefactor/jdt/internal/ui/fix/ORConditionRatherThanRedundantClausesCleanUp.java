@@ -132,8 +132,8 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        List<Expression> copyOfOperands= b.copy(previousOperands);
-        copyOfOperands.addAll(b.copy(nextOperands));
+        List<Expression> copyOfOperands= b.move(previousOperands);
+        copyOfOperands.addAll(b.move(nextOperands));
 
         if (copyOfOperands.size() == 1) {
             r.replace(operandWithRedundance, copyOfOperands.get(0));

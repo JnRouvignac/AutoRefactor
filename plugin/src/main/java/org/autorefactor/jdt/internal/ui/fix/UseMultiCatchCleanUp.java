@@ -68,6 +68,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name;
     }
@@ -77,6 +78,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_description;
     }
@@ -86,6 +88,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_reason;
     }
@@ -122,7 +125,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             if (other instanceof MultiBinding) {
                 MultiBinding o= (MultiBinding) other;
                 for (ITypeBinding otherTypeBinding : o.typeBindings) {
-                    if (otherTypeBinding == null || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
+                    if ((otherTypeBinding == null) || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
                         return false;
                     }
                 }
@@ -283,7 +286,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameMethodBinding(IMethodBinding binding1, IMethodBinding binding2) {
-            return binding1 != null && binding2 != null
+            return (binding1 != null) && (binding2 != null)
                     && (binding1.equals(binding2) || binding1.overrides(binding2) || binding2.overrides(binding1)
                     // This is a really expensive check. Do it at the very end
                             || areOverridingSameMethod(binding1, binding2));
@@ -306,7 +309,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameVariable0(Object other, ASTNode node2) {
-            return other instanceof ASTNode && ASTNodes.isSameVariable((ASTNode) other, node2);
+            return (other instanceof ASTNode) && ASTNodes.isSameVariable((ASTNode) other, node2);
         }
     }
 
@@ -418,7 +421,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final UnionType result= this.ctx.getAST().newUnionType();
         final List<Type> unionedTypes= ASTNodes.types(result);
-        unionedTypes.addAll(b.copy(allTypes));
+        unionedTypes.addAll(b.move(allTypes));
         return result;
     }
 

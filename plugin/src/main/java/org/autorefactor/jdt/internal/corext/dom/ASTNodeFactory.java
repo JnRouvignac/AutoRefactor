@@ -68,7 +68,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
@@ -418,25 +417,8 @@ public class ASTNodeFactory {
         return copySubtree(nodeToCopy);
     }
 
-    /**
-     * Returns a copy of the list of the provided {@link ASTNode}.
-     *
-     * @param <T>         the actual node type
-     * @param nodesToCopy the nodes to copy
-     * @return a copy of the nodes
-     */
-    public <T extends ASTNode> List<T> copy(Collection<T> nodesToCopy) {
-        List<T> copy= new ArrayList<>(nodesToCopy.size());
-
-        for (T astNode : nodesToCopy) {
-            copy.add(copy(astNode));
-        }
-
-        return copy;
-    }
-
     private boolean isValidInCurrentAST(ASTNode node) {
-        return node.getAST() == ast && node.getStartPosition() != -1;
+        return (node.getAST() == ast) && (node.getStartPosition() != -1);
     }
 
     /**
@@ -955,11 +937,11 @@ public class ASTNodeFactory {
     }
 
     private boolean isEmptyRangeCopy(ASTNode... nodes) {
-        return nodes.length == 1 && nodes[0] == null;
+        return (nodes.length == 1) && (nodes[0] == null);
     }
 
     private <E extends ASTNode> boolean isEmptyRangeCopy(List<E> nodes) {
-        return nodes.size() == 1 && nodes.get(0) == null;
+        return (nodes.size() == 1) && (nodes.get(0) == null);
     }
 
     /**
@@ -1034,12 +1016,14 @@ public class ASTNodeFactory {
      * @param nodes the nodes to move
      * @return the provided list with all nodes moved
      */
-    public <T extends ASTNode> List<T> move(final List<T> nodes) {
-        for (ListIterator<T> it= nodes.listIterator(); it.hasNext();) {
-            it.set(move(it.next()));
+    public <T extends ASTNode> List<T> move(final Collection<T> nodes) {
+        List<T> movedNodes= new ArrayList<>(nodes.size());
+
+        for (T astNode : nodes) {
+            movedNodes.add(move(astNode));
         }
 
-        return nodes;
+        return movedNodes;
     }
 
     /**

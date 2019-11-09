@@ -179,6 +179,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name;
     }
@@ -188,6 +189,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_description;
     }
@@ -197,6 +199,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_reason;
     }
@@ -225,7 +228,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final Block body= node.getBody();
 
-        if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "hashCode") && body != null) { //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "hashCode") && (body != null)) { //$NON-NLS-1$
             @SuppressWarnings("unchecked")
             final List<Statement> statements= body.statements();
 
@@ -236,7 +239,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 data.setPrimeId(isVariableValid(data, 31));
                 data.setResultId(isVariableValid(data, 1));
 
-                if (data.getPrimeId() != null && data.getResultId() != null && data.getStmtIterator().hasNext()) {
+                if ((data.getPrimeId() != null) && (data.getResultId() != null) && data.getStmtIterator().hasNext()) {
                     while (!data.isHasReturnStatement() && data.getStmtIterator().hasNext()) {
                         if (!isStmtValid(data)) {
                             return true;
@@ -259,15 +262,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final Statement statement= data.getStmtIterator().next();
         final VariableDeclarationStatement varDecl= ASTNodes.as(statement, VariableDeclarationStatement.class);
 
-        if (varDecl != null && ASTNodes.hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName()) && varDecl.fragments().size() == 1) {
+        if ((varDecl != null) && ASTNodes.hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName()) && (varDecl.fragments().size() == 1)) {
             final VariableDeclarationFragment varFragment= (VariableDeclarationFragment) varDecl.fragments().get(0);
             final String varId= varFragment.getName().getIdentifier();
             final NumberLiteral varLiteral= ASTNodes.as(varFragment.getInitializer(), NumberLiteral.class);
 
-            if (varFragment.getExtraDimensions() == 0 && varLiteral != null) {
+            if ((varFragment.getExtraDimensions() == 0) && (varLiteral != null)) {
                 final Object varValue= varLiteral.resolveConstantExpressionValue();
 
-                if (varValue instanceof Number && ((Number) varValue).intValue() == initValue) {
+                if ((varValue instanceof Number) && (((Number) varValue).intValue() == initValue)) {
                     return varId;
                 }
             }
@@ -285,11 +288,11 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         if (exprStatement != null) {
             return isAssignmentValid(data, exprStatement);
         }
-        if (varStatement != null && data.getTempVar() == null) {
+        if ((varStatement != null) && (data.getTempVar() == null)) {
             @SuppressWarnings("unchecked")
             final List<VariableDeclarationFragment> fragments= varStatement.fragments();
 
-            if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName()) && fragments != null && fragments.size() == 1) {
+            if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName()) && (fragments != null) && (fragments.size() == 1)) {
                 final VariableDeclarationFragment fragment= fragments.get(0);
                 data.setTempVar(fragment.getName());
                 final Expression initializer= fragment.getInitializer();
@@ -299,7 +302,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                         final SimpleName fieldToFind= isDoubleToLongBitsMethod(data, initializer);
                         data.setTempValueUsed(false);
 
-                        if (fieldToFind != null && data.getStmtIterator().hasNext()) {
+                        if ((fieldToFind != null) && data.getStmtIterator().hasNext()) {
                             final boolean assignmentValid= isStmtValid(data);
 
                             if (assignmentValid) {
@@ -316,7 +319,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             data.setHasReturnStatement(true);
             final Expression expression= returnStatement.getExpression();
 
-            return returnStatement != null && (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
+            return (returnStatement != null) && (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
         }
 
         return false;
@@ -325,17 +328,17 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     private boolean isAssignmentValid(final CollectedData data, final ExpressionStatement statement) {
         final Assignment assignment= ASTNodes.as(statement.getExpression(), Assignment.class);
 
-        if (assignment != null && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+        if ((assignment != null) && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
             final Expression field= assignment.getLeftHandSide();
             final Expression resultComputation= assignment.getRightHandSide();
 
             if (isGivenVariable(field, data.getResultId())) {
                 return isHashValid(data, resultComputation);
             }
-            if (data.getTempVar() != null && isGivenVariable(field, data.getTempVar().getIdentifier())) {
+            if ((data.getTempVar() != null) && isGivenVariable(field, data.getTempVar().getIdentifier())) {
                 final SimpleName fieldToFind= isDoubleToLongBitsMethod(data, resultComputation);
 
-                if (fieldToFind != null && data.getStmtIterator().hasNext()) {
+                if ((fieldToFind != null) && data.getStmtIterator().hasNext()) {
                     data.setTempValueUsed(false);
                     final boolean assignmentValid= isStmtValid(data);
 
@@ -354,10 +357,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         SimpleName fieldToFind= null;
         final MethodInvocation doubleToLongBits= ASTNodes.as(initializer, MethodInvocation.class);
 
-        if (doubleToLongBits != null && ASTNodes.usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
+        if ((doubleToLongBits != null) && ASTNodes.usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
             final SimpleName fieldName= ASTNodes.as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
-            if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
+            if ((fieldName != null) && !fieldName.getIdentifier().equals(data.getPrimeId())
                     && !fieldName.getIdentifier().equals(data.getResultId())) {
                 fieldToFind= fieldName;
             }
@@ -374,7 +377,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final Expression newHash= hashAddition.getRightOperand();
 
             if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
-                    && primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
+                    && (primeTimesResult != null) && !primeTimesResult.hasExtendedOperands()
                     && ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
                     && ((isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
                             && isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId()))
@@ -393,7 +396,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
             return isNewHashValid(data, newHashWithoutBrackets.getExpression());
         }
-        if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
+        if (((newHash instanceof Name) || (newHash instanceof FieldAccess)) && data.isTempValueUsed()) {
             final SimpleName fieldName= getField(newHash);
 
             if (!data.getPrimeId().equals(fieldName.getIdentifier())
@@ -401,15 +404,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 data.getFields().add(fieldName);
                 return true;
             }
-        } else if (newHash instanceof ConditionalExpression && data.isTempValueUsed()) {
+        } else if ((newHash instanceof ConditionalExpression) && data.isTempValueUsed()) {
             return isConditionValid(data, newHash);
-        } else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
+        } else if ((newHash instanceof MethodInvocation) && data.isTempValueUsed()) {
             final MethodInvocation specificMethod= (MethodInvocation) newHash;
 
             if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
-                if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
+                if ((fieldName != null) && !fieldName.getIdentifier().equals(data.getPrimeId())
                         && !fieldName.getIdentifier().equals(data.getResultId())) {
                     data.getFields().add(fieldName);
                     return true;
@@ -425,7 +428,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     || ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) { //$NON-NLS-1$ //$NON-NLS-2$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
-                if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
+                if ((fieldName != null) && !fieldName.getIdentifier().equals(data.getPrimeId())
                         && !fieldName.getIdentifier().equals(data.getResultId())) {
                     data.getFields().add(specificMethod);
                     return true;
@@ -456,7 +459,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     SimpleName qualifier= (SimpleName) te.getQualifier();
                     TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
 
-                    if (visitedClass != null
+                    if ((visitedClass != null)
                             && visitedClass.getName().getIdentifier().equals(qualifier.getIdentifier())) {
                         return fieldName.getName();
                     }
@@ -471,7 +474,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final CastExpression castExpression= (CastExpression) newHash;
         final InfixExpression bitwise= ASTNodes.as(castExpression.getExpression(), InfixExpression.class);
 
-        if (ASTNodes.hasType(castExpression, int.class.getSimpleName()) && bitwise != null && ASTNodes.hasType(bitwise, long.class.getSimpleName(), double.class.getSimpleName())
+        if (ASTNodes.hasType(castExpression, int.class.getSimpleName()) && (bitwise != null) && ASTNodes.hasType(bitwise, long.class.getSimpleName(), double.class.getSimpleName())
                 && ASTNodes.hasOperator(bitwise, InfixExpression.Operator.XOR)) {
             final Expression operand1= bitwise.getLeftOperand();
             final Expression operand2= bitwise.getRightOperand();
@@ -484,11 +487,11 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final String fieldName;
             final InfixExpression moveExpression;
 
-            if (field1 != null && moveExpr1 != null && !field1.getIdentifier().equals(data.getPrimeId())
+            if ((field1 != null) && (moveExpr1 != null) && !field1.getIdentifier().equals(data.getPrimeId())
                     && !field1.getIdentifier().equals(data.getResultId())) {
                 fieldName= field1.getIdentifier();
                 moveExpression= moveExpr1;
-            } else if (field2 != null && moveExpr2 != null && !field2.getIdentifier().equals(data.getPrimeId())
+            } else if ((field2 != null) && (moveExpr2 != null) && !field2.getIdentifier().equals(data.getPrimeId())
                     && !field2.getIdentifier().equals(data.getResultId())) {
                 fieldName= field2.getIdentifier();
                 moveExpression= moveExpr2;
@@ -497,14 +500,14 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 moveExpression= null;
             }
 
-            if (fieldName != null && moveExpression != null && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
+            if ((fieldName != null) && (moveExpression != null) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
                 final SimpleName againFieldName= getField(moveExpression.getLeftOperand());
                 final NumberLiteral hash= ASTNodes.as(moveExpression.getRightOperand(), NumberLiteral.class);
 
-                if (againFieldName != null && againFieldName.getIdentifier().equals(fieldName) && hash != null) {
+                if ((againFieldName != null) && againFieldName.getIdentifier().equals(fieldName) && (hash != null)) {
                     final Object numberForHash= hash.resolveConstantExpressionValue();
 
-                    if (numberForHash instanceof Number && ((Number) numberForHash).intValue() == 32) {
+                    if ((numberForHash instanceof Number) && (((Number) numberForHash).intValue() == 32)) {
                         if (data.isTempValueUsed()) {
                             data.getFields().add(againFieldName);
                             return true;
@@ -529,14 +532,14 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final NumberLiteral hashForTrue= ASTNodes.as(condition.getThenExpression(), NumberLiteral.class);
         final NumberLiteral hashForFalse= ASTNodes.as(condition.getElseExpression(), NumberLiteral.class);
 
-        if (isFieldNull != null && !isFieldNull.hasExtendedOperands()
+        if ((isFieldNull != null) && !isFieldNull.hasExtendedOperands()
                 && ASTNodes.hasOperator(isFieldNull, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
             return isObjectValid(data, condition, isFieldNull);
         }
-        if (booleanField != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
+        if ((booleanField != null) && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
                 && !booleanField.getIdentifier().equals(data.getPrimeId())
-                && !booleanField.getIdentifier().equals(data.getResultId()) && hashForTrue != null
-                && hashForFalse != null) {
+                && !booleanField.getIdentifier().equals(data.getResultId()) && (hashForTrue != null)
+                && (hashForFalse != null)) {
             return isBooleanValid(data, booleanField, hashForTrue, hashForFalse);
         }
 
@@ -548,8 +551,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final Object numberForTrue= hashForTrue.resolveConstantExpressionValue();
         final Object numberForFalse= hashForFalse.resolveConstantExpressionValue();
 
-        if (numberForTrue instanceof Number && ((Number) numberForTrue).intValue() == 1231
-                && numberForFalse instanceof Number && ((Number) numberForFalse).intValue() == 1237) {
+        if ((numberForTrue instanceof Number) && (((Number) numberForTrue).intValue() == 1231)
+                && (numberForFalse instanceof Number) && (((Number) numberForFalse).intValue() == 1237)) {
             data.getFields().add(booleanField);
             return true;
         }
@@ -569,10 +572,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
         final String fieldName;
 
-        if (field1 != null && nullLiteral1 != null && !field1.getIdentifier().equals(data.getPrimeId())
+        if ((field1 != null) && (nullLiteral1 != null) && !field1.getIdentifier().equals(data.getPrimeId())
                 && !field1.getIdentifier().equals(data.getResultId())) {
             fieldName= field1.getIdentifier();
-        } else if (field2 != null && nullLiteral2 != null && !field2.getIdentifier().equals(data.getPrimeId())
+        } else if ((field2 != null) && (nullLiteral2 != null) && !field2.getIdentifier().equals(data.getPrimeId())
                 && !field2.getIdentifier().equals(data.getResultId())) {
             fieldName= field2.getIdentifier();
         } else {
@@ -591,13 +594,13 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 zero= ASTNodes.as(condition.getElseExpression(), NumberLiteral.class);
             }
 
-            if (zero != null && hashOnField != null && hashOnField.getExpression() != null
+            if ((zero != null) && (hashOnField != null) && (hashOnField.getExpression() != null)
                     && "hashCode".equals(hashOnField.getName().getIdentifier()) //$NON-NLS-1$
-                    && (hashOnField.arguments() == null || hashOnField.arguments().isEmpty())) {
+                    && ((hashOnField.arguments() == null) || hashOnField.arguments().isEmpty())) {
                 final Object zeroValue= zero.resolveConstantExpressionValue();
                 final SimpleName fieldToHash= getField(hashOnField.getExpression());
 
-                if (zeroValue instanceof Number && ((Number) zeroValue).intValue() == 0 && fieldToHash != null
+                if ((zeroValue instanceof Number) && (((Number) zeroValue).intValue() == 0) && (fieldToHash != null)
                         && fieldName.equals(fieldToHash.getIdentifier())) {
                     data.getFields().add(fieldToHash);
                     return true;
@@ -610,7 +613,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     private boolean isGivenVariable(final Expression expression, final String varId) {
         final SimpleName field= getField(expression);
-        return field != null && varId.equals(field.getIdentifier());
+        return (field != null) && varId.equals(field.getIdentifier());
     }
 
     private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
@@ -623,7 +626,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final Name objectsClassName= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
         r.replace(statements.get(0),
-                b.return0(b.invoke(objectsClassName, "hash", b.copy(data.getFields())))); //$NON-NLS-1$
+                b.return0(b.invoke(objectsClassName, "hash", b.move(data.getFields())))); //$NON-NLS-1$
 
         for (int i= 1; i < statements.size(); i++) {
             r.remove(statements.get(i));
