@@ -171,7 +171,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
         private void replaceWithStraightAssign(IfStatement node, Expression leftHandSide, Expression rightHandSide) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
-                    b.toStatement(b.assign(b.copy(leftHandSide), Assignment.Operator.ASSIGN, b.copy(rightHandSide))));
+                    b.toStatement(b.assign(b.move(leftHandSide), Assignment.Operator.ASSIGN, b.move(rightHandSide))));
         }
 
         private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement rs,
@@ -200,7 +200,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             final Refactorings r= ctx.getRefactorings();
 
             r.remove(toRemove);
-            r.replace(node, b.return0(b.copy(returnedExpression)));
+            r.replace(node, b.return0(b.move(returnedExpression)));
         }
     }
 }
