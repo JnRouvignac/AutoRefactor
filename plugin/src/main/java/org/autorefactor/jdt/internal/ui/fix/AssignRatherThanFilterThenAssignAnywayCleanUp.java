@@ -92,14 +92,13 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             final Statement elseStatement= getElseStatement(node, thenStatement);
 
             if ((condition != null) && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && (thenStatement != null) && (elseStatement != null)) {
-                final Assignment thenAs= ASTNodes.asExpression(thenStatement, Assignment.class);
-                final Assignment elseAs= ASTNodes.asExpression(elseStatement, Assignment.class);
+                final Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
+                final Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
                 boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
 
-                if (ASTNodes.hasOperator(thenAs, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAs, Assignment.Operator.ASSIGN)
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
-                    return maybeReplaceWithStraightAssign(node, condition, elseAs, thenAs, isEqual)
-                            && maybeReplaceWithStraightAssign(node, condition, thenAs, elseAs, isEqual);
+                if (ASTNodes.hasOperator(thenAssignment, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAssignment, Assignment.Operator.ASSIGN)
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, thenAssignment.getLeftHandSide(), elseAssignment.getLeftHandSide())) {
+                    return maybeReplaceWithStraightAssign(node, condition, thenAssignment, elseAssignment, isEqual);
                 }
 
                 final ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
@@ -118,23 +117,30 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private boolean maybeReplaceWithStraightAssign(IfStatement node, final InfixExpression condition,
-                final Assignment thenAs, final Assignment elseAs, boolean isEqual) {
-            final Expression hardCodedAssignment= isEqual ? thenAs.getRightHandSide() : elseAs.getRightHandSide();
+                final Assignment thenAssignment, final Assignment elseAssignment, boolean isEqual) {
+            final Expression hardCodedExpression;
+            final Assignment valuedAssignment;
 
-            if (ASTNodes.isHardCoded(hardCodedAssignment)) {
-                final Assignment valuedAssignment= isEqual ? elseAs : thenAs;
+            if (isEqual) {
+                hardCodedExpression= thenAssignment.getRightHandSide();
+                valuedAssignment= elseAssignment;
+            } else {
+                hardCodedExpression= elseAssignment.getRightHandSide();
+                valuedAssignment= thenAssignment;
+            }
 
+            if (ASTNodes.isHardCoded(hardCodedExpression)) {
                 if (ASTNodes.isPassive(condition.getLeftOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), hardCodedAssignment)
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
+                        && ASTNodes.match(condition.getRightOperand(), hardCodedExpression)
+                        && ASTNodes.match(condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
                     setResult(false);
                     return false;
                 }
 
                 if (ASTNodes.isPassive(condition.getRightOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), hardCodedAssignment)
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
+                        && ASTNodes.match(condition.getLeftOperand(), hardCodedExpression)
+                        && ASTNodes.match(condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
                     setResult(false);
                     return false;
@@ -178,16 +184,16 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                 ReturnStatement hardCodedReturn, Statement toRemove) {
             if (ASTNodes.isHardCoded(hardCodedReturn.getExpression())) {
                 if (ASTNodes.isPassive(condition.getLeftOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), hardCodedReturn.getExpression())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), valuedReturn.getExpression())) {
+                        && ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
+                        && ASTNodes.match(condition.getLeftOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
                     setResult(false);
                     return false;
                 }
 
                 if (ASTNodes.isPassive(condition.getRightOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), hardCodedReturn.getExpression())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), valuedReturn.getExpression())) {
+                        && ASTNodes.match(condition.getLeftOperand(), hardCodedReturn.getExpression())
+                        && ASTNodes.match(condition.getRightOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
                     setResult(false);
                     return false;

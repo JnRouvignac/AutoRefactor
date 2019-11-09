@@ -41,6 +41,16 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
         return output;
     }
 
+    public String doNotRefactorOppositeAssignment(String input) {
+        String output;
+        if (input == null) {
+            output = input;
+        } else {
+            output = null;
+        }
+        return output;
+    }
+
     public String doNotRefactorLocalVariable(String input) {
         String output;
         if (input == null) {
