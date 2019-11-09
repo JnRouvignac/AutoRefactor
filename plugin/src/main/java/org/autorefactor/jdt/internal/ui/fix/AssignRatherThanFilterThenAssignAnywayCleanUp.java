@@ -38,12 +38,11 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
+public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
@@ -51,7 +50,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      */
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name;
     }
 
     /**
@@ -61,7 +60,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      */
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_description;
     }
 
     /**
@@ -71,7 +70,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      */
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
     }
 
     @Override
@@ -120,13 +119,13 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
 
         private boolean maybeReplaceWithStraightAssign(IfStatement node, final InfixExpression condition,
                 final Assignment thenAs, final Assignment elseAs, boolean isEqual) {
-            final Expression constantAssignment= isEqual ? thenAs.getRightHandSide() : elseAs.getRightHandSide();
+            final Expression hardCodedAssignment= isEqual ? thenAs.getRightHandSide() : elseAs.getRightHandSide();
 
-            if (ASTNodes.is(constantAssignment, NullLiteral.class)) {
+            if (ASTNodes.isHardCoded(hardCodedAssignment)) {
                 final Assignment valuedAssignment= isEqual ? elseAs : thenAs;
 
                 if (ASTNodes.isPassive(condition.getLeftOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), constantAssignment)
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), hardCodedAssignment)
                         && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
                     setResult(false);
@@ -134,7 +133,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (ASTNodes.isPassive(condition.getRightOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), constantAssignment)
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), hardCodedAssignment)
                         && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
                     setResult(false);
@@ -175,20 +174,20 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     b.toStatement(b.assign(b.move(leftHandSide), Assignment.Operator.ASSIGN, b.move(rightHandSide))));
         }
 
-        private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement rs,
-                ReturnStatement otherRs, Statement toRemove) {
-            if (ASTNodes.is(otherRs.getExpression(), NullLiteral.class)) {
+        private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement valuedReturn,
+                ReturnStatement hardCodedReturn, Statement toRemove) {
+            if (ASTNodes.isHardCoded(hardCodedReturn.getExpression())) {
                 if (ASTNodes.isPassive(condition.getLeftOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), otherRs.getExpression())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), rs.getExpression())) {
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), hardCodedReturn.getExpression())
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
                     setResult(false);
                     return false;
                 }
 
                 if (ASTNodes.isPassive(condition.getRightOperand())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), otherRs.getExpression())
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), rs.getExpression())) {
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), hardCodedReturn.getExpression())
+                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
                     setResult(false);
                     return false;

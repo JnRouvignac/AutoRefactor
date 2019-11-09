@@ -125,15 +125,15 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_name;
+    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_description;
+    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_reason;
+    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
     /**
      * Automatically filled.
      */

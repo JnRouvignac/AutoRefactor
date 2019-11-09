@@ -67,7 +67,7 @@ public final class AllCleanUpRules {
         return newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
                 new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
                 new FloatPrimitiveRatherThanWrapperCleanUp(), new CharPrimitiveRatherThanWrapperCleanUp(),
-                new BytePrimitiveRatherThanWrapperCleanUp(), new RemoveUselessNullCheckCleanUp(),
+                new BytePrimitiveRatherThanWrapperCleanUp(), new AssignRatherThanFilterThenAssignAnywayCleanUp(),
                 new VectorOldToNewAPICleanUp(), new PrimitiveWrapperCreationCleanUp(),
                 new AutoBoxingRatherThanExplicitMethodCleanUp(), new UnboxingRatherThanExplicitMethodCleanUp(),
                 new BracketsRatherThanArrayInstantiationCleanUp(), new LambdaExpressionRatherThanComparatorCleanUp(),
