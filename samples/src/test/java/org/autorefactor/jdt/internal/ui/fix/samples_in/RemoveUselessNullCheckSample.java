@@ -27,10 +27,21 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class RemoveUselessNullCheckSample {
     private final String DEFAULT = "";
     private String s;
+
+    public String refactorLocalVariable1(String s) throws Exception {
+        String st;
+        if (s == null) {
+            st = null;
+        } else {
+            st = s;
+        }
+        return st;
+    }
 
     public String doNotRefactorLocalVariable(String s) throws Exception {
         String st;
@@ -42,14 +53,14 @@ public class RemoveUselessNullCheckSample {
         return st;
     }
 
-    public String refactorLocalVariable1(String s) throws Exception {
-        String st;
-        if (s == null) {
-            st = null;
+    public String doNotRefactorActiveExpression(List<String> s) throws Exception {
+        String result;
+        if (s.remove(0) == null) {
+            result = null;
         } else {
-            st = s;
+            result = s.remove(0);
         }
-        return st;
+        return result;
     }
 
     public String refactorLocalVariable2(String s) throws Exception {

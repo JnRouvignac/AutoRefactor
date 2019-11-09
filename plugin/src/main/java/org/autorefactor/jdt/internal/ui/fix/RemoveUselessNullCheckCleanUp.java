@@ -149,14 +149,16 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean maybeReplaceWithStraightAssign(IfStatement node, InfixExpression condition, Assignment as) {
-            if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)
+            if (ASTNodes.isPassive(condition.getLeftOperand())
+                    && ASTNodes.is(condition.getRightOperand(), NullLiteral.class)
                     && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getLeftOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getLeftOperand());
                 setResult(false);
                 return false;
             }
 
-            if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
+            if (ASTNodes.isPassive(condition.getRightOperand())
+                    && ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)
                     && ASTNodes.match(ASTSemanticMatcher.INSTANCE, condition.getRightOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getRightOperand());
                 setResult(false);
