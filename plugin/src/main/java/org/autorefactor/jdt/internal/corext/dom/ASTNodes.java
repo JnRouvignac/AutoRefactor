@@ -561,17 +561,31 @@ public final class ASTNodes {
 
     /**
      * Returns all the operands from the provided infix expressions.
+     * It takes a bug into account.
+     * In some cases, ASTConverter.java creates several infix expressions instead of one extended infix expression.
+     * It occurs for an expression with a sub-infix-expression in the middle without parenthesis.
      *
      * @param node the infix expression
      * @return a List of expressions
      */
     public static List<Expression> allOperands(InfixExpression node) {
         final List<Expression> extOps= extendedOperands(node);
-        final List<Expression> results= new ArrayList<>(2 + extOps.size());
-        results.add(node.getLeftOperand());
-        results.add(node.getRightOperand());
-        results.addAll(extOps);
-        return results;
+        final List<Expression> operands= new ArrayList<>(2 + extOps.size());
+        operands.add(node.getLeftOperand());
+        operands.add(node.getRightOperand());
+        operands.addAll(extOps);
+
+        List<Expression> optimizedOperands= new ArrayList<>();
+
+        for (Expression expression : operands) {
+            if ((expression instanceof InfixExpression) && hasOperator((InfixExpression) expression, node.getOperator())) {
+                optimizedOperands.addAll(allOperands((InfixExpression) expression));
+            } else {
+                optimizedOperands.add(expression);
+            }
+        }
+
+        return optimizedOperands;
     }
 
     /**

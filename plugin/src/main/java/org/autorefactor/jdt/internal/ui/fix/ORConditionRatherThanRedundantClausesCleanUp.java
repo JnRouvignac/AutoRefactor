@@ -26,7 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -72,7 +71,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
     @Override
     public boolean visit(InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-            List<Expression> operands= optimizedOperands(node);
+            List<Expression> operands= ASTNodes.allOperands(node);
 
             for (int i= 1; i < operands.size(); i++) {
                 final Expression leftOperand= operands.get(i - 1);
@@ -89,20 +88,6 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         }
 
         return true;
-    }
-
-    private List<Expression> optimizedOperands(InfixExpression node) {
-        List<Expression> optimizedOperands= new ArrayList<>();
-
-        for (Expression expression : ASTNodes.allOperands(node)) {
-            if ((expression instanceof InfixExpression) && ASTNodes.hasOperator((InfixExpression) expression, node.getOperator())) {
-                optimizedOperands.addAll(optimizedOperands((InfixExpression) expression));
-            } else {
-                optimizedOperands.add(expression);
-            }
-        }
-
-        return optimizedOperands;
     }
 
     private boolean maybeRefactorCondition(final Expression operandWithRedundance, final Expression redundantOperand) {
