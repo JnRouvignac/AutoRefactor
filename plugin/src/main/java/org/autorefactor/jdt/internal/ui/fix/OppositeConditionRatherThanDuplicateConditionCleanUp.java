@@ -67,6 +67,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
     }
@@ -76,6 +77,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
     }
@@ -85,6 +87,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
     }
@@ -94,12 +97,12 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         InfixExpression firstCondition= ASTNodes.as(node.getExpression(), InfixExpression.class);
         IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-        if (firstCondition != null
+        if ((firstCondition != null)
                 && !firstCondition.hasExtendedOperands()
                 && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
                 && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
-                && secondIf != null
-                && secondIf.getElseStatement() != null) {
+                && (secondIf != null)
+                && (secondIf.getElseStatement() != null)) {
             return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
                     firstCondition.getRightOperand())
                     && maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
@@ -111,14 +114,13 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
             final Expression duplicateExpression, final Expression notDuplicateExpression) {
-        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
-
-        if (ASTNodes.match(matcher, duplicateExpression, secondIf.getExpression())) {
+        if (ASTNodes.match(duplicateExpression, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
             return false;
         }
-        if (matcher.matchOpposite(duplicateExpression, secondIf.getExpression())) {
+
+        if (ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateExpression, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
                     secondIf.getThenStatement());
             return false;
@@ -143,7 +145,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         final Statement thirdStmtCopy;
         final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
 
-        if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
+        if ((negativeCond != null) && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();
             secondStmtCopy= b.move(positiveStatement);
             thirdStmtCopy= b.move(node.getThenStatement());

@@ -97,7 +97,6 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                 && ASTNodes.isPassive(redundantOperand)
                 && (complexCondition != null)
                 && ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-            final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
             List<Expression> operands= ASTNodes.allOperands(complexCondition);
 
             for (int i= 0; i < operands.size(); i++) {
@@ -108,7 +107,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                 if (ASTNodes.isPrimitive(duplicateOperand)
                         && ASTNodes.isPassive(duplicateOperand)
                         && isPrimitiveAndPassive(nextOperands)
-                        && matcher.matchOpposite(duplicateOperand, redundantOperand)) {
+                        && ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateOperand, redundantOperand)) {
                     replaceDuplicateExpression(previousOperands, nextOperands, operandWithRedundance, complexCondition.getOperator());
                     return false;
                 }

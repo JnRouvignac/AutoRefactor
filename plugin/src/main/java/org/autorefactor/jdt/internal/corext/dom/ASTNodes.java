@@ -2220,10 +2220,8 @@ public final class ASTNodes {
             return false;
         }
 
-        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
-
         for (int codeLine= 0; codeLine < referenceStatements.size(); codeLine++) {
-            if (!match(matcher, referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
+            if (!match(referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
                 return false;
             }
         }

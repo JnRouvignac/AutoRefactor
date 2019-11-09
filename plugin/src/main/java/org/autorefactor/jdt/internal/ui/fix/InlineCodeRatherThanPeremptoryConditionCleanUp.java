@@ -174,14 +174,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         }
         if (condition instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) condition;
-            final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.isPassive(ie.getLeftOperand())) {
-                if (ASTNodes.match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {
+                if (ASTNodes.match(ie.getLeftOperand(), ie.getRightOperand())) {
                     return ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS);
                 }
 
-                if (matcher.matchOpposite(ie.getLeftOperand(), ie.getRightOperand())) {
+                if (ASTSemanticMatcher.INSTANCE.matchOpposite(ie.getLeftOperand(), ie.getRightOperand())) {
                     return ASTNodes.hasOperator(ie, InfixExpression.Operator.NOT_EQUALS);
                 }
             }

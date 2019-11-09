@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -97,7 +96,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                 boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
 
                 if (ASTNodes.hasOperator(thenAssignment, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAssignment, Assignment.Operator.ASSIGN)
-                        && ASTNodes.match(ASTSemanticMatcher.INSTANCE, thenAssignment.getLeftHandSide(), elseAssignment.getLeftHandSide())) {
+                        && ASTNodes.match(thenAssignment.getLeftHandSide(), elseAssignment.getLeftHandSide())) {
                     return maybeReplaceWithStraightAssign(node, condition, thenAssignment, elseAssignment, isEqual);
                 }
 

@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -42,6 +41,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name;
     }
@@ -51,6 +51,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_description;
     }
@@ -60,6 +61,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_reason;
     }
@@ -73,12 +75,11 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         }
 
         final List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
-        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
 
         Statement previousStatement= ASTNodes.getPreviousSibling(node);
         int i= whileStatements.size() - 1;
         while (i >= 0) {
-            if (previousStatement == null || !ASTNodes.match(matcher, previousStatement, whileStatements.get(i))) {
+            if ((previousStatement == null) || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
                 return true;
             }
             i--;

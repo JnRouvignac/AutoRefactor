@@ -91,29 +91,27 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
                         && isBooleanAndPassive(firstCondition.getRightOperand())
                         && isBooleanAndPassive(secondCondition.getLeftOperand())
                         && isBooleanAndPassive(secondCondition.getRightOperand())) {
-                    ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
-
-                    if (!maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
-                            secondCondition.getLeftOperand(), firstCondition.getRightOperand(),
-                            secondCondition.getRightOperand(), previousOperands, nextOperands)) {
+                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+                            firstCondition.getRightOperand(), secondCondition.getRightOperand(),
+                            previousOperands, nextOperands)) {
                         return false;
                     }
 
-                    if (!maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
-                            secondCondition.getRightOperand(), firstCondition.getRightOperand(),
-                            secondCondition.getLeftOperand(), previousOperands, nextOperands)) {
+                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+                            firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+                            previousOperands, nextOperands)) {
                         return false;
                     }
 
-                    if (!maybeReplaceDuplicateExpression(matcher, node, firstCondition.getRightOperand(),
-                            secondCondition.getLeftOperand(), firstCondition.getLeftOperand(),
-                            secondCondition.getRightOperand(), previousOperands, nextOperands)) {
+                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+                            firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+                            previousOperands, nextOperands)) {
                         return false;
                     }
 
-                    if (!maybeReplaceDuplicateExpression(matcher, node, firstCondition.getRightOperand(),
-                            secondCondition.getRightOperand(), firstCondition.getLeftOperand(),
-                            secondCondition.getLeftOperand(), previousOperands, nextOperands)) {
+                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getRightOperand(),
+                            firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+                            previousOperands, nextOperands)) {
                         return false;
                     }
                 }
@@ -127,11 +125,11 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
         return ASTNodes.isPrimitive(expression, boolean.class.getSimpleName()) && ASTNodes.isPassive(expression);
     }
 
-    private boolean maybeReplaceDuplicateExpression(final ASTSemanticMatcher matcher, final InfixExpression node,
-            final Expression oneCondition, final Expression oppositeCondition, final Expression oneExpression,
-            final Expression oppositeExpression, List<Expression> previousOperands, List<Expression> nextOperands) {
-        if (matcher.matchOpposite(oneCondition, oppositeCondition)
-                && !ASTNodes.match(matcher, oneExpression, oppositeExpression)) {
+    private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
+            final Expression oppositeCondition, final Expression oneExpression, final Expression oppositeExpression,
+            List<Expression> previousOperands, List<Expression> nextOperands) {
+        if (ASTSemanticMatcher.INSTANCE.matchOpposite(oneCondition, oppositeCondition)
+                && !ASTNodes.match(oneExpression, oppositeExpression)) {
             replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression, previousOperands,
                     nextOperands);
             return false;

@@ -27,7 +27,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 
@@ -38,6 +37,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
     }
@@ -47,6 +47,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
     }
@@ -56,6 +57,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
     }
@@ -63,11 +65,9 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     @Override
     public boolean visit(IfStatement node) {
         final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
-        final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
-
-        if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
-                && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(matcher, node.getExpression(), secondIf.getExpression())
-                && (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
+        if (!ASTNodes.isExceptionExpected(node) && (secondIf != null) && ASTNodes.isPassive(node.getExpression())
+                && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(node.getExpression(), secondIf.getExpression())
+                && ((secondIf.getElseStatement() == null) || !ASTNodes.fallsThrough(node.getThenStatement())
                         || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
             refactorCondition(secondIf);
 

@@ -42,6 +42,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name;
     }
@@ -51,6 +52,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_description;
     }
@@ -60,6 +62,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_reason;
     }
@@ -70,30 +73,25 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
             final InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
 
-            if (firstCondition != null && !firstCondition.hasExtendedOperands()
-                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && secondCondition != null
+            if ((firstCondition != null) && !firstCondition.hasExtendedOperands()
+                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && (secondCondition != null)
                     && !secondCondition.hasExtendedOperands() && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
                     && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
                     && ASTNodes.isPassive(secondCondition.getLeftOperand()) && ASTNodes.isPassive(secondCondition.getRightOperand())) {
-                final ASTSemanticMatcher matcher= ASTSemanticMatcher.INSTANCE;
-
-                return maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
-                        secondCondition.getLeftOperand(), firstCondition.getRightOperand(),
-                        secondCondition.getRightOperand())
-                        && maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
-                                secondCondition.getRightOperand(), firstCondition.getRightOperand(),
-                                secondCondition.getLeftOperand());
+                return maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+                        firstCondition.getRightOperand(), secondCondition.getRightOperand())
+                        && maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+                                firstCondition.getRightOperand(), secondCondition.getLeftOperand());
             }
         }
 
         return true;
     }
 
-    private boolean maybeReplaceDuplicateExpression(final ASTSemanticMatcher matcher, final InfixExpression node,
-            final Expression firstExpression, final Expression firstOppositeExpression, final Expression secondExpression,
-            final Expression secondOppositeExpression) {
-        if (matcher.matchOpposite(firstExpression, firstOppositeExpression)
-                && matcher.matchOpposite(secondExpression, secondOppositeExpression)) {
+    private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
+            final Expression firstOppositeExpression, final Expression secondExpression, final Expression secondOppositeExpression) {
+        if (ASTSemanticMatcher.INSTANCE.matchOpposite(firstExpression, firstOppositeExpression)
+                && ASTSemanticMatcher.INSTANCE.matchOpposite(secondExpression, secondOppositeExpression)) {
             final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
             final AtomicBoolean isSecondExprPositive= new AtomicBoolean();
 

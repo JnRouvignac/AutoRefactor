@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
@@ -46,6 +45,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
     }
@@ -55,6 +55,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
     }
@@ -64,6 +65,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
     }
@@ -73,6 +75,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
         final Statement elseStatement= node.getElseStatement();
         final Statement thenStatement= node.getThenStatement();
         final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
+
         if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
         }
@@ -90,17 +93,18 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
             final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
         final List<Statement> statements= ASTNodes.asList(statement);
         final MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
+
         if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Statement firstStatement= Utils.getFirst(statements);
             final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
-            final ASTSemanticMatcher astMatcher= ASTSemanticMatcher.INSTANCE;
+
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
-                    && ASTNodes.match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
-                    && ASTNodes.match(astMatcher, ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
+                    && ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
+                    && ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
-                if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
+                if ((statements.size() == 1) && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
                     r.replace(ifStmtToReplace, b.move(firstStatement));
                 } else {
