@@ -76,14 +76,14 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
     @Override
     public boolean visit(Block node) {
-        final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(node);
+        final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(ctx, node);
         node.accept(ifAndFollowingCodeVisitor);
         return ifAndFollowingCodeVisitor.getResult();
     }
 
     private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
-        public IfAndFollowingCodeVisitor(final Block startNode) {
-            super(null, startNode);
+        public IfAndFollowingCodeVisitor(final RefactoringContext ctx, final Block startNode) {
+            super(ctx, startNode);
         }
 
         @Override
@@ -97,12 +97,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     if (!finallyStatements.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
                     }
-                    final Refactorings r= InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
+
+                    final Refactorings r= ctx.getRefactorings();
 
                     if (ASTNodes.canHaveSiblings(node)) {
                         r.remove(node);
                     } else {
-                        r.replace(node, InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getASTBuilder().block());
+                        r.replace(node, ctx.getASTBuilder().block());
                     }
 
                     setResult(false);
@@ -115,7 +116,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         @Override
         public boolean visit(IfStatement node) {
-            final Refactorings r= InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
+            final Refactorings r= ctx.getRefactorings();
 
             final Statement thenStatement= node.getThenStatement();
             final Statement elseStatement= node.getElseStatement();
@@ -126,6 +127,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
             if (Boolean.TRUE.equals(constantCondition)) {
                 return maybeInlineBlock(node, thenStatement);
             }
+
             if (Boolean.FALSE.equals(constantCondition)) {
                 if (elseStatement != null) {
                     return maybeInlineBlock(node, elseStatement);
@@ -134,7 +136,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 if (ASTNodes.canHaveSiblings(node)) {
                     r.remove(node);
                 } else {
-                    r.replace(node, InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getASTBuilder().block());
+                    r.replace(node, ctx.getASTBuilder().block());
                 }
 
                 setResult(false);
@@ -151,11 +153,14 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 setResult(false);
                 return false;
             }
+
             final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
             final Set<String> followingVariableNames= new HashSet<>();
+
             for (Statement statement : ASTNodes.getNextSiblings(node)) {
                 followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
             }
+
             if (!ifVariableNames.removeAll(followingVariableNames)) {
                 replaceBlockByPlainCode(node, unconditionnalStatement);
                 setResult(false);
@@ -172,17 +177,19 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         if (constantCondition != null) {
             return constantCondition;
         }
-        if (condition instanceof InfixExpression) {
-            InfixExpression ie= (InfixExpression) condition;
 
-            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.isPassive(ie.getLeftOperand())) {
-                if (ASTNodes.match(ie.getLeftOperand(), ie.getRightOperand())) {
-                    return ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS);
-                }
+        InfixExpression infixExpression= ASTNodes.as(condition, InfixExpression.class);
 
-                if (ASTSemanticMatcher.INSTANCE.matchOpposite(ie.getLeftOperand(), ie.getRightOperand())) {
-                    return ASTNodes.hasOperator(ie, InfixExpression.Operator.NOT_EQUALS);
-                }
+        if (infixExpression != null
+                && !infixExpression.hasExtendedOperands()
+                && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+                && ASTNodes.isPassive(infixExpression.getLeftOperand())) {
+            if (ASTNodes.match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+                return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
+            }
+
+            if (ASTSemanticMatcher.INSTANCE.matchOpposite(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+                return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
             }
         }
 
@@ -193,7 +200,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        if ((unconditionnalStatement instanceof Block) && (sourceNode.getParent() instanceof Block)) {
+        if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
             r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
