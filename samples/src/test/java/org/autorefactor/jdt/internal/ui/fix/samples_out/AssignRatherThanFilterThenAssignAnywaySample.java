@@ -37,6 +37,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable1(String input) {
         String output;
+        // Keep this comment
         output = input;
         return output;
     }
@@ -73,36 +74,42 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable2(String input) {
         String output;
+        // Keep this comment
         output = input;
         return output;
     }
 
     public String refactorLocalVariable3(String input) {
         String output;
+        // Keep this comment
         output = input;
         return output;
     }
 
     public String refactorLocalVariable4(String input) {
         String output;
+        // Keep this comment
         output = input;
         return output;
     }
 
     public int removeHardCodedNumber(int input) {
         int output;
+        // Keep this comment
         output = input;
         return output;
     }
 
     public char removeHardCodedCharacter(char input) {
         char output;
+        // Keep this comment
         output = input;
         return output;
     }
 
     public int removeHardCodedExpression(int input) {
         int output;
+        // Keep this comment
         output = input;
         return output;
     }
@@ -131,18 +138,22 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public void refactorFieldAssign1(String input) {
+        // Keep this comment
         this.input = input;
     }
 
     public void refactorFieldAssign2(String input) {
+        // Keep this comment
         this.input = input;
     }
 
     public void refactorFieldAssign3(String input) {
+        // Keep this comment
         this.input = input;
     }
 
     public void refactorFieldAssign4(String input) {
+        // Keep this comment
         this.input = input;
     }
 
@@ -163,34 +174,42 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturn1(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturn2(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturn3(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturn4(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturnNoElse1(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturnNoElse2(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturnNoElse3(String input) {
+        // Keep this comment
         return input;
     }
 
     public String refactorReturnNoElse4(String input) {
+        // Keep this comment
         return input;
     }
 

@@ -37,6 +37,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable1(String input) {
         String output;
+        // Keep this comment
         if (input == null) {
             output = null;
         } else {
@@ -77,6 +78,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable2(String input) {
         String output;
+        // Keep this comment
         if (null == input) {
             output = null;
         } else {
@@ -87,6 +89,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable3(String input) {
         String output;
+        // Keep this comment
         if (input != null) {
             output = input;
         } else {
@@ -97,6 +100,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public String refactorLocalVariable4(String input) {
         String output;
+        // Keep this comment
         if (null != input) {
             output = input;
         } else {
@@ -107,6 +111,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public int removeHardCodedNumber(int input) {
         int output;
+        // Keep this comment
         if (123 != input) {
             output = input;
         } else {
@@ -117,6 +122,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public char removeHardCodedCharacter(char input) {
         char output;
+        // Keep this comment
         if (input == 'a') {
             output = 'a';
         } else {
@@ -127,6 +133,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
 
     public int removeHardCodedExpression(int input) {
         int output;
+        // Keep this comment
         if (input != 1 + 2 + 3) {
             output = input;
         } else {
@@ -163,6 +170,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public void refactorFieldAssign1(String input) {
+        // Keep this comment
         if (input == null) {
             this.input = null;
         } else {
@@ -171,6 +179,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public void refactorFieldAssign2(String input) {
+        // Keep this comment
         if (null == input) {
             this.input = null;
         } else {
@@ -179,6 +188,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public void refactorFieldAssign3(String input) {
+        // Keep this comment
         if (input != null) {
             this.input = input;
         } else {
@@ -187,6 +197,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public void refactorFieldAssign4(String input) {
+        // Keep this comment
         if (null != input) {
             this.input = input;
         } else {
@@ -211,6 +222,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturn1(String input) {
+        // Keep this comment
         if (input == null) {
             return null;
         } else {
@@ -219,6 +231,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturn2(String input) {
+        // Keep this comment
         if (null == input) {
             return null;
         } else {
@@ -227,6 +240,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturn3(String input) {
+        // Keep this comment
         if (input != null) {
             return input;
         } else {
@@ -235,6 +249,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturn4(String input) {
+        // Keep this comment
         if (null != input) {
             return input;
         } else {
@@ -243,6 +258,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturnNoElse1(String input) {
+        // Keep this comment
         if (input == null) {
             return null;
         }
@@ -250,6 +266,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturnNoElse2(String input) {
+        // Keep this comment
         if (null == input) {
             return null;
         }
@@ -257,6 +274,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturnNoElse3(String input) {
+        // Keep this comment
         if (input != null) {
             return input;
         }
@@ -264,6 +282,7 @@ public class AssignRatherThanFilterThenAssignAnywaySample {
     }
 
     public String refactorReturnNoElse4(String input) {
+        // Keep this comment
         if (null != input) {
             return input;
         }
