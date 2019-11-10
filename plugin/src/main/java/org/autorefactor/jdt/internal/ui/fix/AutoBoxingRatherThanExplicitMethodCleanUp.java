@@ -38,6 +38,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
     }
@@ -47,6 +48,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
     }
@@ -56,6 +58,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
     }
@@ -68,6 +71,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     @Override
     public boolean visit(MethodInvocation node) {
         if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null //$NON-NLS-1$
+                && node.resolveMethodBinding() != null
                 && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
@@ -83,9 +87,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
             final MethodInvocation node1= node;
             final ITypeBinding actualParameterType= ASTNodes.arguments(node1).get(0).resolveTypeBinding();
 
-            if ((actualResultType != null
-                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass)))
-                    || (actualParameterType != null && actualParameterType.equals(wrapperClass))) {
+            if (actualResultType != null
+                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
+                    || actualParameterType != null && actualParameterType.equals(wrapperClass)) {
                 useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
                 return false;
             }

@@ -71,6 +71,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
     }
@@ -80,6 +81,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
     }
@@ -89,6 +91,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
     }
@@ -258,6 +261,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         final MethodInvocation getValueMi0= getValueMis.get(0);
         final ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
+
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
             r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
@@ -345,14 +349,18 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     /** Sanity check. */
     private boolean haveSameTypeBindings(Collection<? extends Expression> exprs) {
         Iterator<? extends Expression> it= exprs.iterator();
+
         if (!it.hasNext()) {
             // Not really expected
             return false;
         }
+
         final ITypeBinding type0= it.next().resolveTypeBinding();
+
         if (type0 == null) {
             return false;
         }
+
         while (it.hasNext()) {
             final ITypeBinding typeN= it.next().resolveTypeBinding();
             if (!areSameTypeBindings(type0, typeN)) {
@@ -364,8 +372,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        return type1 == null || type2 == null || (type1.isParameterizedType() == type2.isParameterizedType()
-                && areSameParameterizedTypeBindings(type1, type2));
+        return type1 == null || type2 == null || type1.isParameterizedType() == type2.isParameterizedType()
+                && areSameParameterizedTypeBindings(type1, type2);
     }
 
     /** Special handling because of captures. */

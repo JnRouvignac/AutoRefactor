@@ -81,6 +81,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_name;
     }
@@ -90,6 +91,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_description;
     }
@@ -99,6 +101,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_reason;
     }
@@ -155,7 +158,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
         elementType= null;
 
-        if (instanceCreation.resolveTypeBinding().isParameterizedType()) {
+        if (instanceCreation.resolveTypeBinding() == null || instanceCreation.resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
@@ -175,7 +178,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
+        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 

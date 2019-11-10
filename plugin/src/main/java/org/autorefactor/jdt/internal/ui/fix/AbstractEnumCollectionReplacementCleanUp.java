@@ -82,7 +82,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
                 switch (parent.getNodeType()) {
 
                 case RETURN_STATEMENT:
-                    return handleReturnStatement(node, (ReturnStatement) parent, classesToUseWithImport, importsToAdd);
+                    return handleReturnStatement(node, classesToUseWithImport, importsToAdd);
 
                 case ASSIGNMENT:
                     return handleAssignment(node, (Assignment) parent, classesToUseWithImport, importsToAdd);
@@ -110,8 +110,8 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     abstract boolean maybeReplace(ClassInstanceCreation node, Set<String> classesToUseWithImport,
             Set<String> importsToAdd, Type... types);
 
-    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs,
-            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+    private boolean handleReturnStatement(final ClassInstanceCreation node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         MethodDeclaration md= ASTNodes.getAncestorOrNull(node, MethodDeclaration.class);
 
         if (md != null) {

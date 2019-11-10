@@ -114,13 +114,13 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
             return true;
         }
 
-        replace(cic, alreadyImportedClasses, importsToAdd, keyType, valueType, arguments);
+        replace(cic, alreadyImportedClasses, keyType, valueType, arguments);
         importsToAdd.add(EnumMap.class.getCanonicalName());
         return false;
     }
 
-    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
-            Type keyType, Type valueType, List<Expression> arguments) {
+    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Type keyType,
+            Type valueType, List<Expression> arguments) {
         ASTNodeFactory b= ctx.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(

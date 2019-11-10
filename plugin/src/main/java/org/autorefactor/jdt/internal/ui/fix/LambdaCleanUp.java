@@ -64,6 +64,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name;
     }
@@ -73,6 +74,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_description;
     }
@@ -82,6 +84,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_reason;
     }
@@ -110,16 +113,16 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             }
         } else if (node.getBody() instanceof ClassInstanceCreation) {
             final ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
-
             final List<Expression> arguments= ASTNodes.arguments(ci);
-            if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
+
+            if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments) && ci.resolveTypeBinding() != null) {
                 replaceByCreationReference(node, ci);
                 return false;
             }
         } else if (node.getBody() instanceof SuperMethodInvocation) {
             final SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
-
             final List<Expression> arguments= ASTNodes.arguments(smi);
+
             if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
                 replaceBySuperMethodReference(node, smi);
                 return false;
@@ -128,8 +131,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             final MethodInvocation mi= (MethodInvocation) node.getBody();
             final Expression calledExpression= mi.getExpression();
             final ITypeBinding calledType= ASTNodes.getCalledType(mi);
-
             final List<Expression> arguments= ASTNodes.arguments(mi);
+
             if (node.parameters().size() == arguments.size()) {
                 if (!areSameIdentifiers(node, arguments)) {
                     return true;
@@ -139,7 +142,13 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                     if (!arguments.isEmpty()) {
                         final String[] remainingParams= new String[arguments.size() - 1];
                         for (int i= 0; i < arguments.size() - 1; i++) {
-                            remainingParams[i]= arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
+                            final ITypeBinding argumentBinding= arguments.get(i + 1).resolveTypeBinding();
+
+                            if (argumentBinding == null) {
+                                return true;
+                            }
+
+                            remainingParams[i]= argumentBinding.getQualifiedName();
                         }
 
                         for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
@@ -183,10 +192,21 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                     }
 
                     final ITypeBinding clazz= calledExpression.resolveTypeBinding();
+
+                    if (clazz == null) {
+                        return true;
+                    }
+
                     final String[] remainingParams= new String[arguments.size() + 1];
                     remainingParams[0]= clazz.getQualifiedName();
                     for (int i= 0; i < arguments.size(); i++) {
-                        remainingParams[i + 1]= arguments.get(i).resolveTypeBinding().getQualifiedName();
+                        final ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
+
+                        if (argumentBinding == null) {
+                            return true;
+                        }
+
+                        remainingParams[i + 1]= argumentBinding.getQualifiedName();
                     }
 
                     for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {

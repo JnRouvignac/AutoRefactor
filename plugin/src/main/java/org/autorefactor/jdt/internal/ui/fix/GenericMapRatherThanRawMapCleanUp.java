@@ -99,6 +99,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_name;
     }
@@ -108,6 +109,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_description;
     }
@@ -117,6 +119,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_reason;
     }
@@ -178,7 +181,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         keyType= null;
         valueType= null;
 
-        if (instanceCreation.resolveTypeBinding().isParameterizedType()) {
+        if (instanceCreation.resolveTypeBinding() == null || instanceCreation.resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
@@ -200,7 +203,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
+        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 

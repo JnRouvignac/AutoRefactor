@@ -60,7 +60,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         @Override
         public boolean visit(final ClassInstanceCreation node) {
             return LambdaExpressionRatherThanComparatorCleanUp.this
-                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
+                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
         }
     }
 
@@ -69,6 +69,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name;
     }
@@ -78,6 +79,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_description;
     }
@@ -87,6 +89,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_reason;
     }
@@ -108,11 +111,11 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
     @Override
     public boolean visit(final ClassInstanceCreation node) {
-        return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+        return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node));
     }
 
     private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
-            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+            final Set<String> classesToUseWithImport) {
         final AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
         final Type type= node.getType();
 
@@ -154,12 +157,10 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
                     final MethodInvocation compareToMethod= ASTNodes.as(returnStatement.getExpression(), MethodInvocation.class);
 
                     if (compareToMethod != null && compareToMethod.getExpression() != null) {
-                        final String comparisonClass= compareToMethod.getExpression().resolveTypeBinding()
-                                .getQualifiedName();
+                        final ITypeBinding comparisonType= compareToMethod.getExpression().resolveTypeBinding();
 
-                        if (compareToMethod != null && compareToMethod.getExpression() != null
-                                && compareToMethod.getExpression().resolveTypeBinding() != null
-                                && ASTNodes.usesGivenSignature(compareToMethod, comparisonClass, "compareTo", comparisonClass)) { //$NON-NLS-1$
+                        if (compareToMethod != null && compareToMethod.getExpression() != null && comparisonType != null
+                                && ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compareTo", comparisonType.getQualifiedName())) { //$NON-NLS-1$
                             return maybeRefactorComparison(node, methodDecl, compareToMethod, typeArgument,
                                     classesToUseWithImport);
                         }
