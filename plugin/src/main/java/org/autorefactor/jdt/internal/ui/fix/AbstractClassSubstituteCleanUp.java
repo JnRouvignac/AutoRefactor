@@ -173,6 +173,11 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final ITypeBinding origTypeBinding= origType.resolveBinding();
+
+        if (origTypeBinding == null) {
+            return null;
+        }
+
         final String origRawType= origTypeBinding.getErasure().getQualifiedName();
         String substitutingClassName= getSubstitutingClassName(origRawType);
 

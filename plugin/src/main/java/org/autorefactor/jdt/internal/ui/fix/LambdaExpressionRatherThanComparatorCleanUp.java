@@ -119,11 +119,14 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
         final Type type= node.getType();
 
-        if (ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName()) && node.arguments().isEmpty()
-                && anonymousClassDecl != null && anonymousClassDecl.bodyDeclarations() != null
-                && anonymousClassDecl.bodyDeclarations().size() == 1 && type != null && type.resolveBinding() != null
+        if (type != null && type.resolveBinding() != null
                 && type.resolveBinding().getTypeArguments() != null
-                && type.resolveBinding().getTypeArguments().length == 1) {
+                && type.resolveBinding().getTypeArguments().length == 1
+                && ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName())
+                && node.arguments().isEmpty()
+                && anonymousClassDecl != null
+                && anonymousClassDecl.bodyDeclarations() != null
+                && anonymousClassDecl.bodyDeclarations().size() == 1) {
             @SuppressWarnings("unchecked")
             final List<BodyDeclaration> bodies= anonymousClassDecl.bodyDeclarations();
             final ITypeBinding typeArgument= type.resolveBinding().getTypeArguments()[0];

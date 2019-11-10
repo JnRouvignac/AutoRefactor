@@ -72,6 +72,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_name;
     }
@@ -81,6 +82,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_description;
     }
@@ -90,6 +92,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_reason;
     }
@@ -150,14 +153,19 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        String substitutingType= getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
+        final ITypeBinding origTypeBinding= origType.resolveBinding();
+
+        if (origTypeBinding == null) {
+            return null;
+        }
+
+        String substitutingType= getSubstitutingClassName(origTypeBinding.getErasure().getQualifiedName());
 
         if (classesToUseWithImport.contains(substitutingType)) {
             importsToAdd.add(substitutingType);
             substitutingType= getSimpleName(substitutingType);
         }
 
-        final ITypeBinding origTypeBinding= origType.resolveBinding();
         final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
         if (origTypeBinding.isParameterizedType()) {
@@ -220,7 +228,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         ASTNode parentNode= node.getParent();
 
         return parentNode instanceof ExpressionStatement
-                || (parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode));
+                || parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode);
     }
 
     @Override

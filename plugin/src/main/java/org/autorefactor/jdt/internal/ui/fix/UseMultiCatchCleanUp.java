@@ -125,7 +125,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             if (other instanceof MultiBinding) {
                 MultiBinding o= (MultiBinding) other;
                 for (ITypeBinding otherTypeBinding : o.typeBindings) {
-                    if ((otherTypeBinding == null) || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
+                    if (otherTypeBinding == null || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
                         return false;
                     }
                 }
@@ -286,7 +286,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameMethodBinding(IMethodBinding binding1, IMethodBinding binding2) {
-            return (binding1 != null) && (binding2 != null)
+            return binding1 != null && binding2 != null
                     && (binding1.equals(binding2) || binding1.overrides(binding2) || binding2.overrides(binding1)
                     // This is a really expensive check. Do it at the very end
                             || areOverridingSameMethod(binding1, binding2));
@@ -309,7 +309,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameVariable0(Object other, ASTNode node2) {
-            return (other instanceof ASTNode) && ASTNodes.isSameVariable((ASTNode) other, node2);
+            return other instanceof ASTNode && ASTNodes.isSameVariable((ASTNode) other, node2);
         }
     }
 
@@ -439,9 +439,11 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private void removeSupersededAlternatives(List<Type> allTypes) {
         for (ListIterator<Type> it1= allTypes.listIterator(); it1.hasNext();) {
             final ITypeBinding binding1= it1.next().resolveBinding();
+
             for (ListIterator<Type> it2= allTypes.listIterator(it1.nextIndex()); it2.hasNext();) {
                 final ITypeBinding binding2= it2.next().resolveBinding();
-                if (binding1.isSubTypeCompatible(binding2)) {
+
+                if (binding1 != null && binding1.isSubTypeCompatible(binding2)) {
                     it1.remove();
                     break;
                 }

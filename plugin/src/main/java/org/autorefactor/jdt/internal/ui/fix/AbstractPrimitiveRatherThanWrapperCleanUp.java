@@ -173,10 +173,13 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     public boolean visit(VariableDeclarationStatement node) {
         if (node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-            if (ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
+
+            if (fragment.resolveBinding() != null
+                    && ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
                     && fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
                 final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
                 final Block parentBlock= ASTNodes.getAncestorOrNull(fragment, Block.class);
+
                 if (parentBlock != null) {
                     varOccurrenceVisitor.visitNode(parentBlock);
 
@@ -230,8 +233,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         if (expression instanceof CastExpression) {
             final CastExpression castExpression= (CastExpression) expression;
             return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-                    || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpression.getExpression()));
+                    || ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpression.getExpression());
         }
         if (expression instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) expression;

@@ -161,7 +161,9 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             ParameterizedType ptype= (ParameterizedType) type;
             List<Type> typeArguments= ASTNodes.typeArguments(ptype);
 
-            if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
+            if (!typeArguments.isEmpty()
+                    && typeArguments.get(0).resolveBinding() != null
+                    && typeArguments.get(0).resolveBinding().isEnum()) {
                 List<VariableDeclarationFragment> fragments= ASTNodes.fragments(node);
 
                 for (VariableDeclarationFragment vdf : fragments) {

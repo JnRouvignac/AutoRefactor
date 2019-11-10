@@ -418,7 +418,7 @@ public class ASTNodeFactory {
     }
 
     private boolean isValidInCurrentAST(ASTNode node) {
-        return (node.getAST() == ast) && (node.getStartPosition() != -1);
+        return node.getAST() == ast && node.getStartPosition() != -1;
     }
 
     /**
@@ -500,7 +500,13 @@ public class ASTNodeFactory {
             return ast.newPrimitiveType(code);
 
         case QUALIFIED_TYPE:
-            return type(type.resolveBinding().getQualifiedName());
+            final ITypeBinding typeBinding= type.resolveBinding();
+
+            if (typeBinding == null) {
+                return null;
+            }
+
+            return type(typeBinding.getQualifiedName());
 
         case SIMPLE_TYPE:
             final SimpleType sType= (SimpleType) type;
@@ -937,11 +943,11 @@ public class ASTNodeFactory {
     }
 
     private boolean isEmptyRangeCopy(ASTNode... nodes) {
-        return (nodes.length == 1) && (nodes[0] == null);
+        return nodes.length == 1 && nodes[0] == null;
     }
 
     private <E extends ASTNode> boolean isEmptyRangeCopy(List<E> nodes) {
-        return (nodes.size() == 1) && (nodes.get(0) == null);
+        return nodes.size() == 1 && nodes.get(0) == null;
     }
 
     /**
