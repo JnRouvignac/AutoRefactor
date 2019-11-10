@@ -68,6 +68,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
     }
@@ -77,6 +78,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
     }
@@ -86,6 +88,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
     }
@@ -123,37 +126,46 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     private boolean visit(BodyDeclaration node) {
         final BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
         final ASTNode parent= node.getParent();
+
         if (nextSibling != null) {
-            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
+            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
         }
+
         if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
-            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
+            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
         }
+
         if (parent instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
-            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
+            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
         }
+
         if (parent instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) parent;
-            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
+            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
         }
+
         if (parent instanceof TypeDeclarationStatement) {
             return true;
         }
+
         throw new NotImplementedException(node,
                 "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
     }
 
-    private boolean removeSuperfluousSemiColons(ASTNode node, int start, int end) {
+    private boolean maybeRemoveSuperfluousSemiColons(ASTNode node, int start, int end) {
         if (end <= start) {
             return true;
         }
+
         boolean result= true;
         final Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
+
         for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
             final String s= entry.getKey();
             final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s); //$NON-NLS-1$
+
             while (m.find()) {
                 int startPos= entry.getValue().getStartPosition();
                 SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
@@ -226,6 +238,6 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         }
         VariableDeclarationExpression lastResource= Utils.getLast(resources);
         Block body= node.getBody();
-        return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
+        return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
     }
 }

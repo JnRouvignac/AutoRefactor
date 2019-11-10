@@ -71,6 +71,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name;
     }
@@ -80,6 +81,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_description;
     }
@@ -89,6 +91,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_reason;
     }
@@ -151,11 +154,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         }
         final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
         if (emptyLineAtStartMatcher.find()) {
-            return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+            replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+            return false;
         }
         final Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (emptyLineAtEndMatcher.find()) {
-            return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
+            replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
+            return false;
         }
         final String replacement= getReplacement(comment, false);
         if (replacement != null && !replacement.equals(comment)) {
@@ -217,10 +222,12 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             return false;
         }
         if (emptyLineAtStartMatcher.find()) {
-            return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+            replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+            return false;
         }
         if (emptyLineAtEndMatcher.find()) {
-            return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
+            replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
+            return false;
         }
         if (allTagsEmpty(ASTNodes.tags(node))) {
             this.ctx.getRefactorings().remove(node);
@@ -305,16 +312,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
+    private void replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
         this.ctx.getRefactorings().replace(node, replacement);
-        return false;
     }
 
-    private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
+    private void replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1));
         this.ctx.getRefactorings().replace(node, replacement);
-        return false;
     }
 
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
@@ -545,7 +550,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         // PackageDeclaration node accept javadoc in package-info.java files,
         // but they are useless everywhere else.
         return node instanceof BodyDeclaration
-                || (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
+                || node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
     }
 
     @Override

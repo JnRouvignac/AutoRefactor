@@ -198,13 +198,14 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             return maybeReplaceOrRemove(nodeToReplace, originalMethod, isAssertTrue ^ (Boolean) constantValue,
                     failureMessage);
         } else if (isRewriteNeeded) {
-            return refactorToAssertTrueOrFalse(nodeToReplace, originalMethod, failureMessage, condition, isAssertTrue);
+            refactorToAssertTrueOrFalse(nodeToReplace, originalMethod, failureMessage, condition, isAssertTrue);
+            return false;
         }
 
         return true;
     }
 
-    private boolean refactorToAssertTrueOrFalse(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
+    private void refactorToAssertTrueOrFalse(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
             final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
@@ -212,7 +213,6 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                 invokeMethod(b, originalMethod, methodName, b.copy(condition), null, null, failureMessage)));
-        return false;
     }
 
     private boolean maybeReplaceOrRemove(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
@@ -222,12 +222,14 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             r.replace(nodeToReplace, invokeFail(nodeToReplace, originalMethod, failureMessage));
             return false;
         }
+
         if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
             if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent())) {
                 r.remove(nodeToReplace.getParent());
             } else {
                 r.replace(nodeToReplace.getParent(), ctx.getASTBuilder().block());
             }
+
             return false;
         }
 
@@ -238,7 +240,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Expression failureMessage) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final List<Expression> args= ASTNodes.arguments(originalMethod);
-        if ((args.size() == 1) || (args.size() == 2)) {
+        if (args.size() == 1 || args.size() == 2) {
             return invokeMethod(b, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$
         }
         throw new NotImplementedException(node);
@@ -369,7 +371,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final String qualifiedMethodName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
         Expression qualifiedMethod;
-        if ((originalMethod.getExpression() == null) && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
+        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
                 && !staticImports.contains(qualifiedMethodName + ".*")) { //$NON-NLS-1$
             qualifiedMethod= b.name(qualifiedMethodName);
         } else {

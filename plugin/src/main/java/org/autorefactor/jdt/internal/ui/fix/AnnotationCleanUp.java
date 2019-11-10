@@ -51,6 +51,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_name;
     }
@@ -60,6 +61,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_description;
     }
@@ -69,6 +71,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_reason;
     }
@@ -177,13 +180,15 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (javaObj instanceof Object[]) {
             Object[] javaObjArray= (Object[]) javaObj;
             List<Expression> exprs= ASTNodes.expressions(arrayInit);
+
             if (exprs.size() == javaObjArray.length) {
-                boolean result= true;
                 for (int i= 0; i < javaObjArray.length; i++) {
-                    result&= equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i]);
+                    if (!equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i])) {
+                        return false;
+                    }
                 }
 
-                return result;
+                return true;
             }
         }
 

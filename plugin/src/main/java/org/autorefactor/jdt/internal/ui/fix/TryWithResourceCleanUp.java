@@ -55,6 +55,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name;
     }
@@ -64,6 +65,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_description;
     }
@@ -73,6 +75,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_reason;
     }
@@ -100,6 +103,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
         final VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
         final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+
         if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
             final List<ASTNode> nodesToRemove= new ArrayList<>();
             nodesToRemove.add(previousDeclStatement);
@@ -109,12 +113,12 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
             final ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
             final IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
+
             if (finallyEs != null) {
                 final MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
                 if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
-                    final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
-                            previousDeclFragment, nodesToRemove);
-                    return refactorToTryWithResources(node, newResource, nodesToRemove);
+                    return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                            nodesToRemove);
                 }
             } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
                     && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
@@ -122,16 +126,32 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
                 final Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
                 final MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+
                 if (methodClosesCloseables(mi)
                         && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
-                    final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
-                            previousDeclFragment, nodesToRemove);
-                    return refactorToTryWithResources(node, newResource, nodesToRemove);
+                    return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                            nodesToRemove);
                 }
             }
         }
 
         return true;
+    }
+
+    private boolean maybeRefactorToTryWithResources(TryStatement node, final List<Statement> tryStatements,
+            final VariableDeclarationStatement previousDeclStatement,
+            final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
+        final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
+                previousDeclFragment, nodesToRemove);
+
+        if (newResource == null) {
+            return true;
+        }
+
+        final Refactorings r= ctx.getRefactorings();
+        r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
+        r.remove(nodesToRemove);
+        return false;
     }
 
     private boolean methodClosesCloseables(final MethodInvocation mi) {
@@ -151,17 +171,6 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 //                        // Beware of generic types (wildcards like ? extends Closeable)
 //                        || isCollectionOfCloseables(methodBinding.getParameterTypes())
 //                        || isCloseable(methodBinding.getParameterTypes()));
-        return false;
-    }
-
-    private boolean refactorToTryWithResources(TryStatement node, VariableDeclarationExpression newResource,
-            List<ASTNode> nodesToRemove) {
-        if (newResource == null) {
-            return true;
-        }
-        final Refactorings r= ctx.getRefactorings();
-        r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
-        r.remove(nodesToRemove);
         return false;
     }
 

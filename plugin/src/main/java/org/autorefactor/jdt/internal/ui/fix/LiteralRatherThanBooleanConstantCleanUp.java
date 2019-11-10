@@ -37,6 +37,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
     }
@@ -46,6 +47,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
     }
@@ -55,6 +57,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
     }
@@ -65,19 +68,20 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
         if (typeBinding != null && typeBinding.isPrimitive()) {
             if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
-                return replaceWithBooleanLiteral(node, true);
+                replaceWithBooleanLiteral(node, true);
+                return false;
             }
             if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
-                return replaceWithBooleanLiteral(node, false);
+                replaceWithBooleanLiteral(node, false);
+                return false;
             }
         }
 
         return true;
     }
 
-    private boolean replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
+    private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
         final BooleanLiteral booleanLiteral= this.ctx.getASTBuilder().boolean0(val);
         this.ctx.getRefactorings().replace(node, booleanLiteral);
-        return false;
     }
 }

@@ -53,6 +53,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_name;
     }
@@ -62,6 +63,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_description;
     }
@@ -71,6 +73,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_reason;
     }
@@ -114,7 +117,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                     if (ASTNodes.haveSameType(params.srcArrayExpression, params.destArrayExpression)) {
                         params.destPos= calcIndex(aaLHS.getIndex(), params);
                         params.srcPos= calcIndex(aaRHS.getIndex(), params);
-                        return replaceWithSystemArrayCopyCloneAll(node, params);
+                        return maybeReplaceWithSystemArrayCopyCloneAll(node, params);
                     }
                 }
             }
@@ -249,17 +252,19 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
+    private boolean maybeReplaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
         if (params.srcArrayExpression == null || params.srcPos == null || params.destArrayExpression == null
                 || params.destPos == null || params.length == null) {
             return true;
         }
+
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpression), params.srcPos,
+        replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpression), params.srcPos,
                 b.copy(params.destArrayExpression), params.destPos, params.length);
+        return false;
     }
 
-    private boolean replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpression, Expression srcPos,
+    private void replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpression, Expression srcPos,
             Expression destArrayExpression, Expression destPos, Expression length) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
@@ -269,7 +274,6 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                         b.throw0(b.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
         this.ctx.getRefactorings().replace(node, tryS);
-        return false;
     }
 
     private void collectUniqueIndex(ForStatement node, SystemArrayCopyParams params) {

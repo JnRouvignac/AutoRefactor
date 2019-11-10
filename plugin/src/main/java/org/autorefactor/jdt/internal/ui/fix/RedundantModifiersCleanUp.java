@@ -59,6 +59,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
     }
@@ -68,6 +69,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
     }
@@ -77,6 +79,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
     }
@@ -90,6 +93,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
          *
          * @return -1, 0 or 1
          */
+        @Override
         public int compare(IExtendedModifier o1, IExtendedModifier o2) {
             if (o1.isAnnotation()) {
                 if (o2.isAnnotation()) {
@@ -104,10 +108,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
             final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
             if (i1 == -1) {
-                throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
+                throw new NotImplementedException((Modifier) o1, "cannot determine order for modifier " + o1); //$NON-NLS-1$
             }
             if (i2 == -1) {
-                throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2); //$NON-NLS-1$
+                throw new NotImplementedException((Modifier) o2, "cannot compare modifier " + o2); //$NON-NLS-1$
             }
 
             return i1 - i2;
@@ -123,8 +127,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(FieldDeclaration node) {
         if (isInterface(node.getParent())) {
-            return removePublicStaticFinalModifiers(node);
+            return maybeRemovePublicStaticFinalModifiers(node);
         }
+
         if (Modifier.isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
             return removeProtectedModifier(node);
         }
@@ -132,9 +137,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         return ensureModifiersOrder(node);
     }
 
-    private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
+    private boolean maybeRemovePublicStaticFinalModifiers(FieldDeclaration node) {
         // Remove modifiers implied by the context
         boolean result= true;
+
         for (Modifier m : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (m.isPublic() || m.isStatic() || m.isFinal()) {
                 ctx.getRefactorings().remove(m);
