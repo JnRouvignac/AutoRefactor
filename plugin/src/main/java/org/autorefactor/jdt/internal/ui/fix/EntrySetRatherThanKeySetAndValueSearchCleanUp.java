@@ -65,7 +65,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractCleanUpRule {
+public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

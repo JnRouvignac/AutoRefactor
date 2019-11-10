@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
-public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRule {
+public final class RemoveUncheckedThrowsClausesCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

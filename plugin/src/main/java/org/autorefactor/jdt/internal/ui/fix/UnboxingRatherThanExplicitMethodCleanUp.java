@@ -32,7 +32,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
+public class UnboxingRatherThanExplicitMethodCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

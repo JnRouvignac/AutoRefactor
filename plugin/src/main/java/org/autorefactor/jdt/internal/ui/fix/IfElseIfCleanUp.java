@@ -58,7 +58,7 @@ import org.eclipse.jdt.core.dom.Statement;
  *
  * @see #getDescription()
  */
-public class IfElseIfCleanUp extends AbstractCleanUpRule {
+public class IfElseIfCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

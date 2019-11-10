@@ -50,7 +50,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
+public class CommonCodeInIfElseStatementCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -31,7 +31,7 @@ import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
-public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractCleanUpRule {
+public class OneConditionRatherThanUnreachableBlockCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

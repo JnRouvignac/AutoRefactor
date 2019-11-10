@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule {
+public class BooleanEqualsRatherThanNullCheckCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 
 /** See {@link #getDescription()} method. */
-public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
+public class PrimitiveWrapperCreationCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

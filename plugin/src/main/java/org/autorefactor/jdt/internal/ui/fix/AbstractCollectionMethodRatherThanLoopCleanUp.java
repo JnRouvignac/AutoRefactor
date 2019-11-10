@@ -61,7 +61,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends AbstractCleanUpRule {
+public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the expression to find.
      *

@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.QualifiedName;
 
 /** See {@link #getDescription()} method. */
-public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule {
+public class LiteralRatherThanBooleanConstantCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

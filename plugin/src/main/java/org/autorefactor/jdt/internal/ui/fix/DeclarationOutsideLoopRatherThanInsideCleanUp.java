@@ -48,7 +48,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractCleanUpRule {
+public class DeclarationOutsideLoopRatherThanInsideCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

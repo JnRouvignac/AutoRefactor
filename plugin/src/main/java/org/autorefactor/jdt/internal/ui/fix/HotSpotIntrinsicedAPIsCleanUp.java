@@ -47,7 +47,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
-public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
+public class HotSpotIntrinsicedAPIsCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

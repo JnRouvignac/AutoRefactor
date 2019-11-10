@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
-public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCleanUpRule {
+public class StaticConstantRatherThanInstanceConstantCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

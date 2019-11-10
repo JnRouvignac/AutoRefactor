@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
-public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
+public class BooleanConstantRatherThanValueOfCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -238,7 +238,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Expression failureMessage) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final List<Expression> args= ASTNodes.arguments(originalMethod);
-        if ((args.size() == 1) || (args.size() == 2)) {
+        if (args.size() == 1 || args.size() == 2) {
             return invokeMethod(b, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$
         }
         throw new NotImplementedException(node);
@@ -369,7 +369,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final String qualifiedMethodName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
         Expression qualifiedMethod;
-        if ((originalMethod.getExpression() == null) && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
+        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
                 && !staticImports.contains(qualifiedMethodName + ".*")) { //$NON-NLS-1$
             qualifiedMethod= b.name(qualifiedMethodName);
         } else {

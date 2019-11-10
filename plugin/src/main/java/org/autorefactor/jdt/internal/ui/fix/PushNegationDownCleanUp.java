@@ -37,7 +37,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class PushNegationDownCleanUp extends AbstractCleanUpRule {
+public class PushNegationDownCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

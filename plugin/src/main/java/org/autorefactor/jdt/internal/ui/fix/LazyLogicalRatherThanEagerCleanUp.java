@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
+public class LazyLogicalRatherThanEagerCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

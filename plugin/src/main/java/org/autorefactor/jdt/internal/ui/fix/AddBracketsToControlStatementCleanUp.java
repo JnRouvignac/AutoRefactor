@@ -35,7 +35,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
+public class AddBracketsToControlStatementCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
+public class VectorOldToNewAPICleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

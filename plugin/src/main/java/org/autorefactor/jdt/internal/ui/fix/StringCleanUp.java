@@ -41,7 +41,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
-public class StringCleanUp extends AbstractCleanUpRule {
+public class StringCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

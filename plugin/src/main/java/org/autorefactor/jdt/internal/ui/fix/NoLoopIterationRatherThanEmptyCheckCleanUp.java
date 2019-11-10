@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpRule {
+public class NoLoopIterationRatherThanEmptyCheckCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

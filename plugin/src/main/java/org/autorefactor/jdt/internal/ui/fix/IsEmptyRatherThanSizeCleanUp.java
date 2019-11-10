@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
+public class IsEmptyRatherThanSizeCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

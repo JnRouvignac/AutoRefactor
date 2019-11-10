@@ -73,7 +73,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  *
  * @see {@link #getDescription()}
  */
-public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
+public class ReduceVariableScopeCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

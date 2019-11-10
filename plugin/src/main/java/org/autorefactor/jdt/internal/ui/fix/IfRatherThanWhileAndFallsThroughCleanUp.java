@@ -44,7 +44,7 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule {
+public class IfRatherThanWhileAndFallsThroughCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

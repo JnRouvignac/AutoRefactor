@@ -43,7 +43,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
-public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractCleanUpRule {
+public class InlineCodeRatherThanPeremptoryConditionCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

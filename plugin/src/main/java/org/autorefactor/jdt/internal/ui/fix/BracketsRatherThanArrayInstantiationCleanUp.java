@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /** See {@link #getDescription()} method. */
-public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUpRule {
+public class BracketsRatherThanArrayInstantiationCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
  *
  * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
  */
-public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
+public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

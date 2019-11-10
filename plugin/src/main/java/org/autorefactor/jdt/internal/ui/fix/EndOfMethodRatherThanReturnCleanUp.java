@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
+public class EndOfMethodRatherThanReturnCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

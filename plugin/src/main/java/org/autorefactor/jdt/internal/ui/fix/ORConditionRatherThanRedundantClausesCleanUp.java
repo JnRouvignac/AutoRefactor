@@ -37,7 +37,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
-public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
+public class ORConditionRatherThanRedundantClausesCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
-public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends AbstractCleanUpRule {
+public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

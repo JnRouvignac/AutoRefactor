@@ -62,7 +62,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class CollectionCleanUp extends AbstractCleanUpRule {
+public class CollectionCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

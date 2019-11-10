@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
-public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
+public class RemoveEmptyLinesCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

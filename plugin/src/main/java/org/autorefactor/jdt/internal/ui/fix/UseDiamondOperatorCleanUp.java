@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
-public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
+public class UseDiamondOperatorCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

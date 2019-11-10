@@ -43,7 +43,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
+public class ReduceIndentationCleanUp extends NoImportVisitCleanUp {
     private static final class IndentationVisitor extends ASTVisitor {
         private int indentation;
 

@@ -32,7 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
-public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule {
+public class ElseRatherThanOppositeConditionCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

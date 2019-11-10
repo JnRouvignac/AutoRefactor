@@ -46,7 +46,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRule {
+public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

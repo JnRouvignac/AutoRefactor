@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule {
+public class AndConditionRatherThanEmbededIfCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

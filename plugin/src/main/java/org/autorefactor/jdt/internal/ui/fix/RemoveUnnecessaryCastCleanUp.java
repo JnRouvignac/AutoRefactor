@@ -54,7 +54,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
  * <p>
  * TODO JNR remove casts from method parameters
  */
-public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
+public class RemoveUnnecessaryCastCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

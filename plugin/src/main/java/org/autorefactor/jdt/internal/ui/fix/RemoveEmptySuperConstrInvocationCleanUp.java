@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 
 /** See {@link #getDescription()} method. */
-public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule {
+public class RemoveEmptySuperConstrInvocationCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *

@@ -78,7 +78,7 @@ import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 
 /** See {@link #getDescription()} method. */
-public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRule {
+public class SimpleNameRatherThanQualifiedNameCleanUp extends NoImportVisitCleanUp {
     private static final class QName {
         private final QName qualifier;
         private final String simpleName;

@@ -37,7 +37,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  * expression nullness.
  * </p>
  */
-public class InvertEqualsCleanUp extends AbstractCleanUpRule {
+public class InvertEqualsCleanUp extends NoImportVisitCleanUp {
     /**
      * Get the name.
      *
