@@ -41,7 +41,7 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class AssignRatherThanFilterThenAssignAnywayCleanUp extends NoImportVisitCleanUp {
+public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

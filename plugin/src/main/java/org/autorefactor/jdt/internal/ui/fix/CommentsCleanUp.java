@@ -65,7 +65,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
-public class CommentsCleanUp extends NoImportVisitCleanUp {
+public class CommentsCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

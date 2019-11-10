@@ -40,7 +40,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
-public class AndroidWakeLockCleanUp extends NoImportVisitCleanUp {
+public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

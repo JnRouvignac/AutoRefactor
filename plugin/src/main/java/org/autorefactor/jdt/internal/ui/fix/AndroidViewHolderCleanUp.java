@@ -70,7 +70,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  *
  * @see {@link #getDescription()} method.
  */
-public class AndroidViewHolderCleanUp extends NoImportVisitCleanUp {
+public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

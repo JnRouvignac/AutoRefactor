@@ -30,7 +30,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-public class DoubleCompareRatherThanEqualityCleanUp extends NoImportVisitCleanUp {
+public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

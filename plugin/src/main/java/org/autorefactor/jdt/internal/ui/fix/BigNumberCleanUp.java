@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
-public class BigNumberCleanUp extends NoImportVisitCleanUp {
+public class BigNumberCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

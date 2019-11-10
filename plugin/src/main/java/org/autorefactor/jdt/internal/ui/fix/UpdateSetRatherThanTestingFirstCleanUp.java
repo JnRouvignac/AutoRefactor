@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class UpdateSetRatherThanTestingFirstCleanUp extends NoImportVisitCleanUp {
+public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

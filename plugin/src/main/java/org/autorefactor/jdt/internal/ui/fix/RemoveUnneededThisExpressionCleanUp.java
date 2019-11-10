@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
-public class RemoveUnneededThisExpressionCleanUp extends NoImportVisitCleanUp {
+public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

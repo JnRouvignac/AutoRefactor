@@ -44,7 +44,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  *
  * @see #getDescription()
  */
-public class RemoveEmptyStatementCleanUp extends NoImportVisitCleanUp {
+public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

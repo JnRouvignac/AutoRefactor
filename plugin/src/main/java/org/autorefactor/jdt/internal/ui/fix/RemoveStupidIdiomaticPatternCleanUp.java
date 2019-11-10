@@ -55,7 +55,7 @@ import java.util.List;
  * </pre>
  */
 /** See {@link #getDescription()} method. */
-public class RemoveStupidIdiomaticPatternCleanUp extends NoImportVisitCleanUp {
+public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

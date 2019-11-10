@@ -37,7 +37,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.QualifiedName;
 
 /** See {@link #getDescription()} method. */
-public class NamedMethodRatherThanLogLevelParameterCleanUp extends NoImportVisitCleanUp {
+public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

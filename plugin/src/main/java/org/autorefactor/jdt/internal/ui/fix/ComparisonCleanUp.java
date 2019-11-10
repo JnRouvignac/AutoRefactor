@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-public class ComparisonCleanUp extends NoImportVisitCleanUp {
+public class ComparisonCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

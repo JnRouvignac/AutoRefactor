@@ -52,7 +52,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class MapCleanUp extends NoImportVisitCleanUp {
+public class MapCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

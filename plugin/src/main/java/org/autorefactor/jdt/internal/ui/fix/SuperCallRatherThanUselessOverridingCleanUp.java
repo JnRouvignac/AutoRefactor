@@ -55,7 +55,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
  *
  * @see #getDescription()
  */
-public class SuperCallRatherThanUselessOverridingCleanUp extends NoImportVisitCleanUp {
+public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

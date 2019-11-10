@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  *
  * @see #getDescription()
  */
-public class DoWhileRatherThanWhileCleanUp extends NoImportVisitCleanUp {
+public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

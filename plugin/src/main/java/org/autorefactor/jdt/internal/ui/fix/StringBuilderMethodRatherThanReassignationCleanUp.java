@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
-public class StringBuilderMethodRatherThanReassignationCleanUp extends NoImportVisitCleanUp {
+public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

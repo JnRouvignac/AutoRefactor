@@ -35,7 +35,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class ForeachCleanUp extends NoImportVisitCleanUp {
+public class ForeachCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

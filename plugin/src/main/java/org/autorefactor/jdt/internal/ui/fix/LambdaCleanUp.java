@@ -58,7 +58,7 @@ import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
-public class LambdaCleanUp extends NoImportVisitCleanUp {
+public class LambdaCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

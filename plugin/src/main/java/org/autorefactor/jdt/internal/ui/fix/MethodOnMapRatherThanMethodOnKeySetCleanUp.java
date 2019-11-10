@@ -35,7 +35,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends NoImportVisitCleanUp {
+public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

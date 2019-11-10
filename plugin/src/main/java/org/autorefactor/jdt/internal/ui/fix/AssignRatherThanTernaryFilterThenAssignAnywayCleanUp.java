@@ -32,7 +32,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends NoImportVisitCleanUp {
+public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

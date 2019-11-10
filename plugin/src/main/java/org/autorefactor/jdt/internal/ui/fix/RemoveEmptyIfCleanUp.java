@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class RemoveEmptyIfCleanUp extends NoImportVisitCleanUp {
+public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

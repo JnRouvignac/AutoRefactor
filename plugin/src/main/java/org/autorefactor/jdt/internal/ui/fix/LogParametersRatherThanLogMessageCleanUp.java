@@ -37,7 +37,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
-public class LogParametersRatherThanLogMessageCleanUp extends NoImportVisitCleanUp {
+public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

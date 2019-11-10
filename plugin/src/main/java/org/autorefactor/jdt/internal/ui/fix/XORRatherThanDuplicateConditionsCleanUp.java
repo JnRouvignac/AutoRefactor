@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class XORRatherThanDuplicateConditionsCleanUp extends NoImportVisitCleanUp {
+public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

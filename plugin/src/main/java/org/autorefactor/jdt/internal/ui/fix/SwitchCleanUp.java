@@ -56,7 +56,7 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-public class SwitchCleanUp extends NoImportVisitCleanUp {
+public class SwitchCleanUp extends AbstractCleanUpRule {
     static final class Variable {
         private final SimpleName name;
         private final List<Expression> constantValues;

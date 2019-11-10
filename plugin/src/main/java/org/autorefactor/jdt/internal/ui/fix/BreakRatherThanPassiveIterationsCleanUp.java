@@ -54,7 +54,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class BreakRatherThanPassiveIterationsCleanUp extends NoImportVisitCleanUp {
+public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
     private static final class SideEffectVisitor extends InterruptibleVisitor {
         private final Set<String> localVariableNames;
         private boolean hasSideEffect;

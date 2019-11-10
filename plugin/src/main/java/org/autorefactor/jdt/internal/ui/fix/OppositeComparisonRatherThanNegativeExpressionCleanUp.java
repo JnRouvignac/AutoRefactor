@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends NoImportVisitCleanUp {
+public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

@@ -59,7 +59,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
  *
  * @see #getDescription()
  */
-public class CommonIfInIfElseCleanUp extends NoImportVisitCleanUp {
+public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

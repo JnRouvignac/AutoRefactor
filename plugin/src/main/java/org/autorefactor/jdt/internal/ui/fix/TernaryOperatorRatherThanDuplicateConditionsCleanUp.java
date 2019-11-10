@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends NoImportVisitCleanUp {
+public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

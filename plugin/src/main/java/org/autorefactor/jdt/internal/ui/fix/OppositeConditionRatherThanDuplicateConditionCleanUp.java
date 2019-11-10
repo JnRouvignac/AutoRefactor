@@ -61,7 +61,7 @@ import org.eclipse.jdt.core.dom.Statement;
  *
  * @see #getDescription()
  */
-public class OppositeConditionRatherThanDuplicateConditionCleanUp extends NoImportVisitCleanUp {
+public class OppositeConditionRatherThanDuplicateConditionCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

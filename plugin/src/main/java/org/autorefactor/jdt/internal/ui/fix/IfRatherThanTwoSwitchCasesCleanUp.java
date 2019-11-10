@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 
 /** See {@link #getDescription()} method. */
-public class IfRatherThanTwoSwitchCasesCleanUp extends NoImportVisitCleanUp {
+public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

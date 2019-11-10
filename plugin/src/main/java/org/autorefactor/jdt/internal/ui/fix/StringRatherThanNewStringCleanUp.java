@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
-public class StringRatherThanNewStringCleanUp extends NoImportVisitCleanUp {
+public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

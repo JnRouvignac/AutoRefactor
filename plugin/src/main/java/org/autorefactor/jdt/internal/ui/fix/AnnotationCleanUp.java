@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 
 /** See {@link #getDescription()} method. */
-public class AnnotationCleanUp extends NoImportVisitCleanUp {
+public class AnnotationCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

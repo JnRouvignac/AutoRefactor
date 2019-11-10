@@ -40,7 +40,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends NoImportVisitCleanUp {
+public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

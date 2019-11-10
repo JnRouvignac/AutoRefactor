@@ -64,7 +64,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends NoImportVisitCleanUp {
+public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends AbstractCleanUpRule {
     /**
      * Get the wrapper fully qualified name.
      *
