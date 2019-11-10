@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -229,10 +230,13 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         final Expression calledExpression= mi.getExpression();
 
         if (calledExpression == null) {
-            return (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
+            return mi.resolveMethodBinding() != null && (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
         }
-        if (calledExpression instanceof SimpleName) {
-            return ((SimpleName) calledExpression).resolveBinding().getKind() == IBinding.TYPE;
+
+        Name typeName= ASTNodes.as(calledExpression, Name.class);
+
+        if (typeName != null) {
+            return typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
         }
 
         return false;

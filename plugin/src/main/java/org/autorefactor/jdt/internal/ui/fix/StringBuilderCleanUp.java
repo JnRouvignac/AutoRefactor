@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -164,7 +165,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                         r.replace(node.getParent(), ctx.getASTBuilder().block());
                     }
                 } else {
-                    replaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
+                    return maybeReplaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
                 }
 
                 return false;
@@ -301,14 +302,17 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final AtomicBoolean isRefactoringNeeded) {
         for (ListIterator<Pair<ITypeBinding, Expression>> iter= allExprs.listIterator(); iter.hasNext();) {
             final Pair<ITypeBinding, Expression> expression= iter.next();
+
             if (expression.getSecond().getNodeType() == ASTNode.METHOD_INVOCATION) {
                 final MethodInvocation mi= (MethodInvocation) expression.getSecond();
+
                 if (ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, this.ctx.getAST().newThisExpression()));
                     }
+
                     isRefactoringNeeded.set(true);
                 } else if (isToString(mi) || isStringValueOf(mi)) {
                     iter.set(getTypeAndValue(mi));
@@ -319,13 +323,20 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
-        final ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
-        if (ASTNodes.hasType(ASTNodes.arguments(mi).get(0), expectedType.getQualifiedName(),
-                Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).getQualifiedName())) {
-            return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arguments(mi).get(0));
+        final IMethodBinding expectedType= mi.resolveMethodBinding();
+
+        if (expectedType == null) {
+            return null;
         }
 
-        return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arguments(mi).get(0));
+        final Expression argument= ASTNodes.arguments(mi).get(0);
+
+        if (ASTNodes.hasType(argument, expectedType.getParameterTypes()[0].getQualifiedName(),
+                Bindings.getBoxedTypeBinding(expectedType.getParameterTypes()[0], mi.getAST()).getQualifiedName())) {
+            return Pair.<ITypeBinding, Expression>of(null, argument);
+        }
+
+        return Pair.<ITypeBinding, Expression>of(expectedType.getParameterTypes()[0], argument);
     }
 
     /**
@@ -336,8 +347,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
      * @param lastExpression              The expression on which the methods are
      *                                    called.
      * @param isInstanceCreationToRewrite
+     * @return
      */
-    private void replaceWithNewStringAppends(final Expression node,
+    private boolean maybeReplaceWithNewStringAppends(final Expression node,
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
             final boolean isInstanceCreationToRewrite) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
@@ -348,6 +360,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final AtomicBoolean isFirst= new AtomicBoolean(true);
 
         for (Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
+            if (appendedString == null) {
+                return true;
+            }
+
             if (isValuedStringLiteralOrConstant(appendedString.getSecond())) {
                 tempStringLiterals.add(b.copy(appendedString.getSecond()));
             } else {
@@ -387,6 +403,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         }
 
         ctx.getRefactorings().replace(node, result);
+        return false;
     }
 
     private Expression handleTempStringLiterals(final ASTNodeFactory b, final Expression lastExpression,

@@ -45,6 +45,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
     }
@@ -54,6 +55,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
     }
@@ -63,6 +65,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
     }
@@ -70,6 +73,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
+
         if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
                 && ASTNodes.typeArguments(node).isEmpty()) {
             // Remove useless thisExpressions
@@ -89,35 +93,48 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         if (thisQualifierName == null) {
             return true;
         }
+
         final ASTNode enclosingType= ASTNodes.getEnclosingType(node);
+
         if (enclosingType instanceof AnonymousClassDeclaration) {
             return false;
         }
+
         final AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
+
         if (thisQualifierName instanceof SimpleName) {
             return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
         }
+
         if (thisQualifierName instanceof QualifiedName) {
             final QualifiedName qn= (QualifiedName) thisQualifierName;
             return ASTNodes.isEqual(qn.getName(), ancestor.getName())
                     && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
         }
+
         throw new NotImplementedException(thisQualifierName);
     }
 
     private boolean isCallingMethodDeclaredInEnclosingType(MethodInvocation node) {
         final ASTNode currentType= ASTNodes.getEnclosingType(node);
         final IMethodBinding mb= node.resolveMethodBinding();
+
+        if (mb == null) {
+            return false;
+        }
+
         if (currentType instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
             final ITypeBinding enclosingTypeBinding= c.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
+
         if (currentType instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
             final ITypeBinding enclosingTypeBinding= ed.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
+
         throw new NotImplementedException(node, node);
     }
 }
