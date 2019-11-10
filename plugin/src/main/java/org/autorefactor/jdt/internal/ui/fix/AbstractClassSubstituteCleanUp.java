@@ -26,21 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONSTRUCTOR_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +68,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(0);
+        return new HashSet<>(0);
     }
 
     /**
@@ -343,26 +328,29 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
-        case ASSIGNMENT:
-        case RETURN_STATEMENT:
-        case CAST_EXPRESSION:
-        case INSTANCEOF_EXPRESSION:
-        case CLASS_INSTANCE_CREATION:
-        case CONSTRUCTOR_INVOCATION:
-        case CONDITIONAL_EXPRESSION:
+        case ASTNode.EXPRESSION_STATEMENT:
+            return true;
+
+        case ASTNode.ASSIGNMENT:
+        case ASTNode.RETURN_STATEMENT:
+        case ASTNode.CAST_EXPRESSION:
+        case ASTNode.INSTANCEOF_EXPRESSION:
+        case ASTNode.CLASS_INSTANCE_CREATION:
+        case ASTNode.CONSTRUCTOR_INVOCATION:
+        case ASTNode.CONDITIONAL_EXPRESSION:
             return false;
 
-        case PARENTHESIZED_EXPRESSION:
+        case ASTNode.PARENTHESIZED_EXPRESSION:
             return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
                     methodCallsToRefactor);
 
-        case ENHANCED_FOR_STATEMENT:
+        case ASTNode.ENHANCED_FOR_STATEMENT:
             return canInvokeIterator();
 
-        case SINGLE_VARIABLE_DECLARATION:
-        case VARIABLE_DECLARATION_EXPRESSION:
-        case VARIABLE_DECLARATION_FRAGMENT:
-        case VARIABLE_DECLARATION_STATEMENT:
+        case ASTNode.SINGLE_VARIABLE_DECLARATION:
+        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+        case ASTNode.VARIABLE_DECLARATION_STATEMENT:
             final VariableDeclaration varDecl= (VariableDeclaration) parentNode;
             if (varDecl.getParent() instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement variableDeclaration= (VariableDeclarationStatement) varDecl
@@ -375,11 +363,13 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
             return false;
 
-        case METHOD_INVOCATION:
+        case ASTNode.METHOD_INVOCATION:
             final MethodInvocation mi= (MethodInvocation) parentNode;
-            if (isObjectPassedInParameter(node, mi) || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
+
+            if (node.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
                 return false;
             }
+
             if (!isMethodReturningExistingClass(mi)) {
                 return true;
             }
@@ -388,12 +378,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                     methodCallsToRefactor);
 
         default:
-            return true;
+            return false;
         }
-    }
-
-    private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {
-        return !subNode.equals(mi.getExpression());
     }
 
     static String getArgumentType(final MethodInvocation mi) {
