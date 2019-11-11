@@ -81,7 +81,6 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-        environment.getJobManager().register(this);
         try {
             return run0(monitor);
         } catch (OperationCanceledException e) {
@@ -92,8 +91,6 @@ public class PrepareApplyRefactoringsJob extends Job {
                     + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
                     + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
             return new Status(IStatus.ERROR, PluginConstant.PLUGIN_ID, msg, e);
-        } finally {
-            environment.getJobManager().unregister(this);
         }
     }
 
