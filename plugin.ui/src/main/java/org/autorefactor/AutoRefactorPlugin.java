@@ -28,8 +28,8 @@ package org.autorefactor;
 import java.util.Vector;
 
 import org.autorefactor.environment.Environment;
-import org.autorefactor.environment.JobManager;
 import org.autorefactor.environment.Logger;
+import org.autorefactor.jdt.internal.corext.dom.AbstractRefactoringJob;
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.ui.DisplayEventLoop;
 import org.autorefactor.ui.preferences.EclipsePreferences;
@@ -55,14 +55,14 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     public void start(final BundleContext context) throws Exception {
         super.start(context);
         plugin= this;
-        environment= new Environment(new DisplayEventLoop(), new JobManagerImpl(), new LoggerImpl(),
+        environment= new Environment(new DisplayEventLoop(), new LoggerImpl(),
                 new EclipsePreferences(plugin.getPreferenceStore()));
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
+    	Job.getJobManager().cancel(AbstractRefactoringJob.FAMILY);
         plugin= null;
-        ((JobManagerImpl) environment.getJobManager()).cancelJobs();
         environment= null;
         super.stop(context);
     }
@@ -159,34 +159,5 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      */
     public static ImageDescriptor getImageDescriptor(final String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
-
-    private static class JobManagerImpl implements JobManager {
-        private final Vector<Job> jobs= new Vector<>();
-
-        /**
-         * Register a job.
-         *
-         * @param job the job
-         */
-        public void register(Job job) {
-            jobs.add(job);
-        }
-
-        /**
-         * Unregister a job.
-         *
-         * @param job the job
-         */
-        public void unregister(Job job) {
-            jobs.remove(job);
-        }
-
-        private void cancelJobs() {
-            for (Job job : jobs) {
-                job.cancel();
-            }
-            jobs.clear();
-        }
     }
 }

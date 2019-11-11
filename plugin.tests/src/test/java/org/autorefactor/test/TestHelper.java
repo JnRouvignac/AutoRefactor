@@ -59,8 +59,7 @@ import org.eclipse.text.edits.TextEdit;
 
 public final class TestHelper {
     /** Environment for unit tests. */
-    public static final Environment TEST_ENVIRONMENT= new Environment(new CurrentThreadEvenLoop(), null,
-            new ThrowingLogger(), null);
+    public static final Environment TEST_ENVIRONMENT= new Environment(new CurrentThreadEventLoop(), new ThrowingLogger(), null);
 
     private TestHelper() {
     }
