@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.Dimension;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -54,6 +55,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
     }
@@ -63,6 +65,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
     }
@@ -72,6 +75,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
     }
@@ -146,7 +150,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
     @SuppressWarnings("unchecked")
     private boolean hasAnnotation(final List<?> modifiers) {
         for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
-            if (!em.isModifier()) {
+            if (em.isAnnotation()) {
                 return true;
             }
         }
@@ -161,11 +165,31 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
         if (fragment.getInitializer() != null) {
             final Type copyOfType= b.copy(varToMove.getType());
             final SimpleName name= fragment.getName();
-            r.insertBefore(b.declareStatement(copyOfType, b.declareFragment(b.copy(name))), statement);
+            VariableDeclarationFragment newFragment= b.declareFragment(b.copy(name));
+            @SuppressWarnings("unchecked")
+            List<Dimension> extraDimensions= fragment.extraDimensions();
+            @SuppressWarnings("unchecked")
+            List<Dimension> newExtraDimensions= newFragment.extraDimensions();
+            newExtraDimensions.addAll(b.move(extraDimensions));
+            VariableDeclarationStatement newDeclareStatement= b.declareStatement(copyOfType, newFragment);
+            @SuppressWarnings("unchecked")
+            List<IExtendedModifier> modifiers= varToMove.modifiers();
+            @SuppressWarnings("unchecked")
+            List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
+
+            for (IExtendedModifier iExtendedModifier : modifiers) {
+                Modifier modifier= (Modifier) iExtendedModifier;
+
+                if (!modifier.isPrivate() && !modifier.isStatic()) {
+                    newModifiers.add(b.move(modifier));
+                }
+            }
+
+            r.insertBefore(newDeclareStatement, statement);
             r.replace(varToMove,
-                    b.toStatement(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.copy(fragment.getInitializer()))));
+                    b.toStatement(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.move(fragment.getInitializer()))));
         } else {
-            r.insertBefore(b.copy(varToMove), statement);
+            r.insertBefore(b.move(varToMove), statement);
             r.remove(varToMove);
         }
     }

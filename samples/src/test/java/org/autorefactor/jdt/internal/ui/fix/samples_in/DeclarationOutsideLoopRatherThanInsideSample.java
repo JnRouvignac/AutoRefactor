@@ -41,6 +41,19 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         return concat.toString();
     }
 
+    public String moveArrayDecl(int count) {
+        StringBuilder concat = new StringBuilder();
+
+        for (int i = 0; i < count; i++) {
+            // Keep this comment
+            String newNumber[] = new String[]{String.valueOf(i)};
+            concat.append(newNumber);
+            concat.append(";");
+        }
+
+        return concat.toString();
+    }
+
     public String moveObjectDeclFromLoops(int count) {
         StringBuilder concat = new StringBuilder();
 
