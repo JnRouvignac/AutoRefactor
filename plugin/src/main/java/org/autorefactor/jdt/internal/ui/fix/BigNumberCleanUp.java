@@ -253,7 +253,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
+        final MethodInvocation mi= b.invoke(b.move(node.getExpression()), "compareTo", b.move(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
         return b.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
     }

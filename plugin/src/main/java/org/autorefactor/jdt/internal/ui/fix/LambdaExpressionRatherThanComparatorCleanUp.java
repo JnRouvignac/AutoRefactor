@@ -248,7 +248,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
         final TypeMethodReference typeMethodRef= b.typeMethodRef();
         typeMethodRef.setType(b.toType(type, typeNameDecider));
-        typeMethodRef.setName(b.copy(method.getName()));
+        typeMethodRef.setName(b.move(method.getName()));
         final MethodInvocation comparingMethod= b
                 .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", typeMethodRef); //$NON-NLS-1$
         if (straightOrder) {
@@ -278,7 +278,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             lambdaExpression.parameters().add(b.declareSingleVariable(identifier1, b.toType(type, typeNameDecider)));
         }
 
-        lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.copy(field.getName())));
+        lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.move(field.getName())));
         lambdaExpression.setParentheses(false);
         final MethodInvocation comparingMethod= b
                 .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", lambdaExpression); //$NON-NLS-1$

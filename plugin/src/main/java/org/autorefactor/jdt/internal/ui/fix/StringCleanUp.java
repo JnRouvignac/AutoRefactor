@@ -154,7 +154,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                                     && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
                 final Expression leftExpression= leftInvocation.getExpression();
                 final Expression rightExpression= rightInvocation.getExpression();
-                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
+                r.replace(node, b.invoke(b.move(leftExpression), "equalsIgnoreCase", b.move(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
@@ -164,7 +164,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             final Expression rightExpression= getReducedStringExpression(ASTNodes.arguments(node).get(0), isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
+                r.replace(node, b.invoke(b.move(leftExpression), "equalsIgnoreCase", b.move(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$

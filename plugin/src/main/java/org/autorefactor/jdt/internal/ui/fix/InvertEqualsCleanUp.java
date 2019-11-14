@@ -91,6 +91,6 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
         final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
         this.ctx.getRefactorings().replace(node,
-                b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expression)));
+                b.invoke(b.parenthesizeIfNeeded(b.move(arg0)), methodName, b.move(expression)));
     }
 }

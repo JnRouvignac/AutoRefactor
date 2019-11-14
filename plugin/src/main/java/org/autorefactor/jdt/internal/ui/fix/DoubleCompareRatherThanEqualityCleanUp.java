@@ -75,7 +75,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node,
                 b.infixExpression(
-                        b.invoke(Double.class.getSimpleName(), "compare", b.copy(node.getLeftOperand()), b.copy(node.getRightOperand())), //$NON-NLS-1$
+                        b.invoke(Double.class.getSimpleName(), "compare", b.move(node.getLeftOperand()), b.move(node.getRightOperand())), //$NON-NLS-1$
                         node.getOperator(), b.number("0"))); //$NON-NLS-1$
     }
 }

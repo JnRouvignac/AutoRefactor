@@ -44,6 +44,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
     }
@@ -53,6 +54,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
     }
@@ -62,6 +64,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
     }

@@ -83,6 +83,6 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(secondIf, b.copy(secondIf.getThenStatement()));
+        r.replace(secondIf, b.move(secondIf.getThenStatement()));
     }
 }

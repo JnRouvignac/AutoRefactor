@@ -232,6 +232,6 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
         r.replace(node,
                 b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
-                        "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1)))); //$NON-NLS-1$
+                        "equals", b.move(firstField), b.move(secondField))), b.block(b.move(returnStmt1)))); //$NON-NLS-1$
     }
 }

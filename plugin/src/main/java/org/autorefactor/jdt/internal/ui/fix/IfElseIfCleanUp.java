@@ -107,7 +107,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
             List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);
             if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.copy(elseStatements.get(0)));
+                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.move(elseStatements.get(0)));
                 return false;
             }
         }

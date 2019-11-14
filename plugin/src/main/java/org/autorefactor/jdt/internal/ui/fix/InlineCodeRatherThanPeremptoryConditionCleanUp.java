@@ -203,7 +203,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
             r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
-            r.replace(sourceNode, b.copy(unconditionnalStatement));
+            r.replace(sourceNode, b.move(unconditionnalStatement));
         }
     }
 

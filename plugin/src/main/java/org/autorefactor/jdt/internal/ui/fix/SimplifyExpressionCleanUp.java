@@ -358,17 +358,17 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 r.replace(node,
-                        b.infixExpression(b.copy(leftOppositeExpression), getAppropriateOperator(node), b.copy(rightOppositeExpression)));
+                        b.infixExpression(b.move(leftOppositeExpression), getAppropriateOperator(node), b.move(rightOppositeExpression)));
             } else {
                 final InfixExpression.Operator reverseOp= getReverseOperator(node);
-                r.replace(node, b.infixExpression(b.copy(leftOppositeExpression), reverseOp, b.copy(rightExpression)));
+                r.replace(node, b.infixExpression(b.move(leftOppositeExpression), reverseOp, b.move(rightExpression)));
             }
 
             return false;
         }
         if (rightOppositeExpression != null) {
             final InfixExpression.Operator reverseOp= getReverseOperator(node);
-            r.replace(node, b.infixExpression(b.copy(leftExpression), reverseOp, b.copy(rightOppositeExpression)));
+            r.replace(node, b.infixExpression(b.move(leftExpression), reverseOp, b.move(rightOppositeExpression)));
             return false;
         }
 
@@ -404,7 +404,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Expression operand;
         if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-            operand= b.copy(exprToCopy);
+            operand= b.move(exprToCopy);
         } else {
             operand= b.negate(exprToCopy);
         }

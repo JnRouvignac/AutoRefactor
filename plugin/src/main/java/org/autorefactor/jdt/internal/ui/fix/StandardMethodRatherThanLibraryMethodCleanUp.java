@@ -118,8 +118,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                         Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
-            r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)), //$NON-NLS-1$
-                    b.copy((Expression) node.arguments().get(1))));
+            r.replace(node, b.invoke(javaUtilObjects, "equals", b.move((Expression) node.arguments().get(0)), //$NON-NLS-1$
+                    b.move((Expression) node.arguments().get(1))));
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
@@ -128,7 +128,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node,
-                    b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ //$NON-NLS-2$
+                    b.invoke(javaUtilObjects, "toString", b.move((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ //$NON-NLS-2$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
@@ -189,7 +189,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final List<Expression> copyOfArgs= new ArrayList<>(node.arguments().size());
 
         for (Object expression : node.arguments()) {
-            copyOfArgs.add(b.copy((Expression) expression));
+            copyOfArgs.add(b.move((Expression) expression));
         }
 
         return copyOfArgs;

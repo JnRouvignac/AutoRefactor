@@ -125,8 +125,8 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
         ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Arrays.class.getCanonicalName()) ? Arrays.class.getSimpleName() : Arrays.class.getCanonicalName()),
-                        "fill", b.copy(arrayAccess.getArray()), //$NON-NLS-1$
-                        b.copy(assignment.getRightHandSide()))));
+                        "fill", b.move(arrayAccess.getArray()), //$NON-NLS-1$
+                        b.move(assignment.getRightHandSide()))));
     }
 
     private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {

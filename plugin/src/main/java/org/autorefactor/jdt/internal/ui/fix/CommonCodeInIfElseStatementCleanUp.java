@@ -205,7 +205,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.copy(stmtToRemove));
+                    orderedStatements.add(0, b.move(stmtToRemove));
                 }
                 r.replace(node, b.block(orderedStatements));
             }
@@ -234,7 +234,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.copy(stmtToRemove));
+                    orderedStatements.add(0, b.move(stmtToRemove));
                 }
                 orderedStatements.add(0, b.move(node));
                 r.replace(node, b.block(orderedStatements));
@@ -245,7 +245,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
     private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTNodeFactory b,
             final Refactorings r) {
         for (Statement stmtToRemove : stmtsToRemove) {
-            r.insertAfter(b.copy(stmtToRemove), node);
+            r.insertAfter(b.move(stmtToRemove), node);
         }
     }
 

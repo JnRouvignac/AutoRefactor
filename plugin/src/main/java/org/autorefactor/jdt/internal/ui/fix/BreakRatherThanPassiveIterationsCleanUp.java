@@ -271,7 +271,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         if (ifStatement.getThenStatement() instanceof Block) {
             r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));
         } else {
-            r.replace(ifStatement.getThenStatement(), b.block(b.copy(ifStatement.getThenStatement()), b.break0()));
+            r.replace(ifStatement.getThenStatement(), b.block(b.move(ifStatement.getThenStatement()), b.break0()));
         }
     }
 }
