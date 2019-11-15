@@ -184,13 +184,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         boolean isFieldKept= field.fragments().size() != 1;
 
         Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
-        final VariableDeclarationFragment newFragment= b.declareFragment(b.move(reassignment), b.move(reassignmentAssignment.getRightHandSide()));
+        final VariableDeclarationFragment newFragment= b.declareFragment(b.createMoveTarget(reassignment), b.createMoveTarget(reassignmentAssignment.getRightHandSide()));
         @SuppressWarnings("unchecked")
         List<Dimension> extraDimensions= fragment.extraDimensions();
         @SuppressWarnings("unchecked")
         List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-        newExtraDimensions.addAll(b.move(extraDimensions));
-        VariableDeclarationStatement newDeclareStatement= b.declareStatement(isFieldKept ? b.move(field.getType()) : b.copy(field.getType()), newFragment);
+        newExtraDimensions.addAll(b.createMoveTarget(extraDimensions));
+        VariableDeclarationStatement newDeclareStatement= b.declareStatement(isFieldKept ? b.createMoveTarget(field.getType()) : b.createCopyTarget(field.getType()), newFragment);
         @SuppressWarnings("unchecked")
         List<IExtendedModifier> modifiers= field.modifiers();
         @SuppressWarnings("unchecked")
@@ -200,7 +200,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
             Modifier modifier= (Modifier) iExtendedModifier;
 
             if (!modifier.isPrivate() && !modifier.isStatic()) {
-                newModifiers.add(isFieldKept ? b.move(modifier) : b.copy(modifier));
+                newModifiers.add(isFieldKept ? b.createMoveTarget(modifier) : b.createCopyTarget(modifier));
             }
         }
 
@@ -209,7 +209,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
         if (isFieldKept) {
             r.remove(fragment);
-            r.replace(field.getType(), b.copy(field.getType()));
+            r.replace(field.getType(), b.createCopyTarget(field.getType()));
         } else {
             r.remove(field);
         }

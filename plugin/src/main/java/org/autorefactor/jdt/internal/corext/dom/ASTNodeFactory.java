@@ -154,14 +154,14 @@ public class ASTNodeFactory {
         COPY {
             @Override
             protected <T extends ASTNode> T perform(ASTNodeFactory b, T node) {
-                return b.copy(node);
+                return b.createCopyTarget(node);
             }
         },
         /** Delegates to {@link ASTBuilder#move(ASTNode)}. */
         MOVE {
             @Override
             protected <T extends ASTNode> T perform(ASTNodeFactory b, T node) {
-                return b.move(node);
+                return b.createMoveTarget(node);
             }
         };
 
@@ -406,7 +406,7 @@ public class ASTNodeFactory {
      * @return a copy of the node
      */
     @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T copy(T nodeToCopy) {
+    public <T extends ASTNode> T createCopyTarget(T nodeToCopy) {
         if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
         }
@@ -510,17 +510,17 @@ public class ASTNodeFactory {
 
         case SIMPLE_TYPE:
             final SimpleType sType= (SimpleType) type;
-            return ast.newSimpleType(copy(sType.getName()));
+            return ast.newSimpleType(createCopyTarget(sType.getName()));
 
         case PARAMETERIZED_TYPE:
             final ParameterizedType pType= (ParameterizedType) type;
-            final ParameterizedType copyOfType= ast.newParameterizedType(copy(pType.getType()));
+            final ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
             final List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
             for (Object typeArg : pType.typeArguments()) {
                 if (((Type) typeArg).isWildcardType()) {
                     newTypeArgs.add(ast.newWildcardType());
                 } else {
-                    newTypeArgs.add(copy((Type) typeArg));
+                    newTypeArgs.add(createCopyTarget((Type) typeArg));
                 }
             }
 
@@ -538,7 +538,7 @@ public class ASTNodeFactory {
      * @return a copy of the expression, or false if no such expression exists
      */
     public Expression copyExpression(MethodInvocation node) {
-        return node.getExpression() != null ? copy(node.getExpression()) : null;
+        return node.getExpression() != null ? createCopyTarget(node.getExpression()) : null;
     }
 
     /**
@@ -601,7 +601,7 @@ public class ASTNodeFactory {
 
     /**
      * Returns a copy of the provided {@link ASTNode}. This method loses code
-     * comments. Prefer using {@link #copy(ASTNode)}.
+     * comments. Prefer using {@link #createCopyTarget(ASTNode)}.
      *
      * @param <T>  the actual node type
      * @param node the node to copy
@@ -1011,7 +1011,7 @@ public class ASTNodeFactory {
      * @param nodeToMove the node to move
      * @return a placeholder for the moved node
      */
-    public <T extends ASTNode> T move(T nodeToMove) {
+    public <T extends ASTNode> T createMoveTarget(T nodeToMove) {
         return refactorings.createMoveTarget(nodeToMove);
     }
 
@@ -1022,11 +1022,11 @@ public class ASTNodeFactory {
      * @param nodes the nodes to move
      * @return the provided list with all nodes moved
      */
-    public <T extends ASTNode> List<T> move(final Collection<T> nodes) {
+    public <T extends ASTNode> List<T> createMoveTarget(final Collection<T> nodes) {
         List<T> movedNodes= new ArrayList<>(nodes.size());
 
         for (T astNode : nodes) {
-            movedNodes.add(move(astNode));
+            movedNodes.add(createMoveTarget(astNode));
         }
 
         return movedNodes;

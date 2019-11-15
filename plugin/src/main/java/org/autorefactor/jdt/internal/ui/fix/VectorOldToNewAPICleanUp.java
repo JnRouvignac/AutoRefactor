@@ -110,7 +110,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
         if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            r.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.move(arg0)));
+            r.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.createMoveTarget(arg0)));
         }
     }
 
@@ -122,7 +122,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
-        r.moveToIndex(arg1, 0, b.move(arg1));
+        r.moveToIndex(arg1, 0, b.createMoveTarget(arg1));
     }
 
     private void assertSize(final List<Expression> args, final int expectedSize) {

@@ -163,14 +163,14 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
         final VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
         if (fragment.getInitializer() != null) {
-            final Type copyOfType= b.copy(varToMove.getType());
+            final Type copyOfType= b.createCopyTarget(varToMove.getType());
             final SimpleName name= fragment.getName();
-            VariableDeclarationFragment newFragment= b.declareFragment(b.copy(name));
+            VariableDeclarationFragment newFragment= b.declareFragment(b.createCopyTarget(name));
             @SuppressWarnings("unchecked")
             List<Dimension> extraDimensions= fragment.extraDimensions();
             @SuppressWarnings("unchecked")
             List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-            newExtraDimensions.addAll(b.move(extraDimensions));
+            newExtraDimensions.addAll(b.createMoveTarget(extraDimensions));
             VariableDeclarationStatement newDeclareStatement= b.declareStatement(copyOfType, newFragment);
             @SuppressWarnings("unchecked")
             List<IExtendedModifier> modifiers= varToMove.modifiers();
@@ -181,15 +181,15 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 Modifier modifier= (Modifier) iExtendedModifier;
 
                 if (!modifier.isPrivate() && !modifier.isStatic()) {
-                    newModifiers.add(b.move(modifier));
+                    newModifiers.add(b.createMoveTarget(modifier));
                 }
             }
 
             r.insertBefore(newDeclareStatement, statement);
             r.replace(varToMove,
-                    b.toStatement(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.move(fragment.getInitializer()))));
+                    b.toStatement(b.assign(b.createCopyTarget(name), Assignment.Operator.ASSIGN, b.createMoveTarget(fragment.getInitializer()))));
         } else {
-            r.insertBefore(b.move(varToMove), statement);
+            r.insertBefore(b.createMoveTarget(varToMove), statement);
             r.remove(varToMove);
         }
     }

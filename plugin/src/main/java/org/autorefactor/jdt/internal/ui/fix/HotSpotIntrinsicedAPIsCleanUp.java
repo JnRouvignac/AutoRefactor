@@ -133,7 +133,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             final IVariableBinding idxVar= getVariableBinding(index);
 
             if (Utils.equalNotNull(params.indexVarBinding, idxVar)) {
-                return b.copy(params.indexStartPos);
+                return b.createCopyTarget(params.indexStartPos);
             }
         } else if (index instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) index;
@@ -172,13 +172,13 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             return b.int0(expr1Value + expr2Value);
         }
         if (Utils.equalNotNull(expr1Value, 0)) {
-            return b.copy(expr2);
+            return b.createCopyTarget(expr2);
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.copy(expr1);
+            return b.createCopyTarget(expr1);
         }
 
-        return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
+        return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, b.createCopyTarget(expr2));
     }
 
     private Expression minus(Expression expr1, Expression expr2) {
@@ -193,10 +193,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.copy(expr1);
+            return b.createCopyTarget(expr1);
         }
 
-        return b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
+        return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2));
     }
 
     private Expression minusPlusOne(Expression expr1, Expression expr2) {
@@ -211,10 +211,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+            return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpression(b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        return b.infixExpression(b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
     private Integer intValue(Expression expression) {
@@ -259,8 +259,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         }
 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpression), params.srcPos,
-                b.copy(params.destArrayExpression), params.destPos, params.length);
+        replaceWithSystemArrayCopy(node, b.createCopyTarget(params.srcArrayExpression), params.srcPos,
+                b.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
         return false;
     }
 

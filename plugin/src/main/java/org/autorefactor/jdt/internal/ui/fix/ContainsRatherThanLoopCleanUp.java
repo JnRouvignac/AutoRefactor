@@ -98,7 +98,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 
     @Override
     protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTNodeFactory b) {
-        final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind)); //$NON-NLS-1$
+        final MethodInvocation invoke= b.invoke(b.createMoveTarget(iterable), "contains", b.createMoveTarget(toFind)); //$NON-NLS-1$
 
         if (isPositive) {
             return invoke;

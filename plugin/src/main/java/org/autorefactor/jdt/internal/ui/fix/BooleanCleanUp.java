@@ -199,7 +199,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                 Expression orientedCondition;
                 if (booleanValue) {
-                    orientedCondition= b.copy(ifCondition);
+                    orientedCondition= b.createCopyTarget(ifCondition);
                 } else {
                     orientedCondition= b.negate(ifCondition, Copy.COPY);
                 }
@@ -220,7 +220,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 if (booleanValue != null) {
                     Expression orientedCondition;
                     if (booleanValue) {
-                        orientedCondition= b.copy(ifCondition);
+                        orientedCondition= b.createCopyTarget(ifCondition);
                     } else {
                         orientedCondition= b.negate(ifCondition, Copy.COPY);
                     }
@@ -366,16 +366,16 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     private ReturnStatement getReturnStatement(IfStatement node, Boolean thenBool, Boolean elseBool,
             Expression thenExpression, Expression elseExpression) {
         if (thenBool == null && elseBool != null) {
-            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool);
+            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.createCopyTarget(node.getExpression())), !elseBool);
             return b.return0(b.infixExpression(leftOp, getConditionalOperator(elseBool.booleanValue()),
-                    b.parenthesizeIfNeeded(b.copy(thenExpression))));
+                    b.parenthesizeIfNeeded(b.createCopyTarget(thenExpression))));
         }
 
         if (thenBool != null && elseBool == null) {
-            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())),
+            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.createCopyTarget(node.getExpression())),
                     thenBool.booleanValue());
             return b.return0(b.infixExpression(leftOp, getConditionalOperator(thenBool.booleanValue()),
-                    b.parenthesizeIfNeeded(b.copy(elseExpression))));
+                    b.parenthesizeIfNeeded(b.createCopyTarget(elseExpression))));
         }
 
         return null;
@@ -411,7 +411,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     private ReturnStatement getReturnStatement(final IfStatement node, final Expression thenExpression,
             final Expression elseExpression) {
         if (areOppositeBooleanValues(thenExpression, elseExpression)) {
-            Expression exprToReturn= b.copy(node.getExpression());
+            Expression exprToReturn= b.createCopyTarget(node.getExpression());
 
             if (ASTNodes.getBooleanLiteral(elseExpression)) {
                 exprToReturn= b.negate(exprToReturn, Copy.NONE);
@@ -458,7 +458,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Name booleanName= getBooleanName(condition);
             Expression orientedCondition;
             if (thenLiteral) {
-                orientedCondition= b.copy(condition);
+                orientedCondition= b.createCopyTarget(condition);
             } else {
                 orientedCondition= b.negate(condition, Copy.COPY);
             }
@@ -474,18 +474,18 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             // care
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
-                    return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
+                    return b.infixExpression(b.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_OR, b.createCopyTarget(elseExpression));
                 }
 
-                return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
+                return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.createCopyTarget(elseExpression));
             }
 
             if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
-                    return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
+                    return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.createCopyTarget(thenExpression));
                 }
 
-                return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
+                return b.infixExpression(b.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_AND, b.createCopyTarget(thenExpression));
             }
         }
 

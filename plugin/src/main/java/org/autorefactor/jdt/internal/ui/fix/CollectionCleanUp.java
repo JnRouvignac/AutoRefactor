@@ -137,7 +137,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
-                ctx.getRefactorings().replace(nodeToReplace, b.new0(b.move(cic.getType()), b.move(arg0)));
+                ctx.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
                 ctx.getRefactorings().remove(nodeToRemove);
                 setResult(false);
                 return false;

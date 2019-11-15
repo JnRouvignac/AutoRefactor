@@ -183,7 +183,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
         }
 
         if (failureMessage != null) {
-            arguments.add(b.copy(failureMessage));
+            arguments.add(b.createCopyTarget(failureMessage));
         }
 
         return b.invoke(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));

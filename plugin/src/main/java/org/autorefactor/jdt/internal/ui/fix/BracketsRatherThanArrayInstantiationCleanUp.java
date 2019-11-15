@@ -87,7 +87,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
             ctx.getRefactorings().replace(node, node.getInitializer());
         } else {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.copy(b.arrayInitializer()));
+            ctx.getRefactorings().replace(node, b.createCopyTarget(b.arrayInitializer()));
         }
     }
 

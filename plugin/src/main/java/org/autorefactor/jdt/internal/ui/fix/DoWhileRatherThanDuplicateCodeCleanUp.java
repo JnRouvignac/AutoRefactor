@@ -96,6 +96,6 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         r.remove(previousStatements);
 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        r.replace(node, b.doWhile(b.move(node.getExpression()), b.move(node.getBody())));
+        r.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 }

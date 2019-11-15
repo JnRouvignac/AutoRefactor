@@ -80,9 +80,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        final InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.move(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
-                b.parenthesizeIfNeeded(b.move(innerIf.getExpression())));
+        final InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+                b.parenthesizeIfNeeded(b.createMoveTarget(innerIf.getExpression())));
         r.replace(innerIf.getExpression(), ie);
-        r.replace(outerIf, b.move(innerIf));
+        r.replace(outerIf, b.createMoveTarget(innerIf));
     }
 }

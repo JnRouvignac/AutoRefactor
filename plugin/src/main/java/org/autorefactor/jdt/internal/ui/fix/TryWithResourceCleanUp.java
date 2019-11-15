@@ -179,7 +179,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             List<ASTNode> nodesToRemove) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-        return fragment != null ? b.declareExpression(b.move(previousDeclStatement.getType()), fragment) : null;
+        return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
     }
 
     private VariableDeclarationFragment newFragment(List<Statement> tryStatements,
@@ -194,15 +194,15 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             if (assignResource != null && ASTNodes.isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
                 nodesToRemove.add(tryStatement);
                 if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-                    return b.declareFragment(b.move(existingFragment.getName()),
-                            b.move(assignResource.getRightHandSide()));
+                    return b.declareFragment(b.createMoveTarget(existingFragment.getName()),
+                            b.createMoveTarget(assignResource.getRightHandSide()));
                 }
 
                 return null;
             }
         }
 
-        return containsOnly(definitions, existingFragment.getName()) ? b.move(existingFragment) : null;
+        return containsOnly(definitions, existingFragment.getName()) ? b.createMoveTarget(existingFragment) : null;
     }
 
     private boolean containsOnly(Collection<SimpleName> definitions, Expression... simpleNames) {
@@ -222,7 +222,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         final Refactorings r= ctx.getRefactorings();
         final ASTNodeFactory b= ctx.getASTBuilder();
         r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
-        r.replace(innerTryStatement, b.move(innerTryStatement.getBody()));
+        r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
         return false;
     }
 }

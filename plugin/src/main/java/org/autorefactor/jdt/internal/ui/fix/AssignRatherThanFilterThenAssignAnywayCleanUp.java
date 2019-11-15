@@ -176,7 +176,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         private void replaceWithStraightAssign(IfStatement node, Expression leftHandSide, Expression rightHandSide) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
-                    b.toStatement(b.assign(b.move(leftHandSide), Assignment.Operator.ASSIGN, b.move(rightHandSide))));
+                    b.toStatement(b.assign(b.createMoveTarget(leftHandSide), Assignment.Operator.ASSIGN, b.createMoveTarget(rightHandSide))));
         }
 
         private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement valuedReturn,
@@ -207,7 +207,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             final Refactorings r= ctx.getRefactorings();
 
             r.remove(toRemove);
-            r.replace(node, b.return0(b.move(returnedExpression)));
+            r.replace(node, b.return0(b.createMoveTarget(returnedExpression)));
         }
     }
 }

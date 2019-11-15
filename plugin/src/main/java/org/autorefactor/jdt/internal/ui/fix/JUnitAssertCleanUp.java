@@ -190,7 +190,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         List<Expression> arguments= new ArrayList<>(4);
 
         if (failureMessage != null) {
-            arguments.add(b.copy(failureMessage));
+            arguments.add(b.createCopyTarget(failureMessage));
         }
 
         if (copyOfExpected != null) {

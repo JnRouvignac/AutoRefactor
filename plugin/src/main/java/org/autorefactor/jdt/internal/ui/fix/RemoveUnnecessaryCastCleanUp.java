@@ -104,7 +104,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
         if (canRemoveCast(node)) {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+            ctx.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
             return false;
         }
 

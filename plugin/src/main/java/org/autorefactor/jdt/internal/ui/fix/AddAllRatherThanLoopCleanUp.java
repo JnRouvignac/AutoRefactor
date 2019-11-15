@@ -194,8 +194,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
-                        "addAll", mi.getExpression() != null ? b.move(mi.getExpression()) : b.this0(), //$NON-NLS-1$
-                        b.move(iterable))));
+                        "addAll", mi.getExpression() != null ? b.createMoveTarget(mi.getExpression()) : b.this0(), //$NON-NLS-1$
+                        b.createMoveTarget(iterable))));
     }
 
     private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
@@ -257,9 +257,9 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         final MethodInvocation newMethod;
 
         if (affectedCollection != null) {
-            newMethod= b.invoke(b.move(affectedCollection), methodName, b.move(data));
+            newMethod= b.invoke(b.createMoveTarget(affectedCollection), methodName, b.createMoveTarget(data));
         } else {
-            newMethod= b.invoke(methodName, b.move(data));
+            newMethod= b.invoke(methodName, b.createMoveTarget(data));
         }
 
         ctx.getRefactorings().replace(toReplace, b.toStatement(newMethod));

@@ -113,9 +113,9 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 messageBuilder.append("{}"); //$NON-NLS-1$
 
                 if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-                    params.add(b.invoke(String.class.getSimpleName(), "valueOf", b.move(string))); //$NON-NLS-1$
+                    params.add(b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(string))); //$NON-NLS-1$
                 } else {
-                    params.add(b.move(string));
+                    params.add(b.createMoveTarget(string));
                 }
             }
         }
@@ -133,6 +133,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         params.add(0, b.string(messageBuilder.toString()));
 
         final Refactorings r= this.ctx.getRefactorings();
-        r.replace(node, b.invoke(b.move(node.getExpression()), methodName, params));
+        r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, params));
     }
 }

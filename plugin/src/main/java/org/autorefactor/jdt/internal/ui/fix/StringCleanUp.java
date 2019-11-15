@@ -85,7 +85,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
             if (ASTNodes.hasType(stringExpression, String.class.getCanonicalName())) {
                 // If node is already a String, no need to call toString()
-                r.replace(node, b.move(stringExpression));
+                r.replace(node, b.createMoveTarget(stringExpression));
                 return false;
             }
 
@@ -119,7 +119,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             }
         } else if (isStringValueOf && ASTNodes.hasType(ASTNodes.arguments(node).get(0), String.class.getCanonicalName())) {
             if (ASTNodes.arguments(node).get(0) instanceof StringLiteral || ASTNodes.arguments(node).get(0) instanceof InfixExpression) {
-                r.replace(node, b.parenthesizeIfNeeded(b.move(ASTNodes.arguments(node).get(0))));
+                r.replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(node).get(0))));
                 return false;
             }
         } else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
@@ -154,7 +154,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                                     && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
                 final Expression leftExpression= leftInvocation.getExpression();
                 final Expression rightExpression= rightInvocation.getExpression();
-                r.replace(node, b.invoke(b.move(leftExpression), "equalsIgnoreCase", b.move(rightExpression))); //$NON-NLS-1$
+                r.replace(node, b.invoke(b.createMoveTarget(leftExpression), "equalsIgnoreCase", b.createMoveTarget(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
@@ -164,7 +164,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             final Expression rightExpression= getReducedStringExpression(ASTNodes.arguments(node).get(0), isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                r.replace(node, b.invoke(b.move(leftExpression), "equalsIgnoreCase", b.move(rightExpression))); //$NON-NLS-1$
+                r.replace(node, b.invoke(b.createMoveTarget(leftExpression), "equalsIgnoreCase", b.createMoveTarget(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
@@ -212,9 +212,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 
         if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(ASTNodes.arguments(mi).get(0))));
+            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         } else {
-            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.move(ASTNodes.arguments(mi).get(0))));
+            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         }
 
         return false;
@@ -224,7 +224,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
         if (expression != null) {
-            return b.move(expression);
+            return b.createMoveTarget(expression);
         }
 
         return b.this0();

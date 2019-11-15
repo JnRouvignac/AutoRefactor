@@ -135,9 +135,9 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
         Statement negativeStmtCopy;
         if (negativeStatement instanceof IfStatement) {
-            negativeStmtCopy= b.block(b.move(negativeStatement));
+            negativeStmtCopy= b.block(b.createMoveTarget(negativeStatement));
         } else {
-            negativeStmtCopy= b.move(negativeStatement);
+            negativeStmtCopy= b.createMoveTarget(negativeStatement);
         }
 
         final Expression secondCond;
@@ -147,16 +147,16 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
         if ((negativeCond != null) && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();
-            secondStmtCopy= b.move(positiveStatement);
-            thirdStmtCopy= b.move(node.getThenStatement());
+            secondStmtCopy= b.createMoveTarget(positiveStatement);
+            thirdStmtCopy= b.createMoveTarget(node.getThenStatement());
         } else {
             secondCond= notDuplicateExpression;
-            secondStmtCopy= b.move(node.getThenStatement());
-            thirdStmtCopy= b.move(positiveStatement);
+            secondStmtCopy= b.createMoveTarget(node.getThenStatement());
+            thirdStmtCopy= b.createMoveTarget(positiveStatement);
         }
 
         this.ctx.getRefactorings().replace(node,
                 b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
-                        b.if0(b.copy(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
+                        b.if0(b.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }

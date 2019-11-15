@@ -167,7 +167,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
         final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
-        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.copy(origType));
+        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
         final List<Type> typeArgs= ASTNodes.typeArguments(parameterizedType);
         typeArgs.clear();
         typeArgs.add(b.toType(keyType, typeNameDecider));

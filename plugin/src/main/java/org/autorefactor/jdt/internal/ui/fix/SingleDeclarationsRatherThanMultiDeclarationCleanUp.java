@@ -99,11 +99,11 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
         for (int i= fragments.size() - 1; 0 <= i; i--) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
 
-            final SimpleName copyOfFragment= b.copy(fragment.getName());
-            final Type copyOfType= b.copy(type);
+            final SimpleName copyOfFragment= b.createCopyTarget(fragment.getName());
+            final Type copyOfType= b.createCopyTarget(type);
             final Expression copyOfInitializer;
             if (fragment.getInitializer() != null) {
-                copyOfInitializer= b.copy(fragment.getInitializer());
+                copyOfInitializer= b.createCopyTarget(fragment.getInitializer());
             } else {
                 copyOfInitializer= null;
             }
@@ -117,7 +117,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
             } else {
                 final FieldDeclaration newField= b.declareField(copyOfType, newFragment);
                 if (docComment != null) {
-                    newField.setJavadoc(b.copy(docComment));
+                    newField.setJavadoc(b.createCopyTarget(docComment));
                 }
                 updateModifiers(b, modifiers, newField.modifiers());
                 newNode= newField;
@@ -135,7 +135,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     private void updateModifiers(final ASTNodeFactory b, final List modifiers, final List newModifiers) {
         newModifiers.clear();
         for (Object modifier : modifiers) {
-            newModifiers.add(b.copy((ASTNode) modifier));
+            newModifiers.add(b.createCopyTarget((ASTNode) modifier));
         }
     }
 }

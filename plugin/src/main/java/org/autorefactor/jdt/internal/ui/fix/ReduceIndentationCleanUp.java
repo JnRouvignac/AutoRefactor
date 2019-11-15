@@ -193,22 +193,22 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                r.insertAfter(b.move(statementsToMove.get(i)), node);
+                r.insertAfter(b.createMoveTarget(statementsToMove.get(i)), node);
             }
 
             r.replace(node.getExpression(), b.negate(node.getExpression()));
-            r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
+            r.replace(node.getThenStatement(), b.createMoveTarget(node.getElseStatement()));
             r.remove(node.getElseStatement());
         } else {
             final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
-                copyOfStatements.add(b.move(statement));
+                copyOfStatements.add(b.createMoveTarget(statement));
             }
 
             r.replace(node.getExpression(), b.negate(node.getExpression()));
-            r.replace(node.getThenStatement(), b.move(node.getElseStatement()));
-            copyOfStatements.add(0, b.move(node));
+            r.replace(node.getThenStatement(), b.createMoveTarget(node.getElseStatement()));
+            copyOfStatements.add(0, b.createMoveTarget(node));
 
             Block block= b.block(copyOfStatements);
             r.replace(node, block);
@@ -223,7 +223,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                r.insertAfter(b.move(statementsToMove.get(i)), node);
+                r.insertAfter(b.createMoveTarget(statementsToMove.get(i)), node);
             }
 
             r.remove(node.getElseStatement());
@@ -231,11 +231,11 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
-                copyOfStatements.add(b.move(statement));
+                copyOfStatements.add(b.createMoveTarget(statement));
             }
 
             r.remove(node.getElseStatement());
-            copyOfStatements.add(0, b.move(node));
+            copyOfStatements.add(0, b.createMoveTarget(node));
 
             Block block= b.block(copyOfStatements);
             r.replace(node, block);

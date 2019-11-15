@@ -358,17 +358,17 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 r.replace(node,
-                        b.infixExpression(b.move(leftOppositeExpression), getAppropriateOperator(node), b.move(rightOppositeExpression)));
+                        b.infixExpression(b.createMoveTarget(leftOppositeExpression), getAppropriateOperator(node), b.createMoveTarget(rightOppositeExpression)));
             } else {
                 final InfixExpression.Operator reverseOp= getReverseOperator(node);
-                r.replace(node, b.infixExpression(b.move(leftOppositeExpression), reverseOp, b.move(rightExpression)));
+                r.replace(node, b.infixExpression(b.createMoveTarget(leftOppositeExpression), reverseOp, b.createMoveTarget(rightExpression)));
             }
 
             return false;
         }
         if (rightOppositeExpression != null) {
             final InfixExpression.Operator reverseOp= getReverseOperator(node);
-            r.replace(node, b.infixExpression(b.move(leftExpression), reverseOp, b.move(rightOppositeExpression)));
+            r.replace(node, b.infixExpression(b.createMoveTarget(leftExpression), reverseOp, b.createMoveTarget(rightOppositeExpression)));
             return false;
         }
 
@@ -404,7 +404,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Expression operand;
         if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-            operand= b.move(exprToCopy);
+            operand= b.createMoveTarget(exprToCopy);
         } else {
             operand= b.negate(exprToCopy);
         }
@@ -417,7 +417,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             replaceBy(node, remainingOperands.get(0));
         } else {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.infixExpression(node.getOperator(), b.move(remainingOperands)));
+            ctx.getRefactorings().replace(node, b.infixExpression(node.getOperator(), b.createMoveTarget(remainingOperands)));
         }
     }
 
@@ -447,12 +447,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private void addParentheses(Expression expression) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(expression, b.parenthesize(b.move(expression)));
+        this.ctx.getRefactorings().replace(expression, b.parenthesize(b.createMoveTarget(expression)));
     }
 
     private void replaceBy(ASTNode node, Expression expression) {
         final ASTNodeFactory b= ctx.getASTBuilder();
-        ctx.getRefactorings().replace(node, b.move(expression));
+        ctx.getRefactorings().replace(node, b.createMoveTarget(expression));
     }
 
     /**

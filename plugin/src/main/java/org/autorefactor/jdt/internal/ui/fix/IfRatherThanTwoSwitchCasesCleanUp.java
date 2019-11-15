@@ -200,7 +200,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
 
             for (int j= 0; j < caseStructure.getSecond().size(); j++) {
-                copyOfStatements[j]= b.copy(caseStructure.getSecond().get(j));
+                copyOfStatements[j]= b.createCopyTarget(caseStructure.getSecond().get(j));
             }
 
             final Block newBlock= b.block(copyOfStatements);
@@ -224,13 +224,13 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
                 Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-            equality= b.invoke(b.copy(value), "equals", b.copy(discriminant)); //$NON-NLS-1$
+            equality= b.invoke(b.createCopyTarget(value), "equals", b.createCopyTarget(discriminant)); //$NON-NLS-1$
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-            equality= b.infixExpression(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
-                    b.name(value.resolveTypeBinding().getQualifiedName()), b.copy((SimpleName) value)));
+            equality= b.infixExpression(b.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
+                    b.name(value.resolveTypeBinding().getQualifiedName()), b.createCopyTarget((SimpleName) value)));
         } else {
-            equality= b.infixExpression(b.parenthesizeIfNeeded(b.copy(discriminant)), InfixExpression.Operator.EQUALS,
-                    b.copy(value));
+            equality= b.infixExpression(b.parenthesizeIfNeeded(b.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
+                    b.createCopyTarget(value));
         }
 
         return equality;

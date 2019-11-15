@@ -318,9 +318,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             }
         } else if (scope instanceof EnhancedForStatement) {
             final EnhancedForStatement efs= (EnhancedForStatement) scope;
-            final EnhancedForStatement newEfs= b.copy(efs);
-            newEfs.setParameter(b.copy(efs.getParameter()));
-            newEfs.setExpression(b.copy(efs.getExpression()));
+            final EnhancedForStatement newEfs= b.createCopyTarget(efs);
+            newEfs.setParameter(b.createCopyTarget(efs.getParameter()));
+            newEfs.setExpression(b.createCopyTarget(efs.getExpression()));
             final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
@@ -328,7 +328,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().replace(efs, newEfs);
         } else if (scope instanceof ForStatement) {
             final ForStatement fs= (ForStatement) scope;
-            final ForStatement newFs= b.copy(fs);
+            final ForStatement newFs= b.createCopyTarget(fs);
             final List<Expression> initializers= ASTNodes.initializers(newFs);
             if (initializers.size() != 1) {
                 throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
@@ -346,7 +346,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         } else if (scope instanceof WhileStatement) {
             final WhileStatement ws= (WhileStatement) scope;
             final WhileStatement newWs= ast.newWhileStatement();
-            newWs.setExpression(b.copy(ws.getExpression()));
+            newWs.setExpression(b.createCopyTarget(ws.getExpression()));
             final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
                 newWs.setBody(copy(ws.getBody(), varName));
@@ -355,16 +355,16 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         } else if (scope instanceof IfStatement) {
             final IfStatement is= (IfStatement) scope;
             final IfStatement newIs= ast.newIfStatement();
-            newIs.setExpression(b.copy(is.getExpression()));
+            newIs.setExpression(b.createCopyTarget(is.getExpression()));
             final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
-                    newIs.setElseStatement(b.copy(is.getElseStatement()));
+                    newIs.setElseStatement(b.createCopyTarget(is.getElseStatement()));
                 }
             } else if (Utils.equalNotNull(is.getElseStatement(), parentStatement)) {
                 if (is.getThenStatement() != null) {
-                    newIs.setThenStatement(b.copy(is.getThenStatement()));
+                    newIs.setThenStatement(b.createCopyTarget(is.getThenStatement()));
                 }
                 newIs.setElseStatement(copy(is.getElseStatement(), varName));
             } else {
@@ -396,7 +396,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     private Type getType(ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
-            return this.ctx.getASTBuilder().copy(vds.getType());
+            return this.ctx.getASTBuilder().createCopyTarget(vds.getType());
         }
 
         return getType(node.getParent());
@@ -410,8 +410,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
                     final ASTNodeFactory b= this.ctx.getASTBuilder();
                     final VariableDeclarationFragment vdf= b.getAST().newVariableDeclarationFragment();
-                    vdf.setInitializer(b.copy(a.getRightHandSide()));
-                    vdf.setName(b.copy(sn));
+                    vdf.setInitializer(b.createCopyTarget(a.getRightHandSide()));
+                    vdf.setName(b.createCopyTarget(sn));
                     return vdf;
                 }
             }

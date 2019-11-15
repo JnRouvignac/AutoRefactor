@@ -130,14 +130,14 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             final Refactorings r= ctx.getRefactorings();
 
             Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-            Expression newCondition= b.parenthesizeIfNeeded(b.move(iterator.next().getExpression()));
+            Expression newCondition= b.parenthesizeIfNeeded(b.createMoveTarget(iterator.next().getExpression()));
 
             while (iterator.hasNext()) {
                 newCondition= b.infixExpression(newCondition, InfixExpression.Operator.CONDITIONAL_OR,
-                        b.parenthesizeIfNeeded(b.move(iterator.next().getExpression())));
+                        b.parenthesizeIfNeeded(b.createMoveTarget(iterator.next().getExpression())));
             }
 
-            final IfStatement newIf= b.if0(newCondition, b.move(duplicateIfBlocks.get(0).getThenStatement()));
+            final IfStatement newIf= b.if0(newCondition, b.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
 
             iterator= duplicateIfBlocks.iterator();
             r.replace(iterator.next(), newIf);

@@ -193,19 +193,19 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
                 r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());
-                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
+                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
                 setResult(false);
                 return false;
             }
 
             if (!ASTNodes.isInElse(node)) {
-                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.copy(lhs));
-                Statement newAssignment= b.toStatement(b.move(assignment));
+                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
+                Statement newAssignment= b.toStatement(b.createMoveTarget(assignment));
 
                 if (node.getParent() instanceof Block) {
                     r.insertBefore(newAssignment, node);
                 } else {
-                    Block newBlock= b.block(newAssignment, b.move(node));
+                    Block newBlock= b.block(newAssignment, b.createMoveTarget(node));
                     r.replace(node, newBlock);
                 }
 

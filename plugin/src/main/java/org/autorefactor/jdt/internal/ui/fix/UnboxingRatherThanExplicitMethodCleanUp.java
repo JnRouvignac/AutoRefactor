@@ -88,6 +88,6 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
 
     private void useUnboxing(final MethodInvocation node) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+        this.ctx.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
     }
 }

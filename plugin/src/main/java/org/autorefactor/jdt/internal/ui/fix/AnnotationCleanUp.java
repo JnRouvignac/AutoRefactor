@@ -82,13 +82,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final List<MemberValuePair> values= ASTNodes.values(node);
         if (values.isEmpty()) {
-            r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
+            r.replace(node, b.markerAnnotation(b.createMoveTarget(node.getTypeName())));
             return false;
         }
         if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-                r.replace(node, b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
+                r.replace(node, b.singleValueAnnotation(b.createMoveTarget(node.getTypeName()), b.createMoveTarget(pair.getValue())));
                 return false;
             }
         }
@@ -104,7 +104,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                 ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
                 List<Expression> exprs= ASTNodes.expressions(arrayInit);
                 if (exprs.size() == 1) {
-                    r.replace(arrayInit, b.move(exprs.get(0)));
+                    r.replace(arrayInit, b.createMoveTarget(exprs.get(0)));
                     result= false;
                 }
             }

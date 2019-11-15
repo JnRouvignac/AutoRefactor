@@ -259,9 +259,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         for (int i= 0; i < reorderedModifiers.size(); i++) {
             IExtendedModifier m= reorderedModifiers.get(i);
             if (m.isModifier()) {
-                ctx.getRefactorings().moveToIndex((Modifier) m, i, b.move((Modifier) m));
+                ctx.getRefactorings().moveToIndex((Modifier) m, i, b.createMoveTarget((Modifier) m));
             } else {
-                ctx.getRefactorings().moveToIndex((Annotation) m, i, b.move((Annotation) m));
+                ctx.getRefactorings().moveToIndex((Annotation) m, i, b.createMoveTarget((Annotation) m));
             }
         }
     }

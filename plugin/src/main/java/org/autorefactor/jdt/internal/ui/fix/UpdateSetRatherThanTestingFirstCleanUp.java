@@ -106,12 +106,12 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
                 if ((statements.size() == 1) && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
-                    r.replace(ifStmtToReplace, b.move(firstStatement));
+                    r.replace(ifStmtToReplace, b.createMoveTarget(firstStatement));
                 } else {
                     // There are other statements, replace the if condition with col.add() (or
                     // col.remove())
                     r.replace(ifStmtToReplace.getExpression(),
-                            negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.move(miAddOrRemove));
+                            negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.createMoveTarget(miAddOrRemove));
                     r.remove(firstStatement);
                 }
 

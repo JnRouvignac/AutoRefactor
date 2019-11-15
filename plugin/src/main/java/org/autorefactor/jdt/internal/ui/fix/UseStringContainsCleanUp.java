@@ -111,9 +111,9 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
 
         if (negate) {
-            r.replace(ie, b.not(b.move(node)));
+            r.replace(ie, b.not(b.createMoveTarget(node)));
         } else {
-            r.replace(ie, b.move(node));
+            r.replace(ie, b.createMoveTarget(node));
         }
     }
 }

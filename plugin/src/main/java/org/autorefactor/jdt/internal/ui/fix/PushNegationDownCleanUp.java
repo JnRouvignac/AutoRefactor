@@ -90,7 +90,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             final PrefixExpression pe= (PrefixExpression) operand;
 
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-                return b.move(pe.getOperand());
+                return b.createMoveTarget(pe.getOperand());
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) operand;
@@ -107,7 +107,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                         it.set((oppositeOperand != null) ? oppositeOperand : b.negate(anOperand));
                     }
                 } else {
-                    allOperands= b.move(allOperands);
+                    allOperands= b.createMoveTarget(allOperands);
                 }
 
                 return b.parenthesize(b.infixExpression(reverseOp, allOperands));

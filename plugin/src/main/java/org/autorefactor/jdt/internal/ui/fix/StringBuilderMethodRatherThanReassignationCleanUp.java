@@ -74,7 +74,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 
             if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
-                ctx.getRefactorings().replace(node, b.move(node.getRightHandSide()));
+                ctx.getRefactorings().replace(node, b.createMoveTarget(node.getRightHandSide()));
                 return false;
             }
         }

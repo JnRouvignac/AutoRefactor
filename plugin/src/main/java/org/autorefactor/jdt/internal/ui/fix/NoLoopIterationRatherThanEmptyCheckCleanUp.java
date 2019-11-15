@@ -88,7 +88,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
                     if (isConditionValid(condition, container)) {
                         final ASTNodeFactory b= ctx.getASTBuilder();
                         final Refactorings r= ctx.getRefactorings();
-                        r.replace(node, b.move(statements.get(0)));
+                        r.replace(node, b.createMoveTarget(statements.get(0)));
                         return false;
                     }
 
@@ -188,10 +188,10 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         final Refactorings r= ctx.getRefactorings();
 
         if (operands.size() == 2) {
-            r.replace(condition, b.move(operands.get(0)));
+            r.replace(condition, b.createMoveTarget(operands.get(0)));
         } else {
             operands.remove(operands.size() - 1);
-            InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.move(operands));
+            InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.createMoveTarget(operands));
 
             r.replace(condition, newCondition);
         }

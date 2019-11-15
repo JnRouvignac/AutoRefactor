@@ -120,10 +120,10 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
             if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
-            invocation= b.invoke(newClassName, "copyOf", b.copy(typeArg)); //$NON-NLS-1$
+            invocation= b.invoke(newClassName, "copyOf", b.createCopyTarget(typeArg)); //$NON-NLS-1$
         } else {
             TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
-            newTypeLiteral.setType(b.copy(type));
+            newTypeLiteral.setType(b.createCopyTarget(type));
             invocation= b.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
         }
 

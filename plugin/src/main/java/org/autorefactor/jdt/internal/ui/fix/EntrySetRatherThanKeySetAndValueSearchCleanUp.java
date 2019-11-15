@@ -264,7 +264,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
+            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
             final Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
             final Variable objectVar= new Variable(
                     new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b); //$NON-NLS-1$
@@ -274,8 +274,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             // Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
             // Object key = mapEntry.getKey(); // <--- add this statement
 
-            final Type mapKeyType= b.copy(parameter.getType());
-            final VariableDeclarationStatement newKeyDecl= b.declareStatement(mapKeyType, b.move(parameter.getName()),
+            final Type mapKeyType= b.createCopyTarget(parameter.getType());
+            final VariableDeclarationStatement newKeyDecl= b.declareStatement(mapKeyType, b.createMoveTarget(parameter.getName()),
                     b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
             r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
@@ -289,7 +289,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             }
         } else {
             // for (K key : map.keySet()) => for (K key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
+            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
             // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
             // map.entrySet())
             final Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
@@ -298,10 +298,10 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             if (keyUses > getValueMis.size()) {
                 // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
                 // K key = mapEntry.getKey(); // <--- add this statement
-                final Type mapKeyType= b.copy(parameter.getType());
+                final Type mapKeyType= b.createCopyTarget(parameter.getType());
 
                 final VariableDeclarationStatement newKeyDeclaration= b.declareStatement(mapKeyType,
-                        b.move(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
+                        b.createMoveTarget(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
             }
         }
@@ -331,7 +331,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             mapKeyType= b.toType(keyTypeBinding, typeNameDecider);
         } else {
             // Use the type as defined in the code
-            mapKeyType= b.move(paramType);
+            mapKeyType= b.createMoveTarget(paramType);
         }
         final Type mapValueType= b.copyType(getValueMi, typeNameDecider);
         return b.genericType(mapEntryType, mapKeyType, mapValueType);

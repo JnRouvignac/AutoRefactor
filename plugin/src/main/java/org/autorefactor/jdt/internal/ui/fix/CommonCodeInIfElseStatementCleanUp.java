@@ -205,7 +205,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.move(stmtToRemove));
+                    orderedStatements.add(0, b.createMoveTarget(stmtToRemove));
                 }
                 r.replace(node, b.block(orderedStatements));
             }
@@ -218,7 +218,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                     if (i == (areCasesRemovable.length - 2) && !areCasesRemovable[i + 1]) {
                         // Then clause is empty and there is only one else clause
                         // => revert if statement
-                        r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.move(((IfStatement) parent).getElseStatement())));
+                        r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.createMoveTarget(((IfStatement) parent).getElseStatement())));
                         break;
                     }
                     if (allRemovable(areCasesRemovable, i)) {
@@ -234,9 +234,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.move(stmtToRemove));
+                    orderedStatements.add(0, b.createMoveTarget(stmtToRemove));
                 }
-                orderedStatements.add(0, b.move(node));
+                orderedStatements.add(0, b.createMoveTarget(node));
                 r.replace(node, b.block(orderedStatements));
             }
         }
@@ -245,7 +245,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
     private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTNodeFactory b,
             final Refactorings r) {
         for (Statement stmtToRemove : stmtsToRemove) {
-            r.insertAfter(b.move(stmtToRemove), node);
+            r.insertAfter(b.createMoveTarget(stmtToRemove), node);
         }
     }
 

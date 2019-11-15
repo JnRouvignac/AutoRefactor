@@ -159,15 +159,15 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.move(basicExpression),
-                b.move(thenExpression), b.move(elseExpression)));
+        ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.createMoveTarget(basicExpression),
+                b.createMoveTarget(thenExpression), b.createMoveTarget(elseExpression)));
 
         if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
             r.replace(node, newConditionalExpression);
         } else {
-            List<Expression> operands= b.move(previousOperands);
+            List<Expression> operands= b.createMoveTarget(previousOperands);
             operands.add(newConditionalExpression);
-            operands.addAll(b.move(nextOperands));
+            operands.addAll(b.createMoveTarget(nextOperands));
             r.replace(node, b.infixExpression(node.getOperator(), operands));
         }
     }

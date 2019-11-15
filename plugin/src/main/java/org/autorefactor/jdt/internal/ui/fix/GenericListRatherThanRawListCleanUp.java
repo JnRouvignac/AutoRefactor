@@ -148,7 +148,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
         final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
-        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.copy(origType));
+        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
         ASTNodes.typeArguments(parameterizedType).clear();
         ASTNodes.typeArguments(parameterizedType).add(b.toType(elementType, typeNameDecider));
         return parameterizedType;

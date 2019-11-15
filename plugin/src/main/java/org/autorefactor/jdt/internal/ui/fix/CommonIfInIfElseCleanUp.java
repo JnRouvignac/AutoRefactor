@@ -97,8 +97,8 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
                 && ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
             final ASTNodeFactory b= this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
-                    b.if0(b.move(thenInnerIfStatement.getExpression()), b.block(b.if0(b.move(node.getExpression()),
-                            b.move(thenInnerIfStatement.getThenStatement()), b.move(elseInnerIfStatement.getThenStatement())))));
+                    b.if0(b.createMoveTarget(thenInnerIfStatement.getExpression()), b.block(b.if0(b.createMoveTarget(node.getExpression()),
+                            b.createMoveTarget(thenInnerIfStatement.getThenStatement()), b.createMoveTarget(elseInnerIfStatement.getThenStatement())))));
             return false;
         }
 

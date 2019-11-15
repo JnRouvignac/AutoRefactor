@@ -722,7 +722,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
                         && !localIdentifiers.contains(qname.simpleName))) {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.move(node.getName()));
+            ctx.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
             return false;
         }
 

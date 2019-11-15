@@ -107,7 +107,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
             }
         }
 
-        r.replace(node, b.if0(b.move(node.getExpression()), b.move(node.getBody())));
+        r.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 
     private class BreakVisitor extends InterruptibleVisitor {

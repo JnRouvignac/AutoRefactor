@@ -323,7 +323,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     private void replaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
         final ASTNodeFactory b= ctx.getASTBuilder();
-        final SwitchStatement switchStatement= b.switch0(b.move(switchExpression));
+        final SwitchStatement switchStatement= b.switch0(b.createMoveTarget(switchExpression));
         for (SwitchCaseSection aCase : cases) {
             addCaseWithStatements(switchStatement, aCase.constantExprs, aCase.statements);
         }
@@ -345,7 +345,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         // Add the case statement(s)
         if (caseValues != null) {
             for (Expression caseValue : caseValues) {
-                switchStatements.add(b.case0(b.move(caseValue)));
+                switchStatements.add(b.case0(b.createMoveTarget(caseValue)));
             }
         } else {
             switchStatements.add(b.default0());
@@ -355,7 +355,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         boolean isBreakNeeded= true;
         if (!innerStatements.isEmpty()) {
             for (Statement statement : innerStatements) {
-                switchStatements.add(b.move(statement));
+                switchStatements.add(b.createMoveTarget(statement));
             }
             isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStatements));
         }
@@ -486,7 +486,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         for (SwitchCase caseToMove : sectionToRemove.existingCases) {
-            r.insertBefore(b.move(caseToMove), caseKept);
+            r.insertBefore(b.createMoveTarget(caseToMove), caseKept);
         }
         r.remove(sectionToRemove.statements);
     }

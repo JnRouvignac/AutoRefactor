@@ -248,10 +248,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStatement instanceof VariableDeclarationStatement) {
-                replacement= b.declareStatement(b.type(boolean.class.getSimpleName()), b.move((SimpleName) initName),
+                replacement= b.declareStatement(b.type(boolean.class.getSimpleName()), b.createMoveTarget((SimpleName) initName),
                         newMethod(iterable, toFind, isPositive, b));
             } else if (!previousStmtIsPreviousSibling || previousStatement instanceof ExpressionStatement) {
-                replacement= b.toStatement(b.assign(b.move(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, b)));
+                replacement= b.toStatement(b.assign(b.createMoveTarget(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, b)));
             } else {
                 throw new NotImplementedException(forNode);
             }

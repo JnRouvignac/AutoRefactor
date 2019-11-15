@@ -139,7 +139,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             if (returnExpression instanceof ArrayInitializer) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
                 final ReturnStatement newReturnStatement= b
-                        .return0(b.newArray(b.copy((ArrayType) vds.getType()), b.move((ArrayInitializer) returnExpression)));
+                        .return0(b.newArray(b.createCopyTarget((ArrayType) vds.getType()), b.createMoveTarget((ArrayInitializer) returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             } else {
                 replaceReturnStatement(node, vds, returnExpression);
@@ -158,7 +158,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
-            r.replace(node, b.return0(b.move(returnExpression)));
+            r.replace(node, b.return0(b.createMoveTarget(returnExpression)));
         }
     }
 }

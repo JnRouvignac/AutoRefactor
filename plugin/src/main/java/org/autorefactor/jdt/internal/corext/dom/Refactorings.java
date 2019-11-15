@@ -450,7 +450,7 @@ public class Refactorings {
      * @param oldNode   the old node containing the old location
      * @param newIndex  the new index for the node in the parent's list
      * @param movedNode the old node which has been moved using
-     *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#move(ASTNode)}
+     *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#createMoveTarget(ASTNode)}
      */
     public void moveToIndex(ASTNode oldNode, int newIndex, ASTNode movedNode) {
         insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex);

@@ -212,7 +212,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
-                invokeMethod(b, originalMethod, methodName, b.copy(condition), null, null, failureMessage)));
+                invokeMethod(b, originalMethod, methodName, b.createCopyTarget(condition), null, null, failureMessage)));
     }
 
     private boolean maybeReplaceOrRemove(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
@@ -256,7 +256,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Refactorings r= this.ctx.getRefactorings();
 
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Same"), //$NON-NLS-1$
-                    b.copy(actualAndExpected.getFirst()), b.copy(actualAndExpected.getSecond()), null, failureMessage);
+                    b.createCopyTarget(actualAndExpected.getFirst()), b.createCopyTarget(actualAndExpected.getSecond()), null, failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
         }
@@ -295,14 +295,14 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        Expression copyOfExpected= b.copy(expectedValue);
-        Expression copyOfActual= b.copy(actualValue);
+        Expression copyOfExpected= b.createCopyTarget(expectedValue);
+        Expression copyOfActual= b.createCopyTarget(actualValue);
         boolean localIsRewriteNeeded= isRewriteNeeded;
 
         if ((ASTNodes.isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isConstant(expectedValue)
                 && !isVariableNamedExpected(expectedValue)) {
-            copyOfExpected= b.copy(actualValue);
-            copyOfActual= b.copy(expectedValue);
+            copyOfExpected= b.createCopyTarget(actualValue);
+            copyOfActual= b.createCopyTarget(expectedValue);
             localIsRewriteNeeded= true;
         }
 
@@ -361,7 +361,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Expression actual, final Expression failureMessage) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
-        final Expression copyOfActual= b.copy(actual);
+        final Expression copyOfActual= b.createCopyTarget(actual);
         return invokeMethod(b, originalMethod, methodName, copyOfActual, null, null, failureMessage);
     }
 

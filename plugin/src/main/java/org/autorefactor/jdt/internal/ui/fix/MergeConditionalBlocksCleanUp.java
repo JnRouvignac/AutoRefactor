@@ -96,15 +96,15 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
         final Expression additionalCondition;
         if (isPositive) {
-            additionalCondition= b.move(subNode.getExpression());
+            additionalCondition= b.createMoveTarget(subNode.getExpression());
         } else {
             additionalCondition= b.negate(subNode.getExpression(), Copy.COPY);
         }
 
-        r.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.move(firstCondition)),
+        r.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(firstCondition)),
                 InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
         if (remainingStatements != null) {
-            r.replace(subNode, b.move(remainingStatements));
+            r.replace(subNode, b.createMoveTarget(remainingStatements));
         } else {
             r.remove(subNode);
         }
