@@ -140,15 +140,19 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         @Override
         public String toString() {
             final StringBuilder sb= new StringBuilder();
+
             for (Expression expression : constantExprs) {
                 sb.append("new case ").append(expression).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
             }
+
             for (SwitchCase existingCase : existingCases) {
                 sb.append("existing case ").append(existingCase.getExpression()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
             }
+
             for (Statement statement : statements) {
                 sb.append("    ").append(statement); //$NON-NLS-1$
             }
+
             sb.append("    break; // not needed if previous statement breaks control flow"); //$NON-NLS-1$
             return sb.toString();
         }
@@ -201,6 +205,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name;
     }
@@ -210,6 +215,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_description;
     }
@@ -219,6 +225,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_reason;
     }
@@ -250,9 +257,11 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             remainingStatement= currentNode.getElseStatement();
 
             variable= extractVariableAndValues(remainingStatement);
+
             if (variable == null) {
                 break;
             }
+
             currentNode= (IfStatement) remainingStatement;
         }
 
@@ -299,13 +308,17 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     private List<SwitchCaseSection> filterDuplicateCaseValues(final List<SwitchCaseSection> sourceCases) {
         final List<SwitchCaseSection> results= new ArrayList<>();
         final Set<Object> alreadyProccessedValues= new HashSet<>();
+
         for (SwitchCaseSection sourceCase : sourceCases) {
             final List<Expression> filteredExprs= new ArrayList<>();
+
             for (Expression expression : sourceCase.constantExprs) {
                 final Object constantValue= expression.resolveConstantExpressionValue();
+
                 if (constantValue == null) {
                     throw new NotImplementedException(expression, "Cannot handle non constant expressions"); //$NON-NLS-1$
                 }
+
                 if (alreadyProccessedValues.add(constantValue)) {
                     // This is a new value (never seen before)
                     filteredExprs.add(expression);
@@ -324,12 +337,15 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final SwitchStatement switchStatement= b.switch0(b.createMoveTarget(switchExpression));
+
         for (SwitchCaseSection aCase : cases) {
             addCaseWithStatements(switchStatement, aCase.constantExprs, aCase.statements);
         }
+
         if (remainingStatement != null) {
             addDefaultWithStatements(switchStatement, ASTNodes.asList(remainingStatement));
         }
+
         ctx.getRefactorings().replace(node, switchStatement);
     }
 
@@ -359,6 +375,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             }
             isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStatements));
         }
+
         // When required: end with a break;
         if (isBreakNeeded) {
             switchStatements.add(b.break0());
@@ -377,21 +394,35 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
         return exprNoParen instanceof InfixExpression
                 ? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
-                : null;
+                        : null;
     }
 
     private Variable extractVariableAndValuesFromInfixExpression(InfixExpression infixExpression) {
-        final Expression leftOp= infixExpression.getLeftOperand();
-        final Expression rightOp= infixExpression.getRightOperand();
+        if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
+            List<Expression> operands= ASTNodes.allOperands(infixExpression);
+            Variable mergedVariable= null;
 
-        if (ASTNodes.extendedOperands(infixExpression).isEmpty() && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
-            final Variable leftVar= extractVariableAndValues(leftOp);
-            final Variable rightVar= extractVariableAndValues(rightOp);
+            for (Expression operand : operands) {
+                Variable variable= extractVariableAndValues(operand);
 
-            if (leftVar != null && leftVar.isSameVariable(rightVar)) {
-                return leftVar.mergeValues(rightVar);
+                if (variable == null) {
+                    return null;
+                }
+
+                if (mergedVariable == null) {
+                    mergedVariable = variable;
+                } else if (mergedVariable.isSameVariable(variable)) {
+                    mergedVariable = mergedVariable.mergeValues(variable);
+                } else {
+                    return null;
+                }
             }
-        } else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS)) {
+
+            return mergedVariable;
+        } else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
+            final Expression leftOp= infixExpression.getLeftOperand();
+            final Expression rightOp= infixExpression.getRightOperand();
+
             Variable variable= extractVariableWithConstantValue(leftOp, rightOp);
             return variable != null ? variable : extractVariableWithConstantValue(rightOp, leftOp);
         }
@@ -416,17 +447,20 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
         for (int referenceIndex= 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
             final SwitchCaseSection referenceCase= switchStructure.get(referenceIndex);
+
             if (referenceCase.fallsThrough()) {
                 continue;
             }
 
             for (int comparedIndex= referenceIndex + 1; comparedIndex < switchStructure.size(); comparedIndex++) {
                 final SwitchCaseSection comparedCase= switchStructure.get(comparedIndex);
+
                 if (referenceCase.hasSameCode(comparedCase)) {
                     if (!previousSectionFallsthrough(switchStructure, comparedIndex)) {
                         mergeCases(Merge.AFTER_SWITCH_CASES, referenceCase, comparedCase);
                         return false;
                     }
+
                     if (referenceIndex == 0 || !previousSectionFallsthrough(switchStructure, referenceIndex)) {
                         mergeCases(Merge.BEFORE_SWITCH_CASES, comparedCase, referenceCase);
                         return false;

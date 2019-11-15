@@ -27,7 +27,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class SwitchSample {
-
     public int i2 = 0;
 
     public void replaceIfWithSwitchOnParameter(int i1) {
@@ -165,6 +164,24 @@ public class SwitchSample {
             i = 40;
             break;
         case 'd':
+            i = 50;
+            break;
+        default:
+            i = 60;
+            break;
+        }
+    }
+
+    public void replaceIfWithSeveralConditions(char a1) {
+        int i = 0;
+        switch (a1) {
+        case 'a':
+            i = 0;
+            break;
+        case 'd':
+        case 'b':
+        case 'c':
+        case 'f':
             i = 50;
             break;
         default:
