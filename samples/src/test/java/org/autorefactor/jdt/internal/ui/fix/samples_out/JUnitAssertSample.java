@@ -274,6 +274,19 @@ public class JUnitAssertSample {
         assertNotEquals("Failure message to keep", 'a', c);
     }
 
+    public void moveExpression(int i) {
+        // Keep this comment
+        Assert.assertEquals(1 + 2 + 3, i);
+        Assert.assertEquals("Failure message to keep", 1 + 2 + 3, i);
+        Assert.assertNotEquals(1 + 2 + 3, i);
+        Assert.assertNotEquals("Failure message to keep", 1 + 2 + 3, i);
+
+        assertEquals(1 + 2 + 3, i);
+        assertEquals("Failure message to keep", 1 + 2 + 3, i);
+        assertNotEquals(1 + 2 + 3, i);
+        assertNotEquals("Failure message to keep", 1 + 2 + 3, i);
+    }
+
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(42, o);
         Assert.assertEquals("Failure message to keep", 42, o);

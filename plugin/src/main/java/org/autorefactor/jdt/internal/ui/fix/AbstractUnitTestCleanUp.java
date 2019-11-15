@@ -299,7 +299,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         Expression copyOfActual= b.createCopyTarget(actualValue);
         boolean localIsRewriteNeeded= isRewriteNeeded;
 
-        if ((ASTNodes.isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isConstant(expectedValue)
+        if ((ASTNodes.isHardCoded(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isHardCoded(expectedValue)
                 && !isVariableNamedExpected(expectedValue)) {
             copyOfExpected= b.createCopyTarget(actualValue);
             copyOfActual= b.createCopyTarget(expectedValue);

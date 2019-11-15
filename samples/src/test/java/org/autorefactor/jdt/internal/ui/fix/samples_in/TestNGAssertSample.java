@@ -296,6 +296,19 @@ public class TestNGAssertSample {
         assertNotEquals('a', c, "Failure message to keep");
     }
 
+    public void moveExpression(int i) {
+        // Keep this comment
+        Assert.assertEquals(1 + 2 + 3, i);
+        Assert.assertEquals(1 + 2 + 3, i, "Failure message to keep");
+        Assert.assertNotEquals(1 + 2 + 3, i);
+        Assert.assertNotEquals(1 + 2 + 3, i, "Failure message to keep");
+
+        assertEquals(1 + 2 + 3, i);
+        assertEquals(1 + 2 + 3, i, "Failure message to keep");
+        assertNotEquals(1 + 2 + 3, i);
+        assertNotEquals(1 + 2 + 3, i, "Failure message to keep");
+    }
+
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
         Assert.assertEquals(o, 42);
         Assert.assertEquals(o, 42, "Failure message to keep");
