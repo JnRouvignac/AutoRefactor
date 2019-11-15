@@ -48,8 +48,10 @@ public final class AllCleanUpRules {
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
         final List<RefactoringRule> refactorings= getAllCleanUpRules();
+
         for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
             final RefactoringRule refactoring= iter.next();
+
             if (!refactoring.isEnabled(preferences)) {
                 iter.remove();
             }
@@ -64,7 +66,13 @@ public final class AllCleanUpRules {
      * @return all the available cleanup rules
      */
     public static List<RefactoringRule> getAllCleanUpRules() {
-        return newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
+        return newArrayList(new AddBracketsToControlStatementCleanUp(),
+                new RemoveSemiColonCleanUp(), new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
+                new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
+                new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
+                // The previous cleanups should run first as they make the code more standard and avoid weird code
+                new LocalVariableRatherThanFieldCleanUp(),
+                new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
                 new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
                 new FloatPrimitiveRatherThanWrapperCleanUp(), new CharPrimitiveRatherThanWrapperCleanUp(),
                 new BytePrimitiveRatherThanWrapperCleanUp(), new AssignRatherThanFilterThenAssignAnywayCleanUp(),
@@ -130,13 +138,7 @@ public final class AllCleanUpRules {
                 new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
                 new UppercaseNumberSuffixRatherThanLowercaseCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
 
-                // Those cleanups should end the list because they clean the previous
-                // changes
-                new RemoveSemiColonCleanUp(), new AddBracketsToControlStatementCleanUp(),
-                new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
-                new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
-                new LocalVariableRatherThanFieldCleanUp(),
-                new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
+                // Those cleanups should end the list because some other cleanup are prioritary
                 new ReduceIndentationCleanUp());
     }
 
