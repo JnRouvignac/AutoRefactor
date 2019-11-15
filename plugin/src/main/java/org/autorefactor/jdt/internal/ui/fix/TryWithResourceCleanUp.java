@@ -32,11 +32,13 @@ import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -86,143 +88,167 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(TryStatement node) {
-        final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
-        if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
-            final TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
-            if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
-                return collapseTryStatements(node, innerTryStatement);
-            }
+    public boolean visit(Block node) {
+        final DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(ctx, node);
+        node.accept(returnStatementVisitor);
+        return returnStatementVisitor.getResult();
+    }
+
+    private static final class DeclarationAndTryVisitor extends BlockSubVisitor {
+        public DeclarationAndTryVisitor(final RefactoringContext ctx, final Block startNode) {
+            super(ctx, startNode);
         }
 
-        final VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
-                VariableDeclarationStatement.class);
-        if (previousDeclStatement == null) {
+        @Override
+        public boolean visit(TryStatement node) {
+            final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+
+            if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
+                final TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
+
+                if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
+                    return collapseTryStatements(node, innerTryStatement);
+                }
+            }
+
+            final VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
+                    VariableDeclarationStatement.class);
+
+            if (previousDeclStatement == null) {
+                return true;
+            }
+
+            final VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
+            final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+
+            if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
+                final List<ASTNode> nodesToRemove= new ArrayList<>();
+                nodesToRemove.add(previousDeclStatement);
+
+                final Statement finallyStatement= finallyStatements.get(0);
+                nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
+
+                final ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
+                final IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
+
+                if (finallyEs != null) {
+                    final MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
+
+                    if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
+                        return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                                nodesToRemove);
+                    }
+                } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
+                        && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
+                    final Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
+
+                    final Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
+                    final MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+
+                    if (methodClosesCloseables(mi)
+                            && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
+                        return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                                nodesToRemove);
+                    }
+                }
+            }
+
             return true;
         }
 
-        final VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
-        final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+        private boolean maybeRefactorToTryWithResources(TryStatement node, final List<Statement> tryStatements,
+                final VariableDeclarationStatement previousDeclStatement,
+                final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
+            final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
+                    previousDeclFragment, nodesToRemove);
 
-        if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
-            final List<ASTNode> nodesToRemove= new ArrayList<>();
-            nodesToRemove.add(previousDeclStatement);
-
-            final Statement finallyStatement= finallyStatements.get(0);
-            nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
-
-            final ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
-            final IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
-
-            if (finallyEs != null) {
-                final MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
-                if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
-                    return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
-                            nodesToRemove);
-                }
-            } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
-                    && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
-                final Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
-
-                final Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
-                final MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
-
-                if (methodClosesCloseables(mi)
-                        && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
-                    return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
-                            nodesToRemove);
-                }
+            if (newResource == null) {
+                return true;
             }
-        }
 
-        return true;
-    }
-
-    private boolean maybeRefactorToTryWithResources(TryStatement node, final List<Statement> tryStatements,
-            final VariableDeclarationStatement previousDeclStatement,
-            final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
-        final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
-                previousDeclFragment, nodesToRemove);
-
-        if (newResource == null) {
-            return true;
-        }
-
-        final Refactorings r= ctx.getRefactorings();
-        r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
-        r.remove(nodesToRemove);
-        return false;
-    }
-
-    private boolean methodClosesCloseables(final MethodInvocation mi) {
-        if (ASTNodes.usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
-            return true;
-        }
-//        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()
-//        // and/or all various homegrown static utilities closing Closeables
-//        IMethodBinding methodBinding = mi.resolveMethodBinding();
-//        return methodBinding != null
-//                && methodBinding.getName().startsWith("close")
-//                // In theory we should also verify the code of the method that is being called.
-//                // In practice, the only thing you can do with an instance of Closeable is to close it,
-//                // so let's assume this is exactly what the method does
-//                && (isArrayOfCloseables(methodBinding.getParameterTypes())
-//                        || isVarargsOfCloseables(methodBinding.getParameterTypes())
-//                        // Beware of generic types (wildcards like ? extends Closeable)
-//                        || isCollectionOfCloseables(methodBinding.getParameterTypes())
-//                        || isCloseable(methodBinding.getParameterTypes()));
-        return false;
-    }
-
-    private VariableDeclarationExpression newResource(List<Statement> tryStatements,
-            VariableDeclarationStatement previousDeclStatement, VariableDeclarationFragment previousDeclFragment,
-            List<ASTNode> nodesToRemove) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-        return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
-    }
-
-    private VariableDeclarationFragment newFragment(List<Statement> tryStatements,
-            VariableDeclarationFragment existingFragment, List<ASTNode> nodesToRemove) {
-        final VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
-        final List<SimpleName> definitions= visitor.getWrites();
-
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        if (!tryStatements.isEmpty()) {
-            final Statement tryStatement= tryStatements.get(0);
-            final Assignment assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
-            if (assignResource != null && ASTNodes.isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
-                nodesToRemove.add(tryStatement);
-                if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-                    return b.declareFragment(b.createMoveTarget(existingFragment.getName()),
-                            b.createMoveTarget(assignResource.getRightHandSide()));
-                }
-
-                return null;
-            }
-        }
-
-        return containsOnly(definitions, existingFragment.getName()) ? b.createMoveTarget(existingFragment) : null;
-    }
-
-    private boolean containsOnly(Collection<SimpleName> definitions, Expression... simpleNames) {
-        if (definitions.size() != simpleNames.length) {
+            final Refactorings r= ctx.getRefactorings();
+            r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
+            r.remove(nodesToRemove);
+            setResult(false);
             return false;
         }
-        for (Expression simpleName : simpleNames) {
-            if (!definitions.contains(simpleName)) {
-                return false;
+
+        private boolean methodClosesCloseables(final MethodInvocation mi) {
+            if (ASTNodes.usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
+                return true;
             }
+            //        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()
+            //        // and/or all various homegrown static utilities closing Closeables
+            //        IMethodBinding methodBinding = mi.resolveMethodBinding();
+            //        return methodBinding != null
+            //                && methodBinding.getName().startsWith("close")
+            //                // In theory we should also verify the code of the method that is being called.
+            //                // In practice, the only thing you can do with an instance of Closeable is to close it,
+            //                // so let's assume this is exactly what the method does
+            //                && (isArrayOfCloseables(methodBinding.getParameterTypes())
+            //                        || isVarargsOfCloseables(methodBinding.getParameterTypes())
+            //                        // Beware of generic types (wildcards like ? extends Closeable)
+            //                        || isCollectionOfCloseables(methodBinding.getParameterTypes())
+            //                        || isCloseable(methodBinding.getParameterTypes()));
+            return false;
         }
 
-        return true;
-    }
+        private VariableDeclarationExpression newResource(List<Statement> tryStatements,
+                VariableDeclarationStatement previousDeclStatement, VariableDeclarationFragment previousDeclFragment,
+                List<ASTNode> nodesToRemove) {
+            final ASTNodeFactory b= ctx.getASTBuilder();
+            final VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
+            return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
+        }
 
-    private boolean collapseTryStatements(TryStatement outerTryStatement, TryStatement innerTryStatement) {
-        final Refactorings r= ctx.getRefactorings();
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
-        r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
-        return false;
+        private VariableDeclarationFragment newFragment(List<Statement> tryStatements,
+                VariableDeclarationFragment existingFragment, List<ASTNode> nodesToRemove) {
+            final VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
+            final List<SimpleName> definitions= visitor.getWrites();
+
+            final ASTNodeFactory b= ctx.getASTBuilder();
+
+            if (!tryStatements.isEmpty()) {
+                final Statement tryStatement= tryStatements.get(0);
+                final Assignment assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
+
+                if (assignResource != null && ASTNodes.isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
+                    nodesToRemove.add(tryStatement);
+
+                    if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
+                        return b.declareFragment(b.createMoveTarget(existingFragment.getName()),
+                                b.createMoveTarget(assignResource.getRightHandSide()));
+                    }
+
+                    return null;
+                }
+            }
+
+            return containsOnly(definitions, existingFragment.getName()) ? b.createMoveTarget(existingFragment) : null;
+        }
+
+        private boolean containsOnly(Collection<SimpleName> definitions, Expression... simpleNames) {
+            if (definitions.size() != simpleNames.length) {
+                return false;
+            }
+
+            for (Expression simpleName : simpleNames) {
+                if (!definitions.contains(simpleName)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private boolean collapseTryStatements(TryStatement outerTryStatement, TryStatement innerTryStatement) {
+            final Refactorings r= ctx.getRefactorings();
+            final ASTNodeFactory b= ctx.getASTBuilder();
+
+            r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
+            r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
+            setResult(false);
+            return false;
+        }
     }
 }
