@@ -109,7 +109,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                         Object.class.getCanonicalName())
                 || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
                         String.class.getCanonicalName())) {
-            replaceUtilClass(node, classesToUseWithImport, importsToAdd, javaUtilObjects);
+            replaceUtilClass(node, importsToAdd, javaUtilObjects);
             return false;
         }
 
@@ -195,8 +195,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         return copyOfArgs;
     }
 
-    private void replaceUtilClass(final MethodInvocation node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd, Name javaUtilObjects) {
+    private void replaceUtilClass(final MethodInvocation node, final Set<String> importsToAdd,
+            Name javaUtilObjects) {
         final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(node.getExpression(), javaUtilObjects);
