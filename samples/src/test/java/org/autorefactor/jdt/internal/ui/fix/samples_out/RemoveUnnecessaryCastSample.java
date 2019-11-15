@@ -43,8 +43,8 @@ public class RemoveUnnecessaryCastSample {
     private Double floatingDouble = 101.01D;
 
     private Long doNotChangeLong = 101L;
-    private Float doNotChangeFloat = 101F;
-    private Double doNotChangeDouble = 101D;
+    private Float doNotChangeFloat = 101f;
+    private Double doNotChangeDouble = 101d;
 
     public void refactorCast() {
         Long localUsual = 101L;
