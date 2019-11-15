@@ -34,6 +34,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name;
     }
@@ -43,6 +44,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_description;
     }
@@ -52,6 +54,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_reason;
     }
@@ -59,8 +62,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(SuperConstructorInvocation node) {
         if (node.arguments().isEmpty()) {
-            // A replacement keeps comments, contrary to remove
-            ctx.getRefactorings().replace(node, null);
+            ctx.getRefactorings().removeButKeepComment(node);
             return false;
         }
 
