@@ -1269,68 +1269,88 @@ public class CFGBuilder {
             case ASSERT_STATEMENT:
                 liveState= buildCFG((AssertStatement) statement, liveState, throwers);
                 break;
+
             case BLOCK:
                 liveState= buildCFG((Block) statement, liveState, throwers);
                 break;
+
             case BREAK_STATEMENT:
                 liveState= buildCFG((BreakStatement) statement, liveState);
                 break;
+
             case CONSTRUCTOR_INVOCATION:
             case SUPER_CONSTRUCTOR_INVOCATION:
                 liveState= buildCFG(statement, liveState, throwers);
                 break;
+
             case CONTINUE_STATEMENT:
                 liveState= buildCFG((ContinueStatement) statement, liveState);
                 break;
+
             case DO_STATEMENT:
                 liveState= buildCFG((DoStatement) statement, liveState, throwers);
                 break;
+
             case EMPTY_STATEMENT:
                 liveState= buildCFG((EmptyStatement) statement, liveState);
                 break;
+
             case ENHANCED_FOR_STATEMENT:
                 liveState= buildCFG((EnhancedForStatement) statement, liveState, throwers);
                 break;
+
             case EXPRESSION_STATEMENT:
                 liveState= buildCFG((ExpressionStatement) statement, liveState, throwers);
                 break;
+
             case FOR_STATEMENT:
                 liveState= buildCFG((ForStatement) statement, liveState, throwers);
                 break;
+
             case IF_STATEMENT:
                 liveState= buildCFG((IfStatement) statement, liveState, throwers);
                 break;
+
             case LABELED_STATEMENT:
                 liveState= buildCFG((LabeledStatement) statement, liveState, throwers);
                 break;
+
             case RETURN_STATEMENT:
                 liveState= buildCFG((ReturnStatement) statement, liveState, throwers);
                 break;
+
             case SWITCH_CASE:
                 // Here, use startState.liveBasicBlock to build an edge
                 // from the switch condition to the case statement
                 liveState= buildCFG((SwitchCase) statement, startState.liveBasicBlock, liveState, throwers);
                 break;
+
             case SWITCH_STATEMENT:
                 liveState= buildCFG((SwitchStatement) statement, liveState, throwers);
                 break;
+
             case SYNCHRONIZED_STATEMENT:
                 liveState= buildCFG((SynchronizedStatement) statement, liveState, throwers);
                 break;
+
             case THROW_STATEMENT:
                 liveState= buildCFG((ThrowStatement) statement, liveState, throwers);
                 break;
+
             case TRY_STATEMENT:
                 liveState= buildCFG((TryStatement) statement, liveState, throwers);
                 // break;case TYPE_DECLARATION_STATEMENT:
                 // buildCFG((TypeDeclarationStatement) statement, liveState, throwers);
                 break;
+
             case VARIABLE_DECLARATION_STATEMENT:
                 liveState= buildCFG((VariableDeclarationStatement) statement, liveState, throwers);
                 break;
+
             case WHILE_STATEMENT:
                 liveState= buildCFG((WhileStatement) statement, liveState, throwers);
                 break;
+
             default:
                 throw new NotImplementedException(statement);
             }

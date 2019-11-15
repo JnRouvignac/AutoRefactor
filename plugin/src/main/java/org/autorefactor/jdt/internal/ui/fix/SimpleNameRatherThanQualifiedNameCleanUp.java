@@ -492,9 +492,11 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         case METHOD:
             methods.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
+
         case VARIABLE:
             fields.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
+
         case TYPE:
             types.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
