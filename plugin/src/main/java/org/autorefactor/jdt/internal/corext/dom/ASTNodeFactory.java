@@ -1153,7 +1153,7 @@ public class ASTNodeFactory {
      */
     public Expression negate(Expression expression, Copy copy) {
         final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
-        if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
+        if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
             final PrefixExpression pe= (PrefixExpression) exprNoParen;
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 return copy.perform(this, ASTNodes.getUnparenthesedExpression(pe.getOperand()));

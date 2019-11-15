@@ -34,7 +34,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
@@ -95,7 +94,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 
         if (ASTNodes.isPrimitive(redundantOperand)
                 && ASTNodes.isPassive(redundantOperand)
-                && (complexCondition != null)
+                && complexCondition != null
                 && ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
             List<Expression> operands= ASTNodes.allOperands(complexCondition);
 
@@ -127,7 +126,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, Operator operator) {
+    private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, InfixExpression.Operator operator) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
