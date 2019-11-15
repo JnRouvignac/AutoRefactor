@@ -27,11 +27,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,8 +46,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /**
  * See {@link #getDescription()} method.
- * <p>
- * TODO JNR remove casts from method parameters
  */
 public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     /**
@@ -60,6 +53,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name;
     }
@@ -69,6 +63,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_description;
     }
@@ -78,6 +73,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_reason;
     }
@@ -92,12 +88,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
             }
 
             if (ASTNodes.hasType(node.getType().resolveBinding(), float.class.getSimpleName())) {
-                createPrimitive(node, literal, 'f');
+                createPrimitive(node, literal, 'F');
                 return false;
             }
 
             if (ASTNodes.hasType(node.getType().resolveBinding(), double.class.getSimpleName())) {
-                createPrimitive(node, literal, 'd');
+                createPrimitive(node, literal, 'D');
                 return false;
             }
         }
@@ -122,21 +118,21 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     private boolean canRemoveCast(CastExpression node) {
         final ASTNode parent= node.getParent();
         switch (parent.getNodeType()) {
-        case RETURN_STATEMENT:
+        case ASTNode.RETURN_STATEMENT:
             final MethodDeclaration md= ASTNodes.getAncestor(parent, MethodDeclaration.class);
             return isAssignmentCompatible(node.getExpression(), md.getReturnType2())
                     || isConstantExpressionAssignmentConversion(node);
 
-        case ASSIGNMENT:
+        case ASTNode.ASSIGNMENT:
             final Assignment as= (Assignment) parent;
             return isAssignmentCompatible(node.getExpression(), as) || isConstantExpressionAssignmentConversion(node);
 
-        case VARIABLE_DECLARATION_FRAGMENT:
+        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             final VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
             return isAssignmentCompatible(node.getExpression(), ASTNodes.resolveTypeBinding(vdf))
                     || isConstantExpressionAssignmentConversion(node);
 
-        case INFIX_EXPRESSION:
+        case ASTNode.INFIX_EXPRESSION:
             if (!isPrimitiveTypeNarrowing(node)) {
                 final InfixExpression ie= (InfixExpression) parent;
                 final Expression lo= ie.getLeftOperand();
@@ -146,9 +142,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                     return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
                             && !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
                 }
-                final boolean integralDivision= isIntegralDivision(ie);
-                return ((isNotRefactored(lo) && isStringConcat(ie))
-                        || (integralDivision ? canRemoveCastInIntegralDivision(node, ie)
+
+                return (isNotRefactored(lo) && isStringConcat(ie)
+                        || (isIntegralDivision(ie) ? canRemoveCastInIntegralDivision(node, ie)
                                 : isAssignmentCompatibleInInfixExpression(node, ie)))
                         && !isIntegralDividedByFloatingPoint(node, ie);
             }
@@ -265,9 +261,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         final Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             final int val= (Integer) value;
-            return (ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
-                    || (ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
-                    || (ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
+            return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
+                    || ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
+                    || ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
         }
 
         return false;

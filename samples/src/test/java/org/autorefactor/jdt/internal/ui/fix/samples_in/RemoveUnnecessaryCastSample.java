@@ -26,8 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
-public class RemoveUnnecessaryCastSample {
+import java.util.Calendar;
 
+public class RemoveUnnecessaryCastSample {
     private static final int ONE = 1;
     private byte b;
     private char c;
@@ -45,7 +46,7 @@ public class RemoveUnnecessaryCastSample {
     private Float doNotChangeFloat = 101f;
     private Double doNotChangeDouble = 101d;
 
-    public void refactorIt() {
+    public void refactorCast() {
         Long localUsual = (long) 101;
         Long localOctal = (long) 0121;
         Long localHex = (long) 0xdafdaf;
@@ -53,6 +54,18 @@ public class RemoveUnnecessaryCastSample {
         Float localUsualFloat = (float) 101;
         Double localUsualDouble = (double) 101;
         Double localFloatingDouble = (double) 101.01;
+    }
+
+    public void refactorMethodParameter() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTimeInMillis((long) 101);
+        calendar.setTimeInMillis((long) 0121);
+        calendar.setTimeInMillis((long) 0xdafdaf);
+        calendar.setTimeInMillis((long) 0b1110010111);
+        int i = Float.floatToIntBits((float) 101);
+        long l1 = Double.doubleToRawLongBits((double) 101);
+        long l2 = Double.doubleToRawLongBits((double) 101.01);
     }
 
     public void doNotRefactor() {

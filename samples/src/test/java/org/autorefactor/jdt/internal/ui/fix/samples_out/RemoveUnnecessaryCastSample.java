@@ -26,8 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-public class RemoveUnnecessaryCastSample {
+import java.util.Calendar;
 
+public class RemoveUnnecessaryCastSample {
     private static final int ONE = 1;
     private byte b;
     private char c;
@@ -37,22 +38,34 @@ public class RemoveUnnecessaryCastSample {
     private Long octal = 0121L;
     private Long hex = 0xdafdafL;
     private Long binary = 0b1110010111L;
-    private Float usualFloat = 101f;
-    private Double usualDouble = 101d;
-    private Double floatingDouble = 101.01d;
+    private Float usualFloat = 101F;
+    private Double usualDouble = 101D;
+    private Double floatingDouble = 101.01D;
 
     private Long doNotChangeLong = 101L;
-    private Float doNotChangeFloat = 101f;
-    private Double doNotChangeDouble = 101d;
+    private Float doNotChangeFloat = 101F;
+    private Double doNotChangeDouble = 101D;
 
-    public void refactorIt() {
+    public void refactorCast() {
         Long localUsual = 101L;
         Long localOctal = 0121L;
         Long localHex = 0xdafdafL;
         Long localBinary = 0b1110010111L;
-        Float localUsualFloat = 101f;
-        Double localUsualDouble = 101d;
-        Double localFloatingDouble = 101.01d;
+        Float localUsualFloat = 101F;
+        Double localUsualDouble = 101D;
+        Double localFloatingDouble = 101.01D;
+    }
+
+    public void refactorMethodParameter() {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTimeInMillis(101L);
+        calendar.setTimeInMillis(0121L);
+        calendar.setTimeInMillis(0xdafdafL);
+        calendar.setTimeInMillis(0b1110010111L);
+        int i = Float.floatToIntBits(101F);
+        long l1 = Double.doubleToRawLongBits(101D);
+        long l2 = Double.doubleToRawLongBits(101.01D);
     }
 
     public void doNotRefactor() {
