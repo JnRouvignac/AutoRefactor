@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class MergeConditionalBlocksSample {
-
     /** Duplicate if and else if code, merge it */
     public void duplicateIfAndElseIf(int i) {
         // Keep this comment
@@ -145,6 +144,17 @@ public class MergeConditionalBlocksSample {
             System.out.println("Duplicate " + (123 + i));
         } else {
             // Keep this comment also
+            System.out.println("Different");
+        }
+    }
+
+    /** 5 operands, not easily readable */
+    public void doNotMergeMoreThanFourOperands(int i) {
+        if ((i == 0) || (i == 1 || i == 2)) {
+            System.out.println("Duplicate " + (i + 123 + 0));
+        } else if (i > 10 && i < 100) {
+            System.out.println("Duplicate " + (i + 123 + 0));
+        } else {
             System.out.println("Different");
         }
     }

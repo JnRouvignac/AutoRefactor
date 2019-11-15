@@ -43,6 +43,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
     }
@@ -69,11 +72,13 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
     public boolean visit(IfStatement node) {
         final List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
 
-        if (elseCode != null && elseCode.size() == 1 && elseCode.get(0) instanceof IfStatement) {
-            final IfStatement subNode= (IfStatement) elseCode.get(0);
+        if (elseCode != null && elseCode.size() == 1) {
+            final IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
 
-            return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
-                    && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
+            if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < 5) {
+                return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
+                        && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
+            }
         }
 
         return true;
@@ -103,6 +108,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
         r.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(firstCondition)),
                 InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
+
         if (remainingStatements != null) {
             r.replace(subNode, b.createMoveTarget(remainingStatements));
         } else {

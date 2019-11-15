@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -37,7 +38,6 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends AbstractCleanUpRule {
@@ -46,6 +46,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
     }
@@ -55,6 +56,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
     }
@@ -64,6 +66,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
     }
@@ -82,16 +85,18 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
         @Override
         public boolean visit(IfStatement node) {
-            if (getResult()) {
-                final List<IfStatement> duplicateIfBlocks= new ArrayList<>();
+            if (getResult()
+                    && ASTNodes.fallsThrough(node.getThenStatement())) {
+                final List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
+                AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
                 duplicateIfBlocks.add(node);
-                while (addOneMoreIf(duplicateIfBlocks)) {
+
+                while (addOneMoreIf(duplicateIfBlocks, operandCount)) {
                     // OK continue
                 }
 
                 if (duplicateIfBlocks.size() > 1) {
                     mergeCode(duplicateIfBlocks);
-
                     setResult(false);
                     return false;
                 }
@@ -102,23 +107,19 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             return false;
         }
 
-        private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks) {
-            if (duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getElseStatement() == null) {
-                final Statement nextSibling= ASTNodes.getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
+        private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, AtomicInteger operandCount) {
+            IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
 
-                if (nextSibling instanceof IfStatement && ((IfStatement) nextSibling).getElseStatement() == null
-                        && !ctx.getRefactorings().hasBeenRefactored(nextSibling)) {
-                    final IfStatement nextIf= (IfStatement) nextSibling;
+            if (lastBlock.getElseStatement() == null) {
+                final IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
-                    final List<Statement> lastIfStatements= ASTNodes.asList(
-                            duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getThenStatement());
-                    final List<Statement> nextIfStatements= ASTNodes.asList(nextIf.getThenStatement());
-                    if (lastIfStatements != null && !lastIfStatements.isEmpty()
-                            && ASTNodes.fallsThrough(lastIfStatements.get(lastIfStatements.size() - 1))
-                            && ASTNodes.match(lastIfStatements, nextIfStatements)) {
-                        duplicateIfBlocks.add(nextIf);
-                        return true;
-                    }
+                if (nextSibling != null && nextSibling.getElseStatement() == null
+                        && !ctx.getRefactorings().hasBeenRefactored(nextSibling)
+                        && ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())
+                        && operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < 5) {
+                    operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
+                    duplicateIfBlocks.add(nextSibling);
+                    return true;
                 }
             }
 
@@ -129,18 +130,18 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
 
-            Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-            Expression newCondition= b.parenthesizeIfNeeded(b.createMoveTarget(iterator.next().getExpression()));
+            List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 
-            while (iterator.hasNext()) {
-                newCondition= b.infixExpression(newCondition, InfixExpression.Operator.CONDITIONAL_OR,
-                        b.parenthesizeIfNeeded(b.createMoveTarget(iterator.next().getExpression())));
+            for (IfStatement ifStatement : duplicateIfBlocks) {
+                newConditions.add(b.parenthesizeIfNeeded(b.createMoveTarget(ifStatement.getExpression())));
             }
 
+            InfixExpression newCondition= b.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
             final IfStatement newIf= b.if0(newCondition, b.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
 
-            iterator= duplicateIfBlocks.iterator();
+            Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
             r.replace(iterator.next(), newIf);
+
             while (iterator.hasNext()) {
                 r.remove(iterator.next());
             }

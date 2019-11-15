@@ -2712,4 +2712,29 @@ public final class ASTNodes {
 
         return null;
     }
+
+    /**
+     * Returns the number of logical operands in the expression.
+     *
+     * @param node The expression
+     * @return the number of logical operands in the expression
+     */
+    public static int getNbOperands(Expression node) {
+        final InfixExpression infixExpression= as(node, InfixExpression.class);
+
+        if (infixExpression != null
+                && (hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
+                        || (hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR))
+                        && hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
+            int nbOperands= 0;
+
+            for (Expression operand : allOperands(infixExpression)) {
+                nbOperands+= getNbOperands(operand);
+            }
+
+            return nbOperands;
+        } else {
+            return 1;
+        }
+    }
 }

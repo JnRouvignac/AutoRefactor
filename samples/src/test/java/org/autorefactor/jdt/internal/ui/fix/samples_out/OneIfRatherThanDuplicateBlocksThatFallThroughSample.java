@@ -110,6 +110,18 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
         System.out.println("Next code");
     }
 
+    public void doNotMergeMoreThanFourOperands(int i1) {
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2) || (i1 == 3)) {
+            System.out.println("The same code");
+            return;
+        }
+        if (i1 == 4) {
+            System.out.println("The same code");
+            return;
+        }
+        System.out.println("Next code");
+    }
+
     public void doNotMergeConditionsWithoutJump(int i) {
         if (i == 0) {
             System.out.println("The same code");

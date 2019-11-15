@@ -40,6 +40,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
     }
@@ -49,6 +50,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
     }
@@ -58,6 +60,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
     }
@@ -67,7 +70,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         if (node.getElseStatement() == null) {
             final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
-            if ((is != null) && (is.getElseStatement() == null)) {
+            if ((is != null)
+                    && (is.getElseStatement() == null)
+                    && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(is.getExpression()) < 5) {
                 replaceIfNoElseStatement(node, is);
                 return false;
             }
