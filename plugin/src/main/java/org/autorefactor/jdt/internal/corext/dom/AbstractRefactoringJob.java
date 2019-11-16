@@ -8,21 +8,21 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class AbstractRefactoringJob extends Job {
 
-	public AbstractRefactoringJob(String name) {
-		super(name);
-	}
+    public AbstractRefactoringJob(String name) {
+        super(name);
+    }
 
-	/**
-	 * all instances of this job belong to this family
-	 */
-	public static final Object FAMILY = new Object();
-	
+    /**
+     * all instances of this job belong to this family
+     */
+    public static final Object FAMILY = new Object();
+    
     @Override
     public final boolean belongsTo(Object family) {
-    	if (FAMILY == family) {
-    		return true;
-    	}
-    	return super.belongsTo(family);
+        if (FAMILY == family) {
+            return true;
+        }
+        return super.belongsTo(family);
     }
 
 }
