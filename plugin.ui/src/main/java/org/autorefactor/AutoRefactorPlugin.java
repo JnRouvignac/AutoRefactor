@@ -61,7 +61,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 
     @Override
     public void stop(final BundleContext context) throws Exception {
-    	Job.getJobManager().cancel(AbstractRefactoringJob.FAMILY);
+        Job.getJobManager().cancel(AbstractRefactoringJob.FAMILY);
         plugin= null;
         environment= null;
         super.stop(context);
