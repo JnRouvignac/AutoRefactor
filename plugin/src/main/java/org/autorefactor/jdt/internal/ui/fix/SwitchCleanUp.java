@@ -281,9 +281,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return hasConflict;
     }
 
-    private boolean containsAny(final Set<String> variableDeclarationIds, Set<String> declIds2) {
-        for (String newIdentifier : declIds2) {
-            if (variableDeclarationIds.contains(newIdentifier)) {
+    private boolean containsAny(final Set<String> variableDeclarationIds, Set<String> varNames) {
+        for (String varName : varNames) {
+            if (variableDeclarationIds.contains(varName)) {
                 return true;
             }
         }
@@ -293,7 +293,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
-        if (switchExpression != null && cases.size() > 1) {
+        if (switchExpression != null && cases.size() > 2) {
             replaceWithSwitchStatement(node, switchExpression, cases, remainingStatement);
             return false;
         }
@@ -340,24 +340,20 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         if (remainingStatement != null) {
-            addDefaultWithStatements(switchStatement, ASTNodes.asList(remainingStatement));
+            addCaseWithStatements(switchStatement, null, ASTNodes.asList(remainingStatement));
         }
 
         ctx.getRefactorings().replace(node, switchStatement);
     }
 
-    private void addDefaultWithStatements(final SwitchStatement switchStatement, final List<Statement> remainingStatement) {
-        addCaseWithStatements(switchStatement, null, remainingStatement);
-    }
-
-    private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValues,
+    private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
             final List<Statement> innerStatements) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final List<Statement> switchStatements= ASTNodes.statements(switchStatement);
 
         // Add the case statement(s)
-        if (caseValues != null) {
-            for (Expression caseValue : caseValues) {
+        if (caseValuesOrNullForDefault != null) {
+            for (Expression caseValue : caseValuesOrNullForDefault) {
                 switchStatements.add(b.case0(b.createMoveTarget(caseValue)));
             }
         } else {
@@ -373,7 +369,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStatements));
         }
 
-        // When required: end with a break;
+        // When required: end with a break
         if (isBreakNeeded) {
             switchStatements.add(b.break0());
         }

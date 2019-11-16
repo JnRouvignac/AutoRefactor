@@ -114,49 +114,51 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithSwitchOnCharacter(char a1) {
+    public void replaceIfWithSwitchOnCharacter(char character) {
         int i = 0;
         // Keep this comment
-        if (a1 == 'a') {
+        if (character == 'a') {
             // Keep this comment too
             i = 0;
             // Keep this comment also
-        } else if (a1 == 'b')
+        } else if (character == 'b')
             i = 10;
-        else if ('c' == a1) {
+        else if ('c' == character) {
             i = 20;
-        } else if (a1 == 'd') {
+        } else if (character == 'd') {
             i = 30;
         } else
             i = 40;
     }
 
-    public void replaceIfRemoveDuplicateConditions(char a1) {
+    public void replaceIfRemoveDuplicateConditions(char aCharacter) {
         int i = 0;
-        if (a1 == 'a') {
+        if (aCharacter == 'a') {
             i = 0;
-        } else if (a1 == 'b') {
+        } else if (aCharacter == 'b') {
             i = 10;
-        } else if (a1 == 'a') {
+        } else if (aCharacter == 'a') {
             i = 20;
-        } else if (a1 == 'b') {
+        } else if (aCharacter == 'b') {
             i = 30;
-        } else if ('c' == a1) {
+        } else if ('c' == aCharacter) {
             i = 40;
-        } else if (a1 == 'd' || a1 == 'b' || ('c' == a1)) {
+        } else if (aCharacter == 'd' || aCharacter == 'b' || ('c' == aCharacter)) {
             i = 50;
         } else {
             i = 60;
         }
     }
 
-    public void replaceIfWithSeveralConditions(char a1) {
+    public void replaceIfWithSeveralConditions(char myCharacter) {
         int i = 0;
-        if (a1 == 'a') {
+        if (myCharacter == 'a') {
             i = 0;
-        } else if (a1 == 'a') {
+        } else if (myCharacter == 'z') {
+            i = 10;
+        } else if (myCharacter == 'a') {
             i = 20;
-        } else if ((a1 == 'd') || (a1 == 'b') || ('c' == a1) || ('f' == a1)) {
+        } else if ((myCharacter == 'd') || (myCharacter == 'b') || ('c' == myCharacter) || ('f' == myCharacter)) {
             i = 50;
         } else {
             i = 60;
@@ -290,6 +292,9 @@ public class SwitchSample {
         } else if (i1 == 1) {
             int integer1 = 10;
             i = integer1;
+        } else if (i1 == 2) {
+            int i2 = 20;
+            i = i2;
         }
     }
 
@@ -303,6 +308,9 @@ public class SwitchSample {
         } else if (i1 == 1) {
             int integer1 = 10;
             i = integer1;
+        } else if (i1 == 2) {
+            int i2 = 20;
+            i = i2;
         }
     }
 
@@ -314,6 +322,9 @@ public class SwitchSample {
         } else if (i1 == 2) {
             char integer1 = 'a';
             i = integer1;
+        } else if (i1 == 3) {
+            char c = 'a';
+            i = c;
         }
     }
 

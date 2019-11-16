@@ -148,10 +148,10 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithSwitchOnCharacter(char a1) {
+    public void replaceIfWithSwitchOnCharacter(char character) {
         int i = 0;
         // Keep this comment
-        switch (a1) {
+        switch (character) {
         case 'a':
             // Keep this comment too
             i = 0;
@@ -172,9 +172,9 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfRemoveDuplicateConditions(char a1) {
+    public void replaceIfRemoveDuplicateConditions(char aCharacter) {
         int i = 0;
-        switch (a1) {
+        switch (aCharacter) {
         case 'a':
             i = 0;
             break;
@@ -193,11 +193,14 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithSeveralConditions(char a1) {
+    public void replaceIfWithSeveralConditions(char myCharacter) {
         int i = 0;
-        switch (a1) {
+        switch (myCharacter) {
         case 'a':
             i = 0;
+            break;
+        case 'z':
+            i = 10;
             break;
         case 'd':
         case 'b':
@@ -352,6 +355,9 @@ public class SwitchSample {
         } else if (i1 == 1) {
             int integer1 = 10;
             i = integer1;
+        } else if (i1 == 2) {
+            int i2 = 20;
+            i = i2;
         }
     }
 
@@ -368,6 +374,10 @@ public class SwitchSample {
             int integer1 = 10;
             i = integer1;
             break;
+        case 2:
+            int i2 = 20;
+            i = i2;
+            break;
         }
     }
 
@@ -379,6 +389,9 @@ public class SwitchSample {
         } else if (i1 == 2) {
             char integer1 = 'a';
             i = integer1;
+        } else if (i1 == 3) {
+            char c = 'a';
+            i = c;
         }
     }
 
