@@ -1523,16 +1523,9 @@ public final class ASTNodes {
             return true;
 
         case ASTNode.INFIX_EXPRESSION:
-            InfixExpression infixExpression= (InfixExpression) expression;
-
-            if (!isHardCoded(infixExpression.getLeftOperand()) || !isHardCoded(infixExpression.getRightOperand())) {
-                return false;
-            }
-            if (infixExpression.hasExtendedOperands()) {
-                for (Object operand : infixExpression.extendedOperands()) {
-                    if (!isHardCoded((Expression) operand)) {
-                        return false;
-                    }
+            for (Expression operand : allOperands((InfixExpression) expression)) {
+                if (!isHardCoded(operand)) {
+                    return false;
                 }
             }
 
@@ -2724,7 +2717,7 @@ public final class ASTNodes {
 
         if (infixExpression != null
                 && (hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
-                        || (hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR))
+                        || hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR)
                         && hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
             int nbOperands= 0;
 
