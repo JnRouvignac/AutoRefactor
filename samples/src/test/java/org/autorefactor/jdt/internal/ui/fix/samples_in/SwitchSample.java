@@ -31,11 +31,11 @@ public class SwitchSample {
 
     public void replaceIfWithSwitchOnParameter(int i1) {
         int i = 0;
-        // Keep this comment 1
+        // Keep this comment
         if (i1 == 0) {
-            // Keep this comment 2
+            // Keep this comment too
             i = 0;
-            // Keep this comment 3
+            // Keep this comment also
         } else if (i1 == 1) {
             i = 10;
         } else if (2 == i1) {
@@ -65,11 +65,11 @@ public class SwitchSample {
     public void replaceIfWithSwitchOnLocalVariable() {
         int i1 = 0;
         int i = 0;
-        // Keep this comment 1
+        // Keep this comment
         if (i1 == 0) {
-            // Keep this comment 2
+            // Keep this comment too
             i = 0;
-            // Keep this comment 3
+            // Keep this comment also
         } else if (i1 == 1) {
             i = 10;
         } else if (2 == i1) {
@@ -88,23 +88,39 @@ public class SwitchSample {
 
     public void replaceIfWithSwitchOnField() {
         int i = 0;
-        // Keep this comment 1
+        // Keep this comment
         if (i2 == 0) {
-            // Keep this comment 2
+            // Keep this comment too
             i = 0;
-            // Keep this comment 3
+            // Keep this comment also
         } else if (i2 == 1) {
             i = 10;
+        } else if (i2 == 2) {
+            i = 20;
+        }
+    }
+
+    public void replaceWithSwitchOnField() {
+        int i = 0;
+        // Keep this comment
+        if (this.i2 == 0) {
+            // Keep this comment too
+            i = 0;
+            // Keep this comment also
+        } else if (this.i2 == 1) {
+            i = 10;
+        } else if (this.i2 == 2) {
+            i = 20;
         }
     }
 
     public void replaceIfWithSwitchOnCharacter(char a1) {
         int i = 0;
-        // Keep this comment 1
+        // Keep this comment
         if (a1 == 'a') {
-            // Keep this comment 2
+            // Keep this comment too
             i = 0;
-            // Keep this comment 3
+            // Keep this comment also
         } else if (a1 == 'b')
             i = 10;
         else if ('c' == a1) {

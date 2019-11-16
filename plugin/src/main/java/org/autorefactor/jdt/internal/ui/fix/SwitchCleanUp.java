@@ -45,11 +45,12 @@ import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -58,11 +59,11 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 /** See {@link #getDescription()} method. */
 public class SwitchCleanUp extends AbstractCleanUpRule {
     static final class Variable {
-        private final SimpleName name;
+        private final Expression name;
         private final List<Expression> constantValues;
 
-        private Variable(SimpleName varName, List<Expression> constantValues) {
-            this.name= varName;
+        private Variable(Expression firstOp, List<Expression> constantValues) {
+            this.name= firstOp;
             this.constantValues= constantValues;
         }
 
@@ -241,13 +242,13 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final SimpleName switchExpression= variable.name;
+        final Expression switchExpression= variable.name;
         final List<SwitchCaseSection> cases= new ArrayList<>();
         Statement remainingStatement= null;
 
         final Set<String> variableDeclarationIds= new HashSet<>();
         IfStatement currentNode= node;
-        while (haveSameIdentifier(switchExpression, variable.name) && ASTNodes.haveSameType(switchExpression, variable.name)) {
+        while (ASTNodes.isSameVariable(switchExpression, variable.name)) {
             if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
                 // Cannot declare two variables with the same name in two cases
                 return true;
@@ -271,10 +272,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private boolean hasUnlabeledBreak(final IfStatement node) {
         return new HasUnlabeledBreakVisitor().findOrDefault(node, false);
-    }
-
-    private boolean haveSameIdentifier(final SimpleName sn1, SimpleName sn2) {
-        return sn1.getIdentifier().equals(sn2.getIdentifier());
     }
 
     private boolean detectDeclarationConflicts(final Statement statement, final Set<String> variableDeclarationIds) {
@@ -433,9 +430,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
         // TODO JNR handle enums
         // TODO JNR handle strings
-        if (firstOp instanceof SimpleName && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
+        if ((firstOp instanceof Name || firstOp instanceof FieldAccess) && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
                 && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
-            return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
+            return new Variable(firstOp, Arrays.asList(secondOp));
         }
 
         return null;
