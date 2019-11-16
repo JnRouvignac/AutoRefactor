@@ -25,8 +25,6 @@
  */
 package org.autorefactor;
 
-import java.util.Vector;
-
 import org.autorefactor.environment.Environment;
 import org.autorefactor.environment.Logger;
 import org.autorefactor.jdt.internal.corext.dom.AbstractRefactoringJob;
