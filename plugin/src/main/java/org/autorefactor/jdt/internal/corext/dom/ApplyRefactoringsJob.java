@@ -64,7 +64,7 @@ import org.eclipse.text.edits.TextEdit;
  * provided by the partitioner ({@link PrepareApplyRefactoringsJob}).
  */
 public class ApplyRefactoringsJob extends AbstractRefactoringJob {
-	
+    
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Environment environment;
