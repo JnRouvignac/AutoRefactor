@@ -91,6 +91,52 @@ public class ReduceIndentationSample {
         }
     }
 
+    public int reduceIndentationFromElse(int i, List<Integer> integers) {
+        // Keep this comment
+        if (i > 0) {
+            // Keep this comment too
+            return 0;
+        } else {
+            // Keep this comment also
+            for (Integer integer : integers) {
+                System.out.println("Reading " + integer);
+            }
+            return 51;
+        }
+    }
+
+    public int reduceIndentationFromIf(int i, List<Integer> integers) {
+        // Keep this comment
+        if (i > 0) {
+            // Keep this comment too
+            for (Integer integer : integers) {
+                System.out.println("Reading " + integer);
+            }
+            return 0;
+        } else {
+            // Keep this comment also
+            return 51;
+        }
+    }
+
+    public int reduceBigIndentationFromIf(int i, List<String> integers) {
+        // Keep this comment
+        if (i > 0) {
+            // Keep this comment too
+            try {
+                for (String integer : integers) {
+                    System.out.println("Reading " + (Integer.parseInt(integer) + 100));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return 0;
+        } else {
+            // Keep this comment also
+            return 51;
+        }
+    }
+
     public int refactorElseIf(int i) {
         // Keep this comment
         if (i < 0) {
@@ -218,21 +264,6 @@ public class ReduceIndentationSample {
         }
 
         return -1;
-    }
-
-    public int refactorGreatestIndentation(boolean isActive, boolean isVisible) {
-        // Keep this comment
-        if (isActive) {
-            // Keep this comment too
-            if (isVisible) {
-                return 0;
-            } else {
-                return 1;
-            }
-        } else {
-            // Keep this comment also
-            return 2;
-        }
     }
 
     public int doNotRefactorWithNameConflict(int i) {
