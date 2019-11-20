@@ -1232,9 +1232,9 @@ public final class ASTNodes {
             if (0 <= siblingIndex && siblingIndex < statements.size()) {
                 if (isForward) {
                     return statements.subList(siblingIndex, statements.size());
-                } else {
-                    return statements.subList(0, siblingIndex + 1);
                 }
+
+                return statements.subList(0, siblingIndex + 1);
             }
         }
 
@@ -2694,10 +2694,12 @@ public final class ASTNodes {
         if (booleanLiteral != null) {
             return booleanLiteral.booleanValue();
         }
+
         if (booleanConstant != null) {
             if (isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
                 return Boolean.TRUE;
             }
+
             if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
                 return Boolean.FALSE;
             }
@@ -2715,19 +2717,19 @@ public final class ASTNodes {
     public static int getNbOperands(Expression node) {
         final InfixExpression infixExpression= as(node, InfixExpression.class);
 
-        if (infixExpression != null
-                && (hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
-                        || hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)
-                        && hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
-            int nbOperands= 0;
-
-            for (Expression operand : allOperands(infixExpression)) {
-                nbOperands+= getNbOperands(operand);
-            }
-
-            return nbOperands;
-        } else {
+        if (infixExpression == null
+                || !hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
+                && (!hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)
+                        || !hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
             return 1;
         }
+
+        int nbOperands= 0;
+
+        for (Expression operand : allOperands(infixExpression)) {
+            nbOperands+= getNbOperands(operand);
+        }
+
+        return nbOperands;
     }
 }

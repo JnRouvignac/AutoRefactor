@@ -160,7 +160,9 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.canHaveSiblings(node)) {
                 r.remove(node);
                 return false;
-            } else if (node instanceof EmptyStatement) {
+            }
+
+            if (node instanceof EmptyStatement) {
                 r.replace(node, ctx.getASTBuilder().block());
                 return false;
             }
@@ -188,7 +190,9 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.canHaveSiblings(node)) {
                 r.remove(node);
                 return false;
-            } else if (node instanceof EmptyStatement) {
+            }
+
+            if (node instanceof EmptyStatement) {
                 r.replace(node, ctx.getASTBuilder().block());
                 return false;
             }

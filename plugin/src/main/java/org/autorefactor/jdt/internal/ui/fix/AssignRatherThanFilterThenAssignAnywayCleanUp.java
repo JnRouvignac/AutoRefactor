@@ -106,9 +106,9 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                 if ((thenRS != null) && (elseRS != null)) {
                     if (isEqual) {
                         return maybeReplaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
-                    } else {
-                        return maybeReplaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                     }
+
+                    return maybeReplaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                 }
             }
 

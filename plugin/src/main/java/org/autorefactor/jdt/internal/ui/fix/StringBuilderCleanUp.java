@@ -156,16 +156,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             removeCallsToToString(allAppendedStrings, isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                if (allAppendedStrings.isEmpty() && isVariable(lastExpression) && node.getParent() instanceof Statement) {
-                    final Refactorings r= ctx.getRefactorings();
-
-                    if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
-                        r.remove(node.getParent());
-                    } else {
-                        r.replace(node.getParent(), ctx.getASTBuilder().block());
-                    }
-                } else {
+                if (!(allAppendedStrings.isEmpty() && isVariable(lastExpression) && node.getParent() instanceof Statement)) {
                     return maybeReplaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
+                }
+
+                final Refactorings r= ctx.getRefactorings();
+                if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
+                    r.remove(node.getParent());
+                } else {
+                    r.replace(node.getParent(), ctx.getASTBuilder().block());
                 }
 
                 return false;

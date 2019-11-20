@@ -412,7 +412,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             }
 
             return mergedVariable;
-        } else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
+        }
+        if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
             final Expression leftOp= infixExpression.getLeftOperand();
             final Expression rightOp= infixExpression.getRightOperand();
 
