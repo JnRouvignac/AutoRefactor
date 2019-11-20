@@ -86,6 +86,21 @@ public class ReduceIndentationSample {
         return 1;
     }
 
+    public int refactorInTry(int i) {
+        // Keep this comment
+        try {
+            if (i > 0) {
+                // Keep this comment too
+                return 1;
+            }
+            // Keep this comment also
+            return 2;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public int reduceIndentationFromElse(int i, List<Integer> integers) {
         // Keep this comment
         if (i > 0) {
