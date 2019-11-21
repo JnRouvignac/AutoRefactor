@@ -249,6 +249,11 @@ public final class ASTNodes {
         }
     }
 
+    /**
+     * Number of operands a boolean expression should not reach.
+     */
+    public static final int EXCESSIVE_OPERAND_NUMBER= 5;
+
     private ASTNodes() {
     }
 

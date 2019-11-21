@@ -75,7 +75,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
         if (elseCode != null && elseCode.size() == 1) {
             final IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
 
-            if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < 5) {
+            if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
                 return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
                         && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
             }

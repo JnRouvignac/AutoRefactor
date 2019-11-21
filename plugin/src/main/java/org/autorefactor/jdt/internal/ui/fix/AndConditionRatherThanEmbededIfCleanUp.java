@@ -70,9 +70,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         if (node.getElseStatement() == null) {
             final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
-            if ((is != null)
-                    && (is.getElseStatement() == null)
-                    && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(is.getExpression()) < 5) {
+            if (is != null
+                    && is.getElseStatement() == null
+                    && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(is.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
                 replaceIfNoElseStatement(node, is);
                 return false;
             }
