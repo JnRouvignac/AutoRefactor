@@ -159,13 +159,8 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.fallsThrough(node.getThenStatement())) {
                 if (ASTNodes.fallsThrough(node.getElseStatement())) {
                     if (ASTNodes.getNextSiblings(node).isEmpty()) {
-                        IndentationVisitor visitor= new IndentationVisitor();
-                        node.getThenStatement().accept(visitor);
-                        int thenIndentation= visitor.getIndentation();
-
-                        visitor= new IndentationVisitor();
-                        node.getElseStatement().accept(visitor);
-                        int elseIndentation= visitor.getIndentation();
+                        int thenIndentation= getIndentation(node.getThenStatement());
+                        int elseIndentation= getIndentation(node.getElseStatement());
 
                         if (thenIndentation <= elseIndentation || node.getElseStatement() instanceof IfStatement) {
                             moveElseStatement(node);
@@ -186,6 +181,12 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         }
 
         return true;
+    }
+
+    private int getIndentation(final Statement statementInIf) {
+        IndentationVisitor visitor= new IndentationVisitor();
+        statementInIf.accept(visitor);
+        return visitor.getIndentation() + (statementInIf instanceof Block ? -1 : 0);
     }
 
     private void moveThenStatement(IfStatement node) {

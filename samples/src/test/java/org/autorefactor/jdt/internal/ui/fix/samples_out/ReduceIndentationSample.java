@@ -361,4 +361,12 @@ public class ReduceIndentationSample {
             System.out.println(integer);
         }
     }
+
+    public int refactorElse(List<Date> dates) {
+        // Keep this comment
+        if (dates.isEmpty()) {
+            return 0;
+        }
+        return 1;
+    }
 }

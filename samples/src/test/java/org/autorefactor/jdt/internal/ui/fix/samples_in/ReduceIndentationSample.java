@@ -378,4 +378,12 @@ public class ReduceIndentationSample {
             }
         }
     }
+
+    public int refactorElse(List<Date> dates) {
+        // Keep this comment
+        if (dates.isEmpty()) {
+            return 0;
+        } else
+            return 1;
+    }
 }
