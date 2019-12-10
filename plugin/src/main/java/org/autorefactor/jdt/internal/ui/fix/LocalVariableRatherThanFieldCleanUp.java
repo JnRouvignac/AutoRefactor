@@ -136,7 +136,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceFragmentByLocalVariable(TypeDeclaration node, FieldDeclaration field,
             VariableDeclarationFragment fragment) {
-        if (fragment.getInitializer() != null && !ASTNodes.isPassive(fragment.getInitializer())) {
+        if (fragment.getInitializer() != null && !ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
             return true;
         }
 

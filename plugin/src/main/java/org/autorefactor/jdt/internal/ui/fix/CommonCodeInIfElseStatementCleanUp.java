@@ -56,6 +56,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
     }
@@ -65,6 +66,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
     }
@@ -74,6 +76,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
     }
@@ -215,7 +218,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 final ASTNode parent= allCases.get(i);
 
                 if (areCasesRemovable[i]) {
-                    if (i == (areCasesRemovable.length - 2) && !areCasesRemovable[i + 1]) {
+                    if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
                         // Then clause is empty and there is only one else clause
                         // => revert if statement
                         r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.createMoveTarget(((IfStatement) parent).getElseStatement())));
@@ -266,7 +269,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             final ASTNode parent= allCases.get(i);
 
             if (removedStatements.containsAll(allCasesStatements.get(i))
-                    && (!(parent instanceof IfStatement) || ASTNodes.isPassive(((IfStatement) parent).getExpression()))) {
+                    && (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
                 areCasesRemovable[i]= true;
             } else {
                 this.ctx.getRefactorings().remove(removedStatements);

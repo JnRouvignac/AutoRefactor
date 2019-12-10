@@ -41,6 +41,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
     }
@@ -50,6 +51,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
     }
@@ -59,6 +61,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
     }
@@ -68,7 +71,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
         if (node.fragments() != null && node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
-            if (fragment.getInitializer() != null && ASTNodes.isPassive(fragment.getInitializer())) {
+            if (fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
                 final SimpleName varName= fragment.getName();
                 final IVariableBinding variable= fragment.resolveBinding();
                 Statement stmtToInspect= ASTNodes.getNextSibling(node);

@@ -90,7 +90,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             final Statement thenStatement= getThenStatement(node);
             final Statement elseStatement= getElseStatement(node, thenStatement);
 
-            if ((condition != null) && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && (thenStatement != null) && (elseStatement != null)) {
+            if (condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
                 final Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
                 final Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
                 boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
@@ -103,7 +103,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                 final ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
                 final ReturnStatement elseRS= ASTNodes.as(elseStatement, ReturnStatement.class);
 
-                if ((thenRS != null) && (elseRS != null)) {
+                if (thenRS != null && elseRS != null) {
                     if (isEqual) {
                         return maybeReplaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
                     }
@@ -129,7 +129,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             }
 
             if (ASTNodes.isHardCoded(hardCodedExpression)) {
-                if (ASTNodes.isPassive(condition.getLeftOperand())
+                if (ASTNodes.isPassiveWithoutFallingThrough(condition.getLeftOperand())
                         && ASTNodes.match(condition.getRightOperand(), hardCodedExpression)
                         && ASTNodes.match(condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
@@ -137,7 +137,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                     return false;
                 }
 
-                if (ASTNodes.isPassive(condition.getRightOperand())
+                if (ASTNodes.isPassiveWithoutFallingThrough(condition.getRightOperand())
                         && ASTNodes.match(condition.getLeftOperand(), hardCodedExpression)
                         && ASTNodes.match(condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
                     replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
@@ -182,7 +182,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement valuedReturn,
                 ReturnStatement hardCodedReturn, Statement toRemove) {
             if (ASTNodes.isHardCoded(hardCodedReturn.getExpression())) {
-                if (ASTNodes.isPassive(condition.getLeftOperand())
+                if (ASTNodes.isPassiveWithoutFallingThrough(condition.getLeftOperand())
                         && ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
                         && ASTNodes.match(condition.getLeftOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
@@ -190,7 +190,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                     return false;
                 }
 
-                if (ASTNodes.isPassive(condition.getRightOperand())
+                if (ASTNodes.isPassiveWithoutFallingThrough(condition.getRightOperand())
                         && ASTNodes.match(condition.getLeftOperand(), hardCodedReturn.getExpression())
                         && ASTNodes.match(condition.getRightOperand(), valuedReturn.getExpression())) {
                     replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);

@@ -65,6 +65,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
     }
@@ -74,6 +75,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
     }
@@ -83,6 +85,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
     }
@@ -91,6 +94,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
     public boolean visit(IfStatement node) {
         final IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
         final IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+
         if (ASTNodes.isPassive(node.getExpression()) && thenInnerIfStatement != null && elseInnerIfStatement != null
                 && thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
                 && ASTNodes.isPassive(thenInnerIfStatement.getExpression())

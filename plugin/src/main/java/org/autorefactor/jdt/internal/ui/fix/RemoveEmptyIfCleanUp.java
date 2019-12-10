@@ -40,6 +40,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
     }
@@ -49,6 +50,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
     }
@@ -58,6 +60,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
     }
@@ -78,7 +81,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
             final Expression condition= node.getExpression();
             if (elseStatement != null) {
                 r.replace(node, b.if0(b.negate(condition), b.createMoveTarget(elseStatement)));
-            } else if (ASTNodes.isPassive(condition)) {
+            } else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
                 removeBlock(node, r, b);
                 return false;
             }

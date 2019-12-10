@@ -199,7 +199,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-            if (ASTNodes.isPassive((Expression) mi.arguments().get(1))) {
+            if (ASTNodes.isPassiveWithoutFallingThrough((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
             }

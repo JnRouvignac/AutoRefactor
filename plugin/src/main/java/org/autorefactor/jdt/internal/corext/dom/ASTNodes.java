@@ -127,11 +127,22 @@ public final class ASTNodes {
     /** Enum representing the possible side effect of an expression. */
     public enum ExprActivity {
         /** Does nothing. */
-        PASSIVE,
+        PASSIVE_WITHOUT_FALLING_THROUGH(0),
+
+        /** Does nothing but may fall through. */
+        PASSIVE(1),
+
         /** May modify something. */
-        CAN_BE_ACTIVE,
+        CAN_BE_ACTIVE(2),
+
         /** Modify something. */
-        ACTIVE;
+        ACTIVE(3);
+
+        private final int asInteger;
+
+        ExprActivity(int asInteger) {
+            this.asInteger= asInteger;
+        }
     }
 
     /** Compares {@link ASTNode}s according to their start position. */
@@ -151,7 +162,7 @@ public final class ASTNodes {
     }
 
     private static final class ExprActivityVisitor extends InterruptibleVisitor {
-        private ExprActivity activityLevel= ExprActivity.PASSIVE;
+        private ExprActivity activityLevel= ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH;
 
         public ExprActivity getActivityLevel() {
             return activityLevel;
@@ -159,27 +170,47 @@ public final class ASTNodes {
 
         @Override
         public boolean visit(CastExpression node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.PASSIVE);
             return true;
         }
 
         @Override
         public boolean visit(ArrayAccess node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.PASSIVE);
+            return true;
+        }
+
+        @Override
+        public boolean visit(FieldAccess node) {
+            setActivityLevel(ExprActivity.PASSIVE);
+            return true;
+        }
+
+        @Override
+        public boolean visit(QualifiedName node) {
+            if (node.getQualifier() == null
+                    || node.getQualifier().resolveBinding() == null
+                    || node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
+                            && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE) {
+                setActivityLevel(ExprActivity.PASSIVE);
+            }
+
             return true;
         }
 
         @Override
         public boolean visit(Assignment node) {
-            activityLevel= ExprActivity.ACTIVE;
+            setActivityLevel(ExprActivity.ACTIVE);
             return interruptVisit();
         }
 
         @Override
         public boolean visit(PrefixExpression node) {
             if (hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
-                activityLevel= ExprActivity.ACTIVE;
+                setActivityLevel(ExprActivity.ACTIVE);
                 return interruptVisit();
+            } else if (hasType(node.getOperand(), Object.class.getCanonicalName())) {
+                setActivityLevel(ExprActivity.PASSIVE);
             }
 
             return true;
@@ -187,19 +218,29 @@ public final class ASTNodes {
 
         @Override
         public boolean visit(PostfixExpression node) {
-            activityLevel= ExprActivity.ACTIVE;
+            setActivityLevel(ExprActivity.ACTIVE);
             return interruptVisit();
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(InfixExpression node) {
-            if (hasOperator(node, InfixExpression.Operator.DIVIDE)
-                    || hasOperator(node, InfixExpression.Operator.PLUS) && hasType(node, String.class.getCanonicalName())
+            if (hasOperator(node, InfixExpression.Operator.DIVIDE)) {
+                setActivityLevel(ExprActivity.PASSIVE);
+            } else {
+                for (Expression operand : allOperands(node)) {
+                    if (hasType(operand, Object.class.getCanonicalName())) {
+                        setActivityLevel(ExprActivity.PASSIVE);
+                        break;
+                    }
+                }
+            }
+
+            if (hasOperator(node, InfixExpression.Operator.PLUS) && hasType(node, String.class.getCanonicalName())
                             && (mayCallImplicitToString(node.getLeftOperand())
                                     || mayCallImplicitToString(node.getRightOperand())
                                     || mayCallImplicitToString(node.extendedOperands()))) {
-                activityLevel= ExprActivity.CAN_BE_ACTIVE;
+                setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             }
 
             return true;
@@ -226,26 +267,32 @@ public final class ASTNodes {
 
         @Override
         public boolean visit(SuperMethodInvocation node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
         public boolean visit(MethodInvocation node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
         public boolean visit(ThrowStatement node) {
-            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
+        }
+
+        private void setActivityLevel(final ExprActivity newActivityLevel) {
+            if (activityLevel.asInteger < newActivityLevel.asInteger) {
+                activityLevel= newActivityLevel;
+            }
         }
     }
 
@@ -2552,6 +2599,19 @@ public final class ASTNodes {
     }
 
     /**
+     * Return true if the node changes nothing and throws no exceptions.
+     *
+     * @param node The node to visit.
+     *
+     * @return True if the node changes nothing and throws no exceptions.
+     */
+    public static boolean isPassiveWithoutFallingThrough(final ASTNode node) {
+        final ExprActivityVisitor visitor= new ExprActivityVisitor();
+        visitor.visitNode(node);
+        return ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH.equals(visitor.getActivityLevel());
+    }
+
+    /**
      * Return true if the node changes nothing.
      *
      * @param node The node to visit.
@@ -2561,7 +2621,8 @@ public final class ASTNodes {
     public static boolean isPassive(final ASTNode node) {
         final ExprActivityVisitor visitor= new ExprActivityVisitor();
         visitor.visitNode(node);
-        return ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
+        return ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH.equals(visitor.getActivityLevel())
+                || ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
     }
 
     /**

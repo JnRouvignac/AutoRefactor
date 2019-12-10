@@ -183,7 +183,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         if (infixExpression != null
                 && !infixExpression.hasExtendedOperands()
                 && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                && ASTNodes.isPassive(infixExpression.getLeftOperand())) {
+                && ASTNodes.isPassiveWithoutFallingThrough(infixExpression.getLeftOperand())) {
             if (ASTNodes.match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
                 return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
             }

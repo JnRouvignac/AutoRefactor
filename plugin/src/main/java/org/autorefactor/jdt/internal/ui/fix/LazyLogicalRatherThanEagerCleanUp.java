@@ -77,7 +77,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 
                 if (isFirst) {
                     isFirst= false;
-                } else if (!ASTNodes.isPassive(expression)) {
+                } else if (!ASTNodes.isPassiveWithoutFallingThrough(expression)) {
                     return true;
                 }
             }
