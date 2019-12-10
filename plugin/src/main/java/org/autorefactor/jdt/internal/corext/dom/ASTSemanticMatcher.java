@@ -144,6 +144,9 @@ public class ASTSemanticMatcher extends ASTMatcher {
             put(InfixExpression.Operator.AND, InfixExpression.Operator.AND);
             put(InfixExpression.Operator.OR, InfixExpression.Operator.OR);
             put(InfixExpression.Operator.XOR, InfixExpression.Operator.XOR);
+            put(InfixExpression.Operator.PLUS, InfixExpression.Operator.PLUS);
+            put(InfixExpression.Operator.TIMES, InfixExpression.Operator.TIMES);
+
             put(InfixExpression.Operator.GREATER, InfixExpression.Operator.LESS);
             put(InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER);
             put(InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS);
@@ -166,21 +169,25 @@ public class ASTSemanticMatcher extends ASTMatcher {
         if (other instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) other;
 
-            if (!node.hasExtendedOperands() && !ie.hasExtendedOperands() && ASTNodes.isPassiveWithoutFallingThrough(node.getLeftOperand())
-                    && ASTNodes.isPassiveWithoutFallingThrough(node.getRightOperand())
-                    && safeSubtreeMatch(node.getLeftOperand(), ie.getRightOperand())
-                    && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand()) && (node.getOperator().equals(INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator())) || ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES)
-                    && node.getOperator().equals(ie.getOperator())
-                    && ASTNodes.hasType(node.getLeftOperand(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(), Short.class.getCanonicalName(),
+            if (!ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS)
+                    || ASTNodes.hasType(node.getLeftOperand(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(), Short.class.getCanonicalName(),
                             Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName())
-                    && ASTNodes.haveSameType(node.getLeftOperand(), node.getRightOperand()))) {
-                return true;
-            }
+                            && ASTNodes.hasType(node.getRightOperand(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(), Short.class.getCanonicalName(),
+                                    Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName())) {
+                if (!node.hasExtendedOperands() && !ie.hasExtendedOperands() && ASTNodes.isPassiveWithoutFallingThrough(node.getLeftOperand())
+                        && ASTNodes.isPassiveWithoutFallingThrough(node.getRightOperand())
+                        && safeSubtreeMatch(node.getLeftOperand(), ie.getRightOperand())
+                        && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand())
+                        && node.getOperator().equals(INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator()))) {
+                    return true;
+                }
 
-            if (node.getOperator().equals(ie.getOperator()) && ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES, InfixExpression.Operator.AND,
-                            InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.OR,
-                            InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR)) {
-                return isOperandsMatching(node, ie, true);
+                if (node.getOperator().equals(ie.getOperator()) && ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES, InfixExpression.Operator.AND,
+                                InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.OR,
+                                InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR)
+                        && isOperandsMatching(node, ie, true)) {
+                    return true;
+                }
             }
         }
 
