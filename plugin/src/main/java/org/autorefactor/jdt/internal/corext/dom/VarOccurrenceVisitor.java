@@ -2,6 +2,7 @@ package org.autorefactor.jdt.internal.corext.dom;
 
 import java.util.Set;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.SimpleName;
 
@@ -11,6 +12,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 public class VarOccurrenceVisitor extends InterruptibleVisitor {
     private final Set<String> localVarIds;
     private boolean varUsed;
+    private ASTNode startNode= null;
 
     /**
      * Returns true if at least one variable is used.
@@ -31,6 +33,12 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
     }
 
     @Override
+    public void visitNode(ASTNode startNode) {
+        this.startNode= startNode;
+        super.visitNode(this.startNode);
+    }
+
+    @Override
     public boolean visit(final SimpleName aVariable) {
         if (localVarIds.contains(aVariable.getIdentifier())) {
             varUsed= true;
@@ -42,6 +50,6 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
 
     @Override
     public boolean visit(final Block node) {
-        return false;
+        return startNode == node;
     }
 }

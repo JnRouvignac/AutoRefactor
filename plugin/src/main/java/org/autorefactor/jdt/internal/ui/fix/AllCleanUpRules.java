@@ -92,8 +92,6 @@ public final class AllCleanUpRules {
                 new StandardMethodRatherThanLibraryMethodCleanUp(), new StringRatherThanNewStringCleanUp(),
                 new StringCleanUp(), new StringValueOfRatherThanConcatCleanUp(), new BigNumberCleanUp(),
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
-                // TODO JNR implement
-                // new ForeachCleanUp(),
                 new RemoveEmptyIfCleanUp(),
                 new NoLoopIterationRatherThanEmptyCheckCleanUp(),
                 new InlineCodeRatherThanPeremptoryConditionCleanUp(),
@@ -115,10 +113,6 @@ public final class AllCleanUpRules {
                 new EntrySetRatherThanKeySetAndValueSearchCleanUp(), new MethodOnMapRatherThanMethodOnKeySetCleanUp(),
                 new NoAssignmentInIfConditionCleanUp(), new DeclarationOutsideLoopRatherThanInsideCleanUp(),
                 new IfElseIfCleanUp(), new CommonIfInIfElseCleanUp(),
-                // TODO JNR implement
-                // new RemoveStupidIdiomaticPatternCleanUp(),
-                // TODO JNR - to be completed
-                // new ReduceVariableScopeCleanUp(),
                 new StringBuilderCleanUp(), new StringBuilderMethodRatherThanReassignationCleanUp(),
                 new StringBuilderRatherThanStringBufferCleanUp(), new HashMapRatherThanHashtableCleanUp(),
                 new ArrayListRatherThanVectorCleanUp(), new ArrayDequeRatherThanStackCleanUp(),
@@ -137,8 +131,9 @@ public final class AllCleanUpRules {
                 new NamedMethodRatherThanLogLevelParameterCleanUp(), new EnumMapRatherThanHashMapCleanUp(),
                 new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
                 new UppercaseNumberSuffixRatherThanLowercaseCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
+                new VariableInsideIfRatherThanAboveCleanUp(),
 
-                // Those cleanups should end the list because some other cleanup are prioritary
+                // Those cleanups should end the list because some other cleanups are prioritary
                 new ReduceIndentationCleanUp());
     }
 
