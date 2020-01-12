@@ -89,7 +89,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;
     }
 
@@ -109,7 +109,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (Vector.class.getCanonicalName().equals(origRawType)) {
             return ArrayList.class.getCanonicalName();
         }
@@ -155,7 +155,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected void refactorMethod(ASTNodeFactory b, MethodInvocation originalMi, MethodInvocation refactoredMi) {
+    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
         if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$

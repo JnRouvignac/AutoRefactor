@@ -82,7 +82,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;
     }
 
@@ -102,7 +102,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (Hashtable.class.getCanonicalName().equals(origRawType)) {
             return HashMap.class.getCanonicalName();
         }

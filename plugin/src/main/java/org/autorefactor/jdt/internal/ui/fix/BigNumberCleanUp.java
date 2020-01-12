@@ -78,7 +78,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
 
         if (ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
@@ -144,28 +144,28 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
+    private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
         this.ctx.getRefactorings().replace(node, this.ctx.getASTBuilder().name(typeBinding.getName(), field));
         return false;
     }
 
-    private ASTNode getValueOf(String name, String numberLiteral) {
+    private ASTNode getValueOf(final String name, final String numberLiteral) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.invoke(name, "valueOf", b.number(numberLiteral)); //$NON-NLS-1$
     }
 
-    private StringLiteral getStringLiteral(String numberLiteral) {
+    private StringLiteral getStringLiteral(final String numberLiteral) {
         return this.ctx.getASTBuilder().string(numberLiteral);
     }
 
     @Override
-    public boolean visit(PrefixExpression node) {
+    public boolean visit(final PrefixExpression node) {
         final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
         return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || mi == null || maybeReplaceEquals(false, node, mi);
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (node.getExpression() == null) {
             return true;
         }

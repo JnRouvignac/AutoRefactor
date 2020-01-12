@@ -60,8 +60,8 @@ public class RefactoringContext {
      * @param monitor         the progress monitor of the current job
      * @param environment     the environment
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options,
-            SubMonitor monitor, Environment environment) {
+    public RefactoringContext(final ICompilationUnit compilationUnit, final CompilationUnit astRoot, final JavaProjectOptions options,
+            final SubMonitor monitor, final Environment environment) {
         this.compilationUnit= compilationUnit;
         this.astRoot= astRoot;
         this.monitor= monitor;
@@ -127,7 +127,7 @@ public class RefactoringContext {
         return refactorings;
     }
 
-    String getSource(ASTNode node) {
+    String getSource(final ASTNode node) {
         try {
             return compilationUnit.getSource();
         } catch (JavaModelException e) {
@@ -135,7 +135,7 @@ public class RefactoringContext {
         }
     }
 
-    boolean isInComment(int position) {
+    boolean isInComment(final int position) {
         for (Comment comment : ASTNodes.getCommentList(astRoot)) {
             if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
                 return true;

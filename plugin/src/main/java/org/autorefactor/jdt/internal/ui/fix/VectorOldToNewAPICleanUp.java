@@ -67,12 +67,12 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
             replaceWith(node, "get"); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$

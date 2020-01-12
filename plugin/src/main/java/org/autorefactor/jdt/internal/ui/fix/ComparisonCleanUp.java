@@ -67,7 +67,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         final Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
         final Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
 
@@ -75,7 +75,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                 rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand));
     }
 
-    private boolean maybeStandardizeComparison(InfixExpression node, final Expression comparator,
+    private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
             final Expression literal) {
         final MethodInvocation comparisonMI= ASTNodes.as(comparator, MethodInvocation.class);
 

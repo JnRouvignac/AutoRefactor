@@ -39,7 +39,7 @@ public class IllegalStateException extends AutoRefactorException {
      * @param node    the node from which to retrieve the source location
      * @param message the exception message
      */
-    public IllegalStateException(ASTNode node, String message) {
+    public IllegalStateException(final ASTNode node, final String message) {
         super(node, message);
     }
 }

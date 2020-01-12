@@ -65,7 +65,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     }
 
     @Override
-    public boolean visit(Assignment node) {
+    public boolean visit(final Assignment node) {
         final Expression targetVar= node.getLeftHandSide();
         Expression var= node.getRightHandSide();
         if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())

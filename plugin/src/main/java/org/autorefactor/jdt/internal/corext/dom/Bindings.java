@@ -44,7 +44,7 @@ public final class Bindings {
      * @param wrapperName wrapper name
      * @return The type of the associated primitive wrapper.
      */
-    public static String getUnboxedTypeName(String wrapperName) {
+    public static String getUnboxedTypeName(final String wrapperName) {
         if (Long.class.getCanonicalName().equals(wrapperName)) {
             return long.class.getSimpleName();
         }
@@ -79,7 +79,7 @@ public final class Bindings {
      * @param primitiveName primitive name
      * @return The wrapper of the associated primitive type.
      */
-    public static String getBoxedTypeName(String primitiveName) {
+    public static String getBoxedTypeName(final String primitiveName) {
         if (long.class.getSimpleName().equals(primitiveName)) {
             return Long.class.getCanonicalName();
         }
@@ -115,7 +115,7 @@ public final class Bindings {
      * @param ast  The AST.
      * @return The type of the associated primitive wrapper.
      */
-    public static ITypeBinding getBoxedTypeBinding(ITypeBinding type, AST ast) {
+    public static ITypeBinding getBoxedTypeBinding(final ITypeBinding type, final AST ast) {
         if (!type.isPrimitive()) {
             return type;
         }

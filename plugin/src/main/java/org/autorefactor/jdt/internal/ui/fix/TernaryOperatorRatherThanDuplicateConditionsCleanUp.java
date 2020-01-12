@@ -118,7 +118,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 
     private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
             final Expression oppositeCondition, final Expression oneExpression, final Expression oppositeExpression,
-            List<Expression> previousOperands, List<Expression> nextOperands) {
+            final List<Expression> previousOperands, final List<Expression> nextOperands) {
         if (ASTSemanticMatcher.INSTANCE.matchOpposite(oneCondition, oppositeCondition)
                 && !ASTNodes.match(oneExpression, oppositeExpression)) {
             replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression, previousOperands,
@@ -130,8 +130,8 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
     }
 
     private void replaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
-            final Expression oneExpression, final Expression oppositeExpression, List<Expression> previousOperands,
-            List<Expression> nextOperands) {
+            final Expression oneExpression, final Expression oppositeExpression, final List<Expression> previousOperands,
+            final List<Expression> nextOperands) {
         final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
 
         final Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);

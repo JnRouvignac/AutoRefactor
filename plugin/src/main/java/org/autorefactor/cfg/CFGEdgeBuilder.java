@@ -50,7 +50,7 @@ public class CFGEdgeBuilder {
      *
      * @param sourceBlock the edge source block
      */
-    public CFGEdgeBuilder(CFGBasicBlock sourceBlock) {
+    public CFGEdgeBuilder(final CFGBasicBlock sourceBlock) {
         this(null, false, sourceBlock);
     }
 
@@ -62,7 +62,7 @@ public class CFGEdgeBuilder {
      * @param evaluationResult the condition evaluation result
      * @param sourceBlock      the edge source block
      */
-    public CFGEdgeBuilder(Expression condition, boolean evaluationResult, CFGBasicBlock sourceBlock) {
+    public CFGEdgeBuilder(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock) {
         this.condition= condition;
         this.evaluationResult= evaluationResult;
         this.sourceBlock= sourceBlock;
@@ -75,7 +75,7 @@ public class CFGEdgeBuilder {
      * @param jumping       marks a "jumping" edge: and edge built because of an
      *                      exception escaping a try statement
      */
-    public CFGEdgeBuilder(CFGBasicBlock throwingBlock, boolean jumping) {
+    public CFGEdgeBuilder(final CFGBasicBlock throwingBlock, final boolean jumping) {
         this.sourceBlock= throwingBlock;
         this.jumping= jumping;
     }
@@ -86,7 +86,7 @@ public class CFGEdgeBuilder {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -104,7 +104,7 @@ public class CFGEdgeBuilder {
      * @param targetBlock the target block of the edge
      * @return the current object
      */
-    public CFGEdgeBuilder withTarget(CFGBasicBlock targetBlock) {
+    public CFGEdgeBuilder withTarget(final CFGBasicBlock targetBlock) {
         this.targetBlock= targetBlock;
         return this;
     }
@@ -141,7 +141,7 @@ public class CFGEdgeBuilder {
      * @param targetBlock the target block of the edge
      * @return a new {@link CFGEdge}
      */
-    public static CFGEdge buildEdge(CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
+    public static CFGEdge buildEdge(final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
         return buildEdge(null, true, sourceBlock, targetBlock);
     }
 
@@ -154,7 +154,7 @@ public class CFGEdgeBuilder {
      * @param targetBlock the target block of the edge
      * @return a new {@link CFGEdge}
      */
-    public static CFGEdge buildEdge(Expression condition, CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
+    public static CFGEdge buildEdge(final Expression condition, final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
         return buildEdge(condition, true, sourceBlock, targetBlock);
     }
 
@@ -168,8 +168,8 @@ public class CFGEdgeBuilder {
      * @param targetBlock      the target block of the edge
      * @return a new {@link CFGEdge}
      */
-    public static CFGEdge buildEdge(Expression condition, boolean evaluationResult, CFGBasicBlock sourceBlock,
-            CFGBasicBlock targetBlock) {
+    public static CFGEdge buildEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
+            final CFGBasicBlock targetBlock) {
         final CFGEdge edge= new CFGEdge(condition, evaluationResult, sourceBlock, targetBlock);
         sourceBlock.addOutgoingEdge(edge);
         targetBlock.addIncomingEdge(edge);

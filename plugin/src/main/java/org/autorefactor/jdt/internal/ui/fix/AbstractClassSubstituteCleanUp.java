@@ -55,7 +55,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public abstract class AbstractClassSubstituteCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
-        public boolean visit(Block node) {
+        public boolean visit(final Block node) {
             return AbstractClassSubstituteCleanUp.this.maybeRefactorBlock(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
@@ -224,7 +224,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
@@ -255,7 +255,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         return true;
     }
 
-    private boolean canBeRefactored(Block node, final ASTNode itemToRefactor, final ITypeBinding itemTypeBinding,
+    private boolean canBeRefactored(final Block node, final ASTNode itemToRefactor, final ITypeBinding itemTypeBinding,
             final List<VariableDeclaration> varDecls, final List<MethodInvocation> methodCallsToRefactor) {
         return canInstantiationBeRefactored(itemToRefactor, itemTypeBinding, varDecls, methodCallsToRefactor)
                 && canVarOccurrenceBeRefactored(node, varDecls, methodCallsToRefactor);
@@ -411,17 +411,17 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         @Override
-        public boolean visit(Block node) {
+        public boolean visit(final Block node) {
             return startNode == node;
         }
 
         @Override
-        public boolean visit(AnonymousClassDeclaration node) {
+        public boolean visit(final AnonymousClassDeclaration node) {
             return false;
         }
 
         @Override
-        public boolean visit(ClassInstanceCreation instanceCreation) {
+        public boolean visit(final ClassInstanceCreation instanceCreation) {
             final ITypeBinding typeBinding;
             if (instanceCreation.getType() != null) {
                 typeBinding= instanceCreation.getType().resolveBinding();
@@ -442,7 +442,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         private final List<SimpleName> varOccurrences= new ArrayList<>();
         private boolean isUsedInAnnonymousClass;
 
-        public VarOccurrenceVisitor(VariableDeclaration variable) {
+        public VarOccurrenceVisitor(final VariableDeclaration variable) {
             varDecl= variable;
         }
 
@@ -455,7 +455,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         @Override
-        public boolean visit(SimpleName aVariable) {
+        public boolean visit(final SimpleName aVariable) {
             final SimpleName varDeclName= varDecl.getName();
             if (aVariable.getIdentifier().equals(varDeclName.getIdentifier()) && !aVariable.equals(varDeclName)) {
                 varOccurrences.add(aVariable);
@@ -465,7 +465,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         @Override
-        public boolean visit(AnonymousClassDeclaration node) {
+        public boolean visit(final AnonymousClassDeclaration node) {
             if (!canBeSharedInOtherThread()) {
                 final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varDecl.resolveBinding(), node, true).find();

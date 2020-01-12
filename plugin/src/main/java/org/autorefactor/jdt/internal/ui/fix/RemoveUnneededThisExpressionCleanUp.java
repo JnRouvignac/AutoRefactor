@@ -71,7 +71,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
 
         if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
@@ -84,12 +84,12 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private static boolean thisExpressionRefersToEnclosingType(ThisExpression thisExpression) {
+    private static boolean thisExpressionRefersToEnclosingType(final ThisExpression thisExpression) {
         return thisExpression != null
                 && thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
     }
 
-    private static boolean thisExpressionRefersToEnclosingType(Name thisQualifierName, ASTNode node) {
+    private static boolean thisExpressionRefersToEnclosingType(final Name thisQualifierName, final ASTNode node) {
         if (thisQualifierName == null) {
             return true;
         }
@@ -115,7 +115,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         throw new NotImplementedException(thisQualifierName);
     }
 
-    private boolean isCallingMethodDeclaredInEnclosingType(MethodInvocation node) {
+    private boolean isCallingMethodDeclaredInEnclosingType(final MethodInvocation node) {
         final ASTNode currentType= ASTNodes.getEnclosingType(node);
         final IMethodBinding mb= node.resolveMethodBinding();
 

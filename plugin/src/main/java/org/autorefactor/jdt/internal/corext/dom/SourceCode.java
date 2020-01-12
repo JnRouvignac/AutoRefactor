@@ -50,7 +50,7 @@ public class SourceCode {
          * @param length     the length of this line
          * @param sourceCode the enclosing source file
          */
-        public Line(String lineText, int offset, int length, SourceCode sourceCode) {
+        public Line(final String lineText, final int offset, final int length, final SourceCode sourceCode) {
             super(offset, length);
             this.lineText= lineText;
             this.sourceCode= sourceCode;
@@ -86,7 +86,7 @@ public class SourceCode {
      * @param astRoot         the AST root of the source file
      * @param compilationUnit the compilation unit of the source file
      */
-    public SourceCode(String text, CompilationUnit astRoot, ICompilationUnit compilationUnit) {
+    public SourceCode(final String text, final CompilationUnit astRoot, final ICompilationUnit compilationUnit) {
         this.astRoot= astRoot;
         this.text= text;
         this.compilationUnit= compilationUnit;

@@ -72,7 +72,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(ctx, node);
         node.accept(successiveIfVisitor);
         return successiveIfVisitor.getResult();
@@ -84,7 +84,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             if (getResult()
                     && ASTNodes.fallsThrough(node.getThenStatement())) {
                 final List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
@@ -107,7 +107,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             return false;
         }
 
-        private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, AtomicInteger operandCount) {
+        private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final AtomicInteger operandCount) {
             IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
 
             if (lastBlock.getElseStatement() == null) {

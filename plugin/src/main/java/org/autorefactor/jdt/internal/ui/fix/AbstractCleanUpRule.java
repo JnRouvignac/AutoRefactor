@@ -44,7 +44,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
         private boolean useLombok;
 
         @Override
-        public boolean visit(QualifiedName node) {
+        public boolean visit(final QualifiedName node) {
             if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
                 useLombok= true;
                 return interruptVisit();
@@ -80,7 +80,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return true if the visitor is enabled.
      */
-    public boolean isEnabled(Preferences preferences) {
+    public boolean isEnabled(final Preferences preferences) {
         return preferences.isEnabled(getClass());
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return true if this Java version is supported.
      */
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return true;
     }
 
@@ -100,12 +100,12 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @param ctx the cleanup context.
      */
-    public void setRefactoringContext(RefactoringContext ctx) {
+    public void setRefactoringContext(final RefactoringContext ctx) {
         this.ctx= ctx;
     }
 
     @Override
-    public boolean preVisit2(ASTNode node) {
+    public boolean preVisit2(final ASTNode node) {
         if (node instanceof CompilationUnit) {
             LombokVisitor lombokVisitor= new LombokVisitor();
             lombokVisitor.visitNode(node);
@@ -126,7 +126,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return the cleanups.
      */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
+    public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
         return ctx.getRefactorings();
     }

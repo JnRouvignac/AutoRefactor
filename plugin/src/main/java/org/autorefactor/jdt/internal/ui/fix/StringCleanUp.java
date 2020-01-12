@@ -73,7 +73,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         final ASTNode parent= node.getParent();
         final boolean isStringValueOf= isStringValueOf(node);
 
@@ -188,7 +188,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Expression getReducedStringExpression(Expression stringExpression, AtomicBoolean isRefactoringNeeded) {
+    private Expression getReducedStringExpression(final Expression stringExpression, final AtomicBoolean isRefactoringNeeded) {
         final MethodInvocation casingInvocation= ASTNodes.as(stringExpression, MethodInvocation.class);
 
         if (casingInvocation != null && (ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$

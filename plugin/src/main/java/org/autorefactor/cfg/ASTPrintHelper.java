@@ -37,7 +37,7 @@ public final class ASTPrintHelper {
         // Hide utility class ctor
     }
 
-    static String codeExcerpt(List<Expression> expressions) {
+    static String codeExcerpt(final List<Expression> expressions) {
         final StringBuilder sb= new StringBuilder();
         for (final Iterator<Expression> iter= expressions.iterator(); iter.hasNext();) {
             final Expression expression= iter.next();
@@ -50,7 +50,7 @@ public final class ASTPrintHelper {
         return sb.toString();
     }
 
-    static String codeExcerpt(ASTNode node) {
+    static String codeExcerpt(final ASTNode node) {
         final String nodeString= node.toString();
         final String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
         final String codeExcerpt;

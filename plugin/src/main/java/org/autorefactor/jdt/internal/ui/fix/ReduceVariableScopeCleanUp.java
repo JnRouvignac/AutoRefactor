@@ -108,12 +108,12 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     private static final class VariableName {
         private final Name name;
 
-        public VariableName(Name name) {
+        public VariableName(final Name name) {
             this.name= name;
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -153,7 +153,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         private final int accessType;
         private final ASTNode scope;
 
-        public VariableAccess(Name variableName, int accessType, ASTNode scope) {
+        public VariableAccess(final Name variableName, final int accessType, final ASTNode scope) {
             if (accessType == 0) {
                 throw new IllegalArgumentException(null, "accessType must not be null"); //$NON-NLS-1$
             }
@@ -202,18 +202,18 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     private static final Pair<Integer, ASTNode> NULL_PAIR= Pair.of(0, null);
 
     @Override
-    public boolean visit(SimpleName node) {
+    public boolean visit(final SimpleName node) {
         findVariableAccesses(node);
         return true;
     }
 
     @Override
-    public boolean visit(QualifiedName node) {
+    public boolean visit(final QualifiedName node) {
         findVariableAccesses(node);
         return true;
     }
 
-    private void findVariableAccesses(Name node) {
+    private void findVariableAccesses(final Name node) {
         final Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
         if (accessTypeAndScope.getFirst().intValue() != 0) {
             final VariableName varName= new VariableName(node);
@@ -229,7 +229,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private Pair<Integer, ASTNode> getAccessTypeAndScope(ASTNode node) {
+    private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode node) {
         final ASTNode parent= node.getParent();
         if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
                 || parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
@@ -261,7 +261,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         throw new NotImplementedException(parent);
     }
 
-    private ASTNode getScope(ASTNode node) {
+    private ASTNode getScope(final ASTNode node) {
         if (node instanceof Block || node instanceof EnhancedForStatement || node instanceof ForStatement
                 || node instanceof IfStatement || node instanceof WhileStatement) {
             return node;
@@ -273,7 +273,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
+    public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
 
         for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
@@ -296,7 +296,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         return this.ctx.getRefactorings();
     }
 
-    private void replace(VariableAccess varDecl, VariableAccess varAccess) {
+    private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final AST ast= b.getAST();
         final ASTNode scope= varAccess.getScope();
@@ -377,7 +377,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private Block copy(Statement stmtToCopy, Name varName) {
+    private Block copy(final Statement stmtToCopy, final Name varName) {
         if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
             final Block b= this.ctx.getAST().newBlock();
             final Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
@@ -393,7 +393,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         throw new NotImplementedException(stmtToCopy);
     }
 
-    private Type getType(ASTNode node) {
+    private Type getType(final ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
             return this.ctx.getASTBuilder().createCopyTarget(vds.getType());
@@ -402,7 +402,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         return getType(node.getParent());
     }
 
-    private VariableDeclarationFragment getVariableDeclarationFragment(Expression exprToReplace, Name varName) {
+    private VariableDeclarationFragment getVariableDeclarationFragment(final Expression exprToReplace, final Name varName) {
         if (exprToReplace instanceof Assignment) {
             final Assignment a= (Assignment) exprToReplace;
             if (a.getLeftHandSide() instanceof SimpleName) {
@@ -420,7 +420,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         throw new NotImplementedException(exprToReplace);
     }
 
-    private void remove(ASTNode node) {
+    private void remove(final ASTNode node) {
         if (node instanceof VariableDeclarationFragment) {
             this.ctx.getRefactorings().remove(node.getParent());
         } else {
@@ -447,8 +447,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(ASTNode readScope, ASTNode writeScope,
-            ASTNode varScope) {
+    private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(final ASTNode readScope, final ASTNode writeScope,
+            final ASTNode varScope) {
         return !varScope.equals(readScope) && !varScope.equals(writeScope)
                 && (readScope.equals(writeScope) || isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
                         readScope.getParent(), writeScope, varScope));

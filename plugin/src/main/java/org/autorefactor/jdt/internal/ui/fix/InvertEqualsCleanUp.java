@@ -66,7 +66,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (node.getExpression() == null) {
             return true;
         }

@@ -159,7 +159,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
         return false;
     }
 
-    private boolean isChecked(Type type) {
+    private boolean isChecked(final Type type) {
         final ITypeBinding binding= type.resolveBinding();
         return !ASTNodes.instanceOf(binding, RuntimeException.class.getCanonicalName()) && !ASTNodes.instanceOf(binding, Error.class.getCanonicalName());
     }

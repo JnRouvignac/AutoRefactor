@@ -69,13 +69,13 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean isEnabled(final Preferences preferences) {
         // FIXME enable only when android libraries are detected
         return super.isEnabled(preferences);
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ //$NON-NLS-2$
             // Check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= ASTNodes.getAncestor(node, MethodDeclaration.class);
@@ -113,7 +113,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Statement createWakelockReleaseStatement(MethodInvocation methodInvocation) {
+    private Statement createWakelockReleaseStatement(final MethodInvocation methodInvocation) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
                 b.block(b.toStatement(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
@@ -125,7 +125,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 b.block(b.toStatement(b.superInvoke("onPause")))); //$NON-NLS-1$
     }
 
-    private MethodDeclaration findMethod(TypeDeclaration typeDeclaration, String methodToFind) {
+    private MethodDeclaration findMethod(final TypeDeclaration typeDeclaration, final String methodToFind) {
         if (typeDeclaration != null) {
             for (MethodDeclaration method : typeDeclaration.getMethods()) {
                 IMethodBinding methodBinding= method.resolveBinding();
@@ -141,7 +141,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
     private static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
         @Override
-        public boolean visit(MethodInvocation node) {
+        public boolean visit(final MethodInvocation node) {
             if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ //$NON-NLS-2$
                 setResult(true);
                 return false;

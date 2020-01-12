@@ -69,7 +69,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         final MethodInvocation leftMi= ASTNodes.as(node.getLeftOperand(), MethodInvocation.class);
         final Long rightLiteral= ASTNodes.integerLiteral(node.getRightOperand());
 

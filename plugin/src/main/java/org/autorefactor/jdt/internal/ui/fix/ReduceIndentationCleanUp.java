@@ -52,7 +52,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             computeGreatestIndentation(node.getThenStatement());
 
             if (node.getElseStatement() != null) {
@@ -63,31 +63,31 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(WhileStatement node) {
+        public boolean visit(final WhileStatement node) {
             computeGreatestIndentation(node.getBody());
             return false;
         }
 
         @Override
-        public boolean visit(DoStatement node) {
+        public boolean visit(final DoStatement node) {
             computeGreatestIndentation(node.getBody());
             return false;
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             computeGreatestIndentation(node.getBody());
             return false;
         }
 
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             computeGreatestIndentation(node.getBody());
             return false;
         }
 
         @Override
-        public boolean visit(TryStatement node) {
+        public boolean visit(final TryStatement node) {
             computeGreatestIndentation(node.getBody());
 
             for (Object object : node.catchClauses()) {
@@ -107,7 +107,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(Block node) {
+        public boolean visit(final Block node) {
             computeGreatestIndentation(node);
             return false;
         }
@@ -154,7 +154,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         if (node.getElseStatement() != null && !ASTNodes.isInElse(node)) {
             if (ASTNodes.fallsThrough(node.getThenStatement())) {
                 if (ASTNodes.fallsThrough(node.getElseStatement())) {
@@ -189,7 +189,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         return visitor.getIndentation() + (statementInIf instanceof Block ? -1 : 0);
     }
 
-    private void moveThenStatement(IfStatement node) {
+    private void moveThenStatement(final IfStatement node) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
@@ -219,7 +219,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private void moveElseStatement(IfStatement node) {
+    private void moveElseStatement(final IfStatement node) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 

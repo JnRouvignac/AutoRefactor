@@ -326,7 +326,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
         return false;
     }
 
-    private boolean isOneLiteral(Expression operand) {
+    private boolean isOneLiteral(final Expression operand) {
         Object rightExpression= operand.resolveConstantExpressionValue();
 
         return rightExpression instanceof Number && ((Number) rightExpression).longValue() == 1;

@@ -62,7 +62,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         final Object constantCondition= node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
             ASTNodeFactory b= this.ctx.getASTBuilder();

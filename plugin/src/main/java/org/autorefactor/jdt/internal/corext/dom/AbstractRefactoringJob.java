@@ -36,7 +36,7 @@ public abstract class AbstractRefactoringJob extends Job {
      *
      * @param name The job name
      */
-    public AbstractRefactoringJob(String name) {
+    public AbstractRefactoringJob(final String name) {
         super(name);
     }
 
@@ -46,7 +46,7 @@ public abstract class AbstractRefactoringJob extends Job {
     public static final Object FAMILY = new Object();
 
     @Override
-    public final boolean belongsTo(Object family) {
+    public final boolean belongsTo(final Object family) {
         return FAMILY == family || super.belongsTo(family);
     }
 }

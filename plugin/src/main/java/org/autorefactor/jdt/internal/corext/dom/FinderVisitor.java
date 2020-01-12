@@ -45,7 +45,7 @@ public class FinderVisitor<R> extends ASTVisitor {
      *
      * @param result the result
      */
-    protected void setResult(R result) {
+    protected void setResult(final R result) {
         this.resultFound= true;
         this.result= result;
     }
@@ -67,7 +67,7 @@ public class FinderVisitor<R> extends ASTVisitor {
     }
 
     @Override
-    public boolean preVisit2(ASTNode node) {
+    public boolean preVisit2(final ASTNode node) {
         // Exit has fast as possible when the result is found
         return !resultFound;
     }

@@ -140,7 +140,7 @@ public final class ASTNodes {
 
         private final int asInteger;
 
-        ExprActivity(int asInteger) {
+        ExprActivity(final int asInteger) {
             this.asInteger= asInteger;
         }
     }
@@ -156,7 +156,7 @@ public final class ASTNodes {
          * @return -1, 0 or 1
          */
         @Override
-        public int compare(ASTNode o1, ASTNode o2) {
+        public int compare(final ASTNode o1, final ASTNode o2) {
             return o1.getStartPosition() - o2.getStartPosition();
         }
     }
@@ -169,25 +169,25 @@ public final class ASTNodes {
         }
 
         @Override
-        public boolean visit(CastExpression node) {
+        public boolean visit(final CastExpression node) {
             setActivityLevel(ExprActivity.PASSIVE);
             return true;
         }
 
         @Override
-        public boolean visit(ArrayAccess node) {
+        public boolean visit(final ArrayAccess node) {
             setActivityLevel(ExprActivity.PASSIVE);
             return true;
         }
 
         @Override
-        public boolean visit(FieldAccess node) {
+        public boolean visit(final FieldAccess node) {
             setActivityLevel(ExprActivity.PASSIVE);
             return true;
         }
 
         @Override
-        public boolean visit(QualifiedName node) {
+        public boolean visit(final QualifiedName node) {
             if (node.getQualifier() == null
                     || node.getQualifier().resolveBinding() == null
                     || node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
@@ -199,13 +199,13 @@ public final class ASTNodes {
         }
 
         @Override
-        public boolean visit(Assignment node) {
+        public boolean visit(final Assignment node) {
             setActivityLevel(ExprActivity.ACTIVE);
             return interruptVisit();
         }
 
         @Override
-        public boolean visit(PrefixExpression node) {
+        public boolean visit(final PrefixExpression node) {
             if (hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
                 setActivityLevel(ExprActivity.ACTIVE);
                 return interruptVisit();
@@ -219,14 +219,14 @@ public final class ASTNodes {
         }
 
         @Override
-        public boolean visit(PostfixExpression node) {
+        public boolean visit(final PostfixExpression node) {
             setActivityLevel(ExprActivity.ACTIVE);
             return interruptVisit();
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public boolean visit(InfixExpression node) {
+        public boolean visit(final InfixExpression node) {
             if (hasOperator(node, InfixExpression.Operator.DIVIDE)) {
                 setActivityLevel(ExprActivity.PASSIVE);
             } else {
@@ -248,7 +248,7 @@ public final class ASTNodes {
             return true;
         }
 
-        private boolean mayCallImplicitToString(List<Expression> extendedOperands) {
+        private boolean mayCallImplicitToString(final List<Expression> extendedOperands) {
             if (extendedOperands != null) {
                 for (Expression expression : extendedOperands) {
                     if (mayCallImplicitToString(expression)) {
@@ -260,7 +260,7 @@ public final class ASTNodes {
             return false;
         }
 
-        private boolean mayCallImplicitToString(Expression expression) {
+        private boolean mayCallImplicitToString(final Expression expression) {
             return !hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
                     Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
                     Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
@@ -268,25 +268,25 @@ public final class ASTNodes {
         }
 
         @Override
-        public boolean visit(SuperMethodInvocation node) {
+        public boolean visit(final SuperMethodInvocation node) {
             setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
-        public boolean visit(MethodInvocation node) {
+        public boolean visit(final MethodInvocation node) {
             setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
-        public boolean visit(ClassInstanceCreation node) {
+        public boolean visit(final ClassInstanceCreation node) {
             setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
 
         @Override
-        public boolean visit(ThrowStatement node) {
+        public boolean visit(final ThrowStatement node) {
             setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             return true;
         }
@@ -315,7 +315,7 @@ public final class ASTNodes {
      * @return the same node after removing any parentheses around it. If there are
      *         no parentheses around it then the exact same node is returned
      */
-    public static ASTNode getUnparenthesedExpression(ASTNode node) {
+    public static ASTNode getUnparenthesedExpression(final ASTNode node) {
         if (node instanceof Expression) {
             return getUnparenthesedExpression((Expression) node);
         }
@@ -331,7 +331,7 @@ public final class ASTNodes {
      *         are no parentheses around it then the exact same expression is
      *         returned
      */
-    public static Expression getUnparenthesedExpression(Expression expression) {
+    public static Expression getUnparenthesedExpression(final Expression expression) {
         if (expression != null && expression.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
             return getUnparenthesedExpression(((ParenthesizedExpression) expression).getExpression());
         }
@@ -352,7 +352,7 @@ public final class ASTNodes {
      * @param statement the statement to analyze
      * @return the provided statement as a non null list of statements
      */
-    public static List<Statement> asList(Statement statement) {
+    public static List<Statement> asList(final Statement statement) {
         if (statement == null) {
             return Collections.emptyList();
         }
@@ -375,7 +375,7 @@ public final class ASTNodes {
      *         matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Statement> T as(Statement statement, Class<T> stmtClass) {
+    public static <T extends Statement> T as(final Statement statement, final Class<T> stmtClass) {
         if (statement == null) {
             return null;
         }
@@ -400,7 +400,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided statement has the provided type,
      *         {@code false} otherwise
      */
-    public static boolean is(Statement statement, Class<? extends Statement> stmtClass) {
+    public static boolean is(final Statement statement, final Class<? extends Statement> stmtClass) {
         return as(statement, stmtClass) != null;
     }
 
@@ -415,7 +415,7 @@ public final class ASTNodes {
      *         matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Expression> T as(Expression expression, Class<T> exprClass) {
+    public static <T extends Expression> T as(final Expression expression, final Class<T> exprClass) {
         if (expression != null) {
             if (exprClass.isAssignableFrom(expression.getClass())) {
                 return (T) expression;
@@ -436,7 +436,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided expression has the provided type,
      *         {@code false} otherwise
      */
-    public static boolean is(Expression expression, Class<? extends Expression> exprClass) {
+    public static boolean is(final Expression expression, final Class<? extends Expression> exprClass) {
         return as(expression, exprClass) != null;
     }
 
@@ -450,7 +450,7 @@ public final class ASTNodes {
      * @return the provided singleton expression as an object of the provided type
      *         if type matches, null otherwise
      */
-    public static <T extends Expression> T as(Collection<? extends Expression> exprs, Class<T> exprClass) {
+    public static <T extends Expression> T as(final Collection<? extends Expression> exprs, final Class<T> exprClass) {
         if (exprs != null && exprs.size() == 1) {
             return as(exprs.iterator().next(), exprClass);
         }
@@ -469,7 +469,7 @@ public final class ASTNodes {
      * @return the {@link Expression} of a specified type out of an
      *         {@link ExpressionStatement}
      */
-    public static <T extends Expression> T asExpression(Statement statement, Class<T> exprClass) {
+    public static <T extends Expression> T asExpression(final Statement statement, final Class<T> exprClass) {
         final ExpressionStatement es= as(statement, ExpressionStatement.class);
         if (es != null) {
             return as(es.getExpression(), exprClass);
@@ -487,7 +487,7 @@ public final class ASTNodes {
      *         {@code false} otherwise
      * @see ITypeBinding#isCastCompatible(ITypeBinding)
      */
-    public static boolean isCastCompatible(Expression expr1, Expression expr2) {
+    public static boolean isCastCompatible(final Expression expr1, final Expression expr2) {
         final ITypeBinding tb1= expr1.resolveTypeBinding();
         final ITypeBinding tb2= expr2.resolveTypeBinding();
         return tb1 != null && tb2 != null && tb1.isCastCompatible(tb2);
@@ -501,7 +501,7 @@ public final class ASTNodes {
      * @see ClassInstanceCreation#arguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> arguments(ClassInstanceCreation node) {
+    public static List<Expression> arguments(final ClassInstanceCreation node) {
         return node.arguments();
     }
 
@@ -513,7 +513,7 @@ public final class ASTNodes {
      * @see ConstructorInvocation#arguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> arguments(ConstructorInvocation node) {
+    public static List<Expression> arguments(final ConstructorInvocation node) {
         return node.arguments();
     }
 
@@ -525,7 +525,7 @@ public final class ASTNodes {
      * @see MethodInvocation#arguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> arguments(MethodInvocation node) {
+    public static List<Expression> arguments(final MethodInvocation node) {
         return node.arguments();
     }
 
@@ -537,7 +537,7 @@ public final class ASTNodes {
      * @see SuperConstructorInvocation#arguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> arguments(SuperConstructorInvocation node) {
+    public static List<Expression> arguments(final SuperConstructorInvocation node) {
         return node.arguments();
     }
 
@@ -549,7 +549,7 @@ public final class ASTNodes {
      * @see SuperMethodInvocation#arguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> arguments(SuperMethodInvocation node) {
+    public static List<Expression> arguments(final SuperMethodInvocation node) {
         return node.arguments();
     }
 
@@ -561,7 +561,7 @@ public final class ASTNodes {
      * @see AnonymousClassDeclaration#bodyDeclarations()
      */
     @SuppressWarnings("unchecked")
-    public static List<BodyDeclaration> bodyDeclarations(AnonymousClassDeclaration node) {
+    public static List<BodyDeclaration> bodyDeclarations(final AnonymousClassDeclaration node) {
         return node.bodyDeclarations();
     }
 
@@ -573,7 +573,7 @@ public final class ASTNodes {
      * @see TypeDeclaration#bodyDeclarations()
      */
     @SuppressWarnings("unchecked")
-    public static List<BodyDeclaration> bodyDeclarations(AbstractTypeDeclaration node) {
+    public static List<BodyDeclaration> bodyDeclarations(final AbstractTypeDeclaration node) {
         return node.bodyDeclarations();
     }
 
@@ -585,7 +585,7 @@ public final class ASTNodes {
      * @see TryStatement#catchClauses()
      */
     @SuppressWarnings("unchecked")
-    public static List<CatchClause> catchClauses(TryStatement node) {
+    public static List<CatchClause> catchClauses(final TryStatement node) {
         return node.catchClauses();
     }
 
@@ -597,7 +597,7 @@ public final class ASTNodes {
      * @see ArrayInitializer#expressions()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> expressions(ArrayInitializer node) {
+    public static List<Expression> expressions(final ArrayInitializer node) {
         return node.expressions();
     }
 
@@ -609,7 +609,7 @@ public final class ASTNodes {
      * @see InfixExpression#extendedOperands()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> extendedOperands(InfixExpression node) {
+    public static List<Expression> extendedOperands(final InfixExpression node) {
         return node.extendedOperands();
     }
 
@@ -622,7 +622,7 @@ public final class ASTNodes {
      * @param node the infix expression
      * @return a List of expressions
      */
-    public static List<Expression> allOperands(InfixExpression node) {
+    public static List<Expression> allOperands(final InfixExpression node) {
         final List<Expression> extOps= extendedOperands(node);
         final List<Expression> operands= new ArrayList<>(2 + extOps.size());
         operands.add(node.getLeftOperand());
@@ -650,7 +650,7 @@ public final class ASTNodes {
      * @see ForStatement#initializers()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> initializers(ForStatement node) {
+    public static List<Expression> initializers(final ForStatement node) {
         return node.initializers();
     }
 
@@ -662,7 +662,7 @@ public final class ASTNodes {
      * @see ForStatement#updaters()
      */
     @SuppressWarnings("unchecked")
-    public static List<Expression> updaters(ForStatement node) {
+    public static List<Expression> updaters(final ForStatement node) {
         return node.updaters();
     }
 
@@ -674,7 +674,7 @@ public final class ASTNodes {
      * @see FieldDeclaration#fragments()
      */
     @SuppressWarnings("unchecked")
-    public static List<VariableDeclarationFragment> fragments(FieldDeclaration node) {
+    public static List<VariableDeclarationFragment> fragments(final FieldDeclaration node) {
         return node.fragments();
     }
 
@@ -686,7 +686,7 @@ public final class ASTNodes {
      * @see VariableDeclarationExpression#fragments()
      */
     @SuppressWarnings("unchecked")
-    public static List<VariableDeclarationFragment> fragments(VariableDeclarationExpression node) {
+    public static List<VariableDeclarationFragment> fragments(final VariableDeclarationExpression node) {
         return node.fragments();
     }
 
@@ -698,7 +698,7 @@ public final class ASTNodes {
      * @see VariableDeclarationStatement#fragments()
      */
     @SuppressWarnings("unchecked")
-    public static List<VariableDeclarationFragment> fragments(VariableDeclarationStatement node) {
+    public static List<VariableDeclarationFragment> fragments(final VariableDeclarationStatement node) {
         return node.fragments();
     }
 
@@ -710,7 +710,7 @@ public final class ASTNodes {
      * @see CompilationUnit#getCommentList()
      */
     @SuppressWarnings("unchecked")
-    public static List<Comment> getCommentList(CompilationUnit node) {
+    public static List<Comment> getCommentList(final CompilationUnit node) {
         return node.getCommentList();
     }
 
@@ -722,7 +722,7 @@ public final class ASTNodes {
      * @see CompilationUnit#imports()
      */
     @SuppressWarnings("unchecked")
-    public static List<ImportDeclaration> imports(CompilationUnit node) {
+    public static List<ImportDeclaration> imports(final CompilationUnit node) {
         return node.imports();
     }
 
@@ -734,7 +734,7 @@ public final class ASTNodes {
      * @see BodyDeclaration#modifiers()
      */
     @SuppressWarnings("unchecked")
-    public static List<IExtendedModifier> modifiers(BodyDeclaration node) {
+    public static List<IExtendedModifier> modifiers(final BodyDeclaration node) {
         return node.modifiers();
     }
 
@@ -746,7 +746,7 @@ public final class ASTNodes {
      * @see BodyDeclaration#modifiers()
      */
     @SuppressWarnings("unchecked")
-    public static List<IExtendedModifier> modifiers(SingleVariableDeclaration node) {
+    public static List<IExtendedModifier> modifiers(final SingleVariableDeclaration node) {
         return node.modifiers();
     }
 
@@ -758,7 +758,7 @@ public final class ASTNodes {
      * @see VariableDeclarationExpression#modifiers()
      */
     @SuppressWarnings("unchecked")
-    public static List<IExtendedModifier> modifiers(VariableDeclarationExpression node) {
+    public static List<IExtendedModifier> modifiers(final VariableDeclarationExpression node) {
         return node.modifiers();
     }
 
@@ -770,7 +770,7 @@ public final class ASTNodes {
      * @see VariableDeclarationStatement#modifiers()
      */
     @SuppressWarnings("unchecked")
-    public static List<IExtendedModifier> modifiers(VariableDeclarationStatement node) {
+    public static List<IExtendedModifier> modifiers(final VariableDeclarationStatement node) {
         return node.modifiers();
     }
 
@@ -782,7 +782,7 @@ public final class ASTNodes {
      * @see MethodDeclaration#parameters()
      */
     @SuppressWarnings("unchecked")
-    public static List<SingleVariableDeclaration> parameters(MethodDeclaration node) {
+    public static List<SingleVariableDeclaration> parameters(final MethodDeclaration node) {
         return node.parameters();
     }
 
@@ -794,7 +794,7 @@ public final class ASTNodes {
      * @see TryStatement#resources()
      */
     @SuppressWarnings("unchecked")
-    public static List<VariableDeclarationExpression> resources(TryStatement node) {
+    public static List<VariableDeclarationExpression> resources(final TryStatement node) {
         return node.resources();
     }
 
@@ -806,7 +806,7 @@ public final class ASTNodes {
      * @see Block#statements()
      */
     @SuppressWarnings("unchecked")
-    public static List<Statement> statements(Block node) {
+    public static List<Statement> statements(final Block node) {
         return node.statements();
     }
 
@@ -818,7 +818,7 @@ public final class ASTNodes {
      * @see SwitchStatement#statements()
      */
     @SuppressWarnings("unchecked")
-    public static List<Statement> statements(SwitchStatement node) {
+    public static List<Statement> statements(final SwitchStatement node) {
         return node.statements();
     }
 
@@ -830,7 +830,7 @@ public final class ASTNodes {
      * @see Javadoc#tags()
      */
     @SuppressWarnings("unchecked")
-    public static List<TagElement> tags(Javadoc node) {
+    public static List<TagElement> tags(final Javadoc node) {
         return node.tags();
     }
 
@@ -842,7 +842,7 @@ public final class ASTNodes {
      * @see MethodDeclaration#thrownExceptionTypes()
      */
     @SuppressWarnings("unchecked")
-    public static List<Type> thrownExceptionTypes(MethodDeclaration node) {
+    public static List<Type> thrownExceptionTypes(final MethodDeclaration node) {
         return node.thrownExceptionTypes();
     }
 
@@ -854,7 +854,7 @@ public final class ASTNodes {
      * @see ParameterizedType#typeArguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Type> typeArguments(MethodInvocation node) {
+    public static List<Type> typeArguments(final MethodInvocation node) {
         return node.typeArguments();
     }
 
@@ -866,7 +866,7 @@ public final class ASTNodes {
      * @see ParameterizedType#typeArguments()
      */
     @SuppressWarnings("unchecked")
-    public static List<Type> typeArguments(ParameterizedType node) {
+    public static List<Type> typeArguments(final ParameterizedType node) {
         return node.typeArguments();
     }
 
@@ -878,7 +878,7 @@ public final class ASTNodes {
      * @see CompilationUnit#types()
      */
     @SuppressWarnings("unchecked")
-    public static List<AbstractTypeDeclaration> types(CompilationUnit node) {
+    public static List<AbstractTypeDeclaration> types(final CompilationUnit node) {
         return node.types();
     }
 
@@ -890,7 +890,7 @@ public final class ASTNodes {
      * @see UnionType#types()
      */
     @SuppressWarnings("unchecked")
-    public static List<Type> types(UnionType node) {
+    public static List<Type> types(final UnionType node) {
         return node.types();
     }
 
@@ -902,7 +902,7 @@ public final class ASTNodes {
      * @see NormalAnnotation#values()
      */
     @SuppressWarnings("unchecked")
-    public static List<MemberValuePair> values(NormalAnnotation node) {
+    public static List<MemberValuePair> values(final NormalAnnotation node) {
         return node.values();
     }
 
@@ -929,7 +929,7 @@ public final class ASTNodes {
      * @return the {@link Boolean} object value if the provided expression
      *         represents one, null otherwise
      */
-    public static Boolean getBooleanLiteral(Expression expression) {
+    public static Boolean getBooleanLiteral(final Expression expression) {
         final BooleanLiteral bl= as(expression, BooleanLiteral.class);
         if (bl != null) {
             return bl.booleanValue();
@@ -977,7 +977,7 @@ public final class ASTNodes {
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      * @throws IllegalStateException if ancestor not found.
      */
-    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClass) {
+    public static <T extends ASTNode> T getAncestor(final ASTNode node, final Class<T> ancestorClass) {
         final T ancestor= getAncestorOrNull(node, ancestorClass);
         if (ancestor != null) {
             return ancestor;
@@ -997,7 +997,7 @@ public final class ASTNodes {
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      */
     @SuppressWarnings("unchecked")
-    public static <T extends ASTNode> T getAncestorOrNull(ASTNode node, Class<T> ancestorClass) {
+    public static <T extends ASTNode> T getAncestorOrNull(final ASTNode node, final Class<T> ancestorClass) {
         if (node == null || node.getParent() == null) {
             return null;
         }
@@ -1018,7 +1018,7 @@ public final class ASTNodes {
      * @param node the start node
      * @return the enclosing type of the provided node, or {@code null}
      */
-    public static ASTNode getEnclosingType(ASTNode node) {
+    public static ASTNode getEnclosingType(final ASTNode node) {
         final Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
         final ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
         if (ancestor == null) {
@@ -1041,7 +1041,7 @@ public final class ASTNodes {
      * @see #getAncestor(ASTNode, Class)
      * @see #getAncestorOrNull(ASTNode, Class)
      */
-    public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
+    public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<?>... ancestorClasses) {
         if (ancestorClasses.length == 1) {
             throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
         }
@@ -1148,7 +1148,7 @@ public final class ASTNodes {
      * @param node the start node
      * @return the statement at the same level
      */
-    public static Statement statementAtLevel(Statement node) {
+    public static Statement statementAtLevel(final Statement node) {
         final ASTNode parent= node.getParent();
 
         if (parent instanceof LabeledStatement) {
@@ -1164,7 +1164,7 @@ public final class ASTNodes {
      * @param node the start node
      * @return true if a sibling may exist
      */
-    public static boolean canHaveSiblings(Statement node) {
+    public static boolean canHaveSiblings(final Statement node) {
         final ASTNode statementAtLevel= statementAtLevel(node);
         final ASTNode parent= statementAtLevel.getParent();
 
@@ -1179,7 +1179,7 @@ public final class ASTNodes {
      * @return the previous body declaration in the same block if it exists, null
      *         otherwise
      */
-    public static BodyDeclaration getPreviousSibling(BodyDeclaration startNode) {
+    public static BodyDeclaration getPreviousSibling(final BodyDeclaration startNode) {
         return getSibling(startNode, true);
     }
 
@@ -1189,7 +1189,7 @@ public final class ASTNodes {
      * @param startNode the start node
      * @return the previous statement in the same block if it exists, null otherwise
      */
-    public static Statement getPreviousSibling(Statement startNode) {
+    public static Statement getPreviousSibling(final Statement startNode) {
         List<Statement> siblings= getSiblings(startNode, false);
 
         if (siblings.isEmpty()) {
@@ -1206,7 +1206,7 @@ public final class ASTNodes {
      * @return the previous statement in the source file if it exists, null
      *         otherwise
      */
-    public static Statement getPreviousStatement(Statement startNode) {
+    public static Statement getPreviousStatement(final Statement startNode) {
         final Statement previousSibling= getPreviousSibling(startNode);
         if (previousSibling != null) {
             return previousSibling;
@@ -1226,7 +1226,7 @@ public final class ASTNodes {
      * @return the next body declaration in the same block if it exists, null
      *         otherwise
      */
-    public static BodyDeclaration getNextSibling(BodyDeclaration startNode) {
+    public static BodyDeclaration getNextSibling(final BodyDeclaration startNode) {
         return getSibling(startNode, false);
     }
 
@@ -1236,7 +1236,7 @@ public final class ASTNodes {
      * @param startNode the start node
      * @return the next statement in the same block if it exists, null otherwise
      */
-    public static Statement getNextSibling(Statement startNode) {
+    public static Statement getNextSibling(final Statement startNode) {
         List<Statement> siblings= getSiblings(startNode, true);
 
         if (siblings.isEmpty()) {
@@ -1253,7 +1253,7 @@ public final class ASTNodes {
      * @return the next statements in the same block if it exists, empty list
      *         otherwise
      */
-    public static List<Statement> getNextSiblings(Statement startNode) {
+    public static List<Statement> getNextSiblings(final Statement startNode) {
         return getSiblings(startNode, true);
     }
 
@@ -1264,12 +1264,12 @@ public final class ASTNodes {
      * @return the previous statements in the same block if it exists, empty list
      *         otherwise
      */
-    public static List<Statement> getPreviousSiblings(Statement startNode) {
+    public static List<Statement> getPreviousSiblings(final Statement startNode) {
         return getSiblings(startNode, false);
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Statement> getSiblings(Statement startNode, boolean isForward) {
+    private static List<Statement> getSiblings(final Statement startNode, final boolean isForward) {
         final Statement statementAtLevel= statementAtLevel(startNode);
 
         if (canHaveSiblings(statementAtLevel)) {
@@ -1301,7 +1301,7 @@ public final class ASTNodes {
      * @param startNode the start node
      * @return the next statement in the source file if it exists, null otherwise
      */
-    public static Statement getNextStatement(Statement startNode) {
+    public static Statement getNextStatement(final Statement startNode) {
         final Statement nextSibling= getNextSibling(startNode);
         if (nextSibling != null) {
             return nextSibling;
@@ -1314,7 +1314,7 @@ public final class ASTNodes {
         return null;
     }
 
-    private static BodyDeclaration getSibling(BodyDeclaration node, boolean lookForPrevious) {
+    private static BodyDeclaration getSibling(final BodyDeclaration node, final boolean lookForPrevious) {
         final ASTNode parent= node.getParent();
         if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
@@ -1336,18 +1336,18 @@ public final class ASTNodes {
         return null;
     }
 
-    private static BodyDeclaration getSibling(BodyDeclaration node, AbstractTypeDeclaration parent,
-            boolean lookForPrevious) {
+    private static BodyDeclaration getSibling(final BodyDeclaration node, final AbstractTypeDeclaration parent,
+            final boolean lookForPrevious) {
         return getSibling(node, bodyDeclarations(parent), lookForPrevious);
     }
 
-    private static BodyDeclaration getSibling(BodyDeclaration node, AnonymousClassDeclaration parent,
-            boolean lookForPrevious) {
+    private static BodyDeclaration getSibling(final BodyDeclaration node, final AnonymousClassDeclaration parent,
+            final boolean lookForPrevious) {
         return getSibling(node, bodyDeclarations(parent), lookForPrevious);
     }
 
-    private static BodyDeclaration getSibling(BodyDeclaration node, List<BodyDeclaration> bodyDeclarations,
-            boolean lookForPrevious) {
+    private static BodyDeclaration getSibling(final BodyDeclaration node, final List<BodyDeclaration> bodyDeclarations,
+            final boolean lookForPrevious) {
         final TreeSet<BodyDeclaration> children= new TreeSet<>(new NodeStartPositionComparator());
         children.addAll(bodyDeclarations);
 
@@ -1396,7 +1396,7 @@ public final class ASTNodes {
      * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(Assignment node, Assignment.Operator anOperator, Assignment.Operator... operators) {
+    public static boolean hasOperator(final Assignment node, final Assignment.Operator anOperator, final Assignment.Operator... operators) {
         return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
@@ -1409,7 +1409,7 @@ public final class ASTNodes {
      * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator anOperator, InfixExpression.Operator... operators) {
+    public static boolean hasOperator(final InfixExpression node, final InfixExpression.Operator anOperator, final InfixExpression.Operator... operators) {
         return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
@@ -1422,7 +1422,7 @@ public final class ASTNodes {
      * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator anOperator, PostfixExpression.Operator... operators) {
+    public static boolean hasOperator(final PostfixExpression node, final PostfixExpression.Operator anOperator, final PostfixExpression.Operator... operators) {
         return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
@@ -1435,11 +1435,11 @@ public final class ASTNodes {
      * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator anOperator, PrefixExpression.Operator... operators) {
+    public static boolean hasOperator(final PrefixExpression node, final PrefixExpression.Operator anOperator, final PrefixExpression.Operator... operators) {
         return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
-    private static boolean isOperatorInList(Object realOperator, Object anOperator, Object[] operators) {
+    private static boolean isOperatorInList(final Object realOperator, final Object anOperator, final Object[] operators) {
         return realOperator != null && (realOperator.equals(anOperator) || Arrays.asList(operators).contains(realOperator));
     }
 
@@ -1453,7 +1453,7 @@ public final class ASTNodes {
      * @return true if the provided expression evaluates to exactly one of the
      *         provided type, false otherwise
      */
-    public static boolean hasType(Expression expression, String... oneOfQualifiedTypeNames) {
+    public static boolean hasType(final Expression expression, final String... oneOfQualifiedTypeNames) {
         return expression != null && hasType(expression.resolveTypeBinding(), oneOfQualifiedTypeNames);
     }
 
@@ -1467,7 +1467,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided type binding is exactly one of the
      *         provided type, {@code false} otherwise
      */
-    public static boolean hasType(final ITypeBinding typeBinding, String... oneOfQualifiedTypeNames) {
+    public static boolean hasType(final ITypeBinding typeBinding, final String... oneOfQualifiedTypeNames) {
         if (typeBinding != null) {
             final ITypeBinding erasure= typeBinding.getErasure();
             if (erasure != null) {
@@ -1491,7 +1491,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided expression evaluates to exactly one of
      *         the provided type, {@code false} otherwise
      */
-    public static boolean haveSameType(Expression expr1, Expression expr2) {
+    public static boolean haveSameType(final Expression expr1, final Expression expr2) {
         return expr1 != null && expr2 != null && Utils.equalNotNull(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
     }
 
@@ -1504,7 +1504,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided expression is an instance of the
      *         qualified type name, {@code false} otherwise
      */
-    public static boolean instanceOf(Expression expression, String qualifiedTypeName) {
+    public static boolean instanceOf(final Expression expression, final String qualifiedTypeName) {
         return expression != null && instanceOf(expression.resolveTypeBinding(), qualifiedTypeName);
     }
 
@@ -1517,7 +1517,7 @@ public final class ASTNodes {
      * @return true if the provided type binding is an instance of the qualified
      *         type name, false otherwise
      */
-    public static boolean instanceOf(ITypeBinding typeBinding, String qualifiedTypeName) {
+    public static boolean instanceOf(final ITypeBinding typeBinding, final String qualifiedTypeName) {
         return findImplementedType(typeBinding, qualifiedTypeName) != null;
     }
 
@@ -1527,7 +1527,7 @@ public final class ASTNodes {
      * @param expression the expression to analyze
      * @return true the provided expression represents an array, false otherwise
      */
-    public static boolean isArray(Expression expression) {
+    public static boolean isArray(final Expression expression) {
         if (expression != null) {
             final ITypeBinding typeBinding= expression.resolveTypeBinding();
             return typeBinding != null && typeBinding.isArray();
@@ -1613,7 +1613,7 @@ public final class ASTNodes {
      * @param input The input
      * @return Integer literal.
      */
-    public static Long integerLiteral(Expression input) {
+    public static Long integerLiteral(final Expression input) {
         NumberLiteral contant= as(input, NumberLiteral.class);
         PrefixExpression negativeContant= as(input, PrefixExpression.class);
 
@@ -1636,7 +1636,7 @@ public final class ASTNodes {
      * @param input The input
      * @return Positive literal.
      */
-    public static Long positiveLiteral(NumberLiteral input) {
+    public static Long positiveLiteral(final NumberLiteral input) {
         Object number= input.resolveConstantExpressionValue();
 
         if (number instanceof Short) {
@@ -1661,7 +1661,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided binding represents a local variable,
      *         {@code false} otherwise
      */
-    public static boolean isLocalVariable(IBinding binding) {
+    public static boolean isLocalVariable(final IBinding binding) {
         if (binding != null && binding.getKind() == IBinding.VARIABLE) {
             final IVariableBinding bnd= (IVariableBinding) binding;
             return !bnd.isField() && !bnd.isEnumConstant();
@@ -1679,7 +1679,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided binding and expression represent the
      *         same local variable, {@code false} otherwise
      */
-    public static boolean isSameLocalVariable(IBinding binding, Expression expression) {
+    public static boolean isSameLocalVariable(final IBinding binding, final Expression expression) {
         return isLocalVariable(binding) && expression != null && expression.getNodeType() == SIMPLE_NAME
         // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
         // a *local* variable
@@ -1694,7 +1694,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided expressions represent the same local
      *         variable, {@code false} otherwise
      */
-    public static boolean isSameLocalVariable(Expression expr1, Expression expr2) {
+    public static boolean isSameLocalVariable(final Expression expr1, final Expression expr2) {
         return expr1 != null && expr1.getNodeType() == SIMPLE_NAME
                 && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
@@ -1708,7 +1708,7 @@ public final class ASTNodes {
      * @return {@code true} if the provided nodes represent the same local variable,
      *         {@code false} otherwise
      */
-    public static boolean isSameLocalVariable(VariableDeclaration varDecl, Expression expression) {
+    public static boolean isSameLocalVariable(final VariableDeclaration varDecl, final Expression expression) {
         return varDecl != null && isSameLocalVariable(varDecl.resolveBinding(), expression);
     }
 
@@ -1720,7 +1720,7 @@ public final class ASTNodes {
      * @return true if the provided expression evaluates to a primitive type, false
      *         otherwise
      */
-    public static boolean isPrimitive(Expression expression, String primitiveTypeName) {
+    public static boolean isPrimitive(final Expression expression, final String primitiveTypeName) {
         return expression != null && isPrimitive(expression.resolveTypeBinding(), primitiveTypeName);
     }
 
@@ -1731,7 +1731,7 @@ public final class ASTNodes {
      * @return true if the provided expression evaluates to a primitive type, false
      *         otherwise
      */
-    public static boolean isPrimitive(Expression expression) {
+    public static boolean isPrimitive(final Expression expression) {
         return expression != null && isPrimitive(expression.resolveTypeBinding());
     }
 
@@ -1744,7 +1744,7 @@ public final class ASTNodes {
      * @return true if the provided type binding represents the provided primitive
      *         type, false otherwise
      */
-    public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveTypeName) {
+    public static boolean isPrimitive(final ITypeBinding typeBinding, final String primitiveTypeName) {
         return typeBinding != null && typeBinding.isPrimitive()
                 && typeBinding.getQualifiedName().equals(primitiveTypeName);
     }
@@ -1756,7 +1756,7 @@ public final class ASTNodes {
      * @return true if the provided type binding represents a primitive type, false
      *         otherwise
      */
-    public static boolean isPrimitive(ITypeBinding typeBinding) {
+    public static boolean isPrimitive(final ITypeBinding typeBinding) {
         return typeBinding != null && typeBinding.isPrimitive()
                 && Arrays.asList(boolean.class.getSimpleName(), byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName())
                         .contains(typeBinding.getQualifiedName());
@@ -1772,7 +1772,7 @@ public final class ASTNodes {
      *         found in the type hierarchy of the provided type binding, or
      *         {@code null} otherwise
      */
-    public static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
+    public static ITypeBinding findImplementedType(final ITypeBinding typeBinding, final String qualifiedTypeName) {
         if (typeBinding == null) {
             return null;
         }
@@ -1786,8 +1786,8 @@ public final class ASTNodes {
         return findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
     }
 
-    private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName,
-            Set<String> visitedInterfaces) {
+    private static ITypeBinding findImplementedType(final ITypeBinding typeBinding, final String qualifiedTypeName,
+            final Set<String> visitedInterfaces) {
         final ITypeBinding superclass= typeBinding.getSuperclass();
         if (superclass != null) {
             final String superClassQualifiedName= superclass.getErasure().getQualifiedName();
@@ -1822,7 +1822,7 @@ public final class ASTNodes {
      * @return the null-checked expression if the provided node is a null-check, or
      *         {@code null} otherwise.
      */
-    public static Expression getNullCheckedExpression(Expression expression) {
+    public static Expression getNullCheckedExpression(final Expression expression) {
         final Expression e= getUnparenthesedExpression(expression);
         if (e instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) e;
@@ -1850,7 +1850,7 @@ public final class ASTNodes {
      * @param node the infix expression that must not have extended operands
      * @return {@code true}, or it throws
      */
-    public static boolean checkNoExtendedOperands(InfixExpression node) {
+    public static boolean checkNoExtendedOperands(final InfixExpression node) {
         if (!hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
             throw new NotImplementedException(node, "for extended operands"); //$NON-NLS-1$
         }
@@ -1866,7 +1866,7 @@ public final class ASTNodes {
      * @return the unique fragment declared in the provided variable declaration
      *         statement, or {@code null} if more than one exist.
      */
-    public static VariableDeclarationFragment getUniqueFragment(VariableDeclarationStatement node) {
+    public static VariableDeclarationFragment getUniqueFragment(final VariableDeclarationStatement node) {
         if (node == null) {
             return null;
         }
@@ -1880,7 +1880,7 @@ public final class ASTNodes {
      * @param node the node
      * @return true if the provided node defines a loop, false otherwise
      */
-    public static boolean isLoop(ASTNode node) {
+    public static boolean isLoop(final ASTNode node) {
         return node instanceof DoStatement || node instanceof EnhancedForStatement || node instanceof ForStatement
                 || node instanceof WhileStatement;
     }
@@ -1891,7 +1891,7 @@ public final class ASTNodes {
      * @param node the node
      * @return true if the provided node is breakable, false otherwise
      */
-    public static boolean isBreakable(ASTNode node) {
+    public static boolean isBreakable(final ASTNode node) {
         return isLoop(node) || node instanceof SwitchStatement;
     }
 
@@ -1933,7 +1933,7 @@ public final class ASTNodes {
      * @return true if the provided qualified name matches the provided field
      *         signature, false otherwise
      */
-    public static boolean isField(QualifiedName node, String qualifiedTypeName, String... fieldNames) {
+    public static boolean isField(final QualifiedName node, final String qualifiedTypeName, final String... fieldNames) {
         return instanceOf(node, qualifiedTypeName)
                 && Arrays.asList(fieldNames).contains(node.getName().getIdentifier());
     }
@@ -1952,8 +1952,8 @@ public final class ASTNodes {
      * @return true if the provided method invocation matches the provided method
      *         signature, false otherwise
      */
-    public static boolean usesGivenSignature(MethodInvocation node, String typeQualifiedName, String methodName,
-            String... parameterTypesQualifiedNames) {
+    public static boolean usesGivenSignature(final MethodInvocation node, final String typeQualifiedName, final String methodName,
+            final String... parameterTypesQualifiedNames) {
         return node != null
                 && usesGivenSignature(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
@@ -1972,8 +1972,8 @@ public final class ASTNodes {
      * @return true if the provided method declaration matches the provided method
      *         signature, false otherwise
      */
-    public static boolean usesGivenSignature(MethodDeclaration node, String typeQualifiedName, String methodName,
-            String... parameterTypesQualifiedNames) {
+    public static boolean usesGivenSignature(final MethodDeclaration node, final String typeQualifiedName, final String methodName,
+            final String... parameterTypesQualifiedNames) {
         return node != null
                 && usesGivenSignature(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
@@ -1992,8 +1992,8 @@ public final class ASTNodes {
      * @return true if the provided method invocation matches the provided method
      *         signature, false otherwise
      */
-    public static boolean usesGivenSignature(IMethodBinding methodBinding, String typeQualifiedName, String methodName,
-            String... parameterTypesQualifiedNames) {
+    public static boolean usesGivenSignature(final IMethodBinding methodBinding, final String typeQualifiedName, final String methodName,
+            final String... parameterTypesQualifiedNames) {
         // Let's do the fast checks first
         if (methodBinding == null || !methodName.equals(methodBinding.getName())
                 || methodBinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
@@ -2019,8 +2019,8 @@ public final class ASTNodes {
                 && usesGivenSignature(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
-    private static boolean parameterTypesMatch(ITypeBinding implementedType, boolean isInstanceOf,
-            IMethodBinding methodBinding, String[] parameterTypesQualifiedNames) {
+    private static boolean parameterTypesMatch(final ITypeBinding implementedType, final boolean isInstanceOf,
+            final IMethodBinding methodBinding, final String[] parameterTypesQualifiedNames) {
         if (implementedType != null && !implementedType.isRawType()) {
             final ITypeBinding erasure= implementedType.getErasure();
             if (erasure.isGenericType() || erasure.isParameterizedType()) {
@@ -2031,7 +2031,7 @@ public final class ASTNodes {
         return isInstanceOf && concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
     }
 
-    private static boolean concreteTypesMatch(ITypeBinding[] typeBindings, String... typesQualifiedNames) {
+    private static boolean concreteTypesMatch(final ITypeBinding[] typeBindings, final String... typesQualifiedNames) {
         if (typeBindings.length != typesQualifiedNames.length) {
             return false;
         }
@@ -2047,7 +2047,7 @@ public final class ASTNodes {
     }
 
     private static boolean parameterizedTypesMatch(final ITypeBinding clazz, final ITypeBinding clazzErasure,
-            IMethodBinding methodBinding) {
+            final IMethodBinding methodBinding) {
         if (clazz.isParameterizedType() && !clazz.equals(clazzErasure)) {
             final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParamsFromClass= getGenericToConcreteTypeParamsMap(
                     clazz, clazzErasure);
@@ -2088,8 +2088,8 @@ public final class ASTNodes {
         return results;
     }
 
-    private static boolean parameterizedTypesMatch2(Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams,
-            IMethodBinding parameterizedMethod, IMethodBinding genericMethod) {
+    private static boolean parameterizedTypesMatch2(final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams,
+            final IMethodBinding parameterizedMethod, final IMethodBinding genericMethod) {
         final ITypeBinding[] paramTypes= parameterizedMethod.getParameterTypes();
         final ITypeBinding[] genericParamTypes= genericMethod.getParameterTypes();
         if (paramTypes.length != genericParamTypes.length) {
@@ -2145,14 +2145,14 @@ public final class ASTNodes {
      * @return a set made of all the method bindings which are overridden by the
      *         provided method binding
      */
-    public static Set<IMethodBinding> getOverridenMethods(IMethodBinding overridingMethod) {
+    public static Set<IMethodBinding> getOverridenMethods(final IMethodBinding overridingMethod) {
         final Set<IMethodBinding> results= new HashSet<>();
         findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
         return results;
     }
 
-    private static void findOverridenMethods(IMethodBinding overridingMethod, Set<IMethodBinding> results,
-            ITypeBinding declaringClass) {
+    private static void findOverridenMethods(final IMethodBinding overridingMethod, final Set<IMethodBinding> results,
+            final ITypeBinding declaringClass) {
         final ITypeBinding superclass= declaringClass.getSuperclass();
         if (superclass != null && !addOverridenMethods(overridingMethod, superclass, results)) {
             findOverridenMethods(overridingMethod, results, superclass);
@@ -2165,8 +2165,8 @@ public final class ASTNodes {
         }
     }
 
-    private static boolean addOverridenMethods(IMethodBinding overridingMethod, ITypeBinding superType,
-            Set<IMethodBinding> results) {
+    private static boolean addOverridenMethods(final IMethodBinding overridingMethod, final ITypeBinding superType,
+            final Set<IMethodBinding> results) {
         for (IMethodBinding methodFromType : superType.getDeclaredMethods()) {
             if (overridingMethod.overrides(methodFromType) && !results.add(methodFromType)) {
                 // Type has already been visited
@@ -2177,8 +2177,8 @@ public final class ASTNodes {
         return false;
     }
 
-    private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
-            String methodName, String[] parameterTypesQualifiedNames) {
+    private static IMethodBinding findOverridenMethod(final ITypeBinding typeBinding, final String typeQualifiedName,
+            final String methodName, final String[] parameterTypesQualifiedNames) {
         // Superclass
         ITypeBinding superclassBinding= typeBinding.getSuperclass();
         if (superclassBinding != null) {
@@ -2211,8 +2211,8 @@ public final class ASTNodes {
         return null;
     }
 
-    private static IMethodBinding findOverridenMethod(String methodName, String[] parameterTypesQualifiedNames,
-            IMethodBinding[] declaredMethods) {
+    private static IMethodBinding findOverridenMethod(final String methodName, final String[] parameterTypesQualifiedNames,
+            final IMethodBinding[] declaredMethods) {
         for (IMethodBinding methodBinding : declaredMethods) {
             final IMethodBinding methodDecl= methodBinding.getMethodDeclaration();
             if (methodBinding.getName().equals(methodName) && methodDecl != null
@@ -2231,7 +2231,7 @@ public final class ASTNodes {
      * @param name2 the second name to compare
      * @return true if the two names are equal, false otherwise.
      */
-    public static boolean isEqual(Name name1, Name name2) {
+    public static boolean isEqual(final Name name1, final Name name2) {
         if (name1 instanceof SimpleName && name2 instanceof SimpleName) {
             return isEqual((SimpleName) name1, (SimpleName) name2);
         }
@@ -2246,7 +2246,7 @@ public final class ASTNodes {
      * @param name2 the second simple name to compare
      * @return true if the two simple names are equal, false otherwise.
      */
-    public static boolean isEqual(SimpleName name1, SimpleName name2) {
+    public static boolean isEqual(final SimpleName name1, final SimpleName name2) {
         return name1.getIdentifier().equals(name2.getIdentifier());
     }
 
@@ -2257,7 +2257,7 @@ public final class ASTNodes {
      * @param name2 the second qualified name to compare
      * @return true if the two qualified names are equal, false otherwise.
      */
-    public static boolean isEqual(QualifiedName name1, QualifiedName name2) {
+    public static boolean isEqual(final QualifiedName name1, final QualifiedName name2) {
         return isEqual(name1.getName(), name2.getName()) && isEqual(name1.getQualifier(), name2.getQualifier());
     }
 
@@ -2289,7 +2289,7 @@ public final class ASTNodes {
      * @param node2 the second node to compare
      * @return true if the two provided nodes structurally match, false otherwise
      */
-    public static boolean match(ASTNode node1, ASTNode node2) {
+    public static boolean match(final ASTNode node1, final ASTNode node2) {
         return match(ASTSemanticMatcher.INSTANCE, node1, node2);
     }
 
@@ -2301,11 +2301,11 @@ public final class ASTNodes {
      * @param node2   the second node to compare
      * @return true if the two provided nodes structurally match, false otherwise
      */
-    public static boolean match(ASTSemanticMatcher matcher, ASTNode node1, ASTNode node2) {
+    public static boolean match(final ASTSemanticMatcher matcher, final ASTNode node1, final ASTNode node2) {
         return matcher.safeSubtreeMatch(node1, node2);
     }
 
-    private static boolean areVariableBindingsEqual(ASTNode node1, ASTNode node2) {
+    private static boolean areVariableBindingsEqual(final ASTNode node1, final ASTNode node2) {
         return areBindingsEqual(varBinding(node1), varBinding(node2));
     }
 
@@ -2320,7 +2320,7 @@ public final class ASTNodes {
         return b1 != null && b2 != null && b1.isEqualTo(b2);
     }
 
-    private static IBinding varBinding(ASTNode node) {
+    private static IBinding varBinding(final ASTNode node) {
         switch (node.getNodeType()) {
         case THIS_EXPRESSION:
             return ((ThisExpression) node).resolveTypeBinding();
@@ -2349,7 +2349,7 @@ public final class ASTNodes {
      * @return true if the two provided names represent the same variable, false
      *         otherwise
      */
-    public static boolean isSameVariable(SimpleName name1, QualifiedName name2) {
+    public static boolean isSameVariable(final SimpleName name1, final QualifiedName name2) {
         return false;
     }
 
@@ -2361,7 +2361,7 @@ public final class ASTNodes {
      * @return true if the two provided names represent the same variable, false
      *         otherwise
      */
-    public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
+    public static boolean isSameVariable(final SimpleName name1, final SimpleName name2) {
         return areVariableBindingsEqual(name1, name2);
     }
 
@@ -2373,7 +2373,7 @@ public final class ASTNodes {
      * @return true if the two provided expressions represent the same variable,
      *         false otherwise
      */
-    public static boolean isSameVariable(SimpleName name1, FieldAccess field2) {
+    public static boolean isSameVariable(final SimpleName name1, final FieldAccess field2) {
         return as(field2.getExpression(), ThisExpression.class) != null && areVariableBindingsEqual(field2, name1);
     }
 
@@ -2385,7 +2385,7 @@ public final class ASTNodes {
      * @return true if the two provided qualified names represent the same variable,
      *         false otherwise
      */
-    public static boolean isSameVariable(QualifiedName name1, QualifiedName name2) {
+    public static boolean isSameVariable(final QualifiedName name1, final QualifiedName name2) {
         return areVariableBindingsEqual(name1, name2) && isSameVariable(name1.getQualifier(), name2.getQualifier());
     }
 
@@ -2397,7 +2397,7 @@ public final class ASTNodes {
      * @return true if the two provided expressions represent the same variable,
      *         false otherwise
      */
-    public static boolean isSameVariable(QualifiedName name1, FieldAccess field2) {
+    public static boolean isSameVariable(final QualifiedName name1, final FieldAccess field2) {
         return areVariableBindingsEqual(name1, field2) && isSameVariable(field2.getExpression(), name1.getQualifier());
     }
 
@@ -2409,7 +2409,7 @@ public final class ASTNodes {
      * @return true if the two provided field accesses represent the same variable,
      *         false otherwise
      */
-    public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
+    public static boolean isSameVariable(final FieldAccess field1, final FieldAccess field2) {
         return areVariableBindingsEqual(field1, field2)
                 && isSameVariable(field1.getExpression(), field2.getExpression());
     }
@@ -2499,7 +2499,7 @@ public final class ASTNodes {
      * @return the last parent node of the provided classes, or the current node
      *         otherwise
      */
-    public static ASTNode getParent(ASTNode node, Class<?>... includedClasses) {
+    public static ASTNode getParent(final ASTNode node, final Class<?>... includedClasses) {
         final ASTNode parent= node.getParent();
         if (instanceOf(parent, includedClasses)) {
             return getParent(parent, includedClasses);
@@ -2508,7 +2508,7 @@ public final class ASTNodes {
         return node;
     }
 
-    private static boolean instanceOf(ASTNode node, Class<?>... clazzes) {
+    private static boolean instanceOf(final ASTNode node, final Class<?>... clazzes) {
         if (node == null) {
             return false;
         }
@@ -2529,7 +2529,7 @@ public final class ASTNodes {
      * @param ignoredClasses the classes to ignore when looking for the parent node
      * @return the parent node by ignoring the provided types
      */
-    public static ASTNode getParentIgnoring(ASTNode node, Class<?>... ignoredClasses) {
+    public static ASTNode getParentIgnoring(final ASTNode node, final Class<?>... ignoredClasses) {
         final ASTNode parent= node.getParent();
         if (parent == null) {
             return node;
@@ -2549,7 +2549,7 @@ public final class ASTNodes {
      * @return the file name where the node comes from, or "FakeClass.java" if this
      *         is a fake node.
      */
-    public static String getFileName(ASTNode node) {
+    public static String getFileName(final ASTNode node) {
         if (node.getRoot() instanceof CompilationUnit) {
             CompilationUnit cu= (CompilationUnit) node.getRoot();
             if (cu.getTypeRoot() != null) { // added for unit tests
@@ -2568,7 +2568,7 @@ public final class ASTNodes {
      * @param node the node from which to retrieve the source location
      * @return a string suitable for identifying a location in the source
      */
-    public static String getSourceLocation(ASTNode node) {
+    public static String getSourceLocation(final ASTNode node) {
         final ASTNode root= node != null ? node.getRoot() : null;
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) root;
@@ -2593,7 +2593,7 @@ public final class ASTNodes {
      *
      * @return The ids of the declared variables.
      */
-    public static Set<String> getLocalVariableIdentifiers(final ASTNode node, boolean includeInnerScopes) {
+    public static Set<String> getLocalVariableIdentifiers(final ASTNode node, final boolean includeInnerScopes) {
         if (node == null) {
             return Collections.emptySet();
         }
@@ -2636,7 +2636,7 @@ public final class ASTNodes {
      * @param statement the statement
      * @return true if the statement falls through.
      */
-    public static boolean fallsThrough(Statement statement) {
+    public static boolean fallsThrough(final Statement statement) {
         final List<Statement> statements= asList(statement);
         if (statements.isEmpty()) {
             return false;
@@ -2674,7 +2674,7 @@ public final class ASTNodes {
      *         initializing expression, or {@code null} if the initializer could not
      *         be decomposed
      */
-    public static Pair<Expression, Expression> decomposeInitializer(Expression init) {
+    public static Pair<Expression, Expression> decomposeInitializer(final Expression init) {
         if (init instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
             final List<VariableDeclarationFragment> fragments= fragments(vde);
@@ -2731,7 +2731,7 @@ public final class ASTNodes {
      * @param statementInBlock The statement with variables
      * @return true if variables are declared with the same identifier after the given statement.
      */
-    public static boolean hasVariableConflict(Statement node, final Statement statementInBlock) {
+    public static boolean hasVariableConflict(final Statement node, final Statement statementInBlock) {
         final Set<String> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
 
         for (Statement statement : getNextSiblings(node)) {
@@ -2785,7 +2785,7 @@ public final class ASTNodes {
      * @param node The expression
      * @return the number of logical operands in the expression
      */
-    public static int getNbOperands(Expression node) {
+    public static int getNbOperands(final Expression node) {
         final InfixExpression infixExpression= as(node, InfixExpression.class);
 
         if (infixExpression == null

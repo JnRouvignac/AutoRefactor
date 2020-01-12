@@ -96,7 +96,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
     // return result;
     // }
 
-    private Object getModifiersOnly(List modifiers) {
+    private Object getModifiersOnly(final List modifiers) {
         return null;
     }
 }

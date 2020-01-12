@@ -68,7 +68,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
     }
 
     @Override
-    public boolean visit(FieldDeclaration node) {
+    public boolean visit(final FieldDeclaration node) {
         if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
                 Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
             Modifier finalModifier= null;

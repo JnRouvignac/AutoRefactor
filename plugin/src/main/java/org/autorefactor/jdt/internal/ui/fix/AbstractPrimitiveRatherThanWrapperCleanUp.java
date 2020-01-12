@@ -170,7 +170,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     }
 
     @Override
-    public boolean visit(VariableDeclarationStatement node) {
+    public boolean visit(final VariableDeclarationStatement node) {
         if (node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 

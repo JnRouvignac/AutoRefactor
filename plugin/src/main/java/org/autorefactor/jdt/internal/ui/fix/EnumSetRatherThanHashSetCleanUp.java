@@ -103,8 +103,8 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
      * @see java.util.EnumSet#noneOf(Class) <br>
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
-            Type... types) {
+    boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+            final Type... types) {
         if (types == null || types.length < 1) {
             return true;
         }

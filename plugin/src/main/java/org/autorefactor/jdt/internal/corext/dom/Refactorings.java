@@ -81,13 +81,13 @@ public class Refactorings {
      * @param eventLoop the event loop
      * @param monitor   TODO
      */
-    public Refactorings(CompilationUnit astRoot, EventLoop eventLoop, SubMonitor monitor) {
+    public Refactorings(final CompilationUnit astRoot, final EventLoop eventLoop, final SubMonitor monitor) {
         this.eventLoop= eventLoop;
         this.monitor= monitor;
         this.rewrite= ASTRewrite.create(astRoot.getAST());
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
             @Override
-            public SourceRange computeSourceRange(ASTNode node) {
+            public SourceRange computeSourceRange(final ASTNode node) {
                 if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
                     return new SourceRange(node.getStartPosition(), node.getLength());
                 }
@@ -116,11 +116,11 @@ public class Refactorings {
      * @param node the node for which to make the determination
      * @return true if the provided node has been refactored, false otherwise
      */
-    public boolean hasBeenRefactored(ASTNode node) {
+    public boolean hasBeenRefactored(final ASTNode node) {
         return refactoredNodes.contains(node);
     }
 
-    private void addRefactoredNodes(ASTNode node) {
+    private void addRefactoredNodes(final ASTNode node) {
         hasRefactorings= true;
         refactoredNodes.add(node);
         if (node.getParent() != null) {
@@ -143,7 +143,7 @@ public class Refactorings {
      * @see ASTRewrite#createCopyTarget(ASTNode)
      */
     @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T createCopyTarget(T node) {
+    public <T extends ASTNode> T createCopyTarget(final T node) {
         return (T) rewrite.createCopyTarget(node);
     }
 
@@ -163,19 +163,19 @@ public class Refactorings {
      * @see ListRewrite#createCopyTarget(ASTNode, ASTNode)
      */
     @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T createCopyTarget(T first, T last) {
+    public <T extends ASTNode> T createCopyTarget(final T first, final T last) {
         return (T) getListRewrite(first).createCopyTarget(first, last);
     }
 
-    private ListRewrite getListRewrite(ASTNode child) {
+    private ListRewrite getListRewrite(final ASTNode child) {
         return getListRewrite(child.getParent(), (ChildListPropertyDescriptor) child.getLocationInParent());
     }
 
-    private ListRewrite getListRewrite(ASTNode listHolder, StructuralPropertyDescriptor locationInParent) {
+    private ListRewrite getListRewrite(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent) {
         return getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
     }
 
-    private ListRewrite getListRewrite(ASTNode node, ChildListPropertyDescriptor listProperty) {
+    private ListRewrite getListRewrite(final ASTNode node, final ChildListPropertyDescriptor listProperty) {
         final Pair<ASTNode, ChildListPropertyDescriptor> key= Pair.of(node, listProperty);
         ListRewrite listRewrite= listRewriteCache.get(key);
         if (listRewrite == null) {
@@ -202,7 +202,7 @@ public class Refactorings {
      * @see ASTRewrite#createMoveTarget(ASTNode)
      */
     @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T createMoveTarget(T node) {
+    public <T extends ASTNode> T createMoveTarget(final T node) {
         return (T) rewrite.createMoveTarget(node);
     }
 
@@ -229,7 +229,7 @@ public class Refactorings {
      * @see ListRewrite#createMoveTarget(ASTNode, ASTNode)
      */
     @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T createMoveTarget(T first, T last) {
+    public <T extends ASTNode> T createMoveTarget(final T first, final T last) {
         return (T) getListRewrite(first).createMoveTarget(first, last);
     }
 
@@ -240,7 +240,7 @@ public class Refactorings {
      * @return true if the provided nodes are a valid existing range, false
      *         otherwise
      */
-    public boolean isValidRange(List<? extends ASTNode> nodes) {
+    public boolean isValidRange(final List<? extends ASTNode> nodes) {
         if (nodes.isEmpty()) {
             return true;
         }
@@ -278,7 +278,7 @@ public class Refactorings {
      * @see ASTRewrite#replace(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void replace(ASTNode node, ASTNode replacement) {
+    public void replace(final ASTNode node, final ASTNode replacement) {
         node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
         rewrite.replace(node, replacement, null);
         addRefactoredNodes(node);
@@ -290,7 +290,7 @@ public class Refactorings {
      * @param comment     the comment to replace
      * @param replacement the replacement text
      */
-    public void replace(Comment comment, String replacement) {
+    public void replace(final Comment comment, final String replacement) {
         hasRefactorings= true;
         commentRewriter.replace(comment, replacement);
     }
@@ -302,7 +302,7 @@ public class Refactorings {
      * @param toReplace   the source location to replace
      * @param replacement the replacement string
      */
-    public void replace(SourceLocation toReplace, String replacement) {
+    public void replace(final SourceLocation toReplace, final String replacement) {
         hasRefactorings= true;
         this.sourceRewriter.replace(toReplace, replacement);
     }
@@ -313,7 +313,7 @@ public class Refactorings {
      * @param node the node to remove
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void remove(ASTNode node) {
+    public void remove(final ASTNode node) {
         if (node instanceof Comment) {
             commentRewriter.remove((Comment) node);
         } else {
@@ -328,7 +328,7 @@ public class Refactorings {
      * @param node the node to remove
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void removeButKeepComment(ASTNode node) {
+    public void removeButKeepComment(final ASTNode node) {
         node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
         remove(node);
     }
@@ -338,7 +338,7 @@ public class Refactorings {
      *
      * @param toRemove the source location to remove
      */
-    public void remove(SourceLocation toRemove) {
+    public void remove(final SourceLocation toRemove) {
         if (toRemove.getLength() == 0) {
             throw new IllegalArgumentException("Cannot remove an empty source range: " + toRemove); //$NON-NLS-1$
         }
@@ -352,7 +352,7 @@ public class Refactorings {
      * @param nodes the nodes to remove
      * @see #remove(ASTNode)
      */
-    public void remove(ASTNode... nodes) {
+    public void remove(final ASTNode... nodes) {
         remove(Arrays.asList(nodes));
     }
 
@@ -362,7 +362,7 @@ public class Refactorings {
      * @param nodes the nodes to remove
      * @see #remove(ASTNode)
      */
-    public void remove(Collection<? extends ASTNode> nodes) {
+    public void remove(final Collection<? extends ASTNode> nodes) {
         for (ASTNode node : nodes) {
             remove(node);
         }
@@ -386,8 +386,8 @@ public class Refactorings {
      * @param index            the index where to insert the node in the list
      * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertAt(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert,
-            int index) {
+    public void insertAt(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert,
+            final int index) {
         getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, null);
         addRefactoredNodes(listHolder);
     }
@@ -400,7 +400,7 @@ public class Refactorings {
      * @see ListRewrite#insertBefore(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
+    public void insertBefore(final ASTNode nodeToInsert, final ASTNode element) {
         getListRewrite(element).insertBefore(nodeToInsert, element, null);
         addRefactoredNodes(element.getParent());
     }
@@ -413,7 +413,7 @@ public class Refactorings {
      * @see ListRewrite#insertAfter(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
+    public void insertAfter(final ASTNode nodeToInsert, final ASTNode element) {
         getListRewrite(element).insertAfter(nodeToInsert, element, null);
         addRefactoredNodes(element.getParent());
     }
@@ -426,7 +426,7 @@ public class Refactorings {
      * @param nodeToInsert     the node to insert
      * @see ListRewrite#insertFirst(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertFirst(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
+    public void insertFirst(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, null);
         addRefactoredNodes(listHolder);
     }
@@ -439,7 +439,7 @@ public class Refactorings {
      * @param nodeToInsert     the node to insert
      * @see ListRewrite#insertLast(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertLast(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
+    public void insertLast(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, null);
         addRefactoredNodes(listHolder);
     }
@@ -452,7 +452,7 @@ public class Refactorings {
      * @param movedNode the old node which has been moved using
      *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#createMoveTarget(ASTNode)}
      */
-    public void moveToIndex(ASTNode oldNode, int newIndex, ASTNode movedNode) {
+    public void moveToIndex(final ASTNode oldNode, final int newIndex, final ASTNode movedNode) {
         insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex);
     }
 
@@ -462,7 +462,7 @@ public class Refactorings {
      * @param lineComment the line comment to convert to javadoc
      * @param nextNode    the AST node immediately following the line comment
      */
-    public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+    public void toJavadoc(final LineComment lineComment, final ASTNode nextNode) {
         hasRefactorings= true;
         commentRewriter.toJavadoc(lineComment, nextNode);
     }
@@ -472,7 +472,7 @@ public class Refactorings {
      *
      * @param blockComment the block comment to convert to javadoc
      */
-    public void toJavadoc(BlockComment blockComment) {
+    public void toJavadoc(final BlockComment blockComment) {
         hasRefactorings= true;
         commentRewriter.toJavadoc(blockComment);
     }
@@ -486,7 +486,7 @@ public class Refactorings {
      * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void set(ASTNode node, StructuralPropertyDescriptor property, Object value) {
+    public void set(final ASTNode node, final StructuralPropertyDescriptor property, final Object value) {
         rewrite.set(node, property, value, null);
         addRefactoredNodes(node);
     }
@@ -499,7 +499,7 @@ public class Refactorings {
      * @throws BadLocationException if trying to access a non existing position
      * @throws CoreException        CoreException
      */
-    public void applyTo(final IDocument document, boolean hasToSave) throws BadLocationException, CoreException {
+    public void applyTo(final IDocument document, final boolean hasToSave) throws BadLocationException, CoreException {
         edits= rewrite.rewriteAST(document, null);
         final TextEdit importEdits= importRewrite.rewriteImports(monitor);
         commentRewriter.addEdits(document, edits);

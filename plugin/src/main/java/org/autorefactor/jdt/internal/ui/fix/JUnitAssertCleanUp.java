@@ -83,7 +83,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
+    public boolean visit(final CompilationUnit node) {
         canUseAssertNotEquals= false;
 
         for (Object object : node.imports()) {
@@ -105,7 +105,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         final List<Expression> args= ASTNodes.arguments(node);
         int i= 0;
         boolean shouldVisit= true;
@@ -157,7 +157,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
         if (node.getElseStatement() == null && statements.size() == 1) {
@@ -187,7 +187,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpression,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            Expression delta, final Expression failureMessage) {
+            final Expression delta, final Expression failureMessage) {
         List<Expression> arguments= new ArrayList<>(4);
 
         if (failureMessage != null) {

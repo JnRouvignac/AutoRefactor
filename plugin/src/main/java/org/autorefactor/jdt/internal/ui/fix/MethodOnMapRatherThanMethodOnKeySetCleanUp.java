@@ -64,7 +64,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
     }
 
     @Override
-    public boolean visit(MethodInvocation mi) {
+    public boolean visit(final MethodInvocation mi) {
         MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
 
         if (miExpression != null && ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
@@ -97,8 +97,8 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         return true;
     }
 
-    private boolean removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
-            String methodName) {
+    private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
+            final String methodName) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(actualMi,
                 b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(ASTNodes.arguments(actualMi))));

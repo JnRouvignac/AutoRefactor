@@ -67,7 +67,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
 
     private static class VariableUseVisitor extends ASTVisitor {
         @Override
-        public boolean visit(SimpleName node) {
+        public boolean visit(final SimpleName node) {
             ASTNode parent= node.getParent();
             if (parent instanceof QualifiedName || parent instanceof FieldAccess) {
                 return false;
@@ -78,7 +78,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         final VariableUseVisitor variableUseVisitor= new VariableUseVisitor();
         node.accept(variableUseVisitor);
 
@@ -104,7 +104,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         node.getExpression();
         node.getBody();
         // TODO JNR iterate over array with index

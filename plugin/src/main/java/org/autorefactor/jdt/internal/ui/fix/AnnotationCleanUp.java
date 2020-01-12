@@ -77,7 +77,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(NormalAnnotation node) {
+    public boolean visit(final NormalAnnotation node) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final List<MemberValuePair> values= ASTNodes.values(node);
@@ -113,7 +113,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return result;
     }
 
-    private Map<String, IMethodBinding> toElementsMap(IAnnotationBinding annotBinding) {
+    private Map<String, IMethodBinding> toElementsMap(final IAnnotationBinding annotBinding) {
         if (annotBinding == null) {
             return Collections.emptyMap();
         }
@@ -127,7 +127,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return results;
     }
 
-    private boolean equal(ITypeBinding typeBinding, Expression expression, Object javaObj2) {
+    private boolean equal(final ITypeBinding typeBinding, final Expression expression, final Object javaObj2) {
         Object javaObj1= expression.resolveConstantExpressionValue();
         switch (expression.getNodeType()) {
         case ASTNode.ARRAY_INITIALIZER:
@@ -176,7 +176,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean arraysEqual(ITypeBinding typeBinding, ArrayInitializer arrayInit, Object javaObj) {
+    private boolean arraysEqual(final ITypeBinding typeBinding, final ArrayInitializer arrayInit, final Object javaObj) {
         if (javaObj instanceof Object[]) {
             Object[] javaObjArray= (Object[]) javaObj;
             List<Expression> exprs= ASTNodes.expressions(arrayInit);
@@ -195,7 +195,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private Byte toByte(Object javaObj) {
+    private Byte toByte(final Object javaObj) {
         // No byte literal exist
         if (javaObj instanceof Integer) {
             int i= (Integer) javaObj;
@@ -207,7 +207,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Short toShort(Object javaObj) {
+    private Short toShort(final Object javaObj) {
         // No short literal exist
         if (javaObj instanceof Integer) {
             int i= (Integer) javaObj;
@@ -219,7 +219,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Integer toInteger(Object javaObj) {
+    private Integer toInteger(final Object javaObj) {
         if (javaObj instanceof Integer) {
             return (Integer) javaObj;
         }
@@ -227,7 +227,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Long toLong(Object javaObj) {
+    private Long toLong(final Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).longValue();
         }
@@ -238,7 +238,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Float toFloat(Object javaObj) {
+    private Float toFloat(final Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).floatValue();
         }
@@ -252,7 +252,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Double toDouble(Object javaObj) {
+    private Double toDouble(final Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).doubleValue();
         }

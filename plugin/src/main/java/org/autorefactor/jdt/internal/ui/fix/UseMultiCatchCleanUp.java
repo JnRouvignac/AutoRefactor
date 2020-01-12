@@ -94,7 +94,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 7;
     }
 
@@ -109,12 +109,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private static class SingleBinding extends Binding {
         private final ITypeBinding typeBinding;
 
-        public SingleBinding(ITypeBinding typeBinding) {
+        public SingleBinding(final ITypeBinding typeBinding) {
             this.typeBinding= typeBinding;
         }
 
         @Override
-        protected Boolean isSubTypeCompatible(Binding other) {
+        protected Boolean isSubTypeCompatible(final Binding other) {
             if (typeBinding == null) {
                 return false;
             }
@@ -144,12 +144,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private static class MultiBinding extends Binding {
         private final ITypeBinding[] typeBindings;
 
-        public MultiBinding(ITypeBinding[] typeBindings) {
+        public MultiBinding(final ITypeBinding[] typeBindings) {
             this.typeBindings= typeBindings;
         }
 
         @Override
-        protected Boolean isSubTypeCompatible(Binding other) {
+        protected Boolean isSubTypeCompatible(final Binding other) {
             if (other instanceof SingleBinding) {
                 SingleBinding o= (SingleBinding) other;
                 if (o.typeBinding == null) {
@@ -206,16 +206,16 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private static final class MultiCatchASTMatcher extends ASTSemanticMatcher {
         private final Map<ASTNode, ASTNode> matchingVariables= new HashMap<>();
 
-        public MultiCatchASTMatcher(CatchClause catchClause1, CatchClause catchClause2) {
+        public MultiCatchASTMatcher(final CatchClause catchClause1, final CatchClause catchClause2) {
             matchingVariables.put(catchClause1.getException(), catchClause2.getException());
         }
 
         @Override
-        public boolean match(VariableDeclarationStatement node, Object other) {
+        public boolean match(final VariableDeclarationStatement node, final Object other) {
             return super.match(node, other) || matchVariableDeclarationsWithDifferentNames(node, other);
         }
 
-        private boolean matchVariableDeclarationsWithDifferentNames(VariableDeclarationStatement node, Object other) {
+        private boolean matchVariableDeclarationsWithDifferentNames(final VariableDeclarationStatement node, final Object other) {
             if (!(other instanceof VariableDeclarationStatement)) {
                 return false;
             }
@@ -248,12 +248,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean match(SimpleName node, Object other) {
+        public boolean match(final SimpleName node, final Object other) {
             return super.match(node, other) || areBothReferringToSameVariables(node, other);
         }
 
         @Override
-        public boolean match(MethodInvocation mi1, Object other) {
+        public boolean match(final MethodInvocation mi1, final Object other) {
             if (other instanceof MethodInvocation) {
                 MethodInvocation mi2= (MethodInvocation) other;
                 return super.match(mi1, mi2)
@@ -264,7 +264,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean match(SuperMethodInvocation mi1, Object other) {
+        public boolean match(final SuperMethodInvocation mi1, final Object other) {
             if (other instanceof SuperMethodInvocation) {
                 SuperMethodInvocation mi2= (SuperMethodInvocation) other;
                 return super.match(mi1, mi2)
@@ -275,7 +275,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean match(ClassInstanceCreation cic1, Object other) {
+        public boolean match(final ClassInstanceCreation cic1, final Object other) {
             if (other instanceof ClassInstanceCreation) {
                 ClassInstanceCreation cic2= (ClassInstanceCreation) other;
                 return super.match(cic1, cic2)
@@ -285,20 +285,20 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        private boolean isSameMethodBinding(IMethodBinding binding1, IMethodBinding binding2) {
+        private boolean isSameMethodBinding(final IMethodBinding binding1, final IMethodBinding binding2) {
             return binding1 != null && binding2 != null
                     && (binding1.equals(binding2) || binding1.overrides(binding2) || binding2.overrides(binding1)
                     // This is a really expensive check. Do it at the very end
                             || areOverridingSameMethod(binding1, binding2));
         }
 
-        private boolean areOverridingSameMethod(IMethodBinding binding1, IMethodBinding binding2) {
+        private boolean areOverridingSameMethod(final IMethodBinding binding1, final IMethodBinding binding2) {
             Set<IMethodBinding> commonOverridenMethods= ASTNodes.getOverridenMethods(binding1);
             commonOverridenMethods.retainAll(ASTNodes.getOverridenMethods(binding2));
             return !commonOverridenMethods.isEmpty();
         }
 
-        private boolean areBothReferringToSameVariables(ASTNode node, Object other) {
+        private boolean areBothReferringToSameVariables(final ASTNode node, final Object other) {
             for (Entry<ASTNode, ASTNode> pairedVariables : matchingVariables.entrySet()) {
                 if (ASTNodes.isSameVariable(node, pairedVariables.getKey())) {
                     return isSameVariable0(other, pairedVariables.getValue());
@@ -308,13 +308,13 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        private boolean isSameVariable0(Object other, ASTNode node2) {
+        private boolean isSameVariable0(final Object other, final ASTNode node2) {
             return other instanceof ASTNode && ASTNodes.isSameVariable((ASTNode) other, node2);
         }
     }
 
     @Override
-    public boolean visit(TryStatement node) {
+    public boolean visit(final TryStatement node) {
         List<CatchClause> catchClauses= ASTNodes.catchClauses(node);
         Binding[] typeBindings= resolveTypeBindings(catchClauses);
         for (int i= 0; i < catchClauses.size(); i++) {
@@ -342,7 +342,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Binding[] resolveTypeBindings(List<CatchClause> catchClauses) {
+    private Binding[] resolveTypeBindings(final List<CatchClause> catchClauses) {
         final Binding[] results= new Binding[catchClauses.size()];
         for (int i= 0; i < catchClauses.size(); i++) {
             results[i]= resolveBinding(catchClauses.get(i));
@@ -351,7 +351,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return results;
     }
 
-    private Binding resolveBinding(CatchClause catchClause) {
+    private Binding resolveBinding(final CatchClause catchClause) {
         SingleVariableDeclaration svd= catchClause.getException();
         Type type= svd.getType();
         switch (type.getNodeType()) {
@@ -373,12 +373,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean matchMultiCatch(CatchClause catchClause1, CatchClause catchClause2) {
+    private boolean matchMultiCatch(final CatchClause catchClause1, final CatchClause catchClause2) {
         final MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(catchClause1, catchClause2);
         return ASTNodes.match(matcher, catchClause1.getBody(), catchClause2.getBody());
     }
 
-    private MergeDirection mergeDirection(Binding[] typeBindings, int start, int end) {
+    private MergeDirection mergeDirection(final Binding[] typeBindings, final int start, final int end) {
         if (canMergeTypesDown(typeBindings, start, end)) {
             return MergeDirection.DOWN;
         }
@@ -389,7 +389,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return MergeDirection.NONE;
     }
 
-    private boolean canMergeTypesDown(final Binding[] types, int start, int end) {
+    private boolean canMergeTypesDown(final Binding[] types, final int start, final int end) {
         final Binding startType= types[start];
         for (int i= start + 1; i < end; i++) {
             final Binding type= types[i];
@@ -401,7 +401,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean canMergeTypesUp(final Binding[] types, int start, int end) {
+    private boolean canMergeTypesUp(final Binding[] types, final int start, final int end) {
         final Binding endType= types[end];
         for (int i= start + 1; i < end; i++) {
             final Binding type= types[i];
@@ -413,7 +413,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private UnionType unionTypes(Type... types) {
+    private UnionType unionTypes(final Type... types) {
         final List<Type> allTypes= new ArrayList<>();
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
@@ -425,7 +425,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         return result;
     }
 
-    private void collectAllUnionedTypes(List<Type> results, Collection<Type> types) {
+    private void collectAllUnionedTypes(final List<Type> results, final Collection<Type> types) {
         for (Type type : types) {
             if (type instanceof UnionType) {
                 final UnionType ut= (UnionType) type;
@@ -436,7 +436,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private void removeSupersededAlternatives(List<Type> allTypes) {
+    private void removeSupersededAlternatives(final List<Type> allTypes) {
         for (ListIterator<Type> it1= allTypes.listIterator(); it1.hasNext();) {
             final ITypeBinding binding1= it1.next().resolveBinding();
 

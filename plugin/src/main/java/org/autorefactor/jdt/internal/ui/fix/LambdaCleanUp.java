@@ -96,7 +96,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(LambdaExpression node) {
+    public boolean visit(final LambdaExpression node) {
         if (node.hasParentheses() && node.parameters().size() == 1
                 && node.parameters().get(0) instanceof VariableDeclarationFragment) {
             // TODO it should also be possible to deal with a SingleVariableDeclaration
@@ -238,7 +238,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         return typeName != null && typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
     }
 
-    private boolean areSameIdentifiers(LambdaExpression node, List<Expression> arguments) {
+    private boolean areSameIdentifiers(final LambdaExpression node, final List<Expression> arguments) {
         for (int i= 0; i < node.parameters().size(); i++) {
             final Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
 

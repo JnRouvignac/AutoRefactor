@@ -66,7 +66,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final Refactorings r= this.ctx.getRefactorings();
 
         final Statement thenStatement= node.getThenStatement();

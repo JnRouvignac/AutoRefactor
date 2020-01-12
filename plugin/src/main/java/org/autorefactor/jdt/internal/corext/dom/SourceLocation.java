@@ -45,7 +45,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param offset the position offset in the file
      * @param length the length starting from the offset
      */
-    public SourceLocation(int offset, int length) {
+    public SourceLocation(final int offset, final int length) {
         this.offset= offset;
         this.length= length;
     }
@@ -55,7 +55,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      *
      * @param node the {@link ASTNode} where to read positions from
      */
-    public SourceLocation(ASTNode node) {
+    public SourceLocation(final ASTNode node) {
         this(node.getStartPosition(), node.getLength());
     }
 
@@ -66,7 +66,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param endPos   the end position in the file
      * @return a source location instance representing a range in a source file.
      */
-    public static SourceLocation fromPositions(int startPos, int endPos) {
+    public static SourceLocation fromPositions(final int startPos, final int endPos) {
         if (startPos > endPos) {
             throw new IllegalArgumentException(
                     "start position (" + startPos + ") should be situated before end position (" + startPos + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -81,7 +81,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param startPosition the start position in the file
      * @return a source location instance representing a point in a source file.
      */
-    public static SourceLocation fromStartPosition(int startPosition) {
+    public static SourceLocation fromStartPosition(final int startPosition) {
         return new SourceLocation(startPosition, 0);
     }
 
@@ -92,11 +92,11 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param node the node for which to compute the end position
      * @return the end position of the provided {@link ASTNode}
      */
-    public static int getEndPosition(ASTNode node) {
+    public static int getEndPosition(final ASTNode node) {
         return node.getStartPosition() + node.getLength();
     }
 
-    private static int getEndPosition(ISourceRange range) {
+    private static int getEndPosition(final ISourceRange range) {
         return range.getOffset() + range.getLength();
     }
 
@@ -143,7 +143,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @return true if the provided position is inside the current source location,
      *         false otherwise
      */
-    public boolean contains(int position) {
+    public boolean contains(final int position) {
         return getStartPosition() <= position && position <= getEndPosition();
     }
 
@@ -154,7 +154,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @return true if the provided source range is inside the current source
      *         location, false otherwise
      */
-    public boolean contains(ISourceRange sourceRange) {
+    public boolean contains(final ISourceRange sourceRange) {
         return getStartPosition() <= sourceRange.getOffset()
                 && sourceRange.getOffset() + sourceRange.getLength() <= getEndPosition();
     }
@@ -166,7 +166,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param s the string for which to provide the substring
      * @return the substring of the provided string
      */
-    public String substring(String s) {
+    public String substring(final String s) {
         return s.substring(getStartPosition(), getEndPosition());
     }
 
@@ -177,15 +177,15 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @return true if the provided source range overlaps with the current source
      *         location, false otherwise
      */
-    public boolean overlapsWith(ISourceRange sourceRange) {
+    public boolean overlapsWith(final ISourceRange sourceRange) {
         return overlapsLeft(sourceRange) || overlapsRight(sourceRange);
     }
 
-    private boolean overlapsLeft(ISourceRange range) {
+    private boolean overlapsLeft(final ISourceRange range) {
         return getStartPosition() <= range.getOffset() && range.getOffset() <= getEndPosition();
     }
 
-    private boolean overlapsRight(ISourceRange range) {
+    private boolean overlapsRight(final ISourceRange range) {
         return range.getOffset() <= getStartPosition() && getStartPosition() <= getEndPosition(range);
     }
 
@@ -196,7 +196,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      *
      * @return -1, 0 or 1
      */
-    public int compareTo(ISourceRange sourceRange) {
+    public int compareTo(final ISourceRange sourceRange) {
         final int offsetDiff= this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {
             return offsetDiff;
@@ -211,7 +211,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

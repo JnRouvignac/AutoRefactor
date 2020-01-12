@@ -95,7 +95,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         final SystemArrayCopyParams params= new SystemArrayCopyParams();
         collectUniqueIndex(node, params);
         final IVariableBinding incrementedIdx= getUniqueIncrementedVariable(node);
@@ -126,7 +126,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
+    private Expression calcIndex(final Expression index, final SystemArrayCopyParams params) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         if (index instanceof SimpleName) {
@@ -163,7 +163,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Expression plus(Expression expr1, Expression expr2) {
+    private Expression plus(final Expression expr1, final Expression expr2) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
@@ -181,7 +181,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, b.createCopyTarget(expr2));
     }
 
-    private Expression minus(Expression expr1, Expression expr2) {
+    private Expression minus(final Expression expr1, final Expression expr2) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
@@ -199,7 +199,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2));
     }
 
-    private Expression minusPlusOne(Expression expr1, Expression expr2) {
+    private Expression minusPlusOne(final Expression expr1, final Expression expr2) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
@@ -217,7 +217,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return b.infixExpression(b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
-    private Integer intValue(Expression expression) {
+    private Integer intValue(final Expression expression) {
         Object literal= expression.resolveConstantExpressionValue();
 
         if (literal instanceof Number) {
@@ -252,7 +252,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean maybeReplaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
+    private boolean maybeReplaceWithSystemArrayCopyCloneAll(final ForStatement node, final SystemArrayCopyParams params) {
         if (params.srcArrayExpression == null || params.srcPos == null || params.destArrayExpression == null
                 || params.destPos == null || params.length == null) {
             return true;
@@ -264,8 +264,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private void replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpression, Expression srcPos,
-            Expression destArrayExpression, Expression destPos, Expression length) {
+    private void replaceWithSystemArrayCopy(final ForStatement node, final Expression srcArrayExpression, final Expression srcPos,
+            final Expression destArrayExpression, final Expression destPos, final Expression length) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
@@ -276,7 +276,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         this.ctx.getRefactorings().replace(node, tryS);
     }
 
-    private void collectUniqueIndex(ForStatement node, SystemArrayCopyParams params) {
+    private void collectUniqueIndex(final ForStatement node, final SystemArrayCopyParams params) {
         if (ASTNodes.initializers(node).size() != 1) {
             return;
         }
@@ -310,7 +310,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private IVariableBinding getUniqueIncrementedVariable(ForStatement node) {
+    private IVariableBinding getUniqueIncrementedVariable(final ForStatement node) {
         if (ASTNodes.updaters(node).size() != 1) {
             return null;
         }

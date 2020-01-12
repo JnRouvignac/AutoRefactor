@@ -69,7 +69,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
 
         if (elseCode != null && elseCode.size() == 1) {

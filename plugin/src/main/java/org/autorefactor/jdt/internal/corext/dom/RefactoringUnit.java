@@ -40,7 +40,7 @@ public class RefactoringUnit implements Comparable {
      * @param compilationUnit compilationUnit
      * @param options         options
      */
-    public RefactoringUnit(ICompilationUnit compilationUnit, JavaProjectOptions options) {
+    public RefactoringUnit(final ICompilationUnit compilationUnit, final JavaProjectOptions options) {
         this.compilationUnit= compilationUnit;
         this.options= options;
     }
@@ -59,7 +59,7 @@ public class RefactoringUnit implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(final Object o) {
         if (equals(o)) {
             return 0;
         }
@@ -90,7 +90,7 @@ public class RefactoringUnit implements Comparable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

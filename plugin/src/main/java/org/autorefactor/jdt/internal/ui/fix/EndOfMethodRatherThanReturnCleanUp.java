@@ -68,7 +68,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ReturnStatement node) {
+    public boolean visit(final ReturnStatement node) {
         if (node.getExpression() == null && isLastStatement(node)) {
             final Refactorings r= ctx.getRefactorings();
 

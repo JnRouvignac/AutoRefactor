@@ -75,7 +75,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(ctx, node);
         node.accept(ifAndFollowingCodeVisitor);
         return ifAndFollowingCodeVisitor.getResult();
@@ -87,7 +87,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         }
 
         @Override
-        public boolean visit(TryStatement node) {
+        public boolean visit(final TryStatement node) {
             if (node.resources().isEmpty()) {
                 final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
@@ -115,7 +115,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             final Refactorings r= ctx.getRefactorings();
 
             final Statement thenStatement= node.getThenStatement();

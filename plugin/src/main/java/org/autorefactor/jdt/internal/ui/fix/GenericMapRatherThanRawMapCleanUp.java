@@ -125,12 +125,12 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 5;
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         keyType= null;
         valueType= null;
         return super.visit(node);
@@ -142,7 +142,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         return origRawType;
     }
 
@@ -461,7 +461,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         return true;
     }
 
-    private boolean isParameterizedTypeWithNbArguments(final ITypeBinding typeBinding, int nbArgs) {
+    private boolean isParameterizedTypeWithNbArguments(final ITypeBinding typeBinding, final int nbArgs) {
         return typeBinding != null && typeBinding.isParameterizedType()
                 && typeBinding.getTypeArguments().length == nbArgs;
     }

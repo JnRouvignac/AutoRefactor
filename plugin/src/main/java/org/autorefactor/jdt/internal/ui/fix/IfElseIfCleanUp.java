@@ -101,7 +101,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
     // return l;
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final Statement elseStatement= node.getElseStatement();
         if (elseStatement instanceof Block) {
             List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);

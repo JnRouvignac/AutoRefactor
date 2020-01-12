@@ -73,7 +73,7 @@ public class BlockSubVisitor extends ASTVisitor {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         return startNode == node;
     }
 }

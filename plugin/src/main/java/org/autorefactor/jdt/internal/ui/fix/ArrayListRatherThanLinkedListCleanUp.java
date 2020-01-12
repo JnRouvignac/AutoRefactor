@@ -97,7 +97,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (LinkedList.class.getCanonicalName().equals(origRawType)) {
             return ArrayList.class.getCanonicalName();
         }
@@ -106,7 +106,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
     }
 
     @Override
-    protected boolean canMethodBeRefactored(MethodInvocation mi, List<MethodInvocation> methodCallsToRefactor) {
+    protected boolean canMethodBeRefactored(final MethodInvocation mi, final List<MethodInvocation> methodCallsToRefactor) {
         final String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
         return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$

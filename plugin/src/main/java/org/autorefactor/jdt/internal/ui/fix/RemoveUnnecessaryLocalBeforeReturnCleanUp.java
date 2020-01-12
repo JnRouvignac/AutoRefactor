@@ -78,7 +78,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(ctx, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
@@ -90,7 +90,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         @Override
-        public boolean visit(ReturnStatement node) {
+        public boolean visit(final ReturnStatement node) {
             final Statement previousSibling= ASTNodes.getPreviousSibling(node);
             if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {

@@ -44,7 +44,7 @@ public class Environment {
      * @param logger      the logger
      * @param preferences the preferences
      */
-    public Environment(EventLoop eventLoop, Logger logger, Preferences preferences) {
+    public Environment(final EventLoop eventLoop, final Logger logger, final Preferences preferences) {
         this.eventLoop= eventLoop;
         this.logger= logger;
         this.preferences= preferences;

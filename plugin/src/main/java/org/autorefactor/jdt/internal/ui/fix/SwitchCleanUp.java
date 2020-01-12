@@ -62,12 +62,12 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         private final Expression name;
         private final List<Expression> constantValues;
 
-        private Variable(Expression firstOp, List<Expression> constantValues) {
+        private Variable(final Expression firstOp, final List<Expression> constantValues) {
             this.name= firstOp;
             this.constantValues= constantValues;
         }
 
-        private boolean isSameVariable(Variable other) {
+        private boolean isSameVariable(final Variable other) {
             return other != null && ASTNodes.isSameVariable(name, other.name);
         }
 
@@ -109,12 +109,12 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         /** Used for if statements, only constant expressions are used. */
-        private SwitchCaseSection(List<Expression> constantExprs, List<Statement> statements) {
+        private SwitchCaseSection(final List<Expression> constantExprs, final List<Statement> statements) {
             this(constantExprs, Collections.<SwitchCase>emptyList(), statements);
         }
 
-        private SwitchCaseSection(List<Expression> constantExprs, List<SwitchCase> existingCases,
-                List<Statement> statements) {
+        private SwitchCaseSection(final List<Expression> constantExprs, final List<SwitchCase> existingCases,
+                final List<Statement> statements) {
             this.constantExprs= constantExprs;
             this.existingCases= existingCases;
             this.statements= statements;
@@ -124,7 +124,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             return statements.isEmpty() || !ASTNodes.fallsThrough(Utils.getLast(statements));
         }
 
-        private boolean hasSameCode(SwitchCaseSection other) {
+        private boolean hasSameCode(final SwitchCaseSection other) {
             if (statements.size() != other.statements.size()) {
                 return false;
             }
@@ -161,7 +161,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private static final class HasUnlabeledBreakVisitor extends FinderVisitor<Boolean> {
         @Override
-        public boolean visit(BreakStatement node) {
+        public boolean visit(final BreakStatement node) {
             if (node.getLabel() == null) {
                 setResult(true);
                 return false;
@@ -171,27 +171,27 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(DoStatement node) {
+        public boolean visit(final DoStatement node) {
             return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
-        public boolean visit(SwitchStatement node) {
+        public boolean visit(final SwitchStatement node) {
             return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
-        public boolean visit(WhileStatement node) {
+        public boolean visit(final WhileStatement node) {
             return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
@@ -281,7 +281,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return hasConflict;
     }
 
-    private boolean containsAny(final Set<String> variableDeclarationIds, Set<String> varNames) {
+    private boolean containsAny(final Set<String> variableDeclarationIds, final Set<String> varNames) {
         for (String varName : varNames) {
             if (variableDeclarationIds.contains(varName)) {
                 return true;
@@ -383,14 +383,14 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Variable extractVariableAndValues(Expression expression) {
+    private Variable extractVariableAndValues(final Expression expression) {
         final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
         return exprNoParen instanceof InfixExpression
                 ? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
                         : null;
     }
 
-    private Variable extractVariableAndValuesFromInfixExpression(InfixExpression infixExpression) {
+    private Variable extractVariableAndValuesFromInfixExpression(final InfixExpression infixExpression) {
         if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
             List<Expression> operands= ASTNodes.allOperands(infixExpression);
             Variable mergedVariable= null;
@@ -424,7 +424,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
+    private Variable extractVariableWithConstantValue(final Expression firstOp, final Expression secondOp) {
         // TODO JNR handle enums
         // TODO JNR handle strings
         if ((firstOp instanceof Name || firstOp instanceof FieldAccess) && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
@@ -466,7 +466,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean previousSectionFallsthrough(final List<SwitchCaseSection> switchStructure, int idx) {
+    private boolean previousSectionFallsthrough(final List<SwitchCaseSection> switchStructure, final int idx) {
         return switchStructure.get(idx - 1).fallsThrough();
     }
 
@@ -502,7 +502,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         AFTER_SWITCH_CASES
     }
 
-    private void mergeCases(Merge merge, SwitchCaseSection sectionToKeep, SwitchCaseSection sectionToRemove) {
+    private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 

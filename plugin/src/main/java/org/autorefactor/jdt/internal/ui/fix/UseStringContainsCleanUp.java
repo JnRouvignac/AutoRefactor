@@ -63,7 +63,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (!node.hasExtendedOperands()) {
             Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
             Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
@@ -75,8 +75,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeRefactor(InfixExpression node, Expression operand1, Expression operand2,
-            boolean isMethodOnTheLeft) {
+    private boolean maybeRefactor(final InfixExpression node, final Expression operand1, final Expression operand2,
+            final boolean isMethodOnTheLeft) {
         MethodInvocation indexOf= ASTNodes.as(operand1, MethodInvocation.class);
         Long value= ASTNodes.integerLiteral(operand2);
 
@@ -100,12 +100,12 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean is(final InfixExpression ie, InfixExpression.Operator operator, Long number, int constant) {
+    private boolean is(final InfixExpression ie, final InfixExpression.Operator operator, final Long number, final int constant) {
         return ASTNodes.hasOperator(ie, operator)
                 && (long) number == constant;
     }
 
-    private void replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
+    private void replaceWithStringContains(final InfixExpression ie, final MethodInvocation node, final boolean negate) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$

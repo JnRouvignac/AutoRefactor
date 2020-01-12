@@ -73,7 +73,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(ctx, node);
         node.accept(ifAndReturnVisitor);
         return ifAndReturnVisitor.getResult();
@@ -85,7 +85,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             final InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
             final Statement thenStatement= getThenStatement(node);
             final Statement elseStatement= getElseStatement(node, thenStatement);
@@ -115,8 +115,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             return true;
         }
 
-        private boolean maybeReplaceWithStraightAssign(IfStatement node, final InfixExpression condition,
-                final Assignment thenAssignment, final Assignment elseAssignment, boolean isEqual) {
+        private boolean maybeReplaceWithStraightAssign(final IfStatement node, final InfixExpression condition,
+                final Assignment thenAssignment, final Assignment elseAssignment, final boolean isEqual) {
             final Expression hardCodedExpression;
             final Assignment valuedAssignment;
 
@@ -149,7 +149,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             return true;
         }
 
-        private Statement getThenStatement(IfStatement node) {
+        private Statement getThenStatement(final IfStatement node) {
             final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
 
             if (thenStatements.size() == 1) {
@@ -159,7 +159,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             return null;
         }
 
-        private Statement getElseStatement(IfStatement node, Statement thenStatement) {
+        private Statement getElseStatement(final IfStatement node, final Statement thenStatement) {
             final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
 
             if (elseStatements.size() == 1) {
@@ -173,14 +173,14 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             return null;
         }
 
-        private void replaceWithStraightAssign(IfStatement node, Expression leftHandSide, Expression rightHandSide) {
+        private void replaceWithStraightAssign(final IfStatement node, final Expression leftHandSide, final Expression rightHandSide) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
                     b.toStatement(b.assign(b.createMoveTarget(leftHandSide), Assignment.Operator.ASSIGN, b.createMoveTarget(rightHandSide))));
         }
 
-        private boolean maybeReplaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement valuedReturn,
-                ReturnStatement hardCodedReturn, Statement toRemove) {
+        private boolean maybeReplaceWithStraightReturn(final IfStatement node, final InfixExpression condition, final ReturnStatement valuedReturn,
+                final ReturnStatement hardCodedReturn, final Statement toRemove) {
             if (ASTNodes.isHardCoded(hardCodedReturn.getExpression())) {
                 if (ASTNodes.isPassiveWithoutFallingThrough(condition.getLeftOperand())
                         && ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
@@ -202,7 +202,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             return true;
         }
 
-        private void replaceWithStraightReturn(IfStatement node, Expression returnedExpression, Statement toRemove) {
+        private void replaceWithStraightReturn(final IfStatement node, final Expression returnedExpression, final Statement toRemove) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
 

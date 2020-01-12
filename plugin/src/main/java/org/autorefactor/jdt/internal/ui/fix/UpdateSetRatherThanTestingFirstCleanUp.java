@@ -71,7 +71,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final Statement elseStatement= node.getElseStatement();
         final Statement thenStatement= node.getThenStatement();
         final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);

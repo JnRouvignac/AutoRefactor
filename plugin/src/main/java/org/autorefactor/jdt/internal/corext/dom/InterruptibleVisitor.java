@@ -37,7 +37,7 @@ public class InterruptibleVisitor extends ASTVisitor {
      *
      * @param node The visited node.
      */
-    public void visitNode(ASTNode node) {
+    public void visitNode(final ASTNode node) {
         try {
             node.accept(this);
         } catch (StopVisitException e) {

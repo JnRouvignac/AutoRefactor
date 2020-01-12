@@ -74,7 +74,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         if (node.getElseStatement() == null) {
             List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
@@ -108,7 +108,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         return true;
     }
 
-    private boolean isConditionValid(Expression expression, Expression container) {
+    private boolean isConditionValid(final Expression expression, final Expression container) {
         InfixExpression condition= ASTNodes.as(expression, InfixExpression.class);
         return condition != null
                 && !condition.hasExtendedOperands() && ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
@@ -120,8 +120,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
                         || isConditionValid(condition, container, condition.getRightOperand(), condition.getLeftOperand(), false));
     }
 
-    private boolean isConditionValid(InfixExpression condition, Expression container, final Expression arrayOperand,
-            final Expression literalOperand, boolean isArrayOnLeft) {
+    private boolean isConditionValid(final InfixExpression condition, final Expression container, final Expression arrayOperand,
+            final Expression literalOperand, final boolean isArrayOnLeft) {
         Expression array= getArray(container, arrayOperand);
         Long literal= ASTNodes.integerLiteral(literalOperand);
 
@@ -149,7 +149,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         return false;
     }
 
-    private Expression getArray(Expression container, final Expression operand) {
+    private Expression getArray(final Expression container, final Expression operand) {
         FieldAccess fieldAccess= ASTNodes.as(operand, FieldAccess.class);
         QualifiedName name= ASTNodes.as(operand, QualifiedName.class);
 
@@ -164,7 +164,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         return null;
     }
 
-    private Expression getContainer(List<Statement> statements) {
+    private Expression getContainer(final List<Statement> statements) {
         ForStatement forStatement= ASTNodes.as(statements.get(0), ForStatement.class);
         EnhancedForStatement enhancedForStatement= ASTNodes.as(statements.get(0), EnhancedForStatement.class);
 
@@ -181,7 +181,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         return null;
     }
 
-    private void removeCondition(InfixExpression condition, List<Expression> operands) {
+    private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 

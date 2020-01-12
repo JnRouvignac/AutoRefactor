@@ -107,12 +107,12 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 5;
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         elementType= null;
         return super.visit(node);
     }
@@ -123,7 +123,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         return origRawType;
     }
 
@@ -286,11 +286,11 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         return false;
     }
 
-    private boolean resolveTypeCompatibleIfPossible(ITypeBinding paramType) {
+    private boolean resolveTypeCompatibleIfPossible(final ITypeBinding paramType) {
         return isParameterizedTypeWithOneArgument(paramType) && resolveTypeCompatible(paramType.getTypeArguments()[0]);
     }
 
-    private boolean isParameterizedTypeWithOneArgument(ITypeBinding typeBinding) {
+    private boolean isParameterizedTypeWithOneArgument(final ITypeBinding typeBinding) {
         return typeBinding != null && typeBinding.isParameterizedType() && typeBinding.getTypeArguments().length == 1;
     }
 

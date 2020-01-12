@@ -164,7 +164,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *                 {@link AggregateASTVisitor}
      */
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    public AggregateASTVisitor(List<RefactoringRule> visitors) {
+    public AggregateASTVisitor(final List<RefactoringRule> visitors) {
         this.visitors= (List) visitors;
         analyzeVisitors();
     }
@@ -203,7 +203,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @return true if the visitor is enabled.
      */
-    public boolean isEnabled(Preferences preferences) {
+    public boolean isEnabled(final Preferences preferences) {
         return true;
     }
 
@@ -213,7 +213,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    private void analyzeVisitor(ASTVisitor v, Class<?> clazz) {
+    private void analyzeVisitor(final ASTVisitor v, final Class<?> clazz) {
         if (ASTVisitor.class.equals(clazz)) {
             return;
         }
@@ -233,24 +233,24 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         analyzeVisitor(v, clazz.getSuperclass());
     }
 
-    private static boolean is(String methodName, Method m) {
+    private static boolean is(final String methodName, final Method m) {
         return methodName.equals(m.getName()) && m.getParameterTypes().length == 1
                 && ASTNode.class.equals(m.getParameterTypes()[0]);
     }
 
-    private static boolean isVisit(Method m) {
+    private static boolean isVisit(final Method m) {
         return "visit".equals(m.getName()) && m.getParameterTypes().length == 1 //$NON-NLS-1$
                 && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
                 && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
 
-    private static boolean isEndVisit(Method m) {
+    private static boolean isEndVisit(final Method m) {
         return "endVisit".equals(m.getName()) && m.getParameterTypes().length == 1 //$NON-NLS-1$
                 && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
                 && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
 
-    private void put(Map<Class<?>, List<ASTVisitor>> map, Class<?> key, ASTVisitor value) {
+    private void put(final Map<Class<?>, List<ASTVisitor>> map, final Class<?> key, final ASTVisitor value) {
         List<ASTVisitor> visitors= map.get(key);
         if (visitors == null) {
             visitors= new ArrayList<>(1);
@@ -259,7 +259,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         visitors.add(value);
     }
 
-    private List<ASTVisitor> getVisitors(Map<Class<?>, List<ASTVisitor>> map, Class<? extends ASTNode> clazzKey) {
+    private List<ASTVisitor> getVisitors(final Map<Class<?>, List<ASTVisitor>> map, final Class<? extends ASTNode> clazzKey) {
         final List<ASTVisitor> result= map.get(clazzKey);
         if (result != null) {
             return result;
@@ -275,11 +275,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @return true if this Java version is supported.
      */
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return true;
     }
 
-    private boolean isJavaVersionSupported(ASTVisitor visitor) {
+    private boolean isJavaVersionSupported(final ASTVisitor visitor) {
         final Release javaSERelease= ctx.getJavaProjectOptions().getJavaSERelease();
         return visitor instanceof JavaRefactoringRule
                 && ((JavaRefactoringRule) visitor).isJavaVersionSupported(javaSERelease);
@@ -291,7 +291,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      * @param ctx the cleanup context.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    public void setRefactoringContext(RefactoringContext ctx) {
+    public void setRefactoringContext(final RefactoringContext ctx) {
         this.ctx= ctx;
         for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
             v.setRefactoringContext(ctx);
@@ -306,7 +306,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @return the cleanups.
      */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
+    public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();
     }
@@ -339,7 +339,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      * @return true if the following visitors can visit the current node, false
      *         otherwise
      */
-    private boolean continueVisiting(boolean continueVisiting, ASTVisitor v, ASTNode node) {
+    private boolean continueVisiting(final boolean continueVisiting, final ASTVisitor v, final ASTNode node) {
         if (!continueVisiting) {
             if (!this.ctx.getRefactorings().hasRefactorings()) {
                 logBadlyBehavedVisitor(v, node);
@@ -355,13 +355,13 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return true;
     }
 
-    private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
+    private void logBadlyBehavedVisitor(final ASTVisitor v, final ASTNode node) {
         String message= "Visitor " + v.getClass().getName() + " is badly behaved:" //$NON-NLS-1$ //$NON-NLS-2$
                 + " it reported doing a refactoring, but it did not actually contribute any refactoring."; //$NON-NLS-1$
         ctx.getLogger().error(message, new AutoRefactorException(node, message));
     }
 
-    private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
+    private void logFaultyVisitor(final ASTVisitor v, final ASTNode node, final Exception e) {
         if (e instanceof OperationCanceledException) {
             // Let the user cancel the current operation
             throw (OperationCanceledException) e;
@@ -377,7 +377,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @param args the arguments of the Java program
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final Method[] mm= ASTVisitor.class.getDeclaredMethods();
         Arrays.sort(mm, new Comparator<Method>() {
             /**
@@ -388,7 +388,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
              *
              * @return -1, 0 or 1
              */
-            public int compare(Method o1, Method o2) {
+            public int compare(final Method o1, final Method o2) {
                 return o1.getName().compareTo(o2.getName());
             }
         });
@@ -454,7 +454,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(AnnotationTypeDeclaration node) {
+    public void endVisit(final AnnotationTypeDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, AnnotationTypeDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -468,7 +468,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(AnnotationTypeMemberDeclaration node) {
+    public void endVisit(final AnnotationTypeMemberDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, AnnotationTypeMemberDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -482,7 +482,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(AnonymousClassDeclaration node) {
+    public void endVisit(final AnonymousClassDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, AnonymousClassDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -496,7 +496,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ArrayAccess node) {
+    public void endVisit(final ArrayAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ArrayAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -510,7 +510,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ArrayCreation node) {
+    public void endVisit(final ArrayCreation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ArrayCreation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -524,7 +524,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ArrayInitializer node) {
+    public void endVisit(final ArrayInitializer node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ArrayInitializer.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -538,7 +538,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ArrayType node) {
+    public void endVisit(final ArrayType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ArrayType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -552,7 +552,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(AssertStatement node) {
+    public void endVisit(final AssertStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, AssertStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -566,7 +566,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(Assignment node) {
+    public void endVisit(final Assignment node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, Assignment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -580,7 +580,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(Block node) {
+    public void endVisit(final Block node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, Block.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -594,7 +594,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(BlockComment node) {
+    public void endVisit(final BlockComment node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, BlockComment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -608,7 +608,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(BooleanLiteral node) {
+    public void endVisit(final BooleanLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, BooleanLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -622,7 +622,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(BreakStatement node) {
+    public void endVisit(final BreakStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, BreakStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -636,7 +636,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(CastExpression node) {
+    public void endVisit(final CastExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, CastExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -650,7 +650,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(CatchClause node) {
+    public void endVisit(final CatchClause node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, CatchClause.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -664,7 +664,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(CharacterLiteral node) {
+    public void endVisit(final CharacterLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, CharacterLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -678,7 +678,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ClassInstanceCreation node) {
+    public void endVisit(final ClassInstanceCreation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ClassInstanceCreation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -692,7 +692,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(CompilationUnit node) {
+    public void endVisit(final CompilationUnit node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, CompilationUnit.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -706,7 +706,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ConditionalExpression node) {
+    public void endVisit(final ConditionalExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ConditionalExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -720,7 +720,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ConstructorInvocation node) {
+    public void endVisit(final ConstructorInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ConstructorInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -734,7 +734,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ContinueStatement node) {
+    public void endVisit(final ContinueStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ContinueStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -748,7 +748,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(DoStatement node) {
+    public void endVisit(final DoStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, DoStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -762,7 +762,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(EmptyStatement node) {
+    public void endVisit(final EmptyStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, EmptyStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -776,7 +776,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(EnhancedForStatement node) {
+    public void endVisit(final EnhancedForStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, EnhancedForStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -790,7 +790,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(EnumConstantDeclaration node) {
+    public void endVisit(final EnumConstantDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, EnumConstantDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -804,7 +804,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(EnumDeclaration node) {
+    public void endVisit(final EnumDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, EnumDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -818,7 +818,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ExpressionStatement node) {
+    public void endVisit(final ExpressionStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ExpressionStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -832,7 +832,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(FieldAccess node) {
+    public void endVisit(final FieldAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, FieldAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -846,7 +846,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(FieldDeclaration node) {
+    public void endVisit(final FieldDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, FieldDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -860,7 +860,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ForStatement node) {
+    public void endVisit(final ForStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ForStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -874,7 +874,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(IfStatement node) {
+    public void endVisit(final IfStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, IfStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -888,7 +888,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ImportDeclaration node) {
+    public void endVisit(final ImportDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ImportDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -902,7 +902,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(InfixExpression node) {
+    public void endVisit(final InfixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, InfixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -916,7 +916,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(Initializer node) {
+    public void endVisit(final Initializer node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, Initializer.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -930,7 +930,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(InstanceofExpression node) {
+    public void endVisit(final InstanceofExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, InstanceofExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -944,7 +944,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(Javadoc node) {
+    public void endVisit(final Javadoc node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, Javadoc.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -958,7 +958,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(LabeledStatement node) {
+    public void endVisit(final LabeledStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, LabeledStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -972,7 +972,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(LineComment node) {
+    public void endVisit(final LineComment node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, LineComment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -986,7 +986,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MarkerAnnotation node) {
+    public void endVisit(final MarkerAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MarkerAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1000,7 +1000,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MemberRef node) {
+    public void endVisit(final MemberRef node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MemberRef.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1014,7 +1014,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MemberValuePair node) {
+    public void endVisit(final MemberValuePair node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MemberValuePair.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1028,7 +1028,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MethodDeclaration node) {
+    public void endVisit(final MethodDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MethodDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1042,7 +1042,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MethodInvocation node) {
+    public void endVisit(final MethodInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MethodInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1056,7 +1056,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MethodRef node) {
+    public void endVisit(final MethodRef node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MethodRef.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1070,7 +1070,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(MethodRefParameter node) {
+    public void endVisit(final MethodRefParameter node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, MethodRefParameter.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1084,7 +1084,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(Modifier node) {
+    public void endVisit(final Modifier node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, Modifier.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1098,7 +1098,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(NormalAnnotation node) {
+    public void endVisit(final NormalAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, NormalAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1112,7 +1112,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(NullLiteral node) {
+    public void endVisit(final NullLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, NullLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1126,7 +1126,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(NumberLiteral node) {
+    public void endVisit(final NumberLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, NumberLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1140,7 +1140,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(PackageDeclaration node) {
+    public void endVisit(final PackageDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, PackageDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1154,7 +1154,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ParameterizedType node) {
+    public void endVisit(final ParameterizedType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ParameterizedType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1168,7 +1168,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ParenthesizedExpression node) {
+    public void endVisit(final ParenthesizedExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ParenthesizedExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1182,7 +1182,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(PostfixExpression node) {
+    public void endVisit(final PostfixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, PostfixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1196,7 +1196,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(PrefixExpression node) {
+    public void endVisit(final PrefixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, PrefixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1210,7 +1210,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(PrimitiveType node) {
+    public void endVisit(final PrimitiveType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, PrimitiveType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1224,7 +1224,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(QualifiedName node) {
+    public void endVisit(final QualifiedName node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, QualifiedName.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1238,7 +1238,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(QualifiedType node) {
+    public void endVisit(final QualifiedType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, QualifiedType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1252,7 +1252,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ReturnStatement node) {
+    public void endVisit(final ReturnStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ReturnStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1266,7 +1266,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SimpleName node) {
+    public void endVisit(final SimpleName node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SimpleName.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1280,7 +1280,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SimpleType node) {
+    public void endVisit(final SimpleType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SimpleType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1294,7 +1294,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SingleMemberAnnotation node) {
+    public void endVisit(final SingleMemberAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SingleMemberAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1308,7 +1308,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SingleVariableDeclaration node) {
+    public void endVisit(final SingleVariableDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SingleVariableDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1322,7 +1322,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(StringLiteral node) {
+    public void endVisit(final StringLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, StringLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1336,7 +1336,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SuperConstructorInvocation node) {
+    public void endVisit(final SuperConstructorInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SuperConstructorInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1350,7 +1350,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SuperFieldAccess node) {
+    public void endVisit(final SuperFieldAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SuperFieldAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1364,7 +1364,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SuperMethodInvocation node) {
+    public void endVisit(final SuperMethodInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SuperMethodInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1378,7 +1378,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SwitchCase node) {
+    public void endVisit(final SwitchCase node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SwitchCase.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1392,7 +1392,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SwitchStatement node) {
+    public void endVisit(final SwitchStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SwitchStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1406,7 +1406,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(SynchronizedStatement node) {
+    public void endVisit(final SynchronizedStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, SynchronizedStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1420,7 +1420,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TagElement node) {
+    public void endVisit(final TagElement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TagElement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1434,7 +1434,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TextElement node) {
+    public void endVisit(final TextElement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TextElement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1448,7 +1448,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ThisExpression node) {
+    public void endVisit(final ThisExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ThisExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1462,7 +1462,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(ThrowStatement node) {
+    public void endVisit(final ThrowStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, ThrowStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1476,7 +1476,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TryStatement node) {
+    public void endVisit(final TryStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TryStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1490,7 +1490,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TypeDeclaration node) {
+    public void endVisit(final TypeDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TypeDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1504,7 +1504,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TypeDeclarationStatement node) {
+    public void endVisit(final TypeDeclarationStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TypeDeclarationStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1518,7 +1518,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TypeLiteral node) {
+    public void endVisit(final TypeLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TypeLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1532,7 +1532,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(TypeParameter node) {
+    public void endVisit(final TypeParameter node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, TypeParameter.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1546,7 +1546,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(UnionType node) {
+    public void endVisit(final UnionType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, UnionType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1560,7 +1560,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(VariableDeclarationExpression node) {
+    public void endVisit(final VariableDeclarationExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, VariableDeclarationExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1574,7 +1574,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(VariableDeclarationFragment node) {
+    public void endVisit(final VariableDeclarationFragment node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, VariableDeclarationFragment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1588,7 +1588,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(VariableDeclarationStatement node) {
+    public void endVisit(final VariableDeclarationStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, VariableDeclarationStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1602,7 +1602,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(WhileStatement node) {
+    public void endVisit(final WhileStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, WhileStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1616,7 +1616,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void endVisit(WildcardType node) {
+    public void endVisit(final WildcardType node) {
         final List<ASTVisitor> visitorList= getVisitors(endVisitorsMap, WildcardType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1630,7 +1630,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void postVisit(ASTNode node) {
+    public void postVisit(final ASTNode node) {
         for (Iterator<ASTVisitor> iter= postVisitors.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
@@ -1643,7 +1643,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public void preVisit(ASTNode node) {
+    public void preVisit(final ASTNode node) {
         for (Iterator<ASTVisitor> iter= preVisitors.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
@@ -1656,7 +1656,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean preVisit2(ASTNode node) {
+    public boolean preVisit2(final ASTNode node) {
         for (Iterator<ASTVisitor> iter= preVisitors2.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
@@ -1673,7 +1673,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(AnnotationTypeDeclaration node) {
+    public boolean visit(final AnnotationTypeDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, AnnotationTypeDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1691,7 +1691,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(AnnotationTypeMemberDeclaration node) {
+    public boolean visit(final AnnotationTypeMemberDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, AnnotationTypeMemberDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1709,7 +1709,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(AnonymousClassDeclaration node) {
+    public boolean visit(final AnonymousClassDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, AnonymousClassDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1727,7 +1727,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ArrayAccess node) {
+    public boolean visit(final ArrayAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ArrayAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1745,7 +1745,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ArrayCreation node) {
+    public boolean visit(final ArrayCreation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ArrayCreation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1763,7 +1763,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ArrayInitializer node) {
+    public boolean visit(final ArrayInitializer node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ArrayInitializer.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1781,7 +1781,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ArrayType node) {
+    public boolean visit(final ArrayType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ArrayType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1799,7 +1799,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(AssertStatement node) {
+    public boolean visit(final AssertStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, AssertStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1817,7 +1817,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(Assignment node) {
+    public boolean visit(final Assignment node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, Assignment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1835,7 +1835,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, Block.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1853,7 +1853,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(BlockComment node) {
+    public boolean visit(final BlockComment node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, BlockComment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1871,7 +1871,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(BooleanLiteral node) {
+    public boolean visit(final BooleanLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, BooleanLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1889,7 +1889,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(BreakStatement node) {
+    public boolean visit(final BreakStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, BreakStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1907,7 +1907,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(CastExpression node) {
+    public boolean visit(final CastExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CastExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1925,7 +1925,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(CatchClause node) {
+    public boolean visit(final CatchClause node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CatchClause.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1943,7 +1943,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(CharacterLiteral node) {
+    public boolean visit(final CharacterLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CharacterLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1961,7 +1961,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ClassInstanceCreation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1979,7 +1979,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
+    public boolean visit(final CompilationUnit node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CompilationUnit.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -1997,7 +1997,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ConditionalExpression node) {
+    public boolean visit(final ConditionalExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ConditionalExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2015,7 +2015,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ConstructorInvocation node) {
+    public boolean visit(final ConstructorInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ConstructorInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2033,7 +2033,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ContinueStatement node) {
+    public boolean visit(final ContinueStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ContinueStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2051,7 +2051,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(CreationReference node) {
+    public boolean visit(final CreationReference node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CreationReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2069,7 +2069,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(DoStatement node) {
+    public boolean visit(final DoStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, DoStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2087,7 +2087,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(EmptyStatement node) {
+    public boolean visit(final EmptyStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, EmptyStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2105,7 +2105,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(EnhancedForStatement node) {
+    public boolean visit(final EnhancedForStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, EnhancedForStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2123,7 +2123,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(EnumConstantDeclaration node) {
+    public boolean visit(final EnumConstantDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, EnumConstantDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2141,7 +2141,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(EnumDeclaration node) {
+    public boolean visit(final EnumDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, EnumDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2159,7 +2159,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ExpressionMethodReference node) {
+    public boolean visit(final ExpressionMethodReference node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ExpressionMethodReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2177,7 +2177,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ExpressionStatement node) {
+    public boolean visit(final ExpressionStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ExpressionStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2195,7 +2195,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(FieldAccess node) {
+    public boolean visit(final FieldAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, FieldAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2213,7 +2213,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(FieldDeclaration node) {
+    public boolean visit(final FieldDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, FieldDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2231,7 +2231,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ForStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2249,7 +2249,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, IfStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2267,7 +2267,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ImportDeclaration node) {
+    public boolean visit(final ImportDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ImportDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2285,7 +2285,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, InfixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2303,7 +2303,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(Initializer node) {
+    public boolean visit(final Initializer node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, Initializer.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2321,7 +2321,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(InstanceofExpression node) {
+    public boolean visit(final InstanceofExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, InstanceofExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2339,7 +2339,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(Javadoc node) {
+    public boolean visit(final Javadoc node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, Javadoc.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2357,7 +2357,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(LabeledStatement node) {
+    public boolean visit(final LabeledStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, LabeledStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2375,7 +2375,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(LambdaExpression node) {
+    public boolean visit(final LambdaExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, LambdaExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2393,7 +2393,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(LineComment node) {
+    public boolean visit(final LineComment node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, LineComment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2411,7 +2411,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MarkerAnnotation node) {
+    public boolean visit(final MarkerAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MarkerAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2429,7 +2429,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MemberRef node) {
+    public boolean visit(final MemberRef node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MemberRef.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2447,7 +2447,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MemberValuePair node) {
+    public boolean visit(final MemberValuePair node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MemberValuePair.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2465,7 +2465,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MethodDeclaration node) {
+    public boolean visit(final MethodDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MethodDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2483,7 +2483,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MethodInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2501,7 +2501,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MethodRef node) {
+    public boolean visit(final MethodRef node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MethodRef.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2519,7 +2519,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(MethodRefParameter node) {
+    public boolean visit(final MethodRefParameter node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, MethodRefParameter.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2537,7 +2537,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(Modifier node) {
+    public boolean visit(final Modifier node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, Modifier.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2555,7 +2555,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(NormalAnnotation node) {
+    public boolean visit(final NormalAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, NormalAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2573,7 +2573,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(NullLiteral node) {
+    public boolean visit(final NullLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, NullLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2591,7 +2591,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(NumberLiteral node) {
+    public boolean visit(final NumberLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, NumberLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2609,7 +2609,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(PackageDeclaration node) {
+    public boolean visit(final PackageDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, PackageDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2627,7 +2627,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ParameterizedType node) {
+    public boolean visit(final ParameterizedType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ParameterizedType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2645,7 +2645,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ParenthesizedExpression node) {
+    public boolean visit(final ParenthesizedExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ParenthesizedExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2663,7 +2663,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(PostfixExpression node) {
+    public boolean visit(final PostfixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, PostfixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2681,7 +2681,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(PrefixExpression node) {
+    public boolean visit(final PrefixExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, PrefixExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2699,7 +2699,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(PrimitiveType node) {
+    public boolean visit(final PrimitiveType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, PrimitiveType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2717,7 +2717,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(QualifiedName node) {
+    public boolean visit(final QualifiedName node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, QualifiedName.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2735,7 +2735,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(QualifiedType node) {
+    public boolean visit(final QualifiedType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, QualifiedType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2753,7 +2753,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ReturnStatement node) {
+    public boolean visit(final ReturnStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ReturnStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2771,7 +2771,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SimpleName node) {
+    public boolean visit(final SimpleName node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SimpleName.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2789,7 +2789,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SimpleType node) {
+    public boolean visit(final SimpleType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SimpleType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2807,7 +2807,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SingleMemberAnnotation node) {
+    public boolean visit(final SingleMemberAnnotation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SingleMemberAnnotation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2825,7 +2825,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SingleVariableDeclaration node) {
+    public boolean visit(final SingleVariableDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SingleVariableDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2843,7 +2843,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(StringLiteral node) {
+    public boolean visit(final StringLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, StringLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2861,7 +2861,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SuperConstructorInvocation node) {
+    public boolean visit(final SuperConstructorInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SuperConstructorInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2879,7 +2879,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SuperFieldAccess node) {
+    public boolean visit(final SuperFieldAccess node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SuperFieldAccess.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2897,7 +2897,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SuperMethodInvocation node) {
+    public boolean visit(final SuperMethodInvocation node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SuperMethodInvocation.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2915,7 +2915,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SuperMethodReference node) {
+    public boolean visit(final SuperMethodReference node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SuperMethodReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2933,7 +2933,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SwitchCase node) {
+    public boolean visit(final SwitchCase node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SwitchCase.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2951,7 +2951,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SwitchStatement node) {
+    public boolean visit(final SwitchStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SwitchStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2969,7 +2969,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(SynchronizedStatement node) {
+    public boolean visit(final SynchronizedStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SynchronizedStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -2987,7 +2987,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TagElement node) {
+    public boolean visit(final TagElement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TagElement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3005,7 +3005,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TextElement node) {
+    public boolean visit(final TextElement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TextElement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3023,7 +3023,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ThisExpression node) {
+    public boolean visit(final ThisExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ThisExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3041,7 +3041,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(ThrowStatement node) {
+    public boolean visit(final ThrowStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ThrowStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3059,7 +3059,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TryStatement node) {
+    public boolean visit(final TryStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TryStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3077,7 +3077,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(final TypeDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeDeclaration.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3095,7 +3095,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TypeDeclarationStatement node) {
+    public boolean visit(final TypeDeclarationStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeDeclarationStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3113,7 +3113,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TypeLiteral node) {
+    public boolean visit(final TypeLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeLiteral.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3131,7 +3131,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TypeMethodReference node) {
+    public boolean visit(final TypeMethodReference node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeMethodReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3149,7 +3149,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(TypeParameter node) {
+    public boolean visit(final TypeParameter node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeParameter.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3167,7 +3167,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(UnionType node) {
+    public boolean visit(final UnionType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, UnionType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3185,7 +3185,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(VariableDeclarationExpression node) {
+    public boolean visit(final VariableDeclarationExpression node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, VariableDeclarationExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3203,7 +3203,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(VariableDeclarationFragment node) {
+    public boolean visit(final VariableDeclarationFragment node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, VariableDeclarationFragment.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3221,7 +3221,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(VariableDeclarationStatement node) {
+    public boolean visit(final VariableDeclarationStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, VariableDeclarationStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3239,7 +3239,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, WhileStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
@@ -3257,7 +3257,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
-    public boolean visit(WildcardType node) {
+    public boolean visit(final WildcardType node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, WildcardType.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();

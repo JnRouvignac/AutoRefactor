@@ -41,7 +41,7 @@ public final class Utils {
      * @param obj2 the second object to compare for equality
      * @return true if the two provided objects are equal, false otherwise.
      */
-    public static boolean equal(Object obj1, Object obj2) {
+    public static boolean equal(final Object obj1, final Object obj2) {
         if (obj1 == null) {
             return obj2 == null;
         }
@@ -57,7 +57,7 @@ public final class Utils {
      * @return true if the two provided objects are equal and not null, false
      *         otherwise.
      */
-    public static boolean equalNotNull(Object obj1, Object obj2) {
+    public static boolean equalNotNull(final Object obj1, final Object obj2) {
         return obj1 != null && obj1.equals(obj2);
     }
 
@@ -68,7 +68,7 @@ public final class Utils {
      * @param b2 the second boolean to compare for equality
      * @return true if the two provided booleans are equal, false otherwise.
      */
-    public static boolean equal(boolean b1, boolean b2) {
+    public static boolean equal(final boolean b1, final boolean b2) {
         return b1 == b2;
     }
 
@@ -79,7 +79,7 @@ public final class Utils {
      * @param b2 the second byte to compare for equality
      * @return true if the two provided bytes are equal, false otherwise.
      */
-    public static boolean equal(byte b1, byte b2) {
+    public static boolean equal(final byte b1, final byte b2) {
         return b1 == b2;
     }
 
@@ -90,7 +90,7 @@ public final class Utils {
      * @param c2 the second character to compare for equality
      * @return true if the two provided characters are equal, false otherwise.
      */
-    public static boolean equal(char c1, char c2) {
+    public static boolean equal(final char c1, final char c2) {
         return c1 == c2;
     }
 
@@ -101,7 +101,7 @@ public final class Utils {
      * @param s2 the second short to compare for equality
      * @return true if the two provided shorts are equal, false otherwise.
      */
-    public static boolean equal(short s1, short s2) {
+    public static boolean equal(final short s1, final short s2) {
         return s1 == s2;
     }
 
@@ -112,7 +112,7 @@ public final class Utils {
      * @param i2 the second integer to compare for equality
      * @return true if the two provided integers are equal, false otherwise.
      */
-    public static boolean equal(int i1, int i2) {
+    public static boolean equal(final int i1, final int i2) {
         return i1 == i2;
     }
 
@@ -123,7 +123,7 @@ public final class Utils {
      * @param l2 the second long to compare for equality
      * @return true if the two provided longs are equal, false otherwise.
      */
-    public static boolean equal(long l1, long l2) {
+    public static boolean equal(final long l1, final long l2) {
         return l1 == l2;
     }
 
@@ -134,7 +134,7 @@ public final class Utils {
      * @param f2 the second float to compare for equality
      * @return true if the two provided floats are equal, false otherwise.
      */
-    public static boolean equal(float f1, float f2) {
+    public static boolean equal(final float f1, final float f2) {
         return f1 == f2;
     }
 
@@ -145,7 +145,7 @@ public final class Utils {
      * @param d2 the second double to compare for equality
      * @return true if the two provided doubles are equal, false otherwise.
      */
-    public static boolean equal(double d1, double d2) {
+    public static boolean equal(final double d1, final double d2) {
         return Double.compare(d1, d2) == 0;
     }
 
@@ -193,7 +193,7 @@ public final class Utils {
      * @return the value associated to this key in this map, the default value
      *         otherwise
      */
-    public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
+    public static <K, V> V getOrDefault(final Map<K, V> map, final K key, final V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 }

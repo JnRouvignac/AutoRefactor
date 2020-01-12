@@ -68,7 +68,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
     }
 
     @Override
-    public boolean visit(ArrayCreation node) {
+    public boolean visit(final ArrayCreation node) {
         if (node.getInitializer() != null || isVoid(node)) {
             final ITypeBinding arrayType= node.resolveTypeBinding();
             final ITypeBinding destinationType= ASTNodes.getTargetType(node);

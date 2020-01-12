@@ -196,7 +196,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
     }
 
     private void replaceUtilClass(final MethodInvocation node, final Set<String> importsToAdd,
-            Name javaUtilObjects) {
+            final Name javaUtilObjects) {
         final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(node.getExpression(), javaUtilObjects);

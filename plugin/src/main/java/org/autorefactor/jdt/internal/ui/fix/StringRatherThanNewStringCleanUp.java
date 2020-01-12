@@ -63,7 +63,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
             final Expression arg0= ASTNodes.arguments(node).get(0);
             if (ASTNodes.hasType(arg0, String.class.getCanonicalName())

@@ -81,7 +81,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(ctx, node);
         node.accept(newAndPutAllMethodVisitor);
         return newAndPutAllMethodVisitor.getResult();
@@ -93,11 +93,11 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             return moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
         }
 
-        private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, Expression expression, List<Expression> evaluatedExpression) {
+        private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
             final Assignment assignment= ASTNodes.as(expression, Assignment.class);
 
             if (assignment != null) {

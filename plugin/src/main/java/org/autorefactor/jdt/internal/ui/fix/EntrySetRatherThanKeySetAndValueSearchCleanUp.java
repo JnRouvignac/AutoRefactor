@@ -109,13 +109,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private final int insertionPoint;
         private final ASTNode namingScope;
 
-        private VariableNameDecider(ASTNode scope, int insertionPoint) {
+        private VariableNameDecider(final ASTNode scope, final int insertionPoint) {
             this.scope= scope;
             this.insertionPoint= insertionPoint;
             this.namingScope= getNamingScope(scope);
         }
 
-        private ASTNode getNamingScope(ASTNode scope) {
+        private ASTNode getNamingScope(final ASTNode scope) {
             Class<?>[] ancestorClasses= { MethodDeclaration.class, Initializer.class };
             ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
             if (ancestor == null) {
@@ -139,7 +139,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
          *                       maybe suffixed by a number
          * @return the suggestion for a variable name
          */
-        public String suggest(String... candidateNames) {
+        public String suggest(final String... candidateNames) {
             final Set<String> declaredLocalVarNames= new HashSet<>(collectDeclaredLocalVariableNames());
             final Set<String> varNamesUsedAfter= new HashSet<>(collectVariableNamesUsedAfter());
             // Can we use one of the candidate names?
@@ -160,8 +160,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             } while (true);
         }
 
-        private boolean isSuitable(String candidateName, Set<String> declaredLocalVarNames,
-                Set<String> varNamesUsedAfter) {
+        private boolean isSuitable(final String candidateName, final Set<String> declaredLocalVarNames,
+                final Set<String> varNamesUsedAfter) {
             // No variable declaration conflict
             return !declaredLocalVarNames.contains(candidateName)
                     // New variable does not shadow use of other variables/fields with the same name
@@ -171,12 +171,12 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private Collection<String> collectDeclaredLocalVariableNames() {
             return new CollectorVisitor<String>() {
                 @Override
-                public boolean preVisit2(ASTNode node) {
+                public boolean preVisit2(final ASTNode node) {
                     return !isTypeDeclaration(node);
                 }
 
                 @Override
-                public boolean visit(SimpleName node) {
+                public boolean visit(final SimpleName node) {
                     final IBinding binding= node.resolveBinding();
                     if (binding != null && binding.getKind() == IBinding.VARIABLE) {
                         addResult(binding.getName());
@@ -190,12 +190,12 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private List<String> collectVariableNamesUsedAfter() {
             return new CollectorVisitor<String>() {
                 @Override
-                public boolean preVisit2(ASTNode node) {
+                public boolean preVisit2(final ASTNode node) {
                     return node.getStartPosition() > insertionPoint && !isTypeDeclaration(node);
                 }
 
                 @Override
-                public boolean visit(SimpleName node) {
+                public boolean visit(final SimpleName node) {
                     final IBinding binding= node.resolveBinding();
                     if (binding != null && binding.getKind() == IBinding.VARIABLE) {
                         addResult(binding.getName());
@@ -206,7 +206,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             }.collect(scope);
         }
 
-        private boolean isTypeDeclaration(ASTNode node) {
+        private boolean isTypeDeclaration(final ASTNode node) {
             switch (node.getNodeType()) {
             case ANNOTATION_TYPE_DECLARATION:
             case ANONYMOUS_CLASS_DECLARATION:
@@ -221,7 +221,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     @Override
-    public boolean visit(EnhancedForStatement enhancedFor) {
+    public boolean visit(final EnhancedForStatement enhancedFor) {
         final MethodInvocation foreachExpression= ASTNodes.as(enhancedFor.getExpression(), MethodInvocation.class);
 
         if (isKeySetMethod(foreachExpression)) {
@@ -244,7 +244,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         return true;
     }
 
-    private void replaceEntryIterationByKeyIteration(EnhancedForStatement enhancedFor, final Expression mapExpression,
+    private void replaceEntryIterationByKeyIteration(final EnhancedForStatement enhancedFor, final Expression mapExpression,
             final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
@@ -316,8 +316,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      * declared. Otherwise, let's use the type binding and output verbose fully
      * qualified types.
      */
-    private Type createMapEntryType(SingleVariableDeclaration parameter, MethodInvocation getValueMi,
-            TypeNameDecider typeNameDecider) {
+    private Type createMapEntryType(final SingleVariableDeclaration parameter, final MethodInvocation getValueMi,
+            final TypeNameDecider typeNameDecider) {
         final String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
         final ASTNodeFactory b= ctx.getASTBuilder();
@@ -336,17 +336,17 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         return b.genericType(mapEntryType, mapKeyType, mapValueType);
     }
 
-    private boolean isKeySetMethod(MethodInvocation foreachExpression) {
+    private boolean isKeySetMethod(final MethodInvocation foreachExpression) {
         return foreachExpression != null && ASTNodes.usesGivenSignature(foreachExpression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
-    private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
-            SingleVariableDeclaration parameter, Statement body) {
+    private List<MethodInvocation> collectMapGetValueCalls(final Expression mapExpression,
+            final SingleVariableDeclaration parameter, final Statement body) {
         return new CollectMapGetCalls(mapExpression, parameter).collect(body);
     }
 
     /** Sanity check. */
-    private boolean haveSameTypeBindings(Collection<? extends Expression> exprs) {
+    private boolean haveSameTypeBindings(final Collection<? extends Expression> exprs) {
         Iterator<? extends Expression> it= exprs.iterator();
 
         if (!it.hasNext()) {
@@ -381,7 +381,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 && areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
     }
 
-    private boolean areSameTypeBindings(ITypeBinding[] types1, ITypeBinding[] types2) {
+    private boolean areSameTypeBindings(final ITypeBinding[] types1, final ITypeBinding[] types2) {
         if (types1.length != types2.length) {
             return false;
         }
@@ -402,13 +402,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private final Expression mapExpression;
         private final SingleVariableDeclaration forEachParameter;
 
-        public CollectMapGetCalls(Expression mapExpression, SingleVariableDeclaration forEachParameter) {
+        public CollectMapGetCalls(final Expression mapExpression, final SingleVariableDeclaration forEachParameter) {
             this.mapExpression= mapExpression;
             this.forEachParameter= forEachParameter;
         }
 
         @Override
-        public boolean visit(MethodInvocation node) {
+        public boolean visit(final MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
                     && ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
                     && ASTNodes.isSameVariable(ASTNodes.arguments(node).get(0), forEachParameter.getName())) {
@@ -418,7 +418,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             return true;
         }
 
-        private boolean isSameReference(Expression expr1, Expression expr2) {
+        private boolean isSameReference(final Expression expr1, final Expression expr2) {
             if (expr1 == null || expr2 == null) {
                 return false;
             }

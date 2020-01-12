@@ -47,7 +47,7 @@ public class Variable {
      * @param variableName the variable's name
      * @param astBuilder   the builder to build new AST nodes
      */
-    public Variable(String typeName, String variableName, ASTNodeFactory astBuilder) {
+    public Variable(final String typeName, final String variableName, final ASTNodeFactory astBuilder) {
         this.typeName= typeName;
         this.variableName= variableName;
         this.b= astBuilder;
@@ -60,7 +60,7 @@ public class Variable {
      * @param variableName the variable's name
      * @param astBuilder   the builder to build new AST nodes
      */
-    public Variable(String variableName, ASTNodeFactory astBuilder) {
+    public Variable(final String variableName, final ASTNodeFactory astBuilder) {
         this(null, variableName, astBuilder);
     }
 

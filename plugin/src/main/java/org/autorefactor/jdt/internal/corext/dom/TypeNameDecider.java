@@ -66,7 +66,7 @@ public class TypeNameDecider {
         private final ASTNode parsedNode;
         private final ITypeBinding anyTypeBinding;
 
-        public ReflectionResolveTypeBindingStrategy(ASTNode parsedNode, ITypeBinding anyTypeBinding) {
+        public ReflectionResolveTypeBindingStrategy(final ASTNode parsedNode, final ITypeBinding anyTypeBinding) {
             this.parsedNode= parsedNode;
             this.anyTypeBinding= anyTypeBinding;
         }
@@ -78,7 +78,7 @@ public class TypeNameDecider {
          *
          * @return the type binding.
          */
-        public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
+        public ITypeBinding resolveTypeBinding(final String fullyQualifiedName) {
             try {
                 final Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$
                 final Object compilationUnitScope= getField(bindingResolver, "scope"); //$NON-NLS-1$
@@ -97,14 +97,14 @@ public class TypeNameDecider {
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T invokeMethod(Object object, Method method, Object... args)
+        private <T> T invokeMethod(final Object object, final Method method, final Object... args)
                 throws IllegalAccessException, InvocationTargetException {
             method.setAccessible(true);
             return (T) method.invoke(object, args);
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T getField(Object object, String fieldName)
+        private <T> T getField(final Object object, final String fieldName)
                 throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
             final Field f= object.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
@@ -140,7 +140,7 @@ public class TypeNameDecider {
      * @param resolveTypeBindingStrategy the strategy that resolves type bindings
      * @param importedTypes              the imported types
      */
-    public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, TreeSet<String> importedTypes) {
+    public TypeNameDecider(final ResolveTypeBindingStrategy resolveTypeBindingStrategy, final TreeSet<String> importedTypes) {
         this.resolveTypeBindingStrategy= resolveTypeBindingStrategy;
         this.packageName= ""; //$NON-NLS-1$
         this.importedTypes= importedTypes;
@@ -156,7 +156,7 @@ public class TypeNameDecider {
         throw new NotImplementedException(parsedNode);
     }
 
-    private static TreeSet<String> getImportedTypes(CompilationUnit cu) {
+    private static TreeSet<String> getImportedTypes(final CompilationUnit cu) {
         final TreeSet<String> results= new TreeSet<>();
         for (ImportDeclaration importDecl : ASTNodes.imports(cu)) {
             Name importName= importDecl.getName();
@@ -173,7 +173,7 @@ public class TypeNameDecider {
      * @param fullyQualifiedName the fully qualified name of the type
      * @return the simplest possible name to use when referring to the type
      */
-    public String useSimplestPossibleName(String fullyQualifiedName) {
+    public String useSimplestPossibleName(final String fullyQualifiedName) {
         return useSimplestPossibleName(resolveTypeBinding(fullyQualifiedName));
     }
 
@@ -183,7 +183,7 @@ public class TypeNameDecider {
      * @param fullyQualifiedName the fully qualified type name
      * @return a type binding
      */
-    public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
+    public ITypeBinding resolveTypeBinding(final String fullyQualifiedName) {
         return resolveTypeBindingStrategy.resolveTypeBinding(fullyQualifiedName);
     }
 
@@ -194,7 +194,7 @@ public class TypeNameDecider {
      * @param typeBinding the type binding
      * @return the simplest possible name to use when referring to the type
      */
-    public String useSimplestPossibleName(ITypeBinding typeBinding) {
+    public String useSimplestPossibleName(final ITypeBinding typeBinding) {
         final String pkgName= typeBinding.getPackage().getName();
         if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) { //$NON-NLS-1$
             // TODO beware of name shadowing!
@@ -249,7 +249,7 @@ public class TypeNameDecider {
         return fqn;
     }
 
-    private static char[][] toSimpleNamesArray(String fullyQualifiedName) {
+    private static char[][] toSimpleNamesArray(final String fullyQualifiedName) {
         final String[] simpleNames= fullyQualifiedName.split("\\."); //$NON-NLS-1$
         final char[][] result= new char[simpleNames.length][];
         for (int i= 0; i < simpleNames.length; i++) {

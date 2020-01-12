@@ -53,7 +53,7 @@ public class VariableAccess {
      * @param type       the type of the variable
      * @param accessType the access type to the variable
      */
-    public VariableAccess(ASTNode astNode, Name name, Type type, int accessType) {
+    public VariableAccess(final ASTNode astNode, final Name name, final Type type, final int accessType) {
         this.astNode= astNode;
         this.name= name;
         this.type= type;
@@ -66,7 +66,7 @@ public class VariableAccess {
      * @param astNode    the AST node of the variable
      * @param accessType the access type to the variable
      */
-    public VariableAccess(ASTNode astNode, int accessType) {
+    public VariableAccess(final ASTNode astNode, final int accessType) {
         this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
     }
 

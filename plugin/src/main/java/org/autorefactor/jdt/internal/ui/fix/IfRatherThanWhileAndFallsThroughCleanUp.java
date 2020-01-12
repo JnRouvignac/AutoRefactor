@@ -76,7 +76,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         if (ASTNodes.fallsThrough(node.getBody())) {
             final ContinueVisitor continueVisitor= new ContinueVisitor(node);
             continueVisitor.visitNode(node);
@@ -95,7 +95,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         return true;
     }
 
-    private void replaceByIf(WhileStatement node, final BreakVisitor breakVisitor) {
+    private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
@@ -128,7 +128,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         }
 
         @Override
-        public boolean visit(BreakStatement aBreak) {
+        public boolean visit(final BreakStatement aBreak) {
             if (aBreak.getLabel() != null) {
                 canBeRefactored= false;
                 return interruptVisit();
@@ -150,37 +150,37 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         }
 
         @Override
-        public boolean visit(WhileStatement node) {
+        public boolean visit(final WhileStatement node) {
             return root.equals(node);
         }
 
         @Override
-        public boolean visit(DoStatement node) {
+        public boolean visit(final DoStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(SwitchStatement node) {
+        public boolean visit(final SwitchStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(AnonymousClassDeclaration node) {
+        public boolean visit(final AnonymousClassDeclaration node) {
             return false;
         }
 
         @Override
-        public boolean visit(LambdaExpression node) {
+        public boolean visit(final LambdaExpression node) {
             return false;
         }
     }
@@ -198,38 +198,38 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         }
 
         @Override
-        public boolean visit(ContinueStatement node) {
+        public boolean visit(final ContinueStatement node) {
             canBeRefactored= false;
             return interruptVisit();
         }
 
         @Override
-        public boolean visit(WhileStatement node) {
+        public boolean visit(final WhileStatement node) {
             return root.equals(node);
         }
 
         @Override
-        public boolean visit(DoStatement node) {
+        public boolean visit(final DoStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             return false;
         }
 
         @Override
-        public boolean visit(AnonymousClassDeclaration node) {
+        public boolean visit(final AnonymousClassDeclaration node) {
             return false;
         }
 
         @Override
-        public boolean visit(LambdaExpression node) {
+        public boolean visit(final LambdaExpression node) {
             return false;
         }
     }

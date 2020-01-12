@@ -68,12 +68,12 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 7;
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         final Type type= node.getType();
 
         if (type.isParameterizedType()
@@ -95,7 +95,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * Tries to rebuild the process that leads to
      * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
      */
-    private boolean canUseDiamondOperator(ClassInstanceCreation node, final Type type) {
+    private boolean canUseDiamondOperator(final ClassInstanceCreation node, final Type type) {
         List<Expression> args= ASTNodes.arguments(node);
         if (args.isEmpty()) {
             return true;

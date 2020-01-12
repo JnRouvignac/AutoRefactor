@@ -23,7 +23,7 @@ public class VarDeclarationIdentifierVisitor extends ASTVisitor {
      * @param startNode       the {@link ASTNode} which is the scope of the search
      * @param includeInnerScopes True if the sub blocks should be analyzed
      */
-    public VarDeclarationIdentifierVisitor(ASTNode startNode, boolean includeInnerScopes) {
+    public VarDeclarationIdentifierVisitor(final ASTNode startNode, final boolean includeInnerScopes) {
         this.startNode= startNode;
         this.includeInnerScopes= includeInnerScopes;
     }
@@ -38,19 +38,19 @@ public class VarDeclarationIdentifierVisitor extends ASTVisitor {
     }
 
     @Override
-    public boolean visit(SingleVariableDeclaration node) {
+    public boolean visit(final SingleVariableDeclaration node) {
         variableNames.add(node.getName().getIdentifier());
         return true;
     }
 
     @Override
-    public boolean visit(VariableDeclarationFragment node) {
+    public boolean visit(final VariableDeclarationFragment node) {
         variableNames.add(node.getName().getIdentifier());
         return true;
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         return startNode == node || includeInnerScopes;
     }
 }

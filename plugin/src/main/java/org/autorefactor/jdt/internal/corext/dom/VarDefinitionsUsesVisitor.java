@@ -59,7 +59,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
-    public VarDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
+    public VarDefinitionsUsesVisitor(final VariableDeclaration variableDeclaration) {
         this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration), true);
     }
 
@@ -71,13 +71,13 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
      * @param scopeNode       the {@link ASTNode} which is the scope of the search
      * @param includeInnerScopes True if the sub blocks should be analyzed
      */
-    public VarDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode, boolean includeInnerScopes) {
+    public VarDefinitionsUsesVisitor(final IVariableBinding variableBinding, final ASTNode scopeNode, final boolean includeInnerScopes) {
         this.variableBinding= variableBinding;
         this.scopeNode= scopeNode;
         this.includeInnerScopes= includeInnerScopes;
     }
 
-    private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
+    private static ASTNode getDeclaringScope(final VariableDeclaration variableDeclaration) {
         ASTNode node= variableDeclaration.getParent();
         while (isVariableDeclaration(node)) {
             node= node.getParent();
@@ -86,7 +86,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
         return node;
     }
 
-    private static boolean isVariableDeclaration(ASTNode node) {
+    private static boolean isVariableDeclaration(final ASTNode node) {
         switch (node.getNodeType()) {
         case SINGLE_VARIABLE_DECLARATION:
         case VARIABLE_DECLARATION_EXPRESSION:
@@ -113,7 +113,7 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
     }
 
     @Override
-    public boolean visit(SimpleName node) {
+    public boolean visit(final SimpleName node) {
         if (ASTNodes.isSameLocalVariable(variableBinding, node)) {
             switch (node.getParent().getNodeType()) {
             case ASSIGNMENT:
@@ -138,11 +138,11 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         return scopeNode == node || includeInnerScopes;
     }
 
-    private void addWriteOrRead(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
+    private void addWriteOrRead(final SimpleName node, final ChildPropertyDescriptor definitionPropertyDescriptor) {
         if (node.getLocationInParent() == definitionPropertyDescriptor) {
             writes.add(node);
         } else {

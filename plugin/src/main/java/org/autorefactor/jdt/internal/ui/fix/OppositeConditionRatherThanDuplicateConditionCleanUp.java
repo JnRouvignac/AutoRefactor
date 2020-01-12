@@ -93,7 +93,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         InfixExpression firstCondition= ASTNodes.as(node.getExpression(), InfixExpression.class);
         IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 

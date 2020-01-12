@@ -94,36 +94,36 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(AnnotationTypeDeclaration node) {
+    public boolean visit(final AnnotationTypeDeclaration node) {
         return visit((BodyDeclaration) node);
     }
 
     @Override
-    public boolean visit(EnumDeclaration node) {
+    public boolean visit(final EnumDeclaration node) {
         return visit((BodyDeclaration) node);
     }
 
     @Override
-    public boolean visit(FieldDeclaration node) {
+    public boolean visit(final FieldDeclaration node) {
         return visit((BodyDeclaration) node);
     }
 
     @Override
-    public boolean visit(Initializer node) {
+    public boolean visit(final Initializer node) {
         return visit((BodyDeclaration) node);
     }
 
     @Override
-    public boolean visit(MethodDeclaration node) {
+    public boolean visit(final MethodDeclaration node) {
         return visit((BodyDeclaration) node);
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(final TypeDeclaration node) {
         return visit((BodyDeclaration) node);
     }
 
-    private boolean visit(BodyDeclaration node) {
+    private boolean visit(final BodyDeclaration node) {
         final BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
         final ASTNode parent= node.getParent();
 
@@ -154,7 +154,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
     }
 
-    private boolean maybeRemoveSuperfluousSemiColons(ASTNode node, int start, int end) {
+    private boolean maybeRemoveSuperfluousSemiColons(final ASTNode node, final int start, final int end) {
         if (end <= start) {
             return true;
         }
@@ -177,7 +177,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         return result;
     }
 
-    private Map<String, SourceLocation> getNonCommentsStrings(ASTNode node, int start, int end) {
+    private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode node, final int start, final int end) {
         final List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
 
         final String source= ctx.getSource(node);
@@ -197,13 +197,13 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         return results;
     }
 
-    private void putResult(String source, int start, int end, final LinkedHashMap<String, SourceLocation> results) {
+    private void putResult(final String source, final int start, final int end, final LinkedHashMap<String, SourceLocation> results) {
         final SourceLocation sourceLoc= SourceLocation.fromPositions(start, end);
         final String s= sourceLoc.substring(source);
         results.put(s, sourceLoc);
     }
 
-    private List<Comment> filterCommentsInRange(int start, int end, final ASTNode root) {
+    private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) root;
             return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
@@ -212,7 +212,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         return Collections.emptyList();
     }
 
-    private List<Comment> filterCommentsInRange(int start, int end, List<Comment> commentList) {
+    private List<Comment> filterCommentsInRange(final int start, final int end, final List<Comment> commentList) {
         if (commentList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -231,7 +231,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(TryStatement node) {
+    public boolean visit(final TryStatement node) {
         final List<VariableDeclarationExpression> resources= ASTNodes.resources(node);
         if (resources.isEmpty()) {
             return true;

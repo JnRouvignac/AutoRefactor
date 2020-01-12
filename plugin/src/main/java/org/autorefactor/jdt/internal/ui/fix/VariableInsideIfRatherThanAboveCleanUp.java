@@ -74,7 +74,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor(ctx, node);
         node.accept(newAndPutAllMethodVisitor);
         return newAndPutAllMethodVisitor.getResult();

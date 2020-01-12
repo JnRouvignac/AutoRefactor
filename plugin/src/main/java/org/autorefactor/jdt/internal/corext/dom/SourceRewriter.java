@@ -46,7 +46,7 @@ public class SourceRewriter {
      *
      * @param toRemove the source location to remove
      */
-    public void remove(SourceLocation toRemove) {
+    public void remove(final SourceLocation toRemove) {
         this.removals.add(toRemove);
     }
 
@@ -57,7 +57,7 @@ public class SourceRewriter {
      * @param toReplace   the source location to replace
      * @param replacement the replacement string
      */
-    public void replace(SourceLocation toReplace, String replacement) {
+    public void replace(final SourceLocation toReplace, final String replacement) {
         this.replacements.put(toReplace, replacement);
     }
 
@@ -68,7 +68,7 @@ public class SourceRewriter {
      * @param document the document to edit
      * @param edits    where to add edits
      */
-    public void addEdits(IDocument document, TextEdit edits) {
+    public void addEdits(final IDocument document, final TextEdit edits) {
         for (SourceLocation loc : this.removals) {
             edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
         }

@@ -66,14 +66,14 @@ public class CFGDotPrinter {
         final Set<CFGBasicBlock> blocks= new TreeSet<>();
         final List<CFGSubGraph> subGraphs= new ArrayList<>();
 
-        public CFGSubGraph(String codeExcerpt, int startPosition) {
+        public CFGSubGraph(final String codeExcerpt, final int startPosition) {
             this.codeExcerpt= codeExcerpt;
             this.startPosition= startPosition;
         }
     }
 
     private static final class CFGEdgeComparator implements Comparator<CFGEdge> {
-        public int compare(CFGEdge e1, CFGEdge e2) {
+        public int compare(final CFGEdge e1, final CFGEdge e2) {
             final int cmp= e1.getSourceBlock().compareTo(e2.getSourceBlock());
             if (cmp != 0) {
                 return cmp;
@@ -100,7 +100,7 @@ public class CFGDotPrinter {
         return sb.toString();
     }
 
-    private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, Set<CFGEdge> edges,
+    private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, final Set<CFGEdge> edges,
             final StringBuilder sb) {
         final boolean needDigraph= sb.length() == 0;
         if (needDigraph) {
@@ -132,7 +132,7 @@ public class CFGDotPrinter {
         }
     }
 
-    private void collect(CFGBasicBlock block, Map<ASTNode, CFGSubGraph> subGraphs, Set<CFGEdge> edges) {
+    private void collect(final CFGBasicBlock block, final Map<ASTNode, CFGSubGraph> subGraphs, final Set<CFGEdge> edges) {
         CFGSubGraph blockSubGraph= getSubGraph(subGraphs, block.getNode());
         if (!blockSubGraph.blocks.add(block)) {
             // Node was already added.
@@ -149,7 +149,7 @@ public class CFGDotPrinter {
         }
     }
 
-    private CFGSubGraph getSubGraph(Map<ASTNode, CFGSubGraph> subGraphs, ASTNode node) {
+    private CFGSubGraph getSubGraph(final Map<ASTNode, CFGSubGraph> subGraphs, final ASTNode node) {
         if (node == null) {
             return null;
         }
@@ -198,7 +198,7 @@ public class CFGDotPrinter {
         return true;
     }
 
-    private void appendDotNode(CFGBasicBlock block, StringBuilder sb) {
+    private void appendDotNode(final CFGBasicBlock block, final StringBuilder sb) {
         if (block.isEntryBlock()) {
             sb.append("Entry [style=\"filled\" fillcolor=\"red\"   fontcolor=\"white\"];\n"); //$NON-NLS-1$
         } else if (block.isExitBlock()) {
@@ -214,7 +214,7 @@ public class CFGDotPrinter {
         }
     }
 
-    private String escape(String s) {
+    private String escape(final String s) {
         return s != null ? s.replaceAll("\"", "\\\"") : null; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

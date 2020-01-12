@@ -67,7 +67,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(FieldDeclaration node) {
+    public boolean visit(final FieldDeclaration node) {
         if (!canRemoveFieldDefaultValue(node)) {
             return true;
         }
@@ -101,7 +101,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         return parent instanceof AnonymousClassDeclaration || parent instanceof EnumDeclaration;
     }
 
-    private boolean isPrimitiveDefaultValue(Object val) {
+    private boolean isPrimitiveDefaultValue(final Object val) {
         if (val instanceof Short || val instanceof Integer || val instanceof Long) {
             return ((Number) val).longValue() == 0;
         }
@@ -114,7 +114,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         return val instanceof Character && ((Character) val).charValue() == '\u0000';
     }
 
-    private boolean isPrimitiveLiteral(Expression initializer) {
+    private boolean isPrimitiveLiteral(final Expression initializer) {
         switch (initializer.getNodeType()) {
         case ASTNode.BOOLEAN_LITERAL:
         case ASTNode.CHARACTER_LITERAL:

@@ -98,7 +98,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;
     }
 
@@ -114,7 +114,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (HashMap.class.getCanonicalName().equals(origRawType)) {
             return HashSet.class.getCanonicalName();
         }

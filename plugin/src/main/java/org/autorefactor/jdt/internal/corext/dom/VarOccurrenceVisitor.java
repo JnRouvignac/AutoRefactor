@@ -30,13 +30,13 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
      * @param localVarIds The ids of the variable to search
      * @param includeInnerScopes TODO
      */
-    public VarOccurrenceVisitor(final Set<String> localVarIds, boolean includeInnerScopes) {
+    public VarOccurrenceVisitor(final Set<String> localVarIds, final boolean includeInnerScopes) {
         this.localVarIds= localVarIds;
         this.includeInnerScopes= includeInnerScopes;
     }
 
     @Override
-    public void visitNode(ASTNode startNode) {
+    public void visitNode(final ASTNode startNode) {
         this.startNode= startNode;
         super.visitNode(this.startNode);
     }

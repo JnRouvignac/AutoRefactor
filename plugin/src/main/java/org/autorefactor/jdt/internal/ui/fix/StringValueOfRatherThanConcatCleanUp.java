@@ -69,7 +69,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
             final Expression leftOperand= node.getLeftOperand();
             final Expression rightOperand= node.getRightOperand();

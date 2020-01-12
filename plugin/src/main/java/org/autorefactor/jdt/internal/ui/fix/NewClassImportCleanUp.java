@@ -79,19 +79,19 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
          *
          * @param classnamesNeverUsedLocally Classnames never used locally
          */
-        public LocalClassVisitor(Set<String> classnamesNeverUsedLocally) {
+        public LocalClassVisitor(final Set<String> classnamesNeverUsedLocally) {
             this.classnamesNeverUsedLocally= classnamesNeverUsedLocally;
         }
 
         @Override
-        public boolean visit(TypeDeclaration nestedClass) {
+        public boolean visit(final TypeDeclaration nestedClass) {
             classnamesNeverUsedLocally.remove(nestedClass.getName().getIdentifier());
 
             return !classnamesNeverUsedLocally.isEmpty() || interruptVisit();
         }
 
         @Override
-        public boolean visit(SimpleType simpleName) {
+        public boolean visit(final SimpleType simpleName) {
             if (simpleName.getName().isSimpleName()) {
                 classnamesNeverUsedLocally.remove(((SimpleName) simpleName.getName()).getIdentifier());
 

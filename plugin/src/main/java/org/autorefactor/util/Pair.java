@@ -59,7 +59,7 @@ public final class Pair<F, S> {
      * @param second the second element, can be null
      * @return an immutable pair made of the two objects.
      */
-    public static <F, S> Pair<F, S> of(F first, S second) {
+    public static <F, S> Pair<F, S> of(final F first, final S second) {
         return new Pair<F, S>(first, second);
     }
 
@@ -69,7 +69,7 @@ public final class Pair<F, S> {
      * @param first  the first element, can be null
      * @param second the second element, can be null
      */
-    private Pair(F first, S second) {
+    private Pair(final F first, final S second) {
         this.first= first;
         this.second= second;
     }
@@ -98,7 +98,7 @@ public final class Pair<F, S> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

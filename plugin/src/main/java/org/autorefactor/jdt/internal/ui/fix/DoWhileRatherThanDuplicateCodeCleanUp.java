@@ -67,7 +67,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         final List<Statement> whileStatements= ASTNodes.asList(node.getBody());
 
         if (whileStatements.isEmpty()) {

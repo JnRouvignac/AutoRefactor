@@ -91,7 +91,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         final IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
         final IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 

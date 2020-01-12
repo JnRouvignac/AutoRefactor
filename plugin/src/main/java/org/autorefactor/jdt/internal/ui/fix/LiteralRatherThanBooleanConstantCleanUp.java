@@ -63,7 +63,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
     }
 
     @Override
-    public boolean visit(QualifiedName node) {
+    public boolean visit(final QualifiedName node) {
         final ITypeBinding typeBinding= ASTNodes.getTargetType(node);
 
         if (typeBinding != null && typeBinding.isPrimitive()) {

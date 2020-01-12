@@ -38,7 +38,7 @@ public class UnhandledException extends AutoRefactorException {
      * @param node      the node from which to retrieve the source location
      * @param unhandled the unhandled exception.
      */
-    public UnhandledException(ASTNode node, Throwable unhandled) {
+    public UnhandledException(final ASTNode node, final Throwable unhandled) {
         super(node, unhandled);
     }
 
@@ -49,7 +49,7 @@ public class UnhandledException extends AutoRefactorException {
      * @param message   the message to report
      * @param unhandled the unhandled exception.
      */
-    public UnhandledException(ASTNode node, String message, Throwable unhandled) {
+    public UnhandledException(final ASTNode node, final String message, final Throwable unhandled) {
         super(node, message, unhandled);
     }
 }

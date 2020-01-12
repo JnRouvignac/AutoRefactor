@@ -60,7 +60,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
     }
 
     @Override
-    public boolean visit(SuperConstructorInvocation node) {
+    public boolean visit(final SuperConstructorInvocation node) {
         if (node.arguments().isEmpty()) {
             ctx.getRefactorings().removeButKeepComment(node);
             return false;

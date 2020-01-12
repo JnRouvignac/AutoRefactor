@@ -46,7 +46,7 @@ public class CollectorVisitor<R> extends ASTVisitor {
      *
      * @param result a new result
      */
-    protected void addResult(R result) {
+    protected void addResult(final R result) {
         this.results.add(result);
     }
 
@@ -55,7 +55,7 @@ public class CollectorVisitor<R> extends ASTVisitor {
      *
      * @param results the new results
      */
-    protected void addResults(Collection<R> results) {
+    protected void addResults(final Collection<R> results) {
         this.results.addAll(results);
     }
 

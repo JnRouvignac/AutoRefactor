@@ -65,7 +65,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
             List<Expression> allOperands= ASTNodes.allOperands(node);
             boolean isFirst= true;
@@ -89,7 +89,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void replaceWithLazyOperator(InfixExpression node, List<Expression> allOperands) {
+    private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
         final InfixExpression.Operator lazyOperator;

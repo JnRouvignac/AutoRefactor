@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.Statement;
 public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             return FillRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
@@ -89,12 +89,12 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
@@ -129,7 +129,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
                         b.createMoveTarget(assignment.getRightHandSide()))));
     }
 
-    private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {
+    private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess aa) {
         return aa != null && ASTNodes.isSameVariable(aa.getArray(), loopContent.getContainerVariable())
                 && ASTNodes.isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
     }

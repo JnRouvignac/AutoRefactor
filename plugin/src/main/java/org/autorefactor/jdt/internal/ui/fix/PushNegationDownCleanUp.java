@@ -66,7 +66,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(PrefixExpression node) {
+    public boolean visit(final PrefixExpression node) {
         if (!ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT)) {
             return true;
         }

@@ -136,7 +136,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private final List<Pair<SourceLocation, Comment>> comments= new ArrayList<>();
 
     @Override
-    public boolean visit(BlockComment node) {
+    public boolean visit(final BlockComment node) {
         final String comment= getComment(node);
         if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
@@ -171,7 +171,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private String getReplacement(String comment, boolean isJavadoc) {
+    private String getReplacement(final String comment, final boolean isJavadoc) {
         int commentLineLength= this.ctx.getJavaProjectOptions().getCommentLineLength();
         String commentNoStartNorEnd= comment.substring(0, comment.length() - 2).substring(isJavadoc ? 3 : 2);
         String commentWithSpaces= commentNoStartNorEnd.replaceAll("\\s*(\\r\\n|\\r|\\n)\\s*\\*", " "); //$NON-NLS-1$ //$NON-NLS-2$
@@ -183,7 +183,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private ASTNode getNextNode(Comment node) {
+    private ASTNode getNextNode(final Comment node) {
         final int nodeEndPosition= node.getStartPosition() + node.getLength();
         final ASTNode coveringNode= getCoveringNode(node);
         final int parentNodeEndPosition= coveringNode.getStartPosition() + coveringNode.getLength();
@@ -195,7 +195,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return finder.getCoveredNode();
     }
 
-    private ASTNode getCoveringNode(Comment node) {
+    private ASTNode getCoveringNode(final Comment node) {
         final int start= node.getStartPosition();
         final int length= node.getLength();
         final ASTNode coveringNode= getCoveringNode(start, length);
@@ -206,13 +206,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return getCoveringNode(start, length + 1);
     }
 
-    private ASTNode getCoveringNode(int start, int length) {
+    private ASTNode getCoveringNode(final int start, final int length) {
         final NodeFinder finder= new NodeFinder(this.astRoot, start, length);
         return finder.getCoveringNode();
     }
 
     @Override
-    public boolean visit(Javadoc node) {
+    public boolean visit(final Javadoc node) {
         final String comment= getComment(node);
         final boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
         final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
@@ -281,7 +281,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean hasOverrideAnnotation(ASTNode node) {
+    private boolean hasOverrideAnnotation(final ASTNode node) {
         if (node instanceof BodyDeclaration) {
             for (IExtendedModifier modifier : ASTNodes.modifiers((BodyDeclaration) node)) {
                 return ASTNodes.hasType(getTypeName(modifier), Override.class.getCanonicalName());
@@ -291,7 +291,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private Name getTypeName(IExtendedModifier extendedModifier) {
+    private Name getTypeName(final IExtendedModifier extendedModifier) {
         if (extendedModifier instanceof MarkerAnnotation) {
             return ((MarkerAnnotation) extendedModifier).getTypeName();
         }
@@ -302,7 +302,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private boolean hasNoTags(Javadoc node) {
+    private boolean hasNoTags(final Javadoc node) {
         for (TagElement tag : ASTNodes.tags(node)) {
             if (tag.getTagName() != null) {
                 return false;
@@ -312,17 +312,17 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
+    private void replaceEmptyLineAtStartOfComment(final Comment node, final Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
         this.ctx.getRefactorings().replace(node, replacement);
     }
 
-    private void replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
+    private void replaceEmptyLineAtEndOfComment(final Comment node, final Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1));
         this.ctx.getRefactorings().replace(node, replacement);
     }
 
-    private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
+    private String addPeriodAtEndOfFirstLine(final Javadoc node, final String comment) {
         String beforeFirstTag= comment;
         String afterFirstTag= ""; //$NON-NLS-1$
         final Matcher m= FIRST_JAVADOC_TAG.matcher(comment);
@@ -350,7 +350,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private boolean allTagsEmpty(List<TagElement> tags) {
+    private boolean allTagsEmpty(final List<TagElement> tags) {
         return !anyTagNotEmpty(tags, false);
     }
 
@@ -363,7 +363,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      *                       remove tag or throw when unknown
      * @return true if any tag is not empty, false otherwise
      */
-    private boolean anyTagNotEmpty(List<TagElement> tags, boolean throwIfUnknown) {
+    private boolean anyTagNotEmpty(final List<TagElement> tags, final boolean throwIfUnknown) {
         if (tags.isEmpty()) {
             return false;
         }
@@ -376,7 +376,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean isNotEmpty(TagElement tag, boolean throwIfUnknown) {
+    private boolean isNotEmpty(final TagElement tag, final boolean throwIfUnknown) {
         final String tagName= tag.getTagName();
         if (tagName == null || TagElement.TAG_AUTHOR.equals(tagName)
         // || TAG_CODE.equals(tagName)
@@ -404,7 +404,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isTagEmptyOrWithSimpleNameOnly(TagElement tag) {
+    private boolean isTagEmptyOrWithSimpleNameOnly(final TagElement tag) {
         switch (tag.fragments().size()) {
         case 0:
             return true;
@@ -415,7 +415,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean anyTextElementNotEmpty(List<?> fragments, boolean throwIfUnknown) {
+    private boolean anyTextElementNotEmpty(final List<?> fragments, final boolean throwIfUnknown) {
         for (/* IDocElement */ Object fragment : fragments) {
             if (fragment instanceof TextElement) {
                 String text= ((TextElement) fragment).getText();
@@ -440,7 +440,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(LineComment node) {
+    public boolean visit(final LineComment node) {
         final String comment= getComment(node);
         if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
@@ -463,14 +463,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isSameLineNumber(LineComment node, ASTNode previousNode) {
+    private boolean isSameLineNumber(final LineComment node, final ASTNode previousNode) {
         final CompilationUnit cu= (CompilationUnit) previousNode.getRoot();
         final int lineNb1= cu.getLineNumber(node.getStartPosition());
         final int lineNb2= cu.getLineNumber(previousNode.getStartPosition());
         return lineNb1 == lineNb2;
     }
 
-    private ASTNode getPreviousSibling(ASTNode node) {
+    private ASTNode getPreviousSibling(final ASTNode node) {
         if (node != null && node.getParent() instanceof TypeDeclaration) {
             boolean isPrevious= true;
             final TypeDeclaration typeDecl= (TypeDeclaration) node.getParent();
@@ -496,13 +496,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private <T extends ASTNode> void addAll(TreeMap<Integer, ASTNode> nodeMap, T[] nodes) {
+    private <T extends ASTNode> void addAll(final TreeMap<Integer, ASTNode> nodeMap, final T[] nodes) {
         for (T node : nodes) {
             nodeMap.put(node.getStartPosition(), node);
         }
     }
 
-    private boolean betterCommentExist(Comment comment, ASTNode nodeWhereToAddJavadoc) {
+    private boolean betterCommentExist(final Comment comment, final ASTNode nodeWhereToAddJavadoc) {
         if (hasJavadoc(nodeWhereToAddJavadoc)) {
             return true;
         }
@@ -535,7 +535,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return bestComment != null && bestComment != comment;
     }
 
-    private boolean hasJavadoc(ASTNode node) {
+    private boolean hasJavadoc(final ASTNode node) {
         if (node instanceof BodyDeclaration) {
             return ((BodyDeclaration) node).getJavadoc() != null;
         }
@@ -551,7 +551,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
+    public boolean visit(final CompilationUnit node) {
         comments.clear();
 
         this.astRoot= node;
@@ -577,7 +577,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private String getComment(Comment node) {
+    private String getComment(final Comment node) {
         final String source= this.ctx.getSource(node);
         final int start= node.getStartPosition();
         return source.substring(start, start + node.getLength());

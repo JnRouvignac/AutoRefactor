@@ -75,7 +75,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (node.getExpression() == null) {
             return true;
         }
@@ -149,19 +149,19 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean is(MethodInvocation node, String declaringTypeQualifiedName) {
+    private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
         return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
                 || (ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
                         && Utils.equal(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue()));
     }
 
-    private boolean replaceMethodName(MethodInvocation node, String methodName) {
+    private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
         final SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
         this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
         return false;
     }
 
-    private void replaceWithTheSingleArgument(MethodInvocation node) {
+    private void replaceWithTheSingleArgument(final MethodInvocation node) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final MethodInvocation node1= node;
         this.ctx.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node1).get(0)));
@@ -194,7 +194,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
         final List<Expression> args= ASTNodes.arguments(node);
 
@@ -214,7 +214,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void replaceFloatInstanceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding,
+    private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding,
             final List<Expression> args) {
         final Expression arg0= args.get(0);
         if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
@@ -229,12 +229,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private void replaceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding) {
+    private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
         this.ctx.getRefactorings().replace(node,
                 newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
     }
 
-    private MethodInvocation newMethodInvocation(String typeName, String methodName, Expression arg) {
+    private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.createMoveTarget(arg));
     }

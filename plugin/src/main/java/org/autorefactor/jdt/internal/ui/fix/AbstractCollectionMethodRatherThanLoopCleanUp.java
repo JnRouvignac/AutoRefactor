@@ -91,7 +91,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
     protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTNodeFactory b);
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(ctx, node);
         node.accept(assignmentForAndReturnVisitor);
         return assignmentForAndReturnVisitor.getResult();
@@ -103,14 +103,14 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         }
 
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             final SingleVariableDeclaration loopVariable= node.getParameter();
             final IfStatement is= uniqueStmtAs(node.getBody(), IfStatement.class);
             return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), is);
         }
 
-        private boolean maybeReplaceWithCollectionContains(Statement forNode, Expression iterable,
-                Expression loopElement, IfStatement is) {
+        private boolean maybeReplaceWithCollectionContains(final Statement forNode, final Expression iterable,
+                final Expression loopElement, final IfStatement is) {
             if (is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
                 MethodInvocation condition= getMethodToReplace(is.getExpression());
                 List<Statement> thenStatements= ASTNodes.asList(is.getThenStatement());
@@ -161,7 +161,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             return true;
         }
 
-        private boolean loopElementIsUsed(Expression loopElement, List<Statement> thenStatements) {
+        private boolean loopElementIsUsed(final Expression loopElement, final List<Statement> thenStatements) {
             if (loopElement instanceof SimpleName) {
                 VarUseFinderVisitor visitor= new VarUseFinderVisitor((SimpleName) loopElement);
 
@@ -178,12 +178,12 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         private class VarUseFinderVisitor extends FinderVisitor<Boolean> {
             private final SimpleName varName;
 
-            public VarUseFinderVisitor(SimpleName varName) {
+            public VarUseFinderVisitor(final SimpleName varName) {
                 this.varName= varName;
             }
 
             @Override
-            public boolean visit(SimpleName variable) {
+            public boolean visit(final SimpleName variable) {
                 if (ASTNodes.isSameLocalVariable(varName, variable)) {
                     setResult(true);
                     return false;
@@ -193,8 +193,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             }
         }
 
-        private void replaceLoopByIf(Statement forNode, Expression iterable, List<Statement> thenStatements,
-                Expression toFind, BreakStatement bs) {
+        private void replaceLoopByIf(final Statement forNode, final Expression iterable, final List<Statement> thenStatements,
+                final Expression toFind, final BreakStatement bs) {
             thenStatements.remove(thenStatements.size() - 1);
 
             ASTNodeFactory b= ctx.getASTBuilder();
@@ -204,8 +204,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             thenStatements.add(bs);
         }
 
-        private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
-                Statement forNextStatement, boolean negate) {
+        private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
+                final Statement forNextStatement, final boolean negate) {
             ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(forNode, b.return0(newMethod(iterable, toFind, negate, b)));
 
@@ -214,8 +214,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             }
         }
 
-        private boolean maybeReplaceLoopAndVariable(Statement forNode, Expression iterable, Statement uniqueThenStatement,
-                Expression toFind) {
+        private boolean maybeReplaceLoopAndVariable(final Statement forNode, final Expression iterable, final Statement uniqueThenStatement,
+                final Expression toFind) {
             Statement previousStatement= ASTNodes.getPreviousStatement(forNode);
 
             if (previousStatement != null) {
@@ -242,8 +242,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             return true;
         }
 
-        private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
-                Statement previousStatement, boolean previousStmtIsPreviousSibling, Expression initName, boolean isPositive) {
+        private void replaceLoopAndVariable(final Statement forNode, final Expression iterable, final Expression toFind,
+                final Statement previousStatement, final boolean previousStmtIsPreviousSibling, final Expression initName, final boolean isPositive) {
             ASTNodeFactory b= ctx.getASTBuilder();
 
             Statement replacement;
@@ -263,7 +263,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             }
         }
 
-        private Boolean signCollectionContains(BooleanLiteral innerBl, BooleanLiteral outerBl) {
+        private Boolean signCollectionContains(final BooleanLiteral innerBl, final BooleanLiteral outerBl) {
             if (innerBl != null && outerBl != null && innerBl.booleanValue() != outerBl.booleanValue()) {
                 return innerBl.booleanValue();
             }
@@ -271,7 +271,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             return null;
         }
 
-        private Pair<Expression, Expression> getInitializer(Statement statement) {
+        private Pair<Expression, Expression> getInitializer(final Statement statement) {
             if (statement instanceof VariableDeclarationStatement) {
                 return uniqueVariableDeclarationFragmentName(statement);
             }
@@ -287,15 +287,15 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             return Pair.empty();
         }
 
-        private IfStatement uniqueStmtAs(Statement statement, Class<IfStatement> stmtClazz) {
+        private IfStatement uniqueStmtAs(final Statement statement, final Class<IfStatement> stmtClazz) {
             return ASTNodes.as(uniqueStatement(ASTNodes.asList(statement)), stmtClazz);
         }
 
-        private Statement uniqueStatement(List<Statement> statements) {
+        private Statement uniqueStatement(final List<Statement> statements) {
             return statements.size() == 1 ? statements.get(0) : null;
         }
 
-        private BooleanLiteral getReturnedBooleanLiteral(Statement statement) {
+        private BooleanLiteral getReturnedBooleanLiteral(final Statement statement) {
             ReturnStatement rs= ASTNodes.as(statement, ReturnStatement.class);
 
             if (rs != null) {
@@ -306,7 +306,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             final ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
             final List<Statement> statements= ASTNodes.asList(node.getBody());
 
@@ -376,7 +376,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     b.copySubtree(loopContent.getLoopVariable()));
         }
 
-        private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(Statement statement) {
+        private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(final Statement statement) {
             VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(ASTNodes.as(statement, VariableDeclarationStatement.class));
 
             if (vdf != null) {

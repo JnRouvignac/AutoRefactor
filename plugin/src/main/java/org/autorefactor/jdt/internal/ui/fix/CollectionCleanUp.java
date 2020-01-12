@@ -94,7 +94,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(ctx, node);
         node.accept(newAndAddAllMethodVisitor);
         return newAndAddAllMethodVisitor.getResult();
@@ -106,7 +106,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(ExpressionStatement node) {
+        public boolean visit(final ExpressionStatement node) {
             final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
             if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
                 final Expression arg0= ASTNodes.arguments(mi).get(0);
@@ -131,8 +131,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        private boolean maybeReplaceInitializer(Expression nodeToReplace, final Expression arg0,
-                ExpressionStatement nodeToRemove) {
+        private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
+                final ExpressionStatement nodeToRemove) {
             final ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
@@ -146,7 +146,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        private boolean canReplaceInitializer(final ClassInstanceCreation cic, Expression sourceCollection) {
+        private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceCollection) {
             if (cic == null) {
                 return false;
             }
@@ -173,7 +173,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                     LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName());
         }
 
-        private boolean isValidCapacityParameter(Expression sourceCollection, final List<Expression> args) {
+        private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
             if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
                 final Object constant= args.get(0).resolveConstantExpressionValue();
                 final MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);

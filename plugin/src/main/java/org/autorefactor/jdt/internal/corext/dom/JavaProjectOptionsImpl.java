@@ -47,12 +47,12 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @param options the java project options
      */
-    public JavaProjectOptionsImpl(Map<String, String> options) {
+    public JavaProjectOptionsImpl(final Map<String, String> options) {
         this.options= options;
         this.javaSERelease= Release.javaSE(options.get(JavaCore.COMPILER_SOURCE));
     }
 
-    private Integer asInteger(String preference) {
+    private Integer asInteger(final String preference) {
         try {
             String value= options.get(preference);
             if (value != null) {
@@ -114,7 +114,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @param javaSERelease the Java SE release
      */
-    public void setJavaSERelease(Release javaSERelease) {
+    public void setJavaSERelease(final Release javaSERelease) {
         this.javaSERelease= javaSERelease;
     }
 
@@ -123,7 +123,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @param tabSize the tabulation Size to set
      */
-    public void setTabSize(int tabSize) {
+    public void setTabSize(final int tabSize) {
         options.put(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE, String.valueOf(tabSize));
     }
 }

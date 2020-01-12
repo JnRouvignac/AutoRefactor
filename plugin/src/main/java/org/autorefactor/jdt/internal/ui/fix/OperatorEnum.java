@@ -205,7 +205,7 @@ public enum OperatorEnum {
     private final boolean isBoolean;
     private final Object reverseBooleanOperator;
 
-    private OperatorEnum(Object operator, int precedence, boolean isAssociative, boolean isBoolean) {
+    private OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final boolean isBoolean) {
         this.operator= operator;
         this.precedence= precedence;
         this.isAssociative= isAssociative;
@@ -213,7 +213,7 @@ public enum OperatorEnum {
         this.reverseBooleanOperator= null;
     }
 
-    private OperatorEnum(Object operator, int precedence, boolean isAssociative, Object reverseBooleanOperator) {
+    private OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final Object reverseBooleanOperator) {
         this.operator= operator;
         this.precedence= precedence;
         this.isAssociative= isAssociative;
@@ -237,7 +237,7 @@ public enum OperatorEnum {
      * @param operator the operator
      * @return true if the supplied operator is associative, false otherwise
      */
-    public static boolean isAssociative(InfixExpression.Operator operator) {
+    public static boolean isAssociative(final InfixExpression.Operator operator) {
         return OperatorEnum.OPERATORS.get(operator).isAssociative;
     }
 
@@ -248,7 +248,7 @@ public enum OperatorEnum {
      * @return true if the supplied operator evaluates to a boolean value, false
      *         otherwise
      */
-    public static boolean isBoolean(InfixExpression.Operator operator) {
+    public static boolean isBoolean(final InfixExpression.Operator operator) {
         return OperatorEnum.OPERATORS.get(operator).isBoolean;
     }
 
@@ -270,7 +270,7 @@ public enum OperatorEnum {
      *         node, 0 if the two nodes are equal or cannot be compared, a value
      *         greater than 0 if the first node is greater than the second node
      */
-    public static int compareTo(ASTNode node1, ASTNode node2) {
+    public static int compareTo(final ASTNode node1, final ASTNode node2) {
         final OperatorEnum op1= OperatorEnum.getOperator(node1);
         final OperatorEnum op2= OperatorEnum.getOperator(node2);
         if (op1 == null || op2 == null) {
@@ -291,7 +291,7 @@ public enum OperatorEnum {
      *         node, 0 if the two operators are equal or cannot be compared, a value
      *         greater than 0 if the first operator is greater than the second node
      */
-    public static int compareTo(OperatorEnum operator1, OperatorEnum operator2) {
+    public static int compareTo(final OperatorEnum operator1, final OperatorEnum operator2) {
         final Integer prec1= operator1.precedence;
         final Integer prec2= operator2.precedence;
         // Reverse the precedence because of the values we are assigning
@@ -308,7 +308,7 @@ public enum OperatorEnum {
      *         supplied node, null if the supplied node is not an expression or if
      *         it does not use an operator
      */
-    public static OperatorEnum getOperator(ASTNode expression) {
+    public static OperatorEnum getOperator(final ASTNode expression) {
         if (expression == null) {
             return null;
         }

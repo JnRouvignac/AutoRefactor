@@ -64,7 +64,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         boolean result= maybeAddBrackets(node.getThenStatement());
 
         if (!(node.getElseStatement() instanceof IfStatement)) {
@@ -75,22 +75,22 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(EnhancedForStatement node) {
+    public boolean visit(final EnhancedForStatement node) {
         return maybeAddBrackets(node.getBody());
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         return maybeAddBrackets(node.getBody());
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
+    public boolean visit(final WhileStatement node) {
         return maybeAddBrackets(node.getBody());
     }
 
     @Override
-    public boolean visit(DoStatement node) {
+    public boolean visit(final DoStatement node) {
         return maybeAddBrackets(node.getBody());
     }
 

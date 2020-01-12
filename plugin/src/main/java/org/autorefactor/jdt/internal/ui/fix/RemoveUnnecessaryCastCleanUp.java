@@ -79,7 +79,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(CastExpression node) {
+    public boolean visit(final CastExpression node) {
         final NumberLiteral literal= ASTNodes.as(node.getExpression(), NumberLiteral.class);
         if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ //$NON-NLS-2$
             if (ASTNodes.hasType(node.getType().resolveBinding(), long.class.getSimpleName())) {
@@ -115,7 +115,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         ctx.getRefactorings().replace(node, numberLiteral);
     }
 
-    private boolean canRemoveCast(CastExpression node) {
+    private boolean canRemoveCast(final CastExpression node) {
         final ASTNode parent= node.getParent();
         switch (parent.getNodeType()) {
         case ASTNode.RETURN_STATEMENT:
@@ -153,7 +153,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean canRemoveCastInIntegralDivision(CastExpression node, InfixExpression ie) {
+    private boolean canRemoveCastInIntegralDivision(final CastExpression node, final InfixExpression ie) {
         final ITypeBinding leftOperandType= getLeftOperandType(ie, node);
         return isIntegralDivision(ie) // safety check
                 && isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOperandType)
@@ -170,7 +170,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 && isAssignmentCompatible(node.resolveTypeBinding(), leftOpType);
     }
 
-    private ITypeBinding getLeftOperandType(InfixExpression ie, CastExpression node) {
+    private ITypeBinding getLeftOperandType(final InfixExpression ie, final CastExpression node) {
         final List<Expression> operands= ASTNodes.allOperands(ie);
         final List<Expression> previousOperands= operands.subList(0, operands.indexOf(node));
         if (isAnyRefactored(previousOperands)) {
@@ -193,13 +193,13 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         return maxTypeBinding;
     }
 
-    private int compareTo(ITypeBinding binding1, ITypeBinding binding2) {
+    private int compareTo(final ITypeBinding binding1, final ITypeBinding binding2) {
         final int rank1= toPseudoEnum(binding1.getQualifiedName());
         final int rank2= toPseudoEnum(binding2.getQualifiedName());
         return rank1 - rank2;
     }
 
-    private int toPseudoEnum(String name) {
+    private int toPseudoEnum(final String name) {
         if (byte.class.getSimpleName().equals(name) || Byte.class.getCanonicalName().equals(name)) {
             return 1;
         }
@@ -238,11 +238,11 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      * If left operand is refactored, we cannot easily make inferences about right
      * operand. Wait for next iteration.
      */
-    private boolean isNotRefactored(Expression leftOperand) {
+    private boolean isNotRefactored(final Expression leftOperand) {
         return preVisit2(leftOperand);
     }
 
-    private boolean isIntegralDividedByFloatingPoint(CastExpression node, InfixExpression ie) {
+    private boolean isIntegralDividedByFloatingPoint(final CastExpression node, final InfixExpression ie) {
         final Expression rightOp= ie.getRightOperand();
         return isIntegralType(ie.getLeftOperand()) && ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE) && isFloatingPointType(rightOp)
                 && node.equals(rightOp);
@@ -257,7 +257,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     /** @see JLS, section 5.2 Assignment Conversion */
-    private boolean isConstantExpressionAssignmentConversion(CastExpression node) {
+    private boolean isConstantExpressionAssignmentConversion(final CastExpression node) {
         final Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             final int val= (Integer) value;
@@ -269,26 +269,26 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean isStringConcat(InfixExpression ie) {
+    private boolean isStringConcat(final InfixExpression ie) {
         return ASTNodes.hasType(ie, String.class.getCanonicalName());
     }
 
-    private boolean isPrimitiveTypeNarrowing(CastExpression node) {
+    private boolean isPrimitiveTypeNarrowing(final CastExpression node) {
         final ITypeBinding castTypeBinding= node.getType().resolveBinding();
         final ITypeBinding exprTypeBinding= node.getExpression().resolveTypeBinding();
         return ASTNodes.isPrimitive(castTypeBinding) && ASTNodes.isPrimitive(exprTypeBinding)
                 && isAssignmentCompatible(castTypeBinding, exprTypeBinding);
     }
 
-    private boolean isAssignmentCompatible(Expression expression, Type type) {
+    private boolean isAssignmentCompatible(final Expression expression, final Type type) {
         return expression != null && type != null && isAssignmentCompatible(expression.resolveTypeBinding(), type.resolveBinding());
     }
 
-    private boolean isAssignmentCompatible(Expression expression, ITypeBinding typeBinding) {
+    private boolean isAssignmentCompatible(final Expression expression, final ITypeBinding typeBinding) {
         return expression != null && typeBinding != null && isAssignmentCompatible(expression.resolveTypeBinding(), typeBinding);
     }
 
-    private boolean isAssignmentCompatible(Expression expr1, Expression expr2) {
+    private boolean isAssignmentCompatible(final Expression expr1, final Expression expr2) {
         return expr1 != null && expr2 != null
                 && isAssignmentCompatible(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
     }

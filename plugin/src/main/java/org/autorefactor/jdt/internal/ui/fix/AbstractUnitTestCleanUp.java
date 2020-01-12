@@ -121,7 +121,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     public abstract boolean visit(IfStatement node);
 
     @Override
-    public boolean visit(CompilationUnit node) {
+    public boolean visit(final CompilationUnit node) {
         staticImports.clear();
         return super.visit(node);
     }
@@ -367,7 +367,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
 
     private MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            Expression delta, final Expression failureMessage) {
+            final Expression delta, final Expression failureMessage) {
         final String qualifiedMethodName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
         Expression qualifiedMethod;

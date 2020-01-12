@@ -17,27 +17,27 @@ class ThrowerBlocks {
     private final Map<CFGBasicBlock, Set<ITypeBinding>> potentialThrowingBlocks= new HashMap<>();
     private final Map<CFGEdgeBuilder, Set<ITypeBinding>> potentialThrowingEdges= new HashMap<>();
 
-    public void addThrow(CFGBasicBlock basicBlock, ITypeBinding... exceptionTypes) {
+    public void addThrow(final CFGBasicBlock basicBlock, final ITypeBinding... exceptionTypes) {
         if (exceptionTypes != null && exceptionTypes.length > 0) {
             potentialThrowingBlocks.put(basicBlock, newSet(exceptionTypes));
         }
     }
 
-    public void addThrow(CFGEdgeBuilder liveEdge, Set<ITypeBinding> exceptionTypes) {
+    public void addThrow(final CFGEdgeBuilder liveEdge, final Set<ITypeBinding> exceptionTypes) {
         if (exceptionTypes != null && !exceptionTypes.isEmpty()) {
             potentialThrowingEdges.put(liveEdge, exceptionTypes);
         }
     }
 
-    public void addThrow(Expression e, ITypeBinding... newExceptions) {
+    public void addThrow(final Expression e, final ITypeBinding... newExceptions) {
         // TODO JNR remove
     }
 
-    private HashSet<ITypeBinding> newSet(ITypeBinding... exceptionTypes) {
+    private HashSet<ITypeBinding> newSet(final ITypeBinding... exceptionTypes) {
         return new HashSet<>(Arrays.asList(exceptionTypes));
     }
 
-    public List<CFGBasicBlock> selectBlocksThrowing(ITypeBinding exceptionTypeToFind) {
+    public List<CFGBasicBlock> selectBlocksThrowing(final ITypeBinding exceptionTypeToFind) {
         final List<CFGBasicBlock> results= new LinkedList<>();
         for (Entry<CFGBasicBlock, Set<ITypeBinding>> entry : potentialThrowingBlocks.entrySet()) {
             final Set<ITypeBinding> thrownTypes= entry.getValue();
@@ -50,7 +50,7 @@ class ThrowerBlocks {
     }
 
     public Map<CFGBasicBlock, Set<ITypeBinding>> selectBlocksThrowingOtherThan(
-            Set<ITypeBinding> exceptionTypesToReject) {
+            final Set<ITypeBinding> exceptionTypesToReject) {
         Map<CFGBasicBlock, Set<ITypeBinding>> results= new HashMap<>();
         for (Entry<CFGBasicBlock, Set<ITypeBinding>> entry : potentialThrowingBlocks.entrySet()) {
             final Set<ITypeBinding> bindings= getNonMatching(exceptionTypesToReject, entry.getValue());
@@ -62,7 +62,7 @@ class ThrowerBlocks {
         return results;
     }
 
-    public List<CFGEdgeBuilder> selectEdgesThrowing(ITypeBinding exceptionTypeToFind) {
+    public List<CFGEdgeBuilder> selectEdgesThrowing(final ITypeBinding exceptionTypeToFind) {
         final List<CFGEdgeBuilder> results= new LinkedList<>();
         for (Entry<CFGEdgeBuilder, Set<ITypeBinding>> entry : potentialThrowingEdges.entrySet()) {
             final Set<ITypeBinding> thrownTypes= entry.getValue();
@@ -74,7 +74,7 @@ class ThrowerBlocks {
         return results;
     }
 
-    private Set<ITypeBinding> getNonMatching(Set<ITypeBinding> exceptionTypes, Set<ITypeBinding> thrownTypes) {
+    private Set<ITypeBinding> getNonMatching(final Set<ITypeBinding> exceptionTypes, final Set<ITypeBinding> thrownTypes) {
         final Set<ITypeBinding> results= new HashSet<>();
         for (ITypeBinding thrownType : thrownTypes) {
             if (!exceptionTypes.contains(thrownType)) {

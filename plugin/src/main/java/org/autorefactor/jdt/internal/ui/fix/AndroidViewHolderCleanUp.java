@@ -99,13 +99,13 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean isEnabled(final Preferences preferences) {
         // FIXME enable only when android libraries are detected
         return super.isEnabled(preferences);
     }
 
     @Override
-    public boolean visit(MethodDeclaration node) {
+    public boolean visit(final MethodDeclaration node) {
         Block body= node.getBody();
         if (body != null && ASTNodes.usesGivenSignature(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 "android.view.ViewGroup")) { //$NON-NLS-1$
@@ -196,8 +196,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private TypeDeclaration createViewHolderItemClass(FindViewByIdVisitor findViewByIdVisitor, SimpleName typeName,
-            TypeNameDecider typeNameDecider) {
+    private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
+            final TypeNameDecider typeNameDecider) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         TypeDeclaration result= b.getAST().newTypeDeclaration();
         ASTNodes.modifiers(result).addAll(Arrays.asList(b.private0(), b.static0()));
@@ -230,7 +230,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(MethodInvocation node) {
+        public boolean visit(final MethodInvocation node) {
             if (isInflateMethod(node)) {
                 ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
                 if (ancestor instanceof VariableDeclarationFragment) {
@@ -259,7 +259,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         }
 
         @Override
-        public boolean visit(ReturnStatement node) {
+        public boolean visit(final ReturnStatement node) {
             this.returnStatement= node;
             return true;
         }
@@ -291,7 +291,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
             return null;
         }
 
-        private boolean isInflateMethod(MethodInvocation node) {
+        private boolean isInflateMethod(final MethodInvocation node) {
             final String inflaterType= "android.view.LayoutInflater"; //$NON-NLS-1$
             final String viewGroupType= "android.view.ViewGroup"; //$NON-NLS-1$
             return ASTNodes.usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
@@ -309,7 +309,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
             private Expression findViewByIdExpression;
             private MethodInvocation findViewByIdInvocation;
 
-            private boolean setAssignment(MethodInvocation node) {
+            private boolean setAssignment(final MethodInvocation node) {
                 this.findViewByIdInvocation= node;
                 ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
                 if (ancestor instanceof VariableDeclarationFragment) {
@@ -346,12 +346,12 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         private List<FindViewByIdItem> items= new ArrayList<>();
         private SimpleName viewVariableName;
 
-        private FindViewByIdVisitor(SimpleName viewVariableName) {
+        private FindViewByIdVisitor(final SimpleName viewVariableName) {
             this.viewVariableName= viewVariableName;
         }
 
         @Override
-        public boolean visit(MethodInvocation node) {
+        public boolean visit(final MethodInvocation node) {
             if (ASTNodes.usesGivenSignature(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
                     && ASTNodes.isSameVariable(viewVariableName, node.getExpression())) {
                 FindViewByIdItem item= new FindViewByIdItem();

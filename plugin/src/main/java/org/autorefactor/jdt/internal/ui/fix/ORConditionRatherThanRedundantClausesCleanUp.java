@@ -68,7 +68,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
             List<Expression> operands= ASTNodes.allOperands(node);
 
@@ -112,7 +112,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private boolean isPrimitiveAndPassive(List<Expression> operands) {
+    private boolean isPrimitiveAndPassive(final List<Expression> operands) {
         for (Expression operand : operands) {
             if (!ASTNodes.isPrimitive(operand) || !ASTNodes.isPassive(operand)) {
                 return false;
@@ -122,7 +122,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, InfixExpression.Operator operator) {
+    private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 

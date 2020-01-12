@@ -80,7 +80,7 @@ public final class ForLoopHelper {
             // Use method factories
         }
 
-        private static ForLoopContent indexedArray(Expression containerVariable, Name loopVariable, boolean isLoopingForward) {
+        private static ForLoopContent indexedArray(final Expression containerVariable, final Name loopVariable, final boolean isLoopingForward) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.ARRAY;
@@ -90,7 +90,7 @@ public final class ForLoopHelper {
             return content;
         }
 
-        private static ForLoopContent indexedCollection(Expression containerVariable, Name loopVariable, boolean isLoopingForward) {
+        private static ForLoopContent indexedCollection(final Expression containerVariable, final Name loopVariable, final boolean isLoopingForward) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.COLLECTION;
@@ -100,7 +100,7 @@ public final class ForLoopHelper {
             return content;
         }
 
-        private static ForLoopContent iteratedCollection(Expression containerVariable, Expression iteratorVariable) {
+        private static ForLoopContent iteratedCollection(final Expression containerVariable, final Expression iteratorVariable) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.ITERATOR;
             content.containerType= ContainerType.COLLECTION;
@@ -191,7 +191,7 @@ public final class ForLoopHelper {
      * @return the {@link ForLoopContent} if this for loop iterates over a
      *         container, null otherwise
      */
-    public static ForLoopContent iterateOverContainer(ForStatement node) {
+    public static ForLoopContent iterateOverContainer(final ForStatement node) {
         final List<Expression> initializers= ASTNodes.initializers(node);
         final Expression condition= node.getExpression();
         final List<Expression> updaters= ASTNodes.updaters(node);
@@ -241,7 +241,7 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static ForLoopContent getIteratorOnCollection(Expression containerVar, Expression iteratorVariable) {
+    private static ForLoopContent getIteratorOnCollection(final Expression containerVar, final Expression iteratorVariable) {
         if (containerVar instanceof Name || containerVar instanceof FieldAccess) {
             return ForLoopContent.iteratedCollection(containerVar, iteratorVariable);
         }
@@ -249,7 +249,7 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static Name getUpdaterOperand(Expression updater, boolean isLoopingForward) {
+    private static Name getUpdaterOperand(final Expression updater, final boolean isLoopingForward) {
         Expression updaterOperand= null;
 
         if (updater instanceof PostfixExpression) {
@@ -273,7 +273,7 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static ForLoopContent getIndexOnIterable(final Expression condition, Expression loopVariable, Long zero, Expression collectionOnSize, Expression arrayOnLength) {
+    private static ForLoopContent getIndexOnIterable(final Expression condition, final Expression loopVariable, final Long zero, final Expression collectionOnSize, final Expression arrayOnLength) {
         final InfixExpression ie= ASTNodes.as(condition, InfixExpression.class);
 
         if (ie != null && !ie.hasExtendedOperands()) {
@@ -304,7 +304,7 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar, Long zero, Expression collectionOnSize, Expression arrayOnLength) {
+    private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar, final Long zero, final Expression collectionOnSize, final Expression arrayOnLength) {
         Long zero2= ASTNodes.integerLiteral(containerVar);
         Expression collectionOnSize2= getCollectionOnSize(containerVar);
         Expression arrayOnLength2= getArrayOnLength(containerVar);

@@ -38,7 +38,7 @@ public class IllegalArgumentException extends AutoRefactorException {
      * @param node    the node from which to retrieve the source location
      * @param message the exception message
      */
-    public IllegalArgumentException(ASTNode node, String message) {
+    public IllegalArgumentException(final ASTNode node, final String message) {
         super(node, message);
     }
 }

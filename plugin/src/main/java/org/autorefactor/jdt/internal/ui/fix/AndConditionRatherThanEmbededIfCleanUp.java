@@ -66,7 +66,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     }
 
     @Override
-    public boolean visit(IfStatement node) {
+    public boolean visit(final IfStatement node) {
         if (node.getElseStatement() == null) {
             final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
@@ -81,7 +81,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         return true;
     }
 
-    private void replaceIfNoElseStatement(IfStatement outerIf, IfStatement innerIf) {
+    private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 

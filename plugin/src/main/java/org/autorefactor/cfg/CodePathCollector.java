@@ -43,12 +43,12 @@ public class CodePathCollector {
      * @param entryBlock the entry block of the CFG
      * @return the collected code paths
      */
-    public Collection<List<CFGBasicBlock>> getPaths(CFGBasicBlock entryBlock) {
+    public Collection<List<CFGBasicBlock>> getPaths(final CFGBasicBlock entryBlock) {
         collectPathes(entryBlock);
         return results;
     }
 
-    private void collectPathes(CFGBasicBlock block) {
+    private void collectPathes(final CFGBasicBlock block) {
         if (block.isExitBlock()) {
             // This is the end of this path,
             // let's take a copy of the stack

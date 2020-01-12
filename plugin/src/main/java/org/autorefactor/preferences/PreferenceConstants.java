@@ -46,7 +46,7 @@ public enum PreferenceConstants {
      * @param name        the preference name
      * @param description the preference description
      */
-    PreferenceConstants(String name, String description, Object defaultValue) {
+    PreferenceConstants(final String name, final String description, final Object defaultValue) {
         this.name= name;
         this.description= description;
         this.defaultValue= defaultValue;

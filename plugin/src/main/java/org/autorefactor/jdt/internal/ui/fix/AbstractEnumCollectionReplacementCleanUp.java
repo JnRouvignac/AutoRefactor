@@ -55,7 +55,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
-        public boolean visit(ClassInstanceCreation node) {
+        public boolean visit(final ClassInstanceCreation node) {
             return AbstractEnumCollectionReplacementCleanUp.this
                     .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
         }

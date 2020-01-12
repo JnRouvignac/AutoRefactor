@@ -40,12 +40,12 @@ public final class Release {
     private final int[] version;
     private final String releaseName;
 
-    private Release(String releaseName, int... versionNumbers) {
+    private Release(final String releaseName, final int... versionNumbers) {
         this.releaseName= releaseName;
         this.version= normalize(versionNumbers);
     }
 
-    private int[] normalize(int[] versionNumbers) {
+    private int[] normalize(final int[] versionNumbers) {
         int i;
         for (i= versionNumbers.length - 1; i >= 0; i--) {
             if (versionNumbers[i] != 0) {
@@ -68,7 +68,7 @@ public final class Release {
      * @return a release instance for Java SE
      * @throws RuntimeException if the provided version is not valid
      */
-    public static Release javaSE(String version) {
+    public static Release javaSE(final String version) {
         return javaSE(toIntegerArray(version));
     }
 
@@ -80,7 +80,7 @@ public final class Release {
      * @return a release instance for Java SE
      * @throws RuntimeException if the provided version is not valid
      */
-    public static Release javaSE(int... version) {
+    public static Release javaSE(final int... version) {
         final Release release= new Release("JavaSE", version); //$NON-NLS-1$
         if (!release.isVersionValid()) {
             throw new IllegalArgumentException(null, "Invalid version for " + release); //$NON-NLS-1$
@@ -101,7 +101,7 @@ public final class Release {
         return false;
     }
 
-    private static int[] toIntegerArray(String version) {
+    private static int[] toIntegerArray(final String version) {
         final String[] versionNumbers= version.split("\\."); //$NON-NLS-1$
         final int[] result= new int[versionNumbers.length];
         for (int i= 0; i < versionNumbers.length; i++) {
@@ -120,7 +120,7 @@ public final class Release {
      * @return true if the current release is compatible with the required release,
      *         false otherwise
      */
-    public boolean isCompatibleWith(Release requiredRelease) {
+    public boolean isCompatibleWith(final Release requiredRelease) {
         if (!this.releaseName.equals(requiredRelease.releaseName)) {
             return false;
         }
@@ -169,7 +169,7 @@ public final class Release {
         return getVersionNumber(2);
     }
 
-    private int getVersionNumber(int i) {
+    private int getVersionNumber(final int i) {
         if (this.version.length >= i + 1) {
             return this.version[i];
         }

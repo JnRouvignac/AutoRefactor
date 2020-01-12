@@ -36,7 +36,7 @@ class LineAndColumn {
     private final int lineNo;
     private final int colNo;
 
-    public LineAndColumn(int position, int lineNo, int colNo) {
+    public LineAndColumn(final int position, final int lineNo, final int colNo) {
         this.startPosition= position;
         this.lineNo= lineNo;
         this.colNo= colNo;
@@ -55,7 +55,7 @@ class LineAndColumn {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

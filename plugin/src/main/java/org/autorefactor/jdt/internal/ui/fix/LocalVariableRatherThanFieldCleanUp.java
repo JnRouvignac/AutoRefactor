@@ -110,7 +110,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(final TypeDeclaration node) {
         for (FieldDeclaration field : node.getFields()) {
             if (!maybeReplaceFieldByLocalVariable(node, field)) {
                 return false;
@@ -120,7 +120,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeReplaceFieldByLocalVariable(TypeDeclaration node, FieldDeclaration field) {
+    private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration node, final FieldDeclaration field) {
         if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && !hasAnnotation(field) && field.getType().isPrimitiveType()) {
             for (Object object : field.fragments()) {
                 VariableDeclarationFragment fragment= (VariableDeclarationFragment) object;
@@ -134,8 +134,8 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeReplaceFragmentByLocalVariable(TypeDeclaration node, FieldDeclaration field,
-            VariableDeclarationFragment fragment) {
+    private boolean maybeReplaceFragmentByLocalVariable(final TypeDeclaration node, final FieldDeclaration field,
+            final VariableDeclarationFragment fragment) {
         if (fragment.getInitializer() != null && !ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
             return true;
         }
@@ -177,7 +177,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void replaceFieldByLocalVariable(FieldDeclaration field, VariableDeclarationFragment fragment, SimpleName reassignment) {
+    private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
@@ -215,7 +215,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private SimpleName findReassignment(List<SimpleName> occurrences) {
+    private SimpleName findReassignment(final List<SimpleName> occurrences) {
         for (SimpleName reassignment : occurrences) {
             if (isReassigned(reassignment) && isReassignmentForAll(reassignment, occurrences)) {
                 return reassignment;
@@ -225,7 +225,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private boolean isReassignmentForAll(SimpleName reassignment, List<SimpleName> occurrences) {
+    private boolean isReassignmentForAll(final SimpleName reassignment, final List<SimpleName> occurrences) {
         for (SimpleName occurrence : occurrences) {
             if (reassignment != occurrence) {
                 Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
@@ -257,7 +257,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isAlwaysErased(List<SimpleName> occurrences) {
+    private boolean isAlwaysErased(final List<SimpleName> occurrences) {
         for (SimpleName occurrence : occurrences) {
             if (!isReassigned(occurrence)) {
                 Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
@@ -288,13 +288,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isReassigned(SimpleName occurrence) {
+    private boolean isReassigned(final SimpleName occurrence) {
         return occurrence.getParent() instanceof Assignment
                 && occurrence.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY
                 && ASTNodes.hasOperator((Assignment) occurrence.getParent(), Assignment.Operator.ASSIGN);
     }
 
-    private static boolean isExternalField(SimpleName occurrence) {
+    private static boolean isExternalField(final SimpleName occurrence) {
         FieldAccess fieldAccess= ASTNodes.as(occurrence, FieldAccess.class);
 
         if (fieldAccess != null && fieldAccess.getExpression() instanceof ThisExpression) {
@@ -306,7 +306,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         return qualifiedName != null;
     }
 
-    private static boolean isVariableDeclaration(SimpleName occurrence) {
+    private static boolean isVariableDeclaration(final SimpleName occurrence) {
         switch (occurrence.getParent().getNodeType()) {
         case ASTNode.SINGLE_VARIABLE_DECLARATION:
         case ASTNode.VARIABLE_DECLARATION_STATEMENT:
@@ -323,7 +323,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean hasAnnotation(FieldDeclaration field) {
+    private boolean hasAnnotation(final FieldDeclaration field) {
         @SuppressWarnings("unchecked")
         final List<IExtendedModifier> modifiers= field.modifiers();
 

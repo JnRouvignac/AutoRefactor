@@ -46,8 +46,8 @@ public class CFGEdge {
      * @param sourceBlock      the source block
      * @param targetBlock      the target block
      */
-    public CFGEdge(Expression condition, boolean evaluationResult, CFGBasicBlock sourceBlock,
-            CFGBasicBlock targetBlock) {
+    public CFGEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
+            final CFGBasicBlock targetBlock) {
         this.condition= condition;
         this.evaluationResult= evaluationResult;
         this.sourceBlock= sourceBlock;
@@ -105,7 +105,7 @@ public class CFGEdge {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

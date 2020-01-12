@@ -51,7 +51,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
-        public boolean visit(Block node) {
+        public boolean visit(final Block node) {
             isContainsMethodUsed= false;
             return SetRatherThanListCleanUp.this.maybeRefactorBlock(node,
                     getClassesToUseWithImport(), getImportsToAdd());
@@ -107,7 +107,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         isContainsMethodUsed= false;
         return super.visit(node);
     }
@@ -123,7 +123,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (ArrayList.class.getCanonicalName().equals(origRawType) || LinkedList.class.getCanonicalName().equals(origRawType)) {
             return HashSet.class.getCanonicalName();
         }

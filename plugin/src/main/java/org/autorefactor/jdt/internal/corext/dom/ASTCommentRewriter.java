@@ -73,16 +73,16 @@ public class ASTCommentRewriter {
      *
      * @param astRoot the compilation unit, root of the AST
      */
-    public ASTCommentRewriter(CompilationUnit astRoot) {
+    public ASTCommentRewriter(final CompilationUnit astRoot) {
         this.lineSeparator= getLineSeparator(astRoot);
     }
 
-    private String getLineSeparator(CompilationUnit astRoot) {
+    private String getLineSeparator(final CompilationUnit astRoot) {
         String result= findRecommendedLineSeparator(astRoot);
         return result != null ? result : System.getProperty("line.separator"); //$NON-NLS-1$
     }
 
-    private String findRecommendedLineSeparator(CompilationUnit astRoot) {
+    private String findRecommendedLineSeparator(final CompilationUnit astRoot) {
         try {
             return astRoot.getTypeRoot().findRecommendedLineSeparator();
         } catch (JavaModelException e) {
@@ -95,7 +95,7 @@ public class ASTCommentRewriter {
      *
      * @param comment the comment to remove
      */
-    public void remove(Comment comment) {
+    public void remove(final Comment comment) {
         this.removals.add(comment);
     }
 
@@ -105,7 +105,7 @@ public class ASTCommentRewriter {
      * @param comment     the comment to replace
      * @param replacement the replacement text
      */
-    public void replace(Comment comment, String replacement) {
+    public void replace(final Comment comment, final String replacement) {
         this.replacements.add(Pair.of(comment, replacement));
     }
 
@@ -114,7 +114,7 @@ public class ASTCommentRewriter {
      *
      * @param comment the block comment to convert into a javadoc
      */
-    public void toJavadoc(BlockComment comment) {
+    public void toJavadoc(final BlockComment comment) {
         this.blockCommentToJavadoc.add(comment);
     }
 
@@ -124,7 +124,7 @@ public class ASTCommentRewriter {
      * @param lineComment the line comment to convert to javadoc
      * @param nextNode    the AST node immediately following the line comment
      */
-    public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+    public void toJavadoc(final LineComment lineComment, final ASTNode nextNode) {
         List<LineComment> comments= lineCommentsToJavadoc.get(nextNode);
         if (comments == null) {
             comments= new LinkedList<>();
@@ -140,7 +140,7 @@ public class ASTCommentRewriter {
      * @param document the provided document to edit
      * @param edits    where to add edits
      */
-    public void addEdits(IDocument document, TextEdit edits) {
+    public void addEdits(final IDocument document, final TextEdit edits) {
         final String source= document.get();
         final List<TextEdit> commentEdits= new ArrayList<>(nbEdits());
         addRemovalEdits(commentEdits, source);
@@ -158,7 +158,7 @@ public class ASTCommentRewriter {
         return removals.size() + replacements.size() + blockCommentToJavadoc.size() + lineCommentsToJavadoc.size();
     }
 
-    private boolean anyOverlaps(TextEdit edits, List<TextEdit> commentEdits) {
+    private boolean anyOverlaps(final TextEdit edits, final List<TextEdit> commentEdits) {
         for (TextEdit commentEdit : commentEdits) {
             if (overlaps(edits, commentEdit)) {
                 return true;
@@ -168,18 +168,18 @@ public class ASTCommentRewriter {
         return false;
     }
 
-    private boolean overlaps(TextEdit edits, TextEdit edit2) {
+    private boolean overlaps(final TextEdit edits, final TextEdit edit2) {
         final SourceLocation range= toSourceLoc(edit2);
         final AtomicBoolean overlaps= new AtomicBoolean();
         edits.accept(new TextEditVisitor() {
             @Override
-            public boolean visit(MultiTextEdit edit) {
+            public boolean visit(final MultiTextEdit edit) {
                 // Move on there is nothing to check here
                 return true;
             }
 
             @Override
-            public boolean visitNode(TextEdit edit) {
+            public boolean visitNode(final TextEdit edit) {
                 if (!overlaps.get()) {
                     overlaps.set(range.overlapsWith(toSourceLoc(edit)));
                 }
@@ -190,11 +190,11 @@ public class ASTCommentRewriter {
         return overlaps.get();
     }
 
-    private SourceLocation toSourceLoc(TextEdit edit) {
+    private SourceLocation toSourceLoc(final TextEdit edit) {
         return new SourceLocation(edit.getOffset(), edit.getLength());
     }
 
-    private void addRemovalEdits(List<TextEdit> commentEdits, String source) {
+    private void addRemovalEdits(final List<TextEdit> commentEdits, final String source) {
         if (this.removals.isEmpty()) {
             return;
         }
@@ -211,7 +211,7 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void addReplacementEdits(List<TextEdit> commentEdits) {
+    private void addReplacementEdits(final List<TextEdit> commentEdits) {
         if (this.replacements.isEmpty()) {
             return;
         }
@@ -223,14 +223,14 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void addBlockCommentToJavadocEdits(List<TextEdit> commentEdits) {
+    private void addBlockCommentToJavadocEdits(final List<TextEdit> commentEdits) {
         for (BlockComment blockComment : this.blockCommentToJavadoc) {
             final int offset= blockComment.getStartPosition() + "/*".length(); //$NON-NLS-1$
             commentEdits.add(new InsertEdit(offset, "*")); //$NON-NLS-1$
         }
     }
 
-    private void addLineCommentsToJavadocEdits(List<TextEdit> commentEdits, String source) {
+    private void addLineCommentsToJavadocEdits(final List<TextEdit> commentEdits, final String source) {
         if (this.lineCommentsToJavadoc.isEmpty()) {
             return;
         }
@@ -248,7 +248,7 @@ public class ASTCommentRewriter {
         }
     }
 
-    private TreeSet<Integer> getLineStarts(String source) {
+    private TreeSet<Integer> getLineStarts(final String source) {
         final TreeSet<Integer> lineStarts= new TreeSet<>();
         lineStarts.add(0);
 
@@ -260,8 +260,8 @@ public class ASTCommentRewriter {
         return lineStarts;
     }
 
-    private void addSingleLineCommentToJavadocEdits(List<TextEdit> commentEdits, ASTNode nextNode,
-            List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
+    private void addSingleLineCommentToJavadocEdits(final List<TextEdit> commentEdits, final ASTNode nextNode,
+            final List<LineComment> lineComments, final String source, final TreeSet<Integer> lineStarts) {
         final int nodeStart= nextNode.getStartPosition();
         final LineComment lineComment= lineComments.get(0);
 
@@ -288,7 +288,7 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void appendCommentTextReplaceEndsOfBlockComment(StringBuilder sb, LineComment lineComment, String source) {
+    private void appendCommentTextReplaceEndsOfBlockComment(final StringBuilder sb, final LineComment lineComment, final String source) {
         final int commentStart= lineComment.getStartPosition();
         int nextStart= commentStart + "//".length(); //$NON-NLS-1$
         final Matcher matcher= endsOfBlockCommentMatcher(lineComment, source, nextStart);
@@ -303,24 +303,24 @@ public class ASTCommentRewriter {
         sb.append(source, nextStart, SourceLocation.getEndPosition(lineComment));
     }
 
-    private String getSpaceAtStart(String source, final LineComment lineComment) {
+    private String getSpaceAtStart(final String source, final LineComment lineComment) {
         final char firstChar= source.charAt(lineComment.getStartPosition() + "//".length()); //$NON-NLS-1$
         return !Character.isWhitespace(firstChar) ? " " : ""; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private String getSpaceAtEnd(String source, final LineComment lineComment) {
+    private String getSpaceAtEnd(final String source, final LineComment lineComment) {
         final char lastChar= source.charAt(SourceLocation.getEndPosition(lineComment) - 1);
         return !Character.isWhitespace(lastChar) ? " " : ""; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private void deleteLineCommentAfterNode(List<TextEdit> commentEdits, String source, LineComment lineComment) {
+    private void deleteLineCommentAfterNode(final List<TextEdit> commentEdits, final String source, final LineComment lineComment) {
         final int commentStart= lineComment.getStartPosition();
         final int commentLength= lineComment.getLength();
         final int nbWhiteSpaces= nbTrailingSpaces(source, commentStart);
         commentEdits.add(new DeleteEdit(commentStart - nbWhiteSpaces, nbWhiteSpaces + commentLength));
     }
 
-    private int nbTrailingSpaces(String source, int commentStart) {
+    private int nbTrailingSpaces(final String source, final int commentStart) {
         int result= 0;
         while (Character.isWhitespace(source.charAt(commentStart - result - 1))) {
             ++result;
@@ -329,8 +329,8 @@ public class ASTCommentRewriter {
         return result;
     }
 
-    private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, ASTNode node,
-            List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
+    private void addMultiLineCommentsToJavadocEdits(final List<TextEdit> commentEdits, final ASTNode node,
+            final List<LineComment> lineComments, final String source, final TreeSet<Integer> lineStarts) {
         for (int i= 0; i < lineComments.size(); i++) {
             final LineComment lineComment= lineComments.get(i);
             if (lineComment.getStartPosition() <= node.getStartPosition()) {
@@ -341,8 +341,8 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void replaceLineCommentBeforeJavaElement(List<TextEdit> commentEdits, LineComment lineComment,
-            List<LineComment> lineComments, int i, String source, TreeSet<Integer> lineStarts) {
+    private void replaceLineCommentBeforeJavaElement(final List<TextEdit> commentEdits, final LineComment lineComment,
+            final List<LineComment> lineComments, final int i, final String source, final TreeSet<Integer> lineStarts) {
         final int replaceLength= "//".length(); //$NON-NLS-1$
         final boolean isFirst= i == 0;
         String replacementText;
@@ -369,20 +369,20 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void replaceEndsOfBlockCommentFromCommentText(List<TextEdit> commentEdits, LineComment lineComment,
-            String source) {
+    private void replaceEndsOfBlockCommentFromCommentText(final List<TextEdit> commentEdits, final LineComment lineComment,
+            final String source) {
         final Matcher matcher= endsOfBlockCommentMatcher(lineComment, source, lineComment.getStartPosition());
         while (matcher.find()) {
             commentEdits.add(new ReplaceEdit(matcher.start(), matcher.end() - matcher.start(), "* /")); //$NON-NLS-1$
         }
     }
 
-    private Matcher endsOfBlockCommentMatcher(LineComment lineComment, String source, int startPos) {
+    private Matcher endsOfBlockCommentMatcher(final LineComment lineComment, final String source, final int startPos) {
         return Pattern.compile("\\*/").matcher(source).region(startPos, SourceLocation.getEndPosition(lineComment)); //$NON-NLS-1$
     }
 
-    private void replaceLineCommentAfterJavaElement(List<TextEdit> commentEdits, LineComment lineComment,
-            List<LineComment> lineComments, int i, String source, TreeSet<Integer> lineStarts) {
+    private void replaceLineCommentAfterJavaElement(final List<TextEdit> commentEdits, final LineComment lineComment,
+            final List<LineComment> lineComments, final int i, final String source, final TreeSet<Integer> lineStarts) {
         if (i - 1 < 0) {
             throw new NotImplementedException(lineComment,
                     "for a line comment situated after the java elements that it documents," //$NON-NLS-1$
@@ -401,7 +401,7 @@ public class ASTCommentRewriter {
         deleteLineCommentAfterNode(commentEdits, source, lineComment);
     }
 
-    private SourceLocation getIndentForJavadoc(LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
+    private SourceLocation getIndentForJavadoc(final LineComment lineComment, final String source, final TreeSet<Integer> lineStarts) {
         final SourceLocation indentLoc= getIndent(lineComment, lineStarts);
         final Matcher matcher= INDENT.matcher(source).region(indentLoc.getStartPosition(), indentLoc.getEndPosition());
         if (matcher.matches()) {
@@ -411,7 +411,7 @@ public class ASTCommentRewriter {
         return SourceLocation.fromPositions(0, 0);
     }
 
-    private SourceLocation getIndent(ASTNode node, TreeSet<Integer> lineStarts) {
+    private SourceLocation getIndent(final ASTNode node, final TreeSet<Integer> lineStarts) {
         if (lineStarts.isEmpty()) {
             // No match, return empty range
             return SourceLocation.fromPositions(0, 0);
@@ -422,7 +422,7 @@ public class ASTCommentRewriter {
         return SourceLocation.fromPositions(previousLineStart, commentStart);
     }
 
-    private int findPreviousLineStart(TreeSet<Integer> lineStarts, final int commentStart) {
+    private int findPreviousLineStart(final TreeSet<Integer> lineStarts, final int commentStart) {
         return lineStarts.headSet(commentStart + 1).last();
     }
 

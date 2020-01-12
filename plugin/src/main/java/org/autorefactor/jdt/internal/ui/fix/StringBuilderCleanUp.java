@@ -97,7 +97,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
+    public boolean visit(final MethodInvocation node) {
         if (node.getExpression() != null && "append".equals(node.getName().getIdentifier()) //$NON-NLS-1$
                 && ASTNodes.arguments(node).size() == 1
                 // Most expensive check comes last
@@ -129,7 +129,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(ClassInstanceCreation node) {
+    public boolean visit(final ClassInstanceCreation node) {
         if (ASTNodes.hasType(node, StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())
                 && ASTNodes.arguments(node).size() == 1) {
             final Expression arg0= ASTNodes.arguments(node).get(0);
@@ -144,7 +144,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeRefactorAppending(Expression node) {
+    private boolean maybeRefactorAppending(final Expression node) {
         final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
         final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
         final AtomicBoolean isInstanceCreationToRewrite= new AtomicBoolean(false);
@@ -266,7 +266,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean isValuedStringLiteralOrConstant(Expression expression) {
+    private boolean isValuedStringLiteralOrConstant(final Expression expression) {
         if (expression instanceof StringLiteral) {
             return !isEmptyString(expression);
         }
@@ -512,7 +512,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (isStringConcat(node)) {
             final LinkedList<Pair<ITypeBinding, Expression>> allOperands= new LinkedList<>();
             readSubExpressions(node, allOperands, new AtomicBoolean(false));

@@ -75,8 +75,8 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
      * @param refactoringRulesToApply the cleanups to apply
      * @param environment             the environment
      */
-    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
-            Environment environment) {
+    public ApplyRefactoringsJob(final Queue<RefactoringUnit> refactoringUnits, final List<RefactoringRule> refactoringRulesToApply,
+            final Environment environment) {
         super("AutoRefactor"); //$NON-NLS-1$
         setPriority(Job.LONG);
         this.refactoringUnits= refactoringUnits;
@@ -85,7 +85,7 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected IStatus run(final IProgressMonitor monitor) {
         try {
             return run0(monitor);
         } catch (OperationCanceledException e) {
@@ -99,7 +99,7 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
         }
     }
 
-    private IStatus run0(IProgressMonitor monitor) throws Exception {
+    private IStatus run0(final IProgressMonitor monitor) throws Exception {
         if (refactoringUnits.isEmpty()) {
             // No java project exists.
             return Status.OK_STATUS;
@@ -152,8 +152,8 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
      *
      * @throws Exception if any problem occurs
      */
-    public List<TextEdit> applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
-            JavaProjectOptions options, SubMonitor monitor, boolean hasToSave) throws Exception {
+    public List<TextEdit> applyRefactoring(final ICompilationUnit compilationUnit, final AggregateASTVisitor refactoringToApply,
+            final JavaProjectOptions options, final SubMonitor monitor, final boolean hasToSave) throws Exception {
         final ITextFileBufferManager bufferManager= FileBuffers.getTextFileBufferManager();
         final IPath path= compilationUnit.getPath();
         final LocationKind locationKind= LocationKind.NORMALIZE;
@@ -207,8 +207,8 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
      *      "http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      *      >Abstract Syntax Tree > Write it down</a>
      */
-    public List<TextEdit> applyRefactoring(IDocument document, ICompilationUnit compilationUnit,
-            AggregateASTVisitor refactoring, JavaProjectOptions options, SubMonitor monitor, boolean hasToSave)
+    public List<TextEdit> applyRefactoring(final IDocument document, final ICompilationUnit compilationUnit,
+            final AggregateASTVisitor refactoring, final JavaProjectOptions options, final SubMonitor monitor, final boolean hasToSave)
             throws Exception {
         // Creation of DOM/AST from a ICompilationUnit
         final ASTParser parser= ASTParser.newParser(AST.JLS8);
@@ -286,13 +286,13 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
         return textEdits;
     }
 
-    private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
+    private static void resetParser(final ICompilationUnit cu, final ASTParser parser, final JavaProjectOptions options) {
         parser.setSource(cu);
         parser.setResolveBindings(true);
         parser.setCompilerOptions(options.getCompilerOptions());
     }
 
-    private String getPossibleCulprits(int nbLoopsWithSameVisitors, Set<ASTVisitor> lastLoopVisitors) {
+    private String getPossibleCulprits(final int nbLoopsWithSameVisitors, final Set<ASTVisitor> lastLoopVisitors) {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
             return ""; //$NON-NLS-1$
         }

@@ -88,7 +88,7 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    public boolean isJavaVersionSupported(Release javaSeRelease) {
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 6;
     }
 
@@ -108,7 +108,7 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected String getSubstitutingClassName(String origRawType) {
+    protected String getSubstitutingClassName(final String origRawType) {
         if (Stack.class.getCanonicalName().equals(origRawType)) {
             return ArrayDeque.class.getCanonicalName();
         }

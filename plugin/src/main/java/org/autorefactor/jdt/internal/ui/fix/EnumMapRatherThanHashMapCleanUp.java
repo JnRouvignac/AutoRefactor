@@ -99,8 +99,8 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
      * @see {@link java.util.HashMap#HashMap(java.util.Map)}
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
-            Type... types) {
+    boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+            final Type... types) {
         if (types == null || types.length < 2) {
             return true;
         }
@@ -119,8 +119,8 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
         return false;
     }
 
-    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Type keyType,
-            Type valueType, List<Expression> arguments) {
+    private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
+            final Type valueType, final List<Expression> arguments) {
         ASTNodeFactory b= ctx.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(
@@ -143,7 +143,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
      *
      * @return correct parameter for EnumMap constructor
      */
-    private Expression resolveParameter(Type keyType, List<Expression> originalArgs) {
+    private Expression resolveParameter(final Type keyType, final List<Expression> originalArgs) {
         if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
             return ctx.getASTBuilder().createCopyTarget(originalArgs.get(0));
         }

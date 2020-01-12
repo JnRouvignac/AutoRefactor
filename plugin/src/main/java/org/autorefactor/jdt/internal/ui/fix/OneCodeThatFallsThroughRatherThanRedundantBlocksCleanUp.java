@@ -68,7 +68,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(ctx,
                 node);
         node.accept(catchesAndFollowingCodeVisitor);
@@ -81,16 +81,16 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         }
 
         @Override
-        public boolean visit(TryStatement node) {
+        public boolean visit(final TryStatement node) {
             return visitStatement(node);
         }
 
         @Override
-        public boolean visit(IfStatement node) {
+        public boolean visit(final IfStatement node) {
             return visitStatement(node);
         }
 
-        private boolean visitStatement(Statement node) {
+        private boolean visitStatement(final Statement node) {
             if (!getResult()) {
                 return true;
             }
@@ -101,7 +101,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         }
 
         @SuppressWarnings("unchecked")
-        private void collectStatements(Statement node, final List<Statement> redundantStatements) {
+        private void collectStatements(final Statement node, final List<Statement> redundantStatements) {
             if (node == null) {
                 return;
             }

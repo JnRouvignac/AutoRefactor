@@ -62,7 +62,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
     }
 
     @Override
-    public boolean visit(NumberLiteral node) {
+    public boolean visit(final NumberLiteral node) {
         final String token= node.getToken();
 
         if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$

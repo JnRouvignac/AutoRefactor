@@ -134,13 +134,13 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     /** This method is extremely expensive. */
-    private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, MethodDeclaration node) {
+    private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration node) {
         final IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
 
         final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
         final SearchRequestor requestor= new SearchRequestor() {
             @Override
-            public void acceptSearchMatch(SearchMatch match) {
+            public void acceptSearchMatch(final SearchMatch match) {
                 methodIsUsedInPackage.set(true);
             }
         };

@@ -53,13 +53,13 @@ import org.eclipse.jdt.core.dom.Statement;
 public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
-        public boolean visit(EnhancedForStatement node) {
+        public boolean visit(final EnhancedForStatement node) {
             return AddAllRatherThanLoopCleanUp.this
                     .maybeRefactorEnhancedForStatement(node, getClassesToUseWithImport(), getImportsToAdd());
         }
 
         @Override
-        public boolean visit(ForStatement node) {
+        public boolean visit(final ForStatement node) {
             return AddAllRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
@@ -135,7 +135,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     @Override
-    public boolean visit(ForStatement node) {
+    public boolean visit(final ForStatement node) {
         return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
@@ -198,7 +198,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
                         b.createMoveTarget(iterable))));
     }
 
-    private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
+    private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
         if (variableBinding != null) {
             final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                     toVisit, true).find();
@@ -208,12 +208,12 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         return 0;
     }
 
-    private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {
+    private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess aa) {
         return aa != null && ASTNodes.isSameVariable(aa.getArray(), loopContent.getContainerVariable())
                 && ASTNodes.isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
     }
 
-    private boolean areTypeCompatible(ITypeBinding colTypeBinding, ITypeBinding arrayTypeBinding) {
+    private boolean areTypeCompatible(final ITypeBinding colTypeBinding, final ITypeBinding arrayTypeBinding) {
         if (arrayTypeBinding != null && colTypeBinding != null) {
             ITypeBinding jucTypeBinding= ASTNodes.findImplementedType(colTypeBinding, Collection.class.getCanonicalName());
 

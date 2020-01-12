@@ -74,7 +74,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     private final TreeSet<Integer> lineEnds= new TreeSet<>();
 
     @Override
-    public boolean visit(CompilationUnit node) {
+    public boolean visit(final CompilationUnit node) {
         lineEnds.clear();
 
         final String source= this.ctx.getSource(node);
@@ -134,7 +134,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean substringMatchesAny(String s, int offset, String... stringToMatch) {
+    private boolean substringMatchesAny(final String s, final int offset, final String... stringToMatch) {
         for (String toMatch : stringToMatch) {
             if (substringMatches(s, offset, toMatch)) {
                 return true;
@@ -144,18 +144,18 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean substringMatches(final String s, int offset, String toMatch) {
+    private boolean substringMatches(final String s, final int offset, final String toMatch) {
         return s.regionMatches(offset, toMatch, 0, s.length() - offset);
     }
 
-    private void computeLineEnds(CompilationUnit node) {
+    private void computeLineEnds(final CompilationUnit node) {
         final Matcher matcher= NEWLINE_PATTERN.matcher(ctx.getSource(node));
         while (matcher.find()) {
             lineEnds.add(matcher.end());
         }
     }
 
-    private int getIndexOfFirstNonWhitespaceChar(String s, int offset) {
+    private int getIndexOfFirstNonWhitespaceChar(final String s, final int offset) {
         if (Character.isWhitespace(s.charAt(offset))) {
             for (int i= offset; i < s.length(); i++) {
                 if (!Character.isWhitespace(s.charAt(i))) {
@@ -167,7 +167,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return -1;
     }
 
-    private int getLastIndexOfNonWhitespaceChar(String s, int fromIndex) {
+    private int getLastIndexOfNonWhitespaceChar(final String s, final int fromIndex) {
         for (int i= fromIndex; 0 <= i; i--) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return i;
@@ -178,21 +178,21 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(AnnotationTypeDeclaration node) {
+    public boolean visit(final AnnotationTypeDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
     }
 
     @Override
-    public boolean visit(EnumDeclaration node) {
+    public boolean visit(final EnumDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(final TypeDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
     }
 
-    private boolean visit(AbstractTypeDeclaration node) {
+    private boolean visit(final AbstractTypeDeclaration node) {
         final String source= this.ctx.getSource(node);
         int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
@@ -207,7 +207,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2) && visitNodeWithClosingCurly(node);
     }
 
-    private int findOpeningCurlyForTypeBody(AbstractTypeDeclaration node, String source) {
+    private int findOpeningCurlyForTypeBody(final AbstractTypeDeclaration node, final String source) {
         int pos= node.getStartPosition();
         do {
             int firstCurly= source.indexOf('{', pos);
@@ -219,7 +219,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodDeclaration node) {
+    public boolean visit(final MethodDeclaration node) {
         final Block body= node.getBody();
         if (body == null) {
             return true;
@@ -229,7 +229,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(Block node) {
+    public boolean visit(final Block node) {
         final String source= this.ctx.getSource(node);
         int openingCurlyIndex= node.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
@@ -240,19 +240,19 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex) && visitNodeWithClosingCurly(node);
     }
 
-    private boolean visitNodeWithClosingCurly(ASTNode node) {
+    private boolean visitNodeWithClosingCurly(final ASTNode node) {
         final String source= this.ctx.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
         return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
     }
 
-    private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode node, int openingCurlyIndex) {
+    private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode node, final int openingCurlyIndex) {
         int lineEndAfterCurly= nextLineEnd(openingCurlyIndex);
         int lineEndAfterNode= nextLineEnd(SourceLocation.getEndPosition(node));
         return lineEndAfterCurly == lineEndAfterNode;
     }
 
-    private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode node, int curlyIndex) {
+    private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode node, final int curlyIndex) {
         final String source= ctx.getSource(node);
         int newLineBeforeCurly= previousLineEnd(curlyIndex);
         int lastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, curlyIndex - 1);
@@ -260,7 +260,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return maybeRemoveEmptyLines(source, endOfLineIndex, newLineBeforeCurly);
     }
 
-    private boolean maybeRemoveEmptyLines(String source, int endOfLineIndex, int newLineIndex) {
+    private boolean maybeRemoveEmptyLines(final String source, final int endOfLineIndex, final int newLineIndex) {
         if (endOfLineIndex < newLineIndex) {
             Matcher matcher= NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
             boolean isEqualToNewline= matcher.matches();
@@ -274,17 +274,17 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private int nextLineEnd(int fromIndex) {
+    private int nextLineEnd(final int fromIndex) {
         SortedSet<Integer> higher= lineEnds.tailSet(fromIndex + 1);
         return higher.isEmpty() ? -1 : higher.first();
     }
 
-    private int previousLineEnd(int fromIndex) {
+    private int previousLineEnd(final int fromIndex) {
         SortedSet<Integer> lower= lineEnds.headSet(fromIndex + 1);
         return lower.isEmpty() ? -1 : lower.last();
     }
 
-    private int beforeNewlineChars(final String source, int fromIndex) {
+    private int beforeNewlineChars(final String source, final int fromIndex) {
         Matcher matcher= NEWLINE_PATTERN.matcher(source);
         if (matcher.find(fromIndex)) {
             return matcher.start();

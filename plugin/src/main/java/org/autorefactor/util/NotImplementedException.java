@@ -39,7 +39,7 @@ public class NotImplementedException extends AutoRefactorException {
      *
      * @param node the node from which to retrieve the source location
      */
-    public NotImplementedException(ASTNode node) {
+    public NotImplementedException(final ASTNode node) {
         this(node, node);
     }
 
@@ -49,7 +49,7 @@ public class NotImplementedException extends AutoRefactorException {
      * @param node  the node from which to retrieve the source location
      * @param cause the unexpected object
      */
-    public NotImplementedException(ASTNode node, Object cause) {
+    public NotImplementedException(final ASTNode node, final Object cause) {
         this(node, "for an object of type " + (cause != null ? cause.getClass() : null)); //$NON-NLS-1$
     }
 
@@ -59,7 +59,7 @@ public class NotImplementedException extends AutoRefactorException {
      * @param node   the node from which to retrieve the source location
      * @param reason an additional message
      */
-    public NotImplementedException(ASTNode node, String reason) {
+    public NotImplementedException(final ASTNode node, final String reason) {
         super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 }
