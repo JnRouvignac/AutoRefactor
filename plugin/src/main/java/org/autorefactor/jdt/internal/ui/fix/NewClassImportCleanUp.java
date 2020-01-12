@@ -240,7 +240,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             final String classToImport= iterator.next();
 
             if (!classnamesNeverUsedLocally.contains(getSimpleName(classToImport))) {
-                classesToImport.remove(classToImport);
+                iterator.remove();
             }
         }
     }
