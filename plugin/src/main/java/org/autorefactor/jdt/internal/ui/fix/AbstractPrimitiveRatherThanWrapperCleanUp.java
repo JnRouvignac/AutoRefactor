@@ -205,37 +205,45 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             final ParenthesizedExpression parenthesizedExpression= (ParenthesizedExpression) expression;
             return isNotNull(parenthesizedExpression.getExpression());
         }
+
         if (expression instanceof ConditionalExpression) {
             final ConditionalExpression prefixExpression= (ConditionalExpression) expression;
             return isNotNull(prefixExpression.getThenExpression()) && isNotNull(prefixExpression.getElseExpression());
         }
+
         if (getLiteralClass().equals(expression.getClass())) {
             return true;
         }
+
         if (expression instanceof QualifiedName) {
             final QualifiedName qualifiedName= (QualifiedName) expression;
             return ASTNodes.hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
                     && (ASTNodes.isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
                             || ASTNodes.isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
         }
+
         if (expression instanceof InfixExpression) {
             final InfixExpression infixExpression= (InfixExpression) expression;
             return getInfixInSafeOperators().contains(infixExpression.getOperator());
         }
+
         if (expression instanceof PrefixExpression) {
             final PrefixExpression prefixExpression= (PrefixExpression) expression;
             return getPrefixInSafeOperators().contains(prefixExpression.getOperator());
         }
+
         if (expression instanceof PostfixExpression) {
             final PostfixExpression postfixExpression= (PostfixExpression) expression;
             return getPostfixInSafeOperators().contains(postfixExpression.getOperator());
         }
+
         if (expression instanceof CastExpression) {
             final CastExpression castExpression= (CastExpression) expression;
             return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-                    || ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpression.getExpression());
+                    || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpression.getExpression()));
         }
+
         if (expression instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) expression;
             return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$

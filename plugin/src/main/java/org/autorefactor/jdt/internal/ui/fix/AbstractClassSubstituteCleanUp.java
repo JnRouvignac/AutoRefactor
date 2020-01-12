@@ -343,6 +343,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         case ASTNode.CLASS_INSTANCE_CREATION:
         case ASTNode.CONSTRUCTOR_INVOCATION:
         case ASTNode.CONDITIONAL_EXPRESSION:
+        default:
             return false;
 
         case ASTNode.PARENTHESIZED_EXPRESSION:
@@ -371,19 +372,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         case ASTNode.METHOD_INVOCATION:
             final MethodInvocation mi= (MethodInvocation) parentNode;
 
-            if (node.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
-                return false;
-            }
-
-            if (!isMethodReturningExistingClass(mi)) {
-                return true;
-            }
-
-            return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
-                    methodCallsToRefactor);
-
-        default:
-            return false;
+            return node.getLocationInParent() != MethodInvocation.ARGUMENTS_PROPERTY && canMethodBeRefactored(mi, methodCallsToRefactor) && (!isMethodReturningExistingClass(mi) || canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
+                    methodCallsToRefactor));
         }
     }
 

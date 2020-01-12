@@ -47,9 +47,6 @@ public abstract class AbstractRefactoringJob extends Job {
 
     @Override
     public final boolean belongsTo(Object family) {
-        if (FAMILY == family) {
-            return true;
-        }
-        return super.belongsTo(family);
+        return FAMILY == family || super.belongsTo(family);
     }
 }

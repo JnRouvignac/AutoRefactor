@@ -148,10 +148,10 @@ public class StringCleanUp extends AbstractCleanUpRule {
             final MethodInvocation rightInvocation= ASTNodes.as(ASTNodes.arguments(node).get(0), MethodInvocation.class);
 
             if (leftInvocation != null && rightInvocation != null
-                    && (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                            && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                            || ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
-                                    && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
+                    && ((ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                            && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
+                            || (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
+                                    && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
                 final Expression leftExpression= leftInvocation.getExpression();
                 final Expression rightExpression= rightInvocation.getExpression();
                 r.replace(node, b.invoke(b.createMoveTarget(leftExpression), "equalsIgnoreCase", b.createMoveTarget(rightExpression))); //$NON-NLS-1$

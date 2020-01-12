@@ -174,23 +174,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean methodClosesCloseables(final MethodInvocation mi) {
-            if (ASTNodes.usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
-                return true;
-            }
-            //        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()
-            //        // and/or all various homegrown static utilities closing Closeables
-            //        IMethodBinding methodBinding = mi.resolveMethodBinding();
-            //        return methodBinding != null
-            //                && methodBinding.getName().startsWith("close")
-            //                // In theory we should also verify the code of the method that is being called.
-            //                // In practice, the only thing you can do with an instance of Closeable is to close it,
-            //                // so let's assume this is exactly what the method does
-            //                && (isArrayOfCloseables(methodBinding.getParameterTypes())
-            //                        || isVarargsOfCloseables(methodBinding.getParameterTypes())
-            //                        // Beware of generic types (wildcards like ? extends Closeable)
-            //                        || isCollectionOfCloseables(methodBinding.getParameterTypes())
-            //                        || isCloseable(methodBinding.getParameterTypes()));
-            return false;
+            return ASTNodes.usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
         }
 
         private VariableDeclarationExpression newResource(List<Statement> tryStatements,

@@ -69,7 +69,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ReturnStatement node) {
-        if ((node.getExpression() == null) && isLastStatement(node)) {
+        if (node.getExpression() == null && isLastStatement(node)) {
             final Refactorings r= ctx.getRefactorings();
 
             if (ASTNodes.canHaveSiblings(node)) {
@@ -91,8 +91,8 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
             if (node.getParent() instanceof MethodDeclaration) {
                 return true;
             }
-            if ((node.getParent() instanceof WhileStatement) || (node.getParent() instanceof DoStatement)
-                    || (node.getParent() instanceof ForStatement) || (node.getParent() instanceof EnhancedForStatement)) {
+            if (node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement
+                    || node.getParent() instanceof ForStatement || node.getParent() instanceof EnhancedForStatement) {
                 return false;
             }
             if (node.getParent() instanceof Statement) {

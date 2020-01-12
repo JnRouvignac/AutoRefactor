@@ -102,7 +102,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
     private boolean is(final InfixExpression ie, InfixExpression.Operator operator, Long number, int constant) {
         return ASTNodes.hasOperator(ie, operator)
-                && ((long) number) == constant;
+                && (long) number == constant;
     }
 
     private void replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {

@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 public class VarOccurrenceVisitor extends InterruptibleVisitor {
     private final Set<String> localVarIds;
     private boolean varUsed;
-    private ASTNode startNode= null;
+    private ASTNode startNode;
 
     /**
      * Returns true if at least one variable is used.

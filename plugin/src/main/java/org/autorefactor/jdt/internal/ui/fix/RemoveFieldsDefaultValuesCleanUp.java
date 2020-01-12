@@ -111,11 +111,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         if (val instanceof Boolean) {
             return Boolean.FALSE.equals(val);
         }
-        if (val instanceof Character) {
-            return ((Character) val).charValue() == '\u0000';
-        }
-
-        return false;
+        return val instanceof Character && ((Character) val).charValue() == '\u0000';
     }
 
     private boolean isPrimitiveLiteral(Expression initializer) {

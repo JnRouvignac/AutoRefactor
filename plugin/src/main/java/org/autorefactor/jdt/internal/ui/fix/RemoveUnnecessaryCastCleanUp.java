@@ -143,7 +143,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                             && !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
                 }
 
-                return (isNotRefactored(lo) && isStringConcat(ie)
+                return ((isNotRefactored(lo) && isStringConcat(ie))
                         || (isIntegralDivision(ie) ? canRemoveCastInIntegralDivision(node, ie)
                                 : isAssignmentCompatibleInInfixExpression(node, ie)))
                         && !isIntegralDividedByFloatingPoint(node, ie);
@@ -261,9 +261,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         final Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             final int val= (Integer) value;
-            return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
-                    || ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
-                    || ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
+            return (ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
+                    || (ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
+                    || (ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
         }
 
         return false;

@@ -51,6 +51,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
     }
@@ -60,6 +61,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
     }
@@ -69,6 +71,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
     }
@@ -156,6 +159,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     public boolean visit(IfStatement node) {
         final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+
         if (node.getElseStatement() == null && statements.size() == 1) {
             final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
             int i= 0;
@@ -176,11 +180,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
         }
-        if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
-        }
 
-        return true;
+        return !ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName()) || maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override

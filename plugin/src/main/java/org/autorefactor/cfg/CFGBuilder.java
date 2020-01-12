@@ -677,8 +677,7 @@ public class CFGBuilder {
             final CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(entryBlock);
             final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
             if (!liveAfterBody.liveEdges.isEmpty()) {
-                if (!((node.getReturnType2() == null) || (node.getReturnType2().resolveBinding() == null /* added for unit Tests */)
-                        || "void".equals(node.getReturnType2().resolveBinding().getName()))) { //$NON-NLS-1$
+                if (node.getReturnType2() != null && node.getReturnType2().resolveBinding() != null /* added for unit Tests */ && !"void".equals(node.getReturnType2().resolveBinding().getName())) { //$NON-NLS-1$
                     throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
                             + "for a constructor or a non void method return type."); //$NON-NLS-1$
                 }
@@ -1124,7 +1123,7 @@ public class CFGBuilder {
 
     private Statement findLabeledParentStatement(ASTNode node) {
         ASTNode n= node;
-        while ((n != null) && (n.getNodeType() != LABELED_STATEMENT)) {
+        while (n != null && n.getNodeType() != LABELED_STATEMENT) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1136,7 +1135,7 @@ public class CFGBuilder {
 
     private Statement findBreakableParentStatement(ASTNode node) {
         ASTNode n= node;
-        while ((n != null) && !ASTNodes.isBreakable(n)) {
+        while (n != null && !ASTNodes.isBreakable(n)) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1618,7 +1617,7 @@ public class CFGBuilder {
 
     private Statement findContinuableParentStatement(ASTNode node) {
         ASTNode n= node;
-        while ((n != null) && !ASTNodes.isLoop(n)) {
+        while (n != null && !ASTNodes.isLoop(n)) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1787,7 +1786,7 @@ public class CFGBuilder {
         int result= 0;
         for (int i= 0; i < s.length(); i++) {
             if (s.charAt(i) == '\t') {
-                result+= tabSize - (i % tabSize);
+                result+= tabSize - i % tabSize;
             } else {
                 result++;
             }
@@ -1797,10 +1796,10 @@ public class CFGBuilder {
     }
 
     private boolean isNotEmpty(final Collection<?> col) {
-        return (col != null) && !col.isEmpty();
+        return col != null && !col.isEmpty();
     }
 
     private boolean isNotEmpty(final Map<?, ?> col) {
-        return (col != null) && !col.isEmpty();
+        return col != null && !col.isEmpty();
     }
 }

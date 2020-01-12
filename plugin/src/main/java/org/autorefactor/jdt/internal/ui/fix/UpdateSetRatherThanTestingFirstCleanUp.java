@@ -104,7 +104,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
-                if ((statements.size() == 1) && ASTNodes.asList(oppositeStatement).isEmpty()) {
+                if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
                     r.replace(ifStmtToReplace, b.createMoveTarget(firstStatement));
                 } else {

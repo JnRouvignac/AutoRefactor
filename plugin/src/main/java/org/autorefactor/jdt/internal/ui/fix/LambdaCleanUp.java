@@ -235,11 +235,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
         Name typeName= ASTNodes.as(calledExpression, Name.class);
 
-        if (typeName != null) {
-            return typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
-        }
-
-        return false;
+        return typeName != null && typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
     }
 
     private boolean areSameIdentifiers(LambdaExpression node, List<Expression> arguments) {

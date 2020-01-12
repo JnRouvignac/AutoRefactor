@@ -146,7 +146,7 @@ public final class Utils {
      * @return true if the two provided doubles are equal, false otherwise.
      */
     public static boolean equal(double d1, double d2) {
-        return d1 == d2;
+        return Double.compare(d1, d2) == 0;
     }
 
     /**

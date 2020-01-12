@@ -206,10 +206,8 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 
             return false;
         }
-        if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            return isReturnValueLost(mi);
-        }
-        // Here are the following cases:
+
+        // Here are the following rejected cases:
         //
         // HashMap.clone()
         // HashMap.containsValue(Object)
@@ -221,7 +219,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         // AbstractMap.toString()
         // HashMap.keySet()
         // HashMap.putAll(Map)
-        return false;
+        return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) && isReturnValueLost(mi); //$NON-NLS-1$
     }
 
     private boolean isReturnValueLost(final ASTNode node) {

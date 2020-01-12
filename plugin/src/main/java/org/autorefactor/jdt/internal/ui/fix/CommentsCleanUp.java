@@ -471,8 +471,8 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getPreviousSibling(ASTNode node) {
-        boolean isPrevious= true;
         if (node != null && node.getParent() instanceof TypeDeclaration) {
+            boolean isPrevious= true;
             final TypeDeclaration typeDecl= (TypeDeclaration) node.getParent();
 
             final TreeMap<Integer, ASTNode> nodes= new TreeMap<>();
@@ -539,18 +539,15 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         if (node instanceof BodyDeclaration) {
             return ((BodyDeclaration) node).getJavadoc() != null;
         }
-        if (node instanceof PackageDeclaration) {
-            return ((PackageDeclaration) node).getJavadoc() != null;
-        }
 
-        return false;
+        return node instanceof PackageDeclaration && ((PackageDeclaration) node).getJavadoc() != null;
     }
 
     private boolean acceptJavadoc(final ASTNode node) {
         // PackageDeclaration node accept javadoc in package-info.java files,
         // but they are useless everywhere else.
         return node instanceof BodyDeclaration
-                || node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
+                || (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
     }
 
     @Override

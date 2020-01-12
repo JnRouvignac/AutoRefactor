@@ -119,15 +119,13 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
                 }
 
                 return maybeMoveAssignment(variableAssignment, node.getThenStatement());
-            } else if (node.getElseStatement() != null) {
+            }
+
+            if (node.getElseStatement() != null) {
                 varOccurrenceVisitor= new VarOccurrenceVisitor(new HashSet<>(Arrays.asList(variable.getIdentifier())));
                 varOccurrenceVisitor.visitNode(node.getElseStatement());
 
-                if (!varOccurrenceVisitor.isVarUsed()) {
-                    return true;
-                }
-
-                return maybeMoveAssignment(variableAssignment, node.getElseStatement());
+                return !varOccurrenceVisitor.isVarUsed() || maybeMoveAssignment(variableAssignment, node.getElseStatement());
             }
 
             return true;

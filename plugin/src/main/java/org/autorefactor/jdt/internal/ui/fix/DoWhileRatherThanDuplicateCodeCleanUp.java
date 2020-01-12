@@ -79,7 +79,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         Statement previousStatement= ASTNodes.getPreviousSibling(node);
         int i= whileStatements.size() - 1;
         while (i >= 0) {
-            if ((previousStatement == null) || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
+            if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
                 return true;
             }
             i--;

@@ -81,10 +81,10 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
                 InfixExpression secondCondition= ASTNodes.as(operands.get(i), InfixExpression.class);
                 List<Expression> nextOperands= operands.subList(i + 1, operands.size());
 
-                if ((firstCondition != null) && !firstCondition.hasExtendedOperands()
+                if (firstCondition != null && !firstCondition.hasExtendedOperands()
                         && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND,
                                 InfixExpression.Operator.AND)
-                        && (secondCondition != null) && !secondCondition.hasExtendedOperands()
+                        && secondCondition != null && !secondCondition.hasExtendedOperands()
                         && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND,
                                 InfixExpression.Operator.AND)
                         && isBooleanAndPassive(firstCondition.getLeftOperand())
@@ -93,25 +93,16 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
                         && isBooleanAndPassive(secondCondition.getRightOperand())) {
                     if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
                             firstCondition.getRightOperand(), secondCondition.getRightOperand(),
-                            previousOperands, nextOperands)) {
-                        return false;
-                    }
-
-                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
-                            firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
-                            previousOperands, nextOperands)) {
-                        return false;
-                    }
-
-                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
-                            firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
-                            previousOperands, nextOperands)) {
-                        return false;
-                    }
-
-                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getRightOperand(),
-                            firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
-                            previousOperands, nextOperands)) {
+                            previousOperands, nextOperands)
+                            || !maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+                                    firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+                                    previousOperands, nextOperands)
+                            || !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+                                    firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+                                    previousOperands, nextOperands)
+                            || !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getRightOperand(),
+                                    firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+                                    previousOperands, nextOperands)) {
                         return false;
                     }
                 }

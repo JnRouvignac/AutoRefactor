@@ -67,7 +67,7 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
     public boolean visit(final ConditionalExpression node) {
         InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
 
-        if ((condition != null)
+        if (condition != null
                 && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
                 && !condition.hasExtendedOperands()) {
             Expression hardCodedExpression;

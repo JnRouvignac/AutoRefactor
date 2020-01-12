@@ -73,8 +73,8 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
             final InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
 
-            if ((firstCondition != null) && !firstCondition.hasExtendedOperands()
-                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && (secondCondition != null)
+            if (firstCondition != null && !firstCondition.hasExtendedOperands()
+                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && secondCondition != null
                     && !secondCondition.hasExtendedOperands() && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
                     && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
                     && ASTNodes.isPassive(secondCondition.getLeftOperand()) && ASTNodes.isPassive(secondCondition.getRightOperand())) {

@@ -372,8 +372,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        return type1 == null || type2 == null || type1.isParameterizedType() == type2.isParameterizedType()
-                && areSameParameterizedTypeBindings(type1, type2);
+        return type1 == null || type2 == null || (type1.isParameterizedType() == type2.isParameterizedType()
+                && areSameParameterizedTypeBindings(type1, type2));
     }
 
     /** Special handling because of captures. */

@@ -76,11 +76,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                 final Expression leftOperand= operands.get(i - 1);
                 final Expression rightOperand= operands.get(i);
 
-                if (!maybeRefactorCondition(leftOperand, rightOperand)) {
-                    return false;
-                }
-
-                if (!maybeRefactorCondition(rightOperand, leftOperand)) {
+                if (!maybeRefactorCondition(leftOperand, rightOperand) || !maybeRefactorCondition(rightOperand, leftOperand)) {
                     return false;
                 }
             }
