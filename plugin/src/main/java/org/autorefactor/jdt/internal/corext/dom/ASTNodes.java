@@ -330,7 +330,7 @@ public final class ASTNodes {
      *         returned
      */
     public static Expression getUnparenthesedExpression(Expression expression) {
-        if (expression.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
+        if (expression != null && expression.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
             return getUnparenthesedExpression(((ParenthesizedExpression) expression).getExpression());
         }
 
@@ -1467,10 +1467,13 @@ public final class ASTNodes {
      */
     public static boolean hasType(final ITypeBinding typeBinding, String... oneOfQualifiedTypeNames) {
         if (typeBinding != null) {
-            final String qualifiedName= typeBinding.getErasure().getQualifiedName();
-            for (String qualifiedTypeName : oneOfQualifiedTypeNames) {
-                if (qualifiedTypeName.equals(qualifiedName)) {
-                    return true;
+            final ITypeBinding erasure= typeBinding.getErasure();
+            if (erasure != null) {
+                final String qualifiedName= erasure.getQualifiedName();
+                for (String qualifiedTypeName : oneOfQualifiedTypeNames) {
+                    if (qualifiedTypeName.equals(qualifiedName)) {
+                        return true;
+                    }
                 }
             }
         }
