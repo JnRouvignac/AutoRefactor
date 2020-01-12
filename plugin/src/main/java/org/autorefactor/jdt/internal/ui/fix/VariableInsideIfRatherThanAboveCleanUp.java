@@ -94,7 +94,8 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
                 return true;
             }
 
-            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(new HashSet<>(Arrays.asList(variable.getIdentifier())));
+            final HashSet<String> variableToFind= new HashSet<>(Arrays.asList(variable.getIdentifier()));
+            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
             varOccurrenceVisitor.visitNode(node.getExpression());
 
             for (Statement statement : ASTNodes.getNextSiblings(node)) {
@@ -105,12 +106,12 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
                 return true;
             }
 
-            varOccurrenceVisitor= new VarOccurrenceVisitor(new HashSet<>(Arrays.asList(variable.getIdentifier())));
+            varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
             varOccurrenceVisitor.visitNode(node.getThenStatement());
 
             if (varOccurrenceVisitor.isVarUsed()) {
                 if (node.getElseStatement() != null) {
-                    varOccurrenceVisitor= new VarOccurrenceVisitor(new HashSet<>(Arrays.asList(variable.getIdentifier())));
+                    varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
                     varOccurrenceVisitor.visitNode(node.getElseStatement());
 
                     if (varOccurrenceVisitor.isVarUsed()) {
@@ -122,7 +123,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
             }
 
             if (node.getElseStatement() != null) {
-                varOccurrenceVisitor= new VarOccurrenceVisitor(new HashSet<>(Arrays.asList(variable.getIdentifier())));
+                varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
                 varOccurrenceVisitor.visitNode(node.getElseStatement());
 
                 return !varOccurrenceVisitor.isVarUsed() || maybeMoveAssignment(variableAssignment, node.getElseStatement());

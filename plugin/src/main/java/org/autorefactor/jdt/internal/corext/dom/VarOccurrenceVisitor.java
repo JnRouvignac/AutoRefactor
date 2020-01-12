@@ -13,6 +13,7 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
     private final Set<String> localVarIds;
     private boolean varUsed;
     private ASTNode startNode;
+    private final boolean includeInnerScopes;
 
     /**
      * Returns true if at least one variable is used.
@@ -27,9 +28,11 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
      * The constructor.
      *
      * @param localVarIds The ids of the variable to search
+     * @param includeInnerScopes TODO
      */
-    public VarOccurrenceVisitor(final Set<String> localVarIds) {
+    public VarOccurrenceVisitor(final Set<String> localVarIds, boolean includeInnerScopes) {
         this.localVarIds= localVarIds;
+        this.includeInnerScopes= includeInnerScopes;
     }
 
     @Override
@@ -50,6 +53,6 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
 
     @Override
     public boolean visit(final Block node) {
-        return startNode == node;
+        return startNode == node || includeInnerScopes;
     }
 }

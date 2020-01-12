@@ -119,6 +119,20 @@ public class VariableInsideIfRatherThanAboveSample {
         return i * 100;
     }
 
+    public int doNotMoveDeclarationUsedInBlock(boolean isValid, boolean isEnabled) {
+        int i = 42;
+
+        if (isValid) {
+            return i * 10;
+        }
+
+        if (isEnabled) {
+            return i;
+        }
+
+        return 0;
+    }
+
     public int doNotMoveDeclarationUsedInThenAndElse(boolean isValid) {
         int i = 42;
 

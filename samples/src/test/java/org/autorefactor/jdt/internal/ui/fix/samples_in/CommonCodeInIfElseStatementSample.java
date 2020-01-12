@@ -266,6 +266,24 @@ public class CommonCodeInIfElseStatementSample {
         return i;
     }
 
+    public int doNotRefactorWithNameConflictInBlock(boolean isActive) {
+        int i;
+
+        if (isActive) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
+
+        if (isActive) {
+            int j = 123;
+            System.out.println("Other number: " + j);
+        }
+        return i;
+    }
+
     public int doNotRefactorWithNameConfusion(boolean b) {
         int i;
 
