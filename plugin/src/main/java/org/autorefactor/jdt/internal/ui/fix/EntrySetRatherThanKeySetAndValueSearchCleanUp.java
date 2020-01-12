@@ -54,7 +54,6 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -179,8 +178,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 @Override
                 public boolean visit(SimpleName node) {
                     final IBinding binding= node.resolveBinding();
-                    if (binding.getKind() == IBinding.VARIABLE) {
-                        addResult(((IVariableBinding) binding).getName());
+                    if (binding != null && binding.getKind() == IBinding.VARIABLE) {
+                        addResult(binding.getName());
                     }
 
                     return true;
@@ -198,8 +197,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 @Override
                 public boolean visit(SimpleName node) {
                     final IBinding binding= node.resolveBinding();
-                    if (binding.getKind() == IBinding.VARIABLE) {
-                        addResult(((IVariableBinding) binding).getName());
+                    if (binding != null && binding.getKind() == IBinding.VARIABLE) {
+                        addResult(binding.getName());
                     }
 
                     return true;
@@ -399,7 +398,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      * Class to find {@code map.get(loopVariable)} constructs in the AST tree, and
      * collect the type of the value, which is unknown until one is located.
      */
-    class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
+    static class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
         private final Expression mapExpression;
         private final SingleVariableDeclaration forEachParameter;
 
@@ -410,10 +409,9 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         @Override
         public boolean visit(MethodInvocation node) {
-            final MethodInvocation node1= node;
             if (isSameReference(node.getExpression(), mapExpression)
                     && ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    && ASTNodes.isSameVariable(ASTNodes.arguments(node1).get(0), forEachParameter.getName())) {
+                    && ASTNodes.isSameVariable(ASTNodes.arguments(node).get(0), forEachParameter.getName())) {
                 addResult(node);
             }
 
