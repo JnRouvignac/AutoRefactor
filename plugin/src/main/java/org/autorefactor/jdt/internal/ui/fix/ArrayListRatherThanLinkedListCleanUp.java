@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -131,6 +130,6 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
     @Override
     protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
-                Utils.getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+                CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

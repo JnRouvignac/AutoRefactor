@@ -26,27 +26,11 @@
 package org.autorefactor.util;
 
 import java.util.List;
-import java.util.Map;
 
 /** Utility class containing miscellaneous helper methods. */
 public final class Utils {
     private Utils() {
         // Utility class constructor is private
-    }
-
-    /**
-     * Returns whether the two provided objects are equal.
-     *
-     * @param obj1 the first object to compare for equality
-     * @param obj2 the second object to compare for equality
-     * @return true if the two provided objects are equal, false otherwise.
-     */
-    public static boolean equal(final Object obj1, final Object obj2) {
-        if (obj1 == null) {
-            return obj2 == null;
-        }
-
-        return obj1.equals(obj2);
     }
 
     /**
@@ -179,21 +163,5 @@ public final class Utils {
      */
     public static <E> E getLast(final List<E> list) {
         return list.get(list.size() - 1);
-    }
-
-    /**
-     * Returns the value to which the specified key is mapped, or defaultValue if
-     * this map contains no mapping for the key.
-     *
-     * @param map          the map
-     * @param key          the key
-     * @param defaultValue default value to use if there is no such key in this map
-     * @param <K>          type for the key
-     * @param <V>          type for the value
-     * @return the value associated to this key in this map, the default value
-     *         otherwise
-     */
-    public static <K, V> V getOrDefault(final Map<K, V> map, final K key, final V defaultValue) {
-        return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 }

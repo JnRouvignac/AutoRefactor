@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -46,7 +47,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -110,7 +110,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 return false;
             }
             QName other= (QName) obj;
-            return Utils.equal(simpleName, other.simpleName) && Utils.equal(qualifier, other.qualifier);
+            return Objects.equals(simpleName, other.simpleName) && Objects.equals(qualifier, other.qualifier);
         }
 
         @Override
@@ -277,8 +277,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             do {
                 for (IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
                     if (binding.getName().equals(simpleName) && (Modifier.isPublic(binding.getModifiers())
-                            || Modifier.isProtected(binding.getModifiers()) || (!Modifier.isPrivate(binding.getModifiers())
-                                    && superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
+                            || Modifier.isProtected(binding.getModifiers()) || !Modifier.isPrivate(binding.getModifiers())
+                                    && superTypeBinding.getPackage().equals(typeBinding.getPackage()))) {
                         return superTypeBinding;
                     }
                 }
@@ -405,6 +405,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name;
     }
@@ -414,6 +415,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_description;
     }
@@ -423,6 +425,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_reason;
     }
@@ -721,8 +724,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             return true;
         }
         if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-                || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
-                        && !localIdentifiers.contains(qname.simpleName))) {
+                || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+                        && !localIdentifiers.contains(qname.simpleName)) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
             return false;

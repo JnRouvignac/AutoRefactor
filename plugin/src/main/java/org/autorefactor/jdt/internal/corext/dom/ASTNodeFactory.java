@@ -68,10 +68,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
@@ -591,7 +591,7 @@ public class ASTNodeFactory {
         final ASTNode parent= firstNode.getParent();
         final StructuralPropertyDescriptor locInParent= firstNode.getLocationInParent();
         for (ASTNode node : nodes) {
-            if (!Utils.equal(node.getParent(), parent) || !Utils.equal(node.getLocationInParent(), locInParent)) {
+            if (!Objects.equals(node.getParent(), parent) || !Objects.equals(node.getLocationInParent(), locInParent)) {
                 return false;
             }
         }

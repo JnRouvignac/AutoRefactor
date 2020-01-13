@@ -28,10 +28,10 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -152,7 +152,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
         return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-                        && Utils.equal(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue());
+                        && Objects.equals(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue());
     }
 
     private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
