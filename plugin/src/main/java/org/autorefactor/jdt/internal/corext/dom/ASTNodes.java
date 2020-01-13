@@ -2457,6 +2457,7 @@ public final class ASTNodes {
             switch (node2.getNodeType()) {
             case QUALIFIED_NAME:
                 return isSameVariable(sn, (QualifiedName) node2);
+
             case FIELD_ACCESS:
                 return isSameVariable(sn, (FieldAccess) node2);
             }
@@ -2467,8 +2468,10 @@ public final class ASTNodes {
             switch (node2.getNodeType()) {
             case SIMPLE_NAME:
                 return isSameVariable((SimpleName) node2, qn);
+
             case QUALIFIED_NAME:
                 return isSameVariable(qn, (QualifiedName) node2);
+
             case FIELD_ACCESS:
                 return isSameVariable(qn, (FieldAccess) node2);
             }
@@ -2479,8 +2482,10 @@ public final class ASTNodes {
             switch (node2.getNodeType()) {
             case SIMPLE_NAME:
                 return isSameVariable((SimpleName) node2, fa);
+
             case QUALIFIED_NAME:
                 return isSameVariable((QualifiedName) node2, fa);
+
             case FIELD_ACCESS:
                 return isSameVariable(fa, (FieldAccess) node2);
             }
@@ -2501,6 +2506,7 @@ public final class ASTNodes {
      */
     public static ASTNode getParent(final ASTNode node, final Class<?>... includedClasses) {
         final ASTNode parent= node.getParent();
+
         if (instanceOf(parent, includedClasses)) {
             return getParent(parent, includedClasses);
         }
@@ -2512,6 +2518,7 @@ public final class ASTNodes {
         if (node == null) {
             return false;
         }
+
         for (Class<?> clazz : clazzes) {
             if (clazz.isAssignableFrom(node.getClass())) {
                 return true;
@@ -2531,9 +2538,11 @@ public final class ASTNodes {
      */
     public static ASTNode getParentIgnoring(final ASTNode node, final Class<?>... ignoredClasses) {
         final ASTNode parent= node.getParent();
+
         if (parent == null) {
             return node;
         }
+
         if (instanceOf(parent, ignoredClasses)) {
             return getParentIgnoring(parent, ignoredClasses);
         }
@@ -2570,14 +2579,17 @@ public final class ASTNodes {
      */
     public static String getSourceLocation(final ASTNode node) {
         final ASTNode root= node != null ? node.getRoot() : null;
+
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) root;
             final int position= node.getStartPosition();
             final int line= cu.getLineNumber(position);
             final int column= cu.getColumnNumber(position) + 1;
+
             if (cu.getTypeRoot() != null) {
                 return cu.getTypeRoot().getElementName() + ":" + line + ":" + column; //$NON-NLS-1$ //$NON-NLS-2$
             }
+
             // It was not created from a file
             return line + ":" + column; //$NON-NLS-1$
         }
@@ -2597,6 +2609,7 @@ public final class ASTNodes {
         if (node == null) {
             return Collections.emptySet();
         }
+
         final VarDeclarationIdentifierVisitor visitor= new VarDeclarationIdentifierVisitor(node,
                 includeInnerScopes);
         node.accept(visitor);
@@ -2638,6 +2651,7 @@ public final class ASTNodes {
      */
     public static boolean fallsThrough(final Statement statement) {
         final List<Statement> statements= asList(statement);
+
         if (statements.isEmpty()) {
             return false;
         }

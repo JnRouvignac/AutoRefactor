@@ -174,8 +174,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-            final MethodInvocation node1= node;
-            final Expression arg0= ASTNodes.arguments(node1).get(0);
+            final Expression arg0= ASTNodes.arguments(node).get(0);
 
             if (arg0 instanceof NumberLiteral) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$

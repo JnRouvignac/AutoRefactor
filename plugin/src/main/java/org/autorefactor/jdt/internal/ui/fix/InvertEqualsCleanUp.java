@@ -43,6 +43,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
     }
@@ -70,12 +73,14 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
+
         boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
         boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expression= node.getExpression();
-            final MethodInvocation node1= node;
-            final Expression arg0= ASTNodes.arguments(node1).get(0);
+            final Expression arg0= ASTNodes.arguments(node).get(0);
+
             if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
                 invertEqualsInvocation(node, isEquals, expression, arg0);
                 return false;
