@@ -92,10 +92,10 @@ public final class Release {
     private boolean isVersionValid() {
         if ("JavaSE".equals(this.releaseName)) { //$NON-NLS-1$
             if (this.version.length >= 2) {
-                return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 12;
+                return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 13;
             }
 
-            return 9 <= this.version[0] && this.version[0] <= 12;
+            return 9 <= this.version[0] && this.version[0] <= 13;
         }
 
         return false;
