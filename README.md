@@ -3,6 +3,8 @@
 
 # AutoRefactor
 
+> **AutoRefactor is no longer planned to be released, it is planned to be [merged in Eclipse](https://bugs.eclipse.org/bugs/show_bug.cgi?id=551614). So update your Eclipse or install the development version of AutoRefactor.**
+
 The AutoRefactor project delivers free software that automatically refactor code bases.
 
 The aim is to fix language/API usage in order to deliver smaller, more maintainable and more expressive code bases.
