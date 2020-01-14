@@ -34,6 +34,7 @@ import org.autorefactor.preferences.Preferences;
  */
 public class Environment {
     private final EventLoop eventLoop;
+    private final JobManager jobManager;
     private final Logger logger;
     private final Preferences preferences;
 
@@ -41,11 +42,13 @@ public class Environment {
      * Builds an instance of this class.
      *
      * @param eventLoop   the event loop
+     * @param jobManager  the job manager
      * @param logger      the logger
      * @param preferences the preferences
      */
-    public Environment(final EventLoop eventLoop, final Logger logger, final Preferences preferences) {
+    public Environment(final EventLoop eventLoop, final JobManager jobManager, final Logger logger, final Preferences preferences) {
         this.eventLoop= eventLoop;
+        this.jobManager= jobManager;
         this.logger= logger;
         this.preferences= preferences;
     }
@@ -57,6 +60,15 @@ public class Environment {
      */
     public EventLoop getEventLoop() {
         return eventLoop;
+    }
+
+    /**
+     * Returns the job manager.
+     *
+     * @return the job manager
+     */
+    public JobManager getJobManager() {
+        return jobManager;
     }
 
     /**

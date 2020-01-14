@@ -63,7 +63,7 @@ import org.eclipse.text.edits.TextEdit;
  * with all workers accepting work items ({@link RefactoringUnit}) from a queue
  * provided by the partitioner ({@link PrepareApplyRefactoringsJob}).
  */
-public class ApplyRefactoringsJob extends AbstractRefactoringJob {
+public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Environment environment;
@@ -85,7 +85,8 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
     }
 
     @Override
-    protected IStatus run(final IProgressMonitor monitor) {
+    protected IStatus run(IProgressMonitor monitor) {
+        environment.getJobManager().register(this);
         try {
             return run0(monitor);
         } catch (OperationCanceledException e) {
@@ -96,6 +97,8 @@ public class ApplyRefactoringsJob extends AbstractRefactoringJob {
                     + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
                     + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
             return new Status(IStatus.ERROR, PluginConstant.PLUGIN_ID, msg, e);
+        } finally {
+            environment.getJobManager().unregister(this);
         }
     }
 
