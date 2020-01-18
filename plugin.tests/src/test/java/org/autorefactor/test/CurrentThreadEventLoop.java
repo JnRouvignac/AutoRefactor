@@ -29,12 +29,12 @@ import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
 
-class CurrentThreadEvenLoop implements EventLoop {
+class CurrentThreadEventLoop implements EventLoop {
     /**
      * Calls the {@link Callable#call()} method of the callable to be invoked by the
      * event loop at the next reasonable opportunity.
      *
-     * @param call the callable to invoke
+     * @param callable the callable to invoke
      * @param <E>  the declared exception type returned by the callable
      * @throws E the exception possibly returned by executing the callable that is
      *           then thrown
