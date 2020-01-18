@@ -42,6 +42,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
@@ -98,7 +99,14 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                 final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
 
                 if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
-                    removeVariable(node, vds, vdf);
+                    final Expression returnExpression= vdf.getInitializer();
+                    if (returnExpression instanceof ArrayInitializer) {
+                        if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
+                            return true;
+                        }
+                    } else {
+                        replaceReturnStatement(node, vds, returnExpression);
+                    }
                     setResult(false);
                     return false;
                 }
@@ -133,17 +141,31 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             return isUsedAfterReturn(varToSearch, tryStatement);
         }
 
-        private void removeVariable(final ReturnStatement node, final VariableDeclarationStatement vds,
-                final VariableDeclarationFragment vdf) {
-            final Expression returnExpression= vdf.getInitializer();
-            if (returnExpression instanceof ArrayInitializer) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
-                final ReturnStatement newReturnStatement= b
-                        .return0(b.newArray(b.createCopyTarget((ArrayType) vds.getType()), b.createMoveTarget((ArrayInitializer) returnExpression)));
+        /**
+         * @return true if refactoring was done
+         */
+        private boolean removeArrayVariable(ReturnStatement node, VariableDeclarationStatement vds, ArrayInitializer returnExpression) {
+            final ASTNodeFactory b= ctx.getASTBuilder();
+            final Type varType = vds.getType();
+            final VariableDeclarationFragment varDeclFrag = (VariableDeclarationFragment) vds.fragments().get(0);
+            if (varType instanceof ArrayType) {
+                final ArrayType arrayType = (ArrayType) varType;
+                // mixed c style/var style not supported yet. Abort instead of generating wrong code
+                if (varDeclFrag.getExtraDimensions() > 0) {
+                    return false;
+                }
+                // java style array "Type[] var"
+                final ReturnStatement newReturnStatement = b
+                        .return0(b.newArray(b.createCopyTarget(arrayType), b.createMoveTarget(returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             } else {
-                replaceReturnStatement(node, vds, returnExpression);
+                // c style array "Type var[]"
+                final ArrayType arrayType = node.getAST().newArrayType(b.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
+                final ReturnStatement newReturnStatement = b
+                        .return0(b.newArray(arrayType, b.createMoveTarget(returnExpression)));
+                replaceReturnStatementForArray(node, vds, newReturnStatement);
             }
+            return true;
         }
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,

@@ -52,6 +52,26 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         return array;
     }
 
+    public String[][] inlineStringArray2Constants() {
+        String[][] array = { { "test" } };
+        return array;
+    }
+    
+    public String[] inlineCStyleStringArrayConstants() {
+        String array[] = { "test" };
+        return array;
+    }
+
+    public String[][] inlineCStyleStringArray2Constants() {
+        String array[][] = { { "test" } };
+        return array;
+    }
+    
+    public String[][] inlineMixedStyleStringArrayConstantsNotSupportedYet() {
+        String[] array[] = { { "mixtest" } };
+        return array;
+    }
+    
     public boolean[] inlineBooleanArrayConstants() {
         boolean[] array = { true };
         return array;
