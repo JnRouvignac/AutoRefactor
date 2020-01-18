@@ -144,6 +144,14 @@ public class AutoBoxingRatherThanExplicitMethodSample {
         d = Double.valueOf(42.42);
     }
 
+    public static void doNotUseAutoboxingOnString() {
+        Integer i = Integer.valueOf("1");
+        Long l = Long.valueOf("1");
+        Short s = Short.valueOf("1");
+        Float f = Float.valueOf("1");
+        Double d = Double.valueOf("1");
+    }
+
     public static Character removeUnnecessaryValueOfCallsInCharacterWrapper() {
         // Keep this comment
         return Character.valueOf('*');
