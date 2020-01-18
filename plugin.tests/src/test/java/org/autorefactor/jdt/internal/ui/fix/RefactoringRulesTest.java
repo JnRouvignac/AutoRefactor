@@ -39,6 +39,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.jdt.internal.corext.dom.ApplyRefactoringsJob;
@@ -48,7 +49,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
@@ -66,12 +66,12 @@ public class RefactoringRulesTest {
     private static final String PACKAGE_NAME= "org.autorefactor.jdt.internal.ui.fix.samples_in"; //$NON-NLS-1$
 
     /** If not empty, then only run the refactorings present in this collection. */
-    private static final Collection<Class<?>> WHITELIST= Arrays.<Class<?>>asList();
+    private static final Collection<Class<?>> WHITELIST= Collections.emptyList();
     /**
      * When {@link #WHITELIST} is empty, the cleanups present in this collection
      * will never be run.
      */
-    private static final Collection<Class<?>> BLACKLIST= Arrays.<Class<?>>asList(ReduceVariableScopeCleanUp.class);
+    private static final Collection<Class<?>> BLACKLIST= Arrays.asList(ReduceVariableScopeCleanUp.class);
 
     private final String testName;
 
@@ -91,17 +91,24 @@ public class RefactoringRulesTest {
 
     @Test
     public void testRefactoring() throws Exception {
-        runTest(new Callable<Void>() {
-            /**
-             * Call.
-             *
-             * @return the void.
-             */
-            public Void call() throws Exception {
-                testRefactoring0();
-                return null;
-            }
-        });
+        try {
+            runTest(new Callable<Void>() {
+                /**
+                 * Call.
+                 *
+                 * @return the void.
+                 */
+                public Void call() throws Exception {
+                    testRefactoring0();
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            // log stacktrace here because otherwise useful details are missing.
+            System.err.println("executing " + testName + " failed");
+            e.printStackTrace(System.err);
+            throw e;
+        }
     }
 
     private void testRefactoring0() throws Exception {
@@ -134,7 +141,7 @@ public class RefactoringRulesTest {
     }
 
     private IDocument when(final String sampleName, final RefactoringRule refactoring, final String sampleInSource)
-            throws Exception, JavaModelException {
+            throws Exception {
         final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
         final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, sampleInSource, true, null);
         cu.getBuffer().setContents(sampleInSource);
@@ -153,7 +160,7 @@ public class RefactoringRulesTest {
         assertEquals(testName + ": wrong output;", expected, actual); //$NON-NLS-1$
     }
 
-    private RefactoringRule getRefactoringClass(final String refactoringClassName) throws Exception {
+    private RefactoringRule getRefactoringClass(final String refactoringClassName) {
         Collection<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
         for (RefactoringRule refactoring : refactorings) {
             if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
