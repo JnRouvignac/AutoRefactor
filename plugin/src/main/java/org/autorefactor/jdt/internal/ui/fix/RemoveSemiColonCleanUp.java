@@ -25,9 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +33,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTComments;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes.NodeStartPositionComparator;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
@@ -205,29 +203,10 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
     private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
         if (root instanceof CompilationUnit) {
-            final CompilationUnit cu= (CompilationUnit) root;
-            return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
+            return ASTComments.filterCommentsInRange(start, end, (CompilationUnit) root);
         }
 
         return Collections.emptyList();
-    }
-
-    private List<Comment> filterCommentsInRange(final int start, final int end, final List<Comment> commentList) {
-        if (commentList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<Comment> comments= new ArrayList<>(commentList);
-        Collections.sort(comments, new NodeStartPositionComparator());
-
-        final Iterator<Comment> it= comments.iterator();
-        while (it.hasNext()) {
-            final Comment comment= it.next();
-            if (comment.getStartPosition() < start || SourceLocation.getEndPosition(comment) > end) {
-                it.remove();
-            }
-        }
-
-        return comments;
     }
 
     @Override

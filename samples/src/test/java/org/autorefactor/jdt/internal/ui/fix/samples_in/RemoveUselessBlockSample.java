@@ -35,9 +35,31 @@ public class RemoveUselessBlockSample {
         {
             // Keep this comment too
             return i + 1;
+        } // trailing line comment to keep
+    }
+
+    public int removeUselessBlockWithLeadingComment(int i) {
+        // Keep this comment
+        { // leading comment to keep
+            return i + 1;
         }
     }
 
+    public int removeUselessBlockWithMixedComments(int i) {
+        // Keep this comment
+        { // leading comment to keep
+            // Keep comment 1 too
+            /* a block comment to keep */
+            // Keep comment 2 too
+            return i + 1;
+        /* trailing comment to keep */ } // trailing line comment to keep
+    }
+
+    public int removeSingleLineUselessBlockWithBlockComment(int i) {
+        // Keep this comment
+        { /* leading comment to keep */ return i + 1; }
+    }
+    
     public int removeUselessBlockWithForwardCode(int i) {
         // Keep this comment
         {
