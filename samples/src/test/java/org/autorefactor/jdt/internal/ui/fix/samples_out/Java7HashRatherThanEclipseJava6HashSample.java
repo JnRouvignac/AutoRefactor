@@ -50,9 +50,30 @@ public class Java7HashRatherThanEclipseJava6HashSample {
         @Override
         public int hashCode() {
             // Keep this comment
-            return Objects.hash(innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt,
+            return Objects.hash(getEnclosingInstance().hashCode(), innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt,
                     Arrays.hashCode(innerIntegers), innerLong, innerObservable, innerOtherDouble, innerShort, innerText,
                     innerTextById, Arrays.hashCode(innerTexts));
+        }
+
+        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+            return Java7HashRatherThanEclipseJava6HashSample.this;
+        }
+    }
+
+    public class DoNotRefactorNewClass {
+        private boolean innerBoolean;
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result= prime * result + getEnclosingInstance().hashCode();
+            result = prime * result + (innerBoolean ? 1231 : 1237);
+            return result;
+        }
+
+        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+            return new Java7HashRatherThanEclipseJava6HashSample();
         }
     }
 

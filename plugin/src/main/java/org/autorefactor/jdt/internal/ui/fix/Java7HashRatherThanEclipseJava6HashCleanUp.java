@@ -396,6 +396,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
             return isNewHashValid(data, newHashWithoutBrackets.getExpression());
         }
+
         if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
             SimpleName fieldName= getField(newHash);
 
@@ -408,6 +409,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             return isConditionValid(data, newHash);
         } else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
             MethodInvocation specificMethod= (MethodInvocation) newHash;
+            TypeDeclaration innerClass= ASTNodes.getAncestorOrNull(newHash, TypeDeclaration.class);
+            TypeDeclaration topLevelClass= ASTNodes.getAncestorOrNull(innerClass, TypeDeclaration.class);
 
             if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
                 SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
@@ -433,9 +436,60 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     data.getFields().add(specificMethod);
                     return true;
                 }
+            } else if (innerClass != null
+                    && innerClass.resolveBinding() != null
+                    && topLevelClass != null
+                    && topLevelClass.resolveBinding() != null
+                            && ASTNodes.usesGivenSignature(specificMethod, topLevelClass.resolveBinding().getQualifiedName(), "hashCode")) { //$NON-NLS-1$
+                return isEnclosingHashCode(data, specificMethod, innerClass, topLevelClass);
             }
         } else if (newHash instanceof CastExpression) {
             return isGreatNumberValid(data, newHash);
+        }
+
+        return false;
+    }
+
+    private boolean isEnclosingHashCode(final CollectedData data, final MethodInvocation specificMethod,
+            final TypeDeclaration innerClass, final TypeDeclaration topLevelClass) {
+        MethodInvocation getEnclosingInstanceMethod= ASTNodes.as(specificMethod.getExpression(), MethodInvocation.class);
+
+        if (ASTNodes.usesGivenSignature(getEnclosingInstanceMethod, innerClass.resolveBinding().getQualifiedName(), "getEnclosingInstance")) { //$NON-NLS-1$
+            MethodDeclaration getEnclosingInstanceDeclaration= null;
+
+            for (MethodDeclaration innerMethod : innerClass.getMethods()) {
+                if ("getEnclosingInstance".equals(innerMethod.getName().getIdentifier()) //$NON-NLS-1$
+                        && (innerMethod.parameters() == null || innerMethod.parameters().isEmpty())
+                        && !innerMethod.isConstructor() && innerMethod.resolveBinding() != null
+                        && ASTNodes.hasType(innerMethod.resolveBinding().getReturnType(), topLevelClass.resolveBinding().getQualifiedName())) {
+                    getEnclosingInstanceDeclaration= innerMethod;
+                    break;
+                }
+            }
+
+            if (getEnclosingInstanceDeclaration != null) {
+                List<Statement> methodStatements= ASTNodes.asList(getEnclosingInstanceDeclaration.getBody());
+
+                if (methodStatements != null && methodStatements.size() == 1) {
+                    ReturnStatement returnStatement= ASTNodes.as(methodStatements.get(0), ReturnStatement.class);
+
+                    if (returnStatement != null) {
+                        ThisExpression thisExpression= ASTNodes.as(returnStatement.getExpression(),
+                                ThisExpression.class);
+
+                        if (thisExpression != null) {
+                            SimpleName topLevelClassReference= ASTNodes.as(thisExpression.getQualifier(),
+                                    SimpleName.class);
+
+                            if (topLevelClassReference != null
+                                    && topLevelClass.getName().getIdentifier().equals(topLevelClassReference.getIdentifier())) {
+                                data.getFields().add(specificMethod);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return false;
@@ -448,6 +502,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         if (simpleName != null) {
             return simpleName;
         }
+
         if (fieldName != null) {
             ThisExpression te= ASTNodes.as(fieldName.getExpression(), ThisExpression.class);
 
@@ -455,6 +510,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 if (te.getQualifier() == null) {
                     return fieldName.getName();
                 }
+
                 if (te.getQualifier().isSimpleName()) {
                     SimpleName qualifier= (SimpleName) te.getQualifier();
                     TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
