@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MethodOnMapRatherThanMethodOnKeySetSample {
@@ -46,5 +47,25 @@ public class MethodOnMapRatherThanMethodOnKeySetSample {
             x++;
         }
         return x;
+    }
+
+    public class DoNotRefactorMapImplementation<K, V> extends HashMap<K, V> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean containsKey(Object key) {
+            System.out.println("Using " + key);
+            return keySet().contains(key);
+        }
+    }
+
+    public class DoNotRefactorThisMapImplementation<K, V> extends HashMap<K, V> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean containsKey(Object key) {
+            System.out.println("Using " + key);
+            return this.keySet().contains(key);
+        }
     }
 }

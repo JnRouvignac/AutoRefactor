@@ -33,6 +33,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
@@ -41,6 +42,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
     }
@@ -50,6 +52,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
     }
@@ -59,6 +62,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
     }
@@ -67,7 +71,8 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
     public boolean visit(final MethodInvocation mi) {
         MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
 
-        if (miExpression != null && ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
+        if (miExpression != null && miExpression.getExpression() != null && ASTNodes.as(miExpression.getExpression(), ThisExpression.class) == null
+                && ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
             if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
             }
