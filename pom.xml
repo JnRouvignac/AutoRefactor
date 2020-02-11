@@ -70,7 +70,7 @@
       <id>Mars</id>
       <url>http://download.eclipse.org/eclipse/updates/4.5</url>
 -->
-			<url>http://download.eclipse.org/releases/mars</url>
+			<url>https://download.eclipse.org/releases/mars</url>
 		</repository>
   </repositories>
 
