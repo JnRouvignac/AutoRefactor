@@ -193,8 +193,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final QualifiedName field1= ASTNodes.as(expr1, QualifiedName.class);
         final QualifiedName field2= ASTNodes.as(expr2, QualifiedName.class);
 
-        if (method1 != null && (method1.arguments() != null || method1.arguments().isEmpty()) && method2 != null
-                && (method2.arguments() != null || method2.arguments().isEmpty())) {
+        if (method1 != null && (method1.arguments() == null || method1.arguments().isEmpty()) && method2 != null
+                && (method2.arguments() == null || method2.arguments().isEmpty())) {
             final String methodName1= method1.getName().getIdentifier();
             final String methodName2= method2.getName().getIdentifier();
 

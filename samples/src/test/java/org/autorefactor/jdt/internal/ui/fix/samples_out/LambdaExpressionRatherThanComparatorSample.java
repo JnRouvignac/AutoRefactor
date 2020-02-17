@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class LambdaExpressionRatherThanComparatorSample {
     public List<Date> useMethodRef(List<Date> listToSort) {
@@ -43,6 +44,21 @@ public class LambdaExpressionRatherThanComparatorSample {
     public List<Date> useReversedMethodRef(List<Date> listToSort) {
         // Keep this comment
         Comparator<Date> comparator = Comparator.comparing(Date::toString).reversed();
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<String> doNotUseMethodRef(List<String> listToSort) {
+        // Keep this comment
+        Comparator<String> comparator = new Comparator<String>() {
+
+            @Override
+            public int compare(String o1, String o2) {
+                return o2.toLowerCase(Locale.ENGLISH).compareTo(o1.toLowerCase(Locale.ENGLISH));
+            }
+
+        };
         Collections.sort(listToSort, comparator);
 
         return listToSort;
