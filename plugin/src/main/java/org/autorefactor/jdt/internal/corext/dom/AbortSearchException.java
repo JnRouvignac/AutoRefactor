@@ -28,6 +28,6 @@ package org.autorefactor.jdt.internal.corext.dom;
 /**
  * Interrupt the visit of a tree.
  */
-public class StopVisitException extends RuntimeException {
+public class AbortSearchException extends RuntimeException {
     private static final long serialVersionUID= 8809979732051907351L;
 }

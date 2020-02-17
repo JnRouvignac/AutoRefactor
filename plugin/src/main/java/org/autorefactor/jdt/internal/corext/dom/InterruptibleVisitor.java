@@ -40,7 +40,7 @@ public class InterruptibleVisitor extends ASTVisitor {
     public void visitNode(final ASTNode node) {
         try {
             node.accept(this);
-        } catch (StopVisitException e) {
+        } catch (AbortSearchException e) {
             return;
         }
     }
@@ -51,6 +51,6 @@ public class InterruptibleVisitor extends ASTVisitor {
      * @return nothing
      */
     public boolean interruptVisit() {
-        throw new StopVisitException();
+        throw new AbortSearchException();
     }
 }
