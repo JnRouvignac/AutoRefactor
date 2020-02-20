@@ -1001,6 +1001,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_name;
     /**
      * Automatically filled.
