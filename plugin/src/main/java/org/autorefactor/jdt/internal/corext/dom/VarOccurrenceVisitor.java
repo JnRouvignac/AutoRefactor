@@ -28,7 +28,7 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
      * The constructor.
      *
      * @param localVarIds The ids of the variable to search
-     * @param includeInnerScopes TODO
+     * @param includeInnerScopes True if the sub blocks should be analyzed
      */
     public VarOccurrenceVisitor(final Set<String> localVarIds, final boolean includeInnerScopes) {
         this.localVarIds= localVarIds;
