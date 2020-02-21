@@ -110,6 +110,7 @@ import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.PrimitiveType.Code;
@@ -480,8 +481,8 @@ public class ASTNodeFactory {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,
                         "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: " //$NON-NLS-1$
-                                + "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
-                                + "at most, and then it is located in first position.\""); //$NON-NLS-1$
+                        + "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
+                        + "at most, and then it is located in first position.\""); //$NON-NLS-1$
             }
 
             return toType(typeBinding.getWildcard(), typeNameDecider);
@@ -806,6 +807,21 @@ public class ASTNodeFactory {
         id.setStatic(false);
         id.setOnDemand(false);
         return id;
+    }
+
+    /**
+     * Builds a new {@link PostfixExpression} instance.
+     *
+     * @param operand the operand
+     * @param operator    the post operator
+     * @return a new post expression
+     */
+    public PostfixExpression postfixExpression(final Expression operand, final PostfixExpression.Operator operator) {
+        final PostfixExpression pe= ast.newPostfixExpression();
+        pe.setOperand(operand);
+        pe.setOperator(operator);
+
+        return pe;
     }
 
     /**
