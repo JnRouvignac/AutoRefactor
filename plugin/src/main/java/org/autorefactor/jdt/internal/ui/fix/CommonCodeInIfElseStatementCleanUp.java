@@ -45,7 +45,6 @@ import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -201,7 +200,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         final List<Statement> oneCaseToRemove= caseStmtsToRemove.get(casesToRefactor.get(0));
 
         if (allRemovable(areCasesRemovable, 0)) {
-            if (node.getParent() instanceof Block) {
+            if (ASTNodes.canHaveSiblings(node)) {
                 insertIdenticalCode(node, oneCaseToRemove, b, r);
 
                 r.removeButKeepComment(node);
@@ -232,7 +231,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 }
             }
 
-            if (node.getParent() instanceof Block) {
+            if (ASTNodes.canHaveSiblings(node)) {
                 insertIdenticalCode(node, oneCaseToRemove, b, r);
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);

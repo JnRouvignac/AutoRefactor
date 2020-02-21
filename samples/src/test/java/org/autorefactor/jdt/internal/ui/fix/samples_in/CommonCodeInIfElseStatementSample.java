@@ -577,4 +577,22 @@ public class CommonCodeInIfElseStatementSample {
             return "Common code";
         }
     }
+
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIfInSwitch(boolean b, int i, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            // Keep this!
+            if (b) {
+                i= i * 2;
+                // Keep this comment
+                i++;
+            } else {
+                i= i * 3;
+                i = i + 1;
+            }
+        case 1:
+            i--;
+        }
+    }
 }
