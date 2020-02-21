@@ -200,7 +200,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
+        if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
             r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
             r.replace(sourceNode, b.createMoveTarget(unconditionnalStatement));
@@ -208,7 +208,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
-        if (astNode.getParent() instanceof Block) {
+        if (ASTNodes.canHaveSiblings(astNode)) {
             this.ctx.getRefactorings().remove(ASTNodes.getNextSiblings(astNode));
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
         } else if (astNode.getParent() instanceof TryStatement) {
