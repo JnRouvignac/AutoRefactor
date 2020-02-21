@@ -29,7 +29,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.Queue;
 
 public class NoAssignmentInIfConditionSample {
-
     public void moveLeftHandSideAssignmentBeforeIf(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
@@ -98,7 +97,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     public void moveAssignmentWithoutParenthesis(Queue<Boolean> q) {
-        Boolean b = q.poll();
+        Boolean b= q.poll();
         // Keep this comment
         if (b) {
             System.out.println("Value=" + b);
@@ -120,6 +119,32 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
+    public void moveAssignmentBeforeIfAtConditionOfTernaryExpression(String s, int i) {
+        final char c= s.charAt(i);
+        // Keep this comment
+        if (c == 'A' ? c == 'B' : c == 'C') {
+            System.out.println("A, B or C");
+        } else {
+            System.out.println("Not A, B or C");
+        }
+    }
+
+    public void doNotMoveAssignmentBeforeIfAtLeftOperandOfTernaryExpression(String s, int i, char c) {
+        if (c == 'A' ? (c = s.charAt(i)) == 'B' : c == 'C') {
+            System.out.println("Found");
+        } else {
+            System.out.println("Not found");
+        }
+    }
+
+    public void doNotMoveAssignmentBeforeIfAtRightOperandOfTernaryExpression(String s, int i, char c) {
+        if (c == 'A' ? c == 'B' : (c = s.charAt(i)) == 'C') {
+            System.out.println("Found");
+        } else {
+            System.out.println("Not found");
+        }
+    }
+
     public void moveAssignmentBeforeIfAtStartOfInfixExpression(String s, int i) {
         final char c= s.charAt(i);
         // Keep this comment
@@ -131,7 +156,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     public void moveNotConditionalAssignment(String s, int i, boolean isValid) {
-        final char c = s.charAt(i);
+        final char c= s.charAt(i);
         // Keep this comment
         if (isValid | c == 'A') {
             System.out.println("valid or A");
@@ -141,7 +166,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     public void moveAssignmentInComplexExpression(String s, int i, boolean isValid) {
-        final char c = s.charAt(i);
+        final char c= s.charAt(i);
         // Keep this comment
         if (!(isValid | (i == 10 & c == 'A'))) {
             System.out.println("valid or A");
@@ -181,6 +206,23 @@ public class NoAssignmentInIfConditionSample {
             System.out.println("Value=" + i);
         } else {
             System.out.println("Empty");
+        }
+    }
+
+    public void moveLeftHandSideAssignmentInSwitch(Queue<Integer> q, int discriminant) {
+        Integer i;
+        System.out.println("Before polling");
+        switch (discriminant) {
+        case 0:
+            i = q.poll();
+            // Keep this comment
+            if (i != null) {
+                System.out.println("Value=" + i);
+            } else {
+                System.out.println("Empty");
+            }
+        case 1:
+            System.out.println("Another case");
         }
     }
 }

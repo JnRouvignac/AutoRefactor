@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -58,6 +59,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
     }
@@ -67,6 +69,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
     }
@@ -76,19 +79,20 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
     }
 
     @Override
     public boolean visit(final Block node) {
-        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(ctx, node);
-        node.accept(newAndPutAllMethodVisitor);
-        return newAndPutAllMethodVisitor.getResult();
+        final IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(ctx, node);
+        node.accept(ifWithAssignmentVisitor);
+        return ifWithAssignmentVisitor.getResult();
     }
 
-    private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-        public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
+    private static final class IfWithAssignmentVisitor extends BlockSubVisitor {
+        public IfWithAssignmentVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
 
@@ -150,6 +154,12 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 }
             }
 
+            final ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
+
+            if (ce != null) {
+                return moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
+            }
+
             return true;
         }
 
@@ -202,7 +212,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
                 Statement newAssignment= b.toStatement(b.createMoveTarget(assignment));
 
-                if (node.getParent() instanceof Block) {
+                if (ASTNodes.canHaveSiblings(node)) {
                     r.insertBefore(newAssignment, node);
                 } else {
                     Block newBlock= b.block(newAssignment, b.createMoveTarget(node));
