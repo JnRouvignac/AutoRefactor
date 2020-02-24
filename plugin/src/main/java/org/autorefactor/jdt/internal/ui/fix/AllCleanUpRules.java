@@ -11,11 +11,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program under LICENSE-GNUGPL.  If not, see
+ * along with this program under LICENSE-GNUGPL.   If not, see
  * <http://www.gnu.org/licenses/>.
  *
  *
@@ -44,7 +44,7 @@ public final class AllCleanUpRules {
      *
      * @param preferences the preferences
      * @return the cleanup rules which have been enabled from the Eclipse
-     *         preferences
+     *             preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
         final List<RefactoringRule> refactorings= getAllCleanUpRules();
@@ -134,7 +134,9 @@ public final class AllCleanUpRules {
                 new AndroidViewHolderCleanUp(), new LogParametersRatherThanLogMessageCleanUp(),
                 new NamedMethodRatherThanLogLevelParameterCleanUp(), new EnumMapRatherThanHashMapCleanUp(),
                 new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
-                new UppercaseNumberSuffixRatherThanLowercaseCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
+                new UppercaseNumberSuffixRatherThanLowercaseCleanUp(),
+                new FormattedNumberRatherThanPackedNumberCleanUp(),
+                new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
                 new VariableInsideIfRatherThanAboveCleanUp(),
 
                 // Those cleanups should end the list because some other cleanups are prioritary

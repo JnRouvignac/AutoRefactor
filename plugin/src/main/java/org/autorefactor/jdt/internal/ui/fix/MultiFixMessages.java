@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2019 Fabrice TIERCELIN - initial API and implementation
+ * Copyright (C) 2019-2020 Fabrice TIERCELIN - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,11 +10,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program under LICENSE-GNUGPL.  If not, see
+ * along with this program under LICENSE-GNUGPL.   If not, see
  * <http://www.gnu.org/licenses/>.
  *
  *
@@ -1382,6 +1382,18 @@ public final class MultiFixMessages extends NLS {
      * Automatically filled.
      */
     public static String CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
+    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_reason;
     /**
      * Automatically filled.
      */
