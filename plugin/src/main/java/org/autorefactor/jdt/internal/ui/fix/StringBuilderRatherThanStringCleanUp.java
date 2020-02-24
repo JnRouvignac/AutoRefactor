@@ -10,11 +10,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program under LICENSE-GNUGPL.  If not, see
+ * along with this program under LICENSE-GNUGPL.   If not, see
  * <http://www.gnu.org/licenses/>.
  *
  *
@@ -213,21 +213,21 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                 List<SimpleName> writes= varOccurrencesVisitor.getWrites();
                 writes.remove(declaration);
 
-                Set<SimpleName> remainingReads= new HashSet<>(reads);
+                Set<SimpleName> unvisitedReads= new HashSet<>(reads);
                 Set<SimpleName> assignmentWrites= new HashSet<>();
                 Set<SimpleName> concatenationWrites= new HashSet<>();
 
                 for (SimpleName simpleName : writes) {
-                    if (!isWriteValid(simpleName, reads, remainingReads, assignmentWrites, concatenationWrites)) {
+                    if (!isWriteValid(simpleName, unvisitedReads, assignmentWrites, concatenationWrites)) {
                         return true;
                     }
                 }
 
-                if (remainingReads.size() == 1
+                if (unvisitedReads.size() == 1
                         && !writes.isEmpty()
                         && writes.size() == assignmentWrites.size() + concatenationWrites.size()) {
                     Statement declarationStatement= ASTNodes.getAncestorOrNull(type, Statement.class);
-                    SimpleName finalRead= remainingReads.iterator().next();
+                    SimpleName finalRead= unvisitedReads.iterator().next();
 
                     if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {
                         replaceString(type, initializer, assignmentWrites, concatenationWrites, finalRead);
@@ -432,8 +432,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
             return varOccurrenceVisitor.getFoundVariables();
         }
 
-        private boolean isWriteValid(final SimpleName simpleName, final List<SimpleName> reads,
-                final Set<SimpleName> remainingReads, final Set<SimpleName> assignmentWrites, final Set<SimpleName> concatenationWrites) {
+        private boolean isWriteValid(final SimpleName simpleName, final Set<SimpleName> unvisitedReads, final Set<SimpleName> assignmentWrites, final Set<SimpleName> concatenationWrites) {
             if (simpleName.getParent() instanceof Assignment) {
                 Assignment assignment= (Assignment) simpleName.getParent();
 
@@ -452,9 +451,8 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                             SimpleName stringRead= ASTNodes.as(concatenation.getLeftOperand(), SimpleName.class);
 
                             if (stringRead != null
-                                    && reads.contains(stringRead)
-                                    && !reads.contains(remainingReads)) {
-                                remainingReads.remove(stringRead);
+                                    && unvisitedReads.contains(stringRead)) {
+                                unvisitedReads.remove(stringRead);
                                 concatenationWrites.add(simpleName);
                                 return true;
                             }
