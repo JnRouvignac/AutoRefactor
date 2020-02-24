@@ -70,10 +70,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
     }
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
-
     @Override
     public boolean visit(final MethodInvocation node) {
         if (node.getExpression() == null) {

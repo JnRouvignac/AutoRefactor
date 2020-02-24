@@ -262,10 +262,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         b= ctx.getASTBuilder();
     }
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
-
     @Override
     public boolean visit(final ConditionalExpression node) {
         final ITypeBinding typeBinding= node.resolveTypeBinding();

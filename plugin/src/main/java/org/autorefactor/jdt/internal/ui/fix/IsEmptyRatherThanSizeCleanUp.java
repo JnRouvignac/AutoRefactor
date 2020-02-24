@@ -42,6 +42,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name;
     }
@@ -51,6 +52,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_description;
     }
@@ -60,12 +62,9 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_reason;
-    }
-
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     @Override
@@ -87,7 +86,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final InfixExpression.Operator operator, final Long literalSize) {
         if ((ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ //$NON-NLS-2$
-                || (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6) //$NON-NLS-1$
                 && literalSize != null) {
             final Refactorings r= this.ctx.getRefactorings();
             final ASTNodeFactory b= this.ctx.getASTBuilder();

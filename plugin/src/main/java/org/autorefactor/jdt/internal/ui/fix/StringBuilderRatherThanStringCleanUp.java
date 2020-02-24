@@ -246,14 +246,21 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
             ASTNodeFactory b= this.ctx.getASTBuilder();
             Refactorings r= this.ctx.getRefactorings();
 
-            r.replace(type, b.type(StringBuilder.class.getSimpleName()));
+            Class<?> builder;
+            if (getJavaMinorVersion() >= 5) {
+                builder= StringBuilder.class;
+            } else {
+                builder= StringBuffer.class;
+            }
+
+            r.replace(type, b.type(builder.getSimpleName()));
 
             StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
             if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-                r.replace(initializer, b.new0(StringBuilder.class.getSimpleName()));
+                r.replace(initializer, b.new0(builder.getSimpleName()));
             } else {
-                r.replace(initializer, b.new0(StringBuilder.class.getSimpleName(), b.createMoveTarget(initializer)));
+                r.replace(initializer, b.new0(builder.getSimpleName(), b.createMoveTarget(initializer)));
             }
 
             for (SimpleName simpleName : assignmentWrites) {

@@ -40,6 +40,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name;
     }
@@ -49,6 +50,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_description;
     }
@@ -58,12 +60,9 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_reason;
-    }
-
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     @Override
@@ -71,8 +70,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
         final Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
         final Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
 
-        return node.hasExtendedOperands() || (maybeStandardizeComparison(node, leftOperand,
-                rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand));
+        return node.hasExtendedOperands() || maybeStandardizeComparison(node, leftOperand,
+                rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand);
     }
 
     private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
@@ -83,8 +82,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                 && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
                         && (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                        || (getJavaMinorVersion() >= 2
-                        && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName())))) { //$NON-NLS-1$
+                        || getJavaMinorVersion() >= 2
+                        && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
             final Object literalValue= literal.resolveConstantExpressionValue();
 
             if (literalValue instanceof Number) {

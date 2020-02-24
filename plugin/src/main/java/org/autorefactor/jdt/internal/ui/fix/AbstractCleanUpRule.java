@@ -69,6 +69,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return true if it is the visitor by default.
      */
+    @Override
     public boolean isByDefault() {
         return true;
     }
@@ -80,6 +81,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return true if the visitor is enabled.
      */
+    @Override
     public boolean isEnabled(final Preferences preferences) {
         return preferences.isEnabled(getClass());
     }
@@ -91,8 +93,18 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return true if this Java version is supported.
      */
+    @Override
     public boolean isJavaVersionSupported(final Release javaSeRelease) {
         return true;
+    }
+
+    /**
+     * Get the java minor version.
+     *
+     * @return the java minor version.
+     */
+    public int getJavaMinorVersion() {
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     /**
@@ -100,6 +112,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @param ctx the cleanup context.
      */
+    @Override
     public void setRefactoringContext(final RefactoringContext ctx) {
         this.ctx= ctx;
     }
@@ -126,6 +139,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      *
      * @return the cleanups.
      */
+    @Override
     public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
         return ctx.getRefactorings();
