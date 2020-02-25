@@ -127,9 +127,11 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
             final TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
+
             if (tryStatement == null) {
                 return false;
             }
+
             if (tryStatement.getFinally() != null) {
                 final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varToSearch, tryStatement.getFinally(), true).find();
@@ -141,30 +143,29 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
             return isUsedAfterReturn(varToSearch, tryStatement);
         }
 
-        /**
-         * @return true if refactoring was done
-         */
-        private boolean removeArrayVariable(ReturnStatement node, VariableDeclarationStatement vds, ArrayInitializer returnExpression) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            final Type varType = vds.getType();
-            final VariableDeclarationFragment varDeclFrag = (VariableDeclarationFragment) vds.fragments().get(0);
+        private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
+            ASTNodeFactory b= ctx.getASTBuilder();
+            Type varType= vds.getType();
+            VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
+
             if (varType instanceof ArrayType) {
-                final ArrayType arrayType = (ArrayType) varType;
-                // mixed c style/var style not supported yet. Abort instead of generating wrong code
+                ArrayType arrayType= (ArrayType) varType;
+                // Mixed c style/var style not supported yet. Abort instead of generating wrong code
                 if (varDeclFrag.getExtraDimensions() > 0) {
                     return false;
                 }
-                // java style array "Type[] var"
-                final ReturnStatement newReturnStatement = b
+                // Java style array "Type[] var"
+                ReturnStatement newReturnStatement= b
                         .return0(b.newArray(b.createCopyTarget(arrayType), b.createMoveTarget(returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             } else {
-                // c style array "Type var[]"
-                final ArrayType arrayType = node.getAST().newArrayType(b.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
-                final ReturnStatement newReturnStatement = b
+                // C style array "Type var[]"
+                ArrayType arrayType= node.getAST().newArrayType(b.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
+                ReturnStatement newReturnStatement= b
                         .return0(b.newArray(arrayType, b.createMoveTarget(returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             }
+
             return true;
         }
 
