@@ -69,16 +69,16 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final InfixExpression node) {
-        final MethodInvocation leftMi= ASTNodes.as(node.getLeftOperand(), MethodInvocation.class);
-        final Long rightLiteral= ASTNodes.integerLiteral(node.getRightOperand());
+        MethodInvocation leftMi= ASTNodes.as(node.getLeftOperand(), MethodInvocation.class);
+        Long rightLiteral= ASTNodes.integerLiteral(node.getRightOperand());
 
         if (!maybeReplaceCollectionSize(node, leftMi, node.getOperator(),
                 rightLiteral)) {
             return false;
         }
 
-        final MethodInvocation rightMi= ASTNodes.as(node.getRightOperand(), MethodInvocation.class);
-        final Long leftLiteral= ASTNodes.integerLiteral(node.getLeftOperand());
+        MethodInvocation rightMi= ASTNodes.as(node.getRightOperand(), MethodInvocation.class);
+        Long leftLiteral= ASTNodes.integerLiteral(node.getLeftOperand());
 
         return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator()), leftLiteral);
     }
@@ -88,30 +88,30 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         if ((ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6) //$NON-NLS-1$
                 && literalSize != null) {
-            final Refactorings r= this.ctx.getRefactorings();
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
+            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.ctx.getASTBuilder();
 
             if (literalSize == 0) {
-                if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
-                    r.replace(node, b.boolean0(true));
-                    return false;
+                if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)
+                        || InfixExpression.Operator.LESS.equals(operator)) {
+                    return true;
                 }
-                if (InfixExpression.Operator.LESS.equals(operator)) {
-                    r.replace(node, b.boolean0(false));
-                    return false;
-                }
+
                 if (InfixExpression.Operator.GREATER.equals(operator)) {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
+
                 if (InfixExpression.Operator.EQUALS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
+
                 if (InfixExpression.Operator.NOT_EQUALS.equals(operator)) {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
+
                 if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
@@ -121,6 +121,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
+
                 if (InfixExpression.Operator.LESS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
@@ -135,12 +136,15 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         if (InfixExpression.Operator.LESS.equals(operator)) {
             return InfixExpression.Operator.GREATER;
         }
+
         if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
             return InfixExpression.Operator.GREATER_EQUALS;
         }
+
         if (InfixExpression.Operator.GREATER.equals(operator)) {
             return InfixExpression.Operator.LESS;
         }
+
         if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
             return InfixExpression.Operator.LESS_EQUALS;
         }

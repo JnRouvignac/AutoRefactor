@@ -36,20 +36,20 @@ public class IsEmptyRatherThanSizeSample {
     public void replaceChecksOnSize(Collection<Integer> col) {
         // Keep this comment
         System.out.println(!col.isEmpty());
-        System.out.println(true);
+        System.out.println(col.size() >= 0);
         System.out.println(col.isEmpty());
         System.out.println(!col.isEmpty());
         System.out.println(col.isEmpty());
-        System.out.println(false);
+        System.out.println(col.size() < 0);
         System.out.println(col.isEmpty());
         System.out.println(!col.isEmpty());
 
         System.out.println(!col.isEmpty());
-        System.out.println(true);
+        System.out.println(0 <= col.size());
         System.out.println(col.isEmpty());
         System.out.println(!col.isEmpty());
         System.out.println(col.isEmpty());
-        System.out.println(false);
+        System.out.println(0 > col.size());
         System.out.println(col.isEmpty());
         System.out.println(!col.isEmpty());
     }
@@ -71,20 +71,20 @@ public class IsEmptyRatherThanSizeSample {
     public void replaceChecksOnSize(Map<Short, Observable> map) {
         // Keep this comment
         System.out.println(!map.isEmpty());
-        System.out.println(true);
+        System.out.println(map.size() >= 0);
         System.out.println(map.isEmpty());
         System.out.println(!map.isEmpty());
         System.out.println(map.isEmpty());
-        System.out.println(false);
+        System.out.println(map.size() < 0);
         System.out.println(map.isEmpty());
         System.out.println(!map.isEmpty());
 
         System.out.println(!map.isEmpty());
-        System.out.println(true);
+        System.out.println(0 <= map.size());
         System.out.println(map.isEmpty());
         System.out.println(!map.isEmpty());
         System.out.println(map.isEmpty());
-        System.out.println(false);
+        System.out.println(0 > map.size());
         System.out.println(map.isEmpty());
         System.out.println(!map.isEmpty());
     }
@@ -106,20 +106,20 @@ public class IsEmptyRatherThanSizeSample {
     public void replaceChecksOnSize(String text) {
         // Keep this comment
         System.out.println(!text.isEmpty());
-        System.out.println(true);
+        System.out.println(text.length() >= 0);
         System.out.println(text.isEmpty());
         System.out.println(!text.isEmpty());
         System.out.println(text.isEmpty());
-        System.out.println(false);
+        System.out.println(text.length() < 0);
         System.out.println(text.isEmpty());
         System.out.println(!text.isEmpty());
 
         System.out.println(!text.isEmpty());
-        System.out.println(true);
+        System.out.println(0 <= text.length());
         System.out.println(text.isEmpty());
         System.out.println(!text.isEmpty());
         System.out.println(text.isEmpty());
-        System.out.println(false);
+        System.out.println(0 > text.length());
         System.out.println(text.isEmpty());
         System.out.println(!text.isEmpty());
     }
