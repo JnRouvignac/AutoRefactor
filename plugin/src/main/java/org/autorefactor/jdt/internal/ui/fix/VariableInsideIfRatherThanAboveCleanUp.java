@@ -25,18 +25,16 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -88,58 +86,46 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
         @Override
         public boolean visit(final IfStatement node) {
             Statement variableAssignment= ASTNodes.getPreviousSibling(node);
-            SimpleName variable= getVariable(variableAssignment);
+            VariableDeclarationFragment variable= getVariable(variableAssignment);
 
-            if (variable == null) {
+            if (variable == null || isVarUsed(variable, node.getExpression())) {
                 return true;
             }
-
-            HashSet<String> variableToFind= new HashSet<>(Arrays.asList(variable.getIdentifier()));
-            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-            varOccurrenceVisitor.visitNode(node.getExpression());
 
             for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                varOccurrenceVisitor.visitNode(statement);
+                if (isVarUsed(variable, statement)) {
+                    return true;
+                }
             }
 
-            if (varOccurrenceVisitor.isVarUsed()) {
-                return true;
-            }
-
-            varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-            varOccurrenceVisitor.visitNode(node.getThenStatement());
-
-            if (varOccurrenceVisitor.isVarUsed()) {
-                if (node.getElseStatement() != null) {
-                    varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-                    varOccurrenceVisitor.visitNode(node.getElseStatement());
-
-                    if (varOccurrenceVisitor.isVarUsed()) {
-                        return true;
-                    }
+            if (isVarUsed(variable, node.getThenStatement())) {
+                if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+                    return true;
                 }
 
                 return maybeMoveAssignment(variableAssignment, node.getThenStatement());
             }
 
             if (node.getElseStatement() != null) {
-                varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-                varOccurrenceVisitor.visitNode(node.getElseStatement());
-
-                return !varOccurrenceVisitor.isVarUsed() || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+                return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
             }
 
             return true;
         }
 
-        private SimpleName getVariable(final Statement variableAssignment) {
+        private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
+            VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true).find();
+            return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
+        }
+
+        private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
             VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
 
             if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
                 VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
 
                 if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-                    return fragment.getName();
+                    return fragment;
                 }
             }
 
