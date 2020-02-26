@@ -72,7 +72,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private Variable mergeValues(final Variable other) {
-            final List<Expression> values= new ArrayList<>(constantValues);
+            List<Expression> values= new ArrayList<>(constantValues);
             values.addAll(other.constantValues);
             return new Variable(name, values);
         }
@@ -140,7 +140,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            final StringBuilder sb= new StringBuilder();
+            StringBuilder sb= new StringBuilder();
 
             for (Expression expression : constantExprs) {
                 sb.append("new case ").append(expression).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,11 +242,11 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final Expression switchExpression= variable.name;
-        final List<SwitchCaseSection> cases= new ArrayList<>();
+        Expression switchExpression= variable.name;
+        List<SwitchCaseSection> cases= new ArrayList<>();
         Statement remainingStatement= null;
 
-        final Set<String> variableDeclarationIds= new HashSet<>();
+        Set<String> variableDeclarationIds= new HashSet<>();
         IfStatement currentNode= node;
         while (ASTNodes.isSameVariable(switchExpression, variable.name)) {
             if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
@@ -266,7 +266,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             currentNode= (IfStatement) remainingStatement;
         }
 
-        final List<SwitchCaseSection> filteredCases= filterDuplicateCaseValues(cases);
+        List<SwitchCaseSection> filteredCases= filterDuplicateCaseValues(cases);
         return maybeReplaceWithSwitchStatement(node, switchExpression, filteredCases, remainingStatement);
     }
 
@@ -275,8 +275,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean detectDeclarationConflicts(final Statement statement, final Set<String> variableDeclarationIds) {
-        final Set<String> varNames= ASTNodes.getLocalVariableIdentifiers(statement, false);
-        final boolean hasConflict= containsAny(variableDeclarationIds, varNames);
+        Set<String> varNames= ASTNodes.getLocalVariableIdentifiers(statement, false);
+        boolean hasConflict= containsAny(variableDeclarationIds, varNames);
         variableDeclarationIds.addAll(varNames);
         return hasConflict;
     }
@@ -303,14 +303,14 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
     private List<SwitchCaseSection> filterDuplicateCaseValues(final List<SwitchCaseSection> sourceCases) {
-        final List<SwitchCaseSection> results= new ArrayList<>();
-        final Set<Object> alreadyProccessedValues= new HashSet<>();
+        List<SwitchCaseSection> results= new ArrayList<>();
+        Set<Object> alreadyProccessedValues= new HashSet<>();
 
         for (SwitchCaseSection sourceCase : sourceCases) {
-            final List<Expression> filteredExprs= new ArrayList<>();
+            List<Expression> filteredExprs= new ArrayList<>();
 
             for (Expression expression : sourceCase.constantExprs) {
-                final Object constantValue= expression.resolveConstantExpressionValue();
+                Object constantValue= expression.resolveConstantExpressionValue();
 
                 if (constantValue == null) {
                     throw new NotImplementedException(expression, "Cannot handle non constant expressions"); //$NON-NLS-1$
@@ -332,8 +332,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final SwitchStatement switchStatement= b.switch0(b.createMoveTarget(switchExpression));
+        ASTNodeFactory b= ctx.getASTBuilder();
+        SwitchStatement switchStatement= b.switch0(b.createMoveTarget(switchExpression));
 
         for (SwitchCaseSection aCase : cases) {
             addCaseWithStatements(switchStatement, aCase.constantExprs, aCase.statements);
@@ -348,8 +348,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
             final List<Statement> innerStatements) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final List<Statement> switchStatements= ASTNodes.statements(switchStatement);
+        ASTNodeFactory b= ctx.getASTBuilder();
+        List<Statement> switchStatements= ASTNodes.statements(switchStatement);
 
         // Add the case statement(s)
         if (caseValuesOrNullForDefault != null) {
@@ -384,7 +384,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private Variable extractVariableAndValues(final Expression expression) {
-        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
+        Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
         return exprNoParen instanceof InfixExpression
                 ? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
                         : null;
@@ -414,8 +414,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             return mergedVariable;
         }
         if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
-            final Expression leftOp= infixExpression.getLeftOperand();
-            final Expression rightOp= infixExpression.getRightOperand();
+            Expression leftOp= infixExpression.getLeftOperand();
+            Expression rightOp= infixExpression.getRightOperand();
 
             Variable variable= extractVariableWithConstantValue(leftOp, rightOp);
             return variable != null ? variable : extractVariableWithConstantValue(rightOp, leftOp);
@@ -437,17 +437,17 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final SwitchStatement node) {
-        final List<SwitchCaseSection> switchStructure= getSwitchStructure(node);
+        List<SwitchCaseSection> switchStructure= getSwitchStructure(node);
 
         for (int referenceIndex= 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
-            final SwitchCaseSection referenceCase= switchStructure.get(referenceIndex);
+            SwitchCaseSection referenceCase= switchStructure.get(referenceIndex);
 
             if (referenceCase.fallsThrough()) {
                 continue;
             }
 
             for (int comparedIndex= referenceIndex + 1; comparedIndex < switchStructure.size(); comparedIndex++) {
-                final SwitchCaseSection comparedCase= switchStructure.get(comparedIndex);
+                SwitchCaseSection comparedCase= switchStructure.get(comparedIndex);
 
                 if (referenceCase.hasSameCode(comparedCase)) {
                     if (!previousSectionFallsthrough(switchStructure, comparedIndex)) {
@@ -471,7 +471,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
-        final List<SwitchCaseSection> switchStructure= new ArrayList<>();
+        List<SwitchCaseSection> switchStructure= new ArrayList<>();
 
         SwitchCaseSection currentCase= new SwitchCaseSection();
         for (Statement statement : ASTNodes.statements(node)) {
@@ -481,7 +481,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                     currentCase= new SwitchCaseSection();
                 }
 
-                final SwitchCase swithCase= (SwitchCase) statement;
+                SwitchCase swithCase= (SwitchCase) statement;
                 currentCase.existingCases.add(swithCase);
             } else {
                 currentCase.statements.add(statement);
@@ -503,10 +503,10 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
-        final Statement caseKept;
+        Statement caseKept;
         if (merge == Merge.BEFORE_SWITCH_CASES) {
             caseKept= sectionToKeep.existingCases.get(0);
         } else { // move == Move.AFTER_SWITCH_CASES

@@ -88,7 +88,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
         for (Object object : node.imports()) {
             ImportDeclaration importDeclaration= (ImportDeclaration) object;
-            final ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
+            ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
 
             if (ASTNodes.hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
                 for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
@@ -106,7 +106,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        final List<Expression> args= ASTNodes.arguments(node);
+        List<Expression> args= ASTNodes.arguments(node);
 
         if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
@@ -147,10 +147,10 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(final IfStatement node) {
-        final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+        List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
         if (node.getElseStatement() == null && statements.size() == 1) {
-            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+            MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
             if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);

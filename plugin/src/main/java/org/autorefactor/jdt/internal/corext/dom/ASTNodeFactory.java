@@ -230,7 +230,7 @@ public class ASTNodeFactory {
      * @return a new Block
      */
     public Assignment assign(final Expression lhs, final Assignment.Operator operator, final Expression rhs) {
-        final Assignment assign= ast.newAssignment();
+        Assignment assign= ast.newAssignment();
         assign.setLeftHandSide(lhs);
         assign.setOperator(operator);
         assign.setRightHandSide(rhs);
@@ -244,7 +244,7 @@ public class ASTNodeFactory {
      * @return a new Block
      */
     public Block block(final Statement... statements) {
-        final Block block= ast.newBlock();
+        Block block= ast.newBlock();
         addAll(ASTNodes.statements(block), statements);
         return block;
     }
@@ -256,7 +256,7 @@ public class ASTNodeFactory {
      * @return a new Block
      */
     public Block block(final Collection<Statement> statements) {
-        final Block block= ast.newBlock();
+        Block block= ast.newBlock();
         ASTNodes.statements(block).addAll(statements);
         return block;
     }
@@ -287,7 +287,7 @@ public class ASTNodeFactory {
      * @return a new switch case statement
      */
     public SwitchCase case0(final Expression expression) {
-        final SwitchCase sc= ast.newSwitchCase();
+        SwitchCase sc= ast.newSwitchCase();
         sc.setExpression(expression);
         return sc;
     }
@@ -300,7 +300,7 @@ public class ASTNodeFactory {
      * @return a new CastExpression
      */
     public CastExpression cast(final Type type, final Expression expression) {
-        final CastExpression ce= ast.newCastExpression();
+        CastExpression ce= ast.newCastExpression();
         ce.setType(type);
         ce.setExpression(parenthesizeIfNeeded(expression));
         return ce;
@@ -340,7 +340,7 @@ public class ASTNodeFactory {
     }
 
     private Type simpleType(final String name) {
-        final Code primitiveTypeCode= PrimitiveType.toCode(name);
+        Code primitiveTypeCode= PrimitiveType.toCode(name);
         if (primitiveTypeCode != null) {
             return ast.newPrimitiveType(primitiveTypeCode);
         }
@@ -372,8 +372,8 @@ public class ASTNodeFactory {
      * @return a new parameterized type
      */
     public Type genericType(final String typeName, final Type... typeArguments) {
-        final Type type= type(typeName);
-        final ParameterizedType parameterizedType= ast.newParameterizedType(type);
+        Type type= type(typeName);
+        ParameterizedType parameterizedType= ast.newParameterizedType(type);
         Collections.addAll(ASTNodes.typeArguments(parameterizedType), typeArguments);
         return parameterizedType;
     }
@@ -387,13 +387,13 @@ public class ASTNodeFactory {
      * @return a new catch clause
      */
     public CatchClause catch0(final String exceptionTypeName, final String caughtExceptionName, final Statement... statements) {
-        final CatchClause cc= ast.newCatchClause();
-        final SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
+        CatchClause cc= ast.newCatchClause();
+        SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
         svd.setType(simpleType(exceptionTypeName));
         svd.setName(ast.newSimpleName(caughtExceptionName));
         cc.setException(svd);
 
-        final Block block= ast.newBlock();
+        Block block= ast.newBlock();
         addAll(ASTNodes.statements(block), statements);
         cc.setBody(block);
         return cc;
@@ -448,8 +448,8 @@ public class ASTNodeFactory {
         }
 
         if (typeBinding.isParameterizedType()) {
-            final ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-            final List<Type> typeArgs= ASTNodes.typeArguments(type);
+            ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
+            List<Type> typeArgs= ASTNodes.typeArguments(type);
             for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
@@ -467,7 +467,7 @@ public class ASTNodeFactory {
             return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider), typeBinding.getDimensions());
         }
         if (typeBinding.isWildcardType()) {
-            final WildcardType type= ast.newWildcardType();
+            WildcardType type= ast.newWildcardType();
             if (typeBinding.getBound() != null) {
                 type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
             }
@@ -493,15 +493,15 @@ public class ASTNodeFactory {
     private Type copyType(final Type type) {
         switch (type.getNodeType()) {
         case ARRAY_TYPE:
-            final ArrayType arrayType= (ArrayType) type;
+            ArrayType arrayType= (ArrayType) type;
             return ast.newArrayType(copyType(arrayType.getElementType()), arrayType.getDimensions());
 
         case PRIMITIVE_TYPE:
-            final Code code= ((PrimitiveType) type).getPrimitiveTypeCode();
+            Code code= ((PrimitiveType) type).getPrimitiveTypeCode();
             return ast.newPrimitiveType(code);
 
         case QUALIFIED_TYPE:
-            final ITypeBinding typeBinding= type.resolveBinding();
+            ITypeBinding typeBinding= type.resolveBinding();
 
             if (typeBinding == null) {
                 return null;
@@ -510,13 +510,13 @@ public class ASTNodeFactory {
             return type(typeBinding.getQualifiedName());
 
         case SIMPLE_TYPE:
-            final SimpleType sType= (SimpleType) type;
+            SimpleType sType= (SimpleType) type;
             return ast.newSimpleType(createCopyTarget(sType.getName()));
 
         case PARAMETERIZED_TYPE:
-            final ParameterizedType pType= (ParameterizedType) type;
-            final ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
-            final List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
+            ParameterizedType pType= (ParameterizedType) type;
+            ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
+            List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
             for (Object typeArg : pType.typeArguments()) {
                 if (((Type) typeArg).isWildcardType()) {
                     newTypeArgs.add(ast.newWildcardType());
@@ -588,9 +588,9 @@ public class ASTNodeFactory {
         if (nodes.isEmpty()) {
             return true;
         }
-        final ASTNode firstNode= nodes.get(0);
-        final ASTNode parent= firstNode.getParent();
-        final StructuralPropertyDescriptor locInParent= firstNode.getLocationInParent();
+        ASTNode firstNode= nodes.get(0);
+        ASTNode parent= firstNode.getParent();
+        StructuralPropertyDescriptor locInParent= firstNode.getLocationInParent();
         for (ASTNode node : nodes) {
             if (!Objects.equals(node.getParent(), parent) || !Objects.equals(node.getLocationInParent(), locInParent)) {
                 return false;
@@ -622,7 +622,7 @@ public class ASTNodeFactory {
      * @return a new variable declaration statement
      */
     public VariableDeclarationStatement declareStatement(final Type type, final SimpleName varName, final Expression initializer) {
-        final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
+        VariableDeclarationFragment fragment= declareFragment(varName, initializer);
         return declareStatement(type, fragment);
     }
 
@@ -634,7 +634,7 @@ public class ASTNodeFactory {
      * @return a new variable declaration statement
      */
     public VariableDeclarationStatement declareStatement(final Type type, final VariableDeclarationFragment fragment) {
-        final VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(fragment);
+        VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(fragment);
         vds.setType(type);
         return vds;
     }
@@ -648,8 +648,8 @@ public class ASTNodeFactory {
      * @return a new variable declaration expression
      */
     public VariableDeclarationExpression declareExpression(final Type type, final SimpleName varName, final Expression initializer) {
-        final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
-        final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
+        VariableDeclarationFragment fragment= declareFragment(varName, initializer);
+        VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         ASTNodes.modifiers(vde).add(final0());
         vde.setType(type);
         return vde;
@@ -663,7 +663,7 @@ public class ASTNodeFactory {
      * @return a new variable declaration expression
      */
     public VariableDeclarationExpression declareExpression(final Type type, final VariableDeclarationFragment fragment) {
-        final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
+        VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         vde.setType(type);
         return vde;
     }
@@ -676,7 +676,7 @@ public class ASTNodeFactory {
      * @return a new field declaration
      */
     public FieldDeclaration declareField(final Type type, final VariableDeclarationFragment fragment) {
-        final FieldDeclaration fd= ast.newFieldDeclaration(fragment);
+        FieldDeclaration fd= ast.newFieldDeclaration(fragment);
         fd.setType(type);
         return fd;
     }
@@ -688,7 +688,7 @@ public class ASTNodeFactory {
      * @return a new variable declaration fragment
      */
     public VariableDeclarationFragment declareFragment(final SimpleName varName) {
-        final VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
+        VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         return vdf;
     }
@@ -701,7 +701,7 @@ public class ASTNodeFactory {
      * @return a new variable declaration fragment
      */
     public VariableDeclarationFragment declareFragment(final SimpleName varName, final Expression initializer) {
-        final VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
+        VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         vdf.setInitializer(initializer);
         return vdf;
@@ -725,7 +725,7 @@ public class ASTNodeFactory {
      * @return a new single field access
      */
     public FieldAccess fieldAccess(final Expression expression, final SimpleName fieldName) {
-        final FieldAccess fa= getAST().newFieldAccess();
+        FieldAccess fa= getAST().newFieldAccess();
         fa.setExpression(expression);
         fa.setName(fieldName);
         return fa;
@@ -748,7 +748,7 @@ public class ASTNodeFactory {
      * @return a new single variable declaration
      */
     public SingleVariableDeclaration declareSingleVariable(final String varName, final Type type) {
-        final SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
+        SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
         svd.setName(simpleName(varName));
         svd.setType(type);
         return svd;
@@ -773,7 +773,7 @@ public class ASTNodeFactory {
      * @return a new do statement
      */
     public DoStatement doWhile(final Expression condition, final Statement statement) {
-        final DoStatement ds= ast.newDoStatement();
+        DoStatement ds= ast.newDoStatement();
         ds.setExpression(condition);
         ds.setBody(statement);
         return ds;
@@ -788,7 +788,7 @@ public class ASTNodeFactory {
      * @return a new if statement
      */
     public IfStatement if0(final Expression condition, final Statement thenStatement, final Statement elseStatement) {
-        final IfStatement is= ast.newIfStatement();
+        IfStatement is= ast.newIfStatement();
         is.setExpression(condition);
         is.setThenStatement(thenStatement);
         is.setElseStatement(elseStatement);
@@ -802,7 +802,7 @@ public class ASTNodeFactory {
      * @return a new if statement
      */
     public ImportDeclaration import0(final Name name) {
-        final ImportDeclaration id= ast.newImportDeclaration();
+        ImportDeclaration id= ast.newImportDeclaration();
         id.setName(name);
         id.setStatic(false);
         id.setOnDemand(false);
@@ -817,7 +817,7 @@ public class ASTNodeFactory {
      * @return a new post expression
      */
     public PostfixExpression postfixExpression(final Expression operand, final PostfixExpression.Operator operator) {
-        final PostfixExpression pe= ast.newPostfixExpression();
+        PostfixExpression pe= ast.newPostfixExpression();
         pe.setOperand(operand);
         pe.setOperator(operator);
 
@@ -836,8 +836,8 @@ public class ASTNodeFactory {
             throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
                     + "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
         }
-        final Iterator<? extends Expression> it= allOperands.iterator();
-        final InfixExpression ie= ast.newInfixExpression();
+        Iterator<? extends Expression> it= allOperands.iterator();
+        InfixExpression ie= ast.newInfixExpression();
         ie.setLeftOperand(it.next());
         ie.setOperator(operator);
         ie.setRightOperand(it.next());
@@ -859,7 +859,7 @@ public class ASTNodeFactory {
      */
     public ConditionalExpression conditionalExpression(final Expression mainExpression, final Expression thenExpression,
             final Expression elseExpression) {
-        final ConditionalExpression ce= ast.newConditionalExpression();
+        ConditionalExpression ce= ast.newConditionalExpression();
         ce.setExpression(mainExpression);
         ce.setThenExpression(thenExpression);
         ce.setElseExpression(elseExpression);
@@ -877,7 +877,7 @@ public class ASTNodeFactory {
      */
     public InfixExpression infixExpression(final Expression leftOperand, final InfixExpression.Operator operator, final Expression rightOperand,
             final Expression... extendedOperands) {
-        final InfixExpression ie= ast.newInfixExpression();
+        InfixExpression ie= ast.newInfixExpression();
         ie.setLeftOperand(leftOperand);
         ie.setOperator(operator);
         ie.setRightOperand(rightOperand);
@@ -904,7 +904,7 @@ public class ASTNodeFactory {
      * @return a new method invocation
      */
     public MethodInvocation invoke(final String expression, final String methodName, final Expression... arguments) {
-        final MethodInvocation mi= ast.newMethodInvocation();
+        MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(ast.newSimpleName(expression));
         mi.setName(ast.newSimpleName(methodName));
         addAll(ASTNodes.arguments(mi), arguments);
@@ -919,7 +919,7 @@ public class ASTNodeFactory {
      * @return a new method invocation
      */
     public MethodInvocation invoke(final String methodName, final Expression... arguments) {
-        final MethodInvocation mi= ast.newMethodInvocation();
+        MethodInvocation mi= ast.newMethodInvocation();
         mi.setName(ast.newSimpleName(methodName));
         addAll(ASTNodes.arguments(mi), arguments);
         return mi;
@@ -934,7 +934,7 @@ public class ASTNodeFactory {
      * @return a new method invocation
      */
     public MethodInvocation invoke(final Expression expression, final String methodName, final Expression... arguments) {
-        final MethodInvocation mi= ast.newMethodInvocation();
+        MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
         addAll(ASTNodes.arguments(mi), arguments);
@@ -951,7 +951,7 @@ public class ASTNodeFactory {
      * @return a new method invocation
      */
     public <E extends Expression> MethodInvocation invoke(final Expression expression, final String methodName, final List<E> arguments) {
-        final MethodInvocation mi= ast.newMethodInvocation();
+        MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
         addAll(mi, arguments);
@@ -1092,7 +1092,7 @@ public class ASTNodeFactory {
      * @return a new class instance creation
      */
     public ClassInstanceCreation new0(final String typeName, final Expression... arguments) {
-        final ClassInstanceCreation cic= ast.newClassInstanceCreation();
+        ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(simpleType(typeName));
         addAll(ASTNodes.arguments(cic), arguments);
         return cic;
@@ -1106,7 +1106,7 @@ public class ASTNodeFactory {
      * @return a new class instance creation
      */
     public ClassInstanceCreation new0(final Type type, final Expression... arguments) {
-        final ClassInstanceCreation cic= ast.newClassInstanceCreation();
+        ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(type);
         addAll(ASTNodes.arguments(cic), arguments);
         return cic;
@@ -1133,7 +1133,7 @@ public class ASTNodeFactory {
      * @return a new array creation instance
      */
     public ArrayCreation newArray(final ArrayType arrayType, final ArrayInitializer arrayInitializer) {
-        final ArrayCreation ac= ast.newArrayCreation();
+        ArrayCreation ac= ast.newArrayCreation();
         ac.setType(arrayType);
         ac.setInitializer(arrayInitializer);
         return ac;
@@ -1168,9 +1168,9 @@ public class ASTNodeFactory {
      * @return the negated expression, copied according to the copy operation
      */
     public Expression negate(final Expression expression, final Copy copy) {
-        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
+        Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
         if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
-            final PrefixExpression pe= (PrefixExpression) exprNoParen;
+            PrefixExpression pe= (PrefixExpression) exprNoParen;
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 return copy.perform(this, ASTNodes.getUnparenthesedExpression(pe.getOperand()));
             }
@@ -1196,13 +1196,13 @@ public class ASTNodeFactory {
      * @return a new parenthesized expression
      */
     public ParenthesizedExpression parenthesize(final Expression expression) {
-        final ParenthesizedExpression pe= ast.newParenthesizedExpression();
+        ParenthesizedExpression pe= ast.newParenthesizedExpression();
         pe.setExpression(expression);
         return pe;
     }
 
     private Expression prefixExpression(final PrefixExpression.Operator operator, final Expression operand) {
-        final PrefixExpression pe= ast.newPrefixExpression();
+        PrefixExpression pe= ast.newPrefixExpression();
         pe.setOperator(operator);
         pe.setOperand(operand);
         return pe;
@@ -1215,7 +1215,7 @@ public class ASTNodeFactory {
      * @return a new return statement
      */
     public ReturnStatement return0(final Expression expression) {
-        final ReturnStatement rs= ast.newReturnStatement();
+        ReturnStatement rs= ast.newReturnStatement();
         rs.setExpression(expression);
         return rs;
     }
@@ -1227,7 +1227,7 @@ public class ASTNodeFactory {
      * @return a new marker annotation
      */
     public MarkerAnnotation markerAnnotation(final Name typeName) {
-        final MarkerAnnotation ma= ast.newMarkerAnnotation();
+        MarkerAnnotation ma= ast.newMarkerAnnotation();
         ma.setTypeName(typeName);
         return ma;
     }
@@ -1240,7 +1240,7 @@ public class ASTNodeFactory {
      * @return a new single member annotation
      */
     public SingleMemberAnnotation singleValueAnnotation(final Name typeName, final Expression value) {
-        final SingleMemberAnnotation sma= ast.newSingleMemberAnnotation();
+        SingleMemberAnnotation sma= ast.newSingleMemberAnnotation();
         sma.setTypeName(typeName);
         sma.setValue(value);
         return sma;
@@ -1253,7 +1253,7 @@ public class ASTNodeFactory {
      * @return a new string literal
      */
     public StringLiteral string(final String s) {
-        final StringLiteral sl= ast.newStringLiteral();
+        StringLiteral sl= ast.newStringLiteral();
         sl.setLiteralValue(s);
         return sl;
     }
@@ -1265,7 +1265,7 @@ public class ASTNodeFactory {
      * @return a new switch statement
      */
     public SwitchStatement switch0(final Expression expression) {
-        final SwitchStatement ss= ast.newSwitchStatement();
+        SwitchStatement ss= ast.newSwitchStatement();
         ss.setExpression(expression);
         return ss;
     }
@@ -1286,7 +1286,7 @@ public class ASTNodeFactory {
      * @return a new throw statement
      */
     public ThrowStatement throw0(final Expression expression) {
-        final ThrowStatement throwS= ast.newThrowStatement();
+        ThrowStatement throwS= ast.newThrowStatement();
         throwS.setExpression(expression);
         return throwS;
     }
@@ -1309,7 +1309,7 @@ public class ASTNodeFactory {
      * @return a new try statement
      */
     public TryStatement try0(final Block body, final CatchClause... catchClauses) {
-        final TryStatement tryS= ast.newTryStatement();
+        TryStatement tryS= ast.newTryStatement();
         tryS.setBody(body);
         addAll(ASTNodes.catchClauses(tryS), catchClauses);
         return tryS;
@@ -1430,7 +1430,7 @@ public class ASTNodeFactory {
     @SuppressWarnings("unchecked")
     public MethodDeclaration method(final List<IExtendedModifier> modifiers, final String methodName,
             final List<SingleVariableDeclaration> parameters, final Block block) {
-        final MethodDeclaration md= ast.newMethodDeclaration();
+        MethodDeclaration md= ast.newMethodDeclaration();
         ASTNodes.modifiers(md).addAll(modifiers);
         md.setName(simpleName(methodName));
         md.parameters().addAll(parameters);

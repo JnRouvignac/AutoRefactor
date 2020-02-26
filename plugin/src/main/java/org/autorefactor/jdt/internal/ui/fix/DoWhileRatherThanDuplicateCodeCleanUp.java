@@ -68,13 +68,13 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final WhileStatement node) {
-        final List<Statement> whileStatements= ASTNodes.asList(node.getBody());
+        List<Statement> whileStatements= ASTNodes.asList(node.getBody());
 
         if (whileStatements.isEmpty()) {
             return true;
         }
 
-        final List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
+        List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
 
         Statement previousStatement= ASTNodes.getPreviousSibling(node);
         int i= whileStatements.size() - 1;
@@ -92,10 +92,10 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
-        final Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.ctx.getRefactorings();
         r.remove(previousStatements);
 
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         r.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 }

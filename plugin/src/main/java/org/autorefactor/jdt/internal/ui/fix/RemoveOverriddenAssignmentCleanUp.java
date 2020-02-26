@@ -69,17 +69,17 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final VariableDeclarationStatement node) {
         if (node.fragments() != null && node.fragments().size() == 1) {
-            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+            VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
             if (fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-                final SimpleName varName= fragment.getName();
-                final IVariableBinding variable= fragment.resolveBinding();
+                SimpleName varName= fragment.getName();
+                IVariableBinding variable= fragment.resolveBinding();
                 Statement stmtToInspect= ASTNodes.getNextSibling(node);
                 boolean isOverridden= false;
                 boolean isRead= false;
 
                 while (stmtToInspect != null && !isOverridden && !isRead) {
-                    final Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
+                    Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
 
                     if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
                         if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {

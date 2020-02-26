@@ -93,7 +93,7 @@ public class CFGEdgeBuilder {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
+        CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
         return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
                 && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
     }
@@ -170,7 +170,7 @@ public class CFGEdgeBuilder {
      */
     public static CFGEdge buildEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
             final CFGBasicBlock targetBlock) {
-        final CFGEdge edge= new CFGEdge(condition, evaluationResult, sourceBlock, targetBlock);
+        CFGEdge edge= new CFGEdge(condition, evaluationResult, sourceBlock, targetBlock);
         sourceBlock.addOutgoingEdge(edge);
         targetBlock.addIncomingEdge(edge);
         return edge;
@@ -178,7 +178,7 @@ public class CFGEdgeBuilder {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE_BUILDER["); //$NON-NLS-1$
+        StringBuilder sb= new StringBuilder("EDGE_BUILDER["); //$NON-NLS-1$
         this.sourceBlock.appendDotNodeLabel(sb);
         sb.append(" -> "); //$NON-NLS-1$
         if (this.targetBlock != null) {

@@ -164,10 +164,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return null;
         }
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
+        TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
-        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
-        final List<Type> typeArgs= ASTNodes.typeArguments(parameterizedType);
+        ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
+        List<Type> typeArgs= ASTNodes.typeArguments(parameterizedType);
         typeArgs.clear();
         typeArgs.add(b.toType(keyType, typeNameDecider));
         typeArgs.add(b.toType(valueType, typeNameDecider));
@@ -206,7 +206,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
 
-        final List<Expression> arguments= ASTNodes.arguments(mi);
+        List<Expression> arguments= ASTNodes.arguments(mi);
         if (ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
@@ -223,20 +223,20 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return true;
         }
         if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) { //$NON-NLS-1$
-            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
+            ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newKeyType= paramType.getTypeArguments()[0];
-                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
+                ITypeBinding newKeyType= paramType.getTypeArguments()[0];
+                ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, LinkedHashMap.class.getCanonicalName(), "removeEldestEntry", Entry.class.getCanonicalName())) { //$NON-NLS-1$
-            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
+            ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newKeyType= paramType.getTypeArguments()[0];
-                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
+                ITypeBinding newKeyType= paramType.getTypeArguments()[0];
+                ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         } else if (ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lastKey") || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "firstKey")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -262,22 +262,22 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lowerEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
-            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "entry", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
-            final ITypeBinding newValueType= arguments.get(1).resolveTypeBinding();
+            ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            ITypeBinding newValueType= arguments.get(1).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "entrySet")) { //$NON-NLS-1$
             if (!isExprReceived(mi)) {
                 return true;
             }
-            final ITypeBinding newTargetType= ASTNodes.getTargetType(mi);
+            ITypeBinding newTargetType= ASTNodes.getTargetType(mi);
             if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
-                final ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
+                ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
 
                 if (isParameterizedTypeWithNbArguments(newElementType, 2)) {
                     return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
@@ -306,8 +306,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                     && resolveValueTypeCompatible(arguments.get(2).resolveTypeBinding());
         } else if (ASTNodes.usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), boolean.class.getSimpleName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 boolean.class.getSimpleName())) {
-            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
-            final ITypeBinding newValueType= arguments.get(2).resolveTypeBinding();
+            ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            ITypeBinding newValueType= arguments.get(2).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
@@ -344,10 +344,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName())) {
-            final Iterator<Expression> argumentIterator= arguments.iterator();
+            Iterator<Expression> argumentIterator= arguments.iterator();
 
-            final List<ITypeBinding> keyTypes= new ArrayList<>();
-            final List<ITypeBinding> valueTypes= new ArrayList<>();
+            List<ITypeBinding> keyTypes= new ArrayList<>();
+            List<ITypeBinding> valueTypes= new ArrayList<>();
 
             while (argumentIterator.hasNext()) {
                 keyTypes.add(argumentIterator.next().resolveTypeBinding());
@@ -370,40 +370,40 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), BiFunction.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfPresent", Object.class.getCanonicalName(), //$NON-NLS-1$
                         BiFunction.class.getCanonicalName())) {
-            final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
+            ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
+                ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(), //$NON-NLS-1$
                 Function.class.getCanonicalName())) {
-            final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
+            ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
+                ITypeBinding newValueType= paramType.getTypeArguments()[1];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 BiFunction.class.getCanonicalName())) {
-            final ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
+            ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
+                ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "replaceAll", BiFunction.class.getCanonicalName())) { //$NON-NLS-1$
-            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
+            ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
+                ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveValueTypeCompatible(newValueType);
             }
@@ -413,7 +413,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     private boolean isExprReceived(final ASTNode node) {
-        final ASTNode parent= node.getParent();
+        ASTNode parent= node.getParent();
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         }
@@ -431,7 +431,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithKey(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= ASTNodes.getTargetType(mi);
+            ITypeBinding newElementType= ASTNodes.getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -441,7 +441,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= ASTNodes.getTargetType(mi);
+            ITypeBinding newElementType= ASTNodes.getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -451,7 +451,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithKeyValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= ASTNodes.getTargetType(mi);
+            ITypeBinding newElementType= ASTNodes.getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 2)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);

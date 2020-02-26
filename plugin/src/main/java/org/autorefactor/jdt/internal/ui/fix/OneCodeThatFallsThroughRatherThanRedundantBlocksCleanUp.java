@@ -69,7 +69,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
     @Override
     public boolean visit(final Block node) {
-        final CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(ctx,
+        CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(ctx,
                 node);
         node.accept(catchesAndFollowingCodeVisitor);
         return catchesAndFollowingCodeVisitor.getResult();
@@ -95,7 +95,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 return true;
             }
 
-            final List<Statement> redundantStatements= new ArrayList<>();
+            List<Statement> redundantStatements= new ArrayList<>();
             collectStatements(node, redundantStatements);
             return maybeRemoveRedundantCode(node, redundantStatements);
         }
@@ -140,7 +140,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 return true;
             }
 
-            final List<Statement> referenceStatements= new ArrayList<>();
+            List<Statement> referenceStatements= new ArrayList<>();
 
             Statement nextSibling= ASTNodes.getNextSibling(node);
             while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {

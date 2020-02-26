@@ -126,7 +126,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
         return true;
     }
 
-    private void refactorNumber(final NumberLiteral node, String token) {
+    private void refactorNumber(final NumberLiteral node, final String token) {
         StringBuilder integers= new StringBuilder(token.replaceFirst("^(\\d{4,})[lLdDfF]?$", "$1")); //$NON-NLS-1$ //$NON-NLS-2$
         String suffix= token.replaceFirst("^\\d{4,}([lLdDfF]?)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 

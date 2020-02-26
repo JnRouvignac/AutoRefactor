@@ -70,8 +70,8 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
     @Override
     public boolean visit(final ArrayCreation node) {
         if (node.getInitializer() != null || isVoid(node)) {
-            final ITypeBinding arrayType= node.resolveTypeBinding();
-            final ITypeBinding destinationType= ASTNodes.getTargetType(node);
+            ITypeBinding arrayType= node.resolveTypeBinding();
+            ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
             if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
                 refactorWithInitializer(node);
@@ -86,24 +86,23 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
         if (node.getInitializer() != null) {
             ctx.getRefactorings().replace(node, node.getInitializer());
         } else {
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.createCopyTarget(b.arrayInitializer()));
         }
     }
 
     private boolean isDestinationAllowed(final ASTNode node) {
-        final int parentType= node.getParent().getNodeType();
+        int parentType= node.getParent().getNodeType();
 
         return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
                 || parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
     }
 
     private boolean isVoid(final ArrayCreation node) {
-        @SuppressWarnings("unchecked")
-        final List<Expression> dimensions= node.dimensions();
+        @SuppressWarnings("unchecked") List<Expression> dimensions= node.dimensions();
 
         for (Expression dimension : dimensions) {
-            final Object dimensionLiteral= dimension.resolveConstantExpressionValue();
+            Object dimensionLiteral= dimension.resolveConstantExpressionValue();
 
             if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
                 return false;

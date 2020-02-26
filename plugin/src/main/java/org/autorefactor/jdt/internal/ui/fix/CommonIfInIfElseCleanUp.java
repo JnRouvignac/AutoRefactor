@@ -92,14 +92,14 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        final IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
-        final IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+        IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
+        IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
         if (ASTNodes.isPassive(node.getExpression()) && thenInnerIfStatement != null && elseInnerIfStatement != null
                 && thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
                 && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
                 && ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
+            ASTNodeFactory b= this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
                     b.if0(b.createMoveTarget(thenInnerIfStatement.getExpression()), b.block(b.if0(b.createMoveTarget(node.getExpression()),
                             b.createMoveTarget(thenInnerIfStatement.getThenStatement()), b.createMoveTarget(elseInnerIfStatement.getThenStatement())))));

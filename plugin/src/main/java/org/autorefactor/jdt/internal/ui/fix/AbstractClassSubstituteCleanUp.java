@@ -172,13 +172,13 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      */
     protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final ITypeBinding origTypeBinding= origType.resolveBinding();
+        ITypeBinding origTypeBinding= origType.resolveBinding();
 
         if (origTypeBinding == null) {
             return null;
         }
 
-        final String origRawType= origTypeBinding.getErasure().getQualifiedName();
+        String origRawType= origTypeBinding.getErasure().getQualifiedName();
         String substitutingClassName= getSubstitutingClassName(origRawType);
 
         if (substitutingClassName != null) {
@@ -187,12 +187,12 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 substitutingClassName= getSimpleName(substitutingClassName);
             }
 
-            final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
+            TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
             if (origTypeBinding.isParameterizedType()) {
-                final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
+                ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
 
-                final Type[] newTypes;
+                Type[] newTypes;
                 if (((ParameterizedType) origType).typeArguments().isEmpty()) {
                     newTypes= new Type[0];
                 } else {
@@ -238,12 +238,12 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      */
     protected boolean maybeRefactorBlock(final Block node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        final ObjectInstantiationVisitor classCreationVisitor= new ObjectInstantiationVisitor(node);
+        ObjectInstantiationVisitor classCreationVisitor= new ObjectInstantiationVisitor(node);
         node.accept(classCreationVisitor);
 
         for (ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
-            final List<VariableDeclaration> varDecls= new ArrayList<>();
-            final List<MethodInvocation> methodCallsToRefactor= new ArrayList<>();
+            List<VariableDeclaration> varDecls= new ArrayList<>();
+            List<MethodInvocation> methodCallsToRefactor= new ArrayList<>();
 
             if (canInstantiationBeRefactored(instanceCreation) && canBeRefactored(node, instanceCreation,
                     instanceCreation.resolveTypeBinding(), varDecls, methodCallsToRefactor) && canCodeBeRefactored()) {
@@ -263,8 +263,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
     private boolean canVarOccurrenceBeRefactored(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactor) {
-        final List<VariableDeclaration> otherVarDecls= new ArrayList<>();
-        final boolean canBeRefactored= canVarOccurrenceBeRefactored0(node, varDecls, methodCallsToRefactor,
+        List<VariableDeclaration> otherVarDecls= new ArrayList<>();
+        boolean canBeRefactored= canVarOccurrenceBeRefactored0(node, varDecls, methodCallsToRefactor,
                 otherVarDecls);
         varDecls.addAll(otherVarDecls);
         return canBeRefactored;
@@ -273,9 +273,9 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     private boolean canVarOccurrenceBeRefactored0(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactor, final List<VariableDeclaration> otherVarDecls) {
         for (VariableDeclaration varDecl : varDecls) {
-            final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(varDecl);
+            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(varDecl);
 
-            final Statement parent= ASTNodes.getAncestorOrNull(varDecl, Statement.class);
+            Statement parent= ASTNodes.getAncestorOrNull(varDecl, Statement.class);
             Statement nextSibling= ASTNodes.getNextSibling(parent);
             while (nextSibling != null) {
                 varOccurrenceVisitor.visitNode(nextSibling);
@@ -287,7 +287,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             }
 
             for (SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
-                final List<VariableDeclaration> subVarDecls= new ArrayList<>();
+                List<VariableDeclaration> subVarDecls= new ArrayList<>();
                 if (!canBeRefactored(node, varOccurrence, varOccurrence.resolveTypeBinding(), subVarDecls,
                         methodCallsToRefactor)) {
                     return false;
@@ -302,8 +302,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
             final List<VariableDeclaration> variableDecls, final List<MethodInvocation> methodCallsToRefactor,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Type substituteType= substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation,
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Type substituteType= substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation,
                 classesToUseWithImport, importsToAdd);
 
         if (substituteType != null) {
@@ -312,14 +312,14 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         for (MethodInvocation methodCall : methodCallsToRefactor) {
-            final MethodInvocation copyOfMethodCall= b.copySubtree(methodCall);
+            MethodInvocation copyOfMethodCall= b.copySubtree(methodCall);
             refactorMethod(b, methodCall, copyOfMethodCall);
             ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
         }
 
         for (VariableDeclaration variableDecl : variableDecls) {
-            final VariableDeclarationStatement oldDeclareStatement= (VariableDeclarationStatement) variableDecl.getParent();
-            final Type substituteVarType= substituteType(b, oldDeclareStatement.getType(),
+            VariableDeclarationStatement oldDeclareStatement= (VariableDeclarationStatement) variableDecl.getParent();
+            Type substituteVarType= substituteType(b, oldDeclareStatement.getType(),
                     (ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);
 
             if (substituteVarType != null) {
@@ -357,9 +357,9 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
         case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-            final VariableDeclaration varDecl= (VariableDeclaration) parentNode;
+            VariableDeclaration varDecl= (VariableDeclaration) parentNode;
             if (varDecl.getParent() instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement variableDeclaration= (VariableDeclarationStatement) varDecl
+                VariableDeclarationStatement variableDeclaration= (VariableDeclarationStatement) varDecl
                         .getParent();
                 if (isTypeCompatible(variableDeclaration.getType().resolveBinding(), nodeTypeBinding)) {
                     variablesToRefactor.add(varDecl);
@@ -370,7 +370,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             return false;
 
         case ASTNode.METHOD_INVOCATION:
-            final MethodInvocation mi= (MethodInvocation) parentNode;
+            MethodInvocation mi= (MethodInvocation) parentNode;
 
             return node.getLocationInParent() != MethodInvocation.ARGUMENTS_PROPERTY && canMethodBeRefactored(mi, methodCallsToRefactor) && (!isMethodReturningExistingClass(mi) || canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
                     methodCallsToRefactor));
@@ -378,11 +378,11 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     }
 
     static String getArgumentType(final MethodInvocation mi) {
-        final Expression expression= mi.getExpression();
+        Expression expression= mi.getExpression();
         if (expression != null) {
-            final ITypeBinding typeBinding= expression.resolveTypeBinding();
+            ITypeBinding typeBinding= expression.resolveTypeBinding();
             if (typeBinding != null) {
-                final ITypeBinding[] typeArguments= typeBinding.getTypeArguments();
+                ITypeBinding[] typeArguments= typeBinding.getTypeArguments();
                 if (typeArguments.length == 1) {
                     return typeArguments[0].getQualifiedName();
                 }
@@ -422,7 +422,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
         @Override
         public boolean visit(final ClassInstanceCreation instanceCreation) {
-            final ITypeBinding typeBinding;
+            ITypeBinding typeBinding;
             if (instanceCreation.getType() != null) {
                 typeBinding= instanceCreation.getType().resolveBinding();
             } else {
@@ -456,7 +456,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
         @Override
         public boolean visit(final SimpleName aVariable) {
-            final SimpleName varDeclName= varDecl.getName();
+            SimpleName varDeclName= varDecl.getName();
             if (aVariable.getIdentifier().equals(varDeclName.getIdentifier()) && !aVariable.equals(varDeclName)) {
                 varOccurrences.add(aVariable);
             }
@@ -467,7 +467,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         @Override
         public boolean visit(final AnonymousClassDeclaration node) {
             if (!canBeSharedInOtherThread()) {
-                final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
+                VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varDecl.resolveBinding(), node, true).find();
                 if (!variableUseVisitor.getReads().isEmpty()) {
                     isUsedInAnnonymousClass= true;

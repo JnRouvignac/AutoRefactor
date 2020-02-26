@@ -77,7 +77,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     public boolean visit(final CompilationUnit node) {
         lineEnds.clear();
 
-        final String source= this.ctx.getSource(node);
+        String source= this.ctx.getSource(node);
         if (source.isEmpty()) {
             // Empty file, bail out
             return true;
@@ -85,7 +85,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
         computeLineEnds(node);
 
-        final Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.ctx.getRefactorings();
 
         int index= getIndexOfFirstNonWhitespaceChar(source, 0);
         if (index != -1) {
@@ -105,11 +105,11 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         }
 
         boolean result= true;
-        final String newline= "(?:" + NEWLINE_PATTERN + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        String newline= "(?:" + NEWLINE_PATTERN + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         Matcher m= Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                 .matcher(source);
         while (m.find()) {
-            final String matchedString= m.group(0);
+            String matchedString= m.group(0);
             if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 r.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
                 result= false;
@@ -149,7 +149,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private void computeLineEnds(final CompilationUnit node) {
-        final Matcher matcher= NEWLINE_PATTERN.matcher(ctx.getSource(node));
+        Matcher matcher= NEWLINE_PATTERN.matcher(ctx.getSource(node));
         while (matcher.find()) {
             lineEnds.add(matcher.end());
         }
@@ -193,7 +193,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visit(final AbstractTypeDeclaration node) {
-        final String source= this.ctx.getSource(node);
+        String source= this.ctx.getSource(node);
         int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -220,7 +220,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final MethodDeclaration node) {
-        final Block body= node.getBody();
+        Block body= node.getBody();
         if (body == null) {
             return true;
         }
@@ -230,7 +230,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        final String source= this.ctx.getSource(node);
+        String source= this.ctx.getSource(node);
         int openingCurlyIndex= node.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -241,7 +241,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visitNodeWithClosingCurly(final ASTNode node) {
-        final String source= this.ctx.getSource(node);
+        String source= this.ctx.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
         return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
     }
@@ -253,7 +253,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode node, final int curlyIndex) {
-        final String source= ctx.getSource(node);
+        String source= ctx.getSource(node);
         int newLineBeforeCurly= previousLineEnd(curlyIndex);
         int lastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, curlyIndex - 1);
         int endOfLineIndex= beforeNewlineChars(source, lastNonWsIndex);
@@ -265,7 +265,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             Matcher matcher= NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
             boolean isEqualToNewline= matcher.matches();
             if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
-                final SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
+                SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
                 this.ctx.getRefactorings().remove(toRemove);
                 return true;
             }

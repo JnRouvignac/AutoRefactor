@@ -90,9 +90,9 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final InfixExpression.Operator lazyOperator;
+        InfixExpression.Operator lazyOperator;
 
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_AND;

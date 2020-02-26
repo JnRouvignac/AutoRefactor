@@ -192,7 +192,7 @@ public enum OperatorEnum {
 
     private static final Map<Object, OperatorEnum> OPERATORS;
     static {
-        final Map<Object, OperatorEnum> m= new HashMap<>();
+        Map<Object, OperatorEnum> m= new HashMap<>();
         for (OperatorEnum op : OperatorEnum.values()) {
             m.put(op.operator, op);
         }
@@ -271,8 +271,8 @@ public enum OperatorEnum {
      *         greater than 0 if the first node is greater than the second node
      */
     public static int compareTo(final ASTNode node1, final ASTNode node2) {
-        final OperatorEnum op1= OperatorEnum.getOperator(node1);
-        final OperatorEnum op2= OperatorEnum.getOperator(node2);
+        OperatorEnum op1= OperatorEnum.getOperator(node1);
+        OperatorEnum op2= OperatorEnum.getOperator(node2);
         if (op1 == null || op2 == null) {
             // Uncomparable results
             return 0;
@@ -292,8 +292,8 @@ public enum OperatorEnum {
      *         greater than 0 if the first operator is greater than the second node
      */
     public static int compareTo(final OperatorEnum operator1, final OperatorEnum operator2) {
-        final Integer prec1= operator1.precedence;
-        final Integer prec2= operator2.precedence;
+        Integer prec1= operator1.precedence;
+        Integer prec2= operator2.precedence;
         // Reverse the precedence because of the values we are assigning
         return prec2.compareTo(prec1);
     }

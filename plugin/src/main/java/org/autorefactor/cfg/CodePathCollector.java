@@ -65,7 +65,7 @@ public class CodePathCollector {
             boolean foundAtLeastOneEdge= false;
             for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
                 if (obj instanceof CFGEdge) {
-                    final CFGEdge edge= (CFGEdge) obj;
+                    CFGEdge edge= (CFGEdge) obj;
                     collectPathes(edge.getTargetBlock());
                     foundAtLeastOneEdge= true;
                 }

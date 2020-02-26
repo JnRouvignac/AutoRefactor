@@ -145,9 +145,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return null;
         }
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
+        TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
-        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
+        ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
         ASTNodes.typeArguments(parameterizedType).clear();
         ASTNodes.typeArguments(parameterizedType).add(b.toType(elementType, typeNameDecider));
         return parameterizedType;
@@ -294,7 +294,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     }
 
     private boolean isExprReceived(final ASTNode node) {
-        final ASTNode parent= node.getParent();
+        ASTNode parent= node.getParent();
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         }

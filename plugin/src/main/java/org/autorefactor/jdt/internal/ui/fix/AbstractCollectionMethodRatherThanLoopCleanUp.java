@@ -92,7 +92,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
     @Override
     public boolean visit(final Block node) {
-        final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(ctx, node);
+        AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(ctx, node);
         node.accept(assignmentForAndReturnVisitor);
         return assignmentForAndReturnVisitor.getResult();
     }
@@ -104,8 +104,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
         @Override
         public boolean visit(final EnhancedForStatement node) {
-            final SingleVariableDeclaration loopVariable= node.getParameter();
-            final IfStatement is= uniqueStmtAs(node.getBody(), IfStatement.class);
+            SingleVariableDeclaration loopVariable= node.getParameter();
+            IfStatement is= uniqueStmtAs(node.getBody(), IfStatement.class);
             return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), is);
         }
 
@@ -307,8 +307,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
         @Override
         public boolean visit(final ForStatement node) {
-            final ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-            final List<Statement> statements= ASTNodes.asList(node.getBody());
+            ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+            List<Statement> statements= ASTNodes.asList(node.getBody());
 
             if (loopContent != null && COLLECTION.equals(loopContent.getContainerType())) {
                 if (INDEX.equals(loopContent.getIterationType())) {

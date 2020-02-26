@@ -89,7 +89,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        final DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(ctx, node);
+        DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(ctx, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
     }
@@ -101,38 +101,38 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final TryStatement node) {
-            final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+            List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
             if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
-                final TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
+                TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
                 if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
                     return collapseTryStatements(node, innerTryStatement);
                 }
             }
 
-            final VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
+            VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
                     VariableDeclarationStatement.class);
 
             if (previousDeclStatement == null) {
                 return true;
             }
 
-            final VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
-            final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+            VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
+            List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
 
             if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
-                final List<ASTNode> nodesToRemove= new ArrayList<>();
+                List<ASTNode> nodesToRemove= new ArrayList<>();
                 nodesToRemove.add(previousDeclStatement);
 
-                final Statement finallyStatement= finallyStatements.get(0);
+                Statement finallyStatement= finallyStatements.get(0);
                 nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
 
-                final ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
-                final IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
+                ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
+                IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
 
                 if (finallyEs != null) {
-                    final MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
+                    MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
 
                     if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
                         return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
@@ -140,10 +140,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                     }
                 } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
                         && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
-                    final Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
+                    Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
 
-                    final Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
-                    final MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+                    Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
+                    MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
 
                     if (methodClosesCloseables(mi)
                             && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
@@ -159,14 +159,14 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         private boolean maybeRefactorToTryWithResources(final TryStatement node, final List<Statement> tryStatements,
                 final VariableDeclarationStatement previousDeclStatement,
                 final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
-            final VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
+            VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
                     previousDeclFragment, nodesToRemove);
 
             if (newResource == null) {
                 return true;
             }
 
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
             r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
             r.remove(nodesToRemove);
             setResult(false);
@@ -180,21 +180,21 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         private VariableDeclarationExpression newResource(final List<Statement> tryStatements,
                 final VariableDeclarationStatement previousDeclStatement, final VariableDeclarationFragment previousDeclFragment,
                 final List<ASTNode> nodesToRemove) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            final VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
+            ASTNodeFactory b= ctx.getASTBuilder();
+            VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
             return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
         }
 
         private VariableDeclarationFragment newFragment(final List<Statement> tryStatements,
                 final VariableDeclarationFragment existingFragment, final List<ASTNode> nodesToRemove) {
-            final VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
-            final List<SimpleName> definitions= visitor.getWrites();
+            VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
+            List<SimpleName> definitions= visitor.getWrites();
 
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= ctx.getASTBuilder();
 
             if (!tryStatements.isEmpty()) {
-                final Statement tryStatement= tryStatements.get(0);
-                final Assignment assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
+                Statement tryStatement= tryStatements.get(0);
+                Assignment assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
 
                 if (assignResource != null && ASTNodes.isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
                     nodesToRemove.add(tryStatement);
@@ -226,8 +226,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
-            final Refactorings r= ctx.getRefactorings();
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= ctx.getASTBuilder();
 
             r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
             r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));

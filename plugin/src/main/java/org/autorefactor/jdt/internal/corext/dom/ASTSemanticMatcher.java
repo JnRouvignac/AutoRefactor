@@ -156,7 +156,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final InfixExpression node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof PrefixExpression) {
             PrefixExpression pe= (PrefixExpression) other;
@@ -196,7 +196,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ParenthesizedExpression node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         return safeSubtreeMatch(node.getExpression(), other);
     }
@@ -211,7 +211,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final PrefixExpression node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (!(other instanceof PrefixExpression) && ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT)) {
             return matchOpposite(node.getOperand(), other);
@@ -231,7 +231,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final PostfixExpression node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (node.getParent() instanceof Statement) {
             if (other instanceof Assignment) {
@@ -247,7 +247,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final Assignment node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof PrefixExpression && ((PrefixExpression) other).getParent() instanceof Statement) {
             return match0((PrefixExpression) other, node);
@@ -334,7 +334,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final Block node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof AssertStatement || other instanceof BreakStatement
                 || other instanceof ConstructorInvocation || other instanceof ContinueStatement
@@ -354,7 +354,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final AssertStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -365,7 +365,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final BreakStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -376,7 +376,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ConstructorInvocation node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -387,7 +387,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ContinueStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -398,7 +398,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final DoStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -409,7 +409,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final EmptyStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -420,7 +420,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final EnhancedForStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -431,7 +431,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ExpressionStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -442,7 +442,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ConditionalExpression node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (super.match(node, other)) {
             return true;
@@ -463,7 +463,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ForStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -474,7 +474,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final IfStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -499,7 +499,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final LabeledStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -510,7 +510,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ReturnStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -521,7 +521,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SuperConstructorInvocation node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -532,7 +532,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SwitchStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -543,7 +543,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SynchronizedStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -554,7 +554,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ThrowStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -565,7 +565,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final TryStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -576,7 +576,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final TypeDeclarationStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -587,7 +587,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final VariableDeclarationStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -598,7 +598,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final WhileStatement node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -625,14 +625,14 @@ public class ASTSemanticMatcher extends ASTMatcher {
      * @return True if it is the boolean opposite.
      */
     public boolean matchOpposite(final ASTNode node, final Object otherObject) {
-        final Object other= unbracket(otherObject);
+        Object other= unbracket(otherObject);
 
         if (node instanceof ParenthesizedExpression) {
             return matchOpposite(((ParenthesizedExpression) node).getExpression(), other);
         }
 
         if (node instanceof PrefixExpression) {
-            final PrefixExpression pe= (PrefixExpression) node;
+            PrefixExpression pe= (PrefixExpression) node;
 
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 if (other instanceof PrefixExpression
@@ -660,13 +660,13 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return false;
         }
 
-        final InfixExpression ie1= (InfixExpression) node;
-        final InfixExpression ie2= (InfixExpression) other;
+        InfixExpression ie1= (InfixExpression) node;
+        InfixExpression ie2= (InfixExpression) other;
 
-        final Expression leftOperand1= ie1.getLeftOperand();
-        final Expression rightOperand1= ie1.getRightOperand();
-        final Expression leftOperand2= ie2.getLeftOperand();
-        final Expression rightOperand2= ie2.getRightOperand();
+        Expression leftOperand1= ie1.getLeftOperand();
+        Expression rightOperand1= ie1.getRightOperand();
+        Expression leftOperand2= ie2.getLeftOperand();
+        Expression rightOperand2= ie2.getRightOperand();
 
         if (ie1.getOperator().equals(ie2.getOperator())) {
             if (!ie1.hasExtendedOperands() && !ie2.hasExtendedOperands()) {
@@ -692,7 +692,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return false;
         }
 
-        final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
+        InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
 
         if (ie2.getOperator().equals(reverseOp)) {
             if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR,
@@ -729,20 +729,20 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean isOperandsMatching(final InfixExpression ie1, final InfixExpression ie2, final boolean equal) {
-        final List<Expression> operands1 = getConsistentOperands(ie1);
-        final List<Expression> operands2 = getConsistentOperands(ie2);
+        List<Expression> operands1 = getConsistentOperands(ie1);
+        List<Expression> operands2 = getConsistentOperands(ie2);
 
         if (operands1.size() != operands2.size()) {
             return false;
         }
 
         boolean isMatching= true;
-        final Iterator<Expression> iterator1= operands1.iterator();
-        final Iterator<Expression> iterator2= operands2.iterator();
+        Iterator<Expression> iterator1= operands1.iterator();
+        Iterator<Expression> iterator2= operands2.iterator();
 
         while (iterator1.hasNext() && iterator2.hasNext()) {
-            final Expression expression= iterator1.next();
-            final Expression otherExpression= iterator2.next();
+            Expression expression= iterator1.next();
+            Expression otherExpression= iterator2.next();
 
             if (equal ? !safeSubtreeMatch(expression, otherExpression) : !matchOpposite(expression, otherExpression)) {
                 isMatching= false;
@@ -767,10 +767,10 @@ public class ASTSemanticMatcher extends ASTMatcher {
         }
 
         for (Iterator<Expression> iterator3= operands1.iterator(); iterator3.hasNext();) {
-            final Expression expression= iterator3.next();
+            Expression expression= iterator3.next();
 
             for (Iterator<Expression> iterator4= operands2.iterator(); iterator4.hasNext();) {
-                final Expression otherExpression= iterator4.next();
+                Expression otherExpression= iterator4.next();
 
                 if (equal ? safeSubtreeMatch(expression, otherExpression) : matchOpposite(expression, otherExpression)) {
                     iterator3.remove();
@@ -784,12 +784,12 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private List<Expression> getConsistentOperands(final InfixExpression ie) {
-        final List<Expression> operands= ASTNodes.allOperands(ie);
+        List<Expression> operands= ASTNodes.allOperands(ie);
 
         for (Iterator<Expression> iterator= operands.iterator(); iterator.hasNext() && operands.size() > 1;) {
-            final Expression operand= iterator.next();
+            Expression operand= iterator.next();
 
-            final Long numberLiteral= ASTNodes.integerLiteral(operand);
+            Long numberLiteral= ASTNodes.integerLiteral(operand);
             Boolean booleanValue= ASTNodes.booleanConstant(operand);
 
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND)) {

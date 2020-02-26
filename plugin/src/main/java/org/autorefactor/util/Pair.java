@@ -105,7 +105,7 @@ public final class Pair<F, S> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final Pair<?, ?> other= (Pair<?, ?>) obj;
+        Pair<?, ?> other= (Pair<?, ?>) obj;
         return Objects.equals(first, other.first) && Objects.equals(second, other.second);
     }
 

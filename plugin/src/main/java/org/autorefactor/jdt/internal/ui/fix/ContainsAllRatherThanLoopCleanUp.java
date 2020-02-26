@@ -65,7 +65,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     @Override
     protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar) {
         Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-        final MethodInvocation node= condition;
+        MethodInvocation node= condition;
         Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(node).get(0));
 
         if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
@@ -94,7 +94,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
     @Override
     protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final ASTNodeFactory b) {
-        final MethodInvocation invoke= b.invoke(b.createMoveTarget(toFind), "containsAll", b.createMoveTarget(iterable)); //$NON-NLS-1$
+        MethodInvocation invoke= b.invoke(b.createMoveTarget(toFind), "containsAll", b.createMoveTarget(iterable)); //$NON-NLS-1$
 
         if (isPositive) {
             return b.not(invoke);

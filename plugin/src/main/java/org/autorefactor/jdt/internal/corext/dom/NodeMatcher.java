@@ -50,7 +50,7 @@ public abstract class NodeMatcher<N extends ASTNode> {
         final NodeMatcher<N> thisNodeMatcher= this;
         return new NodeMatcher<N>() {
             @Override
-            public Boolean isMatching(N node) {
+            public Boolean isMatching(final N node) {
                 Boolean isMatching= thisNodeMatcher.isMatching(node);
 
                 if (isMatching == null) {

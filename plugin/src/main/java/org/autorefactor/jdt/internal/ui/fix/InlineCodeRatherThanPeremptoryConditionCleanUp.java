@@ -76,7 +76,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
     @Override
     public boolean visit(final Block node) {
-        final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(ctx, node);
+        IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(ctx, node);
         node.accept(ifAndFollowingCodeVisitor);
         return ifAndFollowingCodeVisitor.getResult();
     }
@@ -89,16 +89,16 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         @Override
         public boolean visit(final TryStatement node) {
             if (node.resources().isEmpty()) {
-                final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+                List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
                 if (tryStatements.isEmpty()) {
-                    final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+                    List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
 
                     if (!finallyStatements.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
                     }
 
-                    final Refactorings r= ctx.getRefactorings();
+                    Refactorings r= ctx.getRefactorings();
 
                     if (ASTNodes.canHaveSiblings(node)) {
                         r.remove(node);
@@ -116,13 +116,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         @Override
         public boolean visit(final IfStatement node) {
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
 
-            final Statement thenStatement= node.getThenStatement();
-            final Statement elseStatement= node.getElseStatement();
-            final Expression condition= node.getExpression();
+            Statement thenStatement= node.getThenStatement();
+            Statement elseStatement= node.getElseStatement();
+            Expression condition= node.getExpression();
 
-            final Object constantCondition= peremptoryValue(condition);
+            Object constantCondition= peremptoryValue(condition);
 
             if (Boolean.TRUE.equals(constantCondition)) {
                 return maybeInlineBlock(node, thenStatement);
@@ -154,8 +154,8 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 return false;
             }
 
-            final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
-            final Set<String> followingVariableNames= new HashSet<>();
+            Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
+            Set<String> followingVariableNames= new HashSet<>();
 
             for (Statement statement : ASTNodes.getNextSiblings(node)) {
                 followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
@@ -172,7 +172,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private Object peremptoryValue(final Expression condition) {
-        final Object constantCondition= condition.resolveConstantExpressionValue();
+        Object constantCondition= condition.resolveConstantExpressionValue();
 
         if (constantCondition != null) {
             return constantCondition;
@@ -197,8 +197,8 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
         if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
             r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));

@@ -82,22 +82,22 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final List<?> statements= node.statements();
+        List<?> statements= node.statements();
 
         if (statements.isEmpty()) {
             return true;
         }
 
-        final Set<String> previousVarIds= new HashSet<>();
-        final Set<String> caseVarIds= new HashSet<>();
-        final List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
+        Set<String> previousVarIds= new HashSet<>();
+        Set<String> caseVarIds= new HashSet<>();
+        List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
         List<Expression> caseExprs= new ArrayList<>();
         List<Statement> caseStatements= new ArrayList<>();
 
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
         int caseIndexWithDefault= -1;
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
         for (Object object : statements) {
             Statement statement= (Statement) object;
@@ -126,7 +126,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
                 isPreviousStmtACase= true;
             } else {
-                final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
+                VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
                 varOccurrenceVisitor.visitNode(statement);
 
                 if (varOccurrenceVisitor.isVarUsed()) {
@@ -153,13 +153,13 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         }
 
         for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-            final Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+            Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
             if (!ASTNodes.fallsThrough(lastStatement)) {
                 return true;
             }
 
-            final BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
+            BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
 
             if (bs != null && bs.getLabel() == null) {
                 caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
@@ -175,21 +175,21 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
             final ASTNodeFactory b) {
         int localCaseIndexWithDefault= caseIndexWithDefault;
-        final Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.ctx.getRefactorings();
 
-        final Expression discriminant= node.getExpression();
+        Expression discriminant= node.getExpression();
         Statement currentBlock= null;
 
         for (int i= switchStructure.size() - 1; i >= 0; i--) {
-            final Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
+            Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
-            final Expression newCondition;
+            Expression newCondition;
             if (caseStructure.getFirst().isEmpty()) {
                 newCondition= null;
             } else if (caseStructure.getFirst().size() == 1) {
                 newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
             } else {
-                final List<Expression> equalities= new ArrayList<>();
+                List<Expression> equalities= new ArrayList<>();
 
                 for (Expression value : caseStructure.getFirst()) {
                     equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
@@ -197,13 +197,13 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                 newCondition= b.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
             }
 
-            final Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
+            Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
 
             for (int j= 0; j < caseStructure.getSecond().size(); j++) {
                 copyOfStatements[j]= b.createCopyTarget(caseStructure.getSecond().get(j));
             }
 
-            final Block newBlock= b.block(copyOfStatements);
+            Block newBlock= b.block(copyOfStatements);
 
             if (currentBlock != null) {
                 currentBlock= b.if0(newCondition, newBlock, currentBlock);
@@ -220,7 +220,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression buildEquality(final ASTNodeFactory b, final Expression discriminant, final Expression value) {
-        final Expression equality;
+        Expression equality;
 
         if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
                 Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {

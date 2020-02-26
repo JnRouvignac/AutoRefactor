@@ -72,7 +72,7 @@ public class VariableAccess {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("VAR_ACCESS["); //$NON-NLS-1$
+        StringBuilder sb= new StringBuilder("VAR_ACCESS["); //$NON-NLS-1$
         toString(sb);
         return sb.append("]").toString(); //$NON-NLS-1$
     }

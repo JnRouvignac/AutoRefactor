@@ -81,7 +81,7 @@ public final class Release {
      * @throws RuntimeException if the provided version is not valid
      */
     public static Release javaSE(final int... version) {
-        final Release release= new Release("JavaSE", version); //$NON-NLS-1$
+        Release release= new Release("JavaSE", version); //$NON-NLS-1$
         if (!release.isVersionValid()) {
             throw new IllegalArgumentException(null, "Invalid version for " + release); //$NON-NLS-1$
         }
@@ -102,10 +102,10 @@ public final class Release {
     }
 
     private static int[] toIntegerArray(final String version) {
-        final String[] versionNumbers= version.split("\\."); //$NON-NLS-1$
-        final int[] result= new int[versionNumbers.length];
+        String[] versionNumbers= version.split("\\."); //$NON-NLS-1$
+        int[] result= new int[versionNumbers.length];
         for (int i= 0; i < versionNumbers.length; i++) {
-            final String nb= versionNumbers[i];
+            String nb= versionNumbers[i];
             result[i]= Integer.parseInt(nb);
         }
 
@@ -124,10 +124,10 @@ public final class Release {
         if (!this.releaseName.equals(requiredRelease.releaseName)) {
             return false;
         }
-        final int min= Math.min(this.version.length, requiredRelease.version.length);
+        int min= Math.min(this.version.length, requiredRelease.version.length);
         for (int i= 0; i < min; i++) {
-            final int nb= this.version[i];
-            final int requiredNb= requiredRelease.version[i];
+            int nb= this.version[i];
+            int requiredNb= requiredRelease.version[i];
             if (nb < requiredNb) {
                 return false;
             }

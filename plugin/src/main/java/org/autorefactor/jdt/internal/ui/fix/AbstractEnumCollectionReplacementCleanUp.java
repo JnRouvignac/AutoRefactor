@@ -138,7 +138,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             ITypeBinding[] typeArguments= lhs.resolveTypeBinding().getTypeArguments();
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
-                final TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
+                TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
                 ASTNodeFactory b= ctx.getASTBuilder();
                 Type[] types= new Type[typeArguments.length];
 

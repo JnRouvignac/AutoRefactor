@@ -118,7 +118,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 return true;
             }
             if (obj instanceof VariableName) {
-                final VariableName other= (VariableName) obj;
+                VariableName other= (VariableName) obj;
                 if (this.name instanceof SimpleName && other.name instanceof SimpleName) {
                     return ASTNodes.isEqual((SimpleName) this.name, (SimpleName) other.name);
                 }
@@ -176,7 +176,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            final StringBuilder sb= new StringBuilder();
+            StringBuilder sb= new StringBuilder();
             if ((this.accessType & DECL) != 0) {
                 sb.append("DECL"); //$NON-NLS-1$
             }
@@ -214,9 +214,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     private void findVariableAccesses(final Name node) {
-        final Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
+        Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
         if (accessTypeAndScope.getFirst().intValue() != 0) {
-            final VariableName varName= new VariableName(node);
+            VariableName varName= new VariableName(node);
             List<VariableAccess> list= this.allVariableAccesses.get(varName);
             if (list == null) {
                 list= new ArrayList<>();
@@ -230,7 +230,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode node) {
-        final ASTNode parent= node.getParent();
+        ASTNode parent= node.getParent();
         if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
                 || parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
                 || parent instanceof WhileStatement) {
@@ -242,11 +242,11 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             return NULL_PAIR;
         }
         if (parent instanceof SingleVariableDeclaration) {
-            final SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
+            SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
             return getAccessTypeAndScope(var.getParent());
         }
         if (parent instanceof VariableDeclarationFragment) {
-            final VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
+            VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
             return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL, getScope(var));
         }
         if (parent instanceof Assignment) {
@@ -277,9 +277,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         astRoot.accept(this);
 
         for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
-            final List<VariableAccess> variableAccesses= entry.getValue();
+            List<VariableAccess> variableAccesses= entry.getValue();
             if (canReduceVariableScope(variableAccesses)) {
-                final VariableAccess varDecl= variableAccesses.get(0);
+                VariableAccess varDecl= variableAccesses.get(0);
                 remove(varDecl.getVariableName());
 
                 for (VariableAccess varAccess : variableAccesses) {
@@ -297,45 +297,45 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final AST ast= b.getAST();
-        final ASTNode scope= varAccess.getScope();
-        final Name varName= varAccess.getVariableName();
-        final Type varType= getType(varDecl.getVariableName().getParent());
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        AST ast= b.getAST();
+        ASTNode scope= varAccess.getScope();
+        Name varName= varAccess.getVariableName();
+        Type varType= getType(varDecl.getVariableName().getParent());
         if (scope instanceof Block) {
-            final List<Statement> statements= ASTNodes.statements((Block) scope);
+            List<Statement> statements= ASTNodes.statements((Block) scope);
             for (int i= 0; i < statements.size(); i++) {
-                final Statement statement= statements.get(i);
-                final Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
-                final Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
+                Statement statement= statements.get(i);
+                Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
+                Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
                 if (statement.equals(parentStatement)) {
-                    final VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
-                    final VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(vdf);
+                    VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
+                    VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(vdf);
                     vds.setType(varType);
                     this.ctx.getRefactorings().replace(statement, vds);
                     break;
                 }
             }
         } else if (scope instanceof EnhancedForStatement) {
-            final EnhancedForStatement efs= (EnhancedForStatement) scope;
-            final EnhancedForStatement newEfs= b.createCopyTarget(efs);
+            EnhancedForStatement efs= (EnhancedForStatement) scope;
+            EnhancedForStatement newEfs= b.createCopyTarget(efs);
             newEfs.setParameter(b.createCopyTarget(efs.getParameter()));
             newEfs.setExpression(b.createCopyTarget(efs.getExpression()));
-            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(efs, newEfs);
         } else if (scope instanceof ForStatement) {
-            final ForStatement fs= (ForStatement) scope;
-            final ForStatement newFs= b.createCopyTarget(fs);
-            final List<Expression> initializers= ASTNodes.initializers(newFs);
+            ForStatement fs= (ForStatement) scope;
+            ForStatement newFs= b.createCopyTarget(fs);
+            List<Expression> initializers= ASTNodes.initializers(newFs);
             if (initializers.size() != 1) {
                 throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
             }
-            final Expression init= initializers.remove(0);
-            final VariableDeclarationFragment vdf= getVariableDeclarationFragment(init, varName);
-            final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(vdf);
+            Expression init= initializers.remove(0);
+            VariableDeclarationFragment vdf= getVariableDeclarationFragment(init, varName);
+            VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(vdf);
             vde.setType(varType);
             initializers.add(vde);
             this.ctx.getRefactorings().replace(fs, newFs);
@@ -344,19 +344,19 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             // newFs.setBody(copy(fs.getBody()));
             // }
         } else if (scope instanceof WhileStatement) {
-            final WhileStatement ws= (WhileStatement) scope;
-            final WhileStatement newWs= ast.newWhileStatement();
+            WhileStatement ws= (WhileStatement) scope;
+            WhileStatement newWs= ast.newWhileStatement();
             newWs.setExpression(b.createCopyTarget(ws.getExpression()));
-            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(ws, newWs);
         } else if (scope instanceof IfStatement) {
-            final IfStatement is= (IfStatement) scope;
-            final IfStatement newIs= ast.newIfStatement();
+            IfStatement is= (IfStatement) scope;
+            IfStatement newIs= ast.newIfStatement();
             newIs.setExpression(b.createCopyTarget(is.getExpression()));
-            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
             if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
@@ -379,12 +379,12 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
     private Block copy(final Statement stmtToCopy, final Name varName) {
         if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
-            final Block b= this.ctx.getAST().newBlock();
-            final Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
+            Block b= this.ctx.getAST().newBlock();
+            Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
             if (a == null) {
                 throw new NotImplementedException(stmtToCopy);
             }
-            final VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
+            VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
             ASTNodes.statements(b).add(this.ctx.getAST().newVariableDeclarationStatement(vdf));
             return b;
         }
@@ -395,7 +395,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
     private Type getType(final ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
-            final VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
+            VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
             return this.ctx.getASTBuilder().createCopyTarget(vds.getType());
         }
 
@@ -404,12 +404,12 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
     private VariableDeclarationFragment getVariableDeclarationFragment(final Expression exprToReplace, final Name varName) {
         if (exprToReplace instanceof Assignment) {
-            final Assignment a= (Assignment) exprToReplace;
+            Assignment a= (Assignment) exprToReplace;
             if (a.getLeftHandSide() instanceof SimpleName) {
-                final SimpleName sn= (SimpleName) a.getLeftHandSide();
+                SimpleName sn= (SimpleName) a.getLeftHandSide();
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    final ASTNodeFactory b= this.ctx.getASTBuilder();
-                    final VariableDeclarationFragment vdf= b.getAST().newVariableDeclarationFragment();
+                    ASTNodeFactory b= this.ctx.getASTBuilder();
+                    VariableDeclarationFragment vdf= b.getAST().newVariableDeclarationFragment();
                     vdf.setInitializer(b.createCopyTarget(a.getRightHandSide()));
                     vdf.setName(b.createCopyTarget(sn));
                     return vdf;
@@ -429,7 +429,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean canReduceVariableScope(final List<VariableAccess> variableAccesses) {
-        final VariableAccess varDecl= variableAccesses.get(0);
+        VariableAccess varDecl= variableAccesses.get(0);
 
         VariableAccess lastWrite= null;
         for (VariableAccess varAccess : variableAccesses) {

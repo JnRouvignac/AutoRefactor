@@ -91,7 +91,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             computeGreatestIndentation(node.getBody());
 
             for (Object object : node.catchClauses()) {
-                final CatchClause clause= (CatchClause) object;
+                CatchClause clause= (CatchClause) object;
                 computeGreatestIndentation(clause.getBody());
             }
 
@@ -190,10 +190,10 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     }
 
     private void moveThenStatement(final IfStatement node) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
+        List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
@@ -204,7 +204,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
             r.replace(node.getThenStatement(), b.createMoveTarget(node.getElseStatement()));
             r.remove(node.getElseStatement());
         } else {
-            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
+            List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
                 copyOfStatements.add(b.createMoveTarget(statement));
@@ -220,10 +220,10 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     }
 
     private void moveElseStatement(final IfStatement node) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
+        List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
@@ -232,7 +232,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
             r.remove(node.getElseStatement());
         } else {
-            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
+            List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
             for (Statement statement : statementsToMove) {
                 copyOfStatements.add(b.createMoveTarget(statement));

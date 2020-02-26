@@ -130,7 +130,7 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
             return true;
         }
 
-        final String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
+        String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
         return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$

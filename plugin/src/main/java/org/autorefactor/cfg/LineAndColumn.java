@@ -62,7 +62,7 @@ class LineAndColumn {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final LineAndColumn other= (LineAndColumn) obj;
+        LineAndColumn other= (LineAndColumn) obj;
         return Objects.equals(startPosition, other.startPosition);
     }
 

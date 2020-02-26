@@ -65,7 +65,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 
     @Override
     public boolean visit(final IfStatement node) {
-        final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+        IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
         if (secondIf != null && ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(secondIf.getExpression())
                 && ASTSemanticMatcher.INSTANCE.matchOpposite(node.getExpression(), secondIf.getExpression())
@@ -80,8 +80,8 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
     }
 
     private void removeCondition(final IfStatement secondIf) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
         r.replace(secondIf, b.createMoveTarget(secondIf.getThenStatement()));
     }

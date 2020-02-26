@@ -70,8 +70,8 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR) && !node.hasExtendedOperands()) {
-            final InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
-            final InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
+            InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
+            InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
 
             if (firstCondition != null && !firstCondition.hasExtendedOperands()
                     && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && secondCondition != null
@@ -92,11 +92,11 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
             final Expression firstOppositeExpression, final Expression secondExpression, final Expression secondOppositeExpression) {
         if (ASTSemanticMatcher.INSTANCE.matchOpposite(firstExpression, firstOppositeExpression)
                 && ASTSemanticMatcher.INSTANCE.matchOpposite(secondExpression, secondOppositeExpression)) {
-            final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
-            final AtomicBoolean isSecondExprPositive= new AtomicBoolean();
+            AtomicBoolean isFirstExprPositive= new AtomicBoolean();
+            AtomicBoolean isSecondExprPositive= new AtomicBoolean();
 
-            final Expression firstBasicExpression= getBasisExpression(firstExpression, isFirstExprPositive);
-            final Expression secondBasicExpression= getBasisExpression(secondExpression, isSecondExprPositive);
+            Expression firstBasicExpression= getBasisExpression(firstExpression, isFirstExprPositive);
+            Expression secondBasicExpression= getBasisExpression(secondExpression, isSecondExprPositive);
 
             replaceDuplicateExpression(node, firstBasicExpression, secondBasicExpression, isFirstExprPositive, isSecondExprPositive);
             return false;
@@ -107,7 +107,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 
     private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
         Expression basisExpression= null;
-        final PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
+        PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
 
         if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
             basisExpression= negateExpression.getOperand();
@@ -123,7 +123,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     private void replaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
             final Expression secondExpression, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
             ctx.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, b.createMoveTarget(secondExpression)));

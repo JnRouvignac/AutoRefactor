@@ -73,8 +73,8 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
             List<Expression> operands= ASTNodes.allOperands(node);
 
             for (int i= 1; i < operands.size(); i++) {
-                final Expression leftOperand= operands.get(i - 1);
-                final Expression rightOperand= operands.get(i);
+                Expression leftOperand= operands.get(i - 1);
+                Expression rightOperand= operands.get(i);
 
                 if (!maybeRefactorCondition(leftOperand, rightOperand) || !maybeRefactorCondition(rightOperand, leftOperand)) {
                     return false;
@@ -86,7 +86,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
     }
 
     private boolean maybeRefactorCondition(final Expression operandWithRedundance, final Expression redundantOperand) {
-        final InfixExpression complexCondition= ASTNodes.as(operandWithRedundance, InfixExpression.class);
+        InfixExpression complexCondition= ASTNodes.as(operandWithRedundance, InfixExpression.class);
 
         if (ASTNodes.isPrimitive(redundantOperand)
                 && ASTNodes.isPassive(redundantOperand)
@@ -123,8 +123,8 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
     }
 
     private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Refactorings r= ctx.getRefactorings();
 
         List<Expression> copyOfOperands= b.createMoveTarget(previousOperands);
         copyOfOperands.addAll(b.createMoveTarget(nextOperands));

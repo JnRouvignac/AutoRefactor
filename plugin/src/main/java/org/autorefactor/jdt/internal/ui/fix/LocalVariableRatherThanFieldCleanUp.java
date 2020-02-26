@@ -178,13 +178,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
         boolean isFieldKept= field.fragments().size() != 1;
 
         Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
-        final VariableDeclarationFragment newFragment= b.declareFragment(b.createMoveTarget(reassignment), b.createMoveTarget(reassignmentAssignment.getRightHandSide()));
+        VariableDeclarationFragment newFragment= b.declareFragment(b.createMoveTarget(reassignment), b.createMoveTarget(reassignmentAssignment.getRightHandSide()));
         @SuppressWarnings("unchecked")
         List<Dimension> extraDimensions= fragment.extraDimensions();
         @SuppressWarnings("unchecked")
@@ -324,8 +324,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean hasAnnotation(final FieldDeclaration field) {
-        @SuppressWarnings("unchecked")
-        final List<IExtendedModifier> modifiers= field.modifiers();
+        @SuppressWarnings("unchecked") List<IExtendedModifier> modifiers= field.modifiers();
 
         for (IExtendedModifier em : modifiers) {
             if (em.isAnnotation()) {

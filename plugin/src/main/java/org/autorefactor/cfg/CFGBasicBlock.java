@@ -216,7 +216,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final CFGBasicBlock other= (CFGBasicBlock) obj;
+        CFGBasicBlock other= (CFGBasicBlock) obj;
         return Objects.equals(fileName, other.fileName) && Objects.equals(lineAndColumn, other.lineAndColumn)
                 && Objects.equals(isEntryBlock, other.isEntryBlock);
     }
@@ -229,7 +229,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      * @return -1, 0 or 1
      */
     public int compareTo(final CFGBasicBlock o) {
-        final Integer startPosition= lineAndColumn.getStartPosition();
+        Integer startPosition= lineAndColumn.getStartPosition();
         return startPosition.compareTo(o.lineAndColumn.getStartPosition());
     }
 
@@ -257,7 +257,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      * @return the node label in the DOT format
      */
     String getDotNodeLabel() {
-        final StringBuilder sb= new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         appendDotNodeLabel(sb);
         return sb.toString();
     }
@@ -298,7 +298,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("BLOCK["); //$NON-NLS-1$
+        StringBuilder sb= new StringBuilder("BLOCK["); //$NON-NLS-1$
         toString(sb);
         return sb.append("]").toString(); //$NON-NLS-1$
     }

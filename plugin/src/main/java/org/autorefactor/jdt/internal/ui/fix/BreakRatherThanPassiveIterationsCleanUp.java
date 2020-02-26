@@ -184,7 +184,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final ForStatement node) {
-        final Set<String> vars= new HashSet<>();
+        Set<String> vars= new HashSet<>();
 
         for (Expression initializer : ASTNodes.initializers(node)) {
             vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
@@ -204,7 +204,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private boolean hasSideEffect(final ASTNode node, final Set<String> allowedVars) {
-        final SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
+        SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
         variableUseVisitor.visitNode(node);
         return variableUseVisitor.hasSideEffect();
     }
@@ -215,14 +215,14 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
-        final List<Statement> statements= ASTNodes.asList(body);
+        List<Statement> statements= ASTNodes.asList(body);
 
         if (statements == null || statements.isEmpty()) {
             return true;
         }
 
         for (int i= 0; i < statements.size() - 1; i++) {
-            final Statement statement= statements.get(i);
+            Statement statement= statements.get(i);
             allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 
             if (hasSideEffect(statement, allowedVars)) {
@@ -230,24 +230,24 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             }
         }
 
-        final IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
+        IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
 
         if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
-            final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
+            List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
             for (Statement statement : assignments) {
                 if (statement instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
+                    VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
 
                     for (Object obj : decl.fragments()) {
-                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
+                        VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
                         if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
                             return true;
                         }
                     }
                 } else if (statement instanceof ExpressionStatement) {
-                    final Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
+                    Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
 
                     if (assignment == null || !ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                         return true;
@@ -265,8 +265,8 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Refactorings r= ctx.getRefactorings();
 
         if (ifStatement.getThenStatement() instanceof Block) {
             r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));

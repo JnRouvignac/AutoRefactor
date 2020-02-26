@@ -94,28 +94,28 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     @SuppressWarnings("rawtypes")
     private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
             final List fragments, final Javadoc docComment) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
         for (int i= fragments.size() - 1; 0 <= i; i--) {
-            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
+            VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
 
-            final SimpleName copyOfFragment= b.createCopyTarget(fragment.getName());
-            final Type copyOfType= b.createCopyTarget(type);
-            final Expression copyOfInitializer;
+            SimpleName copyOfFragment= b.createCopyTarget(fragment.getName());
+            Type copyOfType= b.createCopyTarget(type);
+            Expression copyOfInitializer;
             if (fragment.getInitializer() != null) {
                 copyOfInitializer= b.createCopyTarget(fragment.getInitializer());
             } else {
                 copyOfInitializer= null;
             }
 
-            final VariableDeclarationFragment newFragment= b.declareFragment(copyOfFragment, copyOfInitializer);
-            final ASTNode newNode;
+            VariableDeclarationFragment newFragment= b.declareFragment(copyOfFragment, copyOfInitializer);
+            ASTNode newNode;
             if (node instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement newStatement= b.declareStatement(copyOfType, newFragment);
+                VariableDeclarationStatement newStatement= b.declareStatement(copyOfType, newFragment);
                 updateModifiers(b, modifiers, newStatement.modifiers());
                 newNode= newStatement;
             } else {
-                final FieldDeclaration newField= b.declareField(copyOfType, newFragment);
+                FieldDeclaration newField= b.declareField(copyOfType, newFragment);
                 if (docComment != null) {
                     newField.setJavadoc(b.createCopyTarget(docComment));
                 }

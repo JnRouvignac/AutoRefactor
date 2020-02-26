@@ -82,16 +82,16 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final Block node) {
-        final List<Statement> blockStatement= ASTNodes.asList(node);
+        List<Statement> blockStatement= ASTNodes.asList(node);
         boolean result= true;
 
         List<Statement> forStatements;
         for (int i= 0; i < blockStatement.size(); i++) {
-            final Statement statement= blockStatement.get(i);
-            final ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
-            final EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
-            final WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
-            final DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
+            Statement statement= blockStatement.get(i);
+            ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
+            EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
+            WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
+            DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
             forStatements= null;
 
             if (forStatement != null) {
@@ -105,7 +105,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
             }
 
             if (forStatements != null) {
-                final Set<String> varNames= new HashSet<>();
+                Set<String> varNames= new HashSet<>();
 
                 for (int j= 0; j < i; j++) {
                     if (!(blockStatement.get(j) instanceof Block)) {
@@ -116,16 +116,16 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
                 }
 
-                final List<VariableDeclarationStatement> candidates= new ArrayList<>();
+                List<VariableDeclarationStatement> candidates= new ArrayList<>();
 
                 for (Statement declarationStatement : forStatements) {
-                    final VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
+                    VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
 
                     if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
                             && decl.fragments() != null && decl.fragments().size() == 1) {
-                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
+                        VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
                                 .get(0);
-                        final String id= fragment.getName().getIdentifier();
+                        String id= fragment.getName().getIdentifier();
 
                         if (!varNames.contains(id)) {
                             candidates.add(decl);
@@ -134,8 +134,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     }
                 }
 
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                final Refactorings r= this.ctx.getRefactorings();
+                ASTNodeFactory b= this.ctx.getASTBuilder();
+                Refactorings r= this.ctx.getRefactorings();
 
                 for (VariableDeclarationStatement candidate : candidates) {
                     moveDeclaration(b, r, statement, candidate);
@@ -160,11 +160,11 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     private void moveDeclaration(final ASTNodeFactory b, final Refactorings r, final Statement statement,
             final VariableDeclarationStatement varToMove) {
-        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
+        VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
         if (fragment.getInitializer() != null) {
-            final Type copyOfType= b.createCopyTarget(varToMove.getType());
-            final SimpleName name= fragment.getName();
+            Type copyOfType= b.createCopyTarget(varToMove.getType());
+            SimpleName name= fragment.getName();
             VariableDeclarationFragment newFragment= b.declareFragment(b.createCopyTarget(name));
             @SuppressWarnings("unchecked")
             List<Dimension> extraDimensions= fragment.extraDimensions();

@@ -75,7 +75,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
                         || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
-            final ITypeBinding actualResultType= ASTNodes.getTargetType(node);
+            ITypeBinding actualResultType= ASTNodes.getTargetType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
                 useUnboxing(node);
@@ -87,7 +87,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     }
 
     private void useUnboxing(final MethodInvocation node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
     }
 }

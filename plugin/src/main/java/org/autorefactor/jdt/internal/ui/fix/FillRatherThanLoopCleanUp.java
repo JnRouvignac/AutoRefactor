@@ -100,14 +100,14 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        final ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-        final List<Statement> statements= ASTNodes.asList(node.getBody());
+        ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+        List<Statement> statements= ASTNodes.asList(node.getBody());
 
         if (loopContent != null && loopContent.getLoopVariable() != null && loopContent.getContainerType() == ContainerType.ARRAY && statements.size() == 1) {
-            final Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
+            Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
 
             if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
-                final ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
+                ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
 
                 if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
                     replaceWithArraysFill(node, classesToUseWithImport, assignment, arrayAccess);

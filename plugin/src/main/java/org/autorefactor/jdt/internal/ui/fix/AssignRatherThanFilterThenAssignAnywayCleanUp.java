@@ -74,7 +74,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final Block node) {
-        final IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(ctx, node);
+        IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(ctx, node);
         node.accept(ifAndReturnVisitor);
         return ifAndReturnVisitor.getResult();
     }
@@ -86,13 +86,13 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
         @Override
         public boolean visit(final IfStatement node) {
-            final InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
-            final Statement thenStatement= getThenStatement(node);
-            final Statement elseStatement= getElseStatement(node, thenStatement);
+            InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+            Statement thenStatement= getThenStatement(node);
+            Statement elseStatement= getElseStatement(node, thenStatement);
 
             if (condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
-                final Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
-                final Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
+                Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
+                Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
                 boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
 
                 if (ASTNodes.hasOperator(thenAssignment, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAssignment, Assignment.Operator.ASSIGN)
@@ -100,8 +100,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
                     return maybeReplaceWithStraightAssign(node, condition, thenAssignment, elseAssignment, isEqual);
                 }
 
-                final ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
-                final ReturnStatement elseRS= ASTNodes.as(elseStatement, ReturnStatement.class);
+                ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
+                ReturnStatement elseRS= ASTNodes.as(elseStatement, ReturnStatement.class);
 
                 if (thenRS != null && elseRS != null) {
                     if (isEqual) {
@@ -117,8 +117,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
         private boolean maybeReplaceWithStraightAssign(final IfStatement node, final InfixExpression condition,
                 final Assignment thenAssignment, final Assignment elseAssignment, final boolean isEqual) {
-            final Expression hardCodedExpression;
-            final Assignment valuedAssignment;
+            Expression hardCodedExpression;
+            Assignment valuedAssignment;
 
             if (isEqual) {
                 hardCodedExpression= thenAssignment.getRightHandSide();
@@ -150,7 +150,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private Statement getThenStatement(final IfStatement node) {
-            final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+            List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
 
             if (thenStatements.size() == 1) {
                 return thenStatements.get(0);
@@ -160,7 +160,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private Statement getElseStatement(final IfStatement node, final Statement thenStatement) {
-            final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+            List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
 
             if (elseStatements.size() == 1) {
                 return elseStatements.get(0);
@@ -174,7 +174,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private void replaceWithStraightAssign(final IfStatement node, final Expression leftHandSide, final Expression rightHandSide) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
                     b.toStatement(b.assign(b.createMoveTarget(leftHandSide), Assignment.Operator.ASSIGN, b.createMoveTarget(rightHandSide))));
         }
@@ -203,8 +203,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private void replaceWithStraightReturn(final IfStatement node, final Expression returnedExpression, final Statement toRemove) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            final Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= ctx.getRefactorings();
 
             r.remove(toRemove);
             r.replace(node, b.return0(b.createMoveTarget(returnedExpression)));

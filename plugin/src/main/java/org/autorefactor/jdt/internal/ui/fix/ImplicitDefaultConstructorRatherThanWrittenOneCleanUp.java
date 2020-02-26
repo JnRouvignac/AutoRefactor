@@ -77,7 +77,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
             for (IExtendedModifier extendedModifier : ASTNodes.modifiers(node)) {
                 if (extendedModifier.isModifier()) {
-                    final Modifier modifier= (Modifier) extendedModifier;
+                    Modifier modifier= (Modifier) extendedModifier;
                     if (modifier.isPublic()) {
                         isPublicClass= true;
                         isPackageClass= false;
@@ -112,7 +112,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
                     && isDefaultStatements(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
-                    final IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
+                    IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
                     if (extendedModifier.isModifier()) {
                         Modifier modifier= (Modifier) extendedModifier;
                         if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
@@ -133,13 +133,13 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
     }
 
     private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
-        final List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
+        List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
 
         if (statements == null || statements.isEmpty()) {
             return true;
         }
         if (statements.size() == 1) {
-            final SuperConstructorInvocation superStatement= ASTNodes.as(statements.get(0), SuperConstructorInvocation.class);
+            SuperConstructorInvocation superStatement= ASTNodes.as(statements.get(0), SuperConstructorInvocation.class);
 
             return superStatement != null && (superStatement.arguments() == null || superStatement.arguments().isEmpty());
         }
@@ -160,7 +160,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
     }
 
     private boolean isChecked(final Type type) {
-        final ITypeBinding binding= type.resolveBinding();
+        ITypeBinding binding= type.resolveBinding();
         return !ASTNodes.instanceOf(binding, RuntimeException.class.getCanonicalName()) && !ASTNodes.instanceOf(binding, Error.class.getCanonicalName());
     }
 }

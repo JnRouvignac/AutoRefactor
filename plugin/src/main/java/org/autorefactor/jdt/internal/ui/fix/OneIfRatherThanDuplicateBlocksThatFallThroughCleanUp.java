@@ -73,7 +73,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
     @Override
     public boolean visit(final Block node) {
-        final SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(ctx, node);
+        SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(ctx, node);
         node.accept(successiveIfVisitor);
         return successiveIfVisitor.getResult();
     }
@@ -87,7 +87,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         public boolean visit(final IfStatement node) {
             if (getResult()
                     && ASTNodes.fallsThrough(node.getThenStatement())) {
-                final List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
+                List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
                 AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
                 duplicateIfBlocks.add(node);
 
@@ -111,7 +111,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
 
             if (lastBlock.getElseStatement() == null) {
-                final IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
+                IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
                 if (nextSibling != null && nextSibling.getElseStatement() == null
                         && !ctx.getRefactorings().hasBeenRefactored(nextSibling)
@@ -127,8 +127,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         }
 
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            final Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= ctx.getRefactorings();
 
             List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 
@@ -137,7 +137,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             }
 
             InfixExpression newCondition= b.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
-            final IfStatement newIf= b.if0(newCondition, b.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
+            IfStatement newIf= b.if0(newCondition, b.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
 
             Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
             r.replace(iterator.next(), newIf);

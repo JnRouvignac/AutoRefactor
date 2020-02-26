@@ -88,7 +88,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
         for (Object object : node.imports()) {
             ImportDeclaration importDeclaration= (ImportDeclaration) object;
-            final ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
+            ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
 
             if (ASTNodes.hasType(typeBinding, "org.junit.Assert")) { //$NON-NLS-1$
                 for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
@@ -106,7 +106,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        final List<Expression> args= ASTNodes.arguments(node);
+        List<Expression> args= ASTNodes.arguments(node);
         int i= 0;
         boolean shouldVisit= true;
         while (shouldVisit && i < PACKAGE_PATHES.length) {
@@ -158,10 +158,10 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(final IfStatement node) {
-        final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+        List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
         if (node.getElseStatement() == null && statements.size() == 1) {
-            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+            MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
             int i= 0;
             boolean shouldVisit= true;
             while (shouldVisit && i < PACKAGE_PATHES.length) {

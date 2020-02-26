@@ -82,7 +82,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
             }
 
             if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
-                final Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
+                Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
 
                 if (ASTNodes.isHardCoded(initializer)) {
                     addStaticModifier(finalModifier);
@@ -95,14 +95,14 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
     }
 
     private void addStaticModifier(final Modifier finalModifier) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Refactorings r= ctx.getRefactorings();
 
         r.insertBefore(b.static0(), finalModifier);
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results= new LinkedList<>();
+        List<Modifier> results= new LinkedList<>();
         for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

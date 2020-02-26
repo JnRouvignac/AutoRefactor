@@ -507,7 +507,7 @@ public class CFGBuilder {
 
     private boolean addDeclaration(final CFGBasicBlock basicBlock, final VariableDeclarationFragment vdf, final Type type,
             final ThrowerBlocks throwers) {
-        final int accessType= vdf.getInitializer() == null ? VariableAccess.DECL_UNINIT : VariableAccess.DECL_INIT | VariableAccess.WRITE;
+        int accessType= vdf.getInitializer() == null ? VariableAccess.DECL_UNINIT : VariableAccess.DECL_INIT | VariableAccess.WRITE;
         basicBlock.addVariableAccess(new VariableAccess(vdf, vdf.getName(), type, accessType));
         return addVariableAccess(basicBlock, vdf.getInitializer(), VariableAccess.READ, throwers);
     }
@@ -536,7 +536,7 @@ public class CFGBuilder {
             return state.nextStmtWillCreateNewBlock();
         }
         try {
-            final Method m= getClass().getMethod("buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class); //$NON-NLS-1$
+            Method m= getClass().getMethod("buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class); //$NON-NLS-1$
             return (LivenessState) m.invoke(this, node, state, throwers);
         } catch (Exception e) {
             throw new UnhandledException(node, e);
@@ -633,7 +633,7 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final ReturnStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         if (node.getExpression() != null) {
             addVariableAccess(basicBlock, node.getExpression(), VariableAccess.READ, throwers);
         }
@@ -667,15 +667,15 @@ public class CFGBuilder {
      * @return the entry block to the CFG of this method declaration
      */
     public CFGBasicBlock buildCFG(final MethodDeclaration node) {
-        final CFGBasicBlock entryBlock= newEntryBlock(node);
+        CFGBasicBlock entryBlock= newEntryBlock(node);
         this.exitBlock= newExitBlock(node);
 
         addDeclarations(entryBlock, ASTNodes.parameters(node));
 
         try {
-            final ThrowerBlocks throwers= new ThrowerBlocks();
-            final CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(entryBlock);
-            final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
+            ThrowerBlocks throwers= new ThrowerBlocks();
+            CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(entryBlock);
+            LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
             if (!liveAfterBody.liveEdges.isEmpty()) {
                 if (node.getReturnType2() != null && node.getReturnType2().resolveBinding() != null /* added for unit Tests */ && !"void".equals(node.getReturnType2().resolveBinding().getName())) { //$NON-NLS-1$
                     throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
@@ -835,26 +835,26 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final TryStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final ThrowerBlocks localThrowers= new ThrowerBlocks();
+        ThrowerBlocks localThrowers= new ThrowerBlocks();
 
-        final LivenessState liveAfterTry= buildCFG(node.getBody(), state, localThrowers);
-        final LivenessState liveAfterCatchClauses= new LivenessState();
+        LivenessState liveAfterTry= buildCFG(node.getBody(), state, localThrowers);
+        LivenessState liveAfterCatchClauses= new LivenessState();
 
-        final Set<ITypeBinding> caughtExceptions= new HashSet<>();
+        Set<ITypeBinding> caughtExceptions= new HashSet<>();
         for (CatchClause catchClause : ASTNodes.catchClauses(node)) {
-            final LivenessState catchState= new LivenessState();
+            LivenessState catchState= new LivenessState();
             CFGBasicBlock catchBasicBlock= getCFGBasicBlock(catchClause, catchState);
-            final SingleVariableDeclaration exceptionDecl= catchClause.getException();
+            SingleVariableDeclaration exceptionDecl= catchClause.getException();
             addDeclaration(catchBasicBlock, exceptionDecl, VariableAccess.DECL_INIT);
 
-            final ITypeBinding caughtException= exceptionDecl.getType().resolveBinding();
+            ITypeBinding caughtException= exceptionDecl.getType().resolveBinding();
             caughtExceptions.add(caughtException);
 
-            final List<CFGBasicBlock> throwingBlocksInTry= localThrowers.selectBlocksThrowing(caughtException);
+            List<CFGBasicBlock> throwingBlocksInTry= localThrowers.selectBlocksThrowing(caughtException);
             if (throwingBlocksInTry.isEmpty()) {
                 // TODO JNR dead code found!!
             }
-            final List<CFGEdgeBuilder> liveBeforeCatchClause= new ArrayList<>(throwingBlocksInTry.size());
+            List<CFGEdgeBuilder> liveBeforeCatchClause= new ArrayList<>(throwingBlocksInTry.size());
             for (CFGBasicBlock throwingBlockInTry : throwingBlocksInTry) {
                 // TODO JNR if a Statement throws an exception, it must break the current
                 // basicBlock
@@ -862,21 +862,21 @@ public class CFGBuilder {
                 liveBeforeCatchClause.add(new CFGEdgeBuilder(throwingBlockInTry));
             }
 
-            final LivenessState liveAfterCatchClause= buildCFG(catchClause.getBody(), catchState, new ThrowerBlocks());
+            LivenessState liveAfterCatchClause= buildCFG(catchClause.getBody(), catchState, new ThrowerBlocks());
             liveAfterCatchClauses.addAll(liveAfterCatchClause);
         }
 
         // TODO JNR move uncaught exceptions from localThrowers to throwers
-        final Map<CFGBasicBlock, Set<ITypeBinding>> throwUncaughtExceptions= localThrowers
+        Map<CFGBasicBlock, Set<ITypeBinding>> throwUncaughtExceptions= localThrowers
                 .selectBlocksThrowingOtherThan(caughtExceptions);
         for (Entry<CFGBasicBlock, Set<ITypeBinding>> throwing : throwUncaughtExceptions.entrySet()) {
-            final CFGEdgeBuilder uncaughtExceptionEdge= new CFGEdgeBuilder(throwing.getKey(), true);
+            CFGEdgeBuilder uncaughtExceptionEdge= new CFGEdgeBuilder(throwing.getKey(), true);
             liveAfterCatchClauses.add(uncaughtExceptionEdge);
             throwers.addThrow(uncaughtExceptionEdge, throwing.getValue());
         }
 
         if (node.getFinally() != null) {
-            final LivenessState liveBeforeFinally= new LivenessState();
+            LivenessState liveBeforeFinally= new LivenessState();
             liveBeforeFinally.addAll(liveAfterTry);
             liveBeforeFinally.addAll(liveAfterCatchClauses);
             return buildCFG(node.getFinally(), liveBeforeFinally, throwers);
@@ -903,11 +903,11 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final WhileStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock conditionBlock= getCFGBasicBlock(node.getExpression(), state.nextStmtWillCreateNewBlock());
+        CFGBasicBlock conditionBlock= getCFGBasicBlock(node.getExpression(), state.nextStmtWillCreateNewBlock());
         addVariableAccess(conditionBlock, node.getExpression(), VariableAccess.READ, throwers);
 
-        final CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(node.getExpression(), true, conditionBlock);
-        final LivenessState liveAfterStatement= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
+        CFGEdgeBuilder liveEdge= new CFGEdgeBuilder(node.getExpression(), true, conditionBlock);
+        LivenessState liveAfterStatement= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
         liveAfterStatement.add(new CFGEdgeBuilder(node.getExpression(), false, conditionBlock));
         buildEdgesAfterBranchableStatement(node, liveAfterStatement, conditionBlock);
         return liveAfterStatement.nextStmtWillCreateNewBlock();
@@ -931,7 +931,7 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final VariableDeclarationStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         addDeclarations(basicBlock, ASTNodes.fragments(node), node.getType(), throwers);
         return getInBlockStmtResult(state, basicBlock);
     }
@@ -954,9 +954,9 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final SwitchStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
-        final LivenessState liveBeforeBody= new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
-        final LivenessState liveAfterBody= buildCFG(ASTNodes.statements(node), liveBeforeBody, throwers);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        LivenessState liveBeforeBody= new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
+        LivenessState liveAfterBody= buildCFG(ASTNodes.statements(node), liveBeforeBody, throwers);
         liveAfterBody.add(new CFGEdgeBuilder(basicBlock));
 
         buildEdgesAfterBranchableStatement(node, liveAfterBody, basicBlock);
@@ -1011,7 +1011,7 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final SuperConstructorInvocation node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         addVariableAccesses(basicBlock, ASTNodes.arguments(node), VariableAccess.READ, throwers);
         return getInBlockStmtResult(state, basicBlock);
     }
@@ -1035,7 +1035,7 @@ public class CFGBuilder {
      */
     public LivenessState buildCFG(final ThrowStatement node, final LivenessState state, final ThrowerBlocks throwers) {
         CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
-        final Expression throwingExpression= node.getExpression();
+        Expression throwingExpression= node.getExpression();
         addVariableAccess(state.liveBasicBlock, throwingExpression, VariableAccess.READ, throwers);
         throwers.addThrow(basicBlock, throwingExpression.resolveTypeBinding());
         return state.nextStmtsAreDeadCode();
@@ -1110,8 +1110,8 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final BreakStatement node, final LivenessState state) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
-        final Statement targetStatement;
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        Statement targetStatement;
         if (node.getLabel() != null) {
             targetStatement= findLabeledParentStatement(node);
         } else {
@@ -1163,7 +1163,7 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final ConstructorInvocation node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         addVariableAccesses(basicBlock, ASTNodes.arguments(node), VariableAccess.READ, throwers);
         return getInBlockStmtResult(state, basicBlock);
     }
@@ -1440,15 +1440,15 @@ public class CFGBuilder {
      * @return the new live state after the current statement
      */
     public LivenessState buildCFG(final IfStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock exprBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock(), true);
+        CFGBasicBlock exprBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock(), true);
         try {
             addVariableAccess(exprBlock, node.getExpression(), VariableAccess.READ, throwers);
 
-            final LivenessState result= new LivenessState();
+            LivenessState result= new LivenessState();
             CFGEdgeBuilder thenEdge= new CFGEdgeBuilder(node.getExpression(), true, exprBlock);
             result.addAll(buildCFG(node.getThenStatement(), LivenessState.of(thenEdge), throwers));
 
-            final Statement elseStatement= node.getElseStatement();
+            Statement elseStatement= node.getElseStatement();
             CFGEdgeBuilder elseEdge= new CFGEdgeBuilder(node.getExpression(), false, exprBlock);
             if (elseStatement != null) {
                 result.addAll(buildCFG(elseStatement, LivenessState.of(elseEdge), throwers));
@@ -1474,7 +1474,7 @@ public class CFGBuilder {
     }
 
     private void moveAllEdgesToBuild(final Statement node, final LivenessState state) {
-        final Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
+        Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
         if (toBuild != null) {
             state.addAll(toBuild.keySet());
         }
@@ -1491,13 +1491,13 @@ public class CFGBuilder {
 
     private void buildEdgesAfterBranchableStatement(final Statement node, final LivenessState liveAfterBranchableStatement,
             final CFGBasicBlock whereToBranchBlock) {
-        final Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
+        Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
         if (isNotEmpty(toBuild)) {
             Set<Entry<CFGEdgeBuilder, Boolean>> set= toBuild.entrySet();
             for (Iterator<Entry<CFGEdgeBuilder, Boolean>> iter= set.iterator(); iter.hasNext();) {
                 Entry<CFGEdgeBuilder, Boolean> entry= iter.next();
-                final CFGEdgeBuilder builder= entry.getKey();
-                final boolean isBreakStatement= entry.getValue();
+                CFGEdgeBuilder builder= entry.getKey();
+                boolean isBreakStatement= entry.getValue();
                 if (isBreakStatement) {
                     liveAfterBranchableStatement.add(builder);
                 } else { // this is a continue statement
@@ -1539,15 +1539,15 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final EnhancedForStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
 
         addDeclaration(basicBlock, node.getParameter(), VariableAccess.DECL_INIT | VariableAccess.WRITE);
 
-        final LivenessState newLiveState= LivenessState.of(new CFGEdgeBuilder(basicBlock));
-        final LivenessState liveAfterBody= buildCFG(node.getBody(), newLiveState, throwers);
+        LivenessState newLiveState= LivenessState.of(new CFGEdgeBuilder(basicBlock));
+        LivenessState liveAfterBody= buildCFG(node.getBody(), newLiveState, throwers);
         buildEdges(liveAfterBody, basicBlock);
 
-        final LivenessState liveAfterStatement= LivenessState.of(new CFGEdgeBuilder(basicBlock));
+        LivenessState liveAfterStatement= LivenessState.of(new CFGEdgeBuilder(basicBlock));
         buildEdgesAfterBranchableStatement(node, liveAfterStatement, basicBlock);
         return liveAfterStatement.nextStmtWillCreateNewBlock();
     }
@@ -1582,9 +1582,9 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final DoStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
-        final LivenessState newLiveState= new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
-        final LivenessState liveAfterLoop= buildCFG(node.getBody(), newLiveState, throwers);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
+        LivenessState newLiveState= new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
+        LivenessState liveAfterLoop= buildCFG(node.getBody(), newLiveState, throwers);
         CFGBasicBlock conditionBlock= getCFGBasicBlock(node.getExpression(),
                 liveAfterLoop.nextStmtWillCreateNewBlock());
         addVariableAccess(conditionBlock, node.getExpression(), VariableAccess.READ, throwers);
@@ -1604,8 +1604,8 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final ContinueStatement node, final LivenessState state) {
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
-        final Statement targetStatement;
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        Statement targetStatement;
         if (node.getLabel() != null) {
             targetStatement= findLabeledParentStatement(node);
         } else {
@@ -1636,10 +1636,10 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(final ForStatement node, final LivenessState state, final ThrowerBlocks throwers) {
-        final CFGBasicBlock initBlock= getCFGBasicBlock(ASTNodes.initializers(node), state);
-        final LivenessState initLiveBlock= LivenessState.of(new CFGEdgeBuilder(initBlock));
-        final CFGBasicBlock exprBlock= getCFGBasicBlock(node.getExpression(), initLiveBlock, true);
-        final CFGBasicBlock updatersBlock= getCFGBasicBlock(ASTNodes.updaters(node), new LivenessState());
+        CFGBasicBlock initBlock= getCFGBasicBlock(ASTNodes.initializers(node), state);
+        LivenessState initLiveBlock= LivenessState.of(new CFGEdgeBuilder(initBlock));
+        CFGBasicBlock exprBlock= getCFGBasicBlock(node.getExpression(), initLiveBlock, true);
+        CFGBasicBlock updatersBlock= getCFGBasicBlock(ASTNodes.updaters(node), new LivenessState());
         CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
 
         for (Expression expression : ASTNodes.initializers(node)) {
@@ -1651,10 +1651,10 @@ public class CFGBuilder {
         addVariableAccesses(updatersBlock, ASTNodes.updaters(node), VariableAccess.WRITE, throwers);
 
         CFGEdgeBuilder liveBlock= new CFGEdgeBuilder(node.getExpression(), true, exprBlock);
-        final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveBlock), throwers);
+        LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveBlock), throwers);
         buildEdges(liveAfterBody, updatersBlock);
 
-        final LivenessState liveAfterStatement= LivenessState.of(new CFGEdgeBuilder(node.getExpression(), false, exprBlock));
+        LivenessState liveAfterStatement= LivenessState.of(new CFGEdgeBuilder(node.getExpression(), false, exprBlock));
         buildEdgesAfterBranchableStatement(node, liveAfterStatement, updatersBlock);
         return liveAfterStatement.nextStmtWillCreateNewBlock();
     }
@@ -1687,10 +1687,10 @@ public class CFGBuilder {
      */
     public LivenessState buildCFG(final ExpressionStatement node, final LivenessState state, final ThrowerBlocks throwers) {
         boolean isNewBlock= state.requireNewBlock();
-        final CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
+        CFGBasicBlock basicBlock= getCFGBasicBlock(node, state);
         boolean mightThrow= addVariableAccess(basicBlock, node.getExpression(), VariableAccess.READ, throwers);
         if (!isNewBlock && mightThrow) {
-            final CFGBasicBlock currentBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
+            CFGBasicBlock currentBlock= getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
             return new LivenessState(currentBlock, new CFGEdgeBuilder(currentBlock));
             // TODO JNR create a new CFGBasicBlock from here to catch / finally / exit
         }
@@ -1715,7 +1715,7 @@ public class CFGBuilder {
      * @return
      */
     private CFGBasicBlock getCFGBasicBlock(final ASTNode node, final LivenessState state, final boolean isDecision) {
-        final Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
+        Map<CFGEdgeBuilder, Boolean> toBuild= this.edgesToBuild.remove(node);
         if (isNotEmpty(toBuild)) {
             throw new IllegalStateException(node, "No edges to build should exist for node \"" + node //$NON-NLS-1$
                     + "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild); //$NON-NLS-1$
@@ -1726,8 +1726,8 @@ public class CFGBuilder {
             // basicBlock.addNode(node);
             return state.liveBasicBlock;
         }
-        final LineAndColumn lineCol= getLineAndColumn(node);
-        final CFGBasicBlock basicBlock= new CFGBasicBlock(node, ASTNodes.getFileName(node), ASTPrintHelper.codeExcerpt(node), isDecision,
+        LineAndColumn lineCol= getLineAndColumn(node);
+        CFGBasicBlock basicBlock= new CFGBasicBlock(node, ASTNodes.getFileName(node), ASTPrintHelper.codeExcerpt(node), isDecision,
                 lineCol);
         buildEdges(state, basicBlock);
         return basicBlock;
@@ -1735,9 +1735,9 @@ public class CFGBuilder {
 
     private CFGBasicBlock getCFGBasicBlock(final List<Expression> expressions, final LivenessState state) {
         if (isNotEmpty(expressions)) {
-            final Expression firstExpression= expressions.get(0);
-            final LineAndColumn lineCol= getLineAndColumn(firstExpression.getStartPosition());
-            final CFGBasicBlock basicBlock= new CFGBasicBlock(expressions.get(0), ASTNodes.getFileName(firstExpression),
+            Expression firstExpression= expressions.get(0);
+            LineAndColumn lineCol= getLineAndColumn(firstExpression.getStartPosition());
+            CFGBasicBlock basicBlock= new CFGBasicBlock(expressions.get(0), ASTNodes.getFileName(firstExpression),
                     ASTPrintHelper.codeExcerpt(expressions), false, lineCol);
             buildEdges(state, basicBlock);
             return basicBlock;
@@ -1750,7 +1750,7 @@ public class CFGBuilder {
     }
 
     private CFGBasicBlock newExitBlock(final MethodDeclaration node) {
-        final LineAndColumn lineCol= getLineAndColumn(node.getStartPosition() + node.getLength());
+        LineAndColumn lineCol= getLineAndColumn(node.getStartPosition() + node.getLength());
         return CFGBasicBlock.buildExitBlock(node, ASTNodes.getFileName(node), ASTPrintHelper.codeExcerpt(node), lineCol);
     }
 
@@ -1767,12 +1767,12 @@ public class CFGBuilder {
         // file starts with line 1
         int lineNo= 1;
         int lastMatchPosition= 0;
-        final Matcher matcher= NEWLINE.matcher(source);
+        Matcher matcher= NEWLINE.matcher(source);
         while (matcher.find()) {
-            final MatchResult matchResult= matcher.toMatchResult();
+            MatchResult matchResult= matcher.toMatchResult();
             if (matchResult.end() >= position) {
-                final String startOfLine= this.source.substring(lastMatchPosition, position);
-                final int nbChars= countCharacters(startOfLine, tabSize);
+                String startOfLine= this.source.substring(lastMatchPosition, position);
+                int nbChars= countCharacters(startOfLine, tabSize);
                 // + 1 because line starts with column 1
                 return new LineAndColumn(position, lineNo, nbChars + 1);
             }

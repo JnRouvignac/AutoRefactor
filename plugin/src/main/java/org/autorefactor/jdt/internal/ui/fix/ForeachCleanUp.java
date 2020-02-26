@@ -79,7 +79,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final ForStatement node) {
-        final VariableUseVisitor variableUseVisitor= new VariableUseVisitor();
+        VariableUseVisitor variableUseVisitor= new VariableUseVisitor();
         node.accept(variableUseVisitor);
 
         if (ASTNodes.initializers(node).size() == 1) {

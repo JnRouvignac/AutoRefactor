@@ -78,10 +78,10 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final IfStatement node) {
         if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-            final boolean isThenEmpty= isEmptyCode(node.getThenStatement());
-            final boolean isElseEmpty= isEmptyCode(node.getElseStatement());
+            boolean isThenEmpty= isEmptyCode(node.getThenStatement());
+            boolean isElseEmpty= isEmptyCode(node.getElseStatement());
 
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
 
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
                 if (ASTNodes.canHaveSiblings(node)) {
@@ -155,7 +155,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final EmptyStatement node) {
         if (isEmptyCode(node)) {
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
 
             if (ASTNodes.canHaveSiblings(node)) {
                 r.remove(node);
@@ -185,7 +185,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
         if (isEmptyCode(emptyCode)) {
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
 
             if (ASTNodes.canHaveSiblings(node)) {
                 r.remove(node);
@@ -207,7 +207,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
         }
 
         if (emptyCode instanceof Block) {
-            final Block block= (Block) emptyCode;
+            Block block= (Block) emptyCode;
             return block.statements() == null || block.statements().isEmpty();
         }
 

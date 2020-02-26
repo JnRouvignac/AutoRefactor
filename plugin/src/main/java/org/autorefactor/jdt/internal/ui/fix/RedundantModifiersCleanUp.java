@@ -105,8 +105,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             if (o2.isAnnotation()) {
                 return 1;
             }
-            final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-            final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+            int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+            int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
             if (i1 == -1) {
                 throw new NotImplementedException((Modifier) o1, "cannot determine order for modifier " + o1); //$NON-NLS-1$
             }
@@ -241,8 +241,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean ensureModifiersOrder(final BodyDeclaration node) {
-        final List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
-        final List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
+        List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
+        List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
         if (!extendedModifiers.equals(reorderedModifiers)) {
@@ -254,7 +254,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
         for (int i= 0; i < reorderedModifiers.size(); i++) {
             IExtendedModifier m= reorderedModifiers.get(i);
@@ -296,7 +296,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results= new ArrayList<>();
+        List<Modifier> results= new ArrayList<>();
         for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

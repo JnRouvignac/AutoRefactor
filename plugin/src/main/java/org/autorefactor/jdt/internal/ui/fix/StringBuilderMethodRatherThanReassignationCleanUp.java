@@ -66,14 +66,14 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 
     @Override
     public boolean visit(final Assignment node) {
-        final Expression targetVar= node.getLeftHandSide();
+        Expression targetVar= node.getLeftHandSide();
         Expression var= node.getRightHandSide();
         if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && var instanceof MethodInvocation) {
             var= getVar(var);
 
             if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
+                ASTNodeFactory b= this.ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.createMoveTarget(node.getRightHandSide()));
                 return false;
             }
@@ -87,7 +87,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
             return var;
         }
 
-        final MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
+        MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
 
         if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$

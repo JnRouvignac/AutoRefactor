@@ -132,12 +132,12 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
     private void replaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
             final Expression oneExpression, final Expression oppositeExpression, final List<Expression> previousOperands,
             final List<Expression> nextOperands) {
-        final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
+        AtomicBoolean isFirstExprPositive= new AtomicBoolean();
 
-        final Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);
+        Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);
 
-        final Expression thenExpression;
-        final Expression elseExpression;
+        Expression thenExpression;
+        Expression elseExpression;
 
         if (isFirstExprPositive.get()) {
             thenExpression= oneExpression;
@@ -147,8 +147,8 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
             elseExpression= oneExpression;
         }
 
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Refactorings r= ctx.getRefactorings();
 
         ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.createMoveTarget(basicExpression),
                 b.createMoveTarget(thenExpression), b.createMoveTarget(elseExpression)));
@@ -165,7 +165,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 
     private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
         Expression basisExpression;
-        final PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
+        PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
 
         if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
             basisExpression= negateExpression.getOperand();

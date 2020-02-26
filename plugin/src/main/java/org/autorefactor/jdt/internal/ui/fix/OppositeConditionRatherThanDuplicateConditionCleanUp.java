@@ -131,7 +131,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
             final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
         Statement negativeStmtCopy;
         if (negativeStatement instanceof IfStatement) {
@@ -140,10 +140,10 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             negativeStmtCopy= b.createMoveTarget(negativeStatement);
         }
 
-        final Expression secondCond;
-        final Statement secondStmtCopy;
-        final Statement thirdStmtCopy;
-        final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
+        Expression secondCond;
+        Statement secondStmtCopy;
+        Statement thirdStmtCopy;
+        PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
 
         if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();

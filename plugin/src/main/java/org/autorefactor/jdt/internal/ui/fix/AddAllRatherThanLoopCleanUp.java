@@ -109,15 +109,15 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeRefactorEnhancedForStatement(final EnhancedForStatement node,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final Expression iterable= node.getExpression();
-        final List<Statement> statements= ASTNodes.asList(node.getBody());
+        Expression iterable= node.getExpression();
+        List<Statement> statements= ASTNodes.asList(node.getBody());
 
         if (statements.size() != 1) {
             return true;
         }
 
-        final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
-        final IVariableBinding foreachVariable= node.getParameter().resolveBinding();
+        MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+        IVariableBinding foreachVariable= node.getParameter().resolveBinding();
         // We should remove all the loop variable occurrences
         // As we replace only one, there should be no more than one occurrence
         if (getVariableUseCount(foreachVariable, node.getBody()) == 1
@@ -141,22 +141,22 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        final ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-        final List<Statement> statements= ASTNodes.asList(node.getBody());
+        ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+        List<Statement> statements= ASTNodes.asList(node.getBody());
 
         if (loopContent != null && loopContent.getLoopVariable() != null && statements.size() == 1) {
-            final Name loopVariable= loopContent.getLoopVariable();
-            final IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
-            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+            Name loopVariable= loopContent.getLoopVariable();
+            IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
+            MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
-                final Expression addArg0= ASTNodes.arguments(mi).get(0);
+                Expression addArg0= ASTNodes.arguments(mi).get(0);
 
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
-                    final MethodInvocation getMI= ASTNodes.as(addArg0, MethodInvocation.class);
+                    MethodInvocation getMI= ASTNodes.as(addArg0, MethodInvocation.class);
 
                     if (getMI != null && getMI.arguments().size() == 1 && isSameVariable(loopContent, getMI)) {
                         return maybeReplaceForCollection(node, mi, getMI.getExpression());
@@ -164,7 +164,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
                     break;
 
                 case ARRAY:
-                    final ArrayAccess aa= ASTNodes.as(addArg0, ArrayAccess.class);
+                    ArrayAccess aa= ASTNodes.as(addArg0, ArrayAccess.class);
 
                     if (isSameVariable(loopContent, aa)) {
                         return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, loopContent.getContainerVariable(), mi);
@@ -200,7 +200,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
         if (variableBinding != null) {
-            final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
+            VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                     toVisit, true).find();
             return variableUseVisitor.getReads().size();
         }
@@ -253,8 +253,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private void replaceWithCollectionMethod(final ASTNode toReplace, final String methodName,
             final Expression affectedCollection,
             final Expression data) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final MethodInvocation newMethod;
+        ASTNodeFactory b= ctx.getASTBuilder();
+        MethodInvocation newMethod;
 
         if (affectedCollection != null) {
             newMethod= b.invoke(b.createMoveTarget(affectedCollection), methodName, b.createMoveTarget(data));

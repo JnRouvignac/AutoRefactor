@@ -121,16 +121,16 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
+        ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
         ClassInstanceCreation classInstanceCreation= ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
 
         if (typeBinding != null && classInstanceCreation != null) {
-            final List<Expression> cicArgs= ASTNodes.arguments(classInstanceCreation);
+            List<Expression> cicArgs= ASTNodes.arguments(classInstanceCreation);
 
             if (cicArgs.size() == 1) {
-                final Expression arg0= cicArgs.get(0);
+                Expression arg0= cicArgs.get(0);
                 if (ASTNodes.arguments(node).isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
-                    final String methodName= getMethodName(typeBinding.getQualifiedName(),
+                    String methodName= getMethodName(typeBinding.getQualifiedName(),
                             node.getName().getIdentifier());
 
                     if (methodName != null) {
@@ -152,13 +152,13 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
-        final SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
+        SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
         this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
         return false;
     }
 
     private void replaceWithTheSingleArgument(final MethodInvocation node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
     }
 
@@ -196,8 +196,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final ClassInstanceCreation node) {
-        final ITypeBinding typeBinding= node.getType().resolveBinding();
-        final List<Expression> args= ASTNodes.arguments(node);
+        ITypeBinding typeBinding= node.getType().resolveBinding();
+        List<Expression> args= ASTNodes.arguments(node);
 
         if (getJavaMinorVersion() >= 5 && args.size() == 1) {
             if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
@@ -217,14 +217,14 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding,
             final List<Expression> args) {
-        final Expression arg0= args.get(0);
+        Expression arg0= args.get(0);
 
         if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
                     b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.createMoveTarget(arg0)))); //$NON-NLS-1$
         } else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke(b.createMoveTarget(arg0), "floatValue")); //$NON-NLS-1$
         } else {
             replaceWithValueOf(node, typeBinding);
@@ -237,7 +237,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.createMoveTarget(arg));
     }
 }

@@ -106,33 +106,33 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             return false;
         }
         if (node.getBody() instanceof Block) {
-            final List<Statement> statements= ASTNodes.asList((Block) node.getBody());
+            List<Statement> statements= ASTNodes.asList((Block) node.getBody());
 
             if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement) {
                 removeReturnAndBrackets(node, statements);
                 return false;
             }
         } else if (node.getBody() instanceof ClassInstanceCreation) {
-            final ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
-            final List<Expression> arguments= ASTNodes.arguments(ci);
+            ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
+            List<Expression> arguments= ASTNodes.arguments(ci);
 
             if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments) && ci.resolveTypeBinding() != null) {
                 replaceByCreationReference(node, ci);
                 return false;
             }
         } else if (node.getBody() instanceof SuperMethodInvocation) {
-            final SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
-            final List<Expression> arguments= ASTNodes.arguments(smi);
+            SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
+            List<Expression> arguments= ASTNodes.arguments(smi);
 
             if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
                 replaceBySuperMethodReference(node, smi);
                 return false;
             }
         } else if (node.getBody() instanceof MethodInvocation) {
-            final MethodInvocation mi= (MethodInvocation) node.getBody();
-            final Expression calledExpression= mi.getExpression();
-            final ITypeBinding calledType= ASTNodes.getCalledType(mi);
-            final List<Expression> arguments= ASTNodes.arguments(mi);
+            MethodInvocation mi= (MethodInvocation) node.getBody();
+            Expression calledExpression= mi.getExpression();
+            ITypeBinding calledType= ASTNodes.getCalledType(mi);
+            List<Expression> arguments= ASTNodes.arguments(mi);
 
             if (node.parameters().size() == arguments.size()) {
                 if (!areSameIdentifiers(node, arguments)) {
@@ -141,9 +141,9 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
                 if (isStaticMethod(mi)) {
                     if (!arguments.isEmpty()) {
-                        final String[] remainingParams= new String[arguments.size() - 1];
+                        String[] remainingParams= new String[arguments.size() - 1];
                         for (int i= 0; i < arguments.size() - 1; i++) {
-                            final ITypeBinding argumentBinding= arguments.get(i + 1).resolveTypeBinding();
+                            ITypeBinding argumentBinding= arguments.get(i + 1).resolveTypeBinding();
 
                             if (argumentBinding == null) {
                                 return true;
@@ -170,38 +170,38 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
                 if (calledExpression instanceof FieldAccess) {
-                    final FieldAccess fieldAccess= (FieldAccess) calledExpression;
+                    FieldAccess fieldAccess= (FieldAccess) calledExpression;
                     if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                         replaceByMethodReference(node, mi);
                         return false;
                     }
                 } else if (calledExpression instanceof SuperFieldAccess) {
-                    final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
+                    SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
                     if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                         replaceByMethodReference(node, mi);
                         return false;
                     }
                 }
             } else if (calledExpression instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
-                final SimpleName calledObject= (SimpleName) calledExpression;
+                SimpleName calledObject= (SimpleName) calledExpression;
                 if (isSameIdentifier(node, 0, calledObject)) {
                     for (int i= 0; i < arguments.size(); i++) {
-                        final ASTNode expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+                        ASTNode expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
                         if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expression)) {
                             return true;
                         }
                     }
 
-                    final ITypeBinding clazz= calledExpression.resolveTypeBinding();
+                    ITypeBinding clazz= calledExpression.resolveTypeBinding();
 
                     if (clazz == null) {
                         return true;
                     }
 
-                    final String[] remainingParams= new String[arguments.size() + 1];
+                    String[] remainingParams= new String[arguments.size() + 1];
                     remainingParams[0]= clazz.getQualifiedName();
                     for (int i= 0; i < arguments.size(); i++) {
-                        final ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
+                        ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
 
                         if (argumentBinding == null) {
                             return true;
@@ -227,7 +227,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStaticMethod(final MethodInvocation mi) {
-        final Expression calledExpression= mi.getExpression();
+        Expression calledExpression= mi.getExpression();
 
         if (calledExpression == null) {
             return mi.resolveMethodBinding() != null && (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
@@ -240,7 +240,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
     private boolean areSameIdentifiers(final LambdaExpression node, final List<Expression> arguments) {
         for (int i= 0; i < node.parameters().size(); i++) {
-            final Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+            Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
 
             if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expression)) {
                 return false;
@@ -251,9 +251,9 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
-        final Object param0= node.parameters().get(i);
+        Object param0= node.parameters().get(i);
         if (param0 instanceof VariableDeclarationFragment) {
-            final VariableDeclarationFragment vdf= (VariableDeclarationFragment) param0;
+            VariableDeclarationFragment vdf= (VariableDeclarationFragment) param0;
             return vdf.getName().getIdentifier().equals(argument.getIdentifier());
             // } else if (param0 instanceof SingleVariableDeclaration) {
             // TODO it should also be possible to deal with a SingleVariableDeclaration
@@ -266,10 +266,10 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
     @SuppressWarnings("unchecked")
     private void removeParamParentheses(final LambdaExpression node) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final LambdaExpression copyOfLambdaExpression= b.lambda();
-        final ASTNode copyOfParameter= b.createMoveTarget((ASTNode) node.parameters().get(0));
+        LambdaExpression copyOfLambdaExpression= b.lambda();
+        ASTNode copyOfParameter= b.createMoveTarget((ASTNode) node.parameters().get(0));
         copyOfLambdaExpression.parameters().add(copyOfParameter);
         copyOfLambdaExpression.setBody(b.createMoveTarget(node.getBody()));
         copyOfLambdaExpression.setParentheses(false);
@@ -277,45 +277,45 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     }
 
     private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
+        ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
         ctx.getRefactorings().replace(node.getBody(), b.parenthesizeIfNeeded(b.createMoveTarget(returnStatement.getExpression())));
     }
 
     private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
+        TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
 
-        final CreationReference creationRef= b.creationRef();
+        CreationReference creationRef= b.creationRef();
         creationRef.setType(b.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
         ctx.getRefactorings().replace(node, creationRef);
     }
 
     private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final SuperMethodReference creationRef= b.superMethodRef();
+        SuperMethodReference creationRef= b.superMethodRef();
         creationRef.setName(b.createMoveTarget(ci.getName()));
         ctx.getRefactorings().replace(node, creationRef);
     }
 
     private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
+        TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
 
-        final TypeMethodReference typeMethodRef= b.typeMethodRef();
+        TypeMethodReference typeMethodRef= b.typeMethodRef();
         typeMethodRef.setType(b.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
         typeMethodRef.setName(b.createMoveTarget(mi.getName()));
         ctx.getRefactorings().replace(node, typeMethodRef);
     }
 
     private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
 
-        final ExpressionMethodReference typeMethodRef= b.exprMethodRef();
+        ExpressionMethodReference typeMethodRef= b.exprMethodRef();
         if (mi.getExpression() != null) {
             typeMethodRef.setExpression(b.createMoveTarget(mi.getExpression()));
         } else {

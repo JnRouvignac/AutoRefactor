@@ -86,7 +86,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        final IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(ctx, node);
+        IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(ctx, node);
         node.accept(ifWithAssignmentVisitor);
         return ifWithAssignmentVisitor.getResult();
     }
@@ -102,13 +102,13 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
-            final Assignment assignment= ASTNodes.as(expression, Assignment.class);
+            Assignment assignment= ASTNodes.as(expression, Assignment.class);
 
             if (assignment != null) {
                 return moveAssignmentBeforeIfStatement(node, assignment, evaluatedExpression);
             }
 
-            final PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
+            PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
 
             if (pe != null && ASTNodes.hasOperator(pe,
                     PrefixExpression.Operator.NOT,
@@ -118,7 +118,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 return moveAssignmentBeforeIfStatementIfPossible(node, pe.getOperand(), evaluatedExpression);
             }
 
-            final InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
+            InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
 
             if (ie != null) {
                 List<Expression> operands= ASTNodes.allOperands(ie);
@@ -154,7 +154,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 }
             }
 
-            final ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
+            ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
 
             if (ce != null) {
                 return moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
@@ -164,11 +164,11 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
-            final Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
+            Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
 
             if (!evaluatedExpression.isEmpty()) {
-                final Name mame= ASTNodes.as(lhs, Name.class);
-                final FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
+                Name mame= ASTNodes.as(lhs, Name.class);
+                FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
                 IVariableBinding variableBinding;
 
                 if (fieldAccess != null) {
@@ -186,7 +186,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 }
 
                 for (Expression expression : evaluatedExpression) {
-                    final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
+                    VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
                             expression, true).find();
 
                     if (!variableUseVisitor.getReads().isEmpty()) {
@@ -195,11 +195,11 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 }
             }
 
-            final VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-            final VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
+            VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
+            VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
 
-            final Refactorings r= ctx.getRefactorings();
-            final ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= ctx.getASTBuilder();
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
                 r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());

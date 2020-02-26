@@ -71,8 +71,8 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final InfixExpression node) {
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
-            final Expression leftOperand= node.getLeftOperand();
-            final Expression rightOperand= node.getRightOperand();
+            Expression leftOperand= node.getLeftOperand();
+            Expression rightOperand= node.getRightOperand();
 
             return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
                     // If not replaced then try the other way round
@@ -88,8 +88,8 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
         if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
                 && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
-            final MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(variable)); //$NON-NLS-1$
+            ASTNodeFactory b= this.ctx.getASTBuilder();
+            MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(variable)); //$NON-NLS-1$
 
             if (node.hasExtendedOperands()) {
                 List<Expression> extendedOperands= ASTNodes.extendedOperands(node);

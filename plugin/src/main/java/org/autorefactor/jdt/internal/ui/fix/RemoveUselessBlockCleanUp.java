@@ -67,15 +67,15 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        final List<Statement> statements= ASTNodes.statements(node);
+        List<Statement> statements= ASTNodes.statements(node);
         if (statements.size() == 1 && statements.get(0) instanceof Block) {
             replaceBlock((Block) statements.get(0));
             return false;
         }
         if (node.getParent() instanceof Block) {
-            final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+            Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
 
-            final Set<String> followingVariableNames= new HashSet<>();
+            Set<String> followingVariableNames= new HashSet<>();
             for (Statement statement : ASTNodes.getNextSiblings(node)) {
                 followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
             }
@@ -90,8 +90,8 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceBlock(final Block node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
         r.replace(node, b.copyRange(ASTNodes.statements(node)));
     }
 }

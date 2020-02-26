@@ -78,8 +78,8 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
 
         if (isEquals || isStringEqualsIgnoreCase) {
-            final Expression expression= node.getExpression();
-            final Expression arg0= ASTNodes.arguments(node).get(0);
+            Expression expression= node.getExpression();
+            Expression arg0= ASTNodes.arguments(node).get(0);
 
             if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
                 invertEqualsInvocation(node, isEquals, expression, arg0);
@@ -92,9 +92,9 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
             final Expression arg0) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
+        String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
         this.ctx.getRefactorings().replace(node,
                 b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget(arg0)), methodName, b.createMoveTarget(expression)));
     }

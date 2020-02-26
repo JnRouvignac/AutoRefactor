@@ -76,7 +76,7 @@ public class AutoRefactorException extends RuntimeException {
     }
 
     private static String buildMessage(final ASTNode node, final String message) {
-        final String sourceLocation= ASTNodes.getSourceLocation(node);
+        String sourceLocation= ASTNodes.getSourceLocation(node);
         if (!sourceLocation.isEmpty()) {
             return sourceLocation + ":" + message; //$NON-NLS-1$
         }

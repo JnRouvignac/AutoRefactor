@@ -65,10 +65,10 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final ClassInstanceCreation node) {
         if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
-            final Expression arg0= ASTNodes.arguments(node).get(0);
+            Expression arg0= ASTNodes.arguments(node).get(0);
             if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
+                ASTNodeFactory b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
                 return false;
             }

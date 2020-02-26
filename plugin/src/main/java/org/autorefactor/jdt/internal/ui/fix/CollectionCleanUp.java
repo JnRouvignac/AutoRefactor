@@ -95,7 +95,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        final NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(ctx, node);
+        NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(ctx, node);
         node.accept(newAndAddAllMethodVisitor);
         return newAndAddAllMethodVisitor.getResult();
     }
@@ -107,20 +107,20 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final ExpressionStatement node) {
-            final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
+            MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
             if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-                final Expression arg0= ASTNodes.arguments(mi).get(0);
-                final Statement previousStatement= ASTNodes.getPreviousSibling(node);
+                Expression arg0= ASTNodes.arguments(mi).get(0);
+                Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-                final Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
+                Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
                 if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                    final SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+                    SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
 
                     if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
                         return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStatement instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
+                    VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
                             (VariableDeclarationStatement) previousStatement);
                     if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
                         return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
@@ -133,10 +133,10 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
         private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
                 final ExpressionStatement nodeToRemove) {
-            final ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+            ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
+                ASTNodeFactory b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
                 ctx.getRefactorings().remove(nodeToRemove);
                 setResult(false);
@@ -151,8 +151,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 return false;
             }
 
-            final List<Expression> args= ASTNodes.arguments(cic);
-            final boolean noArgsCtor= args.isEmpty();
+            List<Expression> args= ASTNodes.arguments(cic);
+            boolean noArgsCtor= args.isEmpty();
 
             if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
                     ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
@@ -165,7 +165,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            final boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
+            boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
 
             return colCapacityCtor && ASTNodes.hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
                     LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
@@ -175,8 +175,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
         private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
             if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
-                final Object constant= args.get(0).resolveConstantExpressionValue();
-                final MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
+                Object constant= args.get(0).resolveConstantExpressionValue();
+                MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
 
                 if (constant != null) {
                     return constant.equals(0);

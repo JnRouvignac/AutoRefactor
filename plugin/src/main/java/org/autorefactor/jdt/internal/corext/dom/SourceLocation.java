@@ -197,7 +197,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @return -1, 0 or 1
      */
     public int compareTo(final ISourceRange sourceRange) {
-        final int offsetDiff= this.offset - sourceRange.getOffset();
+        int offsetDiff= this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {
             return offsetDiff;
         }
@@ -218,7 +218,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final SourceLocation other= (SourceLocation) obj;
+        SourceLocation other= (SourceLocation) obj;
         return Objects.equals(length, other.length) && Objects.equals(offset, other.offset);
     }
 

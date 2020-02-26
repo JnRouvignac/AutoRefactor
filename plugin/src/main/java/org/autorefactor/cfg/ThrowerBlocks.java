@@ -38,9 +38,9 @@ class ThrowerBlocks {
     }
 
     public List<CFGBasicBlock> selectBlocksThrowing(final ITypeBinding exceptionTypeToFind) {
-        final List<CFGBasicBlock> results= new LinkedList<>();
+        List<CFGBasicBlock> results= new LinkedList<>();
         for (Entry<CFGBasicBlock, Set<ITypeBinding>> entry : potentialThrowingBlocks.entrySet()) {
-            final Set<ITypeBinding> thrownTypes= entry.getValue();
+            Set<ITypeBinding> thrownTypes= entry.getValue();
             if (exceptionTypeToFind == null || thrownTypes.contains(exceptionTypeToFind)) {
                 results.add(entry.getKey());
             }
@@ -53,7 +53,7 @@ class ThrowerBlocks {
             final Set<ITypeBinding> exceptionTypesToReject) {
         Map<CFGBasicBlock, Set<ITypeBinding>> results= new HashMap<>();
         for (Entry<CFGBasicBlock, Set<ITypeBinding>> entry : potentialThrowingBlocks.entrySet()) {
-            final Set<ITypeBinding> bindings= getNonMatching(exceptionTypesToReject, entry.getValue());
+            Set<ITypeBinding> bindings= getNonMatching(exceptionTypesToReject, entry.getValue());
             if (!bindings.isEmpty()) {
                 results.put(entry.getKey(), bindings);
             }
@@ -63,9 +63,9 @@ class ThrowerBlocks {
     }
 
     public List<CFGEdgeBuilder> selectEdgesThrowing(final ITypeBinding exceptionTypeToFind) {
-        final List<CFGEdgeBuilder> results= new LinkedList<>();
+        List<CFGEdgeBuilder> results= new LinkedList<>();
         for (Entry<CFGEdgeBuilder, Set<ITypeBinding>> entry : potentialThrowingEdges.entrySet()) {
-            final Set<ITypeBinding> thrownTypes= entry.getValue();
+            Set<ITypeBinding> thrownTypes= entry.getValue();
             if (exceptionTypeToFind == null || thrownTypes.contains(exceptionTypeToFind)) {
                 results.add(entry.getKey());
             }
@@ -75,7 +75,7 @@ class ThrowerBlocks {
     }
 
     private Set<ITypeBinding> getNonMatching(final Set<ITypeBinding> exceptionTypes, final Set<ITypeBinding> thrownTypes) {
-        final Set<ITypeBinding> results= new HashSet<>();
+        Set<ITypeBinding> results= new HashSet<>();
         for (ITypeBinding thrownType : thrownTypes) {
             if (!exceptionTypes.contains(thrownType)) {
                 results.add(thrownType);

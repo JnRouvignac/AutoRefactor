@@ -191,7 +191,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            final StringBuilder sb= new StringBuilder();
+            StringBuilder sb= new StringBuilder();
             for (ITypeBinding typeBinding : typeBindings) {
                 if (sb.length() > 0) {
                     sb.append(" | "); //$NON-NLS-1$
@@ -343,7 +343,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private Binding[] resolveTypeBindings(final List<CatchClause> catchClauses) {
-        final Binding[] results= new Binding[catchClauses.size()];
+        Binding[] results= new Binding[catchClauses.size()];
         for (int i= 0; i < catchClauses.size(); i++) {
             results[i]= resolveBinding(catchClauses.get(i));
         }
@@ -374,7 +374,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean matchMultiCatch(final CatchClause catchClause1, final CatchClause catchClause2) {
-        final MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(catchClause1, catchClause2);
+        MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(catchClause1, catchClause2);
         return ASTNodes.match(matcher, catchClause1.getBody(), catchClause2.getBody());
     }
 
@@ -390,9 +390,9 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean canMergeTypesDown(final Binding[] types, final int start, final int end) {
-        final Binding startType= types[start];
+        Binding startType= types[start];
         for (int i= start + 1; i < end; i++) {
-            final Binding type= types[i];
+            Binding type= types[i];
             if (Boolean.TRUE.equals(startType.isSubTypeCompatible(type))) {
                 return false;
             }
@@ -402,9 +402,9 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean canMergeTypesUp(final Binding[] types, final int start, final int end) {
-        final Binding endType= types[end];
+        Binding endType= types[end];
         for (int i= start + 1; i < end; i++) {
-            final Binding type= types[i];
+            Binding type= types[i];
             if (Boolean.TRUE.equals(type.isSubTypeCompatible(endType))) {
                 return false;
             }
@@ -414,13 +414,13 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private UnionType unionTypes(final Type... types) {
-        final List<Type> allTypes= new ArrayList<>();
+        List<Type> allTypes= new ArrayList<>();
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final UnionType result= this.ctx.getAST().newUnionType();
-        final List<Type> unionedTypes= ASTNodes.types(result);
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        UnionType result= this.ctx.getAST().newUnionType();
+        List<Type> unionedTypes= ASTNodes.types(result);
         unionedTypes.addAll(b.createMoveTarget(allTypes));
         return result;
     }
@@ -428,7 +428,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private void collectAllUnionedTypes(final List<Type> results, final Collection<Type> types) {
         for (Type type : types) {
             if (type instanceof UnionType) {
-                final UnionType ut= (UnionType) type;
+                UnionType ut= (UnionType) type;
                 collectAllUnionedTypes(results, ASTNodes.types(ut));
             } else {
                 results.add(type);
@@ -438,10 +438,10 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
     private void removeSupersededAlternatives(final List<Type> allTypes) {
         for (ListIterator<Type> it1= allTypes.listIterator(); it1.hasNext();) {
-            final ITypeBinding binding1= it1.next().resolveBinding();
+            ITypeBinding binding1= it1.next().resolveBinding();
 
             for (ListIterator<Type> it2= allTypes.listIterator(it1.nextIndex()); it2.hasNext();) {
-                final ITypeBinding binding2= it2.next().resolveBinding();
+                ITypeBinding binding2= it2.next().resolveBinding();
 
                 if (binding1 != null && binding1.isSubTypeCompatible(binding2)) {
                     it1.remove();

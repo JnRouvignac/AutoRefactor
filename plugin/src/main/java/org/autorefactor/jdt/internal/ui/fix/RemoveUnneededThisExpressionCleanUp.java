@@ -72,7 +72,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
+        ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
 
         if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
                 && ASTNodes.typeArguments(node).isEmpty()) {
@@ -94,20 +94,20 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final ASTNode enclosingType= ASTNodes.getEnclosingType(node);
+        ASTNode enclosingType= ASTNodes.getEnclosingType(node);
 
         if (enclosingType instanceof AnonymousClassDeclaration) {
             return false;
         }
 
-        final AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
+        AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
 
         if (thisQualifierName instanceof SimpleName) {
             return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
         }
 
         if (thisQualifierName instanceof QualifiedName) {
-            final QualifiedName qn= (QualifiedName) thisQualifierName;
+            QualifiedName qn= (QualifiedName) thisQualifierName;
             return ASTNodes.isEqual(qn.getName(), ancestor.getName())
                     && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
         }
@@ -116,22 +116,22 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isCallingMethodDeclaredInEnclosingType(final MethodInvocation node) {
-        final ASTNode currentType= ASTNodes.getEnclosingType(node);
-        final IMethodBinding mb= node.resolveMethodBinding();
+        ASTNode currentType= ASTNodes.getEnclosingType(node);
+        IMethodBinding mb= node.resolveMethodBinding();
 
         if (mb == null) {
             return false;
         }
 
         if (currentType instanceof AnonymousClassDeclaration) {
-            final AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
-            final ITypeBinding enclosingTypeBinding= c.resolveBinding();
+            AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
+            ITypeBinding enclosingTypeBinding= c.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
 
         if (currentType instanceof AbstractTypeDeclaration) {
-            final AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
-            final ITypeBinding enclosingTypeBinding= ed.resolveBinding();
+            AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
+            ITypeBinding enclosingTypeBinding= ed.resolveBinding();
             return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
 

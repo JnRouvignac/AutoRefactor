@@ -70,10 +70,10 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        final List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
+        List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
 
         if (elseCode != null && elseCode.size() == 1) {
-            final IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
+            IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
 
             if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
                 return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
@@ -96,10 +96,10 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStatements, final boolean isPositive) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
-        final Expression additionalCondition;
+        Expression additionalCondition;
         if (isPositive) {
             additionalCondition= b.createMoveTarget(subNode.getExpression());
         } else {

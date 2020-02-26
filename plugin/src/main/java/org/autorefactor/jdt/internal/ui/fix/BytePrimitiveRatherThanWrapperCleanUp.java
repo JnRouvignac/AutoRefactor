@@ -124,7 +124,7 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 
     @Override
     public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        final ASTNode parentNode= node.getParent();
+        ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
         case ARRAY_ACCESS:

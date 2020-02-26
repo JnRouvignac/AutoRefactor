@@ -75,10 +75,10 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
         if (ASTNodes.usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
-            final List<Expression> args= ASTNodes.arguments(node);
+            List<Expression> args= ASTNodes.arguments(node);
 
             if (args != null && args.size() == 1) {
-                final InfixExpression message= ASTNodes.as(args.get(0), InfixExpression.class);
+                InfixExpression message= ASTNodes.as(args.get(0), InfixExpression.class);
 
                 if (message != null) {
                     return maybeReplaceConcatenation(node, methodName, message);
@@ -91,17 +91,17 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
             final InfixExpression message) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final StringBuilder messageBuilder= new StringBuilder();
-        final List<Expression> params= new LinkedList<>();
+        StringBuilder messageBuilder= new StringBuilder();
+        List<Expression> params= new LinkedList<>();
         boolean hasLiteral= false;
         boolean hasObjects= false;
 
         for (Expression string : ASTNodes.allOperands(message)) {
             if (string instanceof StringLiteral) {
                 hasLiteral= true;
-                final String literal= (String) string.resolveConstantExpressionValue();
+                String literal= (String) string.resolveConstantExpressionValue();
 
                 if (literal != null && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ //$NON-NLS-2$
                     return true;
@@ -132,7 +132,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
             final StringBuilder messageBuilder, final List<Expression> params) {
         params.add(0, b.string(messageBuilder.toString()));
 
-        final Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.ctx.getRefactorings();
         r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, params));
     }
 }

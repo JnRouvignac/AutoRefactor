@@ -72,9 +72,9 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     @Override
     public boolean visit(final IfStatement node) {
-        final Statement elseStatement= node.getElseStatement();
-        final Statement thenStatement= node.getThenStatement();
-        final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
+        Statement elseStatement= node.getElseStatement();
+        Statement thenStatement= node.getThenStatement();
+        PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
 
         if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
@@ -91,18 +91,18 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
             final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
-        final List<Statement> statements= ASTNodes.asList(statement);
-        final MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
+        List<Statement> statements= ASTNodes.asList(statement);
+        MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
 
         if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final Statement firstStatement= Utils.getFirst(statements);
-            final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
+            Statement firstStatement= Utils.getFirst(statements);
+            MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
 
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
                     && ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                final Refactorings r= this.ctx.getRefactorings();
+                ASTNodeFactory b= this.ctx.getASTBuilder();
+                Refactorings r= this.ctx.getRefactorings();
 
                 if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())

@@ -78,9 +78,9 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final NormalAnnotation node) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final List<MemberValuePair> values= ASTNodes.values(node);
+        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        List<MemberValuePair> values= ASTNodes.values(node);
         if (values.isEmpty()) {
             r.replace(node, b.markerAnnotation(b.createMoveTarget(node.getTypeName())));
             return false;

@@ -68,12 +68,12 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     private final class ObjectNotNullMatcher extends NodeMatcher<Expression> {
         private final String identifier;
 
-        private ObjectNotNullMatcher(String identifier) {
+        private ObjectNotNullMatcher(final String identifier) {
             this.identifier= identifier;
         }
 
         @Override
-        public Boolean isMatching(Expression node) {
+        public Boolean isMatching(final Expression node) {
             InfixExpression condition= ASTNodes.as(node, InfixExpression.class);
 
             if (condition != null && !condition.hasExtendedOperands()
@@ -211,7 +211,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
             NodeMatcher<Expression> compareToMatcher= new NodeMatcher<Expression>() {
                 @Override
-                public Boolean isMatching(Expression node) {
+                public Boolean isMatching(final Expression node) {
                     if (isReturnedExpressionToRefactor(node, criteria, isForward, identifier1, identifier2)) {
                         return true;
                     }
@@ -222,7 +222,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
             NodeMatcher<Expression> zeroMatcher= new NodeMatcher<Expression>() {
                 @Override
-                public Boolean isMatching(Expression node) {
+                public Boolean isMatching(final Expression node) {
                     if (Utils.equalNotNull(Long.valueOf(0), ASTNodes.integerLiteral(node))) {
                         return true;
                     }
@@ -233,7 +233,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
             NodeMatcher<Expression> positiveMatcher= new NodeMatcher<Expression>() {
                 @Override
-                public Boolean isMatching(Expression node) {
+                public Boolean isMatching(final Expression node) {
                     Long value= ASTNodes.integerLiteral(node);
 
                     if (value != null && value > 0) {
@@ -246,7 +246,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
             NodeMatcher<Expression> negativeMatcher= new NodeMatcher<Expression>() {
                 @Override
-                public Boolean isMatching(Expression node) {
+                public Boolean isMatching(final Expression node) {
                     Long value= ASTNodes.integerLiteral(node);
 
                     if (value != null && value < 0) {
@@ -338,8 +338,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     }
 
     private boolean isRefactorComparisonToRefactor(final AtomicReference<Expression> criteria,
-            final AtomicBoolean isForward, final String identifier1, final String identifier2, Expression expr1,
-            Expression expr2) {
+            final AtomicBoolean isForward, final String identifier1, final String identifier2, final Expression expr1,
+            final Expression expr2) {
         MethodInvocation method1= ASTNodes.as(expr1, MethodInvocation.class);
         MethodInvocation method2= ASTNodes.as(expr2, MethodInvocation.class);
 

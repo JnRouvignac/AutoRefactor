@@ -71,11 +71,11 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
         Expression replacement= getOppositeExpression(b, node.getOperand());
 
         if (replacement != null) {
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
             r.replace(node, replacement);
             return false;
         }
@@ -84,25 +84,25 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression getOppositeExpression(final ASTNodeFactory b, final Expression negativeExpression) {
-        final Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
+        Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 
         if (operand instanceof PrefixExpression) {
-            final PrefixExpression pe= (PrefixExpression) operand;
+            PrefixExpression pe= (PrefixExpression) operand;
 
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 return b.createMoveTarget(pe.getOperand());
             }
         } else if (operand instanceof InfixExpression) {
-            final InfixExpression ie= (InfixExpression) operand;
-            final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+            InfixExpression ie= (InfixExpression) operand;
+            InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
 
             if (reverseOp != null) {
                 List<Expression> allOperands= new ArrayList<>(ASTNodes.allOperands(ie));
 
                 if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
                     for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
-                        final Expression anOperand= it.next();
-                        final Expression oppositeOperand= getOppositeExpression(b, anOperand);
+                        Expression anOperand= it.next();
+                        Expression oppositeOperand= getOppositeExpression(b, anOperand);
 
                         it.set((oppositeOperand != null) ? oppositeOperand : b.negate(anOperand));
                     }
@@ -113,7 +113,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                 return b.parenthesize(b.infixExpression(reverseOp, allOperands));
             }
         } else {
-            final Boolean constant= ASTNodes.getBooleanLiteral(operand);
+            Boolean constant= ASTNodes.getBooleanLiteral(operand);
 
             if (constant != null) {
                 return b.boolean0(!constant);

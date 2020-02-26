@@ -104,7 +104,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 
     private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
             final String methodName) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(actualMi,
                 b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(ASTNodes.arguments(actualMi))));
         return false;

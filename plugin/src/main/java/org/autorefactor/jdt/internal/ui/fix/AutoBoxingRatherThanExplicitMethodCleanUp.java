@@ -80,11 +80,11 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
                         || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
-            final ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
-            final ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
+            ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
+            ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 
-            final ITypeBinding actualResultType= ASTNodes.getTargetType(node);
-            final ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
+            ITypeBinding actualResultType= ASTNodes.getTargetType(node);
+            ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
 
             if (actualResultType != null
                     && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
@@ -100,7 +100,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
             final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
             final ITypeBinding actualResultType) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
         if (primitiveType != null && !primitiveType.equals(actualParameterType)
                 && !primitiveType.equals(actualResultType)

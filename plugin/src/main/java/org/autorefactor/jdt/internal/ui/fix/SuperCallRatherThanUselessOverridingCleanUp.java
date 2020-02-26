@@ -89,14 +89,14 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
             return true;
         }
 
-        final List<Statement> bodyStatements= ASTNodes.statements(node.getBody());
+        List<Statement> bodyStatements= ASTNodes.statements(node.getBody());
 
         if (bodyStatements.size() == 1) {
-            final SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
+            SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
 
             if (bodyMi != null) {
-                final IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
-                final IMethodBinding declMethodBinding= node.resolveBinding();
+                IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
+                IMethodBinding declMethodBinding= node.resolveBinding();
 
                 if (declMethodBinding != null && bodyMethodBinding != null
                         && declMethodBinding.overrides(bodyMethodBinding)
@@ -118,11 +118,11 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
-        final List<?> parameters= node.parameters();
+        List<?> parameters= node.parameters();
 
         for (int i= 0; i < node.parameters().size(); i++) {
-            final SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
-            final SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
+            SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
+            SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
 
             if (paramExpression == null
                     || !paramName.getName().getIdentifier().equals(paramExpression.getIdentifier())) {
@@ -135,10 +135,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
     /** This method is extremely expensive. */
     private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration node) {
-        final IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
+        IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
 
         final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
-        final SearchRequestor requestor= new SearchRequestor() {
+        SearchRequestor requestor= new SearchRequestor() {
             @Override
             public void acceptSearchMatch(final SearchMatch match) {
                 methodIsUsedInPackage.set(true);
@@ -146,7 +146,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
         };
 
         try {
-            final SearchEngine searchEngine= new SearchEngine();
+            SearchEngine searchEngine= new SearchEngine();
             searchEngine.search(SearchPattern.createPattern(methodBinding.getJavaElement(), IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH),
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
@@ -158,8 +158,8 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     private boolean declaredInSamePackage(final IMethodBinding methodBinding1, final IMethodBinding methodBinding2) {
-        final ITypeBinding declaringClass1= methodBinding1.getDeclaringClass();
-        final ITypeBinding declaringClass2= methodBinding2.getDeclaringClass();
+        ITypeBinding declaringClass1= methodBinding1.getDeclaringClass();
+        ITypeBinding declaringClass2= methodBinding2.getDeclaringClass();
         return declaringClass1.getPackage().equals(declaringClass2.getPackage());
     }
 
@@ -170,7 +170,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
     private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
         for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
-            final ITypeBinding annotationType= annotation.getAnnotationType();
+            ITypeBinding annotationType= annotation.getAnnotationType();
 
             if (!ASTNodes.hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
                 return true;

@@ -63,7 +63,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 
     @Override
     public boolean visit(final NumberLiteral node) {
-        final String token= node.getToken();
+        String token= node.getToken();
 
         if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$
             useUppercase(node, token);
@@ -74,10 +74,10 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
     }
 
     private void useUppercase(final NumberLiteral node, final String token) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
-        final NumberLiteral replacement= b.number(newToken);
+        String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
+        NumberLiteral replacement= b.number(newToken);
         ctx.getRefactorings().replace(node, replacement);
     }
 }

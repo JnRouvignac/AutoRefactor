@@ -106,8 +106,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithStringContains(final InfixExpression ie, final MethodInvocation node, final boolean negate) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
 
         if (negate) {

@@ -136,7 +136,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
             return true;
         }
 
-        final String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
+        String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
         return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
@@ -183,7 +183,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
         args.add(index);
         args.add(item);
 
-        final List<Type> typeArgs= ASTNodes.typeArguments(refactoredMi);
+        List<Type> typeArgs= ASTNodes.typeArguments(refactoredMi);
         if (typeArgs != null && !typeArgs.isEmpty()) {
             Type itemType= typeArgs.get(0);
             Type indexType= typeArgs.get(1);

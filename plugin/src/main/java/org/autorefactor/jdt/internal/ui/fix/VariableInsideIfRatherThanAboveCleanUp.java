@@ -94,7 +94,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
                 return true;
             }
 
-            final HashSet<String> variableToFind= new HashSet<>(Arrays.asList(variable.getIdentifier()));
+            HashSet<String> variableToFind= new HashSet<>(Arrays.asList(variable.getIdentifier()));
             VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
             varOccurrenceVisitor.visitNode(node.getExpression());
 
@@ -159,8 +159,8 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 
         private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
                 final List<Statement> statements) {
-            final Refactorings r= this.ctx.getRefactorings();
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
+            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.ctx.getASTBuilder();
 
             if (statement instanceof Block) {
                 r.insertBefore(b.createMoveTarget(variableAssignment), statements.get(0));

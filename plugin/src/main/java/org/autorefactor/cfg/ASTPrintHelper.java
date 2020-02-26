@@ -38,9 +38,9 @@ public final class ASTPrintHelper {
     }
 
     static String codeExcerpt(final List<Expression> expressions) {
-        final StringBuilder sb= new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         for (final Iterator<Expression> iter= expressions.iterator(); iter.hasNext();) {
-            final Expression expression= iter.next();
+            Expression expression= iter.next();
             sb.append(expression);
             if (iter.hasNext()) {
                 sb.append(", "); //$NON-NLS-1$
@@ -51,9 +51,9 @@ public final class ASTPrintHelper {
     }
 
     static String codeExcerpt(final ASTNode node) {
-        final String nodeString= node.toString();
-        final String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
-        final String codeExcerpt;
+        String nodeString= node.toString();
+        String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
+        String codeExcerpt;
         if (nodeLines[0].matches("\\s*\\{\\s*")) { //$NON-NLS-1$
             codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ //$NON-NLS-2$
         } else {

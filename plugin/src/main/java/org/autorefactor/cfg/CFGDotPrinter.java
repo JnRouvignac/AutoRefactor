@@ -74,7 +74,7 @@ public class CFGDotPrinter {
 
     private static final class CFGEdgeComparator implements Comparator<CFGEdge> {
         public int compare(final CFGEdge e1, final CFGEdge e2) {
-            final int cmp= e1.getSourceBlock().compareTo(e2.getSourceBlock());
+            int cmp= e1.getSourceBlock().compareTo(e2.getSourceBlock());
             if (cmp != 0) {
                 return cmp;
             }
@@ -90,19 +90,19 @@ public class CFGDotPrinter {
      * @return a String representing the CFG in the dot format.
      */
     public String toDot(final CFGBasicBlock startBlock) {
-        final Map<ASTNode, CFGSubGraph> subGraphs= new HashMap<>();
-        final Set<CFGEdge> edges= new TreeSet<>(new CFGEdgeComparator());
+        Map<ASTNode, CFGSubGraph> subGraphs= new HashMap<>();
+        Set<CFGEdge> edges= new TreeSet<>(new CFGEdgeComparator());
         collect(startBlock, subGraphs, edges);
-        final CFGSubGraph subGraph= subGraphs.get(startBlock.getNode());
+        CFGSubGraph subGraph= subGraphs.get(startBlock.getNode());
 
-        final StringBuilder sb= new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         appendGraph(startBlock, subGraph, edges, sb);
         return sb.toString();
     }
 
     private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, final Set<CFGEdge> edges,
             final StringBuilder sb) {
-        final boolean needDigraph= sb.length() == 0;
+        boolean needDigraph= sb.length() == 0;
         if (needDigraph) {
             appendDigraph(startblock, sb);
             sb.append("\n"); //$NON-NLS-1$
@@ -142,7 +142,7 @@ public class CFGDotPrinter {
 
         for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
             if (obj instanceof CFGEdge) {
-                final CFGEdge edge= (CFGEdge) obj;
+                CFGEdge edge= (CFGEdge) obj;
                 edges.add(edge);
                 collect(edge.getTargetBlock(), subGraphs, edges);
             }
@@ -173,15 +173,15 @@ public class CFGDotPrinter {
     }
 
     private StringBuilder appendDigraph(final CFGBasicBlock block, final StringBuilder sb) {
-        final String fileName= block.getFileName();
-        final String className= fileName.substring(0, fileName.indexOf('.'));
+        String fileName= block.getFileName();
+        String className= fileName.substring(0, fileName.indexOf('.'));
         sb.append("digraph ").append(className).append(" {\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("label=\"").append(className).append("\";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         return sb;
     }
 
     private StringBuilder appendSubgraph(final CFGSubGraph graph, final StringBuilder sb) {
-        final String blockCodeExcerpt= escape(graph.codeExcerpt);
+        String blockCodeExcerpt= escape(graph.codeExcerpt);
         String clusterName= blockCodeExcerpt.replaceAll("\\W", "_"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("subgraph cluster_").append(graph.startPosition).append("_").append(clusterName).append(" {\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         sb.append("label=\"").append(blockCodeExcerpt).append("\";\n"); //$NON-NLS-1$ //$NON-NLS-2$

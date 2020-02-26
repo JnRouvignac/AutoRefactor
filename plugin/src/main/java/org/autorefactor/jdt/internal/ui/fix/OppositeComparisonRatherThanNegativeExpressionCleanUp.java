@@ -64,10 +64,10 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     @Override
     public boolean visit(final PrefixExpression node) {
         if (ASTNodes.hasOperator(node, PrefixExpression.Operator.MINUS)) {
-            final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+            MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
 
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
-                final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
+                String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
                 for (String clazz : classes) {
                     if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
@@ -82,8 +82,8 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     }
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= ctx.getASTBuilder();
+        Refactorings r= ctx.getRefactorings();
 
         r.replace(node, b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
                 b.createMoveTarget(mi.getExpression())));

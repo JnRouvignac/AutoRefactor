@@ -92,7 +92,7 @@ public class CFGEdge {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE["); //$NON-NLS-1$
+        StringBuilder sb= new StringBuilder("EDGE["); //$NON-NLS-1$
         this.sourceBlock.appendDotNodeLabel(sb);
         sb.append(" -> "); //$NON-NLS-1$
         this.targetBlock.appendDotNodeLabel(sb);
@@ -112,7 +112,7 @@ public class CFGEdge {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final CFGEdge other= (CFGEdge) obj;
+        CFGEdge other= (CFGEdge) obj;
         return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
                 && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
     }

@@ -74,13 +74,13 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final ClassInstanceCreation node) {
-        final Type type= node.getType();
+        Type type= node.getType();
 
         if (type.isParameterizedType()
                 && node.getAnonymousClassDeclaration() == null
                 && ASTNodes.getTargetType(node) != null
                 && canUseDiamondOperator(node, type)) {
-            final List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
+            List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
 
             if (!typeArguments.isEmpty()) {
                 this.ctx.getRefactorings().remove(typeArguments);

@@ -71,14 +71,14 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         if (!canRemoveFieldDefaultValue(node)) {
             return true;
         }
-        final ITypeBinding fieldType= node.getType().resolveBinding();
+        ITypeBinding fieldType= node.getType().resolveBinding();
         if (fieldType == null || Modifier.isFinal(node.getModifiers())) {
             return true;
         }
 
         boolean visitSubtree= true;
         for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
-            final Expression initializer= vdf.getInitializer();
+            Expression initializer= vdf.getInitializer();
             if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
                     || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
@@ -93,7 +93,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
     private boolean canRemoveFieldDefaultValue(final FieldDeclaration node) {
         // Do not remove default values from interface/annotation fields
         // because they are final by default
-        final ASTNode parent= node.getParent();
+        ASTNode parent= node.getParent();
         if (parent instanceof TypeDeclaration) {
             return !((TypeDeclaration) parent).isInterface();
         }

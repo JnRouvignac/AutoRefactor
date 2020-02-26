@@ -80,15 +80,15 @@ public class TypeNameDecider {
          */
         public ITypeBinding resolveTypeBinding(final String fullyQualifiedName) {
             try {
-                final Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$
-                final Object compilationUnitScope= getField(bindingResolver, "scope"); //$NON-NLS-1$
+                Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$
+                Object compilationUnitScope= getField(bindingResolver, "scope"); //$NON-NLS-1$
 
-                final char[][] simpleNamesArray= toSimpleNamesArray(fullyQualifiedName);
-                final Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class); //$NON-NLS-1$
-                final Object internalTypeBinding= invokeMethod(compilationUnitScope, getType, simpleNamesArray,
+                char[][] simpleNamesArray= toSimpleNamesArray(fullyQualifiedName);
+                Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class); //$NON-NLS-1$
+                Object internalTypeBinding= invokeMethod(compilationUnitScope, getType, simpleNamesArray,
                         simpleNamesArray.length);
 
-                final Method getTypeBinding= bindingResolver.getClass().getDeclaredMethod("getTypeBinding", //$NON-NLS-1$
+                Method getTypeBinding= bindingResolver.getClass().getDeclaredMethod("getTypeBinding", //$NON-NLS-1$
                         internalTypeBinding.getClass().getSuperclass().getSuperclass());
                 return invokeMethod(bindingResolver, getTypeBinding, internalTypeBinding);
             } catch (Exception e) {
@@ -106,7 +106,7 @@ public class TypeNameDecider {
         @SuppressWarnings("unchecked")
         private <T> T getField(final Object object, final String fieldName)
                 throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
-            final Field f= object.getClass().getDeclaredField(fieldName);
+            Field f= object.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
             return (T) f.get(object);
         }
@@ -125,11 +125,11 @@ public class TypeNameDecider {
     public TypeNameDecider(final ASTNode parsedNode) {
         this.resolveTypeBindingStrategy= new ReflectionResolveTypeBindingStrategy(parsedNode,
                 getAnyTypeBinding(parsedNode));
-        final ASTNode root= parsedNode.getRoot();
+        ASTNode root= parsedNode.getRoot();
         if (!(root instanceof CompilationUnit)) {
             throw new IllegalArgumentException(parsedNode, "Expected the root to be a CompilationUnit"); //$NON-NLS-1$
         }
-        final CompilationUnit cu= (CompilationUnit) root;
+        CompilationUnit cu= (CompilationUnit) root;
         this.packageName= cu.getPackage().getName().getFullyQualifiedName();
         this.importedTypes= getImportedTypes(cu);
     }
@@ -157,7 +157,7 @@ public class TypeNameDecider {
     }
 
     private static TreeSet<String> getImportedTypes(final CompilationUnit cu) {
-        final TreeSet<String> results= new TreeSet<>();
+        TreeSet<String> results= new TreeSet<>();
         for (ImportDeclaration importDecl : ASTNodes.imports(cu)) {
             Name importName= importDecl.getName();
             results.add(importName.getFullyQualifiedName());
@@ -195,18 +195,18 @@ public class TypeNameDecider {
      * @return the simplest possible name to use when referring to the type
      */
     public String useSimplestPossibleName(final ITypeBinding typeBinding) {
-        final String pkgName= typeBinding.getPackage().getName();
+        String pkgName= typeBinding.getPackage().getName();
         if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) { //$NON-NLS-1$
             // TODO beware of name shadowing!
             return typeBinding.getName();
         }
 
-        final String fqn= typeBinding.getQualifiedName();
-        final String elementBefore;
+        String fqn= typeBinding.getQualifiedName();
+        String elementBefore;
         if (importedTypes.contains(fqn)) {
             elementBefore= fqn;
         } else {
-            final SortedSet<String> elementsBefore= importedTypes.headSet(fqn);
+            SortedSet<String> elementsBefore= importedTypes.headSet(fqn);
             if (elementsBefore.isEmpty()) {
                 return fqn;
             }
@@ -220,15 +220,15 @@ public class TypeNameDecider {
             }
         }
 
-        final String[] names= fqn.split("\\."); //$NON-NLS-1$
-        final String[] elementBeforeNames= elementBefore.split("\\."); //$NON-NLS-1$
+        String[] names= fqn.split("\\."); //$NON-NLS-1$
+        String[] elementBeforeNames= elementBefore.split("\\."); //$NON-NLS-1$
         if (names.length < elementBeforeNames.length || names.length - 1 > elementBeforeNames.length) {
             return fqn;
         }
         int i= 0;
         for (; i < names.length && i < elementBeforeNames.length; i++) {
-            final String name= names[i];
-            final String elementBeforeName= elementBeforeNames[i];
+            String name= names[i];
+            String elementBeforeName= elementBeforeNames[i];
             if (!name.equals(elementBeforeName)) {
                 if ("*".equals(elementBeforeName) && i + 1 == elementBeforeNames.length) { //$NON-NLS-1$
                     if (i + 1 == names.length) {
@@ -250,8 +250,8 @@ public class TypeNameDecider {
     }
 
     private static char[][] toSimpleNamesArray(final String fullyQualifiedName) {
-        final String[] simpleNames= fullyQualifiedName.split("\\."); //$NON-NLS-1$
-        final char[][] result= new char[simpleNames.length][];
+        String[] simpleNames= fullyQualifiedName.split("\\."); //$NON-NLS-1$
+        char[][] result= new char[simpleNames.length][];
         for (int i= 0; i < simpleNames.length; i++) {
             result[i]= simpleNames[i].toCharArray();
         }

@@ -64,7 +64,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final QualifiedName node) {
-        final ITypeBinding typeBinding= ASTNodes.getTargetType(node);
+        ITypeBinding typeBinding= ASTNodes.getTargetType(node);
 
         if (typeBinding != null && typeBinding.isPrimitive()) {
             if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
@@ -81,7 +81,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
     }
 
     private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
-        final BooleanLiteral booleanLiteral= this.ctx.getASTBuilder().boolean0(val);
+        BooleanLiteral booleanLiteral= this.ctx.getASTBuilder().boolean0(val);
         this.ctx.getRefactorings().replace(node, booleanLiteral);
     }
 }

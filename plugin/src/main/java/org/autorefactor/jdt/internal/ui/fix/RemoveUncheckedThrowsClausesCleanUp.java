@@ -66,7 +66,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(final MethodDeclaration node) {
-        final Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
+        Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
         if (!nodesToRemove.isEmpty()) {
             for (ASTNode n : nodesToRemove) {
                 ctx.getRefactorings().replace(n, null);
@@ -99,7 +99,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
     }
 
     private boolean isUnchecked(final Type type) {
-        final ITypeBinding binding= type.resolveBinding();
+        ITypeBinding binding= type.resolveBinding();
         return ASTNodes.instanceOf(binding, RuntimeException.class.getCanonicalName()) || ASTNodes.instanceOf(binding, Error.class.getCanonicalName());
     }
 }

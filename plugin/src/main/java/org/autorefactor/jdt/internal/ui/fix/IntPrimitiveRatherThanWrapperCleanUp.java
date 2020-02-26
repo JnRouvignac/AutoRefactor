@@ -141,7 +141,7 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
 
     @Override
     public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        final ASTNode parentNode= node.getParent();
+        ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
         case ARRAY_ACCESS:

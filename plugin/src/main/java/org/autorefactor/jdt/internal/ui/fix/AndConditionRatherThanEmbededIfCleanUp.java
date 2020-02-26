@@ -68,7 +68,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     @Override
     public boolean visit(final IfStatement node) {
         if (node.getElseStatement() == null) {
-            final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
+            IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
             if (is != null
                     && is.getElseStatement() == null
@@ -82,10 +82,10 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     }
 
     private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.ctx.getRefactorings();
 
-        final InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+        InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 b.parenthesizeIfNeeded(b.createMoveTarget(innerIf.getExpression())));
         r.replace(innerIf.getExpression(), ie);
         r.replace(outerIf, b.createMoveTarget(innerIf));

@@ -65,7 +65,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     public boolean visit(final MethodInvocation node) {
         if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            final BooleanLiteral literal= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
+            BooleanLiteral literal= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
 
             if (literal != null) {
                 useConstant(node, literal);
@@ -77,9 +77,9 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     }
 
     private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final FieldAccess fa= b.getAST().newFieldAccess();
-        final Name expression= ASTNodes.as(node.getExpression(), Name.class);
+        ASTNodeFactory b= ctx.getASTBuilder();
+        FieldAccess fa= b.getAST().newFieldAccess();
+        Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
         if (expression != null) {
             fa.setExpression(b.createMoveTarget(expression));

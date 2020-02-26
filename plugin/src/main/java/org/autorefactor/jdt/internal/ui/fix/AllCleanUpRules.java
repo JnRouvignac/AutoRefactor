@@ -47,10 +47,10 @@ public final class AllCleanUpRules {
      *             preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
-        final List<RefactoringRule> refactorings= getAllCleanUpRules();
+        List<RefactoringRule> refactorings= getAllCleanUpRules();
 
         for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
-            final RefactoringRule refactoring= iter.next();
+            RefactoringRule refactoring= iter.next();
 
             if (!refactoring.isEnabled(preferences)) {
                 iter.remove();
@@ -145,7 +145,7 @@ public final class AllCleanUpRules {
     }
 
     private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
-        final List<RefactoringRule> results= new ArrayList<>(refactorings.length);
+        List<RefactoringRule> results= new ArrayList<>(refactorings.length);
         for (RefactoringRule r : refactorings) {
             if (r != null) {
                 results.add(r);

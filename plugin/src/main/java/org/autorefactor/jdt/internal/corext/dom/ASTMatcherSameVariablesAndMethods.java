@@ -45,7 +45,7 @@ public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher 
     }
 
     private IBinding getDeclaration(final SimpleName node) {
-        final IBinding b= node.resolveBinding();
+        IBinding b= node.resolveBinding();
         if (b != null) {
             switch (b.getKind()) {
             case IBinding.VARIABLE:

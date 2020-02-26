@@ -87,7 +87,7 @@ public class PrepareApplyRefactoringsJob extends Job {
         } catch (OperationCanceledException e) {
             throw e;
         } catch (Exception e) {
-            final String msg= "Error while preparing automatic refactorings.\n\n" //$NON-NLS-1$
+            String msg= "Error while preparing automatic refactorings.\n\n" //$NON-NLS-1$
                     + "Please look at the Eclipse workspace logs and " //$NON-NLS-1$
                     + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
                     + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
@@ -99,12 +99,12 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private IStatus run0(final IProgressMonitor monitor) throws Exception {
         if (!javaElements.isEmpty()) {
-            final Queue<RefactoringUnit> toRefactor= collectRefactoringUnits(javaElements, monitor);
-            final int nbCores= Runtime.getRuntime().availableProcessors();
-            final int nbWorkers= computeNbWorkers(toRefactor.size(), nbCores);
-            final JobGroup jobGroup= new JobGroup("Job name", nbWorkers, nbWorkers); //$NON-NLS-1$
+            Queue<RefactoringUnit> toRefactor= collectRefactoringUnits(javaElements, monitor);
+            int nbCores= Runtime.getRuntime().availableProcessors();
+            int nbWorkers= computeNbWorkers(toRefactor.size(), nbCores);
+            JobGroup jobGroup= new JobGroup("Job name", nbWorkers, nbWorkers); //$NON-NLS-1$
             for (int i= 0; i < nbWorkers; i++) {
-                final Job job= new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
+                Job job= new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
                 job.setJobGroup(jobGroup);
                 job.setUser(true);
                 job.schedule();
@@ -119,7 +119,7 @@ public class PrepareApplyRefactoringsJob extends Job {
      * for stateful cleanups.
      */
     private List<RefactoringRule> clone(final List<RefactoringRule> refactorings) throws Exception {
-        final List<RefactoringRule> res= new ArrayList<>(refactorings.size());
+        List<RefactoringRule> res= new ArrayList<>(refactorings.size());
         for (RefactoringRule refactoring : refactorings) {
             res.add(refactoring.getClass().newInstance());
         }
@@ -128,7 +128,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private int computeNbWorkers(final int nbWorkItems, final int nbCores) {
-        final int nbPartitions= nbWorkItems / 10;
+        int nbPartitions= nbWorkItems / 10;
         if (nbPartitions >= nbCores) {
             return nbCores;
         }
@@ -141,7 +141,7 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private Queue<RefactoringUnit> collectRefactoringUnits(final List<IJavaElement> javaElements, final IProgressMonitor monitor) {
         try {
-            final Set<RefactoringUnit> results= new ConcurrentSkipListSet<>();
+            Set<RefactoringUnit> results= new ConcurrentSkipListSet<>();
             addAll(results, javaElements, monitor);
             return new ConcurrentLinkedQueue<>(results);
         } catch (Exception e) {
@@ -151,18 +151,18 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private void addAll(final Set<RefactoringUnit> results, final List<IJavaElement> javaElements, final IProgressMonitor monitor)
             throws JavaModelException {
-        final SubMonitor subMonitor= SubMonitor.convert(monitor, javaElements.size());
+        SubMonitor subMonitor= SubMonitor.convert(monitor, javaElements.size());
         for (IJavaElement javaElement : javaElements) {
-            final SubMonitor child= subMonitor.newChild(1);
-            final JavaProjectOptions options= getJavaProjectOptions(javaElement);
+            SubMonitor child= subMonitor.newChild(1);
+            JavaProjectOptions options= getJavaProjectOptions(javaElement);
             if (javaElement instanceof ICompilationUnit) {
                 add(results, (ICompilationUnit) javaElement, options);
             } else if (javaElement instanceof IPackageFragment) {
-                final IPackageFragment pf= (IPackageFragment) javaElement;
+                IPackageFragment pf= (IPackageFragment) javaElement;
                 addAll(results, getSubPackages(pf), child);
                 addAll(results, pf.getCompilationUnits(), options);
             } else if (javaElement instanceof IPackageFragmentRoot) {
-                final IPackageFragmentRoot pfr= (IPackageFragmentRoot) javaElement;
+                IPackageFragmentRoot pfr= (IPackageFragmentRoot) javaElement;
                 addAll(results, Arrays.asList(pfr.getChildren()), child);
             } else if (javaElement instanceof IJavaProject) {
                 IJavaProject javaProject= (IJavaProject) javaElement;
@@ -191,7 +191,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private JavaProjectOptions getJavaProjectOptions(final IJavaElement javaElement) {
-        final IJavaProject javaProject= getIJavaProject(javaElement);
+        IJavaProject javaProject= getIJavaProject(javaElement);
         JavaProjectOptions options= javaProjects.get(javaProject);
         if (options == null) {
             options= new JavaProjectOptionsImpl(javaProject.getOptions(true));

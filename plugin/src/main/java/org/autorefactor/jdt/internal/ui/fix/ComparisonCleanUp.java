@@ -67,8 +67,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final InfixExpression node) {
-        final Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
-        final Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
+        Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
+        Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
 
         return node.hasExtendedOperands() || maybeStandardizeComparison(node, leftOperand,
                 rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand);
@@ -76,7 +76,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
             final Expression literal) {
-        final MethodInvocation comparisonMI= ASTNodes.as(comparator, MethodInvocation.class);
+        MethodInvocation comparisonMI= ASTNodes.as(comparator, MethodInvocation.class);
 
         if (comparisonMI != null
                 && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
@@ -84,11 +84,11 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                         || ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
                         || getJavaMinorVersion() >= 2
                         && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
-            final Object literalValue= literal.resolveConstantExpressionValue();
+            Object literalValue= literal.resolveConstantExpressionValue();
 
             if (literalValue instanceof Number) {
-                final Number numberValue= (Number) literalValue;
-                final double doubleValue= numberValue.doubleValue();
+                Number numberValue= (Number) literalValue;
+                double doubleValue= numberValue.doubleValue();
 
                 if (doubleValue == 0) {
                     return true;
@@ -115,7 +115,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
             final InfixExpression.Operator operator) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
     }
 }

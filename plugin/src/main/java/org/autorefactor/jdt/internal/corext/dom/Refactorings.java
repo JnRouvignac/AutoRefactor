@@ -176,7 +176,7 @@ public class Refactorings {
     }
 
     private ListRewrite getListRewrite(final ASTNode node, final ChildListPropertyDescriptor listProperty) {
-        final Pair<ASTNode, ChildListPropertyDescriptor> key= Pair.of(node, listProperty);
+        Pair<ASTNode, ChildListPropertyDescriptor> key= Pair.of(node, listProperty);
         ListRewrite listRewrite= listRewriteCache.get(key);
         if (listRewrite == null) {
             listRewrite= rewrite.getListRewrite(node, listProperty);
@@ -244,12 +244,11 @@ public class Refactorings {
         if (nodes.isEmpty()) {
             return true;
         }
-        @SuppressWarnings("unchecked")
-        final List<ASTNode> originalList= getListRewrite(nodes.get(0)).getOriginalList();
-        final Iterator<ASTNode> origIter= originalList.iterator();
+        @SuppressWarnings("unchecked") List<ASTNode> originalList= getListRewrite(nodes.get(0)).getOriginalList();
+        Iterator<ASTNode> origIter= originalList.iterator();
         while (origIter.hasNext()) {
             ASTNode origNode= origIter.next();
-            final Iterator<? extends ASTNode> currIter= nodes.iterator();
+            Iterator<? extends ASTNode> currIter= nodes.iterator();
             while (currIter.hasNext()) {
                 ASTNode currNode= currIter.next();
                 if (origNode.equals(currNode)) {
@@ -501,7 +500,7 @@ public class Refactorings {
      */
     public void applyTo(final IDocument document, final boolean hasToSave) throws BadLocationException, CoreException {
         edits= rewrite.rewriteAST(document, null);
-        final TextEdit importEdits= importRewrite.rewriteImports(monitor);
+        TextEdit importEdits= importRewrite.rewriteImports(monitor);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
 

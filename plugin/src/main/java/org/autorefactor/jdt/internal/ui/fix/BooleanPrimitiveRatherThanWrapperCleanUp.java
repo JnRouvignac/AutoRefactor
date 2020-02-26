@@ -116,7 +116,7 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        final ASTNode parentNode= node.getParent();
+        ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
         case IF_STATEMENT:

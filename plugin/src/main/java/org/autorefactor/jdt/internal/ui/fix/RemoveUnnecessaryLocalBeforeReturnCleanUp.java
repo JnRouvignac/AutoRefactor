@@ -80,7 +80,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(final Block node) {
-        final ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(ctx, node);
+        ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(ctx, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
     }
@@ -92,14 +92,14 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(final ReturnStatement node) {
-            final Statement previousSibling= ASTNodes.getPreviousSibling(node);
+            Statement previousSibling= ASTNodes.getPreviousSibling(node);
             if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-                final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
+                VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
+                VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
 
                 if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
-                    final Expression returnExpression= vdf.getInitializer();
+                    Expression returnExpression= vdf.getInitializer();
                     if (returnExpression instanceof ArrayInitializer) {
                         if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
                             return true;
@@ -111,7 +111,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                     return false;
                 }
             } else {
-                final Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
+                Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
                 if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
                         && as.getLeftHandSide() instanceof Name
                         && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
@@ -126,14 +126,14 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
-            final TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
+            TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
 
             if (tryStatement == null) {
                 return false;
             }
 
             if (tryStatement.getFinally() != null) {
-                final VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
+                VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                         varToSearch, tryStatement.getFinally(), true).find();
                 if (!variableUseVisitor.getReads().isEmpty()) {
                     return true;
@@ -171,15 +171,15 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStatement) {
-            final Refactorings r= ctx.getRefactorings();
+            Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, newReturnStatement);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpression) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            final Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.createMoveTarget(returnExpression)));
         }
