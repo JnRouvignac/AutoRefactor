@@ -191,7 +191,7 @@ public final class ASTNodes {
             if (node.getQualifier() == null
                     || node.getQualifier().resolveBinding() == null
                     || node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
-                            && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE) {
+                    && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE) {
                 setActivityLevel(ExprActivity.PASSIVE);
             }
 
@@ -239,9 +239,9 @@ public final class ASTNodes {
             }
 
             if (hasOperator(node, InfixExpression.Operator.PLUS) && hasType(node, String.class.getCanonicalName())
-                            && (mayCallImplicitToString(node.getLeftOperand())
-                                    || mayCallImplicitToString(node.getRightOperand())
-                                    || mayCallImplicitToString(node.extendedOperands()))) {
+                    && (mayCallImplicitToString(node.getLeftOperand())
+                            || mayCallImplicitToString(node.getRightOperand())
+                            || mayCallImplicitToString(node.extendedOperands()))) {
                 setActivityLevel(ExprActivity.CAN_BE_ACTIVE);
             }
 
@@ -1010,6 +1010,28 @@ public final class ASTNodes {
     }
 
     /**
+     * Returns <code>true</code> iff <code>parent</code> is a true ancestor of <code>node</code>
+     * (i.e. returns <code>false</code> if <code>parent == node</code>).
+     *
+     * @param node node to test
+     * @param parent assumed parent
+     * @return <code>true</code> iff <code>parent</code> is a true ancestor of <code>node</code>
+     */
+    public static boolean isParent(ASTNode node, final ASTNode parent) {
+        if (node != null && parent != null) {
+            do {
+                node= node.getParent();
+
+                if (node == parent) {
+                    return true;
+                }
+            } while (node != null);
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the enclosing type of the provided node.
      * <p>
      * i.e. this returns the most immediate type declaration surrounding the
@@ -1024,7 +1046,7 @@ public final class ASTNodes {
         if (ancestor == null) {
             throw new IllegalStateException(node,
                     "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ //$NON-NLS-2$
-                            + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node); //$NON-NLS-1$
+                    + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node); //$NON-NLS-1$
         }
 
         return ancestor;
@@ -1681,8 +1703,8 @@ public final class ASTNodes {
      */
     public static boolean isSameLocalVariable(final IBinding binding, final Expression expression) {
         return isLocalVariable(binding) && expression != null && expression.getNodeType() == SIMPLE_NAME
-        // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
-        // a *local* variable
+                // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
+                // a *local* variable
                 && binding.equals(((SimpleName) expression).resolveBinding());
     }
 
@@ -1758,8 +1780,14 @@ public final class ASTNodes {
      */
     public static boolean isPrimitive(final ITypeBinding typeBinding) {
         return typeBinding != null && typeBinding.isPrimitive()
-                && Arrays.asList(boolean.class.getSimpleName(), byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName())
-                        .contains(typeBinding.getQualifiedName());
+                && Arrays.asList(boolean.class.getSimpleName(),
+                        byte.class.getSimpleName(),
+                        char.class.getSimpleName(),
+                        short.class.getSimpleName(),
+                        int.class.getSimpleName(),
+                        long.class.getSimpleName(),
+                        float.class.getSimpleName(),
+                        double.class.getSimpleName()).contains(typeBinding.getQualifiedName());
     }
 
     /**

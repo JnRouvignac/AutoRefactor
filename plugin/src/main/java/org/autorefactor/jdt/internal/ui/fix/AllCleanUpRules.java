@@ -100,6 +100,7 @@ public final class AllCleanUpRules {
                 new DoWhileRatherThanWhileCleanUp(), new DoWhileRatherThanDuplicateCodeCleanUp(),
                 new IfRatherThanWhileAndFallsThroughCleanUp(), new SuperCallRatherThanUselessOverridingCleanUp(),
                 new AndConditionRatherThanEmbededIfCleanUp(), new CommonCodeInIfElseStatementCleanUp(),
+                new StaticInnerClassThanNonStaticCleanUp(),
                 new OppositeConditionRatherThanDuplicateConditionCleanUp(),
                 new OneConditionRatherThanUnreachableBlockCleanUp(), new MergeConditionalBlocksCleanUp(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
