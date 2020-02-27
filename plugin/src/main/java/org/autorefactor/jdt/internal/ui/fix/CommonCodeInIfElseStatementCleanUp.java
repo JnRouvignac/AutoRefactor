@@ -45,6 +45,7 @@ import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -341,11 +342,11 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean hasVariableConflict(final IfStatement node, final List<List<Statement>> casesStmtsToRemove) {
-        Set<String> ifVariableNames= new HashSet<>();
+        Set<IVariableBinding> ifVariableNames= new HashSet<>();
 
         for (List<Statement> caseStmtsToRemove : casesStmtsToRemove) {
             for (Statement caseStmtToRemove : caseStmtsToRemove) {
-                ifVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(caseStmtToRemove, false));
+                ifVariableNames.addAll(ASTNodes.getLocalVariableBindings(caseStmtToRemove, false));
             }
         }
 
