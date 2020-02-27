@@ -85,29 +85,31 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 
         @Override
         public boolean visit(final IfStatement node) {
-            Statement variableAssignment= ASTNodes.getPreviousSibling(node);
-            VariableDeclarationFragment variable= getVariable(variableAssignment);
+            if (getResult()) {
+                Statement variableAssignment= ASTNodes.getPreviousSibling(node);
+                VariableDeclarationFragment variable= getVariable(variableAssignment);
 
-            if (variable == null || isVarUsed(variable, node.getExpression())) {
-                return true;
-            }
-
-            for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                if (isVarUsed(variable, statement)) {
-                    return true;
-                }
-            }
-
-            if (isVarUsed(variable, node.getThenStatement())) {
-                if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+                if (variable == null || isVarUsed(variable, node.getExpression())) {
                     return true;
                 }
 
-                return maybeMoveAssignment(variableAssignment, node.getThenStatement());
-            }
+                for (Statement statement : ASTNodes.getNextSiblings(node)) {
+                    if (isVarUsed(variable, statement)) {
+                        return true;
+                    }
+                }
 
-            if (node.getElseStatement() != null) {
-                return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+                if (isVarUsed(variable, node.getThenStatement())) {
+                    if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+                        return true;
+                    }
+
+                    return maybeMoveAssignment(variableAssignment, node.getThenStatement());
+                }
+
+                if (node.getElseStatement() != null) {
+                    return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+                }
             }
 
             return true;
@@ -140,6 +142,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
             }
 
             moveAssignmentInsideIf(variableAssignment, statement, statements);
+            setResult(false);
             return false;
         }
 
