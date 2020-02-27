@@ -38,7 +38,6 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -89,8 +88,8 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        Set<IVariableBinding> previousVarIds= new HashSet<>();
-        Set<IVariableBinding> caseVarIds= new HashSet<>();
+        Set<String> previousVarIds= new HashSet<>();
+        Set<String> caseVarIds= new HashSet<>();
         List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
         List<Expression> caseExprs= new ArrayList<>();
         List<Statement> caseStatements= new ArrayList<>();
@@ -134,7 +133,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     return true;
                 }
 
-                caseVarIds.addAll(ASTNodes.getLocalVariableBindings(statement, false));
+                caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(statement, false));
                 caseStatements.add(statement);
 
                 isPreviousStmtACase= false;

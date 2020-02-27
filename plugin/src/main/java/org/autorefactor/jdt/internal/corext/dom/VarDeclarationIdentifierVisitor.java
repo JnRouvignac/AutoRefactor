@@ -6,7 +6,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -14,7 +13,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
  * Visitor collecting all definitions of any variable.
  */
 public class VarDeclarationIdentifierVisitor extends ASTVisitor {
-    private final Set<IVariableBinding> variableBindings= new HashSet<>();
     private final Set<String> variableNames= new HashSet<>();
     private final ASTNode startNode;
     private final boolean includeInnerScopes;
@@ -31,15 +29,6 @@ public class VarDeclarationIdentifierVisitor extends ASTVisitor {
     }
 
     /**
-     * Get the variable bindings.
-     *
-     * @return the variable bindings.
-     */
-    public Set<IVariableBinding> getVariableBindings() {
-        return variableBindings;
-    }
-
-    /**
      * Get the variable names.
      *
      * @return the variable names.
@@ -50,14 +39,12 @@ public class VarDeclarationIdentifierVisitor extends ASTVisitor {
 
     @Override
     public boolean visit(final SingleVariableDeclaration node) {
-        variableBindings.add(node.resolveBinding());
         variableNames.add(node.getName().getIdentifier());
         return true;
     }
 
     @Override
     public boolean visit(final VariableDeclarationFragment node) {
-        variableBindings.add(node.resolveBinding());
         variableNames.add(node.getName().getIdentifier());
         return true;
     }

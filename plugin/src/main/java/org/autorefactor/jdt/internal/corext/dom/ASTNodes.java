@@ -2643,25 +2643,6 @@ public final class ASTNodes {
     }
 
     /**
-     * Return the bindings of variables declared inside the given statement.
-     *
-     * @param node               The node to visit
-     * @param includeInnerScopes True if blocks are visited too.
-     *
-     * @return The bindings of the declared variables.
-     */
-    public static Set<IVariableBinding> getLocalVariableBindings(final ASTNode node, final boolean includeInnerScopes) {
-        if (node == null) {
-            return Collections.emptySet();
-        }
-
-        VarDeclarationIdentifierVisitor visitor= new VarDeclarationIdentifierVisitor(node,
-                includeInnerScopes);
-        node.accept(visitor);
-        return visitor.getVariableBindings();
-    }
-
-    /**
      * Return the identifiers of variables declared inside the given statement.
      *
      * @param node               The node to visit
@@ -2810,7 +2791,7 @@ public final class ASTNodes {
      * @return true if variables are declared with the same identifier after the given statement.
      */
     public static boolean hasVariableConflict(final Statement node, final Statement statementInBlock) {
-        Set<IVariableBinding> existingVariableNames= getLocalVariableBindings(statementInBlock, false);
+        Set<String> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
 
         for (Statement statement : getNextSiblings(node)) {
             VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(existingVariableNames, true);
