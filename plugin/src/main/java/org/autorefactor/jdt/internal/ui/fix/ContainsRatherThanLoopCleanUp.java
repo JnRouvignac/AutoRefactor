@@ -38,6 +38,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_name;
     }
@@ -47,6 +48,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_description;
     }
@@ -56,6 +58,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
     }

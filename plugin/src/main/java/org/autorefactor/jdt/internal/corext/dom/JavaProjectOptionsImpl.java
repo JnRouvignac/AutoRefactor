@@ -70,6 +70,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @return the compiler options.
      */
+    @Override
     public Map<String, String> getCompilerOptions() {
         Map<String, String> options= JavaCore.getOptions();
         String v= javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion(); //$NON-NLS-1$
@@ -82,6 +83,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @return the JavaSE Release.
      */
+    @Override
     public Release getJavaSERelease() {
         return javaSERelease;
     }
@@ -91,6 +93,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @return the tab size.
      */
+    @Override
     public Integer getTabSize() {
         return asInteger(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE);
     }
@@ -100,6 +103,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      *
      * @return the comment line length.
      */
+    @Override
     public int getCommentLineLength() {
         Integer result= asInteger(DefaultCodeFormatterConstants.FORMATTER_COMMENT_LINE_LENGTH);
         if (result == null) {

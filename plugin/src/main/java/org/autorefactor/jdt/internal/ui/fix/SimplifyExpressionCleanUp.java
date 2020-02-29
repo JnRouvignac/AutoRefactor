@@ -138,12 +138,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             }
         }
         // Infix, prefix or postfix without parenthesis is not readable
-        if ((((parent instanceof InfixExpression
-                && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS))
-                || (parent instanceof PrefixExpression
-                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) && ((innerExpression instanceof PrefixExpression
-                && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) || (innerExpression instanceof PostfixExpression
-                && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)))) || isInnerExprHardToRead(innerExpression, parent)) {
+        if ((parent instanceof InfixExpression
+                && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS)
+                || parent instanceof PrefixExpression
+                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) && (innerExpression instanceof PrefixExpression
+                && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS) || innerExpression instanceof PostfixExpression
+                && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) || isInnerExprHardToRead(innerExpression, parent)) {
             return node;
         }
         if (isUselessParenthesesInStatement(parent, node)) {
@@ -165,11 +165,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 // or if it can be removed.
                 || innerExpression instanceof CastExpression
                 // Infix and prefix or postfix without parenthesis is not readable
-                || ((parent instanceof InfixExpression
+                || (parent instanceof InfixExpression
                         || parent instanceof PrefixExpression
                         || parent instanceof PostfixExpression)
                         && (innerExpression instanceof PrefixExpression
-                                || innerExpression instanceof PostfixExpression))) {
+                                || innerExpression instanceof PostfixExpression)) {
             return node;
         }
 

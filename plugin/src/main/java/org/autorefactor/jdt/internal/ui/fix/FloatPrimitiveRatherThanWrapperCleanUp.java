@@ -42,6 +42,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_name;
     }
@@ -51,6 +52,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_description;
     }
@@ -60,6 +62,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_reason;
     }

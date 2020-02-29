@@ -39,6 +39,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
     }
@@ -48,6 +49,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
     }
@@ -57,6 +59,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
     }

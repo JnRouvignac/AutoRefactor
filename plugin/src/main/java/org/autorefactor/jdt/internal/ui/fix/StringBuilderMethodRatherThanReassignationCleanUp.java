@@ -42,6 +42,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
     }
@@ -51,6 +52,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
     }
@@ -60,6 +62,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
     }

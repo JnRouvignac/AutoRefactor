@@ -40,6 +40,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
     }
@@ -49,6 +50,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
     }
@@ -58,6 +60,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
     }

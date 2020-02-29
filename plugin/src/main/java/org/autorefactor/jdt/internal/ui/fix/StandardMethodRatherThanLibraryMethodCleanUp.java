@@ -56,6 +56,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name;
     }
@@ -65,6 +66,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_description;
     }
@@ -74,6 +76,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_reason;
     }

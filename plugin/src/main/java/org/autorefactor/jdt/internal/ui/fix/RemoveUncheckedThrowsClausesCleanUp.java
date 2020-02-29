@@ -42,6 +42,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name;
     }
@@ -51,6 +52,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_description;
     }
@@ -60,6 +62,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_reason;
     }

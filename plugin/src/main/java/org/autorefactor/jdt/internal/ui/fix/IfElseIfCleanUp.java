@@ -64,6 +64,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name;
     }
@@ -73,6 +74,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_description;
     }
@@ -82,6 +84,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
     }

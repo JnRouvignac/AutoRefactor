@@ -60,6 +60,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name;
     }
@@ -69,6 +70,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_description;
     }
@@ -78,6 +80,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_reason;
     }

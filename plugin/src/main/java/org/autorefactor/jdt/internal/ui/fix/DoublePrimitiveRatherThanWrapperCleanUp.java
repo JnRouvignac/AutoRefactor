@@ -42,6 +42,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_name;
     }
@@ -51,6 +52,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_description;
     }
@@ -60,6 +62,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_reason;
     }

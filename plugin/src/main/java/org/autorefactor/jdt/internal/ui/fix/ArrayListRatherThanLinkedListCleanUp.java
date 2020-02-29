@@ -63,6 +63,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_name;
     }
@@ -72,6 +73,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_description;
     }
@@ -81,6 +83,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_reason;
     }

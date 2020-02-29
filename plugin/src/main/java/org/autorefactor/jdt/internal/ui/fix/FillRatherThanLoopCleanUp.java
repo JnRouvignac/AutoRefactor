@@ -56,6 +56,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name;
     }
@@ -65,6 +66,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_description;
     }
@@ -74,6 +76,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_reason;
     }

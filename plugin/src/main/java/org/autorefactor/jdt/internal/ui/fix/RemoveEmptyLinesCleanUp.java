@@ -48,6 +48,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name;
     }
@@ -57,6 +58,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_description;
     }
@@ -66,6 +68,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_reason;
     }
@@ -225,7 +228,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             return true;
         }
         int openingCurlyIndex= body.getStartPosition();
-        return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || (!maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body));
+        return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || !maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body);
     }
 
     @Override

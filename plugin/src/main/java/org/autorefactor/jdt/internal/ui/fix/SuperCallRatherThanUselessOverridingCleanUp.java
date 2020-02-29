@@ -61,6 +61,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
     }
@@ -70,6 +71,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
     }
@@ -79,6 +81,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
     }

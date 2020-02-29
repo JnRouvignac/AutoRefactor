@@ -44,6 +44,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
     }
@@ -53,6 +54,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
     }
@@ -62,6 +64,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
     }
@@ -79,9 +82,9 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         boolean visitSubtree= true;
         for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
             Expression initializer= vdf.getInitializer();
-            if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
-                    || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
-                            && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
+            if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
+                    || fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
+                            && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
                 this.ctx.getRefactorings().remove(initializer);
                 visitSubtree= false;
             }

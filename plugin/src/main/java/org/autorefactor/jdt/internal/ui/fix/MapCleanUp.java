@@ -58,6 +58,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_name;
     }
@@ -67,6 +68,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_description;
     }
@@ -76,6 +78,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_reason;
     }
@@ -139,13 +142,13 @@ public class MapCleanUp extends AbstractCleanUpRule {
             List<Expression> args= ASTNodes.arguments(cic);
             boolean noArgsCtor= args.isEmpty();
             boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-            return (noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+            return noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
                     ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
                     IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
-                    WeakHashMap.class.getCanonicalName()))
-                    || (mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+                    WeakHashMap.class.getCanonicalName())
+                    || mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
                             HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
-                            WeakHashMap.class.getCanonicalName()));
+                            WeakHashMap.class.getCanonicalName());
         }
 
         private boolean isValidCapacityParameter(final Expression sourceMap, final List<Expression> args) {

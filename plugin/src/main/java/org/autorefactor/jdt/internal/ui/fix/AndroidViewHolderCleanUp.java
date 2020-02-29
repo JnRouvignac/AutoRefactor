@@ -76,6 +76,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
     }
@@ -85,6 +86,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
     }
@@ -94,6 +96,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
     }
@@ -274,7 +277,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 Expression inflateExpression= getInflateExpression();
                 return ASTNodes.getFirstAncestorOrNull(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
                         // Check whether inflate is inside a conditional assignment
-                        || (inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION);
+                        || inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION;
             }
 
             return false;

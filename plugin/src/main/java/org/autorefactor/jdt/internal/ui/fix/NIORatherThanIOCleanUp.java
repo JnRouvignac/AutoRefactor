@@ -262,7 +262,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
                 && Utils.isEmpty(classInstanceCreation.typeArguments())
                 && classInstanceCreation.arguments() != null
                 && classInstanceCreation.arguments().size() == 1
-                && ASTNodes.hasType(((Expression) classInstanceCreation.arguments().get(0)), String.class.getCanonicalName());
+                && ASTNodes.hasType((Expression) classInstanceCreation.arguments().get(0), String.class.getCanonicalName());
     }
 
     private boolean isFileUse(final Expression fileObject) {

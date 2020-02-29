@@ -61,6 +61,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return "Try statement then return"; //$NON-NLS-1$
     }
@@ -70,6 +71,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return "Refactors to a proper use of try statements and return statements."; //$NON-NLS-1$
     }
@@ -79,6 +81,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return "It reduces code to focus attention on code that matters." //$NON-NLS-1$
                 + " It also improves the time and space performance."; //$NON-NLS-1$

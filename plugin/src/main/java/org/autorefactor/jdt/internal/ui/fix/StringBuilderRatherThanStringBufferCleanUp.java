@@ -37,6 +37,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_name;
     }
@@ -46,6 +47,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_description;
     }
@@ -55,6 +57,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_reason;
     }

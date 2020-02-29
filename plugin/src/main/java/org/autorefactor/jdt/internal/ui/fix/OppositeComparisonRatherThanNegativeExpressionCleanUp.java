@@ -39,6 +39,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
     }
@@ -48,6 +49,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
     }
@@ -57,6 +59,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
     }

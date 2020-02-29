@@ -41,6 +41,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return "Foreach"; //$NON-NLS-1$
     }
@@ -50,6 +51,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return "" + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops" //$NON-NLS-1$ //$NON-NLS-2$
                 + " (applicable to arrays or Iterable)." //$NON-NLS-1$
@@ -61,6 +63,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return "It reduces code to focus attention on code that matters."; //$NON-NLS-1$
     }

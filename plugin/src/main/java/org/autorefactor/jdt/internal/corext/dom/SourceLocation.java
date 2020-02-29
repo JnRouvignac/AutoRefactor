@@ -105,6 +105,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      *
      * @return the length.
      */
+    @Override
     public int getLength() {
         return this.length;
     }
@@ -114,6 +115,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      *
      * @return the offset.
      */
+    @Override
     public int getOffset() {
         return this.offset;
     }
@@ -196,6 +198,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      *
      * @return -1, 0 or 1
      */
+    @Override
     public int compareTo(final ISourceRange sourceRange) {
         int offsetDiff= this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {

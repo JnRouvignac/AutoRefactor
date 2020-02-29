@@ -47,7 +47,7 @@ public final class Pair<F, S> {
      * @return an immutable empty
      */
     public static <F, S> Pair<F, S> empty() {
-        return new Pair<F, S>(null, null);
+        return new Pair<>(null, null);
     }
 
     /**
@@ -60,7 +60,7 @@ public final class Pair<F, S> {
      * @return an immutable pair made of the two objects.
      */
     public static <F, S> Pair<F, S> of(final F first, final S second) {
-        return new Pair<F, S>(first, second);
+        return new Pair<>(first, second);
     }
 
     /**

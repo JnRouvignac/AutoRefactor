@@ -45,6 +45,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
     }
@@ -54,6 +55,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
     }
@@ -63,6 +65,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
     }

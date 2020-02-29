@@ -43,6 +43,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_reason;
     }
@@ -104,7 +107,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                         Expression anOperand= it.next();
                         Expression oppositeOperand= getOppositeExpression(b, anOperand);
 
-                        it.set((oppositeOperand != null) ? oppositeOperand : b.negate(anOperand));
+                        it.set(oppositeOperand != null ? oppositeOperand : b.negate(anOperand));
                     }
                 } else {
                     allOperands= b.createMoveTarget(allOperands);

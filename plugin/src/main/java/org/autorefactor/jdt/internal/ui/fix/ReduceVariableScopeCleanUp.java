@@ -79,6 +79,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return "Reduce scope of variable"; //$NON-NLS-1$
     }
@@ -88,6 +89,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return "Reduces the scope of local variables."; //$NON-NLS-1$
     }
@@ -97,6 +99,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return "It reduces the reading and debugging cost."; //$NON-NLS-1$
     }
@@ -304,8 +307,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         Type varType= getType(varDecl.getVariableName().getParent());
         if (scope instanceof Block) {
             List<Statement> statements= ASTNodes.statements((Block) scope);
-            for (int i= 0; i < statements.size(); i++) {
-                Statement statement= statements.get(i);
+            for (Statement statement : statements) {
                 Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
                 Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
                 if (statement.equals(parentStatement)) {

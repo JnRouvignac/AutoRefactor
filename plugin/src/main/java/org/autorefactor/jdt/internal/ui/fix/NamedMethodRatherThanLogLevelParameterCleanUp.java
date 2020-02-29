@@ -43,6 +43,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
     }

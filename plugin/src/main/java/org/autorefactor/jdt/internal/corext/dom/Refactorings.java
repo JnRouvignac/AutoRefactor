@@ -520,6 +520,7 @@ public class Refactorings {
              *
              * @return the bad location exception.
              */
+            @Override
             public BadLocationException call() throws Exception {
                 try {
                     edits.apply(document, TextEdit.UPDATE_REGIONS);

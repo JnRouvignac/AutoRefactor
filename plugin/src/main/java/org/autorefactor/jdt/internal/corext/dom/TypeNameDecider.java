@@ -78,6 +78,7 @@ public class TypeNameDecider {
          *
          * @return the type binding.
          */
+        @Override
         public ITypeBinding resolveTypeBinding(final String fullyQualifiedName) {
             try {
                 Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$

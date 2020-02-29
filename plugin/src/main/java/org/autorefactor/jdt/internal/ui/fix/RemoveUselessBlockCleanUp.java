@@ -43,6 +43,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
     }
@@ -52,6 +53,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
     }
@@ -61,6 +63,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
     }

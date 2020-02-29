@@ -38,6 +38,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
     }
@@ -47,6 +48,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
     }
@@ -56,6 +58,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
     }

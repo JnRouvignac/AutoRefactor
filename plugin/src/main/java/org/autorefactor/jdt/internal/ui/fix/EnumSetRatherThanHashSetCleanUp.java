@@ -50,6 +50,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
     }
@@ -59,6 +60,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
     }
@@ -68,6 +70,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
     }

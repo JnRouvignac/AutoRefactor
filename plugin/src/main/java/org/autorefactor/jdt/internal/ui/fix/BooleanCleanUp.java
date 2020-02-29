@@ -362,14 +362,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Expression thenExpression, final Expression elseExpression) {
         if (thenBool == null && elseBool != null) {
             Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.createCopyTarget(node.getExpression())), !elseBool);
-            return b.return0(b.infixExpression(leftOp, getConditionalOperator(elseBool.booleanValue()),
+            return b.return0(b.infixExpression(leftOp, getConditionalOperator(elseBool),
                     b.parenthesizeIfNeeded(b.createCopyTarget(thenExpression))));
         }
 
         if (thenBool != null && elseBool == null) {
             Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.createCopyTarget(node.getExpression())),
-                    thenBool.booleanValue());
-            return b.return0(b.infixExpression(leftOp, getConditionalOperator(thenBool.booleanValue()),
+                    thenBool);
+            return b.return0(b.infixExpression(leftOp, getConditionalOperator(thenBool),
                     b.parenthesizeIfNeeded(b.createCopyTarget(elseExpression))));
         }
 

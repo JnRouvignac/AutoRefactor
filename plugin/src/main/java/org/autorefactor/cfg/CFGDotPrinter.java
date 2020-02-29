@@ -73,6 +73,7 @@ public class CFGDotPrinter {
     }
 
     private static final class CFGEdgeComparator implements Comparator<CFGEdge> {
+        @Override
         public int compare(final CFGEdge e1, final CFGEdge e2) {
             int cmp= e1.getSourceBlock().compareTo(e2.getSourceBlock());
             if (cmp != 0) {

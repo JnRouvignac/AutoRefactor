@@ -228,6 +228,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      *
      * @return -1, 0 or 1
      */
+    @Override
     public int compareTo(final CFGBasicBlock o) {
         Integer startPosition= lineAndColumn.getStartPosition();
         return startPosition.compareTo(o.lineAndColumn.getStartPosition());
