@@ -41,6 +41,7 @@ import java.util.Vector;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -65,6 +66,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_name;
     }
@@ -74,6 +76,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_description;
     }
@@ -83,6 +86,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_reason;
     }
@@ -184,7 +188,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
         args.add(item);
 
         List<Type> typeArgs= ASTNodes.typeArguments(refactoredMi);
-        if (typeArgs != null && !typeArgs.isEmpty()) {
+        if (!Utils.isEmpty(typeArgs)) {
             Type itemType= typeArgs.get(0);
             Type indexType= typeArgs.get(1);
             typeArgs.clear();

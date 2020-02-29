@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
@@ -208,7 +209,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
         if (emptyCode instanceof Block) {
             Block block= (Block) emptyCode;
-            return block.statements() == null || block.statements().isEmpty();
+            return Utils.isEmpty(block.statements());
         }
 
         return false;

@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -137,7 +138,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
             Statement parent= aBreak;
             do {
                 parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
-            } while (parent != root && (ASTNodes.getNextSiblings(parent) == null || ASTNodes.getNextSiblings(parent).isEmpty()));
+            } while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
 
             if (parent != root) {
                 canBeRefactored= false;

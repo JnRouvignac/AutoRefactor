@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
@@ -24,7 +25,7 @@ class ThrowerBlocks {
     }
 
     public void addThrow(final CFGEdgeBuilder liveEdge, final Set<ITypeBinding> exceptionTypes) {
-        if (exceptionTypes != null && !exceptionTypes.isEmpty()) {
+        if (!Utils.isEmpty(exceptionTypes)) {
             potentialThrowingEdges.put(liveEdge, exceptionTypes);
         }
     }

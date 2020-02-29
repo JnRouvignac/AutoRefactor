@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -45,6 +46,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
     }
@@ -54,6 +56,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
     }
@@ -63,6 +66,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
     }
@@ -127,7 +131,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
             redundantStatements.add(node);
             List<Statement> statements= ASTNodes.asList(node);
 
-            if (statements == null || statements.isEmpty()) {
+            if (Utils.isEmpty(statements)) {
                 return;
             }
 

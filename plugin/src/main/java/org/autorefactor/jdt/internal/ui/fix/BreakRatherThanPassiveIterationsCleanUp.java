@@ -33,6 +33,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -160,6 +161,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
     }
@@ -169,6 +171,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
     }
@@ -178,6 +181,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
     }
@@ -217,7 +221,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
         List<Statement> statements= ASTNodes.asList(body);
 
-        if (statements == null || statements.isEmpty()) {
+        if (Utils.isEmpty(statements)) {
             return true;
         }
 

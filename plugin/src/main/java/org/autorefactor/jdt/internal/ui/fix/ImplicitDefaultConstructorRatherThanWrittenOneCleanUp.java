@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -44,6 +45,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
      *
      * @return the name.
      */
+    @Override
     public String getName() {
         return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
     }
@@ -53,6 +55,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
      *
      * @return the description.
      */
+    @Override
     public String getDescription() {
         return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
     }
@@ -62,6 +65,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
      *
      * @return the reason.
      */
+    @Override
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
     }
@@ -109,19 +113,19 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
             if (uniqueConstructor != null
                     && (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
                             || ASTNodes.hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
-                    && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
+                    && Utils.isEmpty(uniqueConstructor.parameters())
                     && isDefaultStatements(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
                     IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
                     if (extendedModifier.isModifier()) {
                         Modifier modifier= (Modifier) extendedModifier;
-                        if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
-                                || (modifier.isPrivate() && isPrivateClass)) {
+                        if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
+                                || modifier.isPrivate() && isPrivateClass) {
                             ctx.getRefactorings().remove(uniqueConstructor);
                             return false;
                         }
                     }
-                } else if ((uniqueConstructor.modifiers() == null || uniqueConstructor.modifiers().isEmpty())
+                } else if (Utils.isEmpty(uniqueConstructor.modifiers())
                         && isPackageClass) {
                     ctx.getRefactorings().remove(uniqueConstructor);
                     return false;
@@ -135,13 +139,13 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
     private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
         List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
 
-        if (statements == null || statements.isEmpty()) {
+        if (Utils.isEmpty(statements)) {
             return true;
         }
         if (statements.size() == 1) {
             SuperConstructorInvocation superStatement= ASTNodes.as(statements.get(0), SuperConstructorInvocation.class);
 
-            return superStatement != null && (superStatement.arguments() == null || superStatement.arguments().isEmpty());
+            return superStatement != null && Utils.isEmpty(superStatement.arguments());
         }
 
         return false;

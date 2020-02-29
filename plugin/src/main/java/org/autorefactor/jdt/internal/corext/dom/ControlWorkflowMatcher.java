@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -271,12 +272,12 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
         }
 
         if (currentActualNode.getCondition() != null
-                || currentActualNode.getFinalStatement() != null ^ (statementsByWorkflow.get(i) != null && !statementsByWorkflow.get(i).isEmpty())
+                || currentActualNode.getFinalStatement() != null ^ !Utils.isEmpty(statementsByWorkflow.get(i))
                 || currentActualNode.getReturnedValue() != null ^ returnedValuesByWorkflow.get(i) != null) {
             return false;
         }
 
-        if (statementsByWorkflow.get(i) != null && !statementsByWorkflow.get(i).isEmpty()) {
+        if (!Utils.isEmpty(statementsByWorkflow.get(i))) {
             // TODO Handle several final statements
             if (Boolean.TRUE.equals(statementsByWorkflow.get(i).get(0).isMatching(currentActualNode.getFinalStatement()))
                     && actualLastNodes.contains(currentActualNode.getId())) {
@@ -428,7 +429,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
     }
 
     private ControlWorkflowNode buildActualNodes(final List<Statement> actualStatements) {
-        if (actualStatements == null || actualStatements.isEmpty()) {
+        if (Utils.isEmpty(actualStatements)) {
             throw new AbortSearchException();
         }
 

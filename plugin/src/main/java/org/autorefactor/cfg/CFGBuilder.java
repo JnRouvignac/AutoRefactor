@@ -96,6 +96,7 @@ import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -1481,7 +1482,7 @@ public class CFGBuilder {
     }
 
     private void buildEdges(final LivenessState toBuild, final CFGBasicBlock targetBlock) {
-        if (isNotEmpty(toBuild.liveEdges)) {
+        if (!Utils.isEmpty(toBuild.liveEdges)) {
             for (CFGEdgeBuilder builder : toBuild.liveEdges) {
                 builder.withTarget(targetBlock).build();
             }
@@ -1734,7 +1735,7 @@ public class CFGBuilder {
     }
 
     private CFGBasicBlock getCFGBasicBlock(final List<Expression> expressions, final LivenessState state) {
-        if (isNotEmpty(expressions)) {
+        if (!Utils.isEmpty(expressions)) {
             Expression firstExpression= expressions.get(0);
             LineAndColumn lineCol= getLineAndColumn(firstExpression.getStartPosition());
             CFGBasicBlock basicBlock= new CFGBasicBlock(expressions.get(0), ASTNodes.getFileName(firstExpression),
@@ -1793,10 +1794,6 @@ public class CFGBuilder {
         }
 
         return result;
-    }
-
-    private boolean isNotEmpty(final Collection<?> col) {
-        return col != null && !col.isEmpty();
     }
 
     private boolean isNotEmpty(final Map<?, ?> col) {

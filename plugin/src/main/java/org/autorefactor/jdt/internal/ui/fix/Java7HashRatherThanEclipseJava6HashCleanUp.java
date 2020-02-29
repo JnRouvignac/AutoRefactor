@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -459,7 +460,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
             for (MethodDeclaration innerMethod : innerClass.getMethods()) {
                 if ("getEnclosingInstance".equals(innerMethod.getName().getIdentifier()) //$NON-NLS-1$
-                        && (innerMethod.parameters() == null || innerMethod.parameters().isEmpty())
+                        && Utils.isEmpty(innerMethod.parameters())
                         && !innerMethod.isConstructor() && innerMethod.resolveBinding() != null
                         && ASTNodes.hasType(innerMethod.resolveBinding().getReturnType(), topLevelClass.resolveBinding().getQualifiedName())) {
                     getEnclosingInstanceDeclaration= innerMethod;
@@ -649,7 +650,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
             if (zero != null && hashOnField != null && hashOnField.getExpression() != null
                     && "hashCode".equals(hashOnField.getName().getIdentifier()) //$NON-NLS-1$
-                    && (hashOnField.arguments() == null || hashOnField.arguments().isEmpty())) {
+                    && Utils.isEmpty(hashOnField.arguments())) {
                 Object zeroValue= zero.resolveConstantExpressionValue();
                 SimpleName fieldToHash= getField(hashOnField.getExpression());
 
