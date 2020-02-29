@@ -98,7 +98,11 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final IfStatement node) {
-            return moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
+            if (getResult()) {
+                return moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
+            }
+
+            return true;
         }
 
         private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {

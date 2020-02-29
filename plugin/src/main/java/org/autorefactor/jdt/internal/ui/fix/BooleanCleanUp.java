@@ -155,13 +155,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final IfStatement node) {
-            boolean result= visitIfStatement(node);
+            if (getResult()) {
+                boolean result= visitIfStatement(node);
 
-            if (!result) {
-                setResult(false);
+                if (!result) {
+                    setResult(false);
+                }
             }
 
-            return result;
+            return getResult();
         }
     }
 

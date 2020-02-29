@@ -92,33 +92,35 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(final ReturnStatement node) {
-            Statement previousSibling= ASTNodes.getPreviousSibling(node);
-            if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
-                    && previousSibling instanceof VariableDeclarationStatement) {
-                VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-                VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
+            if (getResult()) {
+                Statement previousSibling= ASTNodes.getPreviousSibling(node);
+                if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
+                        && previousSibling instanceof VariableDeclarationStatement) {
+                    VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
+                    VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
 
-                if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
-                    Expression returnExpression= vdf.getInitializer();
-                    if (returnExpression instanceof ArrayInitializer) {
-                        if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
-                            return true;
+                    if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
+                        Expression returnExpression= vdf.getInitializer();
+                        if (returnExpression instanceof ArrayInitializer) {
+                            if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
+                                return true;
+                            }
+                        } else {
+                            replaceReturnStatement(node, vds, returnExpression);
                         }
-                    } else {
-                        replaceReturnStatement(node, vds, returnExpression);
+                        setResult(false);
+                        return false;
                     }
-                    setResult(false);
-                    return false;
-                }
-            } else {
-                Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
-                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
-                        && as.getLeftHandSide() instanceof Name
-                        && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
-                                node)) {
-                    replaceReturnStatement(node, previousSibling, as.getRightHandSide());
-                    setResult(false);
-                    return false;
+                } else {
+                    Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
+                    if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
+                            && as.getLeftHandSide() instanceof Name
+                            && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
+                                    node)) {
+                        replaceReturnStatement(node, previousSibling, as.getRightHandSide());
+                        setResult(false);
+                        return false;
+                    }
                 }
             }
 

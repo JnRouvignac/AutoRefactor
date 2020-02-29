@@ -88,7 +88,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         @Override
         public boolean visit(final TryStatement node) {
-            if (node.resources().isEmpty()) {
+            if (getResult() && node.resources().isEmpty()) {
                 List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
                 if (tryStatements.isEmpty()) {
@@ -116,31 +116,33 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         @Override
         public boolean visit(final IfStatement node) {
-            Refactorings r= ctx.getRefactorings();
+            if (getResult()) {
+                Refactorings r= ctx.getRefactorings();
 
-            Statement thenStatement= node.getThenStatement();
-            Statement elseStatement= node.getElseStatement();
-            Expression condition= node.getExpression();
+                Statement thenStatement= node.getThenStatement();
+                Statement elseStatement= node.getElseStatement();
+                Expression condition= node.getExpression();
 
-            Object constantCondition= peremptoryValue(condition);
+                Object constantCondition= peremptoryValue(condition);
 
-            if (Boolean.TRUE.equals(constantCondition)) {
-                return maybeInlineBlock(node, thenStatement);
-            }
-
-            if (Boolean.FALSE.equals(constantCondition)) {
-                if (elseStatement != null) {
-                    return maybeInlineBlock(node, elseStatement);
+                if (Boolean.TRUE.equals(constantCondition)) {
+                    return maybeInlineBlock(node, thenStatement);
                 }
 
-                if (ASTNodes.canHaveSiblings(node)) {
-                    r.remove(node);
-                } else {
-                    r.replace(node, ctx.getASTBuilder().block());
-                }
+                if (Boolean.FALSE.equals(constantCondition)) {
+                    if (elseStatement != null) {
+                        return maybeInlineBlock(node, elseStatement);
+                    }
 
-                setResult(false);
-                return false;
+                    if (ASTNodes.canHaveSiblings(node)) {
+                        r.remove(node);
+                    } else {
+                        r.replace(node, ctx.getASTBuilder().block());
+                    }
+
+                    setResult(false);
+                    return false;
+                }
             }
 
             return true;

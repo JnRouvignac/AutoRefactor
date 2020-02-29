@@ -90,7 +90,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
             Statement thenStatement= getThenStatement(node);
             Statement elseStatement= getElseStatement(node, thenStatement);
 
-            if (condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
+            if (getResult() && condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
                 Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
                 Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
                 boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);

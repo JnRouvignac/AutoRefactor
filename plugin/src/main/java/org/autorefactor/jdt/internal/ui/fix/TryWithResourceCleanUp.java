@@ -101,54 +101,56 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final TryStatement node) {
-            List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+            if (getResult()) {
+                List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
-            if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
-                TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
+                if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
+                    TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
-                if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
-                    return collapseTryStatements(node, innerTryStatement);
-                }
-            }
-
-            VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
-                    VariableDeclarationStatement.class);
-
-            if (previousDeclStatement == null) {
-                return true;
-            }
-
-            VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
-            List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
-
-            if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
-                List<ASTNode> nodesToRemove= new ArrayList<>();
-                nodesToRemove.add(previousDeclStatement);
-
-                Statement finallyStatement= finallyStatements.get(0);
-                nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
-
-                ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
-                IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
-
-                if (finallyEs != null) {
-                    MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
-
-                    if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
-                        return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
-                                nodesToRemove);
+                    if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
+                        return collapseTryStatements(node, innerTryStatement);
                     }
-                } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
-                        && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
-                    Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
+                }
 
-                    Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
-                    MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+                VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
+                        VariableDeclarationStatement.class);
 
-                    if (methodClosesCloseables(mi)
-                            && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
-                        return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
-                                nodesToRemove);
+                if (previousDeclStatement == null) {
+                    return true;
+                }
+
+                VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
+                List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+
+                if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
+                    List<ASTNode> nodesToRemove= new ArrayList<>();
+                    nodesToRemove.add(previousDeclStatement);
+
+                    Statement finallyStatement= finallyStatements.get(0);
+                    nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
+
+                    ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
+                    IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
+
+                    if (finallyEs != null) {
+                        MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
+
+                        if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
+                            return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                                    nodesToRemove);
+                        }
+                    } else if (finallyIs != null && ASTNodes.asList(finallyIs.getThenStatement()).size() == 1
+                            && ASTNodes.asList(finallyIs.getElseStatement()).isEmpty()) {
+                        Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
+
+                        Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
+                        MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+
+                        if (methodClosesCloseables(mi)
+                                && ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
+                            return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
+                                    nodesToRemove);
+                        }
                     }
                 }
             }

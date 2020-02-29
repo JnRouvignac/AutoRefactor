@@ -95,13 +95,13 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         }
 
         private boolean visitStatement(final Statement node) {
-            if (!getResult()) {
-                return true;
+            if (getResult()) {
+                List<Statement> redundantStatements= new ArrayList<>();
+                collectStatements(node, redundantStatements);
+                return maybeRemoveRedundantCode(node, redundantStatements);
             }
 
-            List<Statement> redundantStatements= new ArrayList<>();
-            collectStatements(node, redundantStatements);
-            return maybeRemoveRedundantCode(node, redundantStatements);
+            return true;
         }
 
         @SuppressWarnings("unchecked")

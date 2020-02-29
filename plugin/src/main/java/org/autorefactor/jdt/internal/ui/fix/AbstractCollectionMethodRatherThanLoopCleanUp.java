@@ -111,7 +111,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
         private boolean maybeReplaceWithCollectionContains(final Statement forNode, final Expression iterable,
                 final Expression loopElement, final IfStatement is) {
-            if (is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
+            if (getResult() && is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
                 MethodInvocation condition= getMethodToReplace(is.getExpression());
                 List<Statement> thenStatements= ASTNodes.asList(is.getThenStatement());
 
@@ -310,7 +310,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
             List<Statement> statements= ASTNodes.asList(node.getBody());
 
-            if (loopContent != null && COLLECTION.equals(loopContent.getContainerType())) {
+            if (getResult() && loopContent != null && COLLECTION.equals(loopContent.getContainerType())) {
                 if (INDEX.equals(loopContent.getIterationType())) {
                     Expression loopElement= null;
                     IfStatement is;
