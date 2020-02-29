@@ -25,6 +25,7 @@
  */
 package org.autorefactor.util;
 
+import java.util.Collection;
 import java.util.List;
 
 /** Utility class containing miscellaneous helper methods. */
@@ -131,6 +132,16 @@ public final class Utils {
      */
     public static boolean equal(final double d1, final double d2) {
         return Double.compare(d1, d2) == 0;
+    }
+
+    /**
+     * Returns true if the collection is null or empty.
+     *
+     * @param collection the collection
+     * @return true if the collection is null or empty
+     */
+    public static  boolean isEmpty(final Collection<?> collection) {
+        return collection == null || collection.isEmpty();
     }
 
     /**
