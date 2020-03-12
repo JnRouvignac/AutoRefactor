@@ -66,7 +66,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     /**
      * The scan of the class imports.
      */
-    private final Set<String> staticImports= new HashSet<>();
+    protected final Set<String> staticImports= new HashSet<>();
 
     /**
      * Get the actual value and then the expected value.
@@ -370,7 +370,19 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         return invokeMethod(b, originalMethod, methodName, copyOfActual, null, null, failureMessage);
     }
 
-    private MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
+    /**
+     * Invoke the method with full qualified name if needed.
+     *
+     * @param b              The builder.
+     * @param originalMethod The original method.
+     * @param methodName     methodName.
+     * @param copyOfActual   The copy of the actual value or null.
+     * @param copyOfExpected The copy of the expected value or null.
+     * @param delta          The delta or null
+     * @param failureMessage The original failure message or null.
+     * @return The method invocation object.
+     */
+    protected MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression delta, final Expression failureMessage) {
         String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();

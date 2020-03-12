@@ -132,7 +132,8 @@ public final class AllCleanUpRules {
                 new HotSpotIntrinsicedAPIsCleanUp(), new AnnotationCleanUp(), new TryWithResourceCleanUp(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for
                 // the project
-                new TestNGAssertCleanUp(), new JUnitAssertCleanUp(), new RemoveEmptyLinesCleanUp(),
+                new TestNGAssertCleanUp(), new JUnitAssertCleanUp(), new AssertJCleanUp(),
+                new RemoveEmptyLinesCleanUp(),
                 new RemoveEmptySuperConstrInvocationCleanUp(),
                 new ImplicitDefaultConstructorRatherThanWrittenOneCleanUp(), new AndroidWakeLockCleanUp(),
                 new AndroidViewHolderCleanUp(), new LogParametersRatherThanLogMessageCleanUp(),
