@@ -119,37 +119,39 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String unitTestPackagePath,
             final List<Expression> args) {
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        String jUnitClass= unitTestPackagePath + "Assert"; //$NON-NLS-1$
+
+        if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, true, args.get(1), args.get(0), false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, false, args.get(1), args.get(0), false);
         }
 
         for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(1), args.get(0), null, false);
+            if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, true, args.get(1), args.get(0), null);
             }
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(2), args.get(1), args.get(0), false);
+            if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, true, args.get(2), args.get(1), args.get(0));
             }
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(1), args.get(0), null, false);
+            if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, false, args.get(1), args.get(0), null);
             }
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(2), args.get(1), args.get(0), false);
+            if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, false, args.get(2), args.get(1), args.get(0));
             }
         }
 

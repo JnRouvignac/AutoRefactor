@@ -49,6 +49,8 @@ import org.eclipse.jdt.core.dom.Statement;
  * </p>
  */
 public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
+    private static final String TESTNG_CLASS= "org.testng.Assert"; //$NON-NLS-1$
+
     /**
      * Get the name.
      *
@@ -93,7 +95,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
             ImportDeclaration importDeclaration= (ImportDeclaration) object;
             ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
 
-            if (ASTNodes.hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
+            if (ASTNodes.hasType(typeBinding, TESTNG_CLASS)) {
                 for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
                     if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
                         canUseAssertNotEquals= true;
@@ -111,37 +113,37 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     public boolean visit(final MethodInvocation node) {
         List<Expression> args= ASTNodes.arguments(node);
 
-        if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, true, args.get(0), args.get(1), false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
         }
 
-        if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
             return maybeRefactorStatement(node, node, false, args.get(0), args.get(1), false);
         }
 
         for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
-            if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), null, false);
+            if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), null);
             }
 
-            if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), args.get(2), false);
+            if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), args.get(2));
             }
 
-            if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), null, false);
+            if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), null);
             }
 
-            if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), args.get(2), false);
+            if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), args.get(2));
             }
         }
 
@@ -155,11 +157,11 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
         if (node.getElseStatement() == null && statements.size() == 1) {
             MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
-            if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail")) { //$NON-NLS-1$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
             }
 
-            if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
             }
         }

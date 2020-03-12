@@ -92,7 +92,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
      */
     protected abstract MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            Expression delta, final Expression failureMessage);
+            final Expression delta, final Expression failureMessage);
 
     /**
      * Resolve the type binding.
@@ -269,15 +269,20 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
      * Maybe refactor the assert null or equals.
      *
      * @param nodeToReplace   The node to replace
-     * @param originalMethod  The node
+     * @param originalMethod  The original method
      * @param isAssertEquals  The is assert equals
      * @param actualValue     The actual value
      * @param expectedValue   The expected value
      * @param failureMessage  The failure message
-     * @param isRewriteNeeded True if is the rewriting is needed.
      * @return The return
      */
-    protected boolean maybeRefactorToEquality(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
+    protected boolean maybeRefactorToEquality(final MethodInvocation nodeToReplace, final MethodInvocation originalMethod, final boolean isAssertEquals,
+            final Expression actualValue, final Expression expectedValue, final Expression failureMessage) {
+        return maybeRefactorToEquality(nodeToReplace, originalMethod, isAssertEquals,
+                actualValue, expectedValue, failureMessage, false);
+    }
+
+    private boolean maybeRefactorToEquality(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
             final boolean isAssertEquals, final Expression actualValue, final Expression expectedValue,
             final Expression failureMessage, final boolean isRewriteNeeded) {
         Refactorings r= this.ctx.getRefactorings();
@@ -368,17 +373,17 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     private MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression delta, final Expression failureMessage) {
-        String qualifiedMethodName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
+        String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
-        Expression qualifiedMethod;
-        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
-                && !staticImports.contains(qualifiedMethodName + ".*")) { //$NON-NLS-1$
-            qualifiedMethod= b.name(qualifiedMethodName);
+        Expression qualifiedClass;
+        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
+                && !staticImports.contains(qualifiedClassName + ".*")) { //$NON-NLS-1$
+            qualifiedClass= b.name(qualifiedClassName);
         } else {
-            qualifiedMethod= b.copyExpression(originalMethod);
+            qualifiedClass= b.copyExpression(originalMethod);
         }
 
-        return invokeQualifiedMethod(b, qualifiedMethod, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
+        return invokeQualifiedMethod(b, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
     }
 
     /**
