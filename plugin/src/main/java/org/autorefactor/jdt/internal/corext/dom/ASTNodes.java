@@ -1492,13 +1492,9 @@ public final class ASTNodes {
     public static boolean hasType(final ITypeBinding typeBinding, final String... oneOfQualifiedTypeNames) {
         if (typeBinding != null) {
             ITypeBinding erasure= typeBinding.getErasure();
+
             if (erasure != null) {
-                String qualifiedName= erasure.getQualifiedName();
-                for (String qualifiedTypeName : oneOfQualifiedTypeNames) {
-                    if (qualifiedTypeName.equals(qualifiedName)) {
-                        return true;
-                    }
-                }
+                return Arrays.asList(oneOfQualifiedTypeNames).contains(erasure.getQualifiedName());
             }
         }
 
