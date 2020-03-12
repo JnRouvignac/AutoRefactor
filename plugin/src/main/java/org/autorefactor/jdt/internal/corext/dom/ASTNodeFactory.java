@@ -904,10 +904,20 @@ public class ASTNodeFactory {
      * @return a new method invocation
      */
     public MethodInvocation invoke(final String expression, final String methodName, final Expression... arguments) {
-        MethodInvocation mi= ast.newMethodInvocation();
-        mi.setExpression(ast.newSimpleName(expression));
-        mi.setName(ast.newSimpleName(methodName));
-        addAll(ASTNodes.arguments(mi), arguments);
+        return invoke(name(expression), methodName, arguments);
+    }
+
+    /**
+     * Builds a new {@link MethodInvocation} instance.
+     *
+     * @param expression the method invocation expression
+     * @param methodName the name of the invoked method
+     * @param arguments  the arguments for the method invocation
+     * @return a new method invocation
+     */
+    public MethodInvocation invoke(final Expression expression, final String methodName, final Expression... arguments) {
+        MethodInvocation mi= invoke(methodName, arguments);
+        mi.setExpression(expression);
         return mi;
     }
 
@@ -920,22 +930,6 @@ public class ASTNodeFactory {
      */
     public MethodInvocation invoke(final String methodName, final Expression... arguments) {
         MethodInvocation mi= ast.newMethodInvocation();
-        mi.setName(ast.newSimpleName(methodName));
-        addAll(ASTNodes.arguments(mi), arguments);
-        return mi;
-    }
-
-    /**
-     * Builds a new {@link MethodInvocation} instance.
-     *
-     * @param expression the method invocation expression
-     * @param methodName the name of the invoked method
-     * @param arguments  the arguments for the method invocation
-     * @return a new method invocation
-     */
-    public MethodInvocation invoke(final Expression expression, final String methodName, final Expression... arguments) {
-        MethodInvocation mi= ast.newMethodInvocation();
-        mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
         addAll(ASTNodes.arguments(mi), arguments);
         return mi;
