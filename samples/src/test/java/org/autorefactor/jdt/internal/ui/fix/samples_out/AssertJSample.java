@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Fail;
+import org.assertj.core.data.Offset;
 
 public class AssertJSample {
     private static final int FOURTYTWO = 42;
@@ -52,36 +53,36 @@ public class AssertJSample {
 
     public void refactorWithDoubles(double d1, double d2) {
         // Keep this comment
-        Assertions.assertThat(d2).isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d2).as("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d2).isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d2).as("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
+        Assertions.assertThat(d2).isEqualTo(d1, Offset.offset(.0));
+        Assertions.assertThat(d2).as("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        Assertions.assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        Assertions.assertThat(d2).isEqualTo(d1, Offset.offset(.0));
+        Assertions.assertThat(d2).as("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        Assertions.assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
 
-        assertThat(d2).isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d2).as("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d2).isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d2).as("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, org.assertj.core.data.Offset.offset(.0));
+        assertThat(d2).isEqualTo(d1, Offset.offset(.0));
+        assertThat(d2).as("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        assertThat(d2).isEqualTo(d1, Offset.offset(.0));
+        assertThat(d2).as("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
+        assertThat(d2).describedAs("Failure message to keep").isEqualTo(d1, Offset.offset(.0));
     }
 
     public void refactorWithFloats(float f1, float f2) {
         // Keep this comment
-        Assertions.assertThat(f2).isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        Assertions.assertThat(f2).as("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        Assertions.assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        Assertions.assertThat(f2).isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        Assertions.assertThat(f2).as("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        Assertions.assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
+        Assertions.assertThat(f2).isEqualTo(f1, Offset.offset(.0F));
+        Assertions.assertThat(f2).as("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        Assertions.assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        Assertions.assertThat(f2).isEqualTo(f1, Offset.offset(.0F));
+        Assertions.assertThat(f2).as("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        Assertions.assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
 
-        assertThat(f2).isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        assertThat(f2).as("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        assertThat(f2).isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        assertThat(f2).as("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
-        assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, org.assertj.core.data.Offset.offset(.0F));
+        assertThat(f2).isEqualTo(f1, Offset.offset(.0F));
+        assertThat(f2).as("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        assertThat(f2).isEqualTo(f1, Offset.offset(.0F));
+        assertThat(f2).as("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
+        assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
     }
 
     public void refactorFailures() {
@@ -467,16 +468,16 @@ public class AssertJSample {
 
     public void moveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) {
         // Keep this comment
-        Assertions.assertThat(d).isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d).as("Failure message to keep").isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
-        Assertions.assertThat(d).describedAs("Failure message to keep").isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
+        Assertions.assertThat(d).isEqualTo(expected, Offset.offset(.0));
+        Assertions.assertThat(d).as("Failure message to keep").isEqualTo(expected, Offset.offset(.0));
+        Assertions.assertThat(d).describedAs("Failure message to keep").isEqualTo(expected, Offset.offset(.0));
         Assertions.assertThat(d).isNotEqualTo(expected);
         Assertions.assertThat(d).as("Failure message to keep").isNotEqualTo(expected);
         Assertions.assertThat(d).describedAs("Failure message to keep").isNotEqualTo(expected);
 
-        assertThat(d).isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d).as("Failure message to keep").isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
-        assertThat(d).describedAs("Failure message to keep").isEqualTo(expected, org.assertj.core.data.Offset.offset(.0));
+        assertThat(d).isEqualTo(expected, Offset.offset(.0));
+        assertThat(d).as("Failure message to keep").isEqualTo(expected, Offset.offset(.0));
+        assertThat(d).describedAs("Failure message to keep").isEqualTo(expected, Offset.offset(.0));
         assertThat(d).isNotEqualTo(expected);
         assertThat(d).as("Failure message to keep").isNotEqualTo(expected);
         assertThat(d).describedAs("Failure message to keep").isNotEqualTo(expected);

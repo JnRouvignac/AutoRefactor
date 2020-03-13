@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -110,40 +111,41 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(final MethodInvocation node) {
+    public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         List<Expression> args= ASTNodes.arguments(node);
 
         if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            return maybeRefactorStatement(node, node, true, args.get(0), null, false);
+            return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), null, false);
         }
 
         if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-            return maybeRefactorStatement(node, node, true, args.get(0), args.get(1), false);
+            return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), false);
         }
 
         if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            return maybeRefactorStatement(node, node, false, args.get(0), null, false);
+            return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), null, false);
         }
 
         if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-            return maybeRefactorStatement(node, node, false, args.get(0), args.get(1), false);
+            return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), false);
         }
 
         for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
             if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), null);
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), null);
             }
 
             if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, node, true, args.get(0), args.get(1), args.get(2));
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), args.get(2));
             }
 
             if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), null);
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), null);
             }
 
             if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, node, false, args.get(0), args.get(1), args.get(2));
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), args.get(2));
             }
         }
 
@@ -151,18 +153,19 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(final IfStatement node) {
+    public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
         if (node.getElseStatement() == null && statements.size() == 1) {
             MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
             if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail")) { //$NON-NLS-1$
-                return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
             }
 
             if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
             }
         }
 
@@ -170,9 +173,9 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpression,
-            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            final Expression delta, final Expression failureMessage) {
+    protected MethodInvocation invokeQualifiedMethod(Set<String> classesToUseWithImport, Set<String> importsToAdd,
+            final ASTNodeFactory b, final Expression copyOfExpression, final String methodName,
+            final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         List<Expression> arguments= new ArrayList<>(4);
 
         if (copyOfActual != null) {

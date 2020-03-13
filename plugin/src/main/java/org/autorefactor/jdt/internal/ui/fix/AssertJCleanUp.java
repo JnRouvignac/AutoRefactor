@@ -26,7 +26,10 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -41,6 +44,13 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public class AssertJCleanUp extends AbstractUnitTestCleanUp {
+    private static final String FAIL_CLASS= "org.assertj.core.api.Fail"; //$NON-NLS-1$
+    private static final String ASSERTIONS_CLASS= "org.assertj.core.api.Assertions"; //$NON-NLS-1$
+    private static final String DESCRIPTABLE_INTERFACE= "org.assertj.core.api.Descriptable"; //$NON-NLS-1$
+    private static final String ABSTRACT_ASSERT_CLASS= "org.assertj.core.api.AbstractAssert"; //$NON-NLS-1$
+    private static final String BOOLEAN_ASSERT_CLASS= "org.assertj.core.api.AbstractBooleanAssert"; //$NON-NLS-1$
+    private static final String OFFSET_CLASS= "org.assertj.core.data.Offset"; //$NON-NLS-1$
+
     private static final String FAIL_METHOD= "fail"; //$NON-NLS-1$
     private static final String IS_NOT_EQUAL_TO_METHOD= "isNotEqualTo"; //$NON-NLS-1$
     private static final String DESCRIBED_AS_METHOD= "describedAs"; //$NON-NLS-1$
@@ -49,12 +59,14 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
     private static final String IS_EQUAL_TO_METHOD= "isEqualTo"; //$NON-NLS-1$
     private static final String IS_FALSE_METHOD= "isFalse"; //$NON-NLS-1$
     private static final String IS_TRUE_METHOD= "isTrue"; //$NON-NLS-1$
+    private static final String ASSERT_THAT_METHOD= "assertThat"; //$NON-NLS-1$
 
-    private static final String FAIL_CLASS= "org.assertj.core.api.Fail"; //$NON-NLS-1$
-    private static final String ASSERTIONS_CLASS= "org.assertj.core.api.Assertions"; //$NON-NLS-1$
-    private static final String DESCRIPTABLE_INTERFACE= "org.assertj.core.api.Descriptable"; //$NON-NLS-1$
-    private static final String ABSTRACT_ASSERT_CLASS= "org.assertj.core.api.AbstractAssert"; //$NON-NLS-1$
-    private static final String BOOLEAN_ASSERT_CLASS= "org.assertj.core.api.AbstractBooleanAssert"; //$NON-NLS-1$
+    /**
+     * Init canUseAssertNotEquals.
+     */
+    public AssertJCleanUp() {
+        canUseAssertNotEquals= true;
+    }
 
     /**
      * Get the name.
@@ -93,7 +105,13 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(final MethodInvocation node) {
+    public Set<String> getClassesToImport() {
+        return new HashSet<>(Arrays.asList(OFFSET_CLASS));
+    }
+
+    @Override
+    public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         MethodInvocation actual= ASTNodes.as(node.getExpression(), MethodInvocation.class);
         Expression message= null;
 
@@ -105,22 +123,22 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
         }
 
         if (actual != null
-                && "assertThat".equals(actual.getName().getIdentifier()) //$NON-NLS-1$
+                && ASSERT_THAT_METHOD.equals(actual.getName().getIdentifier())
                 && actual.resolveMethodBinding() != null
                 && ASTNodes.hasType(actual.resolveMethodBinding().getDeclaringClass(), ASSERTIONS_CLASS)
                 && actual.arguments().size() == 1) {
             Expression actualExpression= (Expression) actual.arguments().get(0);
 
             if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_TRUE_METHOD)) {
-                return maybeRefactorStatement(node, actual,
-                        true, actualExpression, message,
-                        false);
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                        node, actual, true,
+                        actualExpression, message, false);
             }
 
             if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_FALSE_METHOD)) {
-                return maybeRefactorStatement(node, actual,
-                        false, actualExpression, message,
-                        false);
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                        node, actual, false,
+                        actualExpression, message, false);
             }
 
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, EQUALS_METHOD, Object.class.getCanonicalName())
@@ -132,8 +150,8 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractShortAssert", IS_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractCharacterAssert", IS_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractByteAssert", IS_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, actual, true,
-                        actualExpression, (Expression) node.arguments().get(0), message);
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node,
+                        actual, true, actualExpression, (Expression) node.arguments().get(0), message);
             }
 
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, Object.class.getCanonicalName())
@@ -144,8 +162,8 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractShortAssert", IS_NOT_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractCharacterAssert", IS_NOT_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractByteAssert", IS_NOT_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
-                return maybeRefactorToEquality(node, actual, false,
-                        actualExpression, (Expression) node.arguments().get(0), message);
+                return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node,
+                        actual, false, actualExpression, (Expression) node.arguments().get(0), message);
             }
         }
 
@@ -153,7 +171,8 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    public boolean visit(final IfStatement node) {
+    public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
         if (node.getElseStatement() == null && statements.size() == 1) {
@@ -165,10 +184,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                     || ASTNodes.usesGivenSignature(mi, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
                 if (mi.arguments() == null
                         || mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null) {
-                    return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
+                    return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
                 }
 
-                return maybeRefactorStatement(node, mi, false, node.getExpression(), mi, true);
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), mi, true);
             }
         }
 
@@ -176,9 +195,9 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    protected MethodInvocation invokeMethod(final ASTNodeFactory b, final MethodInvocation originalMethod,
-            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            final Expression delta, final Expression failureMessage) {
+    protected MethodInvocation invokeMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+            final ASTNodeFactory b, final MethodInvocation originalMethod, final String methodName,
+            final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
         Expression qualifiedClass;
@@ -198,7 +217,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
             return invokeFail(b, failureMessage, qualifiedClass);
         }
 
-        return invokeQualifiedMethod(b, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
+        return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, b, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
     }
 
     private MethodInvocation invokeFail(final ASTNodeFactory b, final Expression failureMessage,
@@ -218,12 +237,12 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfClass,
-            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            final Expression delta, final Expression failureMessage) {
+    protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+            final ASTNodeFactory b, final Expression copyOfClass, final String methodName,
+            final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         String finalMethodName= getFinalMethodName(methodName);
 
-        Expression assertionMethod= b.invoke(copyOfClass, "assertThat", copyOfActual); //$NON-NLS-1$
+        Expression assertionMethod= b.invoke(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
 
         if (failureMessage != null) {
             MethodInvocation failureMethod= (MethodInvocation) failureMessage;
@@ -239,8 +258,8 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
         if (copyOfExpected != null) {
             if (delta != null && IS_EQUAL_TO_METHOD.equals(finalMethodName)) {
-                // TODO Import org.assertj.core.data.Offset
-                return b.invoke(assertionMethod, finalMethodName, copyOfExpected, b.invoke("org.assertj.core.data.Offset", "offset", b.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
+                importsToAdd.add(OFFSET_CLASS);
+                return b.invoke(assertionMethod, finalMethodName, copyOfExpected, b.invoke(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", b.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             return b.invoke(assertionMethod, finalMethodName, copyOfExpected);
