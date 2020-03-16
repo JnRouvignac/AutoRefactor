@@ -119,8 +119,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                     IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
                     if (extendedModifier.isModifier()) {
                         Modifier modifier= (Modifier) extendedModifier;
-                        if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
-                                || modifier.isPrivate() && isPrivateClass) {
+                        if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
+                                || (modifier.isPrivate() && isPrivateClass)) {
                             ctx.getRefactorings().remove(uniqueConstructor);
                             return false;
                         }

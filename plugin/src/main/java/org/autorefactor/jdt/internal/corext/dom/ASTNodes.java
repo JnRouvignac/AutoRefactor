@@ -190,8 +190,8 @@ public final class ASTNodes {
         public boolean visit(final QualifiedName node) {
             if (node.getQualifier() == null
                     || node.getQualifier().resolveBinding() == null
-                    || node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
-                    && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE) {
+                    || (node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
+                    && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE)) {
                 setActivityLevel(ExprActivity.PASSIVE);
             }
 
@@ -1191,7 +1191,7 @@ public final class ASTNodes {
         ASTNode parent= statementAtLevel.getParent();
 
         return parent instanceof Block
-                || parent instanceof SwitchStatement && statementAtLevel.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY;
+                || (parent instanceof SwitchStatement && statementAtLevel.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY);
     }
 
     /**
@@ -1562,7 +1562,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isConstant(final Expression expression) {
-        return expression != null && expression.resolveConstantExpressionValue() != null || isEnumConstant(expression);
+        return (expression != null && expression.resolveConstantExpressionValue() != null) || isEnumConstant(expression);
     }
 
     private static boolean isEnumConstant(final Expression expression) {
@@ -2872,9 +2872,9 @@ public final class ASTNodes {
         InfixExpression infixExpression= as(node, InfixExpression.class);
 
         if (infixExpression == null
-                || !hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
+                || (!hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
                 && (!hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)
-                        || !hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
+                        || !hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())))) {
             return 1;
         }
 

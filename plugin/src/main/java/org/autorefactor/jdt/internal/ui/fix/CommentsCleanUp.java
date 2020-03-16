@@ -547,7 +547,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         // PackageDeclaration node accept javadoc in package-info.java files,
         // but they are useless everywhere else.
         return node instanceof BodyDeclaration
-                || node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
+                || (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
     }
 
     @Override

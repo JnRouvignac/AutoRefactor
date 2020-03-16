@@ -240,8 +240,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         if (expression instanceof CastExpression) {
             CastExpression castExpression= (CastExpression) expression;
             return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-                    || ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpression.getExpression());
+                    || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpression.getExpression()));
         }
 
         if (expression instanceof MethodInvocation) {

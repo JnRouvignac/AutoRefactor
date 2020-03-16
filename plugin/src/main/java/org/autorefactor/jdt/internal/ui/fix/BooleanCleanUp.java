@@ -102,7 +102,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_reason;
     }
 
-    private class BooleanASTMatcher extends ASTSemanticMatcher {
+    private static class BooleanASTMatcher extends ASTSemanticMatcher {
         /** else node to then node. */
         final Map<ASTNode, ASTNode> matches= new HashMap<>();
         final Map<ASTNode, ASTNode> previousMatches;

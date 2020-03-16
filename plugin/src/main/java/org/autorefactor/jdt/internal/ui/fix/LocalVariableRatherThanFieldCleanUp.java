@@ -54,7 +54,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
-    private final class FieldUseVisitor extends ASTVisitor {
+    private static final class FieldUseVisitor extends ASTVisitor {
         private final SimpleName field;
         private final List<SimpleName> occurrences= new ArrayList<>();
 
@@ -152,7 +152,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
             if (isVariableDeclaration(occurrence)
                     || isExternalField(occurrence)
                     || currentMethodDeclaration == null
-                    || oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration) {
+                    || (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
                 return true;
             }
 

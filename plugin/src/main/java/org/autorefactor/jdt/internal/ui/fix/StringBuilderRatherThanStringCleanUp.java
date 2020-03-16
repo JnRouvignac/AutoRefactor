@@ -65,7 +65,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
-    private class VarOccurrenceVisitor extends ASTVisitor {
+    private static class VarOccurrenceVisitor extends ASTVisitor {
         private final Set<SimpleName> searchedVariables;
         private final Set<SimpleName> foundVariables= new HashSet<>();
         private final boolean hasToVisitLoops;

@@ -86,9 +86,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
             ITypeBinding actualResultType= ASTNodes.getTargetType(node);
             ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
 
-            if (actualResultType != null
-                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
-                    || actualParameterType != null && actualParameterType.equals(wrapperClass)) {
+            if ((actualResultType != null
+                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass)))
+                    || (actualParameterType != null && actualParameterType.equals(wrapperClass))) {
                 useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
                 return false;
             }

@@ -140,11 +140,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
                 return true;
             }
 
-            if (obj == null) {
-                return false;
-            }
-
-            if (getClass() != obj.getClass()) {
+            if (obj == null || getClass() != obj.getClass()) {
                 return false;
             }
 
@@ -153,7 +149,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
         }
     }
 
-    private int nbWorkflow= 0;
+    private int nbWorkflow;
 
     private List<List<NodeMatcher<Expression>>> conditionsByWorkflow= new ArrayList<>();
     private List<List<NodeMatcher<Statement>>> statementsByWorkflow= new ArrayList<>();
@@ -272,7 +268,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
         }
 
         if (currentActualNode.getCondition() != null
-                || currentActualNode.getFinalStatement() != null ^ !Utils.isEmpty(statementsByWorkflow.get(i))
+                || currentActualNode.getFinalStatement() != null == Utils.isEmpty(statementsByWorkflow.get(i))
                 || currentActualNode.getReturnedValue() != null ^ returnedValuesByWorkflow.get(i) != null) {
             return false;
         }
@@ -296,7 +292,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
     private void collectActualLastNodes(final ControlWorkflowNode actualNode, final Set<Integer> actualLastNodes) {
         if (actualNode.getCondition() == null) {
-            if (actualNode.getThenNode() != null || actualNode.getElseNode() != null || actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null) {
+            if (actualNode.getThenNode() != null || actualNode.getElseNode() != null || (actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null)) {
                 throw new AbortSearchException();
             }
 
@@ -312,15 +308,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
     }
 
     private boolean isPassive(final ControlWorkflowNode actualNode) {
-        if (actualNode.getCondition() == null) {
-            return true;
-        }
-
-        if (!ASTNodes.isPassive(actualNode.getCondition())) {
-            return false;
-        }
-
-        return isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode());
+        return actualNode.getCondition() == null || (ASTNodes.isPassive(actualNode.getCondition()) && isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode()));
     }
 
     private void expandActualNode(final ControlWorkflowNode actualNode) {

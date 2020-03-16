@@ -93,7 +93,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         return "".equals(expression.resolveConstantExpressionValue()) //$NON-NLS-1$
                 // Due to a bug with ASTNode.resolveConstantExpressionValue()
                 // in Eclipse 3.7.2 and 3.8.0, this second check is necessary
-                || stringLiteral != null && "".equals(stringLiteral.getLiteralValue()); //$NON-NLS-1$
+                || (stringLiteral != null && "".equals(stringLiteral.getLiteralValue())); //$NON-NLS-1$
     }
 
     @Override
@@ -136,8 +136,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             Expression arg0= ASTNodes.arguments(node).get(0);
 
             if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
-                    && (arg0 instanceof InfixExpression || arg0 instanceof MethodInvocation
-                            && (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0)))) {
+                    && (arg0 instanceof InfixExpression || (arg0 instanceof MethodInvocation
+                            && (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0))))) {
                 return maybeRefactorAppending(node);
             }
         }
@@ -547,8 +547,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName());
 
             if (isEmptyString(expression.getSecond())) {
-                boolean removeExpression= canRemoveEmptyStrings || canNowRemoveEmptyStrings && i + 1 < allOperands.size()
-                        && ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName());
+                boolean removeExpression= canRemoveEmptyStrings || (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
+                        && ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName()));
                 if (removeExpression) {
                     allOperands.remove(i);
                     replaceNeeded= true;

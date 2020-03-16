@@ -29,5 +29,4 @@ package org.autorefactor.jdt.internal.corext.dom;
  * Represents an expected workflow.
  */
 public interface ControlWorkflowMatcherCreable {
-
 }

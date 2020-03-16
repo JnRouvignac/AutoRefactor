@@ -122,7 +122,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
         return regExAndUsesVisitor.getResult();
     }
 
-    private final class RegExAndUsesVisitor extends BlockSubVisitor {
+    private static final class RegExAndUsesVisitor extends BlockSubVisitor {
         private final Block blockNode;
         private final Set<String> classesToUseWithImport;
         private final Set<String> importsToAdd;

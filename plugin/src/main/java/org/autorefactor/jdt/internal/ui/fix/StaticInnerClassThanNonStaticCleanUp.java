@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
-    private class TopLevelClassMemberVisitor extends InterruptibleVisitor {
+    private static class TopLevelClassMemberVisitor extends InterruptibleVisitor {
         private final TypeDeclaration topLevelClass;
         private final TypeDeclaration innerClass;
         private boolean isTopLevelClassMemberUsed;

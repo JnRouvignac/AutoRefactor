@@ -65,7 +65,7 @@ import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 /** See {@link #getDescription()} method. */
 public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportCleanUp {
-    private final class ObjectNotNullMatcher extends NodeMatcher<Expression> {
+    private static final class ObjectNotNullMatcher extends NodeMatcher<Expression> {
         private final String identifier;
 
         private ObjectNotNullMatcher(final String identifier) {

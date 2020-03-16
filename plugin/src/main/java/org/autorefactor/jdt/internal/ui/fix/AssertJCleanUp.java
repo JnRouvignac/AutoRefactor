@@ -183,7 +183,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                     || ASTNodes.usesGivenSignature(mi, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(mi, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
                 if (mi.arguments() == null
-                        || mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null) {
+                        || (mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null)) {
                     return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
                 }
 

@@ -138,7 +138,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
         }
         ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        NumberLiteral replacement= b.number(integers.toString() + suffix);
+        NumberLiteral replacement= b.number(integers + suffix);
         ctx.getRefactorings().replace(node, replacement);
     }
 

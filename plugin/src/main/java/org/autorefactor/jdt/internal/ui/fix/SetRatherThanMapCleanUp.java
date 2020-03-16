@@ -225,7 +225,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         ASTNode parentNode= node.getParent();
 
         return parentNode instanceof ExpressionStatement
-                || parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode);
+                || (parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode));
     }
 
     @Override

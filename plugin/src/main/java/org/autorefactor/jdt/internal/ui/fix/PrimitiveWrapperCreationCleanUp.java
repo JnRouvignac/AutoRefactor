@@ -147,8 +147,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
         return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-                        && Objects.equals(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue());
+                || (ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
+                        && Objects.equals(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue()));
     }
 
     private boolean replaceMethodName(final MethodInvocation node, final String methodName) {

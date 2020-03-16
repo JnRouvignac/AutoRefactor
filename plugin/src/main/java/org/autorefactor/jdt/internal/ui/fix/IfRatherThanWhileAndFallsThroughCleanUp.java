@@ -111,7 +111,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         r.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 
-    private class BreakVisitor extends InterruptibleVisitor {
+    private static class BreakVisitor extends InterruptibleVisitor {
         private final WhileStatement root;
         private final List<BreakStatement> breaks= new ArrayList<>();
         private boolean canBeRefactored= true;
@@ -186,7 +186,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         }
     }
 
-    private class ContinueVisitor extends InterruptibleVisitor {
+    private static class ContinueVisitor extends InterruptibleVisitor {
         private final WhileStatement root;
         private boolean canBeRefactored= true;
 

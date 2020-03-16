@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 /** Helps decide on which type name to use. */
 public class TypeNameDecider {
     /** Strategy that resolves type bindings. */
-    public interface ResolveTypeBindingStrategy {
+    public static interface ResolveTypeBindingStrategy {
         /**
          * Resolves the provided fully qualified name into a type binding.
          *

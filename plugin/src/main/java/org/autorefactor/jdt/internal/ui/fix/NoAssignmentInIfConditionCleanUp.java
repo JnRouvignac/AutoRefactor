@@ -98,11 +98,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(final IfStatement node) {
-            if (getResult()) {
-                return moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
-            }
-
-            return true;
+            return !getResult() || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
         }
 
         private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
@@ -160,11 +156,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
             ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
 
-            if (ce != null) {
-                return moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
-            }
-
-            return true;
+            return ce == null || moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
         }
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
