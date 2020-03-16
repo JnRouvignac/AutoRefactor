@@ -154,8 +154,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
      * @param importsToAdd importsToAdd
      * @return MaybeRefactorMethodInvocation.
      */
-    protected abstract boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd);
+    protected abstract boolean maybeRefactorMethodInvocation(MethodInvocation node, Set<String> classesToUseWithImport,
+            Set<String> importsToAdd);
 
     @Override
     public boolean visit(final IfStatement node) {
@@ -170,8 +170,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
      * @param importsToAdd importsToAdd
      * @return MaybeRefactorIfStatement.
      */
-    protected abstract boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd);
+    protected abstract boolean maybeRefactorIfStatement(IfStatement node, Set<String> classesToUseWithImport,
+            Set<String> importsToAdd);
 
     @Override
     public boolean visit(final CompilationUnit node) {
@@ -291,7 +291,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
         return true;
     }
 
-    private MethodInvocation invokeFail(Set<String> classesToUseWithImport, Set<String> importsToAdd,
+    private MethodInvocation invokeFail(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode node, final MethodInvocation originalMethod, final Expression failureMessage) {
         ASTNodeFactory b= this.ctx.getASTBuilder();
         List<Expression> args= ASTNodes.arguments(originalMethod);
