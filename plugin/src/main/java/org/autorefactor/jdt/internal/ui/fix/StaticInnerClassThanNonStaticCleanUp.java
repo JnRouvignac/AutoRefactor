@@ -115,25 +115,27 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final TypeDeclaration node) {
-        TypeDeclaration parent= ASTNodes.getAncestorOrNull(node, TypeDeclaration.class);
-        TypeDeclaration topLevelClass= null;
+        if (!node.isInterface()) {
+            TypeDeclaration parent= ASTNodes.getAncestorOrNull(node, TypeDeclaration.class);
+            TypeDeclaration topLevelClass= null;
 
-        while (parent != null) {
-            topLevelClass= parent;
-            parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
+            while (parent != null) {
+                topLevelClass= parent;
+                parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
 
-            if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
-                return true;
+                if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
+                    return true;
+                }
             }
-        }
 
-        if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
-            TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(topLevelClass, node);
-            topLevelClassMemberVisitor.visitNode(node);
+            if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
+                TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(topLevelClass, node);
+                topLevelClassMemberVisitor.visitNode(node);
 
-            if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
-                makeStatic(node);
-                return false;
+                if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
+                    makeStatic(node);
+                    return false;
+                }
             }
         }
 

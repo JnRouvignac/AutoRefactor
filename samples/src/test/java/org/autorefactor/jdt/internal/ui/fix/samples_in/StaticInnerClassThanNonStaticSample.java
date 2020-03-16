@@ -39,6 +39,10 @@ public class StaticInnerClassThanNonStaticSample {
         }
     }
 
+    public interface DoNotRefactorInnerInterface {
+        boolean anotherMethod();
+    }
+
     public class RefactorThisInnerClassThatUsesStaticField {
         int i;
 
