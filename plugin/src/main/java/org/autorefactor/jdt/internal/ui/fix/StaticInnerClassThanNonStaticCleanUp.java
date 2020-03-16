@@ -121,6 +121,10 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
         while (parent != null) {
             topLevelClass= parent;
             parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
+
+            if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
+                return true;
+            }
         }
 
         if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {

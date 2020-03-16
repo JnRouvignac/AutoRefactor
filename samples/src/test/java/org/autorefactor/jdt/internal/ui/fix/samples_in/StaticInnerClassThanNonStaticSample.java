@@ -149,6 +149,20 @@ public class StaticInnerClassThanNonStaticSample {
         }
     }
 
+    public class NotStaticClass {
+        public class DoNotRefactorInnerClassInNotStaticClass {
+            int i;
+
+            public boolean anotherMethod() {
+                return true;
+            }
+        }
+
+        public boolean anotherMethod() {
+            return aMethod();
+        }
+    }
+
     private static final String CONSTANT= "foo";
 
     private String aString= "bar";
