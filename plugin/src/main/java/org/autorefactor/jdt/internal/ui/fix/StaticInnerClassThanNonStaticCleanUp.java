@@ -27,10 +27,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -143,25 +143,25 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
     }
 
     private void makeStatic(final TypeDeclaration node) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         List<?> modifiers= node.modifiers();
         Modifier static0= b.static0();
 
         if (modifiers.isEmpty()) {
-            r.insertBefore(static0, node);
+            rewrite.insertBefore(static0, node);
         } else {
             IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
 
             if (lastModifier.isModifier()) {
                 if (((Modifier) lastModifier).isFinal()) {
-                    r.insertBefore(static0, (Modifier) lastModifier);
+                    rewrite.insertBefore(static0, (Modifier) lastModifier);
                 } else {
-                    r.insertAfter(static0, (Modifier) lastModifier);
+                    rewrite.insertAfter(static0, (Modifier) lastModifier);
                 }
             } else {
-                r.insertAfter(static0, (Annotation) lastModifier);
+                rewrite.insertAfter(static0, (Annotation) lastModifier);
             }
         }
     }

@@ -94,7 +94,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     @SuppressWarnings("rawtypes")
     private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
             final List fragments, final Javadoc docComment) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         for (int i= fragments.size() - 1; 0 <= i; i--) {
             VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
@@ -124,9 +124,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
             }
 
             if (i > 0) {
-                cuRewrite.getRefactorings().insertAfter(newNode, node);
+                cuRewrite.getASTRewrite().insertAfter(newNode, node);
             } else {
-                cuRewrite.getRefactorings().replace(node, newNode);
+                cuRewrite.getASTRewrite().replace(node, newNode);
             }
         }
     }

@@ -90,7 +90,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     }
 
     private void useUnboxing(final MethodInvocation node) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        this.cuRewrite.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getExpression()));
     }
 }

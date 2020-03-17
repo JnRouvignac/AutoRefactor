@@ -25,10 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
@@ -80,9 +80,9 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
     }
 
     private void removeCondition(final IfStatement secondIf) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.replace(secondIf, b.createMoveTarget(secondIf.getThenStatement()));
+        rewrite.replace(secondIf, b.createMoveTarget(secondIf.getThenStatement()));
     }
 }

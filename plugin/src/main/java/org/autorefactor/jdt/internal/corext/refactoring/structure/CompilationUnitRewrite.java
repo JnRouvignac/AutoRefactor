@@ -27,10 +27,10 @@ package org.autorefactor.jdt.internal.corext.refactoring.structure;
 
 import org.autorefactor.environment.Environment;
 import org.autorefactor.environment.Logger;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class CompilationUnitRewrite {
     private final ICompilationUnit compilationUnit;
     private final CompilationUnit astRoot;
-    private final Refactorings refactorings;
+    private final ASTRewrite refactorings;
     private final ASTNodeFactory astBuilder;
     private final JavaProjectOptions options;
     private final SubMonitor monitor;
@@ -66,7 +66,7 @@ public class CompilationUnitRewrite {
         this.astRoot= astRoot;
         this.monitor= monitor;
         this.environment= environment;
-        this.refactorings= new Refactorings(astRoot, environment.getEventLoop(), monitor);
+        this.refactorings= new ASTRewrite(astRoot, environment.getEventLoop(), monitor);
         this.astBuilder= new ASTNodeFactory(refactorings);
         this.options= options;
     }
@@ -117,13 +117,13 @@ public class CompilationUnitRewrite {
     }
 
     /**
-     * Returns the {@link Refactorings} object containing the changes that must be
+     * Returns the {@link ASTRewrite} object containing the changes that must be
      * applied to the AST.
      *
-     * @return the {@link Refactorings} object containing the changes that must be
+     * @return the {@link ASTRewrite} object containing the changes that must be
      *         applied to the AST
      */
-    public Refactorings getRefactorings() {
+    public ASTRewrite getASTRewrite() {
         return refactorings;
     }
 

@@ -28,10 +28,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -98,17 +98,17 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
     private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
             if (ASTNodes.canHaveSiblings(breakStatement)) {
-                r.remove(breakStatement);
+                rewrite.remove(breakStatement);
             } else {
-                r.replace(breakStatement, b.block());
+                rewrite.replace(breakStatement, b.block());
             }
         }
 
-        r.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
+        rewrite.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 
     private static class BreakVisitor extends InterruptibleVisitor {

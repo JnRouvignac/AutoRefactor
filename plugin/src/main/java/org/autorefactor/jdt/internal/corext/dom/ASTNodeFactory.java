@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
@@ -143,14 +144,14 @@ public class ASTNodeFactory {
     }
 
     private final AST ast;
-    private final Refactorings refactorings;
+    private final ASTRewrite refactorings;
 
     /**
      * Class constructor.
      *
      * @param refactorings the cleanups
      */
-    public ASTNodeFactory(final Refactorings refactorings) {
+    public ASTNodeFactory(final ASTRewrite refactorings) {
         this.refactorings= refactorings;
         this.ast= refactorings.getAST();
     }

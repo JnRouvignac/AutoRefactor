@@ -128,8 +128,8 @@ public class MapCleanUp extends AbstractCleanUpRule {
             ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
                 ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
-                cuRewrite.getRefactorings().remove(nodeToRemove);
+                cuRewrite.getASTRewrite().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
+                cuRewrite.getASTRewrite().remove(nodeToRemove);
                 setResult(false);
                 return false;
             }

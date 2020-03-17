@@ -169,7 +169,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             while (m.find()) {
                 int startPos= entry.getValue().getStartPosition();
                 SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-                this.cuRewrite.getRefactorings().remove(toRemove);
+                cuRewrite.getASTRewrite().remove(toRemove);
                 result= false;
             }
         }

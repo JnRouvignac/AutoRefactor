@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -244,8 +244,8 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
         private void replaceString(final Type type, final Expression initializer, final Set<SimpleName> assignmentWrites,
                 final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             Class<?> builder;
             if (getJavaMinorVersion() >= 5) {
@@ -254,14 +254,14 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                 builder= StringBuffer.class;
             }
 
-            r.replace(type, b.type(builder.getSimpleName()));
+            rewrite.replace(type, b.type(builder.getSimpleName()));
 
             StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
             if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-                r.replace(initializer, b.new0(builder.getSimpleName()));
+                rewrite.replace(initializer, b.new0(builder.getSimpleName()));
             } else {
-                r.replace(initializer, b.new0(builder.getSimpleName(), b.createMoveTarget(initializer)));
+                rewrite.replace(initializer, b.new0(builder.getSimpleName(), b.createMoveTarget(initializer)));
             }
 
             for (SimpleName simpleName : assignmentWrites) {
@@ -282,7 +282,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                     newExpression= b.invoke(newExpression, "append", b.createMoveTarget((Expression) operand)); //$NON-NLS-1$
                 }
 
-                r.replace(assignment, newExpression);
+                rewrite.replace(assignment, newExpression);
             }
 
             for (SimpleName simpleName : concatenationWrites) {
@@ -297,10 +297,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                     }
                 }
 
-                r.replace(assignment, newExpression);
+                rewrite.replace(assignment, newExpression);
             }
 
-            r.replace(finalRead, b.invoke(b.createMoveTarget(finalRead), "toString")); //$NON-NLS-1$
+            rewrite.replace(finalRead, b.invoke(b.createMoveTarget(finalRead), "toString")); //$NON-NLS-1$
         }
 
         private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

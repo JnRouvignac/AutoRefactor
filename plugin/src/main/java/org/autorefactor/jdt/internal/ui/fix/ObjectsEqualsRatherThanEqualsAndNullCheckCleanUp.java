@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -227,10 +227,10 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private void replaceEquals(final IfStatement node, final Expression firstField, final Expression secondField,
             final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.replace(node,
+        rewrite.replace(node,
                 b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
                         "equals", b.createMoveTarget(firstField), b.createMoveTarget(secondField))), b.block(b.createMoveTarget(returnStmt1)))); //$NON-NLS-1$
     }

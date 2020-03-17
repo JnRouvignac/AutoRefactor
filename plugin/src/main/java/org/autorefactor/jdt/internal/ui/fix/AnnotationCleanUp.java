@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -78,17 +78,17 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final NormalAnnotation node) {
-        Refactorings r= this.cuRewrite.getRefactorings();
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         List<MemberValuePair> values= ASTNodes.values(node);
         if (values.isEmpty()) {
-            r.replace(node, b.markerAnnotation(b.createMoveTarget(node.getTypeName())));
+            rewrite.replace(node, b.markerAnnotation(b.createMoveTarget(node.getTypeName())));
             return false;
         }
         if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-                r.replace(node, b.singleValueAnnotation(b.createMoveTarget(node.getTypeName()), b.createMoveTarget(pair.getValue())));
+                rewrite.replace(node, b.singleValueAnnotation(b.createMoveTarget(node.getTypeName()), b.createMoveTarget(pair.getValue())));
                 return false;
             }
         }
@@ -98,13 +98,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         for (MemberValuePair pair : values) {
             IMethodBinding elementBinding= elements.get(pair.getName().getIdentifier());
             if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
-                r.remove(pair);
+                rewrite.remove(pair);
                 result= false;
             } else if (pair.getValue().getNodeType() == ASTNode.ARRAY_INITIALIZER) {
                 ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
                 List<Expression> exprs= ASTNodes.expressions(arrayInit);
                 if (exprs.size() == 1) {
-                    r.replace(arrayInit, b.createMoveTarget(exprs.get(0)));
+                    rewrite.replace(arrayInit, b.createMoveTarget(exprs.get(0)));
                     result= false;
                 }
             }

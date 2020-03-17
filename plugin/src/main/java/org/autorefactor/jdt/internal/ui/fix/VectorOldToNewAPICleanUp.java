@@ -29,9 +29,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.Vector;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
@@ -100,8 +100,8 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        cuRewrite.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
     }
 
     private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
@@ -109,11 +109,11 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         assertSize(args, 1);
         Expression arg0= args.get(0);
 
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
         if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            r.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.createMoveTarget(arg0)));
+            rewrite.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.createMoveTarget(arg0)));
         }
     }
 
@@ -123,9 +123,9 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         Expression arg1= args.get(1);
 
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
-        r.moveToIndex(arg1, 0, b.createMoveTarget(arg1));
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        rewrite.moveToIndex(arg1, 0, b.createMoveTarget(arg1));
     }
 
     private void assertSize(final List<Expression> args, final int expectedSize) {

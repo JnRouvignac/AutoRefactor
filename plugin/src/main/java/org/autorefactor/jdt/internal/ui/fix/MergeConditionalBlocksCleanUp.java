@@ -27,10 +27,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -96,8 +96,8 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStatements, final boolean isPositive) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Expression additionalCondition;
         if (isPositive) {
@@ -106,13 +106,13 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             additionalCondition= b.negate(subNode.getExpression(), Copy.COPY);
         }
 
-        r.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(firstCondition)),
+        rewrite.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(firstCondition)),
                 InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
 
         if (remainingStatements != null) {
-            r.replace(subNode, b.createMoveTarget(remainingStatements));
+            rewrite.replace(subNode, b.createMoveTarget(remainingStatements));
         } else {
-            r.remove(subNode);
+            rewrite.remove(subNode);
         }
     }
 }

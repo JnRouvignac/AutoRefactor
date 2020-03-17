@@ -32,12 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.IllegalArgumentException;
@@ -273,7 +273,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getThenExpression(), node.getElseExpression());
 
             if (newE != null) {
-                cuRewrite.getRefactorings().replace(node, newE);
+                cuRewrite.getASTRewrite().replace(node, newE);
                 return false;
             }
         }
@@ -285,8 +285,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         ReturnStatement newRs= getReturnStatement(node, thenRs.getExpression(), elseRs.getExpression());
 
         if (newRs != null) {
-            cuRewrite.getRefactorings().replace(node, newRs);
-            cuRewrite.getRefactorings().remove(elseRs);
+            cuRewrite.getASTRewrite().replace(node, newRs);
+            cuRewrite.getASTRewrite().remove(elseRs);
             return false;
         }
 
@@ -302,8 +302,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 newRs= getReturnStatement(node, thenBool, elseBool, thenRs.getExpression(), elseRs.getExpression());
 
                 if (newRs != null) {
-                    cuRewrite.getRefactorings().replace(node, newRs);
-                    cuRewrite.getRefactorings().remove(elseRs);
+                    cuRewrite.getASTRewrite().replace(node, newRs);
+                    cuRewrite.getASTRewrite().remove(elseRs);
                     return false;
                 }
             }
@@ -352,8 +352,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     rightHandSide);
 
             if (newE != null) {
-                cuRewrite.getRefactorings().replace(rightHandSide, newE);
-                cuRewrite.getRefactorings().remove(node);
+                cuRewrite.getASTRewrite().replace(rightHandSide, newE);
+                cuRewrite.getASTRewrite().remove(node);
                 return false;
             }
         }
@@ -541,14 +541,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
                 if (ASTNodes.match(matcher2, copyStatement, node.getElseStatement())) {
-                    Refactorings r = cuRewrite.getRefactorings();
+                    ASTRewrite rewrite = cuRewrite.getASTRewrite();
 
                     copyStatement.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
 
                     if (!ASTNodes.canHaveSiblings(node)) {
                         // Make sure to keep curly braces if the node is an else statement
-                        r.replace(node, copyStatement);
+                        rewrite.replace(node, copyStatement);
                         return false;
                     }
 
@@ -556,10 +556,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                         List<Statement> statementsToMove= ASTNodes.asList(copyStatement);
 
                         for (int i= statementsToMove.size() - 1; i > 0; i--) {
-                            r.insertAfter(statementsToMove.get(i), node);
+                            rewrite.insertAfter(statementsToMove.get(i), node);
                         }
 
-                        r.replace(node, statementsToMove.get(0));
+                        rewrite.replace(node, statementsToMove.get(0));
                         return false;
                     }
                 }

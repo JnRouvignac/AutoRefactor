@@ -30,11 +30,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -99,12 +99,12 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                         return maybeInlineBlock(node, node.getFinally());
                     }
 
-                    Refactorings r= cuRewrite.getRefactorings();
+                    ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                     if (ASTNodes.canHaveSiblings(node)) {
-                        r.remove(node);
+                        rewrite.remove(node);
                     } else {
-                        r.replace(node, cuRewrite.getASTBuilder().block());
+                        rewrite.replace(node, cuRewrite.getASTBuilder().block());
                     }
 
                     setResult(false);
@@ -118,7 +118,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         @Override
         public boolean visit(final IfStatement node) {
             if (getResult()) {
-                Refactorings r= cuRewrite.getRefactorings();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 Statement thenStatement= node.getThenStatement();
                 Statement elseStatement= node.getElseStatement();
@@ -136,9 +136,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     }
 
                     if (ASTNodes.canHaveSiblings(node)) {
-                        r.remove(node);
+                        rewrite.remove(node);
                     } else {
-                        r.replace(node, cuRewrite.getASTBuilder().block());
+                        rewrite.replace(node, cuRewrite.getASTBuilder().block());
                     }
 
                     setResult(false);
@@ -200,19 +200,19 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-            r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
+            rewrite.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
-            r.replace(sourceNode, b.createMoveTarget(unconditionnalStatement));
+            rewrite.replace(sourceNode, b.createMoveTarget(unconditionnalStatement));
         }
     }
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
         if (ASTNodes.canHaveSiblings(astNode)) {
-            this.cuRewrite.getRefactorings().remove(ASTNodes.getNextSiblings(astNode));
+            cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode));
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
         } else if (astNode.getParent() instanceof TryStatement) {
             removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

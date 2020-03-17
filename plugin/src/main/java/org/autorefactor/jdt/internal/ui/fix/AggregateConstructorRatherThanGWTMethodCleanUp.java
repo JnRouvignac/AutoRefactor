@@ -36,9 +36,9 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -147,12 +147,12 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             if (ASTNodes.usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ //$NON-NLS-2$
                     || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ //$NON-NLS-2$
                             Class.class.getCanonicalName() + generic)) {
-                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-                Refactorings r= this.cuRewrite.getRefactorings();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 Type type= b.getAST().newParameterizedType(
                         b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName()));
-                r.replace(node, b.new0(type, b.createMoveTarget(arg)));
+                rewrite.replace(node, b.new0(type, b.createMoveTarget(arg)));
                 importsToAdd.add(EnumMap.class.getCanonicalName());
                 return false;
             }
@@ -165,12 +165,12 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
         if (ASTNodes.usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ //$NON-NLS-2$
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             Type type= b.getAST().newParameterizedType(b.type(
                     classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass)); //$NON-NLS-1$ //$NON-NLS-2$
-            r.replace(node, b.new0(type));
+            rewrite.replace(node, b.new0(type));
             importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
             return false;
         }

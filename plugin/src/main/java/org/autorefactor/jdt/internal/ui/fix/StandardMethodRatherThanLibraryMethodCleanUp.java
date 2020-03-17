@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
@@ -103,7 +103,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         Name javaUtilObjects= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
@@ -119,18 +119,18 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ //$NON-NLS-2$
                 || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
                         Object.class.getCanonicalName())) {
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            r.replace(node, b.invoke(javaUtilObjects, "equals", b.createMoveTarget((Expression) node.arguments().get(0)), //$NON-NLS-1$
+            rewrite.replace(node, b.invoke(javaUtilObjects, "equals", b.createMoveTarget((Expression) node.arguments().get(0)), //$NON-NLS-1$
                     b.createMoveTarget((Expression) node.arguments().get(1))));
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
         if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            r.replace(node,
+            rewrite.replace(node,
                     b.invoke(javaUtilObjects, "toString", b.createMoveTarget((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ //$NON-NLS-2$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
@@ -138,21 +138,21 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
         if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
+            rewrite.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
         if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (node.getExpression() != null) {
-                r.replace(node.getExpression(), javaUtilObjects);
-                r.replace(node.getName(), b.simpleName("hash")); //$NON-NLS-1$
+                rewrite.replace(node.getExpression(), javaUtilObjects);
+                rewrite.replace(node.getName(), b.simpleName("hash")); //$NON-NLS-1$
             } else {
-                r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
+                rewrite.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
             }
 
             importsToAdd.add(Objects.class.getCanonicalName());
@@ -167,17 +167,17 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 || ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         Object[].class.getCanonicalName())) {
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             List<Expression> copyOfArgs= copyArguments(b, node);
 
             if (copyOfArgs.size() <= 2) {
-                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs)); //$NON-NLS-1$
+                rewrite.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs)); //$NON-NLS-1$
             } else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier= b.lambda();
                 messageSupplier
                         .setBody(b.invoke(b.simpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
-                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
+                rewrite.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
             } else {
                 return true;
             }
@@ -200,9 +200,9 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private void replaceUtilClass(final MethodInvocation node, final Set<String> importsToAdd,
             final Name javaUtilObjects) {
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.replace(node.getExpression(), javaUtilObjects);
+        rewrite.replace(node.getExpression(), javaUtilObjects);
         importsToAdd.add(Objects.class.getCanonicalName());
     }
 }

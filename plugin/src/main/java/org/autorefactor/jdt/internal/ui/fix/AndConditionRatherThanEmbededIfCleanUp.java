@@ -27,9 +27,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
@@ -82,12 +82,12 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     }
 
     private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 b.parenthesizeIfNeeded(b.createMoveTarget(innerIf.getExpression())));
-        r.replace(innerIf.getExpression(), ie);
-        r.replace(outerIf, b.createMoveTarget(innerIf));
+        rewrite.replace(innerIf.getExpression(), ie);
+        rewrite.replace(outerIf, b.createMoveTarget(innerIf));
     }
 }

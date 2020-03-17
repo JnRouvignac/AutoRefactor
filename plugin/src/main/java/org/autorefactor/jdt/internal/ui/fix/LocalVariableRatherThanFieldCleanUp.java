@@ -28,9 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -178,8 +178,8 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         boolean isFieldKept= field.fragments().size() != 1;
 
@@ -204,14 +204,14 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        r.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
+        rewrite.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
                 newDeclareStatement);
 
         if (isFieldKept) {
-            r.remove(fragment);
-            r.replace(field.getType(), b.createCopyTarget(field.getType()));
+            rewrite.remove(fragment);
+            rewrite.replace(field.getType(), b.createCopyTarget(field.getType()));
         } else {
-            r.remove(field);
+            rewrite.remove(field);
         }
     }
 

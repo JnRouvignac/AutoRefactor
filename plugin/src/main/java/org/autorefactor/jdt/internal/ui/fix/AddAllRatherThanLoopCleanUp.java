@@ -195,7 +195,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
             final MethodInvocation mi, final Set<String> classesToUseWithImport) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getRefactorings().replace(node,
+        cuRewrite.getASTRewrite().replace(node,
                 b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
                         "addAll", mi.getExpression() != null ? b.createMoveTarget(mi.getExpression()) : b.this0(), //$NON-NLS-1$
                         b.createMoveTarget(iterable))));
@@ -265,6 +265,6 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             newMethod= b.invoke(methodName, b.createMoveTarget(data));
         }
 
-        cuRewrite.getRefactorings().replace(toReplace, b.toStatement(newMethod));
+        cuRewrite.getASTRewrite().replace(toReplace, b.toStatement(newMethod));
     }
 }

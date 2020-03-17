@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -196,10 +196,10 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             node.accept(refactoringClass);
 
             if (!refactoringClass.getImportsToAdd().isEmpty()) {
-                Refactorings r= cuRewrite.getRefactorings();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 for (String importToAdd : refactoringClass.getImportsToAdd()) {
-                    r.getImportRewrite().addImport(importToAdd);
+                    rewrite.getImportRewrite().addImport(importToAdd);
                 }
 
                 return false;

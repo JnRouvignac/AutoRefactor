@@ -29,9 +29,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -99,9 +99,9 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     private void addStaticModifier(final Modifier finalModifier) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.insertBefore(b.static0(), finalModifier);
+        rewrite.insertBefore(b.static0(), finalModifier);
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {

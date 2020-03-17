@@ -136,10 +136,10 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
             integers.insert(position, '_');
             position= position - 3;
         }
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         NumberLiteral replacement= b.number(integers + suffix);
-        cuRewrite.getRefactorings().replace(node, replacement);
+        cuRewrite.getASTRewrite().replace(node, replacement);
     }
 
     private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,

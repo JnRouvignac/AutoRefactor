@@ -252,7 +252,7 @@ public class ASTCommentRewriter {
         TreeSet<Integer> lineStarts= new TreeSet<>();
         lineStarts.add(0);
 
-        Matcher matcher= Pattern.compile("\\r\\n|\\r|\\n").matcher(source); //$NON-NLS-1$
+        Matcher matcher= Pattern.compile("\\rewrite\\n|\\rewrite|\\n").matcher(source); //$NON-NLS-1$
         while (matcher.find()) {
             lineStarts.add(matcher.end());
         }

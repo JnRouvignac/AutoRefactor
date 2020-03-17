@@ -33,11 +33,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -343,7 +343,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             addCaseWithStatements(switchStatement, null, ASTNodes.asList(remainingStatement));
         }
 
-        cuRewrite.getRefactorings().replace(node, switchStatement);
+        cuRewrite.getASTRewrite().replace(node, switchStatement);
     }
 
     private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
@@ -503,8 +503,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Statement caseKept;
         if (merge == Merge.BEFORE_SWITCH_CASES) {
@@ -514,8 +514,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         for (SwitchCase caseToMove : sectionToRemove.existingCases) {
-            r.insertBefore(b.createMoveTarget(caseToMove), caseKept);
+            rewrite.insertBefore(b.createMoveTarget(caseToMove), caseKept);
         }
-        r.remove(sectionToRemove.statements);
+        rewrite.remove(sectionToRemove.statements);
     }
 }

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -66,7 +67,7 @@ public interface RefactoringRule {
      * @param astRoot the compilation unit to refactor
      * @return all the determined cleanups
      */
-    Refactorings getRefactorings(CompilationUnit astRoot);
+    ASTRewrite getRefactorings(CompilationUnit astRoot);
 
     /**
      * True if the cleanup is pre-configured.

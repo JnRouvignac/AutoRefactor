@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Block;
@@ -97,7 +97,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
         int caseIndexWithDefault= -1;
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         for (Object object : statements) {
             Statement statement= (Statement) object;
@@ -175,7 +175,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
             final ASTNodeFactory b) {
         int localCaseIndexWithDefault= caseIndexWithDefault;
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Expression discriminant= node.getExpression();
         Statement currentBlock= null;
@@ -216,7 +216,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        r.replace(node, currentBlock);
+        rewrite.replace(node, currentBlock);
     }
 
     private Expression buildEquality(final ASTNodeFactory b, final Expression discriminant, final Expression value) {

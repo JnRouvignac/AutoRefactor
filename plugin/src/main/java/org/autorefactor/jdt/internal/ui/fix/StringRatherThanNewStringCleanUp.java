@@ -72,7 +72,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
                 ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
+                cuRewrite.getASTRewrite().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
                 return false;
             }
         }

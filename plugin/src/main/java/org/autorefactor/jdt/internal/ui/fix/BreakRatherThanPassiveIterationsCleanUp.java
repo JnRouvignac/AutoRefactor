@@ -29,10 +29,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -270,12 +270,12 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (ifStatement.getThenStatement() instanceof Block) {
-            r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));
+            rewrite.insertAfter(b.break0(), assignments.get(assignments.size() - 1));
         } else {
-            r.replace(ifStatement.getThenStatement(), b.block(b.createMoveTarget(ifStatement.getThenStatement()), b.break0()));
+            rewrite.replace(ifStatement.getThenStatement(), b.block(b.createMoveTarget(ifStatement.getThenStatement()), b.break0()));
         }
     }
 }

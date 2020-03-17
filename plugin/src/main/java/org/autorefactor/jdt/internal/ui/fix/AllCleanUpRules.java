@@ -150,9 +150,9 @@ public final class AllCleanUpRules {
 
     private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
         List<RefactoringRule> results= new ArrayList<>(refactorings.length);
-        for (RefactoringRule r : refactorings) {
-            if (r != null) {
-                results.add(r);
+        for (RefactoringRule rewrite : refactorings) {
+            if (rewrite != null) {
+                results.add(rewrite);
             }
         }
 

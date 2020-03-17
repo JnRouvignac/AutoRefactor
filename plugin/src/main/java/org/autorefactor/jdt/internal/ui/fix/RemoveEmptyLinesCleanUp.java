@@ -30,7 +30,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -80,7 +80,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     public boolean visit(final CompilationUnit node) {
         lineEnds.clear();
 
-        String source= this.cuRewrite.getSource(node);
+        String source= cuRewrite.getSource(node);
         if (source.isEmpty()) {
             // Empty file, bail out
             return true;
@@ -88,11 +88,11 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
         computeLineEnds(node);
 
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         int index= getIndexOfFirstNonWhitespaceChar(source, 0);
         if (index != -1) {
-            r.remove(SourceLocation.fromPositions(0, index));
+            rewrite.remove(SourceLocation.fromPositions(0, index));
             return false;
         }
 
@@ -114,7 +114,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         while (m.find()) {
             String matchedString= m.group(0);
             if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                r.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
+                rewrite.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
                 result= false;
             }
         }
@@ -130,7 +130,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         Matcher endOfFileMatcher= Pattern.compile(newline + "(" + "\\s*?" + "(" + newline + "\\s*?)+)").matcher(source) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 .region(afterLastNonWsIndex, source.length());
         if (endOfFileMatcher.find()) {
-            r.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));
+            rewrite.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));
             return false;
         }
 
@@ -196,7 +196,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visit(final AbstractTypeDeclaration node) {
-        String source= this.cuRewrite.getSource(node);
+        String source= cuRewrite.getSource(node);
         int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -214,7 +214,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         int pos= node.getStartPosition();
         do {
             int firstCurly= source.indexOf('{', pos);
-            if (!this.cuRewrite.isInComment(firstCurly)) {
+            if (!cuRewrite.isInComment(firstCurly)) {
                 return firstCurly;
             }
             pos= firstCurly + 1;
@@ -228,12 +228,12 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             return true;
         }
         int openingCurlyIndex= body.getStartPosition();
-        return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || (!maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body));
+        return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || !maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body);
     }
 
     @Override
     public boolean visit(final Block node) {
-        String source= this.cuRewrite.getSource(node);
+        String source= cuRewrite.getSource(node);
         int openingCurlyIndex= node.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -244,7 +244,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visitNodeWithClosingCurly(final ASTNode node) {
-        String source= this.cuRewrite.getSource(node);
+        String source= cuRewrite.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
         return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
     }
@@ -269,7 +269,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             boolean isEqualToNewline= matcher.matches();
             if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
                 SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
-                this.cuRewrite.getRefactorings().remove(toRemove);
+                cuRewrite.getASTRewrite().remove(toRemove);
                 return true;
             }
         }

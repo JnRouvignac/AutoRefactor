@@ -27,11 +27,11 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -87,8 +87,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
                     if (isConditionValid(condition, container)) {
                         ASTNodeFactory b= cuRewrite.getASTBuilder();
-                        Refactorings r= cuRewrite.getRefactorings();
-                        r.replace(node, b.createMoveTarget(statements.get(0)));
+                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                        rewrite.replace(node, b.createMoveTarget(statements.get(0)));
                         return false;
                     }
 
@@ -183,15 +183,15 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
     private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (operands.size() == 2) {
-            r.replace(condition, b.createMoveTarget(operands.get(0)));
+            rewrite.replace(condition, b.createMoveTarget(operands.get(0)));
         } else {
             operands.remove(operands.size() - 1);
             InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.createMoveTarget(operands));
 
-            r.replace(condition, newCondition);
+            rewrite.replace(condition, newCondition);
         }
     }
 }

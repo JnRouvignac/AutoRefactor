@@ -27,8 +27,8 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -82,19 +82,19 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             boolean isThenEmpty= isEmptyCode(node.getThenStatement());
             boolean isElseEmpty= isEmptyCode(node.getElseStatement());
 
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
                 if (ASTNodes.canHaveSiblings(node)) {
-                    r.remove(node);
+                    rewrite.remove(node);
                 } else {
-                    r.replace(node, cuRewrite.getASTBuilder().block());
+                    rewrite.replace(node, cuRewrite.getASTBuilder().block());
                 }
 
                 return false;
             }
             if (isElseEmpty) {
-                r.remove(node.getElseStatement());
+                rewrite.remove(node.getElseStatement());
                 return false;
             }
         }
@@ -146,7 +146,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final Block node) {
         if (ASTNodes.canHaveSiblings(node) && isEmptyCode(node)) {
-            this.cuRewrite.getRefactorings().remove(node);
+            cuRewrite.getASTRewrite().remove(node);
             return false;
         }
 
@@ -156,15 +156,15 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final EmptyStatement node) {
         if (isEmptyCode(node)) {
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                r.remove(node);
+                rewrite.remove(node);
                 return false;
             }
 
             if (node instanceof EmptyStatement) {
-                r.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block());
                 return false;
             }
         }
@@ -186,15 +186,15 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
         if (isEmptyCode(emptyCode)) {
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                r.remove(node);
+                rewrite.remove(node);
                 return false;
             }
 
             if (node instanceof EmptyStatement) {
-                r.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block());
                 return false;
             }
         }

@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Dimension;
@@ -134,11 +134,11 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     }
                 }
 
-                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-                Refactorings r= this.cuRewrite.getRefactorings();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 for (VariableDeclarationStatement candidate : candidates) {
-                    moveDeclaration(b, r, statement, candidate);
+                    moveDeclaration(b, rewrite, statement, candidate);
                     result= false;
                 }
             }
@@ -158,7 +158,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
         return false;
     }
 
-    private void moveDeclaration(final ASTNodeFactory b, final Refactorings r, final Statement statement,
+    private void moveDeclaration(final ASTNodeFactory b, final ASTRewrite rewrite, final Statement statement,
             final VariableDeclarationStatement varToMove) {
         VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
@@ -185,12 +185,12 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 }
             }
 
-            r.insertBefore(newDeclareStatement, statement);
-            r.replace(varToMove,
+            rewrite.insertBefore(newDeclareStatement, statement);
+            rewrite.replace(varToMove,
                     b.toStatement(b.assign(b.createCopyTarget(name), Assignment.Operator.ASSIGN, b.createMoveTarget(fragment.getInitializer()))));
         } else {
-            r.insertBefore(b.createMoveTarget(varToMove), statement);
-            r.remove(varToMove);
+            rewrite.insertBefore(b.createMoveTarget(varToMove), statement);
+            rewrite.remove(varToMove);
         }
     }
 }

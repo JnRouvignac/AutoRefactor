@@ -25,9 +25,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -86,9 +86,9 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.replace(node, b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
+        rewrite.replace(node, b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
                 b.createMoveTarget(mi.getExpression())));
     }
 }

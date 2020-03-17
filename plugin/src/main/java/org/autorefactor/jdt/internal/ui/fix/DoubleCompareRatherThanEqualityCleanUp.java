@@ -75,8 +75,8 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
     }
 
     private void replace(final InfixExpression node) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        this.cuRewrite.getRefactorings().replace(node,
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getASTRewrite().replace(node,
                 b.infixExpression(
                         b.invoke(Double.class.getSimpleName(), "compare", b.createMoveTarget(node.getLeftOperand()), b.createMoveTarget(node.getRightOperand())), //$NON-NLS-1$
                         node.getOperator(), b.number("0"))); //$NON-NLS-1$

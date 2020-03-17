@@ -127,7 +127,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression calcIndex(final Expression index, final SystemArrayCopyParams params) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         if (index instanceof SimpleName) {
             IVariableBinding idxVar= getVariableBinding(index);
@@ -164,7 +164,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression plus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -182,7 +182,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression minus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -200,7 +200,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression minusPlusOne(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -258,7 +258,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         replaceWithSystemArrayCopy(node, b.createCopyTarget(params.srcArrayExpression), params.srcPos,
                 b.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
         return false;
@@ -266,14 +266,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithSystemArrayCopy(final ForStatement node, final Expression srcArrayExpression, final Expression srcPos,
             final Expression destArrayExpression, final Expression destPos, final Expression length) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         TryStatement tryS= b.try0(
                 b.block(b
                         .toStatement(b.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
                 b.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
                         b.throw0(b.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
-        this.cuRewrite.getRefactorings().replace(node, tryS);
+        cuRewrite.getASTRewrite().replace(node, tryS);
     }
 
     private void collectUniqueIndex(final ForStatement node, final SystemArrayCopyParams params) {

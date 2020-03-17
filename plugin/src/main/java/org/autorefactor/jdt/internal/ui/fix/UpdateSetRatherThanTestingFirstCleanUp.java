@@ -28,9 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -101,18 +101,18 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
                     && ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
-                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-                Refactorings r= this.cuRewrite.getRefactorings();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
-                    r.replace(ifStmtToReplace, b.createMoveTarget(firstStatement));
+                    rewrite.replace(ifStmtToReplace, b.createMoveTarget(firstStatement));
                 } else {
                     // There are other statements, replace the if condition with col.add() (or
                     // col.remove())
-                    r.replace(ifStmtToReplace.getExpression(),
+                    rewrite.replace(ifStmtToReplace.getExpression(),
                             negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.createMoveTarget(miAddOrRemove));
-                    r.remove(firstStatement);
+                    rewrite.remove(firstStatement);
                 }
 
                 return false;

@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
@@ -209,13 +209,13 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
         }
 
         private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             String patternName= classesToUseWithImport.contains(Pattern.class.getCanonicalName()) ? Pattern.class.getSimpleName() : Pattern.class.getCanonicalName();
             importsToAdd.add(Pattern.class.getCanonicalName());
-            r.replace(type, b.type(patternName));
-            r.replace(initializer, b.invoke(b.name(patternName), COMPILE_METHOD, b.createMoveTarget(initializer)));
+            rewrite.replace(type, b.type(patternName));
+            rewrite.replace(initializer, b.invoke(b.name(patternName), COMPILE_METHOD, b.createMoveTarget(initializer)));
 
             for (SimpleName regExUse : regExUses) {
                 MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
@@ -237,7 +237,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
                     }
                 }
 
-                r.replace(methodInvocation, newExpression);
+                rewrite.replace(methodInvocation, newExpression);
             }
         }
     }

@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.corext.dom;
+package org.autorefactor.jdt.core.dom;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +36,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
+import org.autorefactor.jdt.internal.corext.dom.ASTCommentRewriter;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
+import org.autorefactor.jdt.internal.corext.dom.SourceRewriter;
 import org.autorefactor.util.Pair;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -47,7 +50,6 @@ import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.core.dom.rewrite.TargetSourceRangeComputer;
@@ -59,13 +61,12 @@ import org.eclipse.text.edits.TextEdit;
  * Class aggregating all the refactorings performed by a cleanup rule until
  * the rule finished traversing the whole AST tree.
  */
-public class Refactorings {
+public class ASTRewrite {
     private static final String UNTOUCH_COMMENT= "untouchComment"; //$NON-NLS-1$
 
     private final EventLoop eventLoop;
     private final SubMonitor monitor;
-    private boolean hasRefactorings;
-    private final ASTRewrite rewrite;
+    private final org.eclipse.jdt.core.dom.rewrite.ASTRewrite rewrite;
     private final ImportRewrite importRewrite;
     private TextEdit edits;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache= new HashMap<>();
@@ -74,6 +75,8 @@ public class Refactorings {
     /** Nodes that cannot be visited. */
     private final Set<ASTNode> refactoredNodes= new HashSet<>();
 
+    private boolean hasRefactorings;
+
     /**
      * Builds an instance of this class.
      *
@@ -81,10 +84,10 @@ public class Refactorings {
      * @param eventLoop the event loop
      * @param monitor   TODO
      */
-    public Refactorings(final CompilationUnit astRoot, final EventLoop eventLoop, final SubMonitor monitor) {
+    public ASTRewrite(final CompilationUnit astRoot, final EventLoop eventLoop, final SubMonitor monitor) {
         this.eventLoop= eventLoop;
         this.monitor= monitor;
-        this.rewrite= ASTRewrite.create(astRoot.getAST());
+        this.rewrite= org.eclipse.jdt.core.dom.rewrite.ASTRewrite.create(astRoot.getAST());
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
             @Override
             public SourceRange computeSourceRange(final ASTNode node) {
@@ -556,7 +559,7 @@ public class Refactorings {
      *
      * @return the ASTRewrite rewrite
      */
-    public ASTRewrite getRewrite() {
+    public org.eclipse.jdt.core.dom.rewrite.ASTRewrite getRewrite() {
         return rewrite;
     }
 }

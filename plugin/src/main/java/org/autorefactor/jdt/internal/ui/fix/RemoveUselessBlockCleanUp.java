@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -93,8 +93,8 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceBlock(final Block node) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
-        r.replace(node, b.copyRange(ASTNodes.statements(node)));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(node, b.copyRange(ASTNodes.statements(node)));
     }
 }

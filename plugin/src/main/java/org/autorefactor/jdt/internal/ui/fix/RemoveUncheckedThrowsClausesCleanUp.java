@@ -72,7 +72,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
         Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
         if (!nodesToRemove.isEmpty()) {
             for (ASTNode n : nodesToRemove) {
-                cuRewrite.getRefactorings().replace(n, null);
+                cuRewrite.getASTRewrite().replace(n, null);
             }
 
             return false;

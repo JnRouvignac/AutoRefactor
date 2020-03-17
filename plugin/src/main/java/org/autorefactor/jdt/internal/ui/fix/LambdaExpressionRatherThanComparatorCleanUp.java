@@ -33,13 +33,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcher;
 import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcherRunnable;
 import org.autorefactor.jdt.internal.corext.dom.NodeMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.util.Utils;
@@ -407,7 +407,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         }
 
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Expression comparingMethod= b.invoke(b.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
@@ -423,7 +423,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             }
         }
 
-        r.replace(node, comparingMethod);
+        rewrite.replace(node, comparingMethod);
     }
 
     private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {

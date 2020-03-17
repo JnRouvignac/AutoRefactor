@@ -33,10 +33,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
@@ -127,8 +127,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         if (isFileCreation(node.getExpression())
                 && isFileUse(node.getExpression())) {
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             String pathsName= classesToUseWithImport.contains(Paths.class.getCanonicalName()) ? Paths.class.getSimpleName() : Paths.class.getCanonicalName();
             importsToAdd.add(Paths.class.getCanonicalName());
@@ -137,9 +137,9 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
             Expression copyOfPathText= b.createMoveTarget((Expression) classInstanceCreation.arguments().get(0));
 
             if (ASTNodes.usesGivenSignature(node, File.class.getCanonicalName(), TOPATH_METHOD)) {
-                r.replace(node, b.invoke(b.name(pathsName), GET_METHOD, copyOfPathText));
+                rewrite.replace(node, b.invoke(b.name(pathsName), GET_METHOD, copyOfPathText));
             } else {
-                r.replace(node, b.invoke(b.invoke(b.name(pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD));
+                rewrite.replace(node, b.invoke(b.invoke(b.name(pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD));
             }
 
             return false;
@@ -229,8 +229,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
         }
 
         private void refactorFile(final Type type, final Expression initializer, final List<SimpleName> fileUses) {
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             ClassInstanceCreation classInstanceCreation= ASTNodes.as(initializer, ClassInstanceCreation.class);
 
@@ -238,16 +238,16 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
             String pathName= classesToUseWithImport.contains(Path.class.getCanonicalName()) ? Path.class.getSimpleName() : Path.class.getCanonicalName();
             importsToAdd.add(Paths.class.getCanonicalName());
             importsToAdd.add(Path.class.getCanonicalName());
-            r.replace(type, b.type(pathName));
-            r.replace(classInstanceCreation, b.invoke(b.name(pathsName), GET_METHOD, b.createMoveTarget((Expression) classInstanceCreation.arguments().get(0))));
+            rewrite.replace(type, b.type(pathName));
+            rewrite.replace(classInstanceCreation, b.invoke(b.name(pathsName), GET_METHOD, b.createMoveTarget((Expression) classInstanceCreation.arguments().get(0))));
 
             for (SimpleName fileUse : fileUses) {
                 MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();
 
                 if (ASTNodes.usesGivenSignature(methodInvocation, File.class.getCanonicalName(), TOPATH_METHOD)) {
-                    r.replace(methodInvocation, b.createMoveTarget(fileUse));
+                    rewrite.replace(methodInvocation, b.createMoveTarget(fileUse));
                 } else {
-                    r.replace(methodInvocation, b.invoke(b.createMoveTarget(fileUse), TOURI_METHOD));
+                    rewrite.replace(methodInvocation, b.invoke(b.createMoveTarget(fileUse), TOURI_METHOD));
                 }
             }
         }

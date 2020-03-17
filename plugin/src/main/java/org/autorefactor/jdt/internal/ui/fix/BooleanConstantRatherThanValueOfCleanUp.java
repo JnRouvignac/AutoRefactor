@@ -89,6 +89,6 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
         }
 
         fa.setName(b.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-        cuRewrite.getRefactorings().replace(node, fa);
+        cuRewrite.getASTRewrite().replace(node, fa);
     }
 }

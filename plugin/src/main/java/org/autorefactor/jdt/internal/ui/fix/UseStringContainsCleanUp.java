@@ -26,9 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -106,14 +106,14 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithStringContains(final InfixExpression ie, final MethodInvocation node, final boolean negate) {
-        Refactorings r= this.cuRewrite.getRefactorings();
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
 
         if (negate) {
-            r.replace(ie, b.not(b.createMoveTarget(node)));
+            rewrite.replace(ie, b.not(b.createMoveTarget(node)));
         } else {
-            r.replace(ie, b.createMoveTarget(node));
+            rewrite.replace(ie, b.createMoveTarget(node));
         }
     }
 }

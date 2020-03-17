@@ -28,9 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -92,10 +92,10 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
-        Refactorings r= this.cuRewrite.getRefactorings();
-        r.remove(previousStatements);
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.remove(previousStatements);
 
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        r.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        rewrite.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 }

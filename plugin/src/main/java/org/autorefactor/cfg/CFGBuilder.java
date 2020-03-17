@@ -213,7 +213,7 @@ public class CFGBuilder {
         }
     }
 
-    private static final Pattern NEWLINE= Pattern.compile("\r\n|\r|\n"); //$NON-NLS-1$
+    private static final Pattern NEWLINE= Pattern.compile("\rewrite\n|\rewrite|\n"); //$NON-NLS-1$
 
     private final String source;
     private final int tabSize;

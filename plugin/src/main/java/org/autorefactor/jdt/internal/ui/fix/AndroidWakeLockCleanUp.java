@@ -26,10 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
@@ -83,29 +83,29 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
             // Check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= ASTNodes.getAncestor(node, MethodDeclaration.class);
             if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
-                Refactorings r= cuRewrite.getRefactorings();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 TypeDeclaration typeDeclaration= ASTNodes.getAncestor(enclosingMethod, TypeDeclaration.class);
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    r.remove(node.getParent());
-                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
+                    rewrite.remove(node.getParent());
+                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
                 } else {
                     // Add the missing onPause() method to the class.
-                    r.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
+                    rewrite.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
                 }
 
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             TypeDeclaration typeDeclaration= ASTNodes.getAncestor(node, TypeDeclaration.class);
             ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
+                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
                 } else {
-                    r.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
+                    rewrite.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
                             createOnPauseMethodDeclaration());
                 }
 

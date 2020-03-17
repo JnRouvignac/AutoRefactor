@@ -130,7 +130,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
             invocation= b.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
         }
 
-        cuRewrite.getRefactorings().replace(cic, invocation);
+        cuRewrite.getASTRewrite().replace(cic, invocation);
         importsToAdd.add(EnumSet.class.getCanonicalName());
         return false;
     }

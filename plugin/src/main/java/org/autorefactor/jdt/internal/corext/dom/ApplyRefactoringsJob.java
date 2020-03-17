@@ -34,6 +34,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.autorefactor.environment.Environment;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
 import org.autorefactor.util.IllegalStateException;
@@ -251,7 +252,7 @@ public class ApplyRefactoringsJob extends Job {
                     environment);
             refactoring.setRefactoringContext(cuRewrite);
 
-            Refactorings refactorings= refactoring.getRefactorings(astRoot);
+            ASTRewrite refactorings= refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
                 // No new cleanups have been applied,
                 // We are done with applying the cleanups.

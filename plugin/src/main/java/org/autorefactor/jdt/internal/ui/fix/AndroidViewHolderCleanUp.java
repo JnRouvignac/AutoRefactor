@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.jdt.internal.corext.dom.Variable;
 import org.autorefactor.preferences.Preferences;
@@ -115,8 +115,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
             GetViewVariableVisitor visitor= new GetViewVariableVisitor();
             body.accept(visitor);
             if (visitor.canApplyRefactoring()) {
-                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-                Refactorings r= this.cuRewrite.getRefactorings();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
 
                 // Transform tree
@@ -127,7 +127,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 InfixExpression condition= b.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, b.null0());
                 Block thenBlock= b.block();
                 IfStatement ifStatement= b.if0(condition, thenBlock);
-                r.insertBefore(ifStatement, visitor.viewAssignmentStatement);
+                rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement);
                 List<Statement> thenStatements= ASTNodes.statements(thenBlock);
 
                 thenStatements.add(b.toStatement(b.assign(convertViewVar.varName(), Assignment.Operator.ASSIGN, b.createCopyTarget(visitor.getInflateExpression()))));
@@ -143,14 +143,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                                 .toStatement(b.assign(b.createCopyTarget(visitor.viewVariableName), Assignment.Operator.ASSIGN, convertViewVar.varName()));
                     }
                     if (assignConvertViewToView != null) {
-                        r.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement);
+                        rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement);
                     }
                 }
 
                 // Make sure method returns the view to be reused
                 if (visitor.returnStatement != null) {
-                    r.insertAfter(b.return0(b.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement);
-                    r.remove(visitor.returnStatement);
+                    rewrite.insertAfter(b.return0(b.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement);
+                    rewrite.remove(visitor.returnStatement);
                 }
 
                 // Optimize findViewById calls
@@ -161,11 +161,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     Variable viewHolderItemVar= new Variable("ViewHolderItem", "viewHolderItem", b); //$NON-NLS-1$ //$NON-NLS-2$
 
                     // Create ViewHolderItem class
-                    r.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
+                    rewrite.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
                             typeNameDecider), node);
 
                     // Declare viewhHolderItem object
-                    r.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement());
+                    rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement());
                     // Initialize viewHolderItem
                     thenStatements.add(
                             b.toStatement(b.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN, b.new0(viewHolderItemVar.type()))));
@@ -175,14 +175,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                         FieldAccess fieldAccess= b.fieldAccess(viewHolderItemVar.varName(),
                                 b.simpleName(item.variable.getIdentifier()));
                         // FIXME This does not work: not sure why??
-                        // r.set(item.findViewByIdInvocation,
+                        // rewrite.set(item.findViewByIdInvocation,
                         // MethodInvocation.EXPRESSION_PROPERTY, convertViewVar.varName());
                         item.findViewByIdInvocation.setExpression(convertViewVar.varName());
                         // FIXME For some reason b.copy() does not do what we would like
                         thenStatements.add(b.toStatement(b.assign(fieldAccess, Assignment.Operator.ASSIGN, b.copySubtree(item.findViewByIdExpression))));
 
                         // Replace previous findViewById with accesses to viewHolderItem
-                        r.replace(item.findViewByIdExpression, b.createCopyTarget(fieldAccess));
+                        rewrite.replace(item.findViewByIdExpression, b.createCopyTarget(fieldAccess));
                     }
                     // Store viewHolderItem in convertView
                     thenStatements.add(b.toStatement(b.invoke("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,7 +191,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     ifStatement.setElseStatement(b.block(b.toStatement(b.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
                             b.cast(viewHolderItemVar.type(), b.invoke("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                r.remove(visitor.viewAssignmentStatement);
+                rewrite.remove(visitor.viewAssignmentStatement);
                 return false;
             }
         }
@@ -201,7 +201,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
     private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
             final TypeNameDecider typeNameDecider) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         TypeDeclaration result= b.getAST().newTypeDeclaration();
         ASTNodes.modifiers(result).addAll(Arrays.asList(b.private0(), b.static0()));
         result.setName(typeName);

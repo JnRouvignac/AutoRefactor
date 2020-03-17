@@ -115,7 +115,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
             final InfixExpression.Operator operator) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        this.cuRewrite.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getASTRewrite().replace(node, b.infixExpression(b.createMoveTarget(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
     }
 }

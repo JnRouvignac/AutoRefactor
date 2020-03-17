@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -117,7 +117,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
             if (lastExpression instanceof ClassInstanceCreation) {
                 // Replace with String concatenation
-                this.cuRewrite.getRefactorings().replace(node, createStringConcats(allAppendedStrings));
+                cuRewrite.getASTRewrite().replace(node, createStringConcats(allAppendedStrings));
                 return false;
             }
         }
@@ -157,11 +157,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     return maybeReplaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
                 }
 
-                Refactorings r= cuRewrite.getRefactorings();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
-                    r.remove(node.getParent());
+                    rewrite.remove(node.getParent());
                 } else {
-                    r.replace(node.getParent(), cuRewrite.getASTBuilder().block());
+                    rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().block());
                 }
 
                 return false;
@@ -315,7 +315,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
-                        iter.set(Pair.<ITypeBinding, Expression>of(null, this.cuRewrite.getAST().newThisExpression()));
+                        iter.set(Pair.<ITypeBinding, Expression>of(null, cuRewrite.getAST().newThisExpression()));
                     }
 
                     isRefactoringNeeded.set(true);
@@ -357,7 +357,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceWithNewStringAppends(final Expression node,
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
             final boolean isInstanceCreationToRewrite) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         Expression result= null;
         List<Expression> tempStringLiterals= new ArrayList<>();
@@ -407,7 +407,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        cuRewrite.getRefactorings().replace(node, result);
+        cuRewrite.getASTRewrite().replace(node, result);
         return false;
     }
 
@@ -447,7 +447,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Expression stringVar= b.createCopyTarget(embeddedMI.getExpression());
         List<Expression> args= ASTNodes.arguments(embeddedMI);
         Expression arg0= b.createCopyTarget(args.get(0));
@@ -461,7 +461,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             newAppendSubstring= b.invoke(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
         }
 
-        this.cuRewrite.getRefactorings().replace(node, newAppendSubstring);
+        cuRewrite.getASTRewrite().replace(node, newAppendSubstring);
     }
 
     private boolean isStringBuilderOrBuffer(final Expression expression) {
@@ -526,7 +526,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
 
             if (replaceNeeded) {
-                this.cuRewrite.getRefactorings().replace(node, createStringConcats(allOperands));
+                cuRewrite.getASTRewrite().replace(node, createStringConcats(allOperands));
                 return false;
             }
         }
@@ -558,7 +558,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         switch (appendedStrings.size()) {
         case 0:
             return b.string(""); //$NON-NLS-1$

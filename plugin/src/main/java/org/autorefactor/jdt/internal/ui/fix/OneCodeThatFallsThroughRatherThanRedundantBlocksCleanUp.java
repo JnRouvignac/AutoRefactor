@@ -28,10 +28,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
@@ -166,12 +166,12 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                     }
 
                     if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
-                        Refactorings r= cuRewrite.getRefactorings();
+                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                         if (redundantStatement instanceof Block) {
-                            r.remove(stmtsToCompare);
+                            rewrite.remove(stmtsToCompare);
                         } else {
-                            r.replace(redundantStatement, b.block());
+                            rewrite.replace(redundantStatement, b.block());
                         }
 
                         setResult(false);

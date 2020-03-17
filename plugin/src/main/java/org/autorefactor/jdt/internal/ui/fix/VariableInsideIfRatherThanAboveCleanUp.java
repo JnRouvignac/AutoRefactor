@@ -27,10 +27,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -149,17 +149,17 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 
         private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
                 final List<Statement> statements) {
-            Refactorings r= this.cuRewrite.getRefactorings();
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             if (statement instanceof Block) {
-                r.insertBefore(b.createMoveTarget(variableAssignment), statements.get(0));
-                r.remove(variableAssignment);
+                rewrite.insertBefore(b.createMoveTarget(variableAssignment), statements.get(0));
+                rewrite.remove(variableAssignment);
             } else {
                 List<Statement> copyOfThenStatements= b.createMoveTarget(statements);
                 copyOfThenStatements.add(0, b.createMoveTarget(variableAssignment));
                 Block block= b.block(copyOfThenStatements);
-                r.replace(statement, block);
+                rewrite.replace(statement, block);
             }
         }
     }

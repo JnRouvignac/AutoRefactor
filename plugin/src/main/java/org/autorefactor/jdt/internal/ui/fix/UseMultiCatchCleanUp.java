@@ -36,10 +36,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
@@ -320,15 +320,15 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 CatchClause catchClause2= catchClauses.get(j);
                 MergeDirection direction= mergeDirection(typeBindings, i, j);
                 if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
-                    Refactorings r= this.cuRewrite.getRefactorings();
+                    ASTRewrite rewrite= cuRewrite.getASTRewrite();
                     UnionType ut= unionTypes(catchClause1.getException().getType(),
                             catchClause2.getException().getType());
                     if (MergeDirection.UP.equals(direction)) {
-                        r.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
-                        r.remove(catchClause2);
+                        rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                        rewrite.remove(catchClause2);
                     } else if (MergeDirection.DOWN.equals(direction)) {
-                        r.remove(catchClause1);
-                        r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                        rewrite.remove(catchClause1);
+                        rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
                     }
 
                     return false;
@@ -417,8 +417,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        UnionType result= this.cuRewrite.getAST().newUnionType();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        UnionType result= cuRewrite.getAST().newUnionType();
         List<Type> unionedTypes= ASTNodes.types(result);
         unionedTypes.addAll(b.createMoveTarget(allTypes));
         return result;

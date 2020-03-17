@@ -28,9 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -94,7 +94,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
             final InfixExpression message) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         StringBuilder messageBuilder= new StringBuilder();
         List<Expression> params= new LinkedList<>();
@@ -135,7 +135,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
             final StringBuilder messageBuilder, final List<Expression> params) {
         params.add(0, b.string(messageBuilder.toString()));
 
-        Refactorings r= this.cuRewrite.getRefactorings();
-        r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, params));
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, params));
     }
 }

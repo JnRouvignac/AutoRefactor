@@ -26,10 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -95,7 +95,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         public boolean visit(final ReturnStatement node) {
             if (getResult()) {
                 Statement previousSibling= ASTNodes.getPreviousSibling(node);
-                if (!cuRewrite.getRefactorings().hasBeenRefactored(previousSibling)
+                if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
                         && previousSibling instanceof VariableDeclarationStatement) {
                     VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
                     VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
@@ -174,17 +174,17 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStatement) {
-            Refactorings r= cuRewrite.getRefactorings();
-            r.remove(previousSibling);
-            r.replace(node, newReturnStatement);
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.remove(previousSibling);
+            rewrite.replace(node, newReturnStatement);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpression) {
             ASTNodeFactory b= cuRewrite.getASTBuilder();
-            Refactorings r= cuRewrite.getRefactorings();
-            r.remove(previousSibling);
-            r.replace(node, b.return0(b.createMoveTarget(returnExpression)));
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.remove(previousSibling);
+            rewrite.replace(node, b.return0(b.createMoveTarget(returnExpression)));
         }
     }
 }

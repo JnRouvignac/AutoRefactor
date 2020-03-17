@@ -25,10 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -235,20 +235,20 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
         private void extractIncrement(final Expression node, final Expression variable,
                 final Statement statement) {
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory b= cuRewrite.getASTBuilder();
 
-            r.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), b.createCopyTarget(variable));
+            rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), b.createCopyTarget(variable));
 
             if (node instanceof PostfixExpression) {
                 Statement newAssignment= b.toStatement(b.createMoveTarget(node));
 
                 if (ASTNodes.canHaveSiblings(statement)) {
-                    r.insertAfter(newAssignment, statement);
+                    rewrite.insertAfter(newAssignment, statement);
                 } else {
                     Block newBlock= b.block(b.createMoveTarget(statement), newAssignment);
 
-                    r.replace(statement, newBlock);
+                    rewrite.replace(statement, newBlock);
                 }
             } else {
                 Statement newAssignment;
@@ -259,11 +259,11 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
                 }
 
                 if (ASTNodes.canHaveSiblings(statement)) {
-                    r.insertBefore(newAssignment, statement);
+                    rewrite.insertBefore(newAssignment, statement);
                 } else {
                     Block newBlock= b.block(newAssignment, b.createMoveTarget(statement));
 
-                    r.replace(statement, newBlock);
+                    rewrite.replace(statement, newBlock);
                 }
             }
 

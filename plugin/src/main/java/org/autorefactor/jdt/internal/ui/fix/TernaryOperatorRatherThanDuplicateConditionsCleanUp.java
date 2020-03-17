@@ -29,10 +29,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -148,18 +148,18 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
         }
 
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.createMoveTarget(basicExpression),
                 b.createMoveTarget(thenExpression), b.createMoveTarget(elseExpression)));
 
         if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
-            r.replace(node, newConditionalExpression);
+            rewrite.replace(node, newConditionalExpression);
         } else {
             List<Expression> operands= b.createMoveTarget(previousOperands);
             operands.add(newConditionalExpression);
             operands.addAll(b.createMoveTarget(nextOperands));
-            r.replace(node, b.infixExpression(node.getOperator(), operands));
+            rewrite.replace(node, b.infixExpression(node.getOperator(), operands));
         }
     }
 

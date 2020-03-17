@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -276,7 +276,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public Refactorings getRefactorings(final CompilationUnit astRoot) {
+    public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
 
         for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
@@ -296,11 +296,11 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         // TODO JNR remove writes when there are no reads after
         // TODO JNR remove double writes when there are no reads after
 
-        return this.cuRewrite.getRefactorings();
+        return cuRewrite.getASTRewrite();
     }
 
     private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         AST ast= b.getAST();
         ASTNode scope= varAccess.getScope();
         Name varName= varAccess.getVariableName();
@@ -314,7 +314,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                     VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
                     VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(vdf);
                     vds.setType(varType);
-                    this.cuRewrite.getRefactorings().replace(statement, vds);
+                    cuRewrite.getASTRewrite().replace(statement, vds);
                     break;
                 }
             }
@@ -327,7 +327,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
-            this.cuRewrite.getRefactorings().replace(efs, newEfs);
+            cuRewrite.getASTRewrite().replace(efs, newEfs);
         } else if (scope instanceof ForStatement) {
             ForStatement fs= (ForStatement) scope;
             ForStatement newFs= b.createCopyTarget(fs);
@@ -340,7 +340,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(vdf);
             vde.setType(varType);
             initializers.add(vde);
-            this.cuRewrite.getRefactorings().replace(fs, newFs);
+            cuRewrite.getASTRewrite().replace(fs, newFs);
             // TODO JNR
             // if (equalNotNull(fs.getBody(), parentStatement)) {
             // newFs.setBody(copy(fs.getBody()));
@@ -353,7 +353,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
-            this.cuRewrite.getRefactorings().replace(ws, newWs);
+            cuRewrite.getASTRewrite().replace(ws, newWs);
         } else if (scope instanceof IfStatement) {
             IfStatement is= (IfStatement) scope;
             IfStatement newIs= ast.newIfStatement();
@@ -373,7 +373,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 throw new IllegalStateException(is,
                         "Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
             }
-            this.cuRewrite.getRefactorings().replace(is, newIs);
+            cuRewrite.getASTRewrite().replace(is, newIs);
         } else {
             throw new NotImplementedException(scope);
         }
@@ -381,13 +381,13 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
     private Block copy(final Statement stmtToCopy, final Name varName) {
         if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
-            Block b= this.cuRewrite.getAST().newBlock();
+            Block b= cuRewrite.getAST().newBlock();
             Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
             if (a == null) {
                 throw new NotImplementedException(stmtToCopy);
             }
             VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
-            ASTNodes.statements(b).add(this.cuRewrite.getAST().newVariableDeclarationStatement(vdf));
+            ASTNodes.statements(b).add(cuRewrite.getAST().newVariableDeclarationStatement(vdf));
             return b;
         }
         // We should never come here if we had a Block statement, see the replace()
@@ -398,7 +398,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     private Type getType(final ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
             VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
-            return this.cuRewrite.getASTBuilder().createCopyTarget(vds.getType());
+            return cuRewrite.getASTBuilder().createCopyTarget(vds.getType());
         }
 
         return getType(node.getParent());
@@ -410,7 +410,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             if (a.getLeftHandSide() instanceof SimpleName) {
                 SimpleName sn= (SimpleName) a.getLeftHandSide();
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+                    ASTNodeFactory b= cuRewrite.getASTBuilder();
                     VariableDeclarationFragment vdf= b.getAST().newVariableDeclarationFragment();
                     vdf.setInitializer(b.createCopyTarget(a.getRightHandSide()));
                     vdf.setName(b.createCopyTarget(sn));
@@ -424,7 +424,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
     private void remove(final ASTNode node) {
         if (node instanceof VariableDeclarationFragment) {
-            this.cuRewrite.getRefactorings().remove(node.getParent());
+            cuRewrite.getASTRewrite().remove(node.getParent());
         } else {
             remove(node.getParent());
         }

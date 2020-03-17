@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -78,8 +78,8 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
         Expression replacement= getOppositeExpression(b, node.getOperand());
 
         if (replacement != null) {
-            Refactorings r= cuRewrite.getRefactorings();
-            r.replace(node, replacement);
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.replace(node, replacement);
             return false;
         }
 

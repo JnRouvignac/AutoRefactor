@@ -28,10 +28,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
@@ -124,15 +124,15 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 
     private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         List<Expression> copyOfOperands= b.createMoveTarget(previousOperands);
         copyOfOperands.addAll(b.createMoveTarget(nextOperands));
 
         if (copyOfOperands.size() == 1) {
-            r.replace(operandWithRedundance, copyOfOperands.get(0));
+            rewrite.replace(operandWithRedundance, copyOfOperands.get(0));
         } else {
-            r.replace(operandWithRedundance, b.infixExpression(operator, copyOfOperands));
+            rewrite.replace(operandWithRedundance, b.infixExpression(operator, copyOfOperands));
         }
     }
 }

@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -107,9 +107,9 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,
             final Expression message) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, b.createMoveTarget(message)));
+        rewrite.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, b.createMoveTarget(message)));
     }
 }

@@ -641,7 +641,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             ITypeBinding declaringClass= methodBinding.getDeclaringClass();
             QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
             if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
-                cuRewrite.getRefactorings().remove(expression);
+                cuRewrite.getASTRewrite().remove(expression);
                 return false;
             }
         }
@@ -724,7 +724,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
                         && !localIdentifiers.contains(qname.simpleName)) {
             ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
+            cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getName()));
             return false;
         }
 

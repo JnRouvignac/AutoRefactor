@@ -92,10 +92,10 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
             final Expression arg0) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
-        this.cuRewrite.getRefactorings().replace(node,
+        cuRewrite.getASTRewrite().replace(node,
                 b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget(arg0)), methodName, b.createMoveTarget(expression)));
     }
 }

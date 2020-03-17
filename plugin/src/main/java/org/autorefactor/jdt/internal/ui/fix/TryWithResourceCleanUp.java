@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
@@ -169,9 +169,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            Refactorings r= cuRewrite.getRefactorings();
-            r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
-            r.remove(nodesToRemove);
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
+            rewrite.remove(nodesToRemove);
             setResult(false);
             return false;
         }
@@ -229,11 +229,11 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory b= cuRewrite.getASTBuilder();
 
-            r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
-            r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
+            rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
+            rewrite.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
             setResult(false);
             return false;
         }

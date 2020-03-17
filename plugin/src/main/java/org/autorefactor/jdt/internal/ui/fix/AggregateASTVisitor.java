@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
@@ -300,9 +300,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
     public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
         this.cuRewrite= cuRewrite;
+
         for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
             v.setRefactoringContext(cuRewrite);
         }
+
         this.visitorsContributingRefactoring.clear();
     }
 
@@ -314,9 +316,9 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      * @return the cleanups.
      */
     @Override
-    public Refactorings getRefactorings(final CompilationUnit astRoot) {
+    public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
-        return this.cuRewrite.getRefactorings();
+        return cuRewrite.getASTRewrite();
     }
 
     /**
@@ -324,8 +326,8 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @return the cleanups.
      */
-    public Refactorings getRefactorings() {
-        return this.cuRewrite.getRefactorings();
+    public ASTRewrite getRefactorings() {
+        return cuRewrite.getASTRewrite();
     }
 
     /**
@@ -349,7 +351,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      */
     private boolean continueVisiting(final boolean continueVisiting, final ASTVisitor v, final ASTNode node) {
         if (!continueVisiting) {
-            if (!this.cuRewrite.getRefactorings().hasRefactorings()) {
+            if (!cuRewrite.getASTRewrite().hasRefactorings()) {
                 logBadlyBehavedVisitor(v, node);
             } else {
                 visitorsContributingRefactoring.add(v);

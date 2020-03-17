@@ -35,10 +35,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Variable;
@@ -242,7 +242,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     private void replaceEntryIterationByKeyIteration(final EnhancedForStatement enhancedFor, final Expression mapExpression,
             final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Refactorings r= cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
@@ -258,11 +258,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
+            rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
             Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
             Variable objectVar= new Variable(
                     new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b); //$NON-NLS-1$
-            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
+            rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
 
             // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
             // Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
@@ -272,22 +272,22 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             VariableDeclarationStatement newKeyDecl= b.declareStatement(mapKeyType, b.createMoveTarget(parameter.getName()),
                     b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
-            r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
+            rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
 
             if (keyUses > getValueMis.size()) {
                 String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
                 VariableDeclarationStatement newEntryDecl= b.declareStatement(b.type(mapEntryTypeName),
                         entryVar.varName(), b.cast(b.type(mapEntryTypeName), objectVar.varName()));
-                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
+                rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
             }
         } else {
             // for (K key : map.keySet()) => for (K key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
+            rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
             // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
             // map.entrySet())
             Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
-            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
+            rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
 
             if (keyUses > getValueMis.size()) {
                 // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
@@ -296,13 +296,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
                 VariableDeclarationStatement newKeyDeclaration= b.declareStatement(mapKeyType,
                         b.createMoveTarget(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
-                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
+                rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
             }
         }
 
         // Replace all occurrences of map.get(key) => mapEntry.getValue()
         for (MethodInvocation getValueMi : getValueMis) {
-            r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue")); //$NON-NLS-1$
+            rewrite.replace(getValueMi, b.invoke(entryVar.varName(), "getValue")); //$NON-NLS-1$
         }
     }
 

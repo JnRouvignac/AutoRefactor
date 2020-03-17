@@ -273,14 +273,14 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         copyOfLambdaExpression.parameters().add(copyOfParameter);
         copyOfLambdaExpression.setBody(b.createMoveTarget(node.getBody()));
         copyOfLambdaExpression.setParentheses(false);
-        cuRewrite.getRefactorings().replace(node, copyOfLambdaExpression);
+        cuRewrite.getASTRewrite().replace(node, copyOfLambdaExpression);
     }
 
     private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
         ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-        cuRewrite.getRefactorings().replace(node.getBody(), b.parenthesizeIfNeeded(b.createMoveTarget(returnStatement.getExpression())));
+        cuRewrite.getASTRewrite().replace(node.getBody(), b.parenthesizeIfNeeded(b.createMoveTarget(returnStatement.getExpression())));
     }
 
     private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
@@ -290,7 +290,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
         CreationReference creationRef= b.creationRef();
         creationRef.setType(b.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
-        cuRewrite.getRefactorings().replace(node, creationRef);
+        cuRewrite.getASTRewrite().replace(node, creationRef);
     }
 
     private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
@@ -298,7 +298,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
         SuperMethodReference creationRef= b.superMethodRef();
         creationRef.setName(b.createMoveTarget(ci.getName()));
-        cuRewrite.getRefactorings().replace(node, creationRef);
+        cuRewrite.getASTRewrite().replace(node, creationRef);
     }
 
     private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
@@ -309,7 +309,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         TypeMethodReference typeMethodRef= b.typeMethodRef();
         typeMethodRef.setType(b.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
         typeMethodRef.setName(b.createMoveTarget(mi.getName()));
-        cuRewrite.getRefactorings().replace(node, typeMethodRef);
+        cuRewrite.getASTRewrite().replace(node, typeMethodRef);
     }
 
     private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
@@ -322,6 +322,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             typeMethodRef.setExpression(b.this0());
         }
         typeMethodRef.setName(b.createMoveTarget(mi.getName()));
-        cuRewrite.getRefactorings().replace(node, typeMethodRef);
+        cuRewrite.getASTRewrite().replace(node, typeMethodRef);
     }
 }

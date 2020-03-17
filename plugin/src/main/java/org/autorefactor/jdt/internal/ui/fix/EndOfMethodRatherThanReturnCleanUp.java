@@ -25,8 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -70,12 +70,12 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final ReturnStatement node) {
         if (node.getExpression() == null && isLastStatement(node)) {
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                r.remove(node);
+                rewrite.remove(node);
             } else {
-                r.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block());
             }
 
             return false;

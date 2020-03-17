@@ -26,9 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -67,22 +67,22 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Statement thenStatement= node.getThenStatement();
         Statement elseStatement= node.getElseStatement();
         if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-            r.remove(elseStatement);
+            rewrite.remove(elseStatement);
             return false;
         }
         if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
-            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             Expression condition= node.getExpression();
             if (elseStatement != null) {
-                r.replace(node, b.if0(b.negate(condition), b.createMoveTarget(elseStatement)));
+                rewrite.replace(node, b.if0(b.negate(condition), b.createMoveTarget(elseStatement)));
             } else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
-                removeBlock(node, r, b);
+                removeBlock(node, rewrite, b);
                 return false;
             }
         }
@@ -90,11 +90,11 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void removeBlock(final IfStatement node, final Refactorings r, final ASTNodeFactory b) {
+    private void removeBlock(final IfStatement node, final ASTRewrite rewrite, final ASTNodeFactory b) {
         if (ASTNodes.canHaveSiblings(node)) {
-            r.remove(node);
+            rewrite.remove(node);
         } else {
-            r.replace(node, b.block());
+            rewrite.replace(node, b.block());
         }
     }
 }

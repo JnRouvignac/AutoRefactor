@@ -30,10 +30,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -195,25 +195,25 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
             VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
 
-            Refactorings r= cuRewrite.getRefactorings();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
-                r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());
-                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
+                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
                 setResult(false);
                 return false;
             }
 
             if (!ASTNodes.isInElse(node)) {
-                r.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), b.createCopyTarget(lhs));
                 Statement newAssignment= b.toStatement(b.createMoveTarget(assignment));
 
                 if (ASTNodes.canHaveSiblings(node)) {
-                    r.insertBefore(newAssignment, node);
+                    rewrite.insertBefore(newAssignment, node);
                 } else {
                     Block newBlock= b.block(newAssignment, b.createMoveTarget(node));
-                    r.replace(node, newBlock);
+                    rewrite.replace(node, newBlock);
                 }
 
                 setResult(false);

@@ -25,9 +25,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
@@ -130,7 +130,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
         }
         // Only visit nodes that have not been refactored
         // to avoid trying to refactor twice the same node (or sub nodes)
-        return !cuRewrite.getRefactorings().hasBeenRefactored(node);
+        return !cuRewrite.getASTRewrite().hasBeenRefactored(node);
     }
 
     /**
@@ -141,8 +141,8 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      * @return the cleanups.
      */
     @Override
-    public Refactorings getRefactorings(final CompilationUnit astRoot) {
+    public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
-        return cuRewrite.getRefactorings();
+        return cuRewrite.getASTRewrite();
     }
 }

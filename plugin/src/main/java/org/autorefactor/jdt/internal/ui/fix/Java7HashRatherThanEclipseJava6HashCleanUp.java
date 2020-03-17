@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -672,18 +672,18 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
             final CollectedData data) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
-        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         @SuppressWarnings("unchecked")
         List<Statement> statements= node.getBody().statements();
         Name objectsClassName= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
-        r.replace(statements.get(0),
+        rewrite.replace(statements.get(0),
                 b.return0(b.invoke(objectsClassName, "hash", b.createMoveTarget(data.getFields())))); //$NON-NLS-1$
 
         for (int i= 1; i < statements.size(); i++) {
-            r.remove(statements.get(i));
+            rewrite.remove(statements.get(i));
         }
     }
 }

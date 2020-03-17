@@ -77,10 +77,10 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
     }
 
     private void useUppercase(final NumberLiteral node, final String token) {
-        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
         NumberLiteral replacement= b.number(newToken);
-        cuRewrite.getRefactorings().replace(node, replacement);
+        cuRewrite.getASTRewrite().replace(node, replacement);
     }
 }
