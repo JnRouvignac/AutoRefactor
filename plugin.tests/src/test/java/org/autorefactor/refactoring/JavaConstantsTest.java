@@ -243,7 +243,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validIntegerZeroLongLiteralRegexp(String literal) {
+    private void validIntegerZeroLongLiteralRegexp(String literal) {
         assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -254,7 +254,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void invalidIntegerZeroLongLiteralRegexp(String literal) {
+    private void invalidIntegerZeroLongLiteralRegexp(String literal) {
         assertFalse(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -265,7 +265,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validLongZeroLongLiteralRegexp(String literal) {
+    private void validLongZeroLongLiteralRegexp(String literal) {
         assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -276,7 +276,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validIntegerOneLongLiteralRegexp(String literal) {
+    private void validIntegerOneLongLiteralRegexp(String literal) {
         assertTrue(ONE_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -287,7 +287,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void invalidIntegerOneLongLiteralRegexp(String literal) {
+    private void invalidIntegerOneLongLiteralRegexp(String literal) {
         assertFalse(ONE_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -298,7 +298,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validLongOneLongLiteralRegexp(String literal) {
+    private void validLongOneLongLiteralRegexp(String literal) {
         assertTrue(ONE_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -309,7 +309,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validIntegerTenLongLiteralRegexp(String literal) {
+    private void validIntegerTenLongLiteralRegexp(String literal) {
         assertTrue(TEN_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -320,7 +320,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void invalidIntegerTenLongLiteralRegexp(String literal) {
+    private void invalidIntegerTenLongLiteralRegexp(String literal) {
         assertFalse(TEN_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -331,7 +331,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validLongTenLongLiteralRegexp(String literal) {
+    private void validLongTenLongLiteralRegexp(String literal) {
         assertTrue(TEN_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
@@ -342,7 +342,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validIntegerLiteralRegexp(String literal) {
+    private void validIntegerLiteralRegexp(String literal) {
         assertTrue(INTEGER_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
     }
 
@@ -353,7 +353,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void invalidIntegerLiteralRegexp(String literal) {
+    private void invalidIntegerLiteralRegexp(String literal) {
         assertFalse(INTEGER_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
     }
 
@@ -364,7 +364,7 @@ public class JavaConstantsTest {
         }
     }
 
-    public void validLongLiteralRegexp(String literal) {
+    private void validLongLiteralRegexp(String literal) {
         assertTrue(LONG_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
     }
 }
