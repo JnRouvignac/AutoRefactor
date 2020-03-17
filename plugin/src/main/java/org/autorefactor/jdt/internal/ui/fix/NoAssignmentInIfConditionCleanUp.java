@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
@@ -197,23 +198,24 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
-                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), null);
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), null);
+                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
                 setResult(false);
                 return false;
             }
 
             if (!ASTNodes.isInElse(node)) {
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), null);
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
                 Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(assignment));
 
                 if (ASTNodes.canHaveSiblings(node)) {
-                    rewrite.insertBefore(newAssignment, node, null);
+                    rewrite.insertBefore(newAssignment, node, editGroup);
                 } else {
                     Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(node));
-                    rewrite.replace(node, newBlock, null);
+                    rewrite.replace(node, newBlock, editGroup);
                 }
 
                 setResult(false);
