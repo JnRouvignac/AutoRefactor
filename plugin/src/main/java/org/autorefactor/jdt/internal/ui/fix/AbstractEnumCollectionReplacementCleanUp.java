@@ -107,17 +107,17 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
     private boolean handleReturnStatement(final ClassInstanceCreation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        MethodDeclaration md= ASTNodes.getAncestorOrNull(node, MethodDeclaration.class);
+        MethodDeclaration methodDeclaration= ASTNodes.getAncestorOrNull(node, MethodDeclaration.class);
 
-        if (md != null) {
-            Type returnType= md.getReturnType2();
+        if (methodDeclaration != null) {
+            Type returnType= methodDeclaration.getReturnType2();
 
             if (isTargetType(returnType)) {
                 List<Type> typeArguments= typeArgs(returnType);
 
                 if (!typeArguments.isEmpty() && isEnum(typeArguments.get(0))) {
                     return maybeReplace(node, classesToUseWithImport, importsToAdd,
-                            typeArguments.toArray(new Type[] {}));
+                            typeArguments.toArray(new Type[typeArguments.size()]));
                 }
             }
         }
@@ -127,13 +127,13 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
     private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        Expression lhs= a.getLeftHandSide();
+        Expression leftHandSide= a.getLeftHandSide();
 
-        if (isTargetType(lhs.resolveTypeBinding())) {
-            ITypeBinding[] typeArguments= lhs.resolveTypeBinding().getTypeArguments();
+        if (isTargetType(leftHandSide.resolveTypeBinding())) {
+            ITypeBinding[] typeArguments= leftHandSide.resolveTypeBinding().getTypeArguments();
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
-                TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
+                TypeNameDecider typeNameDecider= new TypeNameDecider(leftHandSide);
                 ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 Type[] types= new Type[typeArguments.length];
 
