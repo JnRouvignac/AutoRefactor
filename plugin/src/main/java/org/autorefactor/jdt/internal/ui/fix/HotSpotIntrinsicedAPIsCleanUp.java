@@ -127,13 +127,13 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression calcIndex(final Expression index, final SystemArrayCopyParams params) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         if (index instanceof SimpleName) {
             IVariableBinding idxVar= getVariableBinding(index);
 
             if (Utils.equalNotNull(params.indexVarBinding, idxVar)) {
-                return b.createCopyTarget(params.indexStartPos);
+                return ast.createCopyTarget(params.indexStartPos);
             }
         } else if (index instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) index;
@@ -164,57 +164,57 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression plus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
-            return b.int0(expr1Value + expr2Value);
+            return ast.int0(expr1Value + expr2Value);
         }
         if (Utils.equalNotNull(expr1Value, 0)) {
-            return b.createCopyTarget(expr2);
+            return ast.createCopyTarget(expr2);
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.createCopyTarget(expr1);
+            return ast.createCopyTarget(expr1);
         }
 
-        return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, b.createCopyTarget(expr2));
+        return ast.infixExpression(ast.createCopyTarget(expr1), InfixExpression.Operator.PLUS, ast.createCopyTarget(expr2));
     }
 
     private Expression minus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
-            return b.int0(expr1Value - expr2Value);
+            return ast.int0(expr1Value - expr2Value);
         }
         if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.createCopyTarget(expr1);
+            return ast.createCopyTarget(expr1);
         }
 
-        return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2));
+        return ast.infixExpression(ast.createCopyTarget(expr1), InfixExpression.Operator.MINUS, ast.createCopyTarget(expr2));
     }
 
     private Expression minusPlusOne(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
-            return b.int0(expr1Value - expr2Value + 1);
+            return ast.int0(expr1Value - expr2Value + 1);
         }
         if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+            return ast.infixExpression(ast.createCopyTarget(expr1), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpression(b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        return ast.infixExpression(ast.infixExpression(ast.createCopyTarget(expr1), InfixExpression.Operator.MINUS, ast.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
     private Integer intValue(final Expression expression) {
@@ -258,20 +258,20 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        replaceWithSystemArrayCopy(node, b.createCopyTarget(params.srcArrayExpression), params.srcPos,
-                b.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        replaceWithSystemArrayCopy(node, ast.createCopyTarget(params.srcArrayExpression), params.srcPos,
+                ast.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
         return false;
     }
 
     private void replaceWithSystemArrayCopy(final ForStatement node, final Expression srcArrayExpression, final Expression srcPos,
             final Expression destArrayExpression, final Expression destPos, final Expression length) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        TryStatement tryS= b.try0(
-                b.block(b
-                        .toStatement(b.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
-                b.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
-                        b.throw0(b.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        TryStatement tryS= ast.try0(
+                ast.block(ast
+                        .toStatement(ast.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
+                ast.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
+                        ast.throw0(ast.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), ast.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
         cuRewrite.getASTRewrite().replace(node, tryS);
     }

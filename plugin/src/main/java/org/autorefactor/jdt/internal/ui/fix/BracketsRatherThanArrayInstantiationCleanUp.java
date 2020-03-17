@@ -86,8 +86,8 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
         if (node.getInitializer() != null) {
             cuRewrite.getASTRewrite().replace(node, node.getInitializer());
         } else {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node, b.createCopyTarget(b.arrayInitializer()));
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            cuRewrite.getASTRewrite().replace(node, ast.createCopyTarget(ast.arrayInitializer()));
         }
     }
 

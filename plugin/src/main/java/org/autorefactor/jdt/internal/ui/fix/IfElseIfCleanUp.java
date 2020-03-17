@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -92,7 +92,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
     // TODO JNR
 
     // UseIfElseIfRefactoring
-    // if (b) {
+    // if (ast) {
     // return i;
     // }
     // if (c) {
@@ -106,11 +106,13 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final IfStatement node) {
         Statement elseStatement= node.getElseStatement();
+
         if (elseStatement instanceof Block) {
             List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);
+
             if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getASTRewrite().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.createMoveTarget(elseStatements.get(0)));
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, rewrite.createMoveTarget(elseStatements.get(0)));
                 return false;
             }
         }

@@ -178,19 +178,19 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         boolean isFieldKept= field.fragments().size() != 1;
 
         Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
-        VariableDeclarationFragment newFragment= b.declareFragment(b.createMoveTarget(reassignment), b.createMoveTarget(reassignmentAssignment.getRightHandSide()));
+        VariableDeclarationFragment newFragment= ast.declareFragment(rewrite.createMoveTarget(reassignment), rewrite.createMoveTarget(reassignmentAssignment.getRightHandSide()));
         @SuppressWarnings("unchecked")
         List<Dimension> extraDimensions= fragment.extraDimensions();
         @SuppressWarnings("unchecked")
         List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-        newExtraDimensions.addAll(b.createMoveTarget(extraDimensions));
-        VariableDeclarationStatement newDeclareStatement= b.declareStatement(isFieldKept ? b.createMoveTarget(field.getType()) : b.createCopyTarget(field.getType()), newFragment);
+        newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+        VariableDeclarationStatement newDeclareStatement= ast.declareStatement(isFieldKept ? rewrite.createMoveTarget(field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
         @SuppressWarnings("unchecked")
         List<IExtendedModifier> modifiers= field.modifiers();
         @SuppressWarnings("unchecked")
@@ -200,7 +200,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
             Modifier modifier= (Modifier) iExtendedModifier;
 
             if (!modifier.isPrivate() && !modifier.isStatic()) {
-                newModifiers.add(isFieldKept ? b.createMoveTarget(modifier) : b.createCopyTarget(modifier));
+                newModifiers.add(isFieldKept ? rewrite.createMoveTarget(modifier) : ast.createCopyTarget(modifier));
             }
         }
 
@@ -209,7 +209,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
         if (isFieldKept) {
             rewrite.remove(fragment);
-            rewrite.replace(field.getType(), b.createCopyTarget(field.getType()));
+            rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()));
         } else {
             rewrite.remove(field);
         }

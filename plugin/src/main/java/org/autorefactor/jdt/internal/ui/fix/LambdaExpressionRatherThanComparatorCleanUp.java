@@ -406,20 +406,20 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), identifier1);
         }
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Expression comparingMethod= b.invoke(b.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
+        Expression comparingMethod= ast.invoke(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
         if (!isForward.get()) {
-            comparingMethod= b.invoke(comparingMethod, "reversed"); //$NON-NLS-1$
+            comparingMethod= ast.invoke(comparingMethod, "reversed"); //$NON-NLS-1$
         }
 
         if (isNullFirst != null) {
             if (isNullFirst) {
-                comparingMethod= b.invoke(b.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
+                comparingMethod= ast.invoke(ast.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
             } else {
-                comparingMethod= b.invoke(b.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
+                comparingMethod= ast.invoke(ast.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
             }
         }
 
@@ -427,36 +427,38 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     }
 
     private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         TypeNameDecider typeNameDecider= new TypeNameDecider(method);
 
-        TypeMethodReference typeMethodRef= b.typeMethodRef();
-        typeMethodRef.setType(b.toType(type, typeNameDecider));
-        typeMethodRef.setName(b.createMoveTarget(method.getName()));
+        TypeMethodReference typeMethodRef= ast.typeMethodRef();
+        typeMethodRef.setType(ast.toType(type, typeNameDecider));
+        typeMethodRef.setName(rewrite.createMoveTarget(method.getName()));
         return typeMethodRef;
     }
 
     @SuppressWarnings("unchecked")
     private LambdaExpression buildField(final ClassInstanceCreation node, final ITypeBinding type, final boolean straightOrder,
             final Boolean isNullFirst, final QualifiedName field, final String identifier1) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
-        LambdaExpression lambdaExpression= b.lambda();
+        LambdaExpression lambdaExpression= ast.lambda();
         ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
         boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
                 && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
         if (isTypeKnown && straightOrder && isNullFirst == null) {
-            lambdaExpression.parameters().add(b.declareFragment(b.simpleName(identifier1)));
+            lambdaExpression.parameters().add(ast.declareFragment(ast.simpleName(identifier1)));
         } else {
-            lambdaExpression.parameters().add(b.declareSingleVariable(identifier1, b.toType(type, typeNameDecider)));
+            lambdaExpression.parameters().add(ast.declareSingleVariable(identifier1, ast.toType(type, typeNameDecider)));
         }
 
-        lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.createMoveTarget(field.getName())));
+        lambdaExpression.setBody(ast.fieldAccess(ast.simpleName(identifier1), rewrite.createMoveTarget(field.getName())));
         lambdaExpression.setParentheses(false);
         return lambdaExpression;
     }

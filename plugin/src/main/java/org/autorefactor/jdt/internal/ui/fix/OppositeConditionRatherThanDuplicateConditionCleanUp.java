@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
@@ -38,7 +39,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * Refactors:
  *
  * <pre>
- * if (a && b) {
+ * if (a && ast) {
  *   {{code 1}}
  * } if (a) {
  *   {{code 2}}
@@ -52,7 +53,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * <pre>
  * if (!a) {
  *   {{code 3}}
- * } if (b) {
+ * } if (ast) {
  *   {{code 1}}
  * } else {
  *   {{code 2}}
@@ -131,13 +132,14 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
             final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Statement negativeStmtCopy;
         if (negativeStatement instanceof IfStatement) {
-            negativeStmtCopy= b.block(b.createMoveTarget(negativeStatement));
+            negativeStmtCopy= ast.block(rewrite.createMoveTarget(negativeStatement));
         } else {
-            negativeStmtCopy= b.createMoveTarget(negativeStatement);
+            negativeStmtCopy= rewrite.createMoveTarget(negativeStatement);
         }
 
         Expression secondCond;
@@ -147,16 +149,16 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
         if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();
-            secondStmtCopy= b.createMoveTarget(positiveStatement);
-            thirdStmtCopy= b.createMoveTarget(node.getThenStatement());
+            secondStmtCopy= rewrite.createMoveTarget(positiveStatement);
+            thirdStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
         } else {
             secondCond= notDuplicateExpression;
-            secondStmtCopy= b.createMoveTarget(node.getThenStatement());
-            thirdStmtCopy= b.createMoveTarget(positiveStatement);
+            secondStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
+            thirdStmtCopy= rewrite.createMoveTarget(positiveStatement);
         }
 
         cuRewrite.getASTRewrite().replace(node,
-                b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
-                        b.if0(b.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
+                ast.if0(ast.parenthesizeIfNeeded(ast.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
+                        ast.if0(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }

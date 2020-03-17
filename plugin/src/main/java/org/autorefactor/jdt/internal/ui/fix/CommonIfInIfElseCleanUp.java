@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -99,10 +100,12 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
                 && thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
                 && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
                 && ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node,
-                    b.if0(b.createMoveTarget(thenInnerIfStatement.getExpression()), b.block(b.if0(b.createMoveTarget(node.getExpression()),
-                            b.createMoveTarget(thenInnerIfStatement.getThenStatement()), b.createMoveTarget(elseInnerIfStatement.getThenStatement())))));
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+            rewrite.replace(node,
+                    ast.if0(rewrite.createMoveTarget(thenInnerIfStatement.getExpression()), ast.block(ast.if0(rewrite.createMoveTarget(node.getExpression()),
+                            rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))));
             return false;
         }
 

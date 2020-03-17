@@ -158,23 +158,23 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
+    protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
         if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("get")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("get")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("toArray")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("toArray")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("remove")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("remove")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("clear")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("clear")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
             reorderArguments(refactoredMi);
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("set")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("set")); //$NON-NLS-1$
             reorderArguments(refactoredMi);
         }
     }

@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Comparator;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -70,8 +71,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
         Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
         Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
 
-        return node.hasExtendedOperands() || (maybeStandardizeComparison(node, leftOperand,
-                rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand));
+        return node.hasExtendedOperands() || maybeStandardizeComparison(node, leftOperand,
+                rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand);
     }
 
     private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
@@ -82,8 +83,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                 && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
                         && (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
                         || ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                        || (getJavaMinorVersion() >= 2
-                        && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName())))) { //$NON-NLS-1$
+                        || getJavaMinorVersion() >= 2
+                        && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
             Object literalValue= literal.resolveConstantExpressionValue();
 
             if (literalValue instanceof Number) {
@@ -115,7 +116,9 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
             final InfixExpression.Operator operator) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node, b.infixExpression(b.createMoveTarget(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(comparisonMI), operator, ast.number("0"))); //$NON-NLS-1$
     }
 }

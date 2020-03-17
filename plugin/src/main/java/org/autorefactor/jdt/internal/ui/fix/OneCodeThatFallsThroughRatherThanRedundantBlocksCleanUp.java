@@ -155,7 +155,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
             if (nextSibling != null) {
                 referenceStatements.add(nextSibling);
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
                 for (Statement redundantStatement : redundantStatements) {
                     List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
@@ -171,7 +171,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                         if (redundantStatement instanceof Block) {
                             rewrite.remove(stmtsToCompare);
                         } else {
-                            rewrite.replace(redundantStatement, b.block());
+                            rewrite.replace(redundantStatement, ast.block());
                         }
 
                         setResult(false);

@@ -138,12 +138,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             }
         }
         // Infix, prefix or postfix without parenthesis is not readable
-        if ((((parent instanceof InfixExpression
-                && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS))
-                || (parent instanceof PrefixExpression
-                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) && ((innerExpression instanceof PrefixExpression
-                && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) || (innerExpression instanceof PostfixExpression
-                && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)))) || isInnerExprHardToRead(innerExpression, parent)) {
+        if ((parent instanceof InfixExpression
+                && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS)
+                || parent instanceof PrefixExpression
+                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) && (innerExpression instanceof PrefixExpression
+                && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS) || innerExpression instanceof PostfixExpression
+                && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) || isInnerExprHardToRead(innerExpression, parent)) {
             return node;
         }
         if (isUselessParenthesesInStatement(parent, node)) {
@@ -165,11 +165,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 // or if it can be removed.
                 || innerExpression instanceof CastExpression
                 // Infix and prefix or postfix without parenthesis is not readable
-                || ((parent instanceof InfixExpression
+                || (parent instanceof InfixExpression
                         || parent instanceof PrefixExpression
                         || parent instanceof PostfixExpression)
                         && (innerExpression instanceof PrefixExpression
-                                || innerExpression instanceof PostfixExpression))) {
+                                || innerExpression instanceof PostfixExpression)) {
             return node;
         }
 
@@ -353,22 +353,22 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             rightOppositeExpression= rightPrefix.getOperand();
         }
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
         if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 rewrite.replace(node,
-                        b.infixExpression(b.createMoveTarget(leftOppositeExpression), getAppropriateOperator(node), b.createMoveTarget(rightOppositeExpression)));
+                        ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), getAppropriateOperator(node), rewrite.createMoveTarget(rightOppositeExpression)));
             } else {
                 InfixExpression.Operator reverseOp= getReverseOperator(node);
-                rewrite.replace(node, b.infixExpression(b.createMoveTarget(leftOppositeExpression), reverseOp, b.createMoveTarget(rightExpression)));
+                rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), reverseOp, rewrite.createMoveTarget(rightExpression)));
             }
 
             return false;
         }
         if (rightOppositeExpression != null) {
             InfixExpression.Operator reverseOp= getReverseOperator(node);
-            rewrite.replace(node, b.infixExpression(b.createMoveTarget(leftExpression), reverseOp, b.createMoveTarget(rightOppositeExpression)));
+            rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftExpression), reverseOp, rewrite.createMoveTarget(rightOppositeExpression)));
             return false;
         }
 
@@ -393,22 +393,27 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
         ASTNodes.checkNoExtendedOperands(node);
+
         if (!ASTNodes.isPrimitive(node.getLeftOperand(), boolean.class.getSimpleName()) && !ASTNodes.isPrimitive(node.getRightOperand(), boolean.class.getSimpleName())) {
             return true;
         }
+
         // Either:
         // - Two boolean primitives: no possible NPE
         // - One boolean primitive and one Boolean object, this code already run
         // the risk of an NPE, so we can replace the infix expression without
         // fearing we would introduce a previously non existing NPE.
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
         Expression operand;
         if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-            operand= b.createMoveTarget(exprToCopy);
+            operand= rewrite.createMoveTarget(exprToCopy);
         } else {
-            operand= b.negate(exprToCopy);
+            operand= ast.negate(exprToCopy);
         }
-        cuRewrite.getASTRewrite().replace(node, operand);
+
+        rewrite.replace(node, operand);
         return false;
     }
 
@@ -416,8 +421,9 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (remainingOperands.size() == 1) {
             replaceBy(node, remainingOperands.get(0));
         } else {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node, b.infixExpression(node.getOperator(), b.createMoveTarget(remainingOperands)));
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)));
         }
     }
 
@@ -446,13 +452,14 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private void addParentheses(final Expression expression) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(expression, b.parenthesize(b.createMoveTarget(expression)));
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(expression, ast.parenthesize(rewrite.createMoveTarget(expression)));
     }
 
     private void replaceBy(final ASTNode node, final Expression expression) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(expression));
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(node, rewrite.createMoveTarget(expression));
     }
 
     /**

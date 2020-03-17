@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -110,18 +111,19 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
     private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
             final boolean isAndExpression, final boolean isPositiveExpression) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Name booleanConstant= b.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
-        MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.createMoveTarget(firstExpression)); //$NON-NLS-1$
+        Name booleanConstant= ast.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
+        MethodInvocation equalsMethod= ast.invoke(booleanConstant, "equals", rewrite.createMoveTarget(firstExpression)); //$NON-NLS-1$
 
         Expression newExpression= null;
         if (!isNullCheck || isAndExpression) {
             newExpression= equalsMethod;
         } else {
-            newExpression= b.not(equalsMethod);
+            newExpression= ast.not(equalsMethod);
         }
 
-        cuRewrite.getASTRewrite().replace(node, newExpression);
+        rewrite.replace(node, newExpression);
     }
 }

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -102,7 +103,9 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
     }
 
     private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(valuedExpression)));
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(valuedExpression)));
     }
 }

@@ -141,11 +141,11 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     /**
      * Refactor the method.
      *
-     * @param b            The builder
+     * @param ast            The builder
      * @param originalMi   The original method invocation
      * @param refactoredMi The new method invocation
      */
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     /**
      * Returns the substitute type or null if the class should be the same.
      *
-     * @param b                      The builder.
+     * @param ast                      The builder.
      * @param origType               The original type
      * @param originalExpression     The original expression
      * @param classesToUseWithImport The classes that should be used with simple
@@ -170,7 +170,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      *                               cleanup.
      * @return the substitute type or null if the class should be the same.
      */
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
+    protected Type substituteType(final ASTNodeFactory ast, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         ITypeBinding origTypeBinding= origType.resolveBinding();
 
@@ -198,14 +198,14 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 } else {
                     newTypes= new Type[origTypeArgs.length];
                     for (int i= 0; i < origTypeArgs.length; i++) {
-                        newTypes[i]= b.toType(origTypeArgs[i], typeNameDecider);
+                        newTypes[i]= ast.toType(origTypeArgs[i], typeNameDecider);
                     }
                 }
 
-                return b.genericType(substitutingClassName, newTypes);
+                return ast.genericType(substitutingClassName, newTypes);
             }
 
-            return b.type(substitutingClassName);
+            return ast.type(substitutingClassName);
         }
 
         return null;
@@ -302,8 +302,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
             final List<VariableDeclaration> variableDecls, final List<MethodInvocation> methodCallsToRefactor,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Type substituteType= substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation,
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        Type substituteType= substituteType(ast, originalInstanceCreation.getType(), originalInstanceCreation,
                 classesToUseWithImport, importsToAdd);
 
         if (substituteType != null) {
@@ -312,14 +312,14 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         for (MethodInvocation methodCall : methodCallsToRefactor) {
-            MethodInvocation copyOfMethodCall= b.copySubtree(methodCall);
-            refactorMethod(b, methodCall, copyOfMethodCall);
+            MethodInvocation copyOfMethodCall= ast.copySubtree(methodCall);
+            refactorMethod(ast, methodCall, copyOfMethodCall);
             cuRewrite.getASTRewrite().replace(methodCall, copyOfMethodCall);
         }
 
         for (VariableDeclaration variableDecl : variableDecls) {
             VariableDeclarationStatement oldDeclareStatement= (VariableDeclarationStatement) variableDecl.getParent();
-            Type substituteVarType= substituteType(b, oldDeclareStatement.getType(),
+            Type substituteVarType= substituteType(ast, oldDeclareStatement.getType(),
                     (ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);
 
             if (substituteVarType != null) {

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -102,9 +103,11 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Block block= b.block(b.createMoveTarget(statement));
-        cuRewrite.getASTRewrite().replace(statement, block);
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        Block block= ast.block(rewrite.createMoveTarget(statement));
+        rewrite.replace(statement, block);
         return false;
     }
 }

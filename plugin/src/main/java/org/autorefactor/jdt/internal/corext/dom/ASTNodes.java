@@ -2340,12 +2340,12 @@ public final class ASTNodes {
     /**
      * Returns whether to bindings are equal.
      *
-     * @param b1 the first binding
-     * @param b2 the second binding
+     * @param ast1 the first binding
+     * @param ast2 the second binding
      * @return {@code true} when bindings are equal, {@code false} otherwise
      */
-    public static boolean areBindingsEqual(final IBinding b1, final IBinding b2) {
-        return b1 != null && b2 != null && b1.isEqualTo(b2);
+    public static boolean areBindingsEqual(final IBinding ast1, final IBinding ast2) {
+        return ast1 != null && ast2 != null && ast1.isEqualTo(ast2);
     }
 
     private static IBinding varBinding(final ASTNode node) {

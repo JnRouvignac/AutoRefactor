@@ -26,7 +26,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -112,22 +111,22 @@ public class ASTNodeFactory {
         /** Do not perform any copy. Returns the node as is. */
         NONE {
             @Override
-            protected <T extends ASTNode> T perform(final ASTNodeFactory b, final T node) {
+            protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
                 return node;
             }
         },
         /** Delegates to {@link ASTBuilder#copy(ASTNode)}. */
         COPY {
             @Override
-            protected <T extends ASTNode> T perform(final ASTNodeFactory b, final T node) {
-                return b.createCopyTarget(node);
+            protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
+                return ast.createCopyTarget(node);
             }
         },
         /** Delegates to {@link ASTBuilder#move(ASTNode)}. */
         MOVE {
             @Override
-            protected <T extends ASTNode> T perform(final ASTNodeFactory b, final T node) {
-                return b.createMoveTarget(node);
+            protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
+                return ast.createMoveTarget(node);
             }
         };
 
@@ -135,12 +134,12 @@ public class ASTNodeFactory {
          * Performs the copy operation on the provided node with the provided
          * {@link ASTNodeFactory}.
          *
-         * @param b    the {@link ASTNodeFactory} allowing to copy the provided node
+         * @param ast    the {@link ASTNodeFactory} allowing to copy the provided node
          * @param node the node on which to perform the copy operation
          * @param <T>  the node type
          * @return the copied node
          */
-        protected abstract <T extends ASTNode> T perform(ASTNodeFactory b, T node);
+        protected abstract <T extends ASTNode> T perform(ASTNodeFactory ast, T node);
     }
 
     private final AST ast;
@@ -362,25 +361,6 @@ public class ASTNodeFactory {
         addAll(ASTNodes.statements(block), statements);
         cc.setBody(block);
         return cc;
-    }
-
-    /**
-     * Returns a copy of the provided {@link ASTNode}.
-     *
-     * @param <T>        the actual node type
-     * @param nodeToCopy the node to copy
-     * @return a copy of the node
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends ASTNode> T createCopyTarget(final T nodeToCopy) {
-        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
-            return (T) copyType((Type) nodeToCopy);
-        }
-        if (isValidInCurrentAST(nodeToCopy)) {
-            return refactorings.createCopyTarget(nodeToCopy);
-        }
-
-        return copySubtree(nodeToCopy);
     }
 
     private boolean isValidInCurrentAST(final ASTNode node) {
@@ -980,31 +960,26 @@ public class ASTNodeFactory {
     }
 
     /**
-     * Returns a placeholder where to move the provided {@link ASTNode}.
+     * Returns a copy of the provided {@link ASTNode}.
      *
      * @param <T>        the actual node type
-     * @param nodeToMove the node to move
-     * @return a placeholder for the moved node
+     * @param nodeToCopy the node to copy
+     * @return a copy of the node
      */
-    public <T extends ASTNode> T createMoveTarget(final T nodeToMove) {
-        return refactorings.createMoveTarget(nodeToMove);
-    }
-
-    /**
-     * Moves all the provided {@link ASTNode}s in place.
-     *
-     * @param <T>   the actual nodes type
-     * @param nodes the nodes to move
-     * @return the provided list with all nodes moved
-     */
-    public <T extends ASTNode> List<T> createMoveTarget(final Collection<T> nodes) {
-        List<T> movedNodes= new ArrayList<>(nodes.size());
-
-        for (T astNode : nodes) {
-            movedNodes.add(createMoveTarget(astNode));
+    @SuppressWarnings("unchecked")
+    public <T extends ASTNode> T createCopyTarget(final T nodeToCopy) {
+        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
+            return (T) copyType((Type) nodeToCopy);
+        }
+        if (isValidInCurrentAST(nodeToCopy)) {
+            return refactorings.createCopyTarget(nodeToCopy);
         }
 
-        return movedNodes;
+        return copySubtree(nodeToCopy);
+    }
+
+    private <T extends ASTNode> T createMoveTarget(final T nodeToMove) {
+        return refactorings.createMoveTarget(nodeToMove);
     }
 
     /**

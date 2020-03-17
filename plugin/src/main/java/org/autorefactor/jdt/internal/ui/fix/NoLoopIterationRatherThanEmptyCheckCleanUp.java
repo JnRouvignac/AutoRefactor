@@ -86,9 +86,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
                     InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
 
                     if (isConditionValid(condition, container)) {
-                        ASTNodeFactory b= cuRewrite.getASTBuilder();
                         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                        rewrite.replace(node, b.createMoveTarget(statements.get(0)));
+                        rewrite.replace(node, rewrite.createMoveTarget(statements.get(0)));
                         return false;
                     }
 
@@ -182,14 +181,14 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
     }
 
     private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (operands.size() == 2) {
-            rewrite.replace(condition, b.createMoveTarget(operands.get(0)));
+            rewrite.replace(condition, rewrite.createMoveTarget(operands.get(0)));
         } else {
             operands.remove(operands.size() - 1);
-            InfixExpression newCondition= b.infixExpression(condition.getOperator(), b.createMoveTarget(operands));
+            InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
             rewrite.replace(condition, newCondition);
         }

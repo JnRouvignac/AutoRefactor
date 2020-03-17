@@ -107,13 +107,13 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithStringContains(final InfixExpression ie, final MethodInvocation node, final boolean negate) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains")); //$NON-NLS-1$
 
         if (negate) {
-            rewrite.replace(ie, b.not(b.createMoveTarget(node)));
+            rewrite.replace(ie, ast.not(rewrite.createMoveTarget(node)));
         } else {
-            rewrite.replace(ie, b.createMoveTarget(node));
+            rewrite.replace(ie, rewrite.createMoveTarget(node));
         }
     }
 }

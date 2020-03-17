@@ -113,21 +113,21 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         }
 
         Type type= types[0];
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         List<Expression> arguments= ASTNodes.arguments(cic);
         MethodInvocation invocation;
-        Name newClassName= b.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
+        Name newClassName= ast.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
 
         if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
             Expression typeArg= arguments.get(0);
             if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
-            invocation= b.invoke(newClassName, "copyOf", b.createCopyTarget(typeArg)); //$NON-NLS-1$
+            invocation= ast.invoke(newClassName, "copyOf", ast.createCopyTarget(typeArg)); //$NON-NLS-1$
         } else {
             TypeLiteral newTypeLiteral= cuRewrite.getAST().newTypeLiteral();
-            newTypeLiteral.setType(b.createCopyTarget(type));
-            invocation= b.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
+            newTypeLiteral.setType(ast.createCopyTarget(type));
+            invocation= ast.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
         }
 
         cuRewrite.getASTRewrite().replace(cic, invocation);

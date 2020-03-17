@@ -134,11 +134,11 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 Type[] types= new Type[typeArguments.length];
 
                 for (int i= 0; i < types.length; i++) {
-                    types[i]= b.toType(typeArguments[i], typeNameDecider);
+                    types[i]= ast.toType(typeArguments[i], typeNameDecider);
                 }
 
                 return maybeReplace(node, classesToUseWithImport, importsToAdd, types);

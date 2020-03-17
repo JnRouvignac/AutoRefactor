@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -266,62 +267,69 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
     @SuppressWarnings("unchecked")
     private void removeParamParentheses(final LambdaExpression node) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        LambdaExpression copyOfLambdaExpression= b.lambda();
-        ASTNode copyOfParameter= b.createMoveTarget((ASTNode) node.parameters().get(0));
+        LambdaExpression copyOfLambdaExpression= ast.lambda();
+        ASTNode copyOfParameter= rewrite.createMoveTarget((ASTNode) node.parameters().get(0));
         copyOfLambdaExpression.parameters().add(copyOfParameter);
-        copyOfLambdaExpression.setBody(b.createMoveTarget(node.getBody()));
+        copyOfLambdaExpression.setBody(rewrite.createMoveTarget(node.getBody()));
         copyOfLambdaExpression.setParentheses(false);
         cuRewrite.getASTRewrite().replace(node, copyOfLambdaExpression);
     }
 
     private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-        cuRewrite.getASTRewrite().replace(node.getBody(), b.parenthesizeIfNeeded(b.createMoveTarget(returnStatement.getExpression())));
+        cuRewrite.getASTRewrite().replace(node.getBody(), ast.parenthesizeIfNeeded(rewrite.createMoveTarget(returnStatement.getExpression())));
     }
 
     private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
 
-        CreationReference creationRef= b.creationRef();
-        creationRef.setType(b.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
+        CreationReference creationRef= ast.creationRef();
+        creationRef.setType(ast.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
         cuRewrite.getASTRewrite().replace(node, creationRef);
     }
 
     private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        SuperMethodReference creationRef= b.superMethodRef();
-        creationRef.setName(b.createMoveTarget(ci.getName()));
+        SuperMethodReference creationRef= ast.superMethodRef();
+        creationRef.setName(rewrite.createMoveTarget(ci.getName()));
         cuRewrite.getASTRewrite().replace(node, creationRef);
     }
 
     private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
 
-        TypeMethodReference typeMethodRef= b.typeMethodRef();
-        typeMethodRef.setType(b.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
-        typeMethodRef.setName(b.createMoveTarget(mi.getName()));
+        TypeMethodReference typeMethodRef= ast.typeMethodRef();
+        typeMethodRef.setType(ast.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
+        typeMethodRef.setName(rewrite.createMoveTarget(mi.getName()));
         cuRewrite.getASTRewrite().replace(node, typeMethodRef);
     }
 
     private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        ExpressionMethodReference typeMethodRef= b.exprMethodRef();
+        ExpressionMethodReference typeMethodRef= ast.exprMethodRef();
+
         if (mi.getExpression() != null) {
-            typeMethodRef.setExpression(b.createMoveTarget(mi.getExpression()));
+            typeMethodRef.setExpression(rewrite.createMoveTarget(mi.getExpression()));
         } else {
-            typeMethodRef.setExpression(b.this0());
+            typeMethodRef.setExpression(ast.this0());
         }
-        typeMethodRef.setName(b.createMoveTarget(mi.getName()));
+
+        typeMethodRef.setName(rewrite.createMoveTarget(mi.getName()));
         cuRewrite.getASTRewrite().replace(node, typeMethodRef);
     }
 }

@@ -96,21 +96,21 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStatements, final boolean isPositive) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Expression additionalCondition;
         if (isPositive) {
-            additionalCondition= b.createMoveTarget(subNode.getExpression());
+            additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
         } else {
-            additionalCondition= b.negate(subNode.getExpression(), Copy.COPY);
+            additionalCondition= ast.negate(subNode.getExpression(), Copy.COPY);
         }
 
-        rewrite.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(firstCondition)),
-                InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
+        rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
+                InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)));
 
         if (remainingStatements != null) {
-            rewrite.replace(subNode, b.createMoveTarget(remainingStatements));
+            rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements));
         } else {
             rewrite.remove(subNode);
         }

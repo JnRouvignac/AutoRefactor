@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -88,16 +89,17 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
         if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
                 && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(variable)); //$NON-NLS-1$
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            MethodInvocation newInvoke= ast.invoke(String.class.getSimpleName(), "valueOf", rewrite.createMoveTarget(variable)); //$NON-NLS-1$
 
             if (node.hasExtendedOperands()) {
                 List<Expression> extendedOperands= ASTNodes.extendedOperands(node);
                 List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
                 newOperands.add(newInvoke);
-                newOperands.addAll(b.createMoveTarget(extendedOperands));
+                newOperands.addAll(rewrite.createMoveTarget(extendedOperands));
 
-                cuRewrite.getASTRewrite().replace(node, b.infixExpression(InfixExpression.Operator.PLUS, newOperands));
+                cuRewrite.getASTRewrite().replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands));
             } else {
                 cuRewrite.getASTRewrite().replace(node, newInvoke);
             }

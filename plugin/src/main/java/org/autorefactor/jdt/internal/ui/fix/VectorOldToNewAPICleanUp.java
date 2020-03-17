@@ -100,8 +100,8 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName));
     }
 
     private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
@@ -109,11 +109,11 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         assertSize(args, 1);
         Expression arg0= args.get(0);
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName));
         if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            rewrite.replace(arg0, b.cast(b.type(Object.class.getSimpleName()), b.createMoveTarget(arg0)));
+            rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), rewrite.createMoveTarget(arg0)));
         }
     }
 
@@ -122,10 +122,10 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         assertSize(args, 2);
         Expression arg1= args.get(1);
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
-        rewrite.moveToIndex(arg1, 0, b.createMoveTarget(arg1));
+        rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName));
+        rewrite.moveToIndex(arg1, 0, rewrite.createMoveTarget(arg1));
     }
 
     private void assertSize(final List<Expression> args, final int expectedSize) {

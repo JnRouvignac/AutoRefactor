@@ -104,9 +104,9 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 
     private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
             final String methodName) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         cuRewrite.getASTRewrite().replace(actualMi,
-                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(ASTNodes.arguments(actualMi))));
+                ast.invoke(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))));
         return false;
     }
 }

@@ -136,9 +136,9 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
             integers.insert(position, '_');
             position= position - 3;
         }
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        NumberLiteral replacement= b.number(integers + suffix);
+        NumberLiteral replacement= ast.number(integers + suffix);
         cuRewrite.getASTRewrite().replace(node, replacement);
     }
 

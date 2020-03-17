@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Arrays;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -76,8 +76,8 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
             var= getVar(var);
 
             if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getRightHandSide()));
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                rewrite.replace(node, rewrite.createMoveTarget(node.getRightHandSide()));
                 return false;
             }
         }

@@ -190,7 +190,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
     private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
             final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         // Remove the nodes common to all cases
@@ -201,15 +201,15 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
         if (allRemovable(areCasesRemovable, 0)) {
             if (ASTNodes.canHaveSiblings(node)) {
-                insertIdenticalCode(node, oneCaseToRemove, b, rewrite);
+                insertIdenticalCode(node, oneCaseToRemove, rewrite);
 
                 rewrite.removeButKeepComment(node);
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.createMoveTarget(stmtToRemove));
+                    orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
                 }
-                rewrite.replace(node, b.block(orderedStatements));
+                rewrite.replace(node, ast.block(orderedStatements));
             }
         } else {
             // Remove empty cases
@@ -220,34 +220,33 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                     if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
                         // Then clause is empty and there is only one else clause
                         // => revert if statement
-                        rewrite.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.createMoveTarget(((IfStatement) parent).getElseStatement())));
+                        rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), rewrite.createMoveTarget(((IfStatement) parent).getElseStatement())));
                         break;
                     }
                     if (allRemovable(areCasesRemovable, i)) {
                         rewrite.remove(parent);
                         break;
                     }
-                    rewrite.replace(((IfStatement) parent).getThenStatement(), b.block());
+                    rewrite.replace(((IfStatement) parent).getThenStatement(), ast.block());
                 }
             }
 
             if (ASTNodes.canHaveSiblings(node)) {
-                insertIdenticalCode(node, oneCaseToRemove, b, rewrite);
+                insertIdenticalCode(node, oneCaseToRemove, rewrite);
             } else {
                 List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
                 for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, b.createMoveTarget(stmtToRemove));
+                    orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
                 }
-                orderedStatements.add(0, b.createMoveTarget(node));
-                rewrite.replace(node, b.block(orderedStatements));
+                orderedStatements.add(0, rewrite.createMoveTarget(node));
+                rewrite.replace(node, ast.block(orderedStatements));
             }
         }
     }
 
-    private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTNodeFactory b,
-            final ASTRewrite rewrite) {
+    private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTRewrite rewrite) {
         for (Statement stmtToRemove : stmtsToRemove) {
-            rewrite.insertAfter(b.createMoveTarget(stmtToRemove), node);
+            rewrite.insertAfter(rewrite.createMoveTarget(stmtToRemove), node);
         }
     }
 

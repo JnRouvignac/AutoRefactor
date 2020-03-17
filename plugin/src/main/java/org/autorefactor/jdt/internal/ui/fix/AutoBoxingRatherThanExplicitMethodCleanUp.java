@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -86,9 +87,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
             ITypeBinding actualResultType= ASTNodes.getTargetType(node);
             ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
 
-            if ((actualResultType != null
-                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass)))
-                    || (actualParameterType != null && actualParameterType.equals(wrapperClass))) {
+            if (actualResultType != null
+                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
+                    || actualParameterType != null && actualParameterType.equals(wrapperClass)) {
                 useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
                 return false;
             }
@@ -100,14 +101,15 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
             final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
             final ITypeBinding actualResultType) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (primitiveType != null && !primitiveType.equals(actualParameterType)
                 && !primitiveType.equals(actualResultType)
                 && (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-            cuRewrite.getASTRewrite().replace(node, b.cast(b.type(primitiveType.getName()), b.createMoveTarget(ASTNodes.arguments(node).get(0))));
+            cuRewrite.getASTRewrite().replace(node, ast.cast(ast.type(primitiveType.getName()), rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))));
         } else {
-            cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
+            cuRewrite.getASTRewrite().replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)));
         }
     }
 }

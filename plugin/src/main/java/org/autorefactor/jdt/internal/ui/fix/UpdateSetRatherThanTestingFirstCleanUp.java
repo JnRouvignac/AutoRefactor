@@ -101,17 +101,17 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
                     && ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
-                    rewrite.replace(ifStmtToReplace, b.createMoveTarget(firstStatement));
+                    rewrite.replace(ifStmtToReplace, rewrite.createMoveTarget(firstStatement));
                 } else {
                     // There are other statements, replace the if condition with col.add() (or
                     // col.remove())
                     rewrite.replace(ifStmtToReplace.getExpression(),
-                            negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.createMoveTarget(miAddOrRemove));
+                            negate ? ast.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : rewrite.createMoveTarget(miAddOrRemove));
                     rewrite.remove(firstStatement);
                 }
 

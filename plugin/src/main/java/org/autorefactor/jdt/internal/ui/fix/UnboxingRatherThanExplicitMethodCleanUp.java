@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -90,7 +90,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     }
 
     private void useUnboxing(final MethodInvocation node) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getExpression()));
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(node, rewrite.createMoveTarget(node.getExpression()));
     }
 }

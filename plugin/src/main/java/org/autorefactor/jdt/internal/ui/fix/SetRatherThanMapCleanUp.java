@@ -140,7 +140,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     /**
      * Returns the substitute type.
      *
-     * @param b                      The builder.
+     * @param ast                      The builder.
      * @param origType               The original type
      * @param originalExpression           The original expression
      * @param classesToUseWithImport The classes that should be used with simple
@@ -150,7 +150,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the substitute type.
      */
     @Override
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
+    protected Type substituteType(final ASTNodeFactory ast, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         ITypeBinding origTypeBinding= origType.resolveBinding();
 
@@ -172,15 +172,15 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
             Type[] newTypes;
             if (origTypeArgs.length > 0 && !((ParameterizedType) origType).typeArguments().isEmpty()) {
                 newTypes= new Type[1];
-                newTypes[0]= b.toType(origTypeArgs[0], typeNameDecider);
+                newTypes[0]= ast.toType(origTypeArgs[0], typeNameDecider);
             } else {
                 newTypes= new Type[0];
             }
 
-            return b.genericType(substitutingType, newTypes);
+            return ast.genericType(substitutingType, newTypes);
         }
 
-        return b.type(substitutingType);
+        return ast.type(substitutingType);
     }
 
     @Override
@@ -229,12 +229,12 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("contains")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("contains")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
             refactoredMi.arguments().remove(1);
         }
     }

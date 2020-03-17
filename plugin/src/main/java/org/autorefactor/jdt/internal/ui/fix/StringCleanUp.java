@@ -77,7 +77,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         ASTNode parent= node.getParent();
         boolean isStringValueOf= isStringValueOf(node);
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
@@ -85,7 +85,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
             if (ASTNodes.hasType(stringExpression, String.class.getCanonicalName())) {
                 // If node is already a String, no need to call toString()
-                rewrite.replace(node, b.createMoveTarget(stringExpression));
+                rewrite.replace(node, rewrite.createMoveTarget(stringExpression));
                 return false;
             }
 
@@ -119,7 +119,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             }
         } else if (isStringValueOf && ASTNodes.hasType(ASTNodes.arguments(node).get(0), String.class.getCanonicalName())) {
             if (ASTNodes.arguments(node).get(0) instanceof StringLiteral || ASTNodes.arguments(node).get(0) instanceof InfixExpression) {
-                rewrite.replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(node).get(0))));
+                rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))));
                 return false;
             }
         } else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
@@ -148,13 +148,13 @@ public class StringCleanUp extends AbstractCleanUpRule {
             MethodInvocation rightInvocation= ASTNodes.as(ASTNodes.arguments(node).get(0), MethodInvocation.class);
 
             if (leftInvocation != null && rightInvocation != null
-                    && ((ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                            && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
-                            || (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
-                                    && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
+                    && (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                            && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                            || ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
+                                    && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
                 Expression leftExpression= leftInvocation.getExpression();
                 Expression rightExpression= rightInvocation.getExpression();
-                rewrite.replace(node, b.invoke(b.createMoveTarget(leftExpression), "equalsIgnoreCase", b.createMoveTarget(rightExpression))); //$NON-NLS-1$
+                rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(leftExpression), "equalsIgnoreCase", rewrite.createMoveTarget(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
@@ -164,7 +164,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             Expression rightExpression= getReducedStringExpression(ASTNodes.arguments(node).get(0), isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                rewrite.replace(node, b.invoke(b.createMoveTarget(leftExpression), "equalsIgnoreCase", b.createMoveTarget(rightExpression))); //$NON-NLS-1$
+                rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(leftExpression), "equalsIgnoreCase", rewrite.createMoveTarget(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
@@ -177,7 +177,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 String value= stringLiteral.getLiteralValue();
 
                 if (value.length() == 1) {
-                    CharacterLiteral replacement= b.charLiteral();
+                    CharacterLiteral replacement= ast.charLiteral();
                     replacement.setCharValue(value.charAt(0));
                     rewrite.replace(stringLiteral, replacement);
                     return false;
@@ -201,33 +201,35 @@ public class StringCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-
         ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
 
         if (expectedType == null) {
             return true;
         }
 
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
         ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 
         if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-            cuRewrite.getASTRewrite().replace(toReplace, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
+            cuRewrite.getASTRewrite().replace(toReplace, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         } else {
-            cuRewrite.getASTRewrite().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
+            cuRewrite.getASTRewrite().replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), rewrite.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         }
 
         return false;
     }
 
     private Expression replaceToString(final Expression expression) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         if (expression != null) {
-            return b.createMoveTarget(expression);
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            return rewrite.createMoveTarget(expression);
         }
 
-        return b.this0();
+        return ast.this0();
     }
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {

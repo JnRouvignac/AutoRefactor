@@ -89,7 +89,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
                 || (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
                 && literalSize != null) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (literalSize == 0) {
                 if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)
@@ -98,32 +98,32 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (InfixExpression.Operator.GREATER.equals(operator)) {
-                    rewrite.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
+                    rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
 
                 if (InfixExpression.Operator.EQUALS.equals(operator)) {
-                    rewrite.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
+                    rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
 
                 if (InfixExpression.Operator.NOT_EQUALS.equals(operator)) {
-                    rewrite.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
+                    rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
 
                 if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
-                    rewrite.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
+                    rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
             } else if (literalSize == 1) {
                 if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
-                    rewrite.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
+                    rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 }
 
                 if (InfixExpression.Operator.LESS.equals(operator)) {
-                    rewrite.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
+                    rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
             }

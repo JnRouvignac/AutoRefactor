@@ -170,7 +170,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         if (ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$

@@ -209,31 +209,31 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
         }
 
         private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             String patternName= classesToUseWithImport.contains(Pattern.class.getCanonicalName()) ? Pattern.class.getSimpleName() : Pattern.class.getCanonicalName();
             importsToAdd.add(Pattern.class.getCanonicalName());
-            rewrite.replace(type, b.type(patternName));
-            rewrite.replace(initializer, b.invoke(b.name(patternName), COMPILE_METHOD, b.createMoveTarget(initializer)));
+            rewrite.replace(type, ast.type(patternName));
+            rewrite.replace(initializer, ast.invoke(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(initializer)));
 
             for (SimpleName regExUse : regExUses) {
                 MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
                 MethodInvocation newExpression= null;
 
                 if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), SPLIT_METHOD, String.class.getCanonicalName())) {
-                    newExpression= b.invoke(b.createMoveTarget(regExUse), SPLIT_METHOD, b.createMoveTarget(methodInvocation.getExpression()));
+                    newExpression= ast.invoke(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()));
                 } else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), SPLIT_METHOD, String.class.getCanonicalName(), int.class.getCanonicalName())) {
-                    newExpression= b.invoke(b.createMoveTarget(regExUse), SPLIT_METHOD, b.createMoveTarget(methodInvocation.getExpression()), b.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+                    newExpression= ast.invoke(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()), rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
                 } else {
-                    MethodInvocation matcherExpression= b.invoke(b.createMoveTarget(regExUse), MATCHER_METHOD, b.createMoveTarget(methodInvocation.getExpression()));
+                    MethodInvocation matcherExpression= ast.invoke(rewrite.createMoveTarget(regExUse), MATCHER_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()));
 
                     if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), MATCHES_METHOD, String.class.getCanonicalName())) {
-                        newExpression= b.invoke(matcherExpression, MATCHES_METHOD);
+                        newExpression= ast.invoke(matcherExpression, MATCHES_METHOD);
                     } else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_ALL_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
-                        newExpression= b.invoke(matcherExpression, REPLACE_ALL_METHOD, b.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+                        newExpression= ast.invoke(matcherExpression, REPLACE_ALL_METHOD, rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
                     } else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_FIRST_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
-                        newExpression= b.invoke(matcherExpression, REPLACE_FIRST_METHOD, b.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+                        newExpression= ast.invoke(matcherExpression, REPLACE_FIRST_METHOD, rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
                     }
                 }
 

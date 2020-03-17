@@ -159,6 +159,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
+        @SuppressWarnings("deprecation")
         private boolean maybeRefactorToTryWithResources(final TryStatement node, final List<Statement> tryStatements,
                 final VariableDeclarationStatement previousDeclStatement,
                 final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
@@ -183,9 +184,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         private VariableDeclarationExpression newResource(final List<Statement> tryStatements,
                 final VariableDeclarationStatement previousDeclStatement, final VariableDeclarationFragment previousDeclFragment,
                 final List<ASTNode> nodesToRemove) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-            return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
+            return fragment != null ? ast.declareExpression(rewrite.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
         }
 
         private VariableDeclarationFragment newFragment(final List<Statement> tryStatements,
@@ -193,7 +195,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
             List<SimpleName> definitions= visitor.getWrites();
 
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (!tryStatements.isEmpty()) {
                 Statement tryStatement= tryStatements.get(0);
@@ -203,15 +206,15 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                     nodesToRemove.add(tryStatement);
 
                     if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-                        return b.declareFragment(b.createMoveTarget(existingFragment.getName()),
-                                b.createMoveTarget(assignResource.getRightHandSide()));
+                        return ast.declareFragment(rewrite.createMoveTarget(existingFragment.getName()),
+                                rewrite.createMoveTarget(assignResource.getRightHandSide()));
                     }
 
                     return null;
                 }
             }
 
-            return containsOnly(definitions, existingFragment.getName()) ? b.createMoveTarget(existingFragment) : null;
+            return containsOnly(definitions, existingFragment.getName()) ? rewrite.createMoveTarget(existingFragment) : null;
         }
 
         private boolean containsOnly(final Collection<SimpleName> definitions, final Expression... simpleNames) {
@@ -228,12 +231,13 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
+        @SuppressWarnings("deprecation")
         private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
-            rewrite.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));
+            rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange(ASTNodes.resources(innerTryStatement)));
+            rewrite.replace(innerTryStatement, rewrite.createMoveTarget(innerTryStatement.getBody()));
             setResult(false);
             return false;
         }

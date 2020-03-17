@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
@@ -194,11 +195,13 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
             final MethodInvocation mi, final Set<String> classesToUseWithImport) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node,
-                b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
-                        "addAll", mi.getExpression() != null ? b.createMoveTarget(mi.getExpression()) : b.this0(), //$NON-NLS-1$
-                        b.createMoveTarget(iterable))));
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        rewrite.replace(node,
+                ast.toStatement(ast.invoke(ast.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
+                        "addAll", mi.getExpression() != null ? rewrite.createMoveTarget(mi.getExpression()) : ast.this0(), //$NON-NLS-1$
+                        rewrite.createMoveTarget(iterable))));
     }
 
     private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
@@ -256,15 +259,16 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private void replaceWithCollectionMethod(final ASTNode toReplace, final String methodName,
             final Expression affectedCollection,
             final Expression data) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        MethodInvocation newMethod;
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
+        MethodInvocation newMethod;
         if (affectedCollection != null) {
-            newMethod= b.invoke(b.createMoveTarget(affectedCollection), methodName, b.createMoveTarget(data));
+            newMethod= ast.invoke(rewrite.createMoveTarget(affectedCollection), methodName, rewrite.createMoveTarget(data));
         } else {
-            newMethod= b.invoke(methodName, b.createMoveTarget(data));
+            newMethod= ast.invoke(methodName, rewrite.createMoveTarget(data));
         }
 
-        cuRewrite.getASTRewrite().replace(toReplace, b.toStatement(newMethod));
+        rewrite.replace(toReplace, ast.toStatement(newMethod));
     }
 }

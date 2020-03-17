@@ -47,6 +47,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -138,9 +139,11 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getASTRewrite().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
-                cuRewrite.getASTRewrite().remove(nodeToRemove);
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+                rewrite.replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)));
+                rewrite.remove(nodeToRemove);
                 setResult(false);
                 return false;
             }

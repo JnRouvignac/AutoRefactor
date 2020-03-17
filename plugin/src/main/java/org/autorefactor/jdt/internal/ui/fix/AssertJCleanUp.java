@@ -196,7 +196,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     protected MethodInvocation invokeMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-            final ASTNodeFactory b, final MethodInvocation originalMethod, final String methodName,
+            final ASTNodeFactory ast, final MethodInvocation originalMethod, final String methodName,
             final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
@@ -205,44 +205,44 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
             qualifiedClassName= ASSERTIONS_CLASS;
             qualifiedClass= null;
         } else {
-            qualifiedClass= b.copyExpression(originalMethod);
+            qualifiedClass= ast.copyExpression(originalMethod);
         }
 
         if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
                 && !staticImports.contains(qualifiedClassName + ".*")) { //$NON-NLS-1$
-            qualifiedClass= b.name(qualifiedClassName);
+            qualifiedClass= ast.name(qualifiedClassName);
         }
 
         if (FAIL_METHOD.equals(methodName)) {
-            return invokeFail(b, failureMessage, qualifiedClass);
+            return invokeFail(ast, failureMessage, qualifiedClass);
         }
 
-        return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, b, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
+        return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, ast, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
     }
 
-    private MethodInvocation invokeFail(final ASTNodeFactory b, final Expression failureMessage,
+    private MethodInvocation invokeFail(final ASTNodeFactory ast, final Expression failureMessage,
             final Expression qualifiedClass) {
         if (failureMessage != null) {
             MethodInvocation failureMethod= (MethodInvocation) failureMessage;
             List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
             for (Object message : failureMethod.arguments()) {
-                copyOfMessages.add(b.createCopyTarget((Expression) message));
+                copyOfMessages.add(ast.createCopyTarget((Expression) message));
             }
 
-            return b.invoke(qualifiedClass, FAIL_METHOD, copyOfMessages);
+            return ast.invoke(qualifiedClass, FAIL_METHOD, copyOfMessages);
         }
 
-        return b.invoke(qualifiedClass, FAIL_METHOD, b.null0());
+        return ast.invoke(qualifiedClass, FAIL_METHOD, ast.null0());
     }
 
     @Override
     protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-            final ASTNodeFactory b, final Expression copyOfClass, final String methodName,
+            final ASTNodeFactory ast, final Expression copyOfClass, final String methodName,
             final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         String finalMethodName= getFinalMethodName(methodName);
 
-        Expression assertionMethod= b.invoke(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
+        Expression assertionMethod= ast.invoke(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
 
         if (failureMessage != null) {
             MethodInvocation failureMethod= (MethodInvocation) failureMessage;
@@ -250,22 +250,22 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
             List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
             for (Object message : failureMethod.arguments()) {
-                copyOfMessages.add(b.createCopyTarget((Expression) message));
+                copyOfMessages.add(ast.createCopyTarget((Expression) message));
             }
 
-            assertionMethod= b.invoke(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
+            assertionMethod= ast.invoke(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
         }
 
         if (copyOfExpected != null) {
             if (delta != null && IS_EQUAL_TO_METHOD.equals(finalMethodName)) {
                 importsToAdd.add(OFFSET_CLASS);
-                return b.invoke(assertionMethod, finalMethodName, copyOfExpected, b.invoke(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", b.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
+                return ast.invoke(assertionMethod, finalMethodName, copyOfExpected, ast.invoke(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", ast.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            return b.invoke(assertionMethod, finalMethodName, copyOfExpected);
+            return ast.invoke(assertionMethod, finalMethodName, copyOfExpected);
         }
 
-        return b.invoke(assertionMethod, finalMethodName);
+        return ast.invoke(assertionMethod, finalMethodName);
     }
 
     private String getFinalMethodName(final String methodName) {

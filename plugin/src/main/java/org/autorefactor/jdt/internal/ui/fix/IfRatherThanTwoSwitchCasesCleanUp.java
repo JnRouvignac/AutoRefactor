@@ -97,7 +97,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
         int caseIndexWithDefault= -1;
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         for (Object object : statements) {
             Statement statement= (Statement) object;
@@ -166,14 +166,14 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        replaceSwitch(node, switchStructure, caseIndexWithDefault, b);
+        replaceSwitch(node, switchStructure, caseIndexWithDefault, ast);
 
         return false;
     }
 
     private void replaceSwitch(final SwitchStatement node,
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
-            final ASTNodeFactory b) {
+            final ASTNodeFactory ast) {
         int localCaseIndexWithDefault= caseIndexWithDefault;
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -187,30 +187,30 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             if (caseStructure.getFirst().isEmpty()) {
                 newCondition= null;
             } else if (caseStructure.getFirst().size() == 1) {
-                newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
+                newCondition= buildEquality(ast, discriminant, caseStructure.getFirst().get(0));
             } else {
                 List<Expression> equalities= new ArrayList<>();
 
                 for (Expression value : caseStructure.getFirst()) {
-                    equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
+                    equalities.add(ast.parenthesizeIfNeeded(buildEquality(ast, discriminant, value)));
                 }
-                newCondition= b.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
+                newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
             }
 
             Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
 
             for (int j= 0; j < caseStructure.getSecond().size(); j++) {
-                copyOfStatements[j]= b.createCopyTarget(caseStructure.getSecond().get(j));
+                copyOfStatements[j]= ast.createCopyTarget(caseStructure.getSecond().get(j));
             }
 
-            Block newBlock= b.block(copyOfStatements);
+            Block newBlock= ast.block(copyOfStatements);
 
             if (currentBlock != null) {
-                currentBlock= b.if0(newCondition, newBlock, currentBlock);
+                currentBlock= ast.if0(newCondition, newBlock, currentBlock);
             } else if (copyOfStatements.length == 0) {
                 localCaseIndexWithDefault= -1;
             } else if (localCaseIndexWithDefault == -1) {
-                currentBlock= b.if0(newCondition, newBlock);
+                currentBlock= ast.if0(newCondition, newBlock);
             } else {
                 currentBlock= newBlock;
             }
@@ -219,18 +219,18 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         rewrite.replace(node, currentBlock);
     }
 
-    private Expression buildEquality(final ASTNodeFactory b, final Expression discriminant, final Expression value) {
+    private Expression buildEquality(final ASTNodeFactory ast, final Expression discriminant, final Expression value) {
         Expression equality;
 
         if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
                 Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-            equality= b.invoke(b.createCopyTarget(value), "equals", b.createCopyTarget(discriminant)); //$NON-NLS-1$
+            equality= ast.invoke(ast.createCopyTarget(value), "equals", ast.createCopyTarget(discriminant)); //$NON-NLS-1$
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-            equality= b.infixExpression(b.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
-                    b.name(value.resolveTypeBinding().getQualifiedName()), b.createCopyTarget((SimpleName) value)));
+            equality= ast.infixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
+                    ast.name(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
         } else {
-            equality= b.infixExpression(b.parenthesizeIfNeeded(b.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
-                    b.createCopyTarget(value));
+            equality= ast.infixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
+                    ast.createCopyTarget(value));
         }
 
         return equality;

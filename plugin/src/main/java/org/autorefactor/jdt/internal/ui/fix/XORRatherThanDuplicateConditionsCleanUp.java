@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
@@ -123,12 +124,13 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     private void replaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
             final Expression secondExpression, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-            cuRewrite.getASTRewrite().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, b.createMoveTarget(secondExpression)));
+            rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, rewrite.createMoveTarget(secondExpression)));
         } else {
-            cuRewrite.getASTRewrite().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.XOR, b.createMoveTarget(secondExpression)));
+            rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(firstExpression), InfixExpression.Operator.XOR, rewrite.createMoveTarget(secondExpression)));
         }
     }
 }

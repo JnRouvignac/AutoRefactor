@@ -37,7 +37,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -417,10 +416,10 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
         UnionType result= cuRewrite.getAST().newUnionType();
         List<Type> unionedTypes= ASTNodes.types(result);
-        unionedTypes.addAll(b.createMoveTarget(allTypes));
+        unionedTypes.addAll(rewrite.createMoveTarget(allTypes));
         return result;
     }
 

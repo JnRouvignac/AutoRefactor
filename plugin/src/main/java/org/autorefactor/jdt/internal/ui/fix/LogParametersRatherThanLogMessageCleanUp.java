@@ -94,7 +94,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
             final InfixExpression message) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         StringBuilder messageBuilder= new StringBuilder();
         List<Expression> params= new LinkedList<>();
@@ -113,29 +113,30 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 messageBuilder.append(literal);
             } else {
                 hasObjects= true;
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 messageBuilder.append("{}"); //$NON-NLS-1$
 
                 if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-                    params.add(b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(string))); //$NON-NLS-1$
+                    params.add(ast.invoke(String.class.getSimpleName(), "valueOf", rewrite.createMoveTarget(string))); //$NON-NLS-1$
                 } else {
-                    params.add(b.createMoveTarget(string));
+                    params.add(rewrite.createMoveTarget(string));
                 }
             }
         }
 
         if (hasLiteral && hasObjects) {
-            replaceConcatenation(node, methodName, b, messageBuilder, params);
+            replaceConcatenation(node, methodName, ast, messageBuilder, params);
             return false;
         }
 
         return true;
     }
 
-    private void replaceConcatenation(final MethodInvocation node, final String methodName, final ASTNodeFactory b,
+    private void replaceConcatenation(final MethodInvocation node, final String methodName, final ASTNodeFactory ast,
             final StringBuilder messageBuilder, final List<Expression> params) {
-        params.add(0, b.string(messageBuilder.toString()));
+        params.add(0, ast.string(messageBuilder.toString()));
 
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, params));
+        rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(node.getExpression()), methodName, params));
     }
 }

@@ -74,8 +74,8 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        Expression replacement= getOppositeExpression(b, node.getOperand());
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        Expression replacement= getOppositeExpression(ast, node.getOperand());
 
         if (replacement != null) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -86,14 +86,15 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Expression getOppositeExpression(final ASTNodeFactory b, final Expression negativeExpression) {
+    private Expression getOppositeExpression(final ASTNodeFactory ast, final Expression negativeExpression) {
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
         Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 
         if (operand instanceof PrefixExpression) {
             PrefixExpression pe= (PrefixExpression) operand;
 
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-                return b.createMoveTarget(pe.getOperand());
+                return rewrite.createMoveTarget(pe.getOperand());
             }
         } else if (operand instanceof InfixExpression) {
             InfixExpression ie= (InfixExpression) operand;
@@ -105,21 +106,21 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                 if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
                     for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
                         Expression anOperand= it.next();
-                        Expression oppositeOperand= getOppositeExpression(b, anOperand);
+                        Expression oppositeOperand= getOppositeExpression(ast, anOperand);
 
-                        it.set(oppositeOperand != null ? oppositeOperand : b.negate(anOperand));
+                        it.set(oppositeOperand != null ? oppositeOperand : ast.negate(anOperand));
                     }
                 } else {
-                    allOperands= b.createMoveTarget(allOperands);
+                    allOperands= rewrite.createMoveTarget(allOperands);
                 }
 
-                return b.parenthesize(b.infixExpression(reverseOp, allOperands));
+                return ast.parenthesize(ast.infixExpression(reverseOp, allOperands));
             }
         } else {
             Boolean constant= ASTNodes.getBooleanLiteral(operand);
 
             if (constant != null) {
-                return b.boolean0(!constant);
+                return ast.boolean0(!constant);
             }
         }
 

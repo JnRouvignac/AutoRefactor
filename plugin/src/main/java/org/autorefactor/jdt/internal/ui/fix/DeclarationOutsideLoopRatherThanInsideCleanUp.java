@@ -134,11 +134,11 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     }
                 }
 
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                 for (VariableDeclarationStatement candidate : candidates) {
-                    moveDeclaration(b, rewrite, statement, candidate);
+                    moveDeclaration(ast, rewrite, statement, candidate);
                     result= false;
                 }
             }
@@ -158,20 +158,20 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
         return false;
     }
 
-    private void moveDeclaration(final ASTNodeFactory b, final ASTRewrite rewrite, final Statement statement,
+    private void moveDeclaration(final ASTNodeFactory ast, final ASTRewrite rewrite, final Statement statement,
             final VariableDeclarationStatement varToMove) {
         VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
         if (fragment.getInitializer() != null) {
-            Type copyOfType= b.createCopyTarget(varToMove.getType());
+            Type copyOfType= ast.createCopyTarget(varToMove.getType());
             SimpleName name= fragment.getName();
-            VariableDeclarationFragment newFragment= b.declareFragment(b.createCopyTarget(name));
+            VariableDeclarationFragment newFragment= ast.declareFragment(ast.createCopyTarget(name));
             @SuppressWarnings("unchecked")
             List<Dimension> extraDimensions= fragment.extraDimensions();
             @SuppressWarnings("unchecked")
             List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-            newExtraDimensions.addAll(b.createMoveTarget(extraDimensions));
-            VariableDeclarationStatement newDeclareStatement= b.declareStatement(copyOfType, newFragment);
+            newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+            VariableDeclarationStatement newDeclareStatement= ast.declareStatement(copyOfType, newFragment);
             @SuppressWarnings("unchecked")
             List<IExtendedModifier> modifiers= varToMove.modifiers();
             @SuppressWarnings("unchecked")
@@ -181,15 +181,15 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 Modifier modifier= (Modifier) iExtendedModifier;
 
                 if (!modifier.isPrivate() && !modifier.isStatic()) {
-                    newModifiers.add(b.createMoveTarget(modifier));
+                    newModifiers.add(rewrite.createMoveTarget(modifier));
                 }
             }
 
             rewrite.insertBefore(newDeclareStatement, statement);
             rewrite.replace(varToMove,
-                    b.toStatement(b.assign(b.createCopyTarget(name), Assignment.Operator.ASSIGN, b.createMoveTarget(fragment.getInitializer()))));
+                    ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, rewrite.createMoveTarget(fragment.getInitializer()))));
         } else {
-            rewrite.insertBefore(b.createMoveTarget(varToMove), statement);
+            rewrite.insertBefore(rewrite.createMoveTarget(varToMove), statement);
             rewrite.remove(varToMove);
         }
     }

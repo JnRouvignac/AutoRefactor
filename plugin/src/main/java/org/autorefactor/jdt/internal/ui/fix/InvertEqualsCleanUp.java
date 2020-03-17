@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -92,10 +93,11 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
             final Expression arg0) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
-        cuRewrite.getASTRewrite().replace(node,
-                b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget(arg0)), methodName, b.createMoveTarget(expression)));
+        rewrite.replace(node,
+                ast.invoke(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(arg0)), methodName, rewrite.createMoveTarget(expression)));
     }
 }

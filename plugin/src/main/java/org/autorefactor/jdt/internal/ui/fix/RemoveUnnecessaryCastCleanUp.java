@@ -30,6 +30,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.Iterator;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
@@ -99,8 +100,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         }
 
         if (canRemoveCast(node)) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getExpression()));
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.replace(node, rewrite.createMoveTarget(node.getExpression()));
             return false;
         }
 
@@ -108,9 +109,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        NumberLiteral numberLiteral= b.number(literal.getToken() + postfix);
+        NumberLiteral numberLiteral= ast.number(literal.getToken() + postfix);
 
         cuRewrite.getASTRewrite().replace(node, numberLiteral);
     }
@@ -143,7 +144,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                             && !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
                 }
 
-                return ((isNotRefactored(lo) && isStringConcat(ie))
+                return (isNotRefactored(lo) && isStringConcat(ie)
                         || (isIntegralDivision(ie) ? canRemoveCastInIntegralDivision(node, ie)
                                 : isAssignmentCompatibleInInfixExpression(node, ie)))
                         && !isIntegralDividedByFloatingPoint(node, ie);
@@ -261,9 +262,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             int val= (Integer) value;
-            return (ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
-                    || (ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
-                    || (ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
+            return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
+                    || ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
+                    || ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
         }
 
         return false;

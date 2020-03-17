@@ -85,10 +85,10 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     }
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.replace(node, b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
-                b.createMoveTarget(mi.getExpression())));
+        rewrite.replace(node, ast.invoke(ast.parenthesizeIfNeeded(rewrite.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
+                rewrite.createMoveTarget(mi.getExpression())));
     }
 }

@@ -236,32 +236,32 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
         private void extractIncrement(final Expression node, final Expression variable,
                 final Statement statement) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), b.createCopyTarget(variable));
+            rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable));
 
             if (node instanceof PostfixExpression) {
-                Statement newAssignment= b.toStatement(b.createMoveTarget(node));
+                Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(node));
 
                 if (ASTNodes.canHaveSiblings(statement)) {
                     rewrite.insertAfter(newAssignment, statement);
                 } else {
-                    Block newBlock= b.block(b.createMoveTarget(statement), newAssignment);
+                    Block newBlock= ast.block(rewrite.createMoveTarget(statement), newAssignment);
 
                     rewrite.replace(statement, newBlock);
                 }
             } else {
                 Statement newAssignment;
                 if (ASTNodes.hasOperator((PrefixExpression) node, PrefixExpression.Operator.INCREMENT)) {
-                    newAssignment= b.toStatement(b.postfixExpression(b.createMoveTarget(variable), PostfixExpression.Operator.INCREMENT));
+                    newAssignment= ast.toStatement(ast.postfixExpression(rewrite.createMoveTarget(variable), PostfixExpression.Operator.INCREMENT));
                 } else {
-                    newAssignment= b.toStatement(b.postfixExpression(b.createMoveTarget(variable), PostfixExpression.Operator.DECREMENT));
+                    newAssignment= ast.toStatement(ast.postfixExpression(rewrite.createMoveTarget(variable), PostfixExpression.Operator.DECREMENT));
                 }
 
                 if (ASTNodes.canHaveSiblings(statement)) {
                     rewrite.insertBefore(newAssignment, statement);
                 } else {
-                    Block newBlock= b.block(newAssignment, b.createMoveTarget(statement));
+                    Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(statement));
 
                     rewrite.replace(statement, newBlock);
                 }

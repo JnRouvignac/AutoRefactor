@@ -117,15 +117,15 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     }
 
     private Statement createWakelockReleaseStatement(final MethodInvocation methodInvocation) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
-                b.block(b.toStatement(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        return ast.if0(ast.not(ast.invoke(ast.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
+                ast.block(ast.toStatement(ast.invoke(ast.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration createOnPauseMethodDeclaration() {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(), //$NON-NLS-1$ //$NON-NLS-2$
-                b.block(b.toStatement(b.superInvoke("onPause")))); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        return ast.method(ast.extendedModifiers(ast.annotation("Override"), ast.protected0()), "onPause", ast.parameters(), //$NON-NLS-1$ //$NON-NLS-2$
+                ast.block(ast.toStatement(ast.superInvoke("onPause")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration findMethod(final TypeDeclaration typeDeclaration, final String methodToFind) {

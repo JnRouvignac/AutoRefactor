@@ -147,7 +147,8 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
             Type varType= vds.getType();
             VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
 
@@ -158,14 +159,14 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                     return false;
                 }
                 // Java style array "Type[] var"
-                ReturnStatement newReturnStatement= b
-                        .return0(b.newArray(b.createCopyTarget(arrayType), b.createMoveTarget(returnExpression)));
+                ReturnStatement newReturnStatement= ast
+                        .return0(ast.newArray(ast.createCopyTarget(arrayType), rewrite.createMoveTarget(returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             } else {
                 // C style array "Type var[]"
-                ArrayType arrayType= node.getAST().newArrayType(b.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
-                ReturnStatement newReturnStatement= b
-                        .return0(b.newArray(arrayType, b.createMoveTarget(returnExpression)));
+                ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
+                ReturnStatement newReturnStatement= ast
+                        .return0(ast.newArray(arrayType, rewrite.createMoveTarget(returnExpression)));
                 replaceReturnStatementForArray(node, vds, newReturnStatement);
             }
 
@@ -181,10 +182,10 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpression) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             rewrite.remove(previousSibling);
-            rewrite.replace(node, b.return0(b.createMoveTarget(returnExpression)));
+            rewrite.replace(node, ast.return0(rewrite.createMoveTarget(returnExpression)));
         }
     }
 }

@@ -129,7 +129,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     /**
      * Returns the substitute type.
      *
-     * @param b                      The builder.
+     * @param ast                      The builder.
      * @param origType               The original type
      * @param originalExpression     The original expression
      * @param classesToUseWithImport The classes that should be used with simple
@@ -139,7 +139,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      * @return the substitute type.
      */
     @Override
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
+    protected Type substituteType(final ASTNodeFactory ast, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         if (origType.isParameterizedType()) {
             return null;
@@ -147,9 +147,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
         TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
-        ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.createCopyTarget(origType));
+        ParameterizedType parameterizedType= ast.getAST().newParameterizedType(ast.createCopyTarget(origType));
         ASTNodes.typeArguments(parameterizedType).clear();
-        ASTNodes.typeArguments(parameterizedType).add(b.toType(elementType, typeNameDecider));
+        ASTNodes.typeArguments(parameterizedType).add(ast.toType(elementType, typeNameDecider));
         return parameterizedType;
     }
 

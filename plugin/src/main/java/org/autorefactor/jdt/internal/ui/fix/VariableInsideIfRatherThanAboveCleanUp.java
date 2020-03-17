@@ -150,15 +150,15 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
         private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
                 final List<Statement> statements) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (statement instanceof Block) {
-                rewrite.insertBefore(b.createMoveTarget(variableAssignment), statements.get(0));
+                rewrite.insertBefore(rewrite.createMoveTarget(variableAssignment), statements.get(0));
                 rewrite.remove(variableAssignment);
             } else {
-                List<Statement> copyOfThenStatements= b.createMoveTarget(statements);
-                copyOfThenStatements.add(0, b.createMoveTarget(variableAssignment));
-                Block block= b.block(copyOfThenStatements);
+                List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
+                copyOfThenStatements.add(0, rewrite.createMoveTarget(variableAssignment));
+                Block block= ast.block(copyOfThenStatements);
                 rewrite.replace(statement, block);
             }
         }

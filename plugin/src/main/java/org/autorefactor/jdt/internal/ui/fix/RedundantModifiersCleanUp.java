@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -259,15 +259,15 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         for (int i= 0; i < reorderedModifiers.size(); i++) {
             IExtendedModifier extendedModifier= reorderedModifiers.get(i);
 
             if (extendedModifier.isModifier()) {
-                cuRewrite.getASTRewrite().moveToIndex((Modifier) extendedModifier, i, b.createMoveTarget((Modifier) extendedModifier));
+                rewrite.moveToIndex((Modifier) extendedModifier, i, rewrite.createMoveTarget((Modifier) extendedModifier));
             } else {
-                cuRewrite.getASTRewrite().moveToIndex((Annotation) extendedModifier, i, b.createMoveTarget((Annotation) extendedModifier));
+                rewrite.moveToIndex((Annotation) extendedModifier, i, rewrite.createMoveTarget((Annotation) extendedModifier));
             }
         }
     }

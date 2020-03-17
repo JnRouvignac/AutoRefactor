@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -80,15 +81,16 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     }
 
     private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        FieldAccess fa= b.getAST().newFieldAccess();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        FieldAccess fa= ast.getAST().newFieldAccess();
         Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
         if (expression != null) {
-            fa.setExpression(b.createMoveTarget(expression));
+            fa.setExpression(rewrite.createMoveTarget(expression));
         }
 
-        fa.setName(b.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-        cuRewrite.getASTRewrite().replace(node, fa);
+        fa.setName(ast.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
+        rewrite.replace(node, fa);
     }
 }

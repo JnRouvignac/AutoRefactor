@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -100,13 +101,14 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     }
 
     @Override
-    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final ASTNodeFactory b) {
-        MethodInvocation invoke= b.invoke(b.createMoveTarget(iterable), "contains", b.createMoveTarget(toFind)); //$NON-NLS-1$
+    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final ASTNodeFactory ast) {
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        MethodInvocation invoke= ast.invoke(rewrite.createMoveTarget(iterable), "contains", rewrite.createMoveTarget(toFind)); //$NON-NLS-1$
 
         if (isPositive) {
             return invoke;
         }
 
-        return b.not(invoke);
+        return ast.not(invoke);
     }
 }

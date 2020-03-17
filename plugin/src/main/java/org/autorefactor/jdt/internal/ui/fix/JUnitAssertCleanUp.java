@@ -191,12 +191,12 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     protected MethodInvocation invokeQualifiedMethod(Set<String> classesToUseWithImport, Set<String> importsToAdd,
-            final ASTNodeFactory b, final Expression copyOfExpression, final String methodName,
+            final ASTNodeFactory ast, final Expression copyOfExpression, final String methodName,
             final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
         List<Expression> arguments= new ArrayList<>(4);
 
         if (failureMessage != null) {
-            arguments.add(b.createCopyTarget(failureMessage));
+            arguments.add(ast.createCopyTarget(failureMessage));
         }
 
         if (copyOfExpected != null) {
@@ -211,6 +211,6 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
             arguments.add(delta);
         }
 
-        return b.invoke(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
+        return ast.invoke(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
     }
 }

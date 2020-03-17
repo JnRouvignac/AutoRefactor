@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.core.dom;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -207,6 +208,23 @@ public class ASTRewrite {
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T createMoveTarget(final T node) {
         return (T) rewrite.createMoveTarget(node);
+    }
+
+    /**
+     * Moves all the provided {@link ASTNode}s in place.
+     *
+     * @param <T>   the actual nodes type
+     * @param nodes the nodes to move
+     * @return the provided list with all nodes moved
+     */
+    public <T extends ASTNode> List<T> createMoveTarget(final Collection<T> nodes) {
+        List<T> movedNodes= new ArrayList<>(nodes.size());
+
+        for (T astNode : nodes) {
+            movedNodes.add(createMoveTarget(astNode));
+        }
+
+        return movedNodes;
     }
 
     /**

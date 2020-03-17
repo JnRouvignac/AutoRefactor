@@ -153,7 +153,7 @@ public enum OperatorEnum {
      */
     INFIX_CONDITIONAL_OR(InfixExpression.Operator.CONDITIONAL_OR, 14, true, InfixExpression.Operator.CONDITIONAL_AND),
 
-    /** The ternary operator '?:'. For example <code>b ? 1 : 2</code>. */
+    /** The ternary operator '?:'. For example <code>ast ? 1 : 2</code>. */
     TERNARY(null, 15, false, false),
 
     /** The assign operator '='. For example <code>i = 1</code>. */

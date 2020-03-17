@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.JavaConstants;
@@ -149,8 +150,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getValueOf(final String name, final String numberLiteral) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        return b.invoke(name, "valueOf", b.number(numberLiteral)); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        return ast.invoke(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
     }
 
     private StringLiteral getStringLiteral(final String numberLiteral) {
@@ -208,8 +209,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
-                    ASTNodeFactory b= cuRewrite.getASTBuilder();
-                    cuRewrite.getASTRewrite().replace(node, b.parenthesize(getCompareToNode(isPositive, mi)));
+                    ASTNodeFactory ast= cuRewrite.getASTBuilder();
+                    cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
                     cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi));
                 }
@@ -235,7 +236,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getClassInstanceCreatorNode(final Expression expression, final String numberLiteral) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         String fullyQualifiedName;
         if (expression instanceof Name) {
@@ -246,13 +247,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
             throw new IllegalArgumentException();
         }
 
-        return b.new0(fullyQualifiedName, b.string(numberLiteral));
+        return ast.new0(fullyQualifiedName, ast.string(numberLiteral));
     }
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        MethodInvocation mi= b.invoke(b.createMoveTarget(node.getExpression()), "compareTo", b.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        MethodInvocation mi= ast.invoke(rewrite.createMoveTarget(node.getExpression()), "compareTo", rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
-        return b.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
+        return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
     }
 }

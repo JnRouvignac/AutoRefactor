@@ -37,6 +37,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -127,8 +128,9 @@ public class MapCleanUp extends AbstractCleanUpRule {
                 final ExpressionStatement nodeToRemove) {
             ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                ASTNodeFactory b= cuRewrite.getASTBuilder();
-                cuRewrite.getASTRewrite().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
+                ASTNodeFactory ast= cuRewrite.getASTBuilder();
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                cuRewrite.getASTRewrite().replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)));
                 cuRewrite.getASTRewrite().remove(nodeToRemove);
                 setResult(false);
                 return false;

@@ -155,22 +155,22 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("toArray")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("toArray")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "firstElement")) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("getFirst")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("getFirst")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "lastElement")) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("getLast")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("getLast")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("remove")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("remove")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("clear")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("clear")); //$NON-NLS-1$
         } else if (ASTNodes.usesGivenSignature(originalMi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$
-            refactoredMi.setName(b.simpleName("isEmpty")); //$NON-NLS-1$
+            refactoredMi.setName(ast.simpleName("isEmpty")); //$NON-NLS-1$
         }
     }
 

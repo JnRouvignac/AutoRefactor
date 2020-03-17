@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.IfStatement;
 
@@ -78,13 +77,12 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     }
 
     private void refactorCondition(final IfStatement secondIf) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (secondIf.getElseStatement() == null) {
             rewrite.remove(secondIf);
         } else {
-            rewrite.replace(secondIf, b.createMoveTarget(secondIf.getElseStatement()));
+            rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getElseStatement()));
         }
     }
 }

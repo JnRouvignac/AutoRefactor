@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
@@ -723,8 +723,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
                 || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
                         && !localIdentifiers.contains(qname.simpleName)) {
-            ASTNodeFactory b= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node, b.createMoveTarget(node.getName()));
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            rewrite.replace(node, rewrite.createMoveTarget(node.getName()));
             return false;
         }
 

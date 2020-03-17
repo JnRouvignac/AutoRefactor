@@ -143,11 +143,11 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
     }
 
     private void makeStatic(final TypeDeclaration node) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         List<?> modifiers= node.modifiers();
-        Modifier static0= b.static0();
+        Modifier static0= ast.static0();
 
         if (modifiers.isEmpty()) {
             rewrite.insertBefore(static0, node);

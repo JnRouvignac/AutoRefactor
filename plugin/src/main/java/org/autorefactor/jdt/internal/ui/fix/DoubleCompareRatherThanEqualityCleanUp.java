@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -75,10 +76,12 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
     }
 
     private void replace(final InfixExpression node) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node,
-                b.infixExpression(
-                        b.invoke(Double.class.getSimpleName(), "compare", b.createMoveTarget(node.getLeftOperand()), b.createMoveTarget(node.getRightOperand())), //$NON-NLS-1$
-                        node.getOperator(), b.number("0"))); //$NON-NLS-1$
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        rewrite.replace(node,
+                ast.infixExpression(
+                        ast.invoke(Double.class.getSimpleName(), "compare", rewrite.createMoveTarget(node.getLeftOperand()), rewrite.createMoveTarget(node.getRightOperand())), //$NON-NLS-1$
+                        node.getOperator(), ast.number("0"))); //$NON-NLS-1$
     }
 }

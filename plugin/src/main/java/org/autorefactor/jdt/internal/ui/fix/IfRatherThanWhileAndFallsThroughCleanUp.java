@@ -97,18 +97,18 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
     }
 
     private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
             if (ASTNodes.canHaveSiblings(breakStatement)) {
                 rewrite.remove(breakStatement);
             } else {
-                rewrite.replace(breakStatement, b.block());
+                rewrite.replace(breakStatement, ast.block());
             }
         }
 
-        rewrite.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
+        rewrite.replace(node, ast.if0(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())));
     }
 
     private static class BreakVisitor extends InterruptibleVisitor {

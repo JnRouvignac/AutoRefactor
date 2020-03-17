@@ -672,15 +672,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
             final CollectedData data) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         @SuppressWarnings("unchecked")
         List<Statement> statements= node.getBody().statements();
-        Name objectsClassName= b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
+        Name objectsClassName= ast.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
 
         rewrite.replace(statements.get(0),
-                b.return0(b.invoke(objectsClassName, "hash", b.createMoveTarget(data.getFields())))); //$NON-NLS-1$
+                ast.return0(ast.invoke(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields())))); //$NON-NLS-1$
 
         for (int i= 1; i < statements.size(); i++) {
             rewrite.remove(statements.get(i));

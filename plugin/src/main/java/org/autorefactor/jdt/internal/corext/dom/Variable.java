@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class Variable {
     private final String typeName;
     private final String variableName;
-    private final ASTNodeFactory b;
+    private final ASTNodeFactory ast;
 
     /**
      * Builds a variable with its name and its type.
@@ -50,7 +50,7 @@ public class Variable {
     public Variable(final String typeName, final String variableName, final ASTNodeFactory astBuilder) {
         this.typeName= typeName;
         this.variableName= variableName;
-        this.b= astBuilder;
+        this.ast= astBuilder;
     }
 
     /**
@@ -70,7 +70,7 @@ public class Variable {
      * @return a new {@link SimpleName}
      */
     public SimpleName varName() {
-        return b.simpleName(variableName);
+        return ast.simpleName(variableName);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Variable {
      */
     public Type type() {
         checkTypeDefined();
-        return b.type(typeName);
+        return ast.type(typeName);
     }
 
     /**
@@ -99,7 +99,7 @@ public class Variable {
      */
     public SimpleName typeName() {
         checkTypeDefined();
-        return b.simpleName(typeName);
+        return ast.simpleName(typeName);
     }
 
     /**
@@ -126,7 +126,7 @@ public class Variable {
      * @return a new {@link VariableDeclarationStatement}
      */
     public VariableDeclarationStatement declareStatement() {
-        return b.declareStatement(type(), varName(), null);
+        return ast.declareStatement(type(), varName(), null);
     }
 
     @Override

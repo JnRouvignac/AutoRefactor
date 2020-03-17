@@ -124,11 +124,11 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
     private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
             final Type valueType, final List<Expression> arguments) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
-        Type newType= b.genericType(
-                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), b.createCopyTarget(keyType),
-                b.createCopyTarget(valueType));
+        Type newType= ast.genericType(
+                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), ast.createCopyTarget(keyType),
+                ast.createCopyTarget(valueType));
 
         // If there were no type args in original creation (diamond operator),
         // remove them from replacement
@@ -136,7 +136,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
             typeArgs(newType).clear();
         }
 
-        cuRewrite.getASTRewrite().replace(cic, b.new0(newType, newParam));
+        cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam));
     }
 
     /**

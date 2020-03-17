@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
@@ -125,11 +126,12 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private void replaceWithArraysFill(final ForStatement node, final Set<String> classesToUseWithImport,
             final Assignment assignment, final ArrayAccess arrayAccess) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(node,
-                b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Arrays.class.getCanonicalName()) ? Arrays.class.getSimpleName() : Arrays.class.getCanonicalName()),
-                        "fill", b.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
-                        b.createMoveTarget(assignment.getRightHandSide()))));
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        rewrite.replace(node,
+                ast.toStatement(ast.invoke(ast.name(classesToUseWithImport.contains(Arrays.class.getCanonicalName()) ? Arrays.class.getSimpleName() : Arrays.class.getCanonicalName()),
+                        "fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
+                        rewrite.createMoveTarget(assignment.getRightHandSide()))));
     }
 
     private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess aa) {

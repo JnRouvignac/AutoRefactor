@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -90,7 +91,8 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         InfixExpression.Operator lazyOperator;
 
@@ -100,6 +102,6 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
         }
 
-        cuRewrite.getASTRewrite().replace(node, b.infixExpression(lazyOperator, b.createMoveTarget(allOperands)));
+        rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)));
     }
 }

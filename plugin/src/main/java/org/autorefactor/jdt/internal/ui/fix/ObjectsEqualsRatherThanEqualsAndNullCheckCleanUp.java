@@ -227,11 +227,11 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private void replaceEquals(final IfStatement node, final Expression firstField, final Expression secondField,
             final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         rewrite.replace(node,
-                b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
-                        "equals", b.createMoveTarget(firstField), b.createMoveTarget(secondField))), b.block(b.createMoveTarget(returnStmt1)))); //$NON-NLS-1$
+                ast.if0(ast.not(ast.invoke(ast.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
+                        "equals", rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStmt1)))); //$NON-NLS-1$
     }
 }

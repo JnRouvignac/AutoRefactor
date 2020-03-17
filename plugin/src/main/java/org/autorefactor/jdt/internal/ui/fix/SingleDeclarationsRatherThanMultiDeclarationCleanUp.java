@@ -94,32 +94,32 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     @SuppressWarnings("rawtypes")
     private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
             final List fragments, final Javadoc docComment) {
-        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         for (int i= fragments.size() - 1; 0 <= i; i--) {
             VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
 
-            SimpleName copyOfFragment= b.createCopyTarget(fragment.getName());
-            Type copyOfType= b.createCopyTarget(type);
+            SimpleName copyOfFragment= ast.createCopyTarget(fragment.getName());
+            Type copyOfType= ast.createCopyTarget(type);
             Expression copyOfInitializer;
             if (fragment.getInitializer() != null) {
-                copyOfInitializer= b.createCopyTarget(fragment.getInitializer());
+                copyOfInitializer= ast.createCopyTarget(fragment.getInitializer());
             } else {
                 copyOfInitializer= null;
             }
 
-            VariableDeclarationFragment newFragment= b.declareFragment(copyOfFragment, copyOfInitializer);
+            VariableDeclarationFragment newFragment= ast.declareFragment(copyOfFragment, copyOfInitializer);
             ASTNode newNode;
             if (node instanceof VariableDeclarationStatement) {
-                VariableDeclarationStatement newStatement= b.declareStatement(copyOfType, newFragment);
-                updateModifiers(b, modifiers, newStatement.modifiers());
+                VariableDeclarationStatement newStatement= ast.declareStatement(copyOfType, newFragment);
+                updateModifiers(ast, modifiers, newStatement.modifiers());
                 newNode= newStatement;
             } else {
-                FieldDeclaration newField= b.declareField(copyOfType, newFragment);
+                FieldDeclaration newField= ast.declareField(copyOfType, newFragment);
                 if (docComment != null) {
-                    newField.setJavadoc(b.createCopyTarget(docComment));
+                    newField.setJavadoc(ast.createCopyTarget(docComment));
                 }
-                updateModifiers(b, modifiers, newField.modifiers());
+                updateModifiers(ast, modifiers, newField.modifiers());
                 newNode= newField;
             }
 
@@ -132,10 +132,10 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    private void updateModifiers(final ASTNodeFactory b, final List modifiers, final List newModifiers) {
+    private void updateModifiers(final ASTNodeFactory ast, final List modifiers, final List newModifiers) {
         newModifiers.clear();
         for (Object modifier : modifiers) {
-            newModifiers.add(b.createCopyTarget((ASTNode) modifier));
+            newModifiers.add(ast.createCopyTarget((ASTNode) modifier));
         }
     }
 }
