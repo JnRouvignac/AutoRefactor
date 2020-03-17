@@ -73,9 +73,9 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                rewrite.remove(node);
+                rewrite.remove(node, null);
             } else {
-                rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
             }
 
             return false;

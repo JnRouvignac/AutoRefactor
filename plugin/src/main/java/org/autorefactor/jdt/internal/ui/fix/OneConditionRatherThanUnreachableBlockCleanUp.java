@@ -80,9 +80,9 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (secondIf.getElseStatement() == null) {
-            rewrite.remove(secondIf);
+            rewrite.remove(secondIf, null);
         } else {
-            rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getElseStatement()));
+            rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getElseStatement()), null);
         }
     }
 }

@@ -87,7 +87,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 
         InfixExpression ie= ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 ast.parenthesizeIfNeeded(rewrite.createMoveTarget(innerIf.getExpression())));
-        rewrite.replace(innerIf.getExpression(), ie);
-        rewrite.replace(outerIf, rewrite.createMoveTarget(innerIf));
+        rewrite.replace(innerIf.getExpression(), ie, null);
+        rewrite.replace(outerIf, rewrite.createMoveTarget(innerIf), null);
     }
 }

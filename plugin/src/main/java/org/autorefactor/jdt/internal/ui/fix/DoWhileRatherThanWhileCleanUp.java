@@ -71,7 +71,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
         if (Boolean.TRUE.equals(constantCondition)) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())));
+            rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
             return false;
         }
 

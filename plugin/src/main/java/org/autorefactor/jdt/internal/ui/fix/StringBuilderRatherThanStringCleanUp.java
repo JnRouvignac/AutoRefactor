@@ -254,14 +254,14 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                 builder= StringBuffer.class;
             }
 
-            rewrite.replace(type, ast.type(builder.getSimpleName()));
+            rewrite.replace(type, ast.type(builder.getSimpleName()), null);
 
             StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
             if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-                rewrite.replace(initializer, ast.new0(builder.getSimpleName()));
+                rewrite.replace(initializer, ast.new0(builder.getSimpleName()), null);
             } else {
-                rewrite.replace(initializer, ast.new0(builder.getSimpleName(), rewrite.createMoveTarget(initializer)));
+                rewrite.replace(initializer, ast.new0(builder.getSimpleName(), rewrite.createMoveTarget(initializer)), null);
             }
 
             for (SimpleName simpleName : assignmentWrites) {
@@ -282,7 +282,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                     newExpression= ast.invoke(newExpression, "append", rewrite.createMoveTarget((Expression) operand)); //$NON-NLS-1$
                 }
 
-                rewrite.replace(assignment, newExpression);
+                rewrite.replace(assignment, newExpression, null);
             }
 
             for (SimpleName simpleName : concatenationWrites) {
@@ -297,10 +297,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
                     }
                 }
 
-                rewrite.replace(assignment, newExpression);
+                rewrite.replace(assignment, newExpression, null);
             }
 
-            rewrite.replace(finalRead, ast.invoke(rewrite.createMoveTarget(finalRead), "toString")); //$NON-NLS-1$
+            rewrite.replace(finalRead, ast.invoke(rewrite.createMoveTarget(finalRead), "toString"), null); //$NON-NLS-1$
         }
 
         private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

@@ -150,18 +150,18 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
         Modifier static0= ast.static0();
 
         if (modifiers.isEmpty()) {
-            rewrite.insertBefore(static0, node);
+            rewrite.insertBefore(static0, node, null);
         } else {
             IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
 
             if (lastModifier.isModifier()) {
                 if (((Modifier) lastModifier).isFinal()) {
-                    rewrite.insertBefore(static0, (Modifier) lastModifier);
+                    rewrite.insertBefore(static0, (Modifier) lastModifier, null);
                 } else {
-                    rewrite.insertAfter(static0, (Modifier) lastModifier);
+                    rewrite.insertAfter(static0, (Modifier) lastModifier, null);
                 }
             } else {
-                rewrite.insertAfter(static0, (Annotation) lastModifier);
+                rewrite.insertAfter(static0, (Annotation) lastModifier, null);
             }
         }
     }

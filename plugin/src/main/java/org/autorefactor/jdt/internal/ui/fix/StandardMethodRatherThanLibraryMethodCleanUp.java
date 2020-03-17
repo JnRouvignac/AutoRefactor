@@ -122,7 +122,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             rewrite.replace(node, ast.invoke(javaUtilObjects, "equals", rewrite.createMoveTarget((Expression) node.arguments().get(0)), //$NON-NLS-1$
-                    rewrite.createMoveTarget((Expression) node.arguments().get(1))));
+                    rewrite.createMoveTarget((Expression) node.arguments().get(1))), null);
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
@@ -131,7 +131,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             rewrite.replace(node,
-                    ast.invoke(javaUtilObjects, "toString", rewrite.createMoveTarget((Expression) node.arguments().get(0)), ast.string(""))); //$NON-NLS-1$ //$NON-NLS-2$
+                    ast.invoke(javaUtilObjects, "toString", rewrite.createMoveTarget((Expression) node.arguments().get(0)), ast.string("")), null); //$NON-NLS-1$ //$NON-NLS-2$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
@@ -140,7 +140,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            rewrite.replace(node, ast.invoke(javaUtilObjects, "hash", copyArguments(rewrite, node))); //$NON-NLS-1$
+            rewrite.replace(node, ast.invoke(javaUtilObjects, "hash", copyArguments(rewrite, node)), null); //$NON-NLS-1$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
@@ -149,10 +149,10 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (node.getExpression() != null) {
-                rewrite.replace(node.getExpression(), javaUtilObjects);
-                rewrite.replace(node.getName(), ast.simpleName("hash")); //$NON-NLS-1$
+                rewrite.replace(node.getExpression(), javaUtilObjects, null);
+                rewrite.replace(node.getName(), ast.simpleName("hash"), null); //$NON-NLS-1$
             } else {
-                rewrite.replace(node, ast.invoke(javaUtilObjects, "hash", copyArguments(rewrite, node))); //$NON-NLS-1$
+                rewrite.replace(node, ast.invoke(javaUtilObjects, "hash", copyArguments(rewrite, node)), null); //$NON-NLS-1$
             }
 
             importsToAdd.add(Objects.class.getCanonicalName());
@@ -172,12 +172,12 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             List<Expression> copyOfArgs= copyArguments(rewrite, node);
 
             if (copyOfArgs.size() <= 2) {
-                rewrite.replace(node, ast.invoke(javaUtilObjects, "requireNonNull", copyOfArgs)); //$NON-NLS-1$
+                rewrite.replace(node, ast.invoke(javaUtilObjects, "requireNonNull", copyOfArgs), null); //$NON-NLS-1$
             } else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier= ast.lambda();
                 messageSupplier
                         .setBody(ast.invoke(ast.simpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
-                rewrite.replace(node, ast.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
+                rewrite.replace(node, ast.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier), null); //$NON-NLS-1$
             } else {
                 return true;
             }
@@ -202,7 +202,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             final Name javaUtilObjects) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.replace(node.getExpression(), javaUtilObjects);
+        rewrite.replace(node.getExpression(), javaUtilObjects, null);
         importsToAdd.add(Objects.class.getCanonicalName());
     }
 }

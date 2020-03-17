@@ -323,11 +323,11 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     UnionType ut= unionTypes(catchClause1.getException().getType(),
                             catchClause2.getException().getType());
                     if (MergeDirection.UP.equals(direction)) {
-                        rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
-                        rewrite.remove(catchClause2);
+                        rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, null);
+                        rewrite.remove(catchClause2, null);
                     } else if (MergeDirection.DOWN.equals(direction)) {
-                        rewrite.remove(catchClause1);
-                        rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                        rewrite.remove(catchClause1, null);
+                        rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, null);
                     }
 
                     return false;

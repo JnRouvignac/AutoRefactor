@@ -82,6 +82,6 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
         BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().boolean0(val);
-        cuRewrite.getASTRewrite().replace(node, booleanLiteral);
+        cuRewrite.getASTRewrite().replace(node, booleanLiteral, null);
     }
 }

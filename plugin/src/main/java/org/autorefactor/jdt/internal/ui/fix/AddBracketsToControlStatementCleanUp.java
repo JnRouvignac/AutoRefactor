@@ -107,7 +107,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         Block block= ast.block(rewrite.createMoveTarget(statement));
-        rewrite.replace(statement, block);
+        rewrite.replace(statement, block, null);
         return false;
     }
 }

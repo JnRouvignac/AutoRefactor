@@ -117,7 +117,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
             if (lastExpression instanceof ClassInstanceCreation) {
                 // Replace with String concatenation
-                cuRewrite.getASTRewrite().replace(node, createStringConcats(allAppendedStrings));
+                cuRewrite.getASTRewrite().replace(node, createStringConcats(allAppendedStrings), null);
                 return false;
             }
         }
@@ -159,9 +159,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
-                    rewrite.remove(node.getParent());
+                    rewrite.remove(node.getParent(), null);
                 } else {
-                    rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().block());
+                    rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().block(), null);
                 }
 
                 return false;
@@ -407,7 +407,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        cuRewrite.getASTRewrite().replace(node, result);
+        cuRewrite.getASTRewrite().replace(node, result, null);
         return false;
     }
 
@@ -461,7 +461,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             newAppendSubstring= ast.invoke(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
         }
 
-        cuRewrite.getASTRewrite().replace(node, newAppendSubstring);
+        cuRewrite.getASTRewrite().replace(node, newAppendSubstring, null);
     }
 
     private boolean isStringBuilderOrBuffer(final Expression expression) {
@@ -526,7 +526,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
 
             if (replaceNeeded) {
-                cuRewrite.getASTRewrite().replace(node, createStringConcats(allOperands));
+                cuRewrite.getASTRewrite().replace(node, createStringConcats(allOperands), null);
                 return false;
             }
         }

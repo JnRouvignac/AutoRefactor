@@ -205,13 +205,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
         }
 
         rewrite.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
-                newDeclareStatement);
+                newDeclareStatement, null);
 
         if (isFieldKept) {
-            rewrite.remove(fragment);
-            rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()));
+            rewrite.remove(fragment, null);
+            rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), null);
         } else {
-            rewrite.remove(field);
+            rewrite.remove(field, null);
         }
     }
 

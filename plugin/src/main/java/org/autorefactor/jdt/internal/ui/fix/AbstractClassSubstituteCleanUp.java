@@ -307,14 +307,14 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 classesToUseWithImport, importsToAdd);
 
         if (substituteType != null) {
-            cuRewrite.getASTRewrite().replace(originalInstanceCreation.getType(), substituteType);
+            cuRewrite.getASTRewrite().replace(originalInstanceCreation.getType(), substituteType, null);
             originalInstanceCreation.setType(substituteType);
         }
 
         for (MethodInvocation methodCall : methodCallsToRefactor) {
             MethodInvocation copyOfMethodCall= ast.copySubtree(methodCall);
             refactorMethod(ast, methodCall, copyOfMethodCall);
-            cuRewrite.getASTRewrite().replace(methodCall, copyOfMethodCall);
+            cuRewrite.getASTRewrite().replace(methodCall, copyOfMethodCall, null);
         }
 
         for (VariableDeclaration variableDecl : variableDecls) {
@@ -323,7 +323,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                     (ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);
 
             if (substituteVarType != null) {
-                cuRewrite.getASTRewrite().replace(oldDeclareStatement.getType(), substituteVarType);
+                cuRewrite.getASTRewrite().replace(oldDeclareStatement.getType(), substituteVarType, null);
             }
         }
     }

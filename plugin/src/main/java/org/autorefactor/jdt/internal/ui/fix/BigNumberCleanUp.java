@@ -89,7 +89,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
-                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(token));
+                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(token), null);
                     return false;
                 }
 
@@ -106,7 +106,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                         return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                     }
 
-                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), token));
+                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), token), null);
                     return false;
                 }
             } else if (arg0 instanceof StringLiteral) {
@@ -118,7 +118,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
                     // Only instantiation from double, not from integer
-                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(literalValue.replace("_", ""))); //$NON-NLS-1$ //$NON-NLS-2$
+                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(literalValue.replace("_", "")), null); //$NON-NLS-1$ //$NON-NLS-2$
                     return false;
                 }
 
@@ -135,7 +135,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (literalValue.matches("\\d+")) { //$NON-NLS-1$
-                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), literalValue));
+                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), literalValue), null);
                     return false;
                 }
             }
@@ -145,7 +145,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
-        cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field));
+        cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field), null);
         return false;
     }
 
@@ -181,7 +181,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
                     cuRewrite.getASTRewrite().replace(node,
-                            getClassInstanceCreatorNode(node.getExpression(), token));
+                            getClassInstanceCreatorNode(node.getExpression(), token), null);
                 } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -210,9 +210,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
                     ASTNodeFactory ast= cuRewrite.getASTBuilder();
-                    cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)));
+                    cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)), null);
                 } else {
-                    cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi));
+                    cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi), null);
                 }
 
                 return false;

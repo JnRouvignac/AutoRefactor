@@ -216,7 +216,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        rewrite.replace(node, currentBlock);
+        rewrite.replace(node, currentBlock, null);
     }
 
     private Expression buildEquality(final ASTNodeFactory ast, final Expression discriminant, final Expression value) {

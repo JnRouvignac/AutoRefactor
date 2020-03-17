@@ -101,7 +101,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.insertBefore(ast.static0(), finalModifier);
+        rewrite.insertBefore(ast.static0(), finalModifier, null);
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {

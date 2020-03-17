@@ -107,12 +107,12 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
         }
 
         rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
-                InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)));
+                InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)), null);
 
         if (remainingStatements != null) {
-            rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements));
+            rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements), null);
         } else {
-            rewrite.remove(subNode);
+            rewrite.remove(subNode, null);
         }
     }
 }

@@ -139,7 +139,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         NumberLiteral replacement= ast.number(integers + suffix);
-        cuRewrite.getASTRewrite().replace(node, replacement);
+        cuRewrite.getASTRewrite().replace(node, replacement, null);
     }
 
     private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,

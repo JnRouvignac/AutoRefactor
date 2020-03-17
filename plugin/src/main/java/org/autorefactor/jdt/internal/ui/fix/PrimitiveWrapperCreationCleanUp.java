@@ -136,7 +136,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
                     if (methodName != null) {
                         cuRewrite.getASTRewrite().replace(node,
-                                newMethodInvocation(typeBinding.getName(), methodName, arg0));
+                                newMethodInvocation(typeBinding.getName(), methodName, arg0), null);
                         return false;
                     }
                 }
@@ -154,13 +154,13 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
         SimpleName name= cuRewrite.getASTBuilder().simpleName(methodName);
-        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name);
+        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, null);
         return false;
     }
 
     private void replaceWithTheSingleArgument(final MethodInvocation node) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)));
+        rewrite.replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)), null);
     }
 
     private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -224,11 +224,11 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             rewrite.replace(node,
-                    ast.invoke(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), rewrite.createMoveTarget(arg0)))); //$NON-NLS-1$
+                    ast.invoke(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), rewrite.createMoveTarget(arg0))), null); //$NON-NLS-1$
         } else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(arg0), "floatValue")); //$NON-NLS-1$
+            rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(arg0), "floatValue"), null); //$NON-NLS-1$
         } else {
             replaceWithValueOf(node, typeBinding);
         }
@@ -236,7 +236,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
         cuRewrite.getASTRewrite().replace(node,
-                newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
+                newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0)), null); //$NON-NLS-1$
     }
 
     private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {

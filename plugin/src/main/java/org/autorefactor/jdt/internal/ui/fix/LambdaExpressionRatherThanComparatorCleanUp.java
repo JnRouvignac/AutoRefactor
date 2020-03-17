@@ -423,7 +423,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             }
         }
 
-        rewrite.replace(node, comparingMethod);
+        rewrite.replace(node, comparingMethod, null);
     }
 
     private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {

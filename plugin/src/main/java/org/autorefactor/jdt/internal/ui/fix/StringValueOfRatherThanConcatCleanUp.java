@@ -99,9 +99,9 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
                 newOperands.add(newInvoke);
                 newOperands.addAll(rewrite.createMoveTarget(extendedOperands));
 
-                cuRewrite.getASTRewrite().replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands));
+                cuRewrite.getASTRewrite().replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands), null);
             } else {
-                cuRewrite.getASTRewrite().replace(node, newInvoke);
+                cuRewrite.getASTRewrite().replace(node, newInvoke, null);
             }
 
             return false;

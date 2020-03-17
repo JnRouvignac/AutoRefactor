@@ -102,9 +102,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                     if (ASTNodes.canHaveSiblings(node)) {
-                        rewrite.remove(node);
+                        rewrite.remove(node, null);
                     } else {
-                        rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                        rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
                     }
 
                     setResult(false);
@@ -136,9 +136,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     }
 
                     if (ASTNodes.canHaveSiblings(node)) {
-                        rewrite.remove(node);
+                        rewrite.remove(node, null);
                     } else {
-                        rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                        rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
                     }
 
                     setResult(false);
@@ -204,15 +204,15 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-            rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
+            rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);
         } else {
-            rewrite.replace(sourceNode, rewrite.createMoveTarget(unconditionnalStatement));
+            rewrite.replace(sourceNode, rewrite.createMoveTarget(unconditionnalStatement), null);
         }
     }
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
         if (ASTNodes.canHaveSiblings(astNode)) {
-            cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode));
+            cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), null);
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
         } else if (astNode.getParent() instanceof TryStatement) {
             removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

@@ -159,6 +159,6 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
         cuRewrite.getASTRewrite().replace(node,
                 ast.if0(ast.parenthesizeIfNeeded(ast.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
-                        ast.if0(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
+                        ast.if0(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)), null);
     }
 }

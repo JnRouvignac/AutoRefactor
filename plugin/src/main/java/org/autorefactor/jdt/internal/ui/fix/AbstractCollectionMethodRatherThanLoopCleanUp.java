@@ -199,7 +199,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             Statement replacement= ast.if0(newMethod(iterable, toFind, true, ast), ast.block(ast.copyRange(thenStatements)));
-            cuRewrite.getASTRewrite().replace(forNode, replacement);
+            cuRewrite.getASTRewrite().replace(forNode, replacement, null);
 
             thenStatements.add(bs);
         }
@@ -207,10 +207,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
                 final Statement forNextStatement, final boolean negate) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate, ast)));
+            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate, ast)), null);
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
-                cuRewrite.getASTRewrite().remove(forNextStatement);
+                cuRewrite.getASTRewrite().remove(forNextStatement, null);
             }
         }
 
@@ -257,10 +257,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                 throw new NotImplementedException(forNode);
             }
 
-            rewrite.replace(forNode, replacement);
+            rewrite.replace(forNode, replacement, null);
 
             if (previousStmtIsPreviousSibling) {
-                rewrite.removeButKeepComment(previousStatement);
+                rewrite.removeButKeepComment(previousStatement, null);
             }
         }
 

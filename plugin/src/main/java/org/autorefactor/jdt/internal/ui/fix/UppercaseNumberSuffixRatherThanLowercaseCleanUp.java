@@ -81,6 +81,6 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 
         String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
         NumberLiteral replacement= ast.number(newToken);
-        cuRewrite.getASTRewrite().replace(node, replacement);
+        cuRewrite.getASTRewrite().replace(node, replacement, null);
     }
 }

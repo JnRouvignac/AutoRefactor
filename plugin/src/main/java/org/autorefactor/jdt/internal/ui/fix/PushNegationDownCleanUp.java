@@ -79,7 +79,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 
         if (replacement != null) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.replace(node, replacement);
+            rewrite.replace(node, replacement, null);
             return false;
         }
 

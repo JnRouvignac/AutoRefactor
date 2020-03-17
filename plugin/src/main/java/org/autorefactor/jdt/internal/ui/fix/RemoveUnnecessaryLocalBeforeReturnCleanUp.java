@@ -176,16 +176,16 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStatement) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.remove(previousSibling);
-            rewrite.replace(node, newReturnStatement);
+            rewrite.remove(previousSibling, null);
+            rewrite.replace(node, newReturnStatement, null);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpression) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.remove(previousSibling);
-            rewrite.replace(node, ast.return0(rewrite.createMoveTarget(returnExpression)));
+            rewrite.remove(previousSibling, null);
+            rewrite.replace(node, ast.return0(rewrite.createMoveTarget(returnExpression)), null);
         }
     }
 }

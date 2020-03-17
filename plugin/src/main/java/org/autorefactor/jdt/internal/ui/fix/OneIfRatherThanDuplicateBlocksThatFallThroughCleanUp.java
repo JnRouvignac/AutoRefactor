@@ -141,10 +141,10 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             IfStatement newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
 
             Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-            rewrite.replace(iterator.next(), newIf);
+            rewrite.replace(iterator.next(), newIf, null);
 
             while (iterator.hasNext()) {
-                rewrite.remove(iterator.next());
+                rewrite.remove(iterator.next(), null);
             }
         }
     }

@@ -127,7 +127,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 InfixExpression condition= ast.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.null0());
                 Block thenBlock= ast.block();
                 IfStatement ifStatement= ast.if0(condition, thenBlock);
-                rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement);
+                rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, null);
                 List<Statement> thenStatements= ASTNodes.statements(thenBlock);
 
                 thenStatements.add(ast.toStatement(ast.assign(convertViewVar.varName(), Assignment.Operator.ASSIGN, ast.createCopyTarget(visitor.getInflateExpression()))));
@@ -143,14 +143,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                                 .toStatement(ast.assign(ast.createCopyTarget(visitor.viewVariableName), Assignment.Operator.ASSIGN, convertViewVar.varName()));
                     }
                     if (assignConvertViewToView != null) {
-                        rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement);
+                        rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement, null);
                     }
                 }
 
                 // Make sure method returns the view to be reused
                 if (visitor.returnStatement != null) {
-                    rewrite.insertAfter(ast.return0(ast.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement);
-                    rewrite.remove(visitor.returnStatement);
+                    rewrite.insertAfter(ast.return0(ast.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement, null);
+                    rewrite.remove(visitor.returnStatement, null);
                 }
 
                 // Optimize findViewById calls
@@ -162,10 +162,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
                     // Create ViewHolderItem class
                     rewrite.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
-                            typeNameDecider), node);
+                            typeNameDecider), node, null);
 
                     // Declare viewhHolderItem object
-                    rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement());
+                    rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement(), null);
                     // Initialize viewHolderItem
                     thenStatements.add(
                             ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN, ast.new0(viewHolderItemVar.type()))));
@@ -182,7 +182,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                         thenStatements.add(ast.toStatement(ast.assign(fieldAccess, Assignment.Operator.ASSIGN, ast.copySubtree(item.findViewByIdExpression))));
 
                         // Replace previous findViewById with accesses to viewHolderItem
-                        rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess));
+                        rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), null);
                     }
                     // Store viewHolderItem in convertView
                     thenStatements.add(ast.toStatement(ast.invoke("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,7 +191,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     ifStatement.setElseStatement(ast.block(ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
                             ast.cast(viewHolderItemVar.type(), ast.invoke("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                rewrite.remove(visitor.viewAssignmentStatement);
+                rewrite.remove(visitor.viewAssignmentStatement, null);
                 return false;
             }
         }

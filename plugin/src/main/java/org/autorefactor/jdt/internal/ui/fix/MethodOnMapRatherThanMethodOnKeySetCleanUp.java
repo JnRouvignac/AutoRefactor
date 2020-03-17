@@ -106,7 +106,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
             final String methodName) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         cuRewrite.getASTRewrite().replace(actualMi,
-                ast.invoke(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))));
+                ast.invoke(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))), null);
         return false;
     }
 }

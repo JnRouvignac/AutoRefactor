@@ -264,22 +264,22 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
         String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
         rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-                invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, ast.createCopyTarget(condition), null, null, failureMessage)));
+                invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, ast.createCopyTarget(condition), null, null, failureMessage)), null);
     }
 
     private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean replace, final Expression failureMessage) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
         if (replace) {
-            rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage));
+            rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), null);
             return false;
         }
 
         if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
             if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent())) {
-                rewrite.remove(nodeToReplace.getParent());
+                rewrite.remove(nodeToReplace.getParent(), null);
             } else {
-                rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block());
+                rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block(), null);
             }
 
             return false;
@@ -309,7 +309,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
             MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, ast,
                     originalMethod, getAssertName(isAssertEquals, "Same"), ast.createCopyTarget(actualAndExpected.getFirst()), ast.createCopyTarget(actualAndExpected.getSecond()), null, failureMessage); //$NON-NLS-1$
-            rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert));
+            rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
             return false;
         }
 
@@ -344,13 +344,13 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
         if (ASTNodes.is(actualValue, NullLiteral.class)) {
             rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-                    invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)));
+                    invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), null);
             return false;
         }
 
         if (ASTNodes.is(expectedValue, NullLiteral.class)) {
             rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-                    invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)));
+                    invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), null);
             return false;
         }
 
@@ -376,7 +376,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
             MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, ast,
                     originalMethod, getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
-            rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert));
+            rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
             return false;
         }
 

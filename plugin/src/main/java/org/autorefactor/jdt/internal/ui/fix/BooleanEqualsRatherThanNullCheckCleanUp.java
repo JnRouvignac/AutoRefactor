@@ -124,6 +124,6 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
             newExpression= ast.not(equalsMethod);
         }
 
-        rewrite.replace(node, newExpression);
+        rewrite.replace(node, newExpression, null);
     }
 }

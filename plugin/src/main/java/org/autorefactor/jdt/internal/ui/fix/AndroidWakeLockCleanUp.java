@@ -87,11 +87,11 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 TypeDeclaration typeDeclaration= ASTNodes.getAncestor(enclosingMethod, TypeDeclaration.class);
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    rewrite.remove(node.getParent());
-                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
+                    rewrite.remove(node.getParent(), null);
+                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), null);
                 } else {
                     // Add the missing onPause() method to the class.
-                    rewrite.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
+                    rewrite.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod, null);
                 }
 
                 return false;
@@ -103,10 +103,10 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
+                    rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), null);
                 } else {
                     rewrite.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
-                            createOnPauseMethodDeclaration());
+                            createOnPauseMethodDeclaration(), null);
                 }
 
                 return false;

@@ -102,6 +102,6 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
             lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
         }
 
-        rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)));
+        rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)), null);
     }
 }

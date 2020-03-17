@@ -238,17 +238,17 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable));
+            rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), null);
 
             if (node instanceof PostfixExpression) {
                 Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(node));
 
                 if (ASTNodes.canHaveSiblings(statement)) {
-                    rewrite.insertAfter(newAssignment, statement);
+                    rewrite.insertAfter(newAssignment, statement, null);
                 } else {
                     Block newBlock= ast.block(rewrite.createMoveTarget(statement), newAssignment);
 
-                    rewrite.replace(statement, newBlock);
+                    rewrite.replace(statement, newBlock, null);
                 }
             } else {
                 Statement newAssignment;
@@ -259,11 +259,11 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
                 }
 
                 if (ASTNodes.canHaveSiblings(statement)) {
-                    rewrite.insertBefore(newAssignment, statement);
+                    rewrite.insertBefore(newAssignment, statement, null);
                 } else {
                     Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(statement));
 
-                    rewrite.replace(statement, newBlock);
+                    rewrite.replace(statement, newBlock, null);
                 }
             }
 

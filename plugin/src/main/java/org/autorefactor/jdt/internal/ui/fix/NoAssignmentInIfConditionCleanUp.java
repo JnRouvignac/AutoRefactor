@@ -199,21 +199,21 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
-                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide());
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs));
+                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), null);
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), null);
                 setResult(false);
                 return false;
             }
 
             if (!ASTNodes.isInElse(node)) {
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs));
+                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), null);
                 Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(assignment));
 
                 if (ASTNodes.canHaveSiblings(node)) {
-                    rewrite.insertBefore(newAssignment, node);
+                    rewrite.insertBefore(newAssignment, node, null);
                 } else {
                     Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(node));
-                    rewrite.replace(node, newBlock);
+                    rewrite.replace(node, newBlock, null);
                 }
 
                 setResult(false);

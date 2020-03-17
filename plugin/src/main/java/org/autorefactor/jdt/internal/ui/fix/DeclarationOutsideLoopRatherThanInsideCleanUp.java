@@ -185,12 +185,12 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 }
             }
 
-            rewrite.insertBefore(newDeclareStatement, statement);
+            rewrite.insertBefore(newDeclareStatement, statement, null);
             rewrite.replace(varToMove,
-                    ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, rewrite.createMoveTarget(fragment.getInitializer()))));
+                    ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, rewrite.createMoveTarget(fragment.getInitializer()))), null);
         } else {
-            rewrite.insertBefore(rewrite.createMoveTarget(varToMove), statement);
-            rewrite.remove(varToMove);
+            rewrite.insertBefore(rewrite.createMoveTarget(varToMove), statement, null);
+            rewrite.remove(varToMove, null);
         }
     }
 }

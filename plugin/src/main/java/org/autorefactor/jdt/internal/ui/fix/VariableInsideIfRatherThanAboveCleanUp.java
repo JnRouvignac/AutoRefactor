@@ -153,13 +153,13 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (statement instanceof Block) {
-                rewrite.insertBefore(rewrite.createMoveTarget(variableAssignment), statements.get(0));
-                rewrite.remove(variableAssignment);
+                rewrite.insertBefore(rewrite.createMoveTarget(variableAssignment), statements.get(0), null);
+                rewrite.remove(variableAssignment, null);
             } else {
                 List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
                 copyOfThenStatements.add(0, rewrite.createMoveTarget(variableAssignment));
                 Block block= ast.block(copyOfThenStatements);
-                rewrite.replace(statement, block);
+                rewrite.replace(statement, block, null);
             }
         }
     }

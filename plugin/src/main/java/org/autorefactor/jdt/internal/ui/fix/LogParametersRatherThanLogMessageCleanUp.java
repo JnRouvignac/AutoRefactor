@@ -137,6 +137,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         params.add(0, ast.string(messageBuilder.toString()));
 
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(node.getExpression()), methodName, params));
+        rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(node.getExpression()), methodName, params), null);
     }
 }

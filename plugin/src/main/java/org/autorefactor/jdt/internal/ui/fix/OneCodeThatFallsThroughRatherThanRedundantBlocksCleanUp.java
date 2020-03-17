@@ -169,9 +169,9 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
                         if (redundantStatement instanceof Block) {
-                            rewrite.remove(stmtsToCompare);
+                            rewrite.remove(stmtsToCompare, null);
                         } else {
-                            rewrite.replace(redundantStatement, ast.block());
+                            rewrite.replace(redundantStatement, ast.block(), null);
                         }
 
                         setResult(false);

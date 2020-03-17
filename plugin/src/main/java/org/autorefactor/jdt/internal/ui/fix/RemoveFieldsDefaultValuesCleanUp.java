@@ -85,7 +85,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
             if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
                     || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
-                cuRewrite.getASTRewrite().remove(initializer);
+                cuRewrite.getASTRewrite().remove(initializer, null);
                 visitSubtree= false;
             }
         }

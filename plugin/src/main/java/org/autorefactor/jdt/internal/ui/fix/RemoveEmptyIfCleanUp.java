@@ -72,7 +72,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
         Statement thenStatement= node.getThenStatement();
         Statement elseStatement= node.getElseStatement();
         if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-            rewrite.remove(elseStatement);
+            rewrite.remove(elseStatement, null);
             return false;
         }
         if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
@@ -80,7 +80,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
             Expression condition= node.getExpression();
             if (elseStatement != null) {
-                rewrite.replace(node, ast.if0(ast.negate(condition), rewrite.createMoveTarget(elseStatement)));
+                rewrite.replace(node, ast.if0(ast.negate(condition), rewrite.createMoveTarget(elseStatement)), null);
             } else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
                 removeBlock(node, rewrite, ast);
                 return false;
@@ -92,9 +92,9 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
     private void removeBlock(final IfStatement node, final ASTRewrite rewrite, final ASTNodeFactory ast) {
         if (ASTNodes.canHaveSiblings(node)) {
-            rewrite.remove(node);
+            rewrite.remove(node, null);
         } else {
-            rewrite.replace(node, ast.block());
+            rewrite.replace(node, ast.block(), null);
         }
     }
 }

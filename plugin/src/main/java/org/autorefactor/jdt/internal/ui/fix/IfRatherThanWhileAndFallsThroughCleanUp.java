@@ -102,13 +102,13 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
             if (ASTNodes.canHaveSiblings(breakStatement)) {
-                rewrite.remove(breakStatement);
+                rewrite.remove(breakStatement, null);
             } else {
-                rewrite.replace(breakStatement, ast.block());
+                rewrite.replace(breakStatement, ast.block(), null);
             }
         }
 
-        rewrite.replace(node, ast.if0(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())));
+        rewrite.replace(node, ast.if0(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
     }
 
     private static class BreakVisitor extends InterruptibleVisitor {

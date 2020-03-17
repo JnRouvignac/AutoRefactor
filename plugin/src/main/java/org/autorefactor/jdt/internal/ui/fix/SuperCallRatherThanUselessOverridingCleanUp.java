@@ -110,7 +110,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
                             || declaredInSamePackage(bodyMethodBinding, declMethodBinding)
                             // protected also means package visibility, so check if it is required
                             || !isMethodUsedInItsPackage(declMethodBinding, node)) {
-                        cuRewrite.getASTRewrite().remove(node);
+                        cuRewrite.getASTRewrite().remove(node, null);
                         return false;
                     }
                 }

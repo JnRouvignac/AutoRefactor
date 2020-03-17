@@ -136,7 +136,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
             typeArgs(newType).clear();
         }
 
-        cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam));
+        cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), null);
     }
 
     /**

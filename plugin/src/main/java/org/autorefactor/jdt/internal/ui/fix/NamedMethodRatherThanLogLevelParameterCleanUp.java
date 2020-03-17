@@ -110,6 +110,6 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(node.getExpression()), methodName, rewrite.createMoveTarget(message)));
+        rewrite.replace(node, ast.invoke(rewrite.createMoveTarget(node.getExpression()), methodName, rewrite.createMoveTarget(message)), null);
     }
 }

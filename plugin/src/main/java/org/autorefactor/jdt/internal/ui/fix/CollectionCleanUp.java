@@ -142,8 +142,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                rewrite.replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)));
-                rewrite.remove(nodeToRemove);
+                rewrite.replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)), null);
+                rewrite.remove(nodeToRemove, null);
                 setResult(false);
                 return false;
             }

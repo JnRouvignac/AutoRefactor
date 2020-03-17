@@ -87,7 +87,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
                     if (isConditionValid(condition, container)) {
                         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                        rewrite.replace(node, rewrite.createMoveTarget(statements.get(0)));
+                        rewrite.replace(node, rewrite.createMoveTarget(statements.get(0)), null);
                         return false;
                     }
 
@@ -185,12 +185,12 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         if (operands.size() == 2) {
-            rewrite.replace(condition, rewrite.createMoveTarget(operands.get(0)));
+            rewrite.replace(condition, rewrite.createMoveTarget(operands.get(0)), null);
         } else {
             operands.remove(operands.size() - 1);
             InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
-            rewrite.replace(condition, newCondition);
+            rewrite.replace(condition, newCondition, null);
         }
     }
 }

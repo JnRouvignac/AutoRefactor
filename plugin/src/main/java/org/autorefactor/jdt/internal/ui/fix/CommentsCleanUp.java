@@ -139,13 +139,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     public boolean visit(final BlockComment node) {
         String comment= getComment(node);
         if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
-            cuRewrite.getASTRewrite().remove(node);
+            cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
         ASTNode nextNode= getNextNode(node);
         if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
             if (ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
-                cuRewrite.getASTRewrite().remove(node);
+                cuRewrite.getASTRewrite().remove(node, null);
             } else {
                 cuRewrite.getASTRewrite().toJavadoc(node);
             }
@@ -218,7 +218,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
         Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
-            cuRewrite.getASTRewrite().remove(node);
+            cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
         if (emptyLineAtStartMatcher.find()) {
@@ -230,7 +230,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             return false;
         }
         if (allTagsEmpty(ASTNodes.tags(node))) {
-            cuRewrite.getASTRewrite().remove(node);
+            cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
         if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
@@ -241,7 +241,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             ASTNode nextNode= getNextNode(node);
             if (hasOverrideAnnotation(nextNode)) {
                 // {@inheritDoc} tag is redundant with @Override annotation
-                cuRewrite.getASTRewrite().remove(node);
+                cuRewrite.getASTRewrite().remove(node, null);
                 return false;
             }
 
@@ -443,7 +443,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     public boolean visit(final LineComment node) {
         String comment= getComment(node);
         if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
-            cuRewrite.getASTRewrite().remove(node);
+            cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
         if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()

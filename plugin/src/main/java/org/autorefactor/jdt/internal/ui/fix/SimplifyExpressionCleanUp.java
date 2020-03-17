@@ -358,17 +358,17 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 rewrite.replace(node,
-                        ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), getAppropriateOperator(node), rewrite.createMoveTarget(rightOppositeExpression)));
+                        ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), getAppropriateOperator(node), rewrite.createMoveTarget(rightOppositeExpression)), null);
             } else {
                 InfixExpression.Operator reverseOp= getReverseOperator(node);
-                rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), reverseOp, rewrite.createMoveTarget(rightExpression)));
+                rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftOppositeExpression), reverseOp, rewrite.createMoveTarget(rightExpression)), null);
             }
 
             return false;
         }
         if (rightOppositeExpression != null) {
             InfixExpression.Operator reverseOp= getReverseOperator(node);
-            rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftExpression), reverseOp, rewrite.createMoveTarget(rightOppositeExpression)));
+            rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftExpression), reverseOp, rewrite.createMoveTarget(rightOppositeExpression)), null);
             return false;
         }
 
@@ -413,7 +413,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             operand= ast.negate(exprToCopy);
         }
 
-        rewrite.replace(node, operand);
+        rewrite.replace(node, operand, null);
         return false;
     }
 
@@ -423,7 +423,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         } else {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)));
+            rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), null);
         }
     }
 
@@ -454,12 +454,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private void addParentheses(final Expression expression) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(expression, ast.parenthesize(rewrite.createMoveTarget(expression)));
+        rewrite.replace(expression, ast.parenthesize(rewrite.createMoveTarget(expression)), null);
     }
 
     private void replaceBy(final ASTNode node, final Expression expression) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, rewrite.createMoveTarget(expression));
+        rewrite.replace(node, rewrite.createMoveTarget(expression), null);
     }
 
     /**

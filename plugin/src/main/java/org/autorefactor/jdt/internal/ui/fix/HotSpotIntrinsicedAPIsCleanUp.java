@@ -273,7 +273,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 ast.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
                         ast.throw0(ast.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), ast.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
-        cuRewrite.getASTRewrite().replace(node, tryS);
+        cuRewrite.getASTRewrite().replace(node, tryS, null);
     }
 
     private void collectUniqueIndex(final ForStatement node, final SystemArrayCopyParams params) {

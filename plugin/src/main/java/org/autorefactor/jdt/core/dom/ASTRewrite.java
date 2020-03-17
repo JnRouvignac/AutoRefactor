@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.rewrite.TargetSourceRangeComputer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Class aggregating all the refactorings performed by a cleanup rule until
@@ -293,14 +294,15 @@ public class ASTRewrite {
     /**
      * Replaces the provided node from the AST with the provided replacement node.
      *
-     * @param node        the node to remove
-     * @param replacement the replacement node
+     * @param node        The node to remove
+     * @param replacement The replacement node
+     * @param editGroup   The edit group
      * @see ASTRewrite#replace(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void replace(final ASTNode node, final ASTNode replacement) {
+    public void replace(final ASTNode node, final ASTNode replacement, final TextEditGroup editGroup) {
         node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
-        rewrite.replace(node, replacement, null);
+        rewrite.replace(node, replacement, editGroup);
         addRefactoredNodes(node);
     }
 
@@ -331,13 +333,14 @@ public class ASTRewrite {
      * Removes the provided node from the AST.
      *
      * @param node the node to remove
+     * @param editGroup   The edit group
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void remove(final ASTNode node) {
+    public void remove(final ASTNode node, final TextEditGroup editGroup) {
         if (node instanceof Comment) {
             commentRewriter.remove((Comment) node);
         } else {
-            rewrite.remove(node, null);
+            rewrite.remove(node, editGroup);
         }
         addRefactoredNodes(node);
     }
@@ -346,11 +349,12 @@ public class ASTRewrite {
      * Removes the provided node from the AST leaving the leading comment.
      *
      * @param node the node to remove
+     * @param editGroup   The edit group
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void removeButKeepComment(final ASTNode node) {
+    public void removeButKeepComment(final ASTNode node, final TextEditGroup editGroup) {
         node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
-        remove(node);
+        remove(node, editGroup);
     }
 
     /**
@@ -368,23 +372,25 @@ public class ASTRewrite {
 
     /**
      * Removes the provided nodes from the AST.
-     *
+     * @param editGroup   The edit group
      * @param nodes the nodes to remove
-     * @see #remove(ASTNode)
+     *
+     * @see #remove(ASTNode, TextEditGroup)
      */
-    public void remove(final ASTNode... nodes) {
-        remove(Arrays.asList(nodes));
+    public void remove(final TextEditGroup editGroup, final ASTNode... nodes) {
+        remove(Arrays.asList(nodes), editGroup);
     }
 
     /**
      * Removes the provided nodes from the AST.
      *
      * @param nodes the nodes to remove
-     * @see #remove(ASTNode)
+     * @param editGroup   The edit group
+     * @see #remove(ASTNode, TextEditGroup)
      */
-    public void remove(final Collection<? extends ASTNode> nodes) {
+    public void remove(final Collection<? extends ASTNode> nodes, final TextEditGroup editGroup) {
         for (ASTNode node : nodes) {
-            remove(node);
+            remove(node, editGroup);
         }
     }
 
@@ -404,11 +410,12 @@ public class ASTRewrite {
      * @param locationInParent the insert location description
      * @param nodeToInsert     the node to insert
      * @param index            the index where to insert the node in the list
+     * @param editGroup        The edit group
      * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
      */
     public void insertAt(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert,
-            final int index) {
-        getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, null);
+            final int index, final TextEditGroup editGroup) {
+        getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, editGroup);
         addRefactoredNodes(listHolder);
     }
 
@@ -417,11 +424,12 @@ public class ASTRewrite {
      *
      * @param nodeToInsert the node to insert
      * @param element      the node serving as a reference location
+     * @param editGroup    The edit group
      * @see ListRewrite#insertBefore(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertBefore(final ASTNode nodeToInsert, final ASTNode element) {
-        getListRewrite(element).insertBefore(nodeToInsert, element, null);
+    public void insertBefore(final ASTNode nodeToInsert, final ASTNode element, final TextEditGroup editGroup) {
+        getListRewrite(element).insertBefore(nodeToInsert, element, editGroup);
         addRefactoredNodes(element.getParent());
     }
 
@@ -430,11 +438,12 @@ public class ASTRewrite {
      *
      * @param nodeToInsert the node to insert
      * @param element      the node serving as a reference location
+     * @param editGroup    The edit group
      * @see ListRewrite#insertAfter(ASTNode, ASTNode,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertAfter(final ASTNode nodeToInsert, final ASTNode element) {
-        getListRewrite(element).insertAfter(nodeToInsert, element, null);
+    public void insertAfter(final ASTNode nodeToInsert, final ASTNode element, final TextEditGroup editGroup) {
+        getListRewrite(element).insertAfter(nodeToInsert, element, editGroup);
         addRefactoredNodes(element.getParent());
     }
 
@@ -444,10 +453,11 @@ public class ASTRewrite {
      * @param listHolder       the node holding the list where to insert
      * @param locationInParent the insert location description
      * @param nodeToInsert     the node to insert
+     * @param editGroup        The edit group
      * @see ListRewrite#insertFirst(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertFirst(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert) {
-        getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, null);
+    public void insertFirst(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert, final TextEditGroup editGroup) {
+        getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, editGroup);
         addRefactoredNodes(listHolder);
     }
 
@@ -457,10 +467,11 @@ public class ASTRewrite {
      * @param listHolder       the node holding the list where to insert
      * @param locationInParent the insert location description
      * @param nodeToInsert     the node to insert
+     * @param editGroup        The edit group
      * @see ListRewrite#insertLast(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertLast(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert) {
-        getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, null);
+    public void insertLast(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert, final TextEditGroup editGroup) {
+        getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, editGroup);
         addRefactoredNodes(listHolder);
     }
 
@@ -471,9 +482,10 @@ public class ASTRewrite {
      * @param newIndex  the new index for the node in the parent's list
      * @param movedNode the old node which has been moved using
      *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#createMoveTarget(ASTNode)}
+     * @param editGroup The edit group
      */
-    public void moveToIndex(final ASTNode oldNode, final int newIndex, final ASTNode movedNode) {
-        insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex);
+    public void moveToIndex(final ASTNode oldNode, final int newIndex, final ASTNode movedNode, final TextEditGroup editGroup) {
+        insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex, editGroup);
     }
 
     /**
@@ -503,11 +515,12 @@ public class ASTRewrite {
      * @param node     the node where to set the property
      * @param property the property to be set
      * @param value    the value to set
+     * @param editGroup The edit group
      * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object,
      *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void set(final ASTNode node, final StructuralPropertyDescriptor property, final Object value) {
-        rewrite.set(node, property, value, null);
+    public void set(final ASTNode node, final StructuralPropertyDescriptor property, final Object value, final TextEditGroup editGroup) {
+        rewrite.set(node, property, value, editGroup);
         addRefactoredNodes(node);
     }
 

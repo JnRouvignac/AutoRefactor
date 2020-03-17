@@ -152,7 +152,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
                 Type type= ast.getAST().newParameterizedType(
                         ast.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName()));
-                rewrite.replace(node, ast.new0(type, rewrite.createMoveTarget(arg)));
+                rewrite.replace(node, ast.new0(type, rewrite.createMoveTarget(arg)), null);
                 importsToAdd.add(EnumMap.class.getCanonicalName());
                 return false;
             }
@@ -170,7 +170,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
             Type type= ast.getAST().newParameterizedType(ast.type(
                     classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass)); //$NON-NLS-1$ //$NON-NLS-2$
-            rewrite.replace(node, ast.new0(type));
+            rewrite.replace(node, ast.new0(type), null);
             importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
             return false;
         }

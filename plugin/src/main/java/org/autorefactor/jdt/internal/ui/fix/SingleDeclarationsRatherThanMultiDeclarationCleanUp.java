@@ -124,9 +124,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
             }
 
             if (i > 0) {
-                cuRewrite.getASTRewrite().insertAfter(newNode, node);
+                cuRewrite.getASTRewrite().insertAfter(newNode, node, null);
             } else {
-                cuRewrite.getASTRewrite().replace(node, newNode);
+                cuRewrite.getASTRewrite().replace(node, newNode, null);
             }
         }
     }

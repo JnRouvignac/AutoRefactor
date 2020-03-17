@@ -86,15 +86,15 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
                 if (ASTNodes.canHaveSiblings(node)) {
-                    rewrite.remove(node);
+                    rewrite.remove(node, null);
                 } else {
-                    rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                    rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
                 }
 
                 return false;
             }
             if (isElseEmpty) {
-                rewrite.remove(node.getElseStatement());
+                rewrite.remove(node.getElseStatement(), null);
                 return false;
             }
         }
@@ -146,7 +146,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final Block node) {
         if (ASTNodes.canHaveSiblings(node) && isEmptyCode(node)) {
-            cuRewrite.getASTRewrite().remove(node);
+            cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
 
@@ -159,12 +159,12 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                rewrite.remove(node);
+                rewrite.remove(node, null);
                 return false;
             }
 
             if (node instanceof EmptyStatement) {
-                rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
                 return false;
             }
         }
@@ -189,12 +189,12 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (ASTNodes.canHaveSiblings(node)) {
-                rewrite.remove(node);
+                rewrite.remove(node, null);
                 return false;
             }
 
             if (node instanceof EmptyStatement) {
-                rewrite.replace(node, cuRewrite.getASTBuilder().block());
+                rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
                 return false;
             }
         }

@@ -197,12 +197,12 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node);
+                rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node, null);
             }
 
-            rewrite.replace(node.getExpression(), ast.negate(node.getExpression()));
-            rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()));
-            rewrite.remove(node.getElseStatement());
+            rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
+            rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()), null);
+            rewrite.remove(node.getElseStatement(), null);
         } else {
             List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -210,12 +210,12 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
                 copyOfStatements.add(rewrite.createMoveTarget(statement));
             }
 
-            rewrite.replace(node.getExpression(), ast.negate(node.getExpression()));
-            rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()));
+            rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
+            rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()), null);
             copyOfStatements.add(0, rewrite.createMoveTarget(node));
 
             Block block= ast.block(copyOfStatements);
-            rewrite.replace(node, block);
+            rewrite.replace(node, block, null);
         }
     }
 
@@ -227,10 +227,10 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
         if (ASTNodes.canHaveSiblings(node)) {
             for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node);
+                rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node, null);
             }
 
-            rewrite.remove(node.getElseStatement());
+            rewrite.remove(node.getElseStatement(), null);
         } else {
             List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -238,11 +238,11 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
                 copyOfStatements.add(rewrite.createMoveTarget(statement));
             }
 
-            rewrite.remove(node.getElseStatement());
+            rewrite.remove(node.getElseStatement(), null);
             copyOfStatements.add(0, rewrite.createMoveTarget(node));
 
             Block block= ast.block(copyOfStatements);
-            rewrite.replace(node, block);
+            rewrite.replace(node, block, null);
         }
     }
 }

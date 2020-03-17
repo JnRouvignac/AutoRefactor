@@ -82,13 +82,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         List<MemberValuePair> values= ASTNodes.values(node);
         if (values.isEmpty()) {
-            rewrite.replace(node, ast.markerAnnotation(rewrite.createMoveTarget(node.getTypeName())));
+            rewrite.replace(node, ast.markerAnnotation(rewrite.createMoveTarget(node.getTypeName())), null);
             return false;
         }
         if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-                rewrite.replace(node, ast.singleValueAnnotation(rewrite.createMoveTarget(node.getTypeName()), rewrite.createMoveTarget(pair.getValue())));
+                rewrite.replace(node, ast.singleValueAnnotation(rewrite.createMoveTarget(node.getTypeName()), rewrite.createMoveTarget(pair.getValue())), null);
                 return false;
             }
         }
@@ -98,13 +98,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         for (MemberValuePair pair : values) {
             IMethodBinding elementBinding= elements.get(pair.getName().getIdentifier());
             if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
-                rewrite.remove(pair);
+                rewrite.remove(pair, null);
                 result= false;
             } else if (pair.getValue().getNodeType() == ASTNode.ARRAY_INITIALIZER) {
                 ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
                 List<Expression> exprs= ASTNodes.expressions(arrayInit);
                 if (exprs.size() == 1) {
-                    rewrite.replace(arrayInit, rewrite.createMoveTarget(exprs.get(0)));
+                    rewrite.replace(arrayInit, rewrite.createMoveTarget(exprs.get(0)), null);
                     result= false;
                 }
             }

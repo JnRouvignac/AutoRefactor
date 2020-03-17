@@ -171,8 +171,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             }
 
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
-            rewrite.remove(nodesToRemove);
+            rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, null);
+            rewrite.remove(nodesToRemove, null);
             setResult(false);
             return false;
         }
@@ -236,8 +236,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange(ASTNodes.resources(innerTryStatement)));
-            rewrite.replace(innerTryStatement, rewrite.createMoveTarget(innerTryStatement.getBody()));
+            rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange(ASTNodes.resources(innerTryStatement)), null);
+            rewrite.replace(innerTryStatement, rewrite.createMoveTarget(innerTryStatement.getBody()), null);
             setResult(false);
             return false;
         }

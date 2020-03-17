@@ -201,7 +201,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         rewrite.replace(node,
                 ast.toStatement(ast.invoke(ast.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
                         "addAll", mi.getExpression() != null ? rewrite.createMoveTarget(mi.getExpression()) : ast.this0(), //$NON-NLS-1$
-                        rewrite.createMoveTarget(iterable))));
+                        rewrite.createMoveTarget(iterable))), null);
     }
 
     private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
@@ -269,6 +269,6 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             newMethod= ast.invoke(methodName, rewrite.createMoveTarget(data));
         }
 
-        rewrite.replace(toReplace, ast.toStatement(newMethod));
+        rewrite.replace(toReplace, ast.toStatement(newMethod), null);
     }
 }

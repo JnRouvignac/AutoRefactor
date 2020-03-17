@@ -214,8 +214,8 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
             String patternName= classesToUseWithImport.contains(Pattern.class.getCanonicalName()) ? Pattern.class.getSimpleName() : Pattern.class.getCanonicalName();
             importsToAdd.add(Pattern.class.getCanonicalName());
-            rewrite.replace(type, ast.type(patternName));
-            rewrite.replace(initializer, ast.invoke(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(initializer)));
+            rewrite.replace(type, ast.type(patternName), null);
+            rewrite.replace(initializer, ast.invoke(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(initializer)), null);
 
             for (SimpleName regExUse : regExUses) {
                 MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
@@ -237,7 +237,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
                     }
                 }
 
-                rewrite.replace(methodInvocation, newExpression);
+                rewrite.replace(methodInvocation, newExpression, null);
             }
         }
     }

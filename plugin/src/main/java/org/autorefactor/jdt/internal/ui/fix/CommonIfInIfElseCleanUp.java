@@ -105,7 +105,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 
             rewrite.replace(node,
                     ast.if0(rewrite.createMoveTarget(thenInnerIfStatement.getExpression()), ast.block(ast.if0(rewrite.createMoveTarget(node.getExpression()),
-                            rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))));
+                            rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))), null);
             return false;
         }
 

@@ -273,7 +273,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getThenExpression(), node.getElseExpression());
 
             if (newE != null) {
-                cuRewrite.getASTRewrite().replace(node, newE);
+                cuRewrite.getASTRewrite().replace(node, newE, null);
                 return false;
             }
         }
@@ -285,8 +285,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         ReturnStatement newRs= getReturnStatement(node, thenRs.getExpression(), elseRs.getExpression());
 
         if (newRs != null) {
-            cuRewrite.getASTRewrite().replace(node, newRs);
-            cuRewrite.getASTRewrite().remove(elseRs);
+            cuRewrite.getASTRewrite().replace(node, newRs, null);
+            cuRewrite.getASTRewrite().remove(elseRs, null);
             return false;
         }
 
@@ -302,8 +302,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 newRs= getReturnStatement(node, thenBool, elseBool, thenRs.getExpression(), elseRs.getExpression());
 
                 if (newRs != null) {
-                    cuRewrite.getASTRewrite().replace(node, newRs);
-                    cuRewrite.getASTRewrite().remove(elseRs);
+                    cuRewrite.getASTRewrite().replace(node, newRs, null);
+                    cuRewrite.getASTRewrite().remove(elseRs, null);
                     return false;
                 }
             }
@@ -352,8 +352,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     rightHandSide);
 
             if (newE != null) {
-                cuRewrite.getASTRewrite().replace(rightHandSide, newE);
-                cuRewrite.getASTRewrite().remove(node);
+                cuRewrite.getASTRewrite().replace(rightHandSide, newE, null);
+                cuRewrite.getASTRewrite().remove(node, null);
                 return false;
             }
         }
@@ -548,7 +548,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                     if (!ASTNodes.canHaveSiblings(node)) {
                         // Make sure to keep curly braces if the node is an else statement
-                        rewrite.replace(node, copyStatement);
+                        rewrite.replace(node, copyStatement, null);
                         return false;
                     }
 
@@ -556,10 +556,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                         List<Statement> statementsToMove= ASTNodes.asList(copyStatement);
 
                         for (int i= statementsToMove.size() - 1; i > 0; i--) {
-                            rewrite.insertAfter(statementsToMove.get(i), node);
+                            rewrite.insertAfter(statementsToMove.get(i), node, null);
                         }
 
-                        rewrite.replace(node, statementsToMove.get(0));
+                        rewrite.replace(node, statementsToMove.get(0), null);
                         return false;
                     }
                 }
