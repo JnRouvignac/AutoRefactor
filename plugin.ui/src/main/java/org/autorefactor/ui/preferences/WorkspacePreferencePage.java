@@ -26,8 +26,6 @@
  */
 package org.autorefactor.ui.preferences;
 
-import static org.autorefactor.preferences.PreferenceConstants.DEBUG_MODE_ON;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +34,7 @@ import java.util.List;
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
+import org.autorefactor.preferences.PreferenceConstants;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -86,6 +85,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
      *
      * @param workbench The workbench
      */
+    @Override
     public void init(IWorkbench workbench) {
     }
 
@@ -101,6 +101,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
              *
              * @return -1, 0 or 1
              */
+            @Override
             public int compare(final RefactoringRule o1, final RefactoringRule o2) {
                 return o1.getName().compareTo(o2.getName());
             }
@@ -166,7 +167,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
         fields= new ArrayList<>(1 + allRefactoringRules.size());
 
-        fields.add(new BooleanFieldEditor(DEBUG_MODE_ON.getName(), DEBUG_MODE_ON.getDescription(), fieldEditorParent));
+        fields.add(new BooleanFieldEditor(PreferenceConstants.DEBUG_MODE_ON.getName(), PreferenceConstants.DEBUG_MODE_ON.getDescription(), fieldEditorParent));
     }
 
     private void invalidateToggleRules(final Composite ruleGroup) {

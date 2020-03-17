@@ -25,16 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,8 +230,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         if (expression instanceof CastExpression) {
             CastExpression castExpression= (CastExpression) expression;
             return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-                    || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpression.getExpression()));
+                    || ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpression.getExpression());
         }
 
         if (expression instanceof MethodInvocation) {
@@ -291,14 +281,14 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             ASTNode parentNode= node.getParent();
 
             switch (parentNode.getNodeType()) {
-            case PARENTHESIZED_EXPRESSION:
+            case ASTNode.PARENTHESIZED_EXPRESSION:
                 return isPrimitiveAllowed(parentNode);
 
-            case CAST_EXPRESSION:
+            case ASTNode.CAST_EXPRESSION:
                 CastExpression castExpression= (CastExpression) parentNode;
                 return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName());
 
-            case ASSIGNMENT:
+            case ASTNode.ASSIGNMENT:
                 Assignment assignment= (Assignment) parentNode;
 
                 if (getAssignmentOutSafeOperators().contains(assignment.getOperator())) {
@@ -320,11 +310,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
                 return false;
 
-            case VARIABLE_DECLARATION_FRAGMENT:
+            case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
                 VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
                 return fragment.getInitializer().equals(node) && isOfType(fragment.getName().resolveTypeBinding());
 
-            case RETURN_STATEMENT:
+            case ASTNode.RETURN_STATEMENT:
                 ReturnStatement returnStatement= (ReturnStatement) parentNode;
                 if (returnStatement.getExpression().equals(node)) {
                     MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
@@ -346,17 +336,17 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
                 return false;
 
-            case CONDITIONAL_EXPRESSION:
+            case ASTNode.CONDITIONAL_EXPRESSION:
                 ConditionalExpression conditionalExpression= (ConditionalExpression) parentNode;
                 return conditionalExpression.getExpression().equals(node);
 
-            case PREFIX_EXPRESSION:
+            case ASTNode.PREFIX_EXPRESSION:
                 return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());
 
-            case INFIX_EXPRESSION:
+            case ASTNode.INFIX_EXPRESSION:
                 return getInfixOutSafeOperators().contains(((InfixExpression) parentNode).getOperator());
 
-            case POSTFIX_EXPRESSION:
+            case ASTNode.POSTFIX_EXPRESSION:
                 return getPostfixOutSafeOperators().contains(((PostfixExpression) parentNode).getOperator());
 
             default:

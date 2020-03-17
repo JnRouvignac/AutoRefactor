@@ -26,42 +26,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.CREATION_REFERENCE;
-import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_METHOD_REFERENCE;
-import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.MEMBER_REF;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_REF;
-import static org.eclipse.jdt.core.dom.ASTNode.NULL_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_REFERENCE;
-import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_METHOD_REFERENCE;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -408,7 +372,7 @@ public class ASTNodeFactory {
      */
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T createCopyTarget(final T nodeToCopy) {
-        if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
+        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
         }
         if (isValidInCurrentAST(nodeToCopy)) {
@@ -492,15 +456,15 @@ public class ASTNodeFactory {
 
     private Type copyType(final Type type) {
         switch (type.getNodeType()) {
-        case ARRAY_TYPE:
+        case ASTNode.ARRAY_TYPE:
             ArrayType arrayType= (ArrayType) type;
             return ast.newArrayType(copyType(arrayType.getElementType()), arrayType.getDimensions());
 
-        case PRIMITIVE_TYPE:
+        case ASTNode.PRIMITIVE_TYPE:
             Code code= ((PrimitiveType) type).getPrimitiveTypeCode();
             return ast.newPrimitiveType(code);
 
-        case QUALIFIED_TYPE:
+        case ASTNode.QUALIFIED_TYPE:
             ITypeBinding typeBinding= type.resolveBinding();
 
             if (typeBinding == null) {
@@ -509,11 +473,11 @@ public class ASTNodeFactory {
 
             return type(typeBinding.getQualifiedName());
 
-        case SIMPLE_TYPE:
+        case ASTNode.SIMPLE_TYPE:
             SimpleType sType= (SimpleType) type;
             return ast.newSimpleType(createCopyTarget(sType.getName()));
 
-        case PARAMETERIZED_TYPE:
+        case ASTNode.PARAMETERIZED_TYPE:
             ParameterizedType pType= (ParameterizedType) type;
             ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
             List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
@@ -1163,7 +1127,7 @@ public class ASTNodeFactory {
      */
     public Expression negate(final Expression expression, final Copy copy) {
         Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
-        if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
+        if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
             PrefixExpression pe= (PrefixExpression) exprNoParen;
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 return copy.perform(this, ASTNodes.getUnparenthesedExpression(pe.getOperand()));
@@ -1318,36 +1282,36 @@ public class ASTNodeFactory {
      */
     public Expression parenthesizeIfNeeded(final Expression expression) {
         switch (expression.getNodeType()) {
-        case ANNOTATION_TYPE_DECLARATION:
-        case ANNOTATION_TYPE_MEMBER_DECLARATION:
-        case ANONYMOUS_CLASS_DECLARATION:
-        case ARRAY_ACCESS:
-        case ARRAY_CREATION:
-        case ARRAY_INITIALIZER:
-        case BOOLEAN_LITERAL:
-        case CHARACTER_LITERAL:
-        case CLASS_INSTANCE_CREATION:
-        case CREATION_REFERENCE:
-        case EXPRESSION_METHOD_REFERENCE:
-        case FIELD_ACCESS:
-        case MEMBER_REF:
-        case METHOD_INVOCATION:
-        case METHOD_REF:
-        case NULL_LITERAL:
-        case NUMBER_LITERAL:
-        case PARENTHESIZED_EXPRESSION:
-        case POSTFIX_EXPRESSION:
-        case PREFIX_EXPRESSION:
-        case QUALIFIED_NAME:
-        case SIMPLE_NAME:
-        case STRING_LITERAL:
-        case SUPER_FIELD_ACCESS:
-        case SUPER_METHOD_INVOCATION:
-        case SUPER_METHOD_REFERENCE:
-        case THIS_EXPRESSION:
-        case TYPE_LITERAL:
-        case TYPE_METHOD_REFERENCE:
-        case VARIABLE_DECLARATION_EXPRESSION:
+        case ASTNode.ANNOTATION_TYPE_DECLARATION:
+        case ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION:
+        case ASTNode.ANONYMOUS_CLASS_DECLARATION:
+        case ASTNode.ARRAY_ACCESS:
+        case ASTNode.ARRAY_CREATION:
+        case ASTNode.ARRAY_INITIALIZER:
+        case ASTNode.BOOLEAN_LITERAL:
+        case ASTNode.CHARACTER_LITERAL:
+        case ASTNode.CLASS_INSTANCE_CREATION:
+        case ASTNode.CREATION_REFERENCE:
+        case ASTNode.EXPRESSION_METHOD_REFERENCE:
+        case ASTNode.FIELD_ACCESS:
+        case ASTNode.MEMBER_REF:
+        case ASTNode.METHOD_INVOCATION:
+        case ASTNode.METHOD_REF:
+        case ASTNode.NULL_LITERAL:
+        case ASTNode.NUMBER_LITERAL:
+        case ASTNode.PARENTHESIZED_EXPRESSION:
+        case ASTNode.POSTFIX_EXPRESSION:
+        case ASTNode.PREFIX_EXPRESSION:
+        case ASTNode.QUALIFIED_NAME:
+        case ASTNode.SIMPLE_NAME:
+        case ASTNode.STRING_LITERAL:
+        case ASTNode.SUPER_FIELD_ACCESS:
+        case ASTNode.SUPER_METHOD_INVOCATION:
+        case ASTNode.SUPER_METHOD_REFERENCE:
+        case ASTNode.THIS_EXPRESSION:
+        case ASTNode.TYPE_LITERAL:
+        case ASTNode.TYPE_METHOD_REFERENCE:
+        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
             return expression;
 
         default:

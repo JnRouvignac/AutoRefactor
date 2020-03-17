@@ -25,15 +25,13 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.environment.Environment;
 import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
@@ -50,6 +48,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -75,9 +74,10 @@ public class AutoRefactorHandler extends AbstractHandler {
      *
      * @throws ExecutionException ExecutionException
      */
+    @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
-            Environment environment= getEnvironment();
+            Environment environment= AutoRefactorPlugin.getEnvironment();
             new PrepareApplyRefactoringsJob(getSelectedJavaElements(event),
                     AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()), environment)
                             .schedule();
@@ -119,7 +119,7 @@ public class AutoRefactorHandler extends AbstractHandler {
                 || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) { //$NON-NLS-1$
             return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
-            getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'."); //$NON-NLS-1$ //$NON-NLS-2$
+            AutoRefactorPlugin.getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'."); //$NON-NLS-1$ //$NON-NLS-2$
             return Collections.emptyList();
         }
     }
@@ -172,8 +172,9 @@ public class AutoRefactorHandler extends AbstractHandler {
             /**
              * Run.
              */
+            @Override
             public void run() {
-                openInformation(shell, "Info", message); //$NON-NLS-1$
+                MessageDialog.openInformation(shell, "Info", message); //$NON-NLS-1$
             }
         });
     }

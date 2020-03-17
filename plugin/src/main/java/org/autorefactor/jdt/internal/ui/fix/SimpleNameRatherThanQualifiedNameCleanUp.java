@@ -26,13 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
-import static org.eclipse.jdt.core.dom.IBinding.METHOD;
-import static org.eclipse.jdt.core.dom.IBinding.TYPE;
-import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -277,8 +270,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             do {
                 for (IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
                     if (binding.getName().equals(simpleName) && (Modifier.isPublic(binding.getModifiers())
-                            || Modifier.isProtected(binding.getModifiers()) || (!Modifier.isPrivate(binding.getModifiers())
-                                    && superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
+                            || Modifier.isProtected(binding.getModifiers()) || !Modifier.isPrivate(binding.getModifiers())
+                                    && superTypeBinding.getPackage().equals(typeBinding.getPackage()))) {
                         return superTypeBinding;
                     }
                 }
@@ -366,11 +359,11 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         private ITypeBinding resolveEnclosingTypeBinding(final ASTNode node) {
             if (node != null) {
                 switch (node.getNodeType()) {
-                case ANONYMOUS_CLASS_DECLARATION:
+                case ASTNode.ANONYMOUS_CLASS_DECLARATION:
                     return ((AnonymousClassDeclaration) node).resolveBinding();
-                case ENUM_DECLARATION:
+                case ASTNode.ENUM_DECLARATION:
                     return ((EnumDeclaration) node).resolveBinding();
-                case TYPE_DECLARATION:
+                case ASTNode.TYPE_DECLARATION:
                     return ((TypeDeclaration) node).resolveBinding();
                 default:
                     throw new NotImplementedException(node, node);
@@ -457,7 +450,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         if (binding == null) {
             return;
         }
-        if (binding.getKind() != TYPE) {
+        if (binding.getKind() != IBinding.TYPE) {
             throw new NotImplementedException(node, "for a binding of kind " + binding.getKind()); //$NON-NLS-1$
         }
         ITypeBinding typeBinding= (ITypeBinding) binding;
@@ -488,19 +481,21 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
     private void importStaticTypeOrMember(final ImportDeclaration node, final QName fullyQualifiedName) {
         IBinding binding= node.resolveBinding();
+
         if (binding == null) {
             return;
         }
+
         switch (binding.getKind()) {
-        case METHOD:
+        case IBinding.METHOD:
             methods.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
 
-        case VARIABLE:
+        case IBinding.VARIABLE:
             fields.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
 
-        case TYPE:
+        case IBinding.TYPE:
             types.addName(FQN.fromImport(fullyQualifiedName, false));
             break;
         }
@@ -527,7 +522,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             SearchEngine searchEngine= new SearchEngine();
             searchEngine.searchAllTypeNames(pkgName.toCharArray(), SearchPattern.R_EXACT_MATCH, // search in this package
                     null, SearchPattern.R_EXACT_MATCH, // do not filter by type name
-                    TYPE, // look for all java types (class, interfaces, enums, etc.)
+                    IBinding.TYPE, // look for all java types (class, interfaces, enums, etc.)
                     SearchEngine.createWorkspaceScope(), // search everywhere
                     importTypeCollector, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, // wait in case the indexer is indexing
                     cuRewrite.getProgressMonitor());
@@ -618,15 +613,16 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
     private QName getFullyQualifiedNameOrNull(final QualifiedName node) {
         IBinding binding= node.resolveBinding();
+
         if (binding != null) {
             switch (binding.getKind()) {
-            case TYPE:
+            case IBinding.TYPE:
                 ITypeBinding typeBinding= (ITypeBinding) binding;
                 return QName.valueOf(typeBinding.getErasure().getQualifiedName());
 
-            case VARIABLE:
+            case IBinding.VARIABLE:
                 IVariableBinding fieldBinding= (IVariableBinding) binding;
-                if (hasKind(node.getQualifier(), TYPE)) {
+                if (hasKind(node.getQualifier(), IBinding.TYPE)) {
                     return QName.valueOf(fieldBinding.getDeclaringClass().getQualifiedName(), fieldBinding.getName());
                 } // else this is a field access like other.fieldName
             }
@@ -639,7 +635,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
     public boolean visit(final MethodInvocation node) {
         Expression expression= node.getExpression();
         IMethodBinding methodBinding= node.resolveMethodBinding();
-        if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, TYPE)
+
+        if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, IBinding.TYPE)
                 && node.typeArguments().isEmpty()) {
             ITypeBinding declaringClass= methodBinding.getDeclaringClass();
             QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
@@ -724,8 +721,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             return true;
         }
         if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-                || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
-                        && !localIdentifiers.contains(qname.simpleName))) {
+                || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+                        && !localIdentifiers.contains(qname.simpleName)) {
             ASTNodeFactory b= cuRewrite.getASTBuilder();
             cuRewrite.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
             return false;

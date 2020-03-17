@@ -26,9 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -388,11 +385,11 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
     private boolean isVariableNamedExpected(final Expression expression) {
         switch (expression.getNodeType()) {
-        case SIMPLE_NAME:
+        case ASTNode.SIMPLE_NAME:
             SimpleName sn= (SimpleName) expression;
             return levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3; //$NON-NLS-1$
 
-        case QUALIFIED_NAME:
+        case ASTNode.QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) expression;
             return isVariableNamedExpected(qn.getName());
 

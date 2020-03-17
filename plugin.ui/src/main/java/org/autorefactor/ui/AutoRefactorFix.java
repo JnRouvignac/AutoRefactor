@@ -25,8 +25,6 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -78,7 +76,7 @@ public class AutoRefactorFix implements ICleanUpFix {
             final IJavaProject javaProject= PrepareApplyRefactoringsJob.getIJavaProject(iCompilationUnit);
             final JavaProjectOptions options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
 
-            final Environment environment= getEnvironment();
+            final Environment environment= AutoRefactorPlugin.getEnvironment();
             final List<RefactoringRule> refactoringRules= getConfiguredRefactoringRules(fOptions);
             final SubMonitor loopMonitor= SubMonitor.convert(null, 1);
             final Queue<RefactoringUnit> refactoringUnits= new ConcurrentLinkedQueue<>();
@@ -147,6 +145,7 @@ public class AutoRefactorFix implements ICleanUpFix {
      * @return Compilation unit change
      * @throws CoreException Core exception
      */
+    @Override
     public CleanUpChange createChange(final IProgressMonitor progressMonitor) throws CoreException {
         return cleanUpChange;
     }

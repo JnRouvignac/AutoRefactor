@@ -25,13 +25,6 @@
  */
 package org.autorefactor.ui;
 
-import static org.eclipse.jface.viewers.CheckboxTableViewer.newCheckList;
-import static org.eclipse.swt.SWT.BORDER;
-import static org.eclipse.swt.SWT.CHECK;
-import static org.eclipse.swt.SWT.HIDE_SELECTION;
-import static org.eclipse.swt.SWT.H_SCROLL;
-import static org.eclipse.swt.SWT.NO_FOCUS;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +89,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
          *
          * @return True if it is checked.
          */
+        @Override
         public boolean isChecked(Object element) {
             return Boolean.TRUE.equals(checkedState.get(element));
         }
@@ -107,6 +101,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
          *
          * @return True if it is grayed.
          */
+        @Override
         public boolean isGrayed(Object element) {
             return false;
         }
@@ -158,6 +153,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
      *
      * @param parent The parent
      */
+    @Override
     public void createControl(Composite parent) {
         parent.setLayout(new GridLayout());
 
@@ -172,7 +168,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createFilterText(Composite parent) {
-        filterText= new Text(parent, BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
+        filterText= new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
         filterText.setMessage("Type in to filter refactorings"); //$NON-NLS-1$
         filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
@@ -186,7 +182,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createSelectAllCheckbox(Composite parent) {
-        selectAllVisibleCheckbox= new Button(parent, CHECK);
+        selectAllVisibleCheckbox= new Button(parent, SWT.CHECK);
         selectAllVisibleCheckbox.setText("Toggle all the visible refactorings"); //$NON-NLS-1$
         selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -216,7 +212,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createRefactoringsTable(Composite parent) {
-        tableViewer= newCheckList(parent, BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
+        tableViewer= CheckboxTableViewer.newCheckList(parent, SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
         final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
@@ -275,6 +271,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         final Table table= tableViewer.getTable();
         table.setLinesVisible(false);
         table.addListener(SWT.EraseItem, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if ((event.detail & SWT.SELECTED) != 0) {
                     event.detail&= ~SWT.SELECTED;
@@ -282,6 +279,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
         });
         table.addListener(SWT.MouseDown, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 Point pt= new Point(event.x, event.y);
                 TableItem item= table.getItem(pt);
@@ -296,6 +294,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
         });
         table.addListener(SWT.MouseDoubleClick, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 Point pt= new Point(event.x, event.y);
                 TableItem item= table.getItem(pt);

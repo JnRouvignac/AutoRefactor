@@ -25,10 +25,9 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-
 import java.util.List;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
@@ -66,7 +65,7 @@ public class ChooseRefactoringsWizard extends Wizard {
     @Override
     public boolean performFinish() {
         final List<RefactoringRule> refactoringRules= chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactoringRules, getEnvironment()).schedule();
+        new PrepareApplyRefactoringsJob(javaElements, refactoringRules, AutoRefactorPlugin.getEnvironment()).schedule();
         return !refactoringRules.isEmpty();
     }
 }

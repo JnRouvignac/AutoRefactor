@@ -25,54 +25,6 @@
  */
 package org.autorefactor.cfg;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
-import static org.eclipse.jdt.core.dom.ASTNode.ASSERT_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.BLOCK;
-import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONSTRUCTOR_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.FOR_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.LABELED_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.NULL_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_CONSTRUCTOR_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_CASE;
-import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.SYNCHRONIZED_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.WHILE_STATEMENT;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -309,43 +261,43 @@ public class CFGBuilder {
         }
 
         switch (node.getNodeType()) {
-        case ARRAY_ACCESS:
+        case ASTNode.ARRAY_ACCESS:
             ArrayAccess aa= (ArrayAccess) node;
             addVariableAccess(basicBlock, aa.getArray(), flags, throwers);
             addVariableAccess(basicBlock, aa.getIndex(), flags, throwers);
             throwers.addThrow(aa, newException(node, ArrayIndexOutOfBoundsException.class.getCanonicalName()));
             return true;
 
-        case ARRAY_CREATION:
+        case ASTNode.ARRAY_CREATION:
             ArrayCreation ac= (ArrayCreation) node;
             boolean acMightThrow1= addVariableAccess(basicBlock, ac.getInitializer(), flags, throwers);
             boolean acMightThrow2= addVariableAccesses(basicBlock, ac.dimensions(), flags, throwers);
             return acMightThrow1 || acMightThrow2;
 
-        case ARRAY_INITIALIZER:
+        case ASTNode.ARRAY_INITIALIZER:
             ArrayInitializer ai= (ArrayInitializer) node;
             return addVariableAccesses(basicBlock, ai.expressions(), flags, throwers);
 
-        case ASSIGNMENT:
+        case ASTNode.ASSIGNMENT:
             Assignment a= (Assignment) node;
             boolean aMightThrow1= addVariableAccess(basicBlock, a.getLeftHandSide(), VariableAccess.WRITE, throwers);
             boolean aMightThrow2= addVariableAccess(basicBlock, a.getRightHandSide(), VariableAccess.READ, throwers);
             return aMightThrow1 || aMightThrow2;
 
-        case BOOLEAN_LITERAL:
-        case CHARACTER_LITERAL:
-        case NULL_LITERAL:
-        case NUMBER_LITERAL:
-        case STRING_LITERAL:
-        case TYPE_LITERAL:
+        case ASTNode.BOOLEAN_LITERAL:
+        case ASTNode.CHARACTER_LITERAL:
+        case ASTNode.NULL_LITERAL:
+        case ASTNode.NUMBER_LITERAL:
+        case ASTNode.STRING_LITERAL:
+        case ASTNode.TYPE_LITERAL:
             // Nothing to do
             return false;
 
-        case CAST_EXPRESSION:
+        case ASTNode.CAST_EXPRESSION:
             CastExpression cae= (CastExpression) node;
             return addVariableAccess(basicBlock, cae.getExpression(), flags, throwers);
 
-        case CLASS_INSTANCE_CREATION:
+        case ASTNode.CLASS_INSTANCE_CREATION:
             ClassInstanceCreation cic= (ClassInstanceCreation) node;
             addVariableAccess(basicBlock, cic.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, cic.arguments(), flags, throwers);
@@ -359,14 +311,14 @@ public class CFGBuilder {
 
             return false;
 
-        case CONDITIONAL_EXPRESSION:
+        case ASTNode.CONDITIONAL_EXPRESSION:
             ConditionalExpression coe= (ConditionalExpression) node;
             boolean mightThrow1= addVariableAccess(basicBlock, coe.getExpression(), flags, throwers);
             boolean mightThrow2= addVariableAccess(basicBlock, coe.getThenExpression(), flags, throwers);
             boolean mightThrow3= addVariableAccess(basicBlock, coe.getElseExpression(), flags, throwers);
             return mightThrow1 || mightThrow2 || mightThrow3;
 
-        case FIELD_ACCESS:
+        case ASTNode.FIELD_ACCESS:
             FieldAccess fa= (FieldAccess) node;
             boolean mightThrow= addVariableAccess(basicBlock, fa.getExpression(), flags, throwers);
             basicBlock.addVariableAccess(new VariableAccess(fa, flags));
@@ -378,17 +330,17 @@ public class CFGBuilder {
 
             return mightThrow;
 
-        case INFIX_EXPRESSION:
+        case ASTNode.INFIX_EXPRESSION:
             InfixExpression ie= (InfixExpression) node;
             boolean ieMightThrow1= addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
             boolean ieMightThrow2= addVariableAccess(basicBlock, ie.getRightOperand(), flags, throwers);
             return ieMightThrow1 || ieMightThrow2;
 
-        case INSTANCEOF_EXPRESSION:
+        case ASTNode.INSTANCEOF_EXPRESSION:
             InstanceofExpression ioe= (InstanceofExpression) node;
             return addVariableAccess(basicBlock, ioe.getLeftOperand(), flags, throwers);
 
-        case METHOD_INVOCATION:
+        case ASTNode.METHOD_INVOCATION:
             MethodInvocation mi= (MethodInvocation) node;
             addVariableAccess(basicBlock, mi.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, mi.arguments(), flags, throwers);
@@ -402,7 +354,7 @@ public class CFGBuilder {
 
             return false;
 
-        case SIMPLE_NAME:
+        case ASTNode.SIMPLE_NAME:
             SimpleName sn= (SimpleName) node;
             basicBlock.addVariableAccess(new VariableAccess(sn, flags));
 
@@ -413,31 +365,31 @@ public class CFGBuilder {
 
             return false;
 
-        case QUALIFIED_NAME:
+        case ASTNode.QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) node;
             basicBlock.addVariableAccess(new VariableAccess(qn, flags));
             throwers.addThrow(qn, newException(node, NullPointerException.class.getCanonicalName()));
             return true;
 
-        case PARENTHESIZED_EXPRESSION:
+        case ASTNode.PARENTHESIZED_EXPRESSION:
             ParenthesizedExpression pe= (ParenthesizedExpression) node;
             return addVariableAccess(basicBlock, pe.getExpression(), flags, throwers);
 
-        case POSTFIX_EXPRESSION:
+        case ASTNode.POSTFIX_EXPRESSION:
             PostfixExpression poe= (PostfixExpression) node;
             return addVariableAccess(basicBlock, poe.getOperand(), flags, throwers);
 
-        case PREFIX_EXPRESSION:
+        case ASTNode.PREFIX_EXPRESSION:
             PrefixExpression pre= (PrefixExpression) node;
             return addVariableAccess(basicBlock, pre.getOperand(), flags, throwers);
 
-        case SUPER_FIELD_ACCESS:
+        case ASTNode.SUPER_FIELD_ACCESS:
             SuperFieldAccess sfa= (SuperFieldAccess) node;
             boolean sfaMightThrow1= addVariableAccess(basicBlock, sfa.getQualifier(), flags, throwers);
             boolean sfaMightThrow2= addVariableAccess(basicBlock, sfa.getName(), flags, throwers);
             return sfaMightThrow1 || sfaMightThrow2;
 
-        case SUPER_METHOD_INVOCATION:
+        case ASTNode.SUPER_METHOD_INVOCATION:
             SuperMethodInvocation smi= (SuperMethodInvocation) node;
             addVariableAccess(basicBlock, smi.getQualifier(), flags, throwers);
             addVariableAccess(basicBlock, smi.getName(), flags, throwers);
@@ -451,12 +403,12 @@ public class CFGBuilder {
 
             return false;
 
-        case THIS_EXPRESSION:
+        case ASTNode.THIS_EXPRESSION:
             ThisExpression te= (ThisExpression) node;
             // TODO JNR remember use of "this" here
             return addVariableAccess(basicBlock, te.getQualifier(), flags, throwers);
 
-        case VARIABLE_DECLARATION_EXPRESSION:
+        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
             return addDeclarations(basicBlock, (VariableDeclarationExpression) node, throwers);
 
         default:
@@ -1123,7 +1075,7 @@ public class CFGBuilder {
 
     private Statement findLabeledParentStatement(final ASTNode node) {
         ASTNode n= node;
-        while (n != null && n.getNodeType() != LABELED_STATEMENT) {
+        while (n != null && n.getNodeType() != ASTNode.LABELED_STATEMENT) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1265,88 +1217,88 @@ public class CFGBuilder {
         LivenessState liveState= startState;
         for (Statement statement : statements) {
             switch (statement.getNodeType()) {
-            case ASSERT_STATEMENT:
+            case ASTNode.ASSERT_STATEMENT:
                 liveState= buildCFG((AssertStatement) statement, liveState, throwers);
                 break;
 
-            case BLOCK:
+            case ASTNode.BLOCK:
                 liveState= buildCFG((Block) statement, liveState, throwers);
                 break;
 
-            case BREAK_STATEMENT:
+            case ASTNode.BREAK_STATEMENT:
                 liveState= buildCFG((BreakStatement) statement, liveState);
                 break;
 
-            case CONSTRUCTOR_INVOCATION:
-            case SUPER_CONSTRUCTOR_INVOCATION:
+            case ASTNode.CONSTRUCTOR_INVOCATION:
+            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
                 liveState= buildCFG(statement, liveState, throwers);
                 break;
 
-            case CONTINUE_STATEMENT:
+            case ASTNode.CONTINUE_STATEMENT:
                 liveState= buildCFG((ContinueStatement) statement, liveState);
                 break;
 
-            case DO_STATEMENT:
+            case ASTNode.DO_STATEMENT:
                 liveState= buildCFG((DoStatement) statement, liveState, throwers);
                 break;
 
-            case EMPTY_STATEMENT:
+            case ASTNode.EMPTY_STATEMENT:
                 liveState= buildCFG((EmptyStatement) statement, liveState);
                 break;
 
-            case ENHANCED_FOR_STATEMENT:
+            case ASTNode.ENHANCED_FOR_STATEMENT:
                 liveState= buildCFG((EnhancedForStatement) statement, liveState, throwers);
                 break;
 
-            case EXPRESSION_STATEMENT:
+            case ASTNode.EXPRESSION_STATEMENT:
                 liveState= buildCFG((ExpressionStatement) statement, liveState, throwers);
                 break;
 
-            case FOR_STATEMENT:
+            case ASTNode.FOR_STATEMENT:
                 liveState= buildCFG((ForStatement) statement, liveState, throwers);
                 break;
 
-            case IF_STATEMENT:
+            case ASTNode.IF_STATEMENT:
                 liveState= buildCFG((IfStatement) statement, liveState, throwers);
                 break;
 
-            case LABELED_STATEMENT:
+            case ASTNode.LABELED_STATEMENT:
                 liveState= buildCFG((LabeledStatement) statement, liveState, throwers);
                 break;
 
-            case RETURN_STATEMENT:
+            case ASTNode.RETURN_STATEMENT:
                 liveState= buildCFG((ReturnStatement) statement, liveState, throwers);
                 break;
 
-            case SWITCH_CASE:
+            case ASTNode.SWITCH_CASE:
                 // Here, use startState.liveBasicBlock to build an edge
                 // from the switch condition to the case statement
                 liveState= buildCFG((SwitchCase) statement, startState.liveBasicBlock, liveState, throwers);
                 break;
 
-            case SWITCH_STATEMENT:
+            case ASTNode.SWITCH_STATEMENT:
                 liveState= buildCFG((SwitchStatement) statement, liveState, throwers);
                 break;
 
-            case SYNCHRONIZED_STATEMENT:
+            case ASTNode.SYNCHRONIZED_STATEMENT:
                 liveState= buildCFG((SynchronizedStatement) statement, liveState, throwers);
                 break;
 
-            case THROW_STATEMENT:
+            case ASTNode.THROW_STATEMENT:
                 liveState= buildCFG((ThrowStatement) statement, liveState, throwers);
                 break;
 
-            case TRY_STATEMENT:
+            case ASTNode.TRY_STATEMENT:
                 liveState= buildCFG((TryStatement) statement, liveState, throwers);
                 // break;case TYPE_DECLARATION_STATEMENT:
                 // buildCFG((TypeDeclarationStatement) statement, liveState, throwers);
                 break;
 
-            case VARIABLE_DECLARATION_STATEMENT:
+            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
                 liveState= buildCFG((VariableDeclarationStatement) statement, liveState, throwers);
                 break;
 
-            case WHILE_STATEMENT:
+            case ASTNode.WHILE_STATEMENT:
                 liveState= buildCFG((WhileStatement) statement, liveState, throwers);
                 break;
 

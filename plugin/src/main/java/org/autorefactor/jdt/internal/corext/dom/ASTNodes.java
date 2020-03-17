@@ -25,19 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.eclipse.jdt.core.dom.ASTNode.BLOCK;
-import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -190,8 +177,8 @@ public final class ASTNodes {
         public boolean visit(final QualifiedName node) {
             if (node.getQualifier() == null
                     || node.getQualifier().resolveBinding() == null
-                    || (node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
-                    && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE)) {
+                    || node.getQualifier().resolveBinding().getKind() != IBinding.PACKAGE
+                    && node.getQualifier().resolveBinding().getKind() != IBinding.TYPE) {
                 setActivityLevel(ExprActivity.PASSIVE);
             }
 
@@ -1191,7 +1178,7 @@ public final class ASTNodes {
         ASTNode parent= statementAtLevel.getParent();
 
         return parent instanceof Block
-                || (parent instanceof SwitchStatement && statementAtLevel.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY);
+                || parent instanceof SwitchStatement && statementAtLevel.getLocationInParent() == SwitchStatement.STATEMENTS_PROPERTY;
     }
 
     /**
@@ -1562,7 +1549,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isConstant(final Expression expression) {
-        return (expression != null && expression.resolveConstantExpressionValue() != null) || isEnumConstant(expression);
+        return expression != null && expression.resolveConstantExpressionValue() != null || isEnumConstant(expression);
     }
 
     private static boolean isEnumConstant(final Expression expression) {
@@ -1589,6 +1576,7 @@ public final class ASTNodes {
         if (expression == null) {
             return false;
         }
+
         switch (expression.getNodeType()) {
         case ASTNode.BOOLEAN_LITERAL:
         case ASTNode.CHARACTER_LITERAL:
@@ -1698,7 +1686,7 @@ public final class ASTNodes {
      *         same local variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(final IBinding binding, final Expression expression) {
-        return isLocalVariable(binding) && expression != null && expression.getNodeType() == SIMPLE_NAME
+        return isLocalVariable(binding) && expression != null && expression.getNodeType() == ASTNode.SIMPLE_NAME
                 // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
                 // a *local* variable
                 && binding.equals(((SimpleName) expression).resolveBinding());
@@ -1713,7 +1701,7 @@ public final class ASTNodes {
      *         variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(final Expression expr1, final Expression expr2) {
-        return expr1 != null && expr1.getNodeType() == SIMPLE_NAME
+        return expr1 != null && expr1.getNodeType() == ASTNode.SIMPLE_NAME
                 && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
 
@@ -1824,35 +1812,6 @@ public final class ASTNodes {
         }
 
         return false;
-    }
-
-    private static ITypeBinding findImplementedType(final ITypeBinding typeBinding, final String qualifiedTypeName,
-            final Set<String> visitedInterfaces) {
-        ITypeBinding superclass= typeBinding.getSuperclass();
-        if (superclass != null) {
-            String superClassQualifiedName= superclass.getErasure().getQualifiedName();
-            if (qualifiedTypeName.equals(superClassQualifiedName)) {
-                return superclass;
-            }
-            visitedInterfaces.add(superClassQualifiedName);
-            ITypeBinding implementedType= findImplementedType(superclass, qualifiedTypeName, visitedInterfaces);
-            if (implementedType != null) {
-                return implementedType;
-            }
-        }
-        for (ITypeBinding itfBinding : typeBinding.getInterfaces()) {
-            String itfQualifiedName= itfBinding.getErasure().getQualifiedName();
-            if (qualifiedTypeName.equals(itfQualifiedName)) {
-                return itfBinding;
-            }
-            visitedInterfaces.add(itfQualifiedName);
-            ITypeBinding implementedType= findImplementedType(itfBinding, qualifiedTypeName, visitedInterfaces);
-            if (implementedType != null) {
-                return implementedType;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -2391,18 +2350,18 @@ public final class ASTNodes {
 
     private static IBinding varBinding(final ASTNode node) {
         switch (node.getNodeType()) {
-        case THIS_EXPRESSION:
+        case ASTNode.THIS_EXPRESSION:
             return ((ThisExpression) node).resolveTypeBinding();
 
-        case FIELD_ACCESS:
+        case ASTNode.FIELD_ACCESS:
             return ((FieldAccess) node).resolveFieldBinding();
 
-        case QUALIFIED_NAME:
-        case SIMPLE_NAME:
+        case ASTNode.QUALIFIED_NAME:
+        case ASTNode.SIMPLE_NAME:
             return ((Name) node).resolveBinding();
 
-        case SINGLE_VARIABLE_DECLARATION:
-        case VARIABLE_DECLARATION_FRAGMENT:
+        case ASTNode.SINGLE_VARIABLE_DECLARATION:
+        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             return ((VariableDeclaration) node).resolveBinding();
 
         default:
@@ -2518,44 +2477,44 @@ public final class ASTNodes {
         }
 
         switch (node1.getNodeType()) {
-        case THIS_EXPRESSION:
-            return node2.getNodeType() == THIS_EXPRESSION;
+        case ASTNode.THIS_EXPRESSION:
+            return node2.getNodeType() == ASTNode.THIS_EXPRESSION;
 
-        case SIMPLE_NAME:
+        case ASTNode.SIMPLE_NAME:
             SimpleName sn= (SimpleName) node1;
             switch (node2.getNodeType()) {
-            case QUALIFIED_NAME:
+            case ASTNode.QUALIFIED_NAME:
                 return isSameVariable(sn, (QualifiedName) node2);
 
-            case FIELD_ACCESS:
+            case ASTNode.FIELD_ACCESS:
                 return isSameVariable(sn, (FieldAccess) node2);
             }
             break;
 
-        case QUALIFIED_NAME:
+        case ASTNode.QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) node1;
             switch (node2.getNodeType()) {
-            case SIMPLE_NAME:
+            case ASTNode.SIMPLE_NAME:
                 return isSameVariable((SimpleName) node2, qn);
 
-            case QUALIFIED_NAME:
+            case ASTNode.QUALIFIED_NAME:
                 return isSameVariable(qn, (QualifiedName) node2);
 
-            case FIELD_ACCESS:
+            case ASTNode.FIELD_ACCESS:
                 return isSameVariable(qn, (FieldAccess) node2);
             }
             break;
 
-        case FIELD_ACCESS:
+        case ASTNode.FIELD_ACCESS:
             FieldAccess fa= (FieldAccess) node1;
             switch (node2.getNodeType()) {
-            case SIMPLE_NAME:
+            case ASTNode.SIMPLE_NAME:
                 return isSameVariable((SimpleName) node2, fa);
 
-            case QUALIFIED_NAME:
+            case ASTNode.QUALIFIED_NAME:
                 return isSameVariable((QualifiedName) node2, fa);
 
-            case FIELD_ACCESS:
+            case ASTNode.FIELD_ACCESS:
                 return isSameVariable(fa, (FieldAccess) node2);
             }
         }
@@ -2727,17 +2686,17 @@ public final class ASTNodes {
 
         Statement lastStatement= statements.get(statements.size() - 1);
         switch (lastStatement.getNodeType()) {
-        case RETURN_STATEMENT:
-        case THROW_STATEMENT:
-        case BREAK_STATEMENT:
-        case CONTINUE_STATEMENT:
+        case ASTNode.RETURN_STATEMENT:
+        case ASTNode.THROW_STATEMENT:
+        case ASTNode.BREAK_STATEMENT:
+        case ASTNode.CONTINUE_STATEMENT:
             return true;
 
-        case BLOCK:
+        case ASTNode.BLOCK:
             Block block= (Block) lastStatement;
             return fallsThrough(block);
 
-        case IF_STATEMENT:
+        case ASTNode.IF_STATEMENT:
             IfStatement ifStatement= (IfStatement) lastStatement;
             Statement thenStatement= ifStatement.getThenStatement();
             Statement elseStatement= ifStatement.getElseStatement();
@@ -2872,9 +2831,9 @@ public final class ASTNodes {
         InfixExpression infixExpression= as(node, InfixExpression.class);
 
         if (infixExpression == null
-                || (!hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
+                || !hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
                 && (!hasOperator(infixExpression, InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)
-                        || !hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())))) {
+                        || !hasType(infixExpression.getLeftOperand(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName()))) {
             return 1;
         }
 

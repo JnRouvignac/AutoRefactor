@@ -25,14 +25,13 @@
  */
 package org.autorefactor.ui;
 
-import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -56,6 +55,7 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
      *
      * @throws ExecutionException ExecutionException
      */
+    @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell= HandlerUtil.getActiveShell(event);
         try {
@@ -69,12 +69,13 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
                 /**
                  * Run.
                  */
+                @Override
                 public void run() {
                     final StringWriter sw= new StringWriter();
                     final PrintWriter pw= new PrintWriter(sw);
                     e.printStackTrace(pw);
 
-                    openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageDialog.openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             });
         }

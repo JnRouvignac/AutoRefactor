@@ -26,11 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -208,10 +203,10 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         private boolean isTypeDeclaration(final ASTNode node) {
             switch (node.getNodeType()) {
-            case ANNOTATION_TYPE_DECLARATION:
-            case ANONYMOUS_CLASS_DECLARATION:
-            case ENUM_DECLARATION:
-            case TYPE_DECLARATION:
+            case ASTNode.ANNOTATION_TYPE_DECLARATION:
+            case ASTNode.ANONYMOUS_CLASS_DECLARATION:
+            case ASTNode.ENUM_DECLARATION:
+            case ASTNode.TYPE_DECLARATION:
                 return true;
 
             default:
@@ -371,8 +366,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        return type1 == null || type2 == null || (type1.isParameterizedType() == type2.isParameterizedType()
-                && areSameParameterizedTypeBindings(type1, type2));
+        return type1 == null || type2 == null || type1.isParameterizedType() == type2.isParameterizedType()
+                && areSameParameterizedTypeBindings(type1, type2);
     }
 
     /** Special handling because of captures. */

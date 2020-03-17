@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.UNION_TYPE;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -344,6 +341,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
     private Binding[] resolveTypeBindings(final List<CatchClause> catchClauses) {
         Binding[] results= new Binding[catchClauses.size()];
+
         for (int i= 0; i < catchClauses.size(); i++) {
             results[i]= resolveBinding(catchClauses.get(i));
         }
@@ -354,11 +352,12 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     private Binding resolveBinding(final CatchClause catchClause) {
         SingleVariableDeclaration svd= catchClause.getException();
         Type type= svd.getType();
+
         switch (type.getNodeType()) {
-        case SIMPLE_TYPE:
+        case ASTNode.SIMPLE_TYPE:
             return new SingleBinding(type.resolveBinding());
 
-        case UNION_TYPE:
+        case ASTNode.UNION_TYPE:
             List<Type> types= ASTNodes.types((UnionType) type);
             ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
             for (int j= 0; j < types.size(); j++) {

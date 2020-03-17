@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -147,8 +144,8 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
         ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
-        case ARRAY_ACCESS:
-        case SWITCH_STATEMENT:
+        case ASTNode.ARRAY_ACCESS:
+        case ASTNode.SWITCH_STATEMENT:
             return true;
 
         default:

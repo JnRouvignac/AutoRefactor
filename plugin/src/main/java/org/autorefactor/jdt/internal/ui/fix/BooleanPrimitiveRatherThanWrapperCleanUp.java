@@ -25,10 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.WHILE_STATEMENT;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -122,9 +118,9 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
         ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
-        case IF_STATEMENT:
-        case WHILE_STATEMENT:
-        case DO_STATEMENT:
+        case ASTNode.IF_STATEMENT:
+        case ASTNode.WHILE_STATEMENT:
+        case ASTNode.DO_STATEMENT:
             return true;
 
         default:

@@ -25,10 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,14 +76,13 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
                     VariableDeclarationStatement.class);
             if (parent != null) {
                 switch (parent.getNodeType()) {
-
-                case RETURN_STATEMENT:
+                case ASTNode.RETURN_STATEMENT:
                     return handleReturnStatement(node, classesToUseWithImport, importsToAdd);
 
-                case ASSIGNMENT:
+                case ASTNode.ASSIGNMENT:
                     return handleAssignment(node, (Assignment) parent, classesToUseWithImport, importsToAdd);
 
-                case VARIABLE_DECLARATION_STATEMENT:
+                case ASTNode.VARIABLE_DECLARATION_STATEMENT:
                     return handleVarDeclarationStatement((VariableDeclarationStatement) parent, classesToUseWithImport,
                             importsToAdd);
 
