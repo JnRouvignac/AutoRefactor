@@ -68,7 +68,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.SYNCHRONIZED_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
@@ -1189,7 +1188,7 @@ public class CFGBuilder {
     public List<CFGBasicBlock> buildCFG(final CompilationUnit node) {
         List<CFGBasicBlock> results= new LinkedList<>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
-            if (decl.getNodeType() != TYPE_DECLARATION) {
+            if (decl.getNodeType() != ASTNode.TYPE_DECLARATION) {
                 throw new NotImplementedException(node);
             }
             results.addAll(buildCFG((TypeDeclaration) decl));

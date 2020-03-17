@@ -26,10 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType.COLLECTION;
-import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType.INDEX;
-import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType.ITERATOR;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -38,7 +34,9 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
+import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
+import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -310,8 +308,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
             List<Statement> statements= ASTNodes.asList(node.getBody());
 
-            if (getResult() && loopContent != null && COLLECTION.equals(loopContent.getContainerType())) {
-                if (INDEX.equals(loopContent.getIterationType())) {
+            if (getResult() && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
+                if (IterationType.INDEX.equals(loopContent.getIterationType())) {
                     Expression loopElement= null;
                     IfStatement is;
                     if (statements.size() == 2) {
@@ -336,7 +334,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                             is);
                 }
 
-                if (ITERATOR.equals(loopContent.getIterationType())) {
+                if (IterationType.ITERATOR.equals(loopContent.getIterationType())) {
                     Expression loopElement= null;
                     IfStatement is;
                     if (statements.size() == 2) {

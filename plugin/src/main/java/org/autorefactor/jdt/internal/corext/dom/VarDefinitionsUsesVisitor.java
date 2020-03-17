@@ -25,12 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,10 +82,10 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
 
     private static boolean isVariableDeclaration(final ASTNode node) {
         switch (node.getNodeType()) {
-        case SINGLE_VARIABLE_DECLARATION:
-        case VARIABLE_DECLARATION_EXPRESSION:
-        case VARIABLE_DECLARATION_FRAGMENT:
-        case VARIABLE_DECLARATION_STATEMENT:
+        case ASTNode.SINGLE_VARIABLE_DECLARATION:
+        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+        case ASTNode.VARIABLE_DECLARATION_STATEMENT:
             return true;
 
         default:
@@ -116,15 +110,15 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
     public boolean visit(final SimpleName node) {
         if (ASTNodes.isSameLocalVariable(variableBinding, node)) {
             switch (node.getParent().getNodeType()) {
-            case ASSIGNMENT:
+            case ASTNode.ASSIGNMENT:
                 addWriteOrRead(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
                 break;
 
-            case VARIABLE_DECLARATION_FRAGMENT:
+            case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
                 addWriteOrRead(node, VariableDeclarationFragment.NAME_PROPERTY);
                 break;
 
-            case SINGLE_VARIABLE_DECLARATION:
+            case ASTNode.SINGLE_VARIABLE_DECLARATION:
                 addWriteOrRead(node, SingleVariableDeclaration.NAME_PROPERTY);
                 break;
 
