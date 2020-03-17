@@ -25,14 +25,14 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * Interface that all cleanup rules must implement.
  * <p>
- * First, {@link #setRefactoringContext(RefactoringContext)} is called, then
+ * First, {@link #setRefactoringContext(CompilationUnitRewrite)} is called, then
  * {@link #getRefactorings(CompilationUnit)} is called next.
  */
 public interface RefactoringRule {
@@ -87,7 +87,7 @@ public interface RefactoringRule {
     /**
      * Sets the cleanup context before analysis.
      *
-     * @param ctx the cleanup context
+     * @param cuRewrite the cleanup context
      */
-    void setRefactoringContext(RefactoringContext ctx);
+    void setRefactoringContext(CompilationUnitRewrite cuRewrite);
 }

@@ -30,6 +30,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -79,14 +80,14 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
     @Override
     public boolean visit(final Block node) {
-        NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(ctx, node);
+        NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(cuRewrite, node);
         node.accept(newAndPutAllMethodVisitor);
         return newAndPutAllMethodVisitor.getResult();
     }
 
     private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-        public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public NewAndPutAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -234,8 +235,8 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
         private void extractIncrement(final Expression node, final Expression variable,
                 final Statement statement) {
-            Refactorings r= ctx.getRefactorings();
-            ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             r.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), b.createCopyTarget(variable));
 

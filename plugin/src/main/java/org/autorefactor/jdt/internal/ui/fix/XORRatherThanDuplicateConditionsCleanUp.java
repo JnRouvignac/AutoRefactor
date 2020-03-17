@@ -123,12 +123,12 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     private void replaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
             final Expression secondExpression, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-            ctx.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, b.createMoveTarget(secondExpression)));
+            cuRewrite.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, b.createMoveTarget(secondExpression)));
         } else {
-            ctx.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.XOR, b.createMoveTarget(secondExpression)));
+            cuRewrite.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(firstExpression), InfixExpression.Operator.XOR, b.createMoveTarget(secondExpression)));
         }
     }
 }

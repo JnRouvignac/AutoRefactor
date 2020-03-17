@@ -88,8 +88,8 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         if ((ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ //$NON-NLS-2$
                 || (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
                 && literalSize != null) {
-            Refactorings r= this.ctx.getRefactorings();
-            ASTNodeFactory b= this.ctx.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
             if (literalSize == 0) {
                 if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)

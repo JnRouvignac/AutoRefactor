@@ -353,8 +353,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             rightOppositeExpression= rightPrefix.getOperand();
         }
 
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
         if (leftOppositeExpression != null) {
             if (rightOppositeExpression != null) {
                 r.replace(node,
@@ -401,14 +401,14 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         // - One boolean primitive and one Boolean object, this code already run
         // the risk of an NPE, so we can replace the infix expression without
         // fearing we would introduce a previously non existing NPE.
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Expression operand;
         if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
             operand= b.createMoveTarget(exprToCopy);
         } else {
             operand= b.negate(exprToCopy);
         }
-        this.ctx.getRefactorings().replace(node, operand);
+        this.cuRewrite.getRefactorings().replace(node, operand);
         return false;
     }
 
@@ -416,8 +416,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (remainingOperands.size() == 1) {
             replaceBy(node, remainingOperands.get(0));
         } else {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.infixExpression(node.getOperator(), b.createMoveTarget(remainingOperands)));
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node, b.infixExpression(node.getOperator(), b.createMoveTarget(remainingOperands)));
         }
     }
 
@@ -446,13 +446,13 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private void addParentheses(final Expression expression) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(expression, b.parenthesize(b.createMoveTarget(expression)));
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        this.cuRewrite.getRefactorings().replace(expression, b.parenthesize(b.createMoveTarget(expression)));
     }
 
     private void replaceBy(final ASTNode node, final Expression expression) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        ctx.getRefactorings().replace(node, b.createMoveTarget(expression));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getRefactorings().replace(node, b.createMoveTarget(expression));
     }
 
     /**

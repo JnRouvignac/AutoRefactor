@@ -178,8 +178,8 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         boolean isFieldKept= field.fragments().size() != 1;
 

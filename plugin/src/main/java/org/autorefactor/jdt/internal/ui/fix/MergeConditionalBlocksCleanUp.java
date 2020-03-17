@@ -96,8 +96,8 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStatements, final boolean isPositive) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         Expression additionalCondition;
         if (isPositive) {

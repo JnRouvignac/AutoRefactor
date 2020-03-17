@@ -34,8 +34,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.autorefactor.environment.Environment;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
-import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -214,6 +214,7 @@ public class ApplyRefactoringsJob extends Job {
             final AggregateASTVisitor refactoring, final JavaProjectOptions options, final SubMonitor monitor, final boolean hasToSave)
             throws Exception {
         // Creation of DOM/AST from a ICompilationUnit
+        @SuppressWarnings("deprecation")
         ASTParser parser= ASTParser.newParser(AST.JLS8);
 
         int maxIterations= 100;
@@ -246,9 +247,9 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            RefactoringContext ctx= new RefactoringContext(compilationUnit, astRoot, options, monitor,
+            CompilationUnitRewrite cuRewrite= new CompilationUnitRewrite(compilationUnit, astRoot, options, monitor,
                     environment);
-            refactoring.setRefactoringContext(ctx);
+            refactoring.setRefactoringContext(cuRewrite);
 
             Refactorings refactorings= refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {

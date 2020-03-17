@@ -68,8 +68,8 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
     public boolean visit(final WhileStatement node) {
         Object constantCondition= node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            this.ctx.getRefactorings().replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            this.cuRewrite.getRefactorings().replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
             return false;
         }
 

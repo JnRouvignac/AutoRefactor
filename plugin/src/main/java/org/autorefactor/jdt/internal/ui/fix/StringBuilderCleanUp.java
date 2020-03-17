@@ -121,7 +121,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
             if (lastExpression instanceof ClassInstanceCreation) {
                 // Replace with String concatenation
-                this.ctx.getRefactorings().replace(node, createStringConcats(allAppendedStrings));
+                this.cuRewrite.getRefactorings().replace(node, createStringConcats(allAppendedStrings));
                 return false;
             }
         }
@@ -161,11 +161,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     return maybeReplaceWithNewStringAppends(node, allAppendedStrings, lastExpression, isInstanceCreationToRewrite.get());
                 }
 
-                Refactorings r= ctx.getRefactorings();
+                Refactorings r= cuRewrite.getRefactorings();
                 if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
                     r.remove(node.getParent());
                 } else {
-                    r.replace(node.getParent(), ctx.getASTBuilder().block());
+                    r.replace(node.getParent(), cuRewrite.getASTBuilder().block());
                 }
 
                 return false;
@@ -319,7 +319,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
-                        iter.set(Pair.<ITypeBinding, Expression>of(null, this.ctx.getAST().newThisExpression()));
+                        iter.set(Pair.<ITypeBinding, Expression>of(null, this.cuRewrite.getAST().newThisExpression()));
                     }
 
                     isRefactoringNeeded.set(true);
@@ -361,7 +361,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceWithNewStringAppends(final Expression node,
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
             final boolean isInstanceCreationToRewrite) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         Expression result= null;
         List<Expression> tempStringLiterals= new ArrayList<>();
@@ -411,7 +411,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        ctx.getRefactorings().replace(node, result);
+        cuRewrite.getRefactorings().replace(node, result);
         return false;
     }
 
@@ -451,7 +451,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Expression stringVar= b.createCopyTarget(embeddedMI.getExpression());
         List<Expression> args= ASTNodes.arguments(embeddedMI);
         Expression arg0= b.createCopyTarget(args.get(0));
@@ -465,7 +465,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             newAppendSubstring= b.invoke(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
         }
 
-        this.ctx.getRefactorings().replace(node, newAppendSubstring);
+        this.cuRewrite.getRefactorings().replace(node, newAppendSubstring);
     }
 
     private boolean isStringBuilderOrBuffer(final Expression expression) {
@@ -530,7 +530,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
 
             if (replaceNeeded) {
-                this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
+                this.cuRewrite.getRefactorings().replace(node, createStringConcats(allOperands));
                 return false;
             }
         }
@@ -562,7 +562,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         switch (appendedStrings.size()) {
         case 0:
             return b.string(""); //$NON-NLS-1$

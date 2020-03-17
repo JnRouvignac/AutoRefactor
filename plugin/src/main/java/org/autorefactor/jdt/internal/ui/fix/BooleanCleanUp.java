@@ -39,6 +39,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -149,8 +150,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private final class AssignmentIfAndReturnVisitor extends BlockSubVisitor {
-        public AssignmentIfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public AssignmentIfAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -169,7 +170,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        AssignmentIfAndReturnVisitor assignmentIfAndReturnVisitor= new AssignmentIfAndReturnVisitor(ctx, node);
+        AssignmentIfAndReturnVisitor assignmentIfAndReturnVisitor= new AssignmentIfAndReturnVisitor(cuRewrite, node);
         node.accept(assignmentIfAndReturnVisitor);
         return assignmentIfAndReturnVisitor.getResult();
     }
@@ -258,9 +259,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     private ASTNodeFactory b;
 
     @Override
-    public void setRefactoringContext(final RefactoringContext ctx) {
-        super.setRefactoringContext(ctx);
-        b= ctx.getASTBuilder();
+    public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
+        super.setRefactoringContext(cuRewrite);
+        b= cuRewrite.getASTBuilder();
     }
 
     @Override
@@ -272,7 +273,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getThenExpression(), node.getElseExpression());
 
             if (newE != null) {
-                ctx.getRefactorings().replace(node, newE);
+                cuRewrite.getRefactorings().replace(node, newE);
                 return false;
             }
         }
@@ -284,8 +285,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         ReturnStatement newRs= getReturnStatement(node, thenRs.getExpression(), elseRs.getExpression());
 
         if (newRs != null) {
-            ctx.getRefactorings().replace(node, newRs);
-            ctx.getRefactorings().remove(elseRs);
+            cuRewrite.getRefactorings().replace(node, newRs);
+            cuRewrite.getRefactorings().remove(elseRs);
             return false;
         }
 
@@ -301,8 +302,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 newRs= getReturnStatement(node, thenBool, elseBool, thenRs.getExpression(), elseRs.getExpression());
 
                 if (newRs != null) {
-                    ctx.getRefactorings().replace(node, newRs);
-                    ctx.getRefactorings().remove(elseRs);
+                    cuRewrite.getRefactorings().replace(node, newRs);
+                    cuRewrite.getRefactorings().remove(elseRs);
                     return false;
                 }
             }
@@ -351,8 +352,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     rightHandSide);
 
             if (newE != null) {
-                ctx.getRefactorings().replace(rightHandSide, newE);
-                ctx.getRefactorings().remove(node);
+                cuRewrite.getRefactorings().replace(rightHandSide, newE);
+                cuRewrite.getRefactorings().remove(node);
                 return false;
             }
         }
@@ -540,7 +541,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
                 if (ASTNodes.match(matcher2, copyStatement, node.getElseStatement())) {
-                    Refactorings r = ctx.getRefactorings();
+                    Refactorings r = cuRewrite.getRefactorings();
 
                     copyStatement.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));

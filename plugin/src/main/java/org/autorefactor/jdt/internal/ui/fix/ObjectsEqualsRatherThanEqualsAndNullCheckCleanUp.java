@@ -227,8 +227,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private void replaceEquals(final IfStatement node, final Expression firstField, final Expression secondField,
             final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         r.replace(node,
                 b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),

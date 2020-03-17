@@ -323,7 +323,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 CatchClause catchClause2= catchClauses.get(j);
                 MergeDirection direction= mergeDirection(typeBindings, i, j);
                 if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
-                    Refactorings r= this.ctx.getRefactorings();
+                    Refactorings r= this.cuRewrite.getRefactorings();
                     UnionType ut= unionTypes(catchClause1.getException().getType(),
                             catchClause2.getException().getType());
                     if (MergeDirection.UP.equals(direction)) {
@@ -418,8 +418,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        UnionType result= this.ctx.getAST().newUnionType();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        UnionType result= this.cuRewrite.getAST().newUnionType();
         List<Type> unionedTypes= ASTNodes.types(result);
         unionedTypes.addAll(b.createMoveTarget(allTypes));
         return result;

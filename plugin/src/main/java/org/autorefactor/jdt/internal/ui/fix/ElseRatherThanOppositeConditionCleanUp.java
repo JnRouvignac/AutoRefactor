@@ -80,8 +80,8 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
     }
 
     private void removeCondition(final IfStatement secondIf) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         r.replace(secondIf, b.createMoveTarget(secondIf.getThenStatement()));
     }

@@ -113,7 +113,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         }
 
         Type type= types[0];
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         List<Expression> arguments= ASTNodes.arguments(cic);
         MethodInvocation invocation;
         Name newClassName= b.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
@@ -125,12 +125,12 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
             }
             invocation= b.invoke(newClassName, "copyOf", b.createCopyTarget(typeArg)); //$NON-NLS-1$
         } else {
-            TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
+            TypeLiteral newTypeLiteral= cuRewrite.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.createCopyTarget(type));
             invocation= b.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
         }
 
-        ctx.getRefactorings().replace(cic, invocation);
+        cuRewrite.getRefactorings().replace(cic, invocation);
         importsToAdd.add(EnumSet.class.getCanonicalName());
         return false;
     }

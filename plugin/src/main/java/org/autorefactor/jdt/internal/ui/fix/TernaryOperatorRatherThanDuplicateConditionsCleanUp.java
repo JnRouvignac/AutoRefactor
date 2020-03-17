@@ -147,8 +147,8 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
             elseExpression= oneExpression;
         }
 
-        ASTNodeFactory b= ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.createMoveTarget(basicExpression),
                 b.createMoveTarget(thenExpression), b.createMoveTarget(elseExpression)));

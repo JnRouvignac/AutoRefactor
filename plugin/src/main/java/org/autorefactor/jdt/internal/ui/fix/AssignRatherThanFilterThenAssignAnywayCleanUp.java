@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -74,14 +75,14 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final Block node) {
-        IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(ctx, node);
+        IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(cuRewrite, node);
         node.accept(ifAndReturnVisitor);
         return ifAndReturnVisitor.getResult();
     }
 
     private static final class IfAndReturnVisitor extends BlockSubVisitor {
-        public IfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public IfAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -174,8 +175,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private void replaceWithStraightAssign(final IfStatement node, final Expression leftHandSide, final Expression rightHandSide) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node,
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node,
                     b.toStatement(b.assign(b.createMoveTarget(leftHandSide), Assignment.Operator.ASSIGN, b.createMoveTarget(rightHandSide))));
         }
 
@@ -203,8 +204,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
         }
 
         private void replaceWithStraightReturn(final IfStatement node, final Expression returnedExpression, final Statement toRemove) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            Refactorings r= cuRewrite.getRefactorings();
 
             r.remove(toRemove);
             r.replace(node, b.return0(b.createMoveTarget(returnedExpression)));

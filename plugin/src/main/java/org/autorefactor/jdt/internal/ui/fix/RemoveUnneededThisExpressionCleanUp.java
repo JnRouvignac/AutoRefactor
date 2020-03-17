@@ -77,7 +77,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
                 && ASTNodes.typeArguments(node).isEmpty()) {
             // Remove useless thisExpressions
-            this.ctx.getRefactorings().remove(node.getExpression());
+            this.cuRewrite.getRefactorings().remove(node.getExpression());
             return false;
         }
 

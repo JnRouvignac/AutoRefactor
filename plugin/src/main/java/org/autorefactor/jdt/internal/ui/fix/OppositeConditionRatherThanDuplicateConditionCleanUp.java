@@ -131,7 +131,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
             final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         Statement negativeStmtCopy;
         if (negativeStatement instanceof IfStatement) {
@@ -155,7 +155,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             thirdStmtCopy= b.createMoveTarget(positiveStatement);
         }
 
-        this.ctx.getRefactorings().replace(node,
+        this.cuRewrite.getRefactorings().replace(node,
                 b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
                         b.if0(b.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }

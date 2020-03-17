@@ -29,6 +29,7 @@ import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -62,7 +63,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
     }
 
     /** The refactoring context of the current visitor. */
-    protected RefactoringContext ctx;
+    protected CompilationUnitRewrite cuRewrite;
 
     /**
      * True if it is the visitor by default.
@@ -104,17 +105,17 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      * @return the java minor version.
      */
     public int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+        return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     /**
      * Set the cleanup context.
      *
-     * @param ctx the cleanup context.
+     * @param cuRewrite the cleanup context.
      */
     @Override
-    public void setRefactoringContext(final RefactoringContext ctx) {
-        this.ctx= ctx;
+    public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
+        this.cuRewrite= cuRewrite;
     }
 
     @Override
@@ -129,7 +130,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
         }
         // Only visit nodes that have not been refactored
         // to avoid trying to refactor twice the same node (or sub nodes)
-        return !ctx.getRefactorings().hasBeenRefactored(node);
+        return !cuRewrite.getRefactorings().hasBeenRefactored(node);
     }
 
     /**
@@ -142,6 +143,6 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
     @Override
     public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
-        return ctx.getRefactorings();
+        return cuRewrite.getRefactorings();
     }
 }

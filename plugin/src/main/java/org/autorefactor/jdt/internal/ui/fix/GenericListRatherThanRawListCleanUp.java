@@ -307,7 +307,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType= Bindings.getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= Bindings.getBoxedTypeBinding(newElementType, cuRewrite.getAST());
         }
         if (!ASTNodes.hasType(newElementType, Object.class.getCanonicalName())
                 && (elementType == null || newElementType.equals(elementType))) {

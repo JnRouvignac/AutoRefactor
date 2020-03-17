@@ -530,7 +530,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     TYPE, // look for all java types (class, interfaces, enums, etc.)
                     SearchEngine.createWorkspaceScope(), // search everywhere
                     importTypeCollector, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, // wait in case the indexer is indexing
-                    ctx.getProgressMonitor());
+                    cuRewrite.getProgressMonitor());
         } catch (JavaModelException e) {
             throw new UnhandledException(node, e);
         }
@@ -644,7 +644,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             ITypeBinding declaringClass= methodBinding.getDeclaringClass();
             QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
             if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
-                ctx.getRefactorings().remove(expression);
+                cuRewrite.getRefactorings().remove(expression);
                 return false;
             }
         }
@@ -726,8 +726,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
                 || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
                         && !localIdentifiers.contains(qname.simpleName))) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node, b.createMoveTarget(node.getName()));
             return false;
         }
 

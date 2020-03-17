@@ -86,7 +86,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
             List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
 
             if (!typeArguments.isEmpty()) {
-                this.ctx.getRefactorings().remove(typeArguments);
+                this.cuRewrite.getRefactorings().remove(typeArguments);
                 return false;
             }
         }

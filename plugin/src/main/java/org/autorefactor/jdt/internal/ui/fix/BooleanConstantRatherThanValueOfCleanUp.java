@@ -80,7 +80,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     }
 
     private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         FieldAccess fa= b.getAST().newFieldAccess();
         Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
@@ -89,6 +89,6 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
         }
 
         fa.setName(b.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-        ctx.getRefactorings().replace(node, fa);
+        cuRewrite.getRefactorings().replace(node, fa);
     }
 }

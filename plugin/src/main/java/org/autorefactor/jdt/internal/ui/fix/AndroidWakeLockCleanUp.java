@@ -83,7 +83,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
             // Check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= ASTNodes.getAncestor(node, MethodDeclaration.class);
             if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
-                Refactorings r= ctx.getRefactorings();
+                Refactorings r= cuRewrite.getRefactorings();
                 TypeDeclaration typeDeclaration= ASTNodes.getAncestor(enclosingMethod, TypeDeclaration.class);
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
@@ -97,7 +97,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
-            Refactorings r= ctx.getRefactorings();
+            Refactorings r= cuRewrite.getRefactorings();
             TypeDeclaration typeDeclaration= ASTNodes.getAncestor(node, TypeDeclaration.class);
             ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
@@ -117,13 +117,13 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     }
 
     private Statement createWakelockReleaseStatement(final MethodInvocation methodInvocation) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
                 b.block(b.toStatement(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration createOnPauseMethodDeclaration() {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(), //$NON-NLS-1$ //$NON-NLS-2$
                 b.block(b.toStatement(b.superInvoke("onPause")))); //$NON-NLS-1$
     }

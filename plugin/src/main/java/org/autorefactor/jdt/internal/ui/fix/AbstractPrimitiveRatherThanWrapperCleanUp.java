@@ -195,9 +195,9 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     }
 
     private void refactorWrapper(final VariableDeclarationStatement node) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Type primitiveType= b.type(getPrimitiveTypeName());
-        ctx.getRefactorings().replace(node.getType(), primitiveType);
+        cuRewrite.getRefactorings().replace(node.getType(), primitiveType);
     }
 
     private boolean isNotNull(final Expression expression) {

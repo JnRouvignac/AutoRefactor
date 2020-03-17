@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -73,15 +74,15 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
     @Override
     public boolean visit(final Block node) {
-        CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(ctx,
+        CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(cuRewrite,
                 node);
         node.accept(catchesAndFollowingCodeVisitor);
         return catchesAndFollowingCodeVisitor.getResult();
     }
 
     private static final class CatchesAndFollowingCodeVisitor extends BlockSubVisitor {
-        public CatchesAndFollowingCodeVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public CatchesAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -154,7 +155,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
             if (nextSibling != null) {
                 referenceStatements.add(nextSibling);
-                ASTNodeFactory b= ctx.getASTBuilder();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
 
                 for (Statement redundantStatement : redundantStatements) {
                     List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
@@ -165,7 +166,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                     }
 
                     if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
-                        Refactorings r= ctx.getRefactorings();
+                        Refactorings r= cuRewrite.getRefactorings();
 
                         if (redundantStatement instanceof Block) {
                             r.remove(stmtsToCompare);

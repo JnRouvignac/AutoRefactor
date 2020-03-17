@@ -134,7 +134,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
                             node.getName().getIdentifier());
 
                     if (methodName != null) {
-                        ctx.getRefactorings().replace(node,
+                        cuRewrite.getRefactorings().replace(node,
                                 newMethodInvocation(typeBinding.getName(), methodName, arg0));
                         return false;
                     }
@@ -152,14 +152,14 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
-        SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
-        this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
+        SimpleName name= this.cuRewrite.getASTBuilder().simpleName(methodName);
+        this.cuRewrite.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
         return false;
     }
 
     private void replaceWithTheSingleArgument(final MethodInvocation node) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        this.cuRewrite.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
     }
 
     private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -220,24 +220,24 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         Expression arg0= args.get(0);
 
         if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node,
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node,
                     b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.createMoveTarget(arg0)))); //$NON-NLS-1$
         } else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke(b.createMoveTarget(arg0), "floatValue")); //$NON-NLS-1$
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node, b.invoke(b.createMoveTarget(arg0), "floatValue")); //$NON-NLS-1$
         } else {
             replaceWithValueOf(node, typeBinding);
         }
     }
 
     private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
-        this.ctx.getRefactorings().replace(node,
+        this.cuRewrite.getRefactorings().replace(node,
                 newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
     }
 
     private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         return b.invoke(typeName, methodName, b.createMoveTarget(arg));
     }
 }

@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -90,14 +91,14 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
     @Override
     public boolean visit(final Block node) {
-        AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(ctx, node);
+        AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(cuRewrite, node);
         node.accept(assignmentForAndReturnVisitor);
         return assignmentForAndReturnVisitor.getResult();
     }
 
     private final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
-        public AssignmentForAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public AssignmentForAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -195,20 +196,20 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                 final Expression toFind, final BreakStatement bs) {
             thenStatements.remove(thenStatements.size() - 1);
 
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
             Statement replacement= b.if0(newMethod(iterable, toFind, true, b), b.block(b.copyRange(thenStatements)));
-            ctx.getRefactorings().replace(forNode, replacement);
+            cuRewrite.getRefactorings().replace(forNode, replacement);
 
             thenStatements.add(bs);
         }
 
         private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
                 final Statement forNextStatement, final boolean negate) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(forNode, b.return0(newMethod(iterable, toFind, negate, b)));
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(forNode, b.return0(newMethod(iterable, toFind, negate, b)));
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
-                ctx.getRefactorings().remove(forNextStatement);
+                cuRewrite.getRefactorings().remove(forNextStatement);
             }
         }
 
@@ -242,7 +243,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
         private void replaceLoopAndVariable(final Statement forNode, final Expression iterable, final Expression toFind,
                 final Statement previousStatement, final boolean previousStmtIsPreviousSibling, final Expression initName, final boolean isPositive) {
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStatement instanceof VariableDeclarationStatement) {
@@ -254,10 +255,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                 throw new NotImplementedException(forNode);
             }
 
-            ctx.getRefactorings().replace(forNode, replacement);
+            cuRewrite.getRefactorings().replace(forNode, replacement);
 
             if (previousStmtIsPreviousSibling) {
-                ctx.getRefactorings().removeButKeepComment(previousStatement);
+                cuRewrite.getRefactorings().removeButKeepComment(previousStatement);
             }
         }
 
@@ -364,12 +365,12 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         }
 
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
             return b.invoke(b.copySubtree(loopContent.getIteratorVariable()), "next"); //$NON-NLS-1$
         }
 
         private MethodInvocation collectionGet(final ForLoopContent loopContent) {
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
             return b.invoke(b.copySubtree(loopContent.getContainerVariable()), "get", //$NON-NLS-1$
                     b.copySubtree(loopContent.getLoopVariable()));
         }

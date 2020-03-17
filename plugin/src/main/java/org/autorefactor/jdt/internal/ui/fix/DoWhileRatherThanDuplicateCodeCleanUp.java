@@ -92,10 +92,10 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
-        Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.cuRewrite.getRefactorings();
         r.remove(previousStatements);
 
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         r.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
     }
 }

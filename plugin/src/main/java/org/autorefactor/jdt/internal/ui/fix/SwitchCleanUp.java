@@ -332,7 +332,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         SwitchStatement switchStatement= b.switch0(b.createMoveTarget(switchExpression));
 
         for (SwitchCaseSection aCase : cases) {
@@ -343,12 +343,12 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             addCaseWithStatements(switchStatement, null, ASTNodes.asList(remainingStatement));
         }
 
-        ctx.getRefactorings().replace(node, switchStatement);
+        cuRewrite.getRefactorings().replace(node, switchStatement);
     }
 
     private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
             final List<Statement> innerStatements) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         List<Statement> switchStatements= ASTNodes.statements(switchStatement);
 
         // Add the case statement(s)
@@ -503,8 +503,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         Statement caseKept;
         if (merge == Merge.BEFORE_SWITCH_CASES) {

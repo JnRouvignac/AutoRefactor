@@ -74,11 +74,11 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Expression replacement= getOppositeExpression(b, node.getOperand());
 
         if (replacement != null) {
-            Refactorings r= ctx.getRefactorings();
+            Refactorings r= cuRewrite.getRefactorings();
             r.replace(node, replacement);
             return false;
         }

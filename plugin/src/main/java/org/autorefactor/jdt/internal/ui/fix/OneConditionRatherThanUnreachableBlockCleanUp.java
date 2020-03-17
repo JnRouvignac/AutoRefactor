@@ -78,8 +78,8 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     }
 
     private void refactorCondition(final IfStatement secondIf) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         if (secondIf.getElseStatement() == null) {
             r.remove(secondIf);

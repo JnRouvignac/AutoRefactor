@@ -124,7 +124,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
     private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
             final Type valueType, final List<Expression> arguments) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(
                 alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), b.createCopyTarget(keyType),
@@ -136,7 +136,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
             typeArgs(newType).clear();
         }
 
-        ctx.getRefactorings().replace(cic, b.new0(newType, newParam));
+        cuRewrite.getRefactorings().replace(cic, b.new0(newType, newParam));
     }
 
     /**
@@ -148,10 +148,10 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
      */
     private Expression resolveParameter(final Type keyType, final List<Expression> originalArgs) {
         if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
-            return ctx.getASTBuilder().createCopyTarget(originalArgs.get(0));
+            return cuRewrite.getASTBuilder().createCopyTarget(originalArgs.get(0));
         }
         TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();
-        keyTypeLiteral.setType(ctx.getASTBuilder().createCopyTarget(keyType));
+        keyTypeLiteral.setType(cuRewrite.getASTBuilder().createCopyTarget(keyType));
         return keyTypeLiteral;
     }
 }

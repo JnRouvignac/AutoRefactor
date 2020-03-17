@@ -82,8 +82,8 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     }
 
     private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 b.parenthesizeIfNeeded(b.createMoveTarget(innerIf.getExpression())));

@@ -107,8 +107,8 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,
             final Expression message) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, b.createMoveTarget(message)));
     }

@@ -97,7 +97,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
         int caseIndexWithDefault= -1;
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         for (Object object : statements) {
             Statement statement= (Statement) object;
@@ -175,7 +175,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
             final ASTNodeFactory b) {
         int localCaseIndexWithDefault= caseIndexWithDefault;
-        Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         Expression discriminant= node.getExpression();
         Statement currentBlock= null;

@@ -110,7 +110,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
                             || declaredInSamePackage(bodyMethodBinding, declMethodBinding)
                             // protected also means package visibility, so check if it is required
                             || !isMethodUsedInItsPackage(declMethodBinding, node)) {
-                        this.ctx.getRefactorings().remove(node);
+                        this.cuRewrite.getRefactorings().remove(node);
                         return false;
                     }
                 }
@@ -153,7 +153,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
             searchEngine.search(SearchPattern.createPattern(methodBinding.getJavaElement(), IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH),
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
-                    requestor, ctx.getProgressMonitor());
+                    requestor, cuRewrite.getProgressMonitor());
             return methodIsUsedInPackage.get();
         } catch (CoreException e) {
             throw new UnhandledException(node, e);

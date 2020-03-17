@@ -110,7 +110,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
     private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
             final boolean isAndExpression, final boolean isPositiveExpression) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         Name booleanConstant= b.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
         MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.createMoveTarget(firstExpression)); //$NON-NLS-1$
@@ -122,6 +122,6 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
             newExpression= b.not(equalsMethod);
         }
 
-        ctx.getRefactorings().replace(node, newExpression);
+        cuRewrite.getRefactorings().replace(node, newExpression);
     }
 }

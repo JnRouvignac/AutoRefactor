@@ -34,6 +34,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -73,14 +74,14 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
     @Override
     public boolean visit(final Block node) {
-        SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(ctx, node);
+        SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(cuRewrite, node);
         node.accept(successiveIfVisitor);
         return successiveIfVisitor.getResult();
     }
 
     private static final class SuccessiveIfVisitor extends BlockSubVisitor {
-        public SuccessiveIfVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public SuccessiveIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -114,7 +115,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
                 IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
                 if (nextSibling != null && nextSibling.getElseStatement() == null
-                        && !ctx.getRefactorings().hasBeenRefactored(nextSibling)
+                        && !cuRewrite.getRefactorings().hasBeenRefactored(nextSibling)
                         && ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())
                         && operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
                     operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
@@ -127,8 +128,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         }
 
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            Refactorings r= cuRewrite.getRefactorings();
 
             List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 

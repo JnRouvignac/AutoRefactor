@@ -93,8 +93,8 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceBlock(final Block node) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
         r.replace(node, b.copyRange(ASTNodes.statements(node)));
     }
 }

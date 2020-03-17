@@ -134,8 +134,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     }
                 }
 
-                ASTNodeFactory b= this.ctx.getASTBuilder();
-                Refactorings r= this.ctx.getRefactorings();
+                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+                Refactorings r= this.cuRewrite.getRefactorings();
 
                 for (VariableDeclarationStatement candidate : candidates) {
                     moveDeclaration(b, r, statement, candidate);

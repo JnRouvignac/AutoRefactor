@@ -269,8 +269,8 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         if (ifStatement.getThenStatement() instanceof Block) {
             r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));

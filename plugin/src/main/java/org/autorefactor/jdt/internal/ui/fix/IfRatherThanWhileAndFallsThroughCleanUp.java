@@ -97,8 +97,8 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
     }
 
     private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
             if (ASTNodes.canHaveSiblings(breakStatement)) {

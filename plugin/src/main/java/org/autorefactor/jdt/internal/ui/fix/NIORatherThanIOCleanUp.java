@@ -39,6 +39,7 @@ import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -126,8 +127,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         if (isFileCreation(node.getExpression())
                 && isFileUse(node.getExpression())) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             String pathsName= classesToUseWithImport.contains(Paths.class.getCanonicalName()) ? Paths.class.getSimpleName() : Paths.class.getCanonicalName();
             importsToAdd.add(Paths.class.getCanonicalName());
@@ -154,7 +155,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeRefactorBlock(final Block node,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(ctx, node, classesToUseWithImport, importsToAdd);
+        FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
         node.accept(fileAndUsesVisitor);
         return fileAndUsesVisitor.getResult();
     }
@@ -164,9 +165,9 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
         private final Set<String> classesToUseWithImport;
         private final Set<String> importsToAdd;
 
-        public FileAndUsesVisitor(final RefactoringContext ctx, final Block startNode,
+        public FileAndUsesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
                 final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-            super(ctx, startNode);
+            super(cuRewrite, startNode);
 
             this.blockNode= startNode;
             this.classesToUseWithImport= classesToUseWithImport;
@@ -228,8 +229,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
         }
 
         private void refactorFile(final Type type, final Expression initializer, final List<SimpleName> fileUses) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             ClassInstanceCreation classInstanceCreation= ASTNodes.as(initializer, ClassInstanceCreation.class);
 

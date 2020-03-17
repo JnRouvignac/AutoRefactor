@@ -71,8 +71,8 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
             Expression arg0= ASTNodes.arguments(node).get(0);
             if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
-                ASTNodeFactory b= ctx.getASTBuilder();
-                ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                cuRewrite.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
                 return false;
             }
         }

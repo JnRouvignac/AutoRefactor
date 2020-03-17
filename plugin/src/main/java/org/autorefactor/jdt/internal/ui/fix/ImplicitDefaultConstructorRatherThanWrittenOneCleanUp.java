@@ -121,13 +121,13 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                         Modifier modifier= (Modifier) extendedModifier;
                         if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
                                 || (modifier.isPrivate() && isPrivateClass)) {
-                            ctx.getRefactorings().remove(uniqueConstructor);
+                            cuRewrite.getRefactorings().remove(uniqueConstructor);
                             return false;
                         }
                     }
                 } else if (Utils.isEmpty(uniqueConstructor.modifiers())
                         && isPackageClass) {
-                    ctx.getRefactorings().remove(uniqueConstructor);
+                    cuRewrite.getRefactorings().remove(uniqueConstructor);
                     return false;
                 }
             }

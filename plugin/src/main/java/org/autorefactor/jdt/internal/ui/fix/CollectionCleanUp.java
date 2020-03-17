@@ -50,6 +50,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -95,14 +96,14 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(ctx, node);
+        NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(cuRewrite, node);
         node.accept(newAndAddAllMethodVisitor);
         return newAndAddAllMethodVisitor.getResult();
     }
 
     private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
-        public NewAndAddAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public NewAndAddAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -137,9 +138,9 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
             if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                ASTNodeFactory b= ctx.getASTBuilder();
-                ctx.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
-                ctx.getRefactorings().remove(nodeToRemove);
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
+                cuRewrite.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
+                cuRewrite.getRefactorings().remove(nodeToRemove);
                 setResult(false);
                 return false;
             }

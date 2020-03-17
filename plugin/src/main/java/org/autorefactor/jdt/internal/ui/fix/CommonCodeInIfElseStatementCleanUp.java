@@ -190,8 +190,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
     private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
             final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         // Remove the nodes common to all cases
         boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
@@ -271,7 +271,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                     && (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
                 areCasesRemovable[i]= true;
             } else {
-                this.ctx.getRefactorings().remove(removedStatements);
+                this.cuRewrite.getRefactorings().remove(removedStatements);
             }
         }
     }

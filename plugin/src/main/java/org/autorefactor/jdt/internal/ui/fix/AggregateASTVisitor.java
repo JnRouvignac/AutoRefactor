@@ -42,6 +42,7 @@ import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.util.AutoRefactorException;
 import org.autorefactor.util.NotImplementedException;
@@ -154,7 +155,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 
     private final List<ASTVisitor> visitors;
 
-    private RefactoringContext ctx;
+    private CompilationUnitRewrite cuRewrite;
     private final Set<ASTVisitor> visitorsContributingRefactoring= new HashSet<>();
 
     /**
@@ -285,7 +286,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private boolean isJavaVersionSupported(final ASTVisitor visitor) {
-        Release javaSERelease= ctx.getJavaProjectOptions().getJavaSERelease();
+        Release javaSERelease= cuRewrite.getJavaProjectOptions().getJavaSERelease();
         return visitor instanceof JavaRefactoringRule
                 && ((JavaRefactoringRule) visitor).isJavaVersionSupported(javaSERelease);
     }
@@ -293,14 +294,14 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     /**
      * Set the cleanup context.
      *
-     * @param ctx the cleanup context.
+     * @param cuRewrite the cleanup context.
      */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    public void setRefactoringContext(final RefactoringContext ctx) {
-        this.ctx= ctx;
+    public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
+        this.cuRewrite= cuRewrite;
         for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
-            v.setRefactoringContext(ctx);
+            v.setRefactoringContext(cuRewrite);
         }
         this.visitorsContributingRefactoring.clear();
     }
@@ -315,7 +316,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public Refactorings getRefactorings(final CompilationUnit astRoot) {
         astRoot.accept(this);
-        return this.ctx.getRefactorings();
+        return this.cuRewrite.getRefactorings();
     }
 
     /**
@@ -324,7 +325,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      * @return the cleanups.
      */
     public Refactorings getRefactorings() {
-        return this.ctx.getRefactorings();
+        return this.cuRewrite.getRefactorings();
     }
 
     /**
@@ -348,7 +349,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      */
     private boolean continueVisiting(final boolean continueVisiting, final ASTVisitor v, final ASTNode node) {
         if (!continueVisiting) {
-            if (!this.ctx.getRefactorings().hasRefactorings()) {
+            if (!this.cuRewrite.getRefactorings().hasRefactorings()) {
                 logBadlyBehavedVisitor(v, node);
             } else {
                 visitorsContributingRefactoring.add(v);
@@ -365,7 +366,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     private void logBadlyBehavedVisitor(final ASTVisitor v, final ASTNode node) {
         String message= "Visitor " + v.getClass().getName() + " is badly behaved:" //$NON-NLS-1$ //$NON-NLS-2$
                 + " it reported doing a refactoring, but it did not actually contribute any refactoring."; //$NON-NLS-1$
-        ctx.getLogger().error(message, new AutoRefactorException(node, message));
+        cuRewrite.getLogger().error(message, new AutoRefactorException(node, message));
     }
 
     private void logFaultyVisitor(final ASTVisitor v, final ASTNode node, final Exception e) {
@@ -375,7 +376,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
         String message= "Visitor " + v.getClass().getName() + " is faulty," //$NON-NLS-1$ //$NON-NLS-2$
                 + " it will be disabled for the rest of this run."; //$NON-NLS-1$
-        ctx.getLogger().error(message, new UnhandledException(node, message, e));
+        cuRewrite.getLogger().error(message, new UnhandledException(node, message, e));
     }
 
     /**

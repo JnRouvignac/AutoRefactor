@@ -77,8 +77,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
         ASTNode parent= node.getParent();
         boolean isStringValueOf= isStringValueOf(node);
 
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             Expression stringExpression= node.getExpression();
@@ -201,7 +201,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
 
@@ -212,16 +212,16 @@ public class StringCleanUp extends AbstractCleanUpRule {
         ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 
         if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
+            cuRewrite.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         } else {
-            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
+            cuRewrite.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.createMoveTarget(ASTNodes.arguments(mi).get(0))));
         }
 
         return false;
     }
 
     private Expression replaceToString(final Expression expression) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         if (expression != null) {
             return b.createMoveTarget(expression);

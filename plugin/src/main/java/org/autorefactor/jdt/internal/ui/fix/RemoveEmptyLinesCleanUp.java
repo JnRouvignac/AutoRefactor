@@ -80,7 +80,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     public boolean visit(final CompilationUnit node) {
         lineEnds.clear();
 
-        String source= this.ctx.getSource(node);
+        String source= this.cuRewrite.getSource(node);
         if (source.isEmpty()) {
             // Empty file, bail out
             return true;
@@ -88,7 +88,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
         computeLineEnds(node);
 
-        Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         int index= getIndexOfFirstNonWhitespaceChar(source, 0);
         if (index != -1) {
@@ -152,7 +152,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private void computeLineEnds(final CompilationUnit node) {
-        Matcher matcher= NEWLINE_PATTERN.matcher(ctx.getSource(node));
+        Matcher matcher= NEWLINE_PATTERN.matcher(cuRewrite.getSource(node));
         while (matcher.find()) {
             lineEnds.add(matcher.end());
         }
@@ -196,7 +196,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visit(final AbstractTypeDeclaration node) {
-        String source= this.ctx.getSource(node);
+        String source= this.cuRewrite.getSource(node);
         int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -214,7 +214,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         int pos= node.getStartPosition();
         do {
             int firstCurly= source.indexOf('{', pos);
-            if (!this.ctx.isInComment(firstCurly)) {
+            if (!this.cuRewrite.isInComment(firstCurly)) {
                 return firstCurly;
             }
             pos= firstCurly + 1;
@@ -233,7 +233,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        String source= this.ctx.getSource(node);
+        String source= this.cuRewrite.getSource(node);
         int openingCurlyIndex= node.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
             return true;
@@ -244,7 +244,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visitNodeWithClosingCurly(final ASTNode node) {
-        String source= this.ctx.getSource(node);
+        String source= this.cuRewrite.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
         return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
     }
@@ -256,7 +256,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode node, final int curlyIndex) {
-        String source= ctx.getSource(node);
+        String source= cuRewrite.getSource(node);
         int newLineBeforeCurly= previousLineEnd(curlyIndex);
         int lastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, curlyIndex - 1);
         int endOfLineIndex= beforeNewlineChars(source, lastNonWsIndex);
@@ -269,7 +269,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             boolean isEqualToNewline= matcher.matches();
             if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
                 SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
-                this.ctx.getRefactorings().remove(toRemove);
+                this.cuRewrite.getRefactorings().remove(toRemove);
                 return true;
             }
         }

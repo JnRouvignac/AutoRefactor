@@ -143,8 +143,8 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
     }
 
     private void makeStatic(final TypeDeclaration node) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         List<?> modifiers= node.modifiers();
         Modifier static0= b.static0();

@@ -262,8 +262,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
     private void refactorToAssertTrueOrFalse(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode nodeToReplace, final MethodInvocation originalMethod, final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
-        Refactorings r= this.ctx.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
         String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
@@ -272,7 +272,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean replace, final Expression failureMessage) {
-        Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.cuRewrite.getRefactorings();
         if (replace) {
             r.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage));
             return false;
@@ -282,7 +282,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
             if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent())) {
                 r.remove(nodeToReplace.getParent());
             } else {
-                r.replace(nodeToReplace.getParent(), ctx.getASTBuilder().block());
+                r.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block());
             }
 
             return false;
@@ -293,7 +293,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
     private MethodInvocation invokeFail(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode node, final MethodInvocation originalMethod, final Expression failureMessage) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         List<Expression> args= ASTNodes.arguments(originalMethod);
         if (args.size() == 1 || args.size() == 2) {
             return invokeMethod(classesToUseWithImport, importsToAdd, b, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$
@@ -307,8 +307,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
                 ie.getRightOperand());
 
         if (isComparingObjects(ie) && !ASTNodes.is(ie.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(ie.getRightOperand(), NullLiteral.class)) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, b,
                     originalMethod, getAssertName(isAssertEquals, "Same"), b.createCopyTarget(actualAndExpected.getFirst()), b.createCopyTarget(actualAndExpected.getSecond()), null, failureMessage); //$NON-NLS-1$
@@ -342,8 +342,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
     private boolean maybeRefactorToEquality(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean isAssertEquals,
             final Expression actualValue, final Expression expectedValue, final Expression failureMessage, final boolean isRewriteNeeded) {
-        Refactorings r= this.ctx.getRefactorings();
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         if (ASTNodes.is(actualValue, NullLiteral.class)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
@@ -421,7 +421,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
     private MethodInvocation invokeAssertNull(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
             final MethodInvocation originalMethod, final boolean isPositive, final Expression actual, final Expression failureMessage) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
         Expression copyOfActual= b.createCopyTarget(actual);
         return invokeMethod(classesToUseWithImport, importsToAdd, b, originalMethod, methodName, copyOfActual, null, null, failureMessage);

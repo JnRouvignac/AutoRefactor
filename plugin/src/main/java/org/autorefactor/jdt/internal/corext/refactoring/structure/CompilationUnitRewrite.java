@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.ui.fix;
+package org.autorefactor.jdt.internal.corext.refactoring.structure;
 
 import org.autorefactor.environment.Environment;
 import org.autorefactor.environment.Logger;
@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /** Class holding necessary data for a refactoring. */
-public class RefactoringContext {
+public class CompilationUnitRewrite {
     private final ICompilationUnit compilationUnit;
     private final CompilationUnit astRoot;
     private final Refactorings refactorings;
@@ -60,7 +60,7 @@ public class RefactoringContext {
      * @param monitor         the progress monitor of the current job
      * @param environment     the environment
      */
-    public RefactoringContext(final ICompilationUnit compilationUnit, final CompilationUnit astRoot, final JavaProjectOptions options,
+    public CompilationUnitRewrite(final ICompilationUnit compilationUnit, final CompilationUnit astRoot, final JavaProjectOptions options,
             final SubMonitor monitor, final Environment environment) {
         this.compilationUnit= compilationUnit;
         this.astRoot= astRoot;
@@ -127,7 +127,13 @@ public class RefactoringContext {
         return refactorings;
     }
 
-    String getSource(final ASTNode node) {
+    /**
+     * Get the source.
+     *
+     * @param node The node
+     * @return The source
+     */
+    public String getSource(final ASTNode node) {
         try {
             return compilationUnit.getSource();
         } catch (JavaModelException e) {
@@ -135,7 +141,13 @@ public class RefactoringContext {
         }
     }
 
-    boolean isInComment(final int position) {
+    /**
+     * Is in comment.
+     *
+     * @param position The position
+     * @return True if it is in comment
+     */
+    public boolean isInComment(final int position) {
         for (Comment comment : ASTNodes.getCommentList(astRoot)) {
             if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
                 return true;

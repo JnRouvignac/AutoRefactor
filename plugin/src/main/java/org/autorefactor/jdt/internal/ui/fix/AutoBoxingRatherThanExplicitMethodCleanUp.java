@@ -100,14 +100,14 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
             final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
             final ITypeBinding actualResultType) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         if (primitiveType != null && !primitiveType.equals(actualParameterType)
                 && !primitiveType.equals(actualResultType)
                 && (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-            this.ctx.getRefactorings().replace(node, b.cast(b.type(primitiveType.getName()), b.createMoveTarget(ASTNodes.arguments(node).get(0))));
+            this.cuRewrite.getRefactorings().replace(node, b.cast(b.type(primitiveType.getName()), b.createMoveTarget(ASTNodes.arguments(node).get(0))));
         } else {
-            this.ctx.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
+            this.cuRewrite.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
         }
     }
 }

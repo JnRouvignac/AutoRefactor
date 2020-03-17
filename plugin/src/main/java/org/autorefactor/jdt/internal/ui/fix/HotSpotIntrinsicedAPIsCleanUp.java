@@ -127,7 +127,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression calcIndex(final Expression index, final SystemArrayCopyParams params) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         if (index instanceof SimpleName) {
             IVariableBinding idxVar= getVariableBinding(index);
@@ -164,7 +164,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression plus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -182,7 +182,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression minus(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -200,7 +200,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression minusPlusOne(final Expression expr1, final Expression expr2) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         Integer expr1Value= intValue(expr1);
         Integer expr2Value= intValue(expr2);
 
@@ -211,10 +211,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         }
         if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+            return b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpression(b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        return b.infixExpression(b.infixExpression(b.createCopyTarget(expr1), InfixExpression.Operator.MINUS, b.createCopyTarget(expr2)), InfixExpression.Operator.PLUS, cuRewrite.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
     private Integer intValue(final Expression expression) {
@@ -258,7 +258,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         replaceWithSystemArrayCopy(node, b.createCopyTarget(params.srcArrayExpression), params.srcPos,
                 b.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
         return false;
@@ -266,14 +266,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithSystemArrayCopy(final ForStatement node, final Expression srcArrayExpression, final Expression srcPos,
             final Expression destArrayExpression, final Expression destPos, final Expression length) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         TryStatement tryS= b.try0(
                 b.block(b
                         .toStatement(b.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
                 b.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
                         b.throw0(b.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), b.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
-        this.ctx.getRefactorings().replace(node, tryS);
+        this.cuRewrite.getRefactorings().replace(node, tryS);
     }
 
     private void collectUniqueIndex(final ForStatement node, final SystemArrayCopyParams params) {

@@ -31,6 +31,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
@@ -80,21 +81,21 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(final Block node) {
-        ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(ctx, node);
+        ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(cuRewrite, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
     }
 
     private static final class ReturnStatementVisitor extends BlockSubVisitor {
-        public ReturnStatementVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public ReturnStatementVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
         public boolean visit(final ReturnStatement node) {
             if (getResult()) {
                 Statement previousSibling= ASTNodes.getPreviousSibling(node);
-                if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
+                if (!cuRewrite.getRefactorings().hasBeenRefactored(previousSibling)
                         && previousSibling instanceof VariableDeclarationStatement) {
                     VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
                     VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
@@ -146,7 +147,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
             Type varType= vds.getType();
             VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
 
@@ -173,15 +174,15 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStatement) {
-            Refactorings r= ctx.getRefactorings();
+            Refactorings r= cuRewrite.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, newReturnStatement);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpression) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            Refactorings r= ctx.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            Refactorings r= cuRewrite.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.createMoveTarget(returnExpression)));
         }

@@ -70,12 +70,12 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final ReturnStatement node) {
         if (node.getExpression() == null && isLastStatement(node)) {
-            Refactorings r= ctx.getRefactorings();
+            Refactorings r= cuRewrite.getRefactorings();
 
             if (ASTNodes.canHaveSiblings(node)) {
                 r.remove(node);
             } else {
-                r.replace(node, ctx.getASTBuilder().block());
+                r.replace(node, cuRewrite.getASTBuilder().block());
             }
 
             return false;

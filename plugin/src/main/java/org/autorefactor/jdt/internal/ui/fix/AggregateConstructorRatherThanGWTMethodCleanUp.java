@@ -147,8 +147,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             if (ASTNodes.usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ //$NON-NLS-2$
                     || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ //$NON-NLS-2$
                             Class.class.getCanonicalName() + generic)) {
-                ASTNodeFactory b= this.ctx.getASTBuilder();
-                Refactorings r= this.ctx.getRefactorings();
+                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+                Refactorings r= this.cuRewrite.getRefactorings();
 
                 Type type= b.getAST().newParameterizedType(
                         b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName()));
@@ -165,8 +165,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
         if (ASTNodes.usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ //$NON-NLS-2$
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             Type type= b.getAST().newParameterizedType(b.type(
                     classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass)); //$NON-NLS-1$ //$NON-NLS-2$

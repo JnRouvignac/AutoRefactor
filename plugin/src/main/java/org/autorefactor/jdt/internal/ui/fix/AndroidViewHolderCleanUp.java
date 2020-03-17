@@ -115,8 +115,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
             GetViewVariableVisitor visitor= new GetViewVariableVisitor();
             body.accept(visitor);
             if (visitor.canApplyRefactoring()) {
-                ASTNodeFactory b= this.ctx.getASTBuilder();
-                Refactorings r= this.ctx.getRefactorings();
+                ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+                Refactorings r= this.cuRewrite.getRefactorings();
                 TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
 
                 // Transform tree
@@ -201,7 +201,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
     private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
             final TypeNameDecider typeNameDecider) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         TypeDeclaration result= b.getAST().newTypeDeclaration();
         ASTNodes.modifiers(result).addAll(Arrays.asList(b.private0(), b.static0()));
         result.setName(typeName);

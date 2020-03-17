@@ -143,7 +143,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
         for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
-                ctx.getRefactorings().remove(modifier);
+                cuRewrite.getRefactorings().remove(modifier);
                 result= false;
             }
         }
@@ -193,7 +193,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     private boolean removeProtectedModifier(final BodyDeclaration node) {
         for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (modifier.isProtected()) {
-                ctx.getRefactorings().remove(modifier);
+                cuRewrite.getRefactorings().remove(modifier);
                 return false;
             }
         }
@@ -206,7 +206,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
         for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (modifier.isPublic() || modifier.isAbstract()) {
-                ctx.getRefactorings().remove(modifier);
+                cuRewrite.getRefactorings().remove(modifier);
                 result= false;
             }
         }
@@ -259,15 +259,15 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
 
         for (int i= 0; i < reorderedModifiers.size(); i++) {
             IExtendedModifier extendedModifier= reorderedModifiers.get(i);
 
             if (extendedModifier.isModifier()) {
-                ctx.getRefactorings().moveToIndex((Modifier) extendedModifier, i, b.createMoveTarget((Modifier) extendedModifier));
+                cuRewrite.getRefactorings().moveToIndex((Modifier) extendedModifier, i, b.createMoveTarget((Modifier) extendedModifier));
             } else {
-                ctx.getRefactorings().moveToIndex((Annotation) extendedModifier, i, b.createMoveTarget((Annotation) extendedModifier));
+                cuRewrite.getRefactorings().moveToIndex((Annotation) extendedModifier, i, b.createMoveTarget((Annotation) extendedModifier));
             }
         }
     }
@@ -277,7 +277,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
         for (Modifier modifier : getModifiersOnly(modifiers)) {
             if (modifier.isStatic() || modifier.isAbstract()) {
-                ctx.getRefactorings().remove(modifier);
+                cuRewrite.getRefactorings().remove(modifier);
                 result= false;
             }
         }
@@ -306,7 +306,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
         for (Modifier modifier : getModifiersOnly(modifiers)) {
             if (modifier.isFinal()) {
-                ctx.getRefactorings().remove(modifier);
+                cuRewrite.getRefactorings().remove(modifier);
                 result= false;
             }
         }

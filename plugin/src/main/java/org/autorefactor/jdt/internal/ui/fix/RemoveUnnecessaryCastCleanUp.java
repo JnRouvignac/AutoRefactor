@@ -99,8 +99,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         }
 
         if (canRemoveCast(node)) {
-            ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
+            cuRewrite.getRefactorings().replace(node, b.createMoveTarget(node.getExpression()));
             return false;
         }
 
@@ -108,11 +108,11 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         NumberLiteral numberLiteral= b.number(literal.getToken() + postfix);
 
-        ctx.getRefactorings().replace(node, numberLiteral);
+        cuRewrite.getRefactorings().replace(node, numberLiteral);
     }
 
     private boolean canRemoveCast(final CastExpression node) {

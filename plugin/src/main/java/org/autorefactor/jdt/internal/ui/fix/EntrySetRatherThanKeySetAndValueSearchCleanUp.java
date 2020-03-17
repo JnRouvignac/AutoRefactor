@@ -246,8 +246,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     private void replaceEntryIterationByKeyIteration(final EnhancedForStatement enhancedFor, final Expression mapExpression,
             final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
@@ -320,7 +320,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             final TypeNameDecider typeNameDecider) {
         String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-        ASTNodeFactory b= ctx.getASTBuilder();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
         Type paramType= parameter.getType();
         Type mapKeyType;
         if (paramType.isPrimitiveType()) {

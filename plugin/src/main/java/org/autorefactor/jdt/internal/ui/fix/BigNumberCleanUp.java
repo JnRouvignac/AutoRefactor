@@ -88,7 +88,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
-                    ctx.getRefactorings().replace(arg0, getStringLiteral(token));
+                    cuRewrite.getRefactorings().replace(arg0, getStringLiteral(token));
                     return false;
                 }
 
@@ -105,7 +105,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                         return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                     }
 
-                    ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
+                    cuRewrite.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
                     return false;
                 }
             } else if (arg0 instanceof StringLiteral) {
@@ -117,7 +117,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
                 if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
                     // Only instantiation from double, not from integer
-                    ctx.getRefactorings().replace(arg0, getStringLiteral(literalValue.replace("_", ""))); //$NON-NLS-1$ //$NON-NLS-2$
+                    cuRewrite.getRefactorings().replace(arg0, getStringLiteral(literalValue.replace("_", ""))); //$NON-NLS-1$ //$NON-NLS-2$
                     return false;
                 }
 
@@ -134,7 +134,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (literalValue.matches("\\d+")) { //$NON-NLS-1$
-                    this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
+                    this.cuRewrite.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
                     return false;
                 }
             }
@@ -144,17 +144,17 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
-        this.ctx.getRefactorings().replace(node, this.ctx.getASTBuilder().name(typeBinding.getName(), field));
+        this.cuRewrite.getRefactorings().replace(node, this.cuRewrite.getASTBuilder().name(typeBinding.getName(), field));
         return false;
     }
 
     private ASTNode getValueOf(final String name, final String numberLiteral) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         return b.invoke(name, "valueOf", b.number(numberLiteral)); //$NON-NLS-1$
     }
 
     private StringLiteral getStringLiteral(final String numberLiteral) {
-        return this.ctx.getASTBuilder().string(numberLiteral);
+        return this.cuRewrite.getASTBuilder().string(numberLiteral);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
                 if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
-                    this.ctx.getRefactorings().replace(node,
+                    this.cuRewrite.getRefactorings().replace(node,
                             getClassInstanceCreatorNode(node.getExpression(), token));
                 } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
@@ -208,10 +208,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
-                    ASTNodeFactory b= this.ctx.getASTBuilder();
-                    this.ctx.getRefactorings().replace(node, b.parenthesize(getCompareToNode(isPositive, mi)));
+                    ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+                    this.cuRewrite.getRefactorings().replace(node, b.parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
-                    this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
+                    this.cuRewrite.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
 
                 return false;
@@ -235,7 +235,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getClassInstanceCreatorNode(final Expression expression, final String numberLiteral) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         String fullyQualifiedName;
         if (expression instanceof Name) {
@@ -250,7 +250,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
         MethodInvocation mi= b.invoke(b.createMoveTarget(node.getExpression()), "compareTo", b.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
         return b.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));

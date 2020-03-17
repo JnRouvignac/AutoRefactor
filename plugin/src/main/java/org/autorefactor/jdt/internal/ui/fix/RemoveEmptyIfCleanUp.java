@@ -67,7 +67,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        Refactorings r= this.ctx.getRefactorings();
+        Refactorings r= this.cuRewrite.getRefactorings();
 
         Statement thenStatement= node.getThenStatement();
         Statement elseStatement= node.getElseStatement();
@@ -76,7 +76,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
             return false;
         }
         if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
             Expression condition= node.getExpression();
             if (elseStatement != null) {

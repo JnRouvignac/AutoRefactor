@@ -36,6 +36,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -162,7 +163,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(ctx, node);
+        StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(cuRewrite, node);
         node.accept(stringOccurrencesVisitor);
         return stringOccurrencesVisitor.getResult();
     }
@@ -170,8 +171,8 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
     private final class StringOccurrencesVisitor extends BlockSubVisitor {
         private Block blockNode;
 
-        public StringOccurrencesVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public StringOccurrencesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
 
             blockNode= startNode;
         }
@@ -243,8 +244,8 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
         private void replaceString(final Type type, final Expression initializer, final Set<SimpleName> assignmentWrites,
                 final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             Class<?> builder;
             if (getJavaMinorVersion() >= 5) {

@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -117,7 +118,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeRefactorBlock(final Block node,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(ctx, node, classesToUseWithImport, importsToAdd);
+        RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
         node.accept(regExAndUsesVisitor);
         return regExAndUsesVisitor.getResult();
     }
@@ -127,9 +128,9 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
         private final Set<String> classesToUseWithImport;
         private final Set<String> importsToAdd;
 
-        public RegExAndUsesVisitor(final RefactoringContext ctx, final Block startNode,
+        public RegExAndUsesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
                 final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-            super(ctx, startNode);
+            super(cuRewrite, startNode);
 
             this.blockNode= startNode;
             this.classesToUseWithImport= classesToUseWithImport;
@@ -208,8 +209,8 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
         }
 
         private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
-            ASTNodeFactory b= this.ctx.getASTBuilder();
-            Refactorings r= this.ctx.getRefactorings();
+            ASTNodeFactory b= this.cuRewrite.getASTBuilder();
+            Refactorings r= this.cuRewrite.getRefactorings();
 
             String patternName= classesToUseWithImport.contains(Pattern.class.getCanonicalName()) ? Pattern.class.getSimpleName() : Pattern.class.getCanonicalName();
             importsToAdd.add(Pattern.class.getCanonicalName());

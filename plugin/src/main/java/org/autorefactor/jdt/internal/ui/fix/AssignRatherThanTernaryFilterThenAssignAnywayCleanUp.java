@@ -102,7 +102,7 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
     }
 
     private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(valuedExpression)));
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        cuRewrite.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(valuedExpression)));
     }
 }

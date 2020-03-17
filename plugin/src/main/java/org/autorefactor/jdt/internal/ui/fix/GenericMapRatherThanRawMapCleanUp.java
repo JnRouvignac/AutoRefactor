@@ -470,7 +470,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType= Bindings.getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= Bindings.getBoxedTypeBinding(newElementType, cuRewrite.getAST());
         }
         if (!ASTNodes.hasType(newElementType, Object.class.getCanonicalName()) && (keyType == null || newElementType.equals(keyType))) {
             keyType= newElementType;
@@ -485,7 +485,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType= Bindings.getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= Bindings.getBoxedTypeBinding(newElementType, cuRewrite.getAST());
         }
         if (!ASTNodes.hasType(newElementType, Object.class.getCanonicalName()) && (valueType == null || newElementType.equals(valueType))) {
             valueType= newElementType;

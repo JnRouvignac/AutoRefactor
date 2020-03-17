@@ -196,7 +196,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             node.accept(refactoringClass);
 
             if (!refactoringClass.getImportsToAdd().isEmpty()) {
-                Refactorings r= ctx.getRefactorings();
+                Refactorings r= cuRewrite.getRefactorings();
 
                 for (String importToAdd : refactoringClass.getImportsToAdd()) {
                     r.getImportRewrite().addImport(importToAdd);

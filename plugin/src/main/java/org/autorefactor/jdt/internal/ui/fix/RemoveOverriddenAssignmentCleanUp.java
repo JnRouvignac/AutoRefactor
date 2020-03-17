@@ -94,7 +94,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (isOverridden && !isRead) {
-                    ctx.getRefactorings().remove(fragment.getInitializer());
+                    cuRewrite.getRefactorings().remove(fragment.getInitializer());
                     return false;
                 }
             }

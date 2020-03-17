@@ -190,8 +190,8 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     }
 
     private void moveThenStatement(final IfStatement node) {
-        Refactorings r= this.ctx.getRefactorings();
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
@@ -220,8 +220,8 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     }
 
     private void moveElseStatement(final IfStatement node) {
-        Refactorings r= this.ctx.getRefactorings();
-        ASTNodeFactory b= this.ctx.getASTBuilder();
+        Refactorings r= this.cuRewrite.getRefactorings();
+        ASTNodeFactory b= this.cuRewrite.getASTBuilder();
 
         List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 

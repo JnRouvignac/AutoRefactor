@@ -36,6 +36,7 @@ import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -89,14 +90,14 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(ctx, node);
+        DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(cuRewrite, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
     }
 
     private static final class DeclarationAndTryVisitor extends BlockSubVisitor {
-        public DeclarationAndTryVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
+        public DeclarationAndTryVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
         @Override
@@ -168,7 +169,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            Refactorings r= ctx.getRefactorings();
+            Refactorings r= cuRewrite.getRefactorings();
             r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
             r.remove(nodesToRemove);
             setResult(false);
@@ -182,7 +183,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         private VariableDeclarationExpression newResource(final List<Statement> tryStatements,
                 final VariableDeclarationStatement previousDeclStatement, final VariableDeclarationFragment previousDeclFragment,
                 final List<ASTNode> nodesToRemove) {
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
             VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
             return fragment != null ? b.declareExpression(b.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
         }
@@ -192,7 +193,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
             VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
             List<SimpleName> definitions= visitor.getWrites();
 
-            ASTNodeFactory b= ctx.getASTBuilder();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             if (!tryStatements.isEmpty()) {
                 Statement tryStatement= tryStatements.get(0);
@@ -228,8 +229,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
-            Refactorings r= ctx.getRefactorings();
-            ASTNodeFactory b= ctx.getASTBuilder();
+            Refactorings r= cuRewrite.getRefactorings();
+            ASTNodeFactory b= cuRewrite.getASTBuilder();
 
             r.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, b.copyRange(ASTNodes.resources(innerTryStatement)));
             r.replace(innerTryStatement, b.createMoveTarget(innerTryStatement.getBody()));

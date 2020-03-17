@@ -169,7 +169,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             while (m.find()) {
                 int startPos= entry.getValue().getStartPosition();
                 SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-                this.ctx.getRefactorings().remove(toRemove);
+                this.cuRewrite.getRefactorings().remove(toRemove);
                 result= false;
             }
         }
@@ -180,7 +180,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode node, final int start, final int end) {
         List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
 
-        String source= ctx.getSource(node);
+        String source= cuRewrite.getSource(node);
         LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<>();
         if (comments.isEmpty()) {
             putResult(source, start, end, results);

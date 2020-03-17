@@ -139,7 +139,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
-                ASTNodeFactory b= ctx.getASTBuilder();
+                ASTNodeFactory b= cuRewrite.getASTBuilder();
                 Type[] types= new Type[typeArguments.length];
 
                 for (int i= 0; i < types.length; i++) {
@@ -209,6 +209,6 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     }
 
     private boolean isEnabled() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 5;
+        return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 5;
     }
 }

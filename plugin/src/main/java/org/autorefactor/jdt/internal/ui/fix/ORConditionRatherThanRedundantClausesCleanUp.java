@@ -123,8 +123,8 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
     }
 
     private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        Refactorings r= ctx.getRefactorings();
+        ASTNodeFactory b= cuRewrite.getASTBuilder();
+        Refactorings r= cuRewrite.getRefactorings();
 
         List<Expression> copyOfOperands= b.createMoveTarget(previousOperands);
         copyOfOperands.addAll(b.createMoveTarget(nextOperands));
