@@ -309,61 +309,46 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         @Override
         public boolean visit(final ForStatement node) {
             ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-            List<Statement> statements= ASTNodes.asList(node.getBody());
 
             if (getResult() && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
                 if (IterationType.INDEX.equals(loopContent.getIterationType())) {
-                    Expression loopElement= null;
-                    IfStatement is;
-                    if (statements.size() == 2) {
-                        Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
-                        loopElement= loopVarPair.getFirst();
-                        MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
-
-                        if (!ASTNodes.match(mi, collectionGet(loopContent))
-                                || !ASTNodes.isSameVariable(mi.getExpression(), loopContent.getContainerVariable())) {
-                            return true;
-                        }
-
-                        is= ASTNodes.as(statements.get(1), IfStatement.class);
-                    } else if (statements.size() == 1) {
-                        is= ASTNodes.as(statements.get(0), IfStatement.class);
-                        loopElement= collectionGet(loopContent);
-                    } else {
-                        return true;
-                    }
-
-                    return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
-                            is);
+                    return maybeReplace(node, loopContent, collectionGet(loopContent), loopContent.getContainerVariable());
                 }
 
                 if (IterationType.ITERATOR.equals(loopContent.getIterationType())) {
-                    Expression loopElement= null;
-                    IfStatement is;
-                    if (statements.size() == 2) {
-                        Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
-                        loopElement= loopVarPair.getFirst();
-                        MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
-
-                        if (!ASTNodes.match(mi, iteratorNext(loopContent))
-                                || !ASTNodes.isSameVariable(mi.getExpression(), loopContent.getIteratorVariable())) {
-                            return true;
-                        }
-
-                        is= ASTNodes.as(statements.get(1), IfStatement.class);
-                    } else if (statements.size() == 1) {
-                        is= ASTNodes.as(statements.get(0), IfStatement.class);
-                        loopElement= iteratorNext(loopContent);
-                    } else {
-                        return true;
-                    }
-
-                    return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
-                            is);
+                    return maybeReplace(node, loopContent, iteratorNext(loopContent), loopContent.getIteratorVariable());
                 }
             }
 
             return true;
+        }
+
+        private boolean maybeReplace(final ForStatement node, final ForLoopContent loopContent,
+                final MethodInvocation item, final Expression variable) {
+            List<Statement> statements= ASTNodes.asList(node.getBody());
+
+            Expression loopElement;
+            IfStatement is;
+            if (statements.size() == 2) {
+                Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
+                MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
+
+                if (!ASTNodes.match(mi, item)
+                        || !ASTNodes.isSameVariable(mi.getExpression(), variable)) {
+                    return true;
+                }
+
+                loopElement= loopVarPair.getFirst();
+                is= ASTNodes.as(statements.get(1), IfStatement.class);
+            } else if (statements.size() == 1) {
+                loopElement= item;
+                is= ASTNodes.as(statements.get(0), IfStatement.class);
+            } else {
+                return true;
+            }
+
+            return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
+                    is);
         }
 
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
@@ -378,7 +363,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         }
 
         private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(final Statement statement) {
-            VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(ASTNodes.as(statement, VariableDeclarationStatement.class));
+            VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(statement);
 
             if (vdf != null) {
                 return Pair.of(vdf.getName(), vdf.getInitializer());
