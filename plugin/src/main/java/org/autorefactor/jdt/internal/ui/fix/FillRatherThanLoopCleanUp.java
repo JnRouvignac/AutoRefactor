@@ -134,8 +134,8 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
                         rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
     }
 
-    private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess aa) {
-        return aa != null && ASTNodes.isSameVariable(aa.getArray(), loopContent.getContainerVariable())
-                && ASTNodes.isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
+    private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
+        return arrayAccess != null && ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
+                && ASTNodes.isSameLocalVariable(arrayAccess.getIndex(), loopContent.getLoopVariable());
     }
 }
