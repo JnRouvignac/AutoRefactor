@@ -1865,11 +1865,14 @@ public final class ASTNodes {
      * @return the unique fragment declared in the provided variable declaration
      *         statement, or {@code null} if more than one exist.
      */
-    public static VariableDeclarationFragment getUniqueFragment(final VariableDeclarationStatement node) {
-        if (node == null) {
+    public static VariableDeclarationFragment getUniqueFragment(final Statement node) {
+        VariableDeclarationStatement statement= ASTNodes.as(node, VariableDeclarationStatement.class);
+
+        if (statement == null) {
             return null;
         }
-        List<VariableDeclarationFragment> fragments= fragments(node);
+
+        List<VariableDeclarationFragment> fragments= fragments(statement);
         return fragments.size() == 1 ? fragments.get(0) : null;
     }
 
