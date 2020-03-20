@@ -358,8 +358,7 @@ public final class ASTNodes {
      * @param <T>       the required statement type
      * @param statement the statement to cast
      * @param stmtClass the class representing the required statement type
-     * @return the provided statement as an object of the provided type if type
-     *         matches, null otherwise
+     * @return the provided statement as an object of the provided type if type matches, null otherwise
      */
     @SuppressWarnings("unchecked")
     public static <T extends Statement> T as(final Statement statement, final Class<T> stmtClass) {
@@ -409,6 +408,74 @@ public final class ASTNodes {
             }
             if (expression instanceof ParenthesizedExpression) {
                 return as(((ParenthesizedExpression) expression).getExpression(), exprClass);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the items of an infix expression in the order it is specified. It reverses the operator if needed.
+     *
+     * @param <F>        the required expression type
+     * @param <S>        the required expression type
+     * @param node       the supposed infix expression
+     * @param firstClass  the class representing the required expression type
+     * @param secondClass  the class representing the required expression type
+     * @return the items of an infix expression in the order it is specified. It reverses the operator if needed.
+     */
+    public static <F extends Expression, S extends Expression> TypedInfixExpression<F, S> typedInfix(final Expression node, final Class<F> firstClass, final Class<S> secondClass) {
+        InfixExpression expression= as(node, InfixExpression.class);
+
+        if (expression == null || expression.hasExtendedOperands()) {
+            return null;
+        }
+
+        if (Utils.equalNotNull(firstClass, secondClass)) {
+            F first= as(expression.getLeftOperand(), firstClass);
+            S second= as(expression.getRightOperand(), secondClass);
+
+            if (first != null && second != null) {
+                return new TypedInfixExpression<>(first, expression.getOperator(), second);
+            }
+        } else {
+            F leftFirst= as(expression.getLeftOperand(), firstClass);
+            S rightSecond= as(expression.getRightOperand(), secondClass);
+
+            if (leftFirst != null && rightSecond != null) {
+                return new TypedInfixExpression<>(leftFirst, expression.getOperator(), rightSecond);
+            }
+
+            InfixExpression.Operator mirroredOperator= null;
+
+            if (Arrays.asList(
+                    InfixExpression.Operator.AND,
+                    InfixExpression.Operator.CONDITIONAL_AND,
+                    InfixExpression.Operator.CONDITIONAL_OR,
+                    InfixExpression.Operator.EQUALS,
+                    InfixExpression.Operator.NOT_EQUALS,
+                    InfixExpression.Operator.OR,
+                    InfixExpression.Operator.PLUS,
+                    InfixExpression.Operator.TIMES,
+                    InfixExpression.Operator.XOR).contains(expression.getOperator())) {
+                mirroredOperator= expression.getOperator();
+            } else if (InfixExpression.Operator.GREATER.equals(expression.getOperator())) {
+                mirroredOperator= InfixExpression.Operator.LESS;
+            } else if (InfixExpression.Operator.GREATER_EQUALS.equals(expression.getOperator())) {
+                mirroredOperator= InfixExpression.Operator.LESS_EQUALS;
+            } else if (InfixExpression.Operator.LESS.equals(expression.getOperator())) {
+                mirroredOperator= InfixExpression.Operator.GREATER;
+            } else if (InfixExpression.Operator.LESS_EQUALS.equals(expression.getOperator())) {
+                mirroredOperator= InfixExpression.Operator.GREATER_EQUALS;
+            }
+
+            if (mirroredOperator != null) {
+                F rightFirst= as(expression.getRightOperand(), firstClass);
+                S leftSecond= as(expression.getLeftOperand(), secondClass);
+
+                if (rightFirst != null && leftSecond != null) {
+                    return new TypedInfixExpression<>(rightFirst, mirroredOperator, leftSecond);
+                }
             }
         }
 
@@ -1866,7 +1933,7 @@ public final class ASTNodes {
      *         statement, or {@code null} if more than one exist.
      */
     public static VariableDeclarationFragment getUniqueFragment(final Statement node) {
-        VariableDeclarationStatement statement= ASTNodes.as(node, VariableDeclarationStatement.class);
+        VariableDeclarationStatement statement= as(node, VariableDeclarationStatement.class);
 
         if (statement == null) {
             return null;

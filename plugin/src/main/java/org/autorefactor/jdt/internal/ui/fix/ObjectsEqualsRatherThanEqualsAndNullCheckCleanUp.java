@@ -35,6 +35,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
@@ -116,23 +117,10 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             if (condition != null && !condition.hasExtendedOperands()
                     && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
                     && thenStatements != null && thenStatements.size() == 1 && elseStatements != null && elseStatements.size() == 1) {
-                Expression operand1= condition.getLeftOperand();
-                Expression operand2= condition.getRightOperand();
+                TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(condition, Expression.class, NullLiteral.class);
 
-                NullLiteral nullLiteral1= ASTNodes.as(operand2, NullLiteral.class);
-                NullLiteral nullLiteral2= ASTNodes.as(operand1, NullLiteral.class);
-                Expression firstField;
-
-                if (ASTNodes.isPassive(operand1) && nullLiteral1 != null) {
-                    firstField= operand1;
-                } else if (ASTNodes.isPassive(operand2) && nullLiteral2 != null) {
-                    firstField= operand2;
-                } else {
-                    firstField= null;
-                }
-
-                if (firstField != null) {
-                    return maybeReplaceCode(node, condition, thenStatements, elseStatements, firstField, classesToUseWithImport,
+                if (nullityTypedCondition != null && ASTNodes.isPassive(nullityTypedCondition.getFirstOperand())) {
+                    return maybeReplaceCode(node, condition, thenStatements, elseStatements, nullityTypedCondition.getFirstOperand(), classesToUseWithImport,
                             importsToAdd);
                 }
             }
@@ -180,19 +168,11 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             final InfixExpression nullityCondition, final List<Statement> nullityStatements,
             final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        Expression nullityOperand1= nullityCondition.getLeftOperand();
-        Expression nullityOperand2= nullityCondition.getRightOperand();
+        TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(nullityCondition, Expression.class, NullLiteral.class);
+        Expression secondField= null;
 
-        NullLiteral nullityLiteral1= ASTNodes.as(nullityOperand2, NullLiteral.class);
-        NullLiteral nullityLiteral2= ASTNodes.as(nullityOperand1, NullLiteral.class);
-        Expression secondField;
-
-        if (ASTNodes.isPassive(nullityOperand1) && nullityLiteral1 != null) {
-            secondField= nullityOperand1;
-        } else if (ASTNodes.isPassive(nullityOperand2) && nullityLiteral2 != null) {
-            secondField= nullityOperand2;
-        } else {
-            secondField= null;
+        if (nullityTypedCondition != null) {
+            secondField= nullityTypedCondition.getFirstOperand();
         }
 
         ReturnStatement returnStmt1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
