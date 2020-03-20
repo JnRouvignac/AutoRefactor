@@ -380,10 +380,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
                     && primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
                     && ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
-                    && ((isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
-                            && isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId()))
-                            || (isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
-                                    && isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId())))) {
+                    && (isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
+                            && isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId())
+                            || isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
+                                    && isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId()))) {
                 return isNewHashValid(data, newHash);
             }
         }
@@ -637,24 +637,23 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         }
 
         if (fieldName != null) {
-            NumberLiteral zero;
+            Long zero;
             MethodInvocation hashOnField;
 
             if (ASTNodes.hasOperator(isFieldNull, InfixExpression.Operator.EQUALS)) {
-                zero= ASTNodes.as(condition.getThenExpression(), NumberLiteral.class);
+                zero= ASTNodes.integerLiteral(condition.getThenExpression());
                 hashOnField= ASTNodes.as(condition.getElseExpression(), MethodInvocation.class);
             } else {
                 hashOnField= ASTNodes.as(condition.getThenExpression(), MethodInvocation.class);
-                zero= ASTNodes.as(condition.getElseExpression(), NumberLiteral.class);
+                zero= ASTNodes.integerLiteral(condition.getElseExpression());
             }
 
             if (zero != null && hashOnField != null && hashOnField.getExpression() != null
                     && "hashCode".equals(hashOnField.getName().getIdentifier()) //$NON-NLS-1$
                     && Utils.isEmpty(hashOnField.arguments())) {
-                Object zeroValue= zero.resolveConstantExpressionValue();
                 SimpleName fieldToHash= getField(hashOnField.getExpression());
 
-                if (zeroValue instanceof Number && ((Number) zeroValue).intValue() == 0 && fieldToHash != null
+                if (zero.longValue() == 0 && fieldToHash != null
                         && fieldName.equals(fieldToHash.getIdentifier())) {
                     data.getFields().add(fieldToHash);
                     return true;
