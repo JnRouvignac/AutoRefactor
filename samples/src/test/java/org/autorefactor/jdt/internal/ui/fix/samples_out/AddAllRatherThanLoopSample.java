@@ -70,6 +70,12 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return output;
     }
 
+    public void replaceAddWithNotEqualOperator(
+            java.util.Date[] dates) {
+        // Keep this comment
+        Collections.addAll(this, dates);
+    }
+
     public void replaceAddWithForLoopByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment
