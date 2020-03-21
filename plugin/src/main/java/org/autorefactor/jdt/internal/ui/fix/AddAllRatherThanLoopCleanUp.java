@@ -155,7 +155,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
-            if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
+            if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
+                    && (loopContent.isLoopingForward() || mi.resolveMethodBinding() != null && ASTNodes.hasType(mi.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
                 Expression addArg0= ASTNodes.arguments(mi).get(0);
 
                 switch (loopContent.getContainerType()) {
