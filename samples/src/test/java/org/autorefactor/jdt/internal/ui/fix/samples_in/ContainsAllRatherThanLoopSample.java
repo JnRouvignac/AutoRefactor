@@ -27,10 +27,12 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class ContainsAllRatherThanLoopSample {
     private List<Long> collectionToAnalyzeField = new ArrayList<>();
@@ -38,6 +40,16 @@ public class ContainsAllRatherThanLoopSample {
     private boolean resultField;
 
     public boolean replaceForeach(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+        // Keep this comment
+        for (Long number : dataToSearch) {
+            if (!collectionToAnalyze.contains(number)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean replaceForeach(Set<Long> collectionToAnalyze, Set<Long> dataToSearch) {
         // Keep this comment
         for (Long number : dataToSearch) {
             if (!collectionToAnalyze.contains(number)) {
@@ -67,7 +79,7 @@ public class ContainsAllRatherThanLoopSample {
         return true;
     }
 
-    public boolean replaceForeachInvertedContains(List<Date> collectionToAnalyze, List<Date> dataToSearch) {
+    public boolean replaceForeachInvertedContains(Collection<Date> collectionToAnalyze, List<Date> dataToSearch) {
         // Keep this comment
         for (Date day : dataToSearch) {
             if (!collectionToAnalyze.contains(day)) {
@@ -77,7 +89,7 @@ public class ContainsAllRatherThanLoopSample {
         return true;
     }
 
-    public boolean replaceForeachWithNotCollectionContains(List<byte[]> collectionToAnalyze, List<byte[]> dataToSearch) {
+    public boolean replaceForeachWithNotCollectionContains(List<byte[]> collectionToAnalyze, Collection<byte[]> dataToSearch) {
         // Keep this comment
         for (byte[] data : dataToSearch) {
             if (!collectionToAnalyze.contains(data)) {
