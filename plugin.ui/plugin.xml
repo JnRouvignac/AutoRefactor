@@ -113,7 +113,7 @@
               defaultHandler="org.autorefactor.ui.ChooseRefactoringsWizardHandler"
               description="Choose AutoRefactor refactorings to execute on selection"
               id="org.autorefactor.choose.refactorings"
-              name="Choose refactorings...">
+              name="Choose cleanups...">
         </command>
     </extension>
     

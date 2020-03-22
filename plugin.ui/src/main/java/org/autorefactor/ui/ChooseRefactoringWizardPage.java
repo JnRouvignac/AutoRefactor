@@ -127,8 +127,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     };
 
     ChooseRefactoringWizardPage() {
-        super("Choose refactorings..."); //$NON-NLS-1$
-        setTitle("Choose refactorings..."); //$NON-NLS-1$
+        super("Choose cleanups..."); //$NON-NLS-1$
+        setTitle("Choose cleanups..."); //$NON-NLS-1$
         setDescription("Choose the refactorings to perform automatically"); //$NON-NLS-1$
     }
 
