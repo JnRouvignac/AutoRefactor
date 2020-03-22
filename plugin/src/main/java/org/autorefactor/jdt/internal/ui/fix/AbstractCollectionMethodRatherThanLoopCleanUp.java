@@ -67,9 +67,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
      *
      * @param condition The condition
      * @param forVar    The variable
+     * @param iterable TODO
      * @return The expression
      */
-    protected abstract Expression getExpressionToFind(MethodInvocation condition, Expression forVar);
+    protected abstract Expression getExpressionToFind(MethodInvocation condition, Expression forVar, Expression iterable);
 
     /**
      * Returns the method to replace or null otherwise.
@@ -115,8 +116,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                 MethodInvocation condition= getMethodToReplace(is.getExpression());
                 List<Statement> thenStatements= ASTNodes.asList(is.getThenStatement());
 
-                if (!thenStatements.isEmpty() && condition != null) {
-                    Expression toFind= getExpressionToFind(condition, loopElement);
+                if (!thenStatements.isEmpty()
+                        && condition != null) {
+                    Expression toFind= getExpressionToFind(condition, loopElement, iterable);
 
                     if (toFind != null) {
                         if (thenStatements.size() == 1) {

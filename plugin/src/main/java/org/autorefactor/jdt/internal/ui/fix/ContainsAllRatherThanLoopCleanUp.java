@@ -33,6 +33,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
@@ -67,7 +68,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     }
 
     @Override
-    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar) {
+    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
         Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
         MethodInvocation node= condition;
         Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(node).get(0));
@@ -83,17 +84,17 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     protected MethodInvocation getMethodToReplace(final Expression condition) {
         PrefixExpression negation= ASTNodes.as(condition, PrefixExpression.class);
 
-        if (negation == null || !ASTNodes.hasOperator(negation, PrefixExpression.Operator.NOT)) {
-            return null;
+        if (negation != null && ASTNodes.hasOperator(negation, PrefixExpression.Operator.NOT)) {
+            MethodInvocation method= ASTNodes.as(negation.getOperand(), MethodInvocation.class);
+
+            if (ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                    && method.getExpression() != null
+                    && ASTNodes.as(method.getExpression(), ThisExpression.class) == null) {
+                return method;
+            }
         }
 
-        MethodInvocation method= ASTNodes.as(negation.getOperand(), MethodInvocation.class);
-
-        if (!ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            return null;
-        }
-
-        return method;
+        return null;
     }
 
     @Override

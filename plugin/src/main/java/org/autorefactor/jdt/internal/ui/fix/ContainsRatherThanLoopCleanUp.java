@@ -31,6 +31,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
@@ -65,7 +66,11 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     }
 
     @Override
-    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar) {
+    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
+        if (ASTNodes.as(iterable, ThisExpression.class) != null) {
+            return null;
+        }
+
         Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
         MethodInvocation node= condition;
         Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(node).get(0));

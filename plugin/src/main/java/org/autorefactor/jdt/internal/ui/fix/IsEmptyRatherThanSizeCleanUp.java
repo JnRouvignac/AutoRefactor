@@ -34,6 +34,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
@@ -86,8 +87,10 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final InfixExpression.Operator operator, final Long literalSize) {
         if ((ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ //$NON-NLS-2$
-                || (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
-                && literalSize != null) {
+                || ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6) //$NON-NLS-1$
+                && literalSize != null
+                && miToReplace.getExpression() != null
+                && ASTNodes.as(miToReplace.getExpression(), ThisExpression.class) == null) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 

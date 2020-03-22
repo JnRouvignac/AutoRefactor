@@ -239,4 +239,32 @@ public class ContainsAllRatherThanLoopSample {
             }
         }
     }
+
+    public class DoNotRefactorCollectionImplementation<T> extends ArrayList<T> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean containsAll(Collection<?> other) {
+            for (Object item : other) {
+                if (!contains(item)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public class DoNotRefactorThisCollectionImplementation<T> extends ArrayList<T> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean containsAll(Collection<?> other) {
+            for (Object item : other) {
+                if (!this.contains(item)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 }

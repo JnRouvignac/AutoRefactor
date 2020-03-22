@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Observable;
@@ -136,5 +137,23 @@ public class IsEmptyRatherThanSizeSample {
         System.out.println(1 < text.length());
         System.out.println(1 >= text.length());
         System.out.println(2 <= text.length());
+    }
+
+    public class DoNotRefactorCollectionImplementation<T> extends ArrayList<T> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean isEmpty() {
+            return size() == 0;
+        }
+    }
+
+    public class DoNotRefactorThisCollectionImplementation<T> extends ArrayList<T> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean isEmpty() {
+            return this.size() == 0;
+        }
     }
 }
