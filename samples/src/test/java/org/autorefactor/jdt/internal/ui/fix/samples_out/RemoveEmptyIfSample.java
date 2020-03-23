@@ -109,6 +109,9 @@ public class RemoveEmptyIfSample {
         }
         while ((i--) * 13 > -200);
 
+        if (i > 0)
+            i++;
+
         return i;
     }
 

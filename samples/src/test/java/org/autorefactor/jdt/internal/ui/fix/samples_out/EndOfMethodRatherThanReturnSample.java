@@ -49,6 +49,12 @@ public class EndOfMethodRatherThanReturnSample {
         }
     }
 
+    public void removeElseStatement(boolean b) {
+        System.out.println("Keep this line");
+        if (b)
+            System.out.println("b is true");
+    }
+
     public void removeUselessReturnWithSwitch(int i) {
         switch (i) {
         case 0:

@@ -276,7 +276,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
         }
 
         if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-            if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent())) {
+            if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent()) || nodeToReplace.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                 rewrite.remove(nodeToReplace.getParent(), null);
             } else {
                 rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block(), null);

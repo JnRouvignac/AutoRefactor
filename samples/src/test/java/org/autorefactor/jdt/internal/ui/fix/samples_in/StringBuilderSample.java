@@ -229,6 +229,18 @@ public class StringBuilderSample {
             buffer.append("");
     }
 
+    public void removeElse(StringBuilder builder, StringBuffer buffer, boolean isValid) {
+        if (isValid)
+            System.out.println("foo");
+        else
+            builder.append("");
+
+        if (isValid)
+            System.out.println("foo");
+        else
+            buffer.append("");
+    }
+
     public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
         buf.append(o.toString());
     }

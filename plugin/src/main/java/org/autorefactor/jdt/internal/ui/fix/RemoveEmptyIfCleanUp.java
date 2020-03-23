@@ -91,7 +91,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
     }
 
     private void removeBlock(final IfStatement node, final ASTRewrite rewrite, final ASTNodeFactory ast) {
-        if (ASTNodes.canHaveSiblings(node)) {
+        if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
             rewrite.remove(node, null);
         } else {
             rewrite.replace(node, ast.block(), null);

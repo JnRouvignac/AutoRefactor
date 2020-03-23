@@ -116,6 +116,13 @@ public class JUnitAssertSample {
             assertFalse("Useless message", false);
     }
 
+    public void removeElse(boolean b) {
+        if (b)
+            System.out.println("foo");
+        else
+            Assert.assertTrue(true);
+    }
+
     public void refactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertTrue(!b);

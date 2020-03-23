@@ -30,6 +30,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -72,7 +73,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null && isLastStatement(node)) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node)) {
+            if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                 rewrite.remove(node, null);
             } else {
                 rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);

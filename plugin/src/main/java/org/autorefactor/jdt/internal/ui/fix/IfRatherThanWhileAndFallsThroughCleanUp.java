@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -101,7 +102,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
-            if (ASTNodes.canHaveSiblings(breakStatement)) {
+            if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                 rewrite.remove(breakStatement, null);
             } else {
                 rewrite.replace(breakStatement, ast.block(), null);

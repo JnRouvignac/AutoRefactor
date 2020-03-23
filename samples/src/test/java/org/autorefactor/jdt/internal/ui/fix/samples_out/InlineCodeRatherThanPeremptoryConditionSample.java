@@ -57,6 +57,13 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
         return i;
     }
 
+    public int removeElse(int i) {
+        if (i < 0)
+            i--;
+
+        return i;
+    }
+
     public int doNotRefactorWithVariableConflict() {
         if (true) {
             int j = 0;

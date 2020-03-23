@@ -107,6 +107,11 @@ public class JUnitAssertSample {
         }
     }
 
+    public void removeElse(boolean b) {
+        if (b)
+            System.out.println("foo");
+    }
+
     public void refactorNegatedConditions(boolean b) {
         // Keep this comment
         Assert.assertFalse(b);

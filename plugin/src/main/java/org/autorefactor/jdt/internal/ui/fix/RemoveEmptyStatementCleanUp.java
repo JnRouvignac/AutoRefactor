@@ -85,7 +85,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
-                if (ASTNodes.canHaveSiblings(node)) {
+                if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                     rewrite.remove(node, null);
                 } else {
                     rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
@@ -145,7 +145,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final Block node) {
-        if (ASTNodes.canHaveSiblings(node) && isEmptyCode(node)) {
+        if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
             cuRewrite.getASTRewrite().remove(node, null);
             return false;
         }
@@ -158,7 +158,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
         if (isEmptyCode(node)) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node)) {
+            if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                 rewrite.remove(node, null);
                 return false;
             }
@@ -188,7 +188,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
         if (isEmptyCode(emptyCode)) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node)) {
+            if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                 rewrite.remove(node, null);
                 return false;
             }

@@ -71,9 +71,18 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
     public int replaceIfByBlock(int i) {
         if (i < 0)
             if (false) {
-                // Keep this comment
                 i++;
             }
+
+        return i;
+    }
+
+    public int removeElse(int i) {
+        if (i < 0)
+            i--;
+        else if (false) {
+            i++;
+        }
 
         return i;
     }

@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -158,7 +159,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 }
 
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                if (ASTNodes.canHaveSiblings((Statement) node.getParent())) {
+                if (ASTNodes.canHaveSiblings((Statement) node.getParent()) || node.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                     rewrite.remove(node.getParent(), null);
                 } else {
                     rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().block(), null);

@@ -101,7 +101,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
                     ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                    if (ASTNodes.canHaveSiblings(node)) {
+                    if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                         rewrite.remove(node, null);
                     } else {
                         rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
@@ -135,7 +135,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                         return maybeInlineBlock(node, elseStatement);
                     }
 
-                    if (ASTNodes.canHaveSiblings(node)) {
+                    if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
                         rewrite.remove(node, null);
                     } else {
                         rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);

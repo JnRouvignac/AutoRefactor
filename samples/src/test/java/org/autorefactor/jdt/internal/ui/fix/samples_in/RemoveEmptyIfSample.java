@@ -122,6 +122,11 @@ public class RemoveEmptyIfSample {
         }
         while ((i--) * 13 > -200);
 
+        if (i > 0)
+            i++;
+        else if (uselessCondition) {
+        }
+
         return i;
     }
 
