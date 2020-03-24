@@ -42,6 +42,7 @@ import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcherRunnable;
 import org.autorefactor.jdt.internal.corext.dom.NodeMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
@@ -76,22 +77,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         public Boolean isMatching(final Expression node) {
             InfixExpression condition= ASTNodes.as(node, InfixExpression.class);
 
-            if (condition != null && !condition.hasExtendedOperands()
+            if (condition != null
                     && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
-                Expression operand1= condition.getLeftOperand();
-                Expression operand2= condition.getRightOperand();
+                TypedInfixExpression<SimpleName, NullLiteral> typedInfix= ASTNodes.typedInfix(condition, SimpleName.class, NullLiteral.class);
 
-                NullLiteral nullLiteral1= ASTNodes.as(operand2, NullLiteral.class);
-                NullLiteral nullLiteral2= ASTNodes.as(operand1, NullLiteral.class);
-                SimpleName firstField= null;
-
-                if (nullLiteral1 != null && ASTNodes.isPassive(operand1)) {
-                    firstField= ASTNodes.as(operand1, SimpleName.class);
-                } else if (nullLiteral2 != null && ASTNodes.isPassive(operand2)) {
-                    firstField= ASTNodes.as(operand2, SimpleName.class);
-                }
-
-                if (firstField != null && Utils.equalNotNull(firstField.getIdentifier(), identifier)) {
+                if (typedInfix != null
+                        && ASTNodes.isPassive(typedInfix.getFirstOperand())
+                        && Utils.equalNotNull(typedInfix.getFirstOperand().getIdentifier(), identifier)) {
                     return ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS);
                 }
             }
