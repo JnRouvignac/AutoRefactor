@@ -130,8 +130,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            String pathsName= classesToUseWithImport.contains(Paths.class.getCanonicalName()) ? Paths.class.getSimpleName() : Paths.class.getCanonicalName();
-            importsToAdd.add(Paths.class.getCanonicalName());
+            String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 
             ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) node.getExpression();
             Expression copyOfPathText= rewrite.createMoveTarget((Expression) classInstanceCreation.arguments().get(0));
@@ -234,10 +233,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
             ClassInstanceCreation classInstanceCreation= ASTNodes.as(initializer, ClassInstanceCreation.class);
 
-            String pathsName= classesToUseWithImport.contains(Paths.class.getCanonicalName()) ? Paths.class.getSimpleName() : Paths.class.getCanonicalName();
-            String pathName= classesToUseWithImport.contains(Path.class.getCanonicalName()) ? Path.class.getSimpleName() : Path.class.getCanonicalName();
-            importsToAdd.add(Paths.class.getCanonicalName());
-            importsToAdd.add(Path.class.getCanonicalName());
+            String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
+            String pathName= addImport(Path.class, classesToUseWithImport, importsToAdd);
             rewrite.replace(type, ast.type(pathName), null);
             rewrite.replace(classInstanceCreation, ast.invoke(ast.name(pathsName), GET_METHOD, rewrite.createMoveTarget((Expression) classInstanceCreation.arguments().get(0))), null);
 

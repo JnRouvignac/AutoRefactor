@@ -150,8 +150,9 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                 ASTNodeFactory ast= cuRewrite.getASTBuilder();
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
+                String classname= addImport(EnumMap.class, classesToUseWithImport, importsToAdd);
                 Type type= ast.getAST().newParameterizedType(
-                        ast.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName()));
+                        ast.type(classname));
                 rewrite.replace(node, ast.new0(type, rewrite.createMoveTarget(arg)), null);
                 importsToAdd.add(EnumMap.class.getCanonicalName());
                 return false;
@@ -168,10 +169,11 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            Type type= ast.getAST().newParameterizedType(ast.type(
-                    classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass)); //$NON-NLS-1$ //$NON-NLS-2$
-            rewrite.replace(node, ast.new0(type), null);
+            String classname= classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass; //$NON-NLS-1$ //$NON-NLS-2$
             importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
+            Type type= ast.getAST().newParameterizedType(ast.type(
+                    classname));
+            rewrite.replace(node, ast.new0(type), null);
             return false;
         }
 

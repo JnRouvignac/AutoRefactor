@@ -210,6 +210,25 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
     }
 
     /**
+     * Add the class to the list of classes to import and return the name of the class.
+     *
+     * @param classToUse The class to use
+     * @param classesToUseWithImport The classes to use with import
+     * @param importsToAdd The imports to add
+     *
+     * @return the name of the class.
+     */
+    public static String addImport(final Class<?> classToUse, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
+        if (classesToUseWithImport.contains(classToUse.getCanonicalName())) {
+            importsToAdd.add(classToUse.getCanonicalName());
+            return classToUse.getSimpleName();
+        }
+
+        return classToUse.getCanonicalName();
+    }
+
+    /**
      * The simple name of the class.
      *
      * @param fullyQualifiedName The name of the class with packages.

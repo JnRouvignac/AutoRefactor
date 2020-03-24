@@ -248,8 +248,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     }
 
                     if (data.isHasReturnStatement() && !data.getStmtIterator().hasNext()) {
-                        refactorHash(node, classesToUseWithImport, data);
-                        importsToAdd.add(Objects.class.getCanonicalName());
+                        refactorHash(node, classesToUseWithImport, importsToAdd, data);
                         return false;
                     }
                 }
@@ -670,13 +669,14 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     }
 
     private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
-            final CollectedData data) {
+            final Set<String> importsToAdd, final CollectedData data) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         @SuppressWarnings("unchecked")
         List<Statement> statements= node.getBody().statements();
-        Name objectsClassName= ast.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName());
+        String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
+        Name objectsClassName= ast.name(classname);
 
         rewrite.replace(statements.get(0),
                 ast.return0(ast.invoke(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), null); //$NON-NLS-1$

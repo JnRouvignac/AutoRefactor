@@ -114,8 +114,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
                 ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
 
                 if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
-                    replaceWithArraysFill(node, classesToUseWithImport, assignment, arrayAccess);
-                    importsToAdd.add(Arrays.class.getCanonicalName());
+                    replaceWithArraysFill(node, classesToUseWithImport, importsToAdd, assignment, arrayAccess);
                     return false;
                 }
             }
@@ -125,11 +124,12 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     private void replaceWithArraysFill(final ForStatement node, final Set<String> classesToUseWithImport,
-            final Assignment assignment, final ArrayAccess arrayAccess) {
+            final Set<String> importsToAdd, final Assignment assignment, final ArrayAccess arrayAccess) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
         rewrite.replace(node,
-                ast.toStatement(ast.invoke(ast.name(classesToUseWithImport.contains(Arrays.class.getCanonicalName()) ? Arrays.class.getSimpleName() : Arrays.class.getCanonicalName()),
+                ast.toStatement(ast.invoke(ast.name(classname),
                         "fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
                         rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
     }

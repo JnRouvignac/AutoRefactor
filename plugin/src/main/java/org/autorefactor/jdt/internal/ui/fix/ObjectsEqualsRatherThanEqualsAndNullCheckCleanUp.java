@@ -191,8 +191,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
             if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
                     && !returnFalse2.booleanValue()) {
-                replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
-                importsToAdd.add(Objects.class.getCanonicalName());
+                replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStmt1);
                 return false;
             }
         }
@@ -205,13 +204,15 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         return ASTNodes.match(thisObject, firstField) && ASTNodes.match(otherObject, secondField);
     }
 
-    private void replaceEquals(final IfStatement node, final Expression firstField, final Expression secondField,
-            final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
+    private void replaceEquals(final IfStatement node, final Expression firstField,
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd, final Expression secondField,
+            final ReturnStatement returnStmt1) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
+        String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
         rewrite.replace(node,
-                ast.if0(ast.not(ast.invoke(ast.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
+                ast.if0(ast.not(ast.invoke(ast.name(classname),
                         "equals", rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStmt1))), null); //$NON-NLS-1$
     }
 }

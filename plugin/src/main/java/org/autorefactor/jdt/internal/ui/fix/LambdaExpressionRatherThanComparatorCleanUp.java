@@ -397,7 +397,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     private void refactor(final ClassInstanceCreation node, final ITypeBinding typeArgument,
             final Set<String> classesToUseWithImport, final String identifier1, final AtomicReference<Expression> criteria,
             final AtomicBoolean isForward, final Boolean isNullFirst) {
-        String comparatorClassName= classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName();
+        String comparatorClassName= addImport(Comparator.class, classesToUseWithImport, new HashSet<>(0));
 
         Expression lambda;
         if (criteria.get() instanceof MethodInvocation) {

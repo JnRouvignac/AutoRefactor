@@ -186,21 +186,21 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
         if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 && areTypeCompatible(ASTNodes.getCalledType(mi), iterable.resolveTypeBinding())) {
-            replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
-            importsToAdd.add(Collections.class.getCanonicalName());
+            replaceWithCollectionsAddAll(node, classesToUseWithImport, importsToAdd, iterable, mi);
             return false;
         }
 
         return true;
     }
 
-    private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
-            final MethodInvocation mi, final Set<String> classesToUseWithImport) {
+    private void replaceWithCollectionsAddAll(final Statement node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
+        String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
         rewrite.replace(node,
-                ast.toStatement(ast.invoke(ast.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
+                ast.toStatement(ast.invoke(ast.name(classname),
                         "addAll", mi.getExpression() != null ? rewrite.createMoveTarget(mi.getExpression()) : ast.this0(), //$NON-NLS-1$
                         rewrite.createMoveTarget(iterable))), null);
     }

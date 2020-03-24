@@ -212,8 +212,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            String patternName= classesToUseWithImport.contains(Pattern.class.getCanonicalName()) ? Pattern.class.getSimpleName() : Pattern.class.getCanonicalName();
-            importsToAdd.add(Pattern.class.getCanonicalName());
+            String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
             rewrite.replace(type, ast.type(patternName), null);
             rewrite.replace(initializer, ast.invoke(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(initializer)), null);
 
