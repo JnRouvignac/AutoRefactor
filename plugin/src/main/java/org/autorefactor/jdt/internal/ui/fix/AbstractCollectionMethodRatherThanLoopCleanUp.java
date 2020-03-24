@@ -86,10 +86,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
      * @param iterable   The iterable
      * @param toFind     The expression to find
      * @param isPositive true if the expression is positive
-     * @param ast          The builder
      * @return the future method.
      */
-    protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTNodeFactory ast);
+    protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive);
 
     @Override
     public boolean visit(final Block node) {
@@ -200,7 +199,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             thenStatements.remove(thenStatements.size() - 1);
 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            Statement replacement= ast.if0(newMethod(iterable, toFind, true, ast), ast.block(ast.copyRange(thenStatements)));
+            Statement replacement= ast.if0(newMethod(iterable, toFind, true), ast.block(ast.copyRange(thenStatements)));
             cuRewrite.getASTRewrite().replace(forNode, replacement, null);
 
             thenStatements.add(bs);
@@ -209,7 +208,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
                 final Statement forNextStatement, final boolean negate) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate, ast)), null);
+            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate)), null);
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
                 cuRewrite.getASTRewrite().remove(forNextStatement, null);
@@ -252,9 +251,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStatement instanceof VariableDeclarationStatement) {
                 replacement= ast.declareStatement(ast.type(boolean.class.getSimpleName()), rewrite.createMoveTarget((SimpleName) initName),
-                        newMethod(iterable, toFind, isPositive, ast));
+                        newMethod(iterable, toFind, isPositive));
             } else if (!previousStmtIsPreviousSibling || previousStatement instanceof ExpressionStatement) {
-                replacement= ast.toStatement(ast.assign(rewrite.createMoveTarget(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, ast)));
+                replacement= ast.toStatement(ast.assign(rewrite.createMoveTarget(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive)));
             } else {
                 throw new NotImplementedException(forNode);
             }
