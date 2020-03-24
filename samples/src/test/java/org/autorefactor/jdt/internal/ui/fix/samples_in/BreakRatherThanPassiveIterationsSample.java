@@ -150,6 +150,43 @@ public class BreakRatherThanPassiveIterationsSample {
         return isFound ? "The result has been found" : ("The result has not been found on " + number + " iteration(s)");
     }
 
+    public boolean[] doNotAddBreakWithChangingAssignment(int number) {
+        boolean[] hasNumber42 = new boolean[number];
+
+        for (int i = 0; i < number; i++) {
+            if (i == 42) {
+                hasNumber42[i] = true;
+            }
+        }
+
+        return hasNumber42;
+    }
+
+    public boolean[] addBreakWithFixedAssignment(int number, int index) {
+        boolean[] isFound = new boolean[number];
+
+        for (int i = 0; i < number; i++) {
+            if (i == 42) {
+                // Keep this comment
+                isFound[index] = true;
+            }
+        }
+
+        return isFound;
+    }
+
+    public boolean[] doNotAddBreakWithActiveAssignment(int number, int index) {
+        boolean[] isFound = new boolean[number];
+
+        for (int i = 0; i < number; i++) {
+            if (i == 42) {
+                isFound[index++] = true;
+            }
+        }
+
+        return isFound;
+    }
+
     public String doNotAddBreakWithActiveUpdater(int number) {
         boolean isFound = false;
 

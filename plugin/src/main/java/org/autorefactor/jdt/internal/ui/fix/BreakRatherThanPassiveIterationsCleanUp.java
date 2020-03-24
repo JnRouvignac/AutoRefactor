@@ -33,6 +33,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -40,7 +41,6 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -90,7 +90,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(final PrefixExpression node) {
-            return !ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT) || visitVar(node.getOperand());
+            if (ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
+                return visitVar(node.getOperand());
+            }
+
+            return true;
         }
 
         @Override
@@ -240,25 +244,34 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
             for (Statement statement : assignments) {
-                if (statement instanceof VariableDeclarationStatement) {
-                    VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
+                VariableDeclarationStatement variableDeclaration= ASTNodes.as(statement, VariableDeclarationStatement.class);
+                Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
 
-                    for (Object obj : decl.fragments()) {
+                if (variableDeclaration != null) {
+                    for (Object obj : variableDeclaration.fragments()) {
                         VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
-                        if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
-                            return true;
+                        if (ASTNodes.isHardCoded(fragment.getInitializer())) {
+                            continue;
                         }
-                    }
-                } else if (statement instanceof ExpressionStatement) {
-                    Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
 
-                    if (assignment == null || !ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                         return true;
                     }
-                } else {
-                    return true;
+
+                    continue;
+                } else if (assignment != null
+                        && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+                        && ASTNodes.isHardCoded(assignment.getRightHandSide())
+                        && ASTNodes.isPassive(assignment.getLeftHandSide())) {
+                    VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
+                    varOccurrenceVisitor.visitNode(assignment.getLeftHandSide());
+
+                    if (!varOccurrenceVisitor.isVarUsed()) {
+                        continue;
+                    }
                 }
+
+                return true;
             }
 
             addBreak(ifStatement, assignments);
