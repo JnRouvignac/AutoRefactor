@@ -27,7 +27,9 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -61,13 +63,21 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends AbstractCleanUpRule {
+public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
+    private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
+        @Override
+        public boolean visit(final Block node) {
+            return AbstractCollectionMethodRatherThanLoopCleanUp.this
+                    .maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
+        }
+    }
+
     /**
      * Get the expression to find.
      *
      * @param condition The condition
      * @param forVar    The variable
-     * @param iterable TODO
+     * @param iterable  The iterable
      * @return The expression
      */
     protected abstract Expression getExpressionToFind(MethodInvocation condition, Expression forVar, Expression iterable);
@@ -86,20 +96,44 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
      * @param iterable   The iterable
      * @param toFind     The expression to find
      * @param isPositive true if the expression is positive
+     * @param classesToUseWithImport The classes to use with import
+     * @param importsToAdd The imports to add
      * @return the future method.
      */
-    protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive);
+    protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, Set<String> classesToUseWithImport, Set<String> importsToAdd);
+
+    @Override
+    public RefactoringWithObjectsClass getRefactoringClassInstance() {
+        return new RefactoringWithObjectsClass();
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<>(0);
+    }
 
     @Override
     public boolean visit(final Block node) {
-        AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(cuRewrite, node);
+        return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
+    }
+
+    private boolean maybeRefactorBlock(final Block node,
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
         node.accept(assignmentForAndReturnVisitor);
         return assignmentForAndReturnVisitor.getResult();
     }
 
     private final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
-        public AssignmentForAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+        private final Set<String> classesToUseWithImport;
+        private final Set<String> importsToAdd;
+
+        public AssignmentForAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
+                final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
             super(cuRewrite, startNode);
+
+            this.classesToUseWithImport= classesToUseWithImport;
+            this.importsToAdd= importsToAdd;
         }
 
         @Override
@@ -199,7 +233,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             thenStatements.remove(thenStatements.size() - 1);
 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            Statement replacement= ast.if0(newMethod(iterable, toFind, true), ast.block(ast.copyRange(thenStatements)));
+            Statement replacement= ast.if0(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.block(ast.copyRange(thenStatements)));
             cuRewrite.getASTRewrite().replace(forNode, replacement, null);
 
             thenStatements.add(bs);
@@ -208,7 +242,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
         private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
                 final Statement forNextStatement, final boolean negate) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate)), null);
+            cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), null);
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
                 cuRewrite.getASTRewrite().remove(forNextStatement, null);
@@ -251,9 +285,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStatement instanceof VariableDeclarationStatement) {
                 replacement= ast.declareStatement(ast.type(boolean.class.getSimpleName()), rewrite.createMoveTarget((SimpleName) initName),
-                        newMethod(iterable, toFind, isPositive));
+                        newMethod(iterable, toFind, isPositive, classesToUseWithImport, importsToAdd));
             } else if (!previousStmtIsPreviousSibling || previousStatement instanceof ExpressionStatement) {
-                replacement= ast.toStatement(ast.assign(rewrite.createMoveTarget(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive)));
+                replacement= ast.toStatement(ast.assign(rewrite.createMoveTarget(initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, classesToUseWithImport, importsToAdd)));
             } else {
                 throw new NotImplementedException(forNode);
             }

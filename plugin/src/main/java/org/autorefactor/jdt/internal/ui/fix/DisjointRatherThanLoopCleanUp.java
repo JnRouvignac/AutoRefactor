@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2018 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2019 Fabrice TIERCELIN - Reuse for Collection.containsAll()
+ * Copyright (C) 2020 Fabrice TIERCELIN - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,17 +25,22 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
-public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
+public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
     /**
      * Get the name.
      *
@@ -44,7 +48,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      */
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name;
     }
 
     /**
@@ -54,7 +58,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      */
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_description;
     }
 
     /**
@@ -64,31 +68,25 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
      */
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_reason;
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
+    }
+
+    @Override
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 5;
     }
 
     @Override
     protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
-        if (ASTNodes.as(iterable, ThisExpression.class) != null) {
-            return null;
-        }
-
         Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
         Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
 
-        if (ASTNodes.isSameVariable(forVar, expression)) {
-            return arg0;
-        }
-
-        if (ASTNodes.isSameVariable(forVar, arg0)) {
-            return expression;
-        }
-
-        if (ASTNodes.match(forVar, expression)) {
-            return arg0;
-        }
-
-        if (ASTNodes.match(forVar, arg0)) {
+        if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
             return expression;
         }
 
@@ -99,7 +97,9 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     protected MethodInvocation getMethodToReplace(final Expression condition) {
         MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
 
-        if (ASTNodes.usesGivenSignature(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                && method.getExpression() != null
+                && ASTNodes.as(method.getExpression(), ThisExpression.class) == null) {
             return method;
         }
 
@@ -110,12 +110,14 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        MethodInvocation invoke= ast.invoke(rewrite.createMoveTarget(iterable), "contains", rewrite.createMoveTarget(toFind)); //$NON-NLS-1$
+        String classname= classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName();
+        importsToAdd.add(Collections.class.getCanonicalName());
+        MethodInvocation invoke= ast.invoke(classname, "disjoint", rewrite.createMoveTarget(toFind), rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
 
         if (isPositive) {
-            return invoke;
+            return ast.not(invoke);
         }
 
-        return ast.not(invoke);
+        return invoke;
     }
 }

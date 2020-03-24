@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -64,7 +65,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
      */
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_reason;
     }
 
     @Override
@@ -97,7 +98,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     }
 
     @Override
-    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive) {
+    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
         MethodInvocation invoke= ast.invoke(rewrite.createMoveTarget(toFind), "containsAll", rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
