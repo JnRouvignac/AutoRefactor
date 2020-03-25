@@ -59,7 +59,7 @@ import org.junit.runners.Parameterized.Parameters;
  * cleanup rules work together and do not introduce problems.
  */
 @RunWith(value= Parameterized.class)
-public class AllCleanUpRulesTest {
+public class CleanUpTest {
     private static final String SAMPLES_ALL_BASE_DIR= "../samples/src/test/java/org/autorefactor/jdt/internal/ui/fix/all"; //$NON-NLS-1$
     private static final String PACKAGE_NAME= "org.autorefactor.jdt.internal.ui.fix.all.samples_in"; //$NON-NLS-1$
 
@@ -73,7 +73,7 @@ public class AllCleanUpRulesTest {
 
     private final String sampleName;
 
-    public AllCleanUpRulesTest(String testName) {
+    public CleanUpTest(String testName) {
         this.sampleName= testName;
     }
 
