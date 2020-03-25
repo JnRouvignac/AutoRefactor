@@ -117,7 +117,10 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
             List<Expression> arguments= ASTNodes.arguments(ci);
 
-            if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments) && ci.resolveTypeBinding() != null) {
+            if (ci.resolveTypeBinding() != null
+                    && ci.getAnonymousClassDeclaration() == null
+                    && node.parameters().size() == arguments.size()
+                    && areSameIdentifiers(node, arguments)) {
                 replaceByCreationReference(node, ci);
                 return false;
             }

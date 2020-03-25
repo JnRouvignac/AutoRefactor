@@ -88,6 +88,16 @@ public class LambdaSample extends Date {
         return capacity -> new ArrayList<>(capacity + 1);
     }
 
+    public Supplier<Date> doNotRefactorWithAnonymousBody() {
+        return () -> new Date() {
+            private static final long serialVersionUID= 2792545515752346367L;
+
+            public String toString() {
+                return "foo";
+            }
+        };
+    }
+
     public BiFunction<Integer, Integer, Vector<String>> useCreationReferenceWithParameters() {
         return Vector::new;
     }
