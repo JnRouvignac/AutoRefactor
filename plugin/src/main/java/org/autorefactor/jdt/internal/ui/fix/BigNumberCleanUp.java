@@ -81,7 +81,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     public boolean visit(final ClassInstanceCreation node) {
         ITypeBinding typeBinding= node.getType().resolveBinding();
 
-        if (ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
+        if (node.getAnonymousClassDeclaration() == null
+                && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
+                && ASTNodes.arguments(node).size() == 1) {
             Expression arg0= ASTNodes.arguments(node).get(0);
 
             if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {

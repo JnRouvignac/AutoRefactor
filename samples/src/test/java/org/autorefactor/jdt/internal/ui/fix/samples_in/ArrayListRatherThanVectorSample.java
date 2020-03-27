@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Observable;
 
 public class ArrayListRatherThanVectorSample {
-
     public void replaceVectorInstanceCreation() {
         // Keep this comment
         Object[] stringArray = new Vector<String>().toArray();
@@ -256,5 +255,17 @@ public class ArrayListRatherThanVectorSample {
                 vector.add("No conflict please");
             }
         };
+    }
+
+    public void doNotReplaceAnonymousVector() {
+        Vector<String> list = new Vector<String>() {
+            private static final long serialVersionUID= 2598952380459765926L;
+
+            @Override
+            public String firstElement() {
+                return null;
+            }
+        };
+        list.add("bar");
     }
 }

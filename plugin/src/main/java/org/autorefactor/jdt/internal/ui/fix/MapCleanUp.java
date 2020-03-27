@@ -114,7 +114,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
                     }
                 } else if (previousStatement instanceof VariableDeclarationStatement) {
                     VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
-                            (VariableDeclarationStatement) previousStatement);
+                            previousStatement);
                     if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
                         return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
                     }
@@ -140,7 +140,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceMap) {
-            if (cic == null) {
+            if (cic == null || cic.getAnonymousClassDeclaration() != null) {
                 return false;
             }
             List<Expression> args= ASTNodes.arguments(cic);
