@@ -218,6 +218,58 @@ public class TestNGAssertSample {
         assertFalse(o == null, "Failure message to keep");
     }
 
+    public void refactorTrueCheckFirstArgWithEquals(boolean o) {
+        // Keep this comment
+        Assert.assertEquals(true, o);
+        Assert.assertEquals(true, o, "Failure message to keep");
+
+        assertEquals(true, o);
+        assertEquals(true, o, "Failure message to keep");
+    }
+
+    public void refactorTrueCheckSecondArgWithEquals(boolean o) {
+        // Keep this comment
+        Assert.assertEquals(o, true);
+        Assert.assertEquals(o, true, "Failure message to keep");
+
+        assertEquals(o, true);
+        assertEquals(o, true, "Failure message to keep");
+    }
+
+    public void refactorFalseCheckFirstArgWithEquals(boolean o) {
+        // Keep this comment
+        Assert.assertEquals(false, o);
+        Assert.assertEquals(false, o, "Failure message to keep");
+
+        assertEquals(false, o);
+        assertEquals(false, o, "Failure message to keep");
+    }
+
+    public void refactorFalseCheckSecondArgWithEquals(boolean o) {
+        // Keep this comment
+        Assert.assertEquals(o, false);
+        Assert.assertEquals(o, false, "Failure message to keep");
+
+        assertEquals(o, false);
+        assertEquals(o, false, "Failure message to keep");
+    }
+
+    public void doNotRefactorMethodOnObject(boolean o) {
+        Assert.assertNotEquals(o, true);
+        Assert.assertNotEquals(o, true, "Failure message to keep");
+        Assert.assertNotEquals(o, false);
+        Assert.assertNotEquals(o, false, "Failure message to keep");
+        Assert.assertNotEquals(o, false);
+        Assert.assertNotEquals(o, false, "Failure message to keep");
+
+        assertNotEquals(o, true);
+        assertNotEquals(o, true, "Failure message to keep");
+        assertNotEquals(o, false);
+        assertNotEquals(o, false, "Failure message to keep");
+        assertNotEquals(o, false);
+        assertNotEquals(o, false, "Failure message to keep");
+    }
+
     public void refactorNullCheckFirstArgWithEquals(Object o) {
         // Keep this comment
         Assert.assertEquals(null, o);

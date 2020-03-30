@@ -131,6 +131,24 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
             return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), false);
         }
 
+        if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", boolean.class.getSimpleName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
+            if (ASTNodes.booleanConstant(args.get(1)) != null) {
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(1)), args.get(0), null, true);
+            }
+
+            if (ASTNodes.booleanConstant(args.get(0)) != null) {
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(0)), args.get(1), null, true);
+            }
+        } else if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", boolean.class.getSimpleName(), boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+            if (ASTNodes.booleanConstant(args.get(1)) != null) {
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(1)), args.get(0), args.get(2), true);
+            }
+
+            if (ASTNodes.booleanConstant(args.get(0)) != null) {
+                return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(0)), args.get(1), args.get(2), true);
+            }
+        }
+
         for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
             if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
                 return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), null);
