@@ -141,9 +141,43 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                         actualExpression, message, false);
             }
 
+            if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
+                final Boolean booleanConstant= ASTNodes.booleanConstant((Expression) node.arguments().get(0));
+
+                if (booleanConstant != null) {
+                    return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                            node, actual, booleanConstant,
+                            actualExpression, message, true);
+                }
+
+                final Boolean actualConstant= ASTNodes.booleanConstant(actualExpression);
+
+                if (actualConstant != null) {
+                    return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                            node, actual, actualConstant,
+                            (Expression) node.arguments().get(0), message, true);
+                }
+            } else if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
+                final Boolean booleanConstant= ASTNodes.booleanConstant((Expression) node.arguments().get(0));
+
+                if (booleanConstant != null) {
+                    return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                            node, actual, !booleanConstant,
+                            actualExpression, message, true);
+                }
+
+                final Boolean actualConstant= ASTNodes.booleanConstant(actualExpression);
+
+                if (actualConstant != null) {
+                    return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+                            node, actual, !actualConstant,
+                            (Expression) node.arguments().get(0), message, true);
+                }
+            }
+
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, EQUALS_METHOD, Object.class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_EQUAL_TO_METHOD, Object.class.getCanonicalName())
-                    || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractBooleanAssert", IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
@@ -156,7 +190,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
             }
 
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, Object.class.getCanonicalName())
-                    || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractBooleanAssert", IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_NOT_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_NOT_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_NOT_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$

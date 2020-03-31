@@ -302,23 +302,6 @@ public class AssertJSample {
         assertThat(42).describedAs("Failure message to keep").isNotEqualTo(o);
     }
 
-    public void moveBooleanLiteral(boolean b) {
-        // Keep this comment
-        Assertions.assertThat(true).isEqualTo(b);
-        Assertions.assertThat(true).as("Failure message to keep").isEqualTo(b);
-        Assertions.assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
-        Assertions.assertThat(true).isNotEqualTo(b);
-        Assertions.assertThat(true).as("Failure message to keep").isNotEqualTo(b);
-        Assertions.assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
-
-        assertThat(true).isEqualTo(b);
-        assertThat(true).as("Failure message to keep").isEqualTo(b);
-        assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
-        assertThat(true).isNotEqualTo(b);
-        assertThat(true).as("Failure message to keep").isNotEqualTo(b);
-        assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
-    }
-
     public void moveLongLiteral(long l) {
         // Keep this comment
         Assertions.assertThat(42L).isEqualTo(l);
@@ -401,6 +384,74 @@ public class AssertJSample {
         assertThat(o).isNotEqualTo(42);
         assertThat(o).as("Failure message to keep").isNotEqualTo(42);
         assertThat(o).describedAs("Failure message to keep").isNotEqualTo(42);
+    }
+
+    public void refactorTrueCheckSecondArgWithEquals(boolean b) {
+        // Keep this comment
+        Assertions.assertThat(true).isEqualTo(b);
+        Assertions.assertThat(true).as("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(true).isNotEqualTo(b);
+        Assertions.assertThat(true).as("Failure message to keep").isNotEqualTo(b);
+        Assertions.assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
+
+        assertThat(true).isEqualTo(b);
+        assertThat(true).as("Failure message to keep").isEqualTo(b);
+        assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
+        assertThat(true).isNotEqualTo(b);
+        assertThat(true).as("Failure message to keep").isNotEqualTo(b);
+        assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
+    }
+
+    public void refactorTrueCheckFirstArgWithEquals(boolean b) {
+        // Keep this comment
+        Assertions.assertThat(b).isEqualTo(true);
+        Assertions.assertThat(b).as("Failure message to keep").isEqualTo(true);
+        Assertions.assertThat(b).describedAs("Failure message to keep").isEqualTo(true);
+        Assertions.assertThat(b).isNotEqualTo(true);
+        Assertions.assertThat(b).as("Failure message to keep").isNotEqualTo(true);
+        Assertions.assertThat(b).describedAs("Failure message to keep").isNotEqualTo(true);
+
+        assertThat(b).isEqualTo(true);
+        assertThat(b).as("Failure message to keep").isEqualTo(true);
+        assertThat(b).describedAs("Failure message to keep").isEqualTo(true);
+        assertThat(b).isNotEqualTo(true);
+        assertThat(b).as("Failure message to keep").isNotEqualTo(true);
+        assertThat(b).describedAs("Failure message to keep").isNotEqualTo(true);
+    }
+
+    public void refactorFalseCheckSecondArgWithEquals(boolean b) {
+        // Keep this comment
+        Assertions.assertThat(false).isEqualTo(b);
+        Assertions.assertThat(false).as("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(false).describedAs("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(false).isNotEqualTo(b);
+        Assertions.assertThat(false).as("Failure message to keep").isNotEqualTo(b);
+        Assertions.assertThat(false).describedAs("Failure message to keep").isNotEqualTo(b);
+
+        assertThat(false).isEqualTo(b);
+        assertThat(false).as("Failure message to keep").isEqualTo(b);
+        assertThat(false).describedAs("Failure message to keep").isEqualTo(b);
+        assertThat(false).isNotEqualTo(b);
+        assertThat(false).as("Failure message to keep").isNotEqualTo(b);
+        assertThat(false).describedAs("Failure message to keep").isNotEqualTo(b);
+    }
+
+    public void refactorFalseCheckFirstArgWithEquals(boolean b) {
+        // Keep this comment
+        Assertions.assertThat(b).isEqualTo(false);
+        Assertions.assertThat(b).as("Failure message to keep").isEqualTo(false);
+        Assertions.assertThat(b).describedAs("Failure message to keep").isEqualTo(false);
+        Assertions.assertThat(b).isNotEqualTo(false);
+        Assertions.assertThat(b).as("Failure message to keep").isNotEqualTo(false);
+        Assertions.assertThat(b).describedAs("Failure message to keep").isNotEqualTo(false);
+
+        assertThat(b).isEqualTo(false);
+        assertThat(b).as("Failure message to keep").isEqualTo(false);
+        assertThat(b).describedAs("Failure message to keep").isEqualTo(false);
+        assertThat(b).isNotEqualTo(false);
+        assertThat(b).as("Failure message to keep").isNotEqualTo(false);
+        assertThat(b).describedAs("Failure message to keep").isNotEqualTo(false);
     }
 
     public void moveConstantAsExpectedArgInWithEquals(Object o) {
