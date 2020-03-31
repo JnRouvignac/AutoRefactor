@@ -143,6 +143,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, EQUALS_METHOD, Object.class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_EQUAL_TO_METHOD, Object.class.getCanonicalName())
+                    || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractBooleanAssert", IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
@@ -155,6 +156,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
             }
 
             if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, Object.class.getCanonicalName())
+                    || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractBooleanAssert", IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_NOT_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_NOT_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
                     || ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_NOT_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
@@ -183,7 +185,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
                     || ASTNodes.usesGivenSignature(mi, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
                     || ASTNodes.usesGivenSignature(mi, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
                 if (mi.arguments() == null
-                        || (mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null)) {
+                        || mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null) {
                     return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
                 }
 

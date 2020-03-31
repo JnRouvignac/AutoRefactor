@@ -302,6 +302,23 @@ public class AssertJSample {
         assertThat(42).describedAs("Failure message to keep").isNotEqualTo(o);
     }
 
+    public void moveBooleanLiteral(boolean b) {
+        // Keep this comment
+        Assertions.assertThat(true).isEqualTo(b);
+        Assertions.assertThat(true).as("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
+        Assertions.assertThat(true).isNotEqualTo(b);
+        Assertions.assertThat(true).as("Failure message to keep").isNotEqualTo(b);
+        Assertions.assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
+
+        assertThat(true).isEqualTo(b);
+        assertThat(true).as("Failure message to keep").isEqualTo(b);
+        assertThat(true).describedAs("Failure message to keep").isEqualTo(b);
+        assertThat(true).isNotEqualTo(b);
+        assertThat(true).as("Failure message to keep").isNotEqualTo(b);
+        assertThat(true).describedAs("Failure message to keep").isNotEqualTo(b);
+    }
+
     public void moveLongLiteral(long l) {
         // Keep this comment
         Assertions.assertThat(42L).isEqualTo(l);
