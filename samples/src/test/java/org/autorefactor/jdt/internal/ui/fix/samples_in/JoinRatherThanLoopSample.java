@@ -27,10 +27,12 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class JoinRatherThanLoopSample {
     public String refactorConcatenation(String[] texts) {
+        // Keep this comment
         boolean isFirst = true;
+        // Keep this comment too
         StringBuilder concatenation = new StringBuilder();
 
-        // Keep this comment
+        // Keep this comment also
         for (int i = 0; i < texts.length; i++) {
             if (isFirst) {
                 isFirst = false;

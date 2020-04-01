@@ -27,9 +27,12 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class JoinRatherThanLoopSample {
     public String refactorConcatenation(String[] texts) {
-
-
         // Keep this comment
+
+        // Keep this comment too
+
+
+        // Keep this comment also
         String concatenation= String.join(", ", texts);
 
         return concatenation;
