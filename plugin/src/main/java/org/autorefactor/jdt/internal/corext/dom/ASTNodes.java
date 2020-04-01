@@ -668,7 +668,7 @@ public final class ASTNodes {
     }
 
     /**
-     * Returns all the operands from the provided infix expressions.
+     * Returns a copy of all the operands from the provided infix expressions.
      * It takes a bug into account.
      * In some cases, ASTConverter.java creates several infix expressions instead of one extended infix expression.
      * It occurs for an expression with a sub-infix-expression in the middle without parenthesis.
@@ -1688,6 +1688,90 @@ public final class ASTNodes {
      */
     public static Long integerLiteral(final Expression input) {
         NumberLiteral contant= as(input, NumberLiteral.class);
+
+        if (contant != null) {
+            return positiveLiteral(contant);
+        }
+
+        InfixExpression operation= as(input, InfixExpression.class);
+
+        if (operation != null
+                && hasOperator(operation,
+                        InfixExpression.Operator.AND,
+                        InfixExpression.Operator.DIVIDE,
+                        InfixExpression.Operator.LEFT_SHIFT,
+                        InfixExpression.Operator.MINUS,
+                        InfixExpression.Operator.OR,
+                        InfixExpression.Operator.PLUS,
+                        InfixExpression.Operator.REMAINDER,
+                        InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
+                        InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+                        InfixExpression.Operator.TIMES,
+                        InfixExpression.Operator.XOR)) {
+            List<Expression> operands= allOperands(operation);
+            Long leftValue= integerLiteral(operands.remove(0));
+
+            if (leftValue == null) {
+                return null;
+            }
+
+            long result= leftValue;
+
+            for (Expression operand : operands) {
+                Long newValue= integerLiteral(operand);
+
+                if (newValue == null) {
+                    return null;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.PLUS)) {
+                    result= result + newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.MINUS)) {
+                    result= result - newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.TIMES)) {
+                    result= result * newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.DIVIDE) && result % newValue == 0) {
+                    result= result / newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.AND)) {
+                    result= result & newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.OR)) {
+                    result= result | newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.XOR)) {
+                    result= result ^ newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.LEFT_SHIFT)) {
+                    result= result << newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.REMAINDER)) {
+                    result= result % newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_SIGNED)) {
+                    result= result >> newValue;
+                }
+
+                if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
+                    result= result >>> newValue;
+                }
+            }
+
+            return result;
+        }
+
         PrefixExpression negativeContant= as(input, PrefixExpression.class);
 
         if (negativeContant != null && hasOperator(negativeContant, PrefixExpression.Operator.MINUS)) {
@@ -1696,8 +1780,6 @@ public final class ASTNodes {
             if (value != null) {
                 return -value;
             }
-        } else if (contant != null) {
-            return positiveLiteral(contant);
         }
 
         return null;
