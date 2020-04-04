@@ -124,7 +124,7 @@ public class PatternRatherThanRegExStringSample {
     	return dateText1 + dateText2;
     }
 
-	public boolean usePatternFromeVariable(String regex, String date1, String date2) {
+	public boolean usePatternFromVariable(String regex, String date1, String date2) {
     	// Keep this comment
     	String dateValidation= regex;
 
