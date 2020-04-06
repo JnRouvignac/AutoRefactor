@@ -142,7 +142,8 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
             List<Statement> statements= ASTNodes.asList(body);
             Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-            if (previousStatement != null
+            if (getResult()
+                    && previousStatement != null
                     && containerVariable != null
                     && ASTNodes.hasType(containerVariable, String[].class.getCanonicalName())
                     && (statements.size() == 2 || statements.size() == 3)) {
