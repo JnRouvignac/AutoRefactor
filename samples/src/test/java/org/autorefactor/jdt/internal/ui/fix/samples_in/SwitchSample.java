@@ -370,6 +370,163 @@ public class SwitchSample {
         }
     }
 
+    public int replaceIfSuite(int i1) {
+        // Keep this comment
+        if (i1 == 0) {
+            // Keep this comment too
+            return 0;
+            // Keep this comment also
+        }
+        if (i1 == 1) {
+            return 10;
+        }
+        if (2 == i1) {
+            return 20;
+        }
+        if (i1 == 3) {
+            return 30;
+        }
+        if (i1 == 4)
+            return 40;
+        if ((i1 == 5) || (i1 == 6)) {
+            return 60;
+        }
+        if ((i1 == 7) ^ (i1 == 8)) {
+            return 80;
+        }
+        if ((i1 == 9) | (i1 == 10)) {
+            return 100;
+        }
+        if ((i1 == 11) || i1 == 12 || (i1 == 13)) {
+            return 130;
+        }
+        if (14 == i1) {
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceSuiteThatDoNotFallThrough(int i1) {
+        if (i1 == 0) {
+            if (i2 == 1) {
+                return 0;
+            }
+        }
+        // Keep this comment
+        if (i1 == 1) {
+            // Keep this comment too
+            return 10;
+            // Keep this comment also
+        }
+        if (2 == i1) {
+            return 20;
+        }
+        if (i1 == 3) {
+            return 30;
+        }
+        if (i1 == 4)
+            return 40;
+        if ((i1 == 5) || (i1 == 6)) {
+            return 60;
+        }
+        if ((i1 == 7) ^ (i1 == 8)) {
+            return 80;
+        }
+        if ((i1 == 9) | (i1 == 10)) {
+            return 100;
+        }
+        if ((i1 == 11) || i1 == 12 || (i1 == 13)) {
+            return 130;
+        }
+        if (14 == i1) {
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceSuiteIgnoring(int i1) {
+        if (i1 == 0) {
+            return 0;
+        } else if (i2 == 1) {
+            return 140;
+        }
+        // Keep this comment
+        if (i1 == 1) {
+            // Keep this comment too
+            return 10;
+            // Keep this comment also
+        }
+        if (2 == i1) {
+            return 20;
+        }
+        if (i1 == 3) {
+            return 30;
+        }
+        if (i1 == 4)
+            return 40;
+        if ((i1 == 5) || (i1 == 6)) {
+            return 60;
+        }
+        if ((i1 == 7) ^ (i1 == 8)) {
+            return 80;
+        }
+        if ((i1 == 9) | (i1 == 10)) {
+            return 100;
+        }
+        if ((i1 == 11) || i1 == 12 || (i1 == 13)) {
+            return 130;
+        }
+        if (14 == i1) {
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceMeltCases(int i1) {
+        // Keep this comment
+        if (i1 == 0) {
+            // Keep this comment too
+            return 0;
+            // Keep this comment also
+        } else if (i1 == 1) {
+            return 10;
+        } else if (2 == i1) {
+            return 20;
+        } else if (i1 == 3) {
+            return 30;
+        }
+        if (i1 == 4)
+            return 40;
+        if ((i1 == 5) || (i1 == 6)) {
+            return 60;
+        }
+        if ((i1 == 7) ^ (i1 == 8)) {
+            return 80;
+        }
+        if ((i1 == 9) | (i1 == 10)) {
+            return 100;
+        }
+        if ((i1 == 11) || i1 == 12 || (i1 == 13)) {
+            return 130;
+        }
+        if (14 == i1) {
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
     public void mergeConsecutiveCases(int i1) {
         int i = 0;
         switch (i1) {

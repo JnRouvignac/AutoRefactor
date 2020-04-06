@@ -437,6 +437,160 @@ public class SwitchSample {
         }
     }
 
+    public int replaceIfSuite(int i1) {
+        // Keep this comment
+        switch (i1) {
+        case 0:
+            // Keep this comment too
+            return 0;
+            // Keep this comment also
+        case 1:
+            return 10;
+        case 2:
+            return 20;
+        case 3:
+            return 30;
+        case 4:
+            return 40;
+        case 5:
+        case 6:
+            return 60;
+        case 7:
+        case 8:
+            return 80;
+        case 9:
+        case 10:
+            return 100;
+        case 11:
+        case 12:
+        case 13:
+            return 130;
+        case 14:
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceSuiteThatDoNotFallThrough(int i1) {
+        if (i1 == 0) {
+            if (i2 == 1) {
+                return 0;
+            }
+        }
+        // Keep this comment
+        switch (i1) {
+        case 1:
+            // Keep this comment too
+            return 10;
+            // Keep this comment also
+        case 2:
+            return 20;
+        case 3:
+            return 30;
+        case 4:
+            return 40;
+        case 5:
+        case 6:
+            return 60;
+        case 7:
+        case 8:
+            return 80;
+        case 9:
+        case 10:
+            return 100;
+        case 11:
+        case 12:
+        case 13:
+            return 130;
+        case 14:
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceSuiteIgnoring(int i1) {
+        if (i1 == 0) {
+            return 0;
+        } else if (i2 == 1) {
+            return 140;
+        }
+        // Keep this comment
+        switch (i1) {
+        case 1:
+            // Keep this comment too
+            return 10;
+            // Keep this comment also
+        case 2:
+            return 20;
+        case 3:
+            return 30;
+        case 4:
+            return 40;
+        case 5:
+        case 6:
+            return 60;
+        case 7:
+        case 8:
+            return 80;
+        case 9:
+        case 10:
+            return 100;
+        case 11:
+        case 12:
+        case 13:
+            return 130;
+        case 14:
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
+    public int replaceMeltCases(int i1) {
+        // Keep this comment
+        switch (i1) {
+        case 0:
+            // Keep this comment too
+            return 0;
+            // Keep this comment also
+        case 1:
+            return 10;
+        case 2:
+            return 20;
+        case 3:
+            return 30;
+        case 4:
+            return 40;
+        case 5:
+        case 6:
+            return 60;
+        case 7:
+        case 8:
+            return 80;
+        case 9:
+        case 10:
+            return 100;
+        case 11:
+        case 12:
+        case 13:
+            return 130;
+        case 14:
+            if (i2 == 1) {
+                return 140;
+            }
+            return 145;
+        }
+        return 155;
+    }
+
     public void mergeConsecutiveCases(int i1) {
         int i = 0;
         switch (i1) {

@@ -37,9 +37,12 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -232,42 +235,87 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(final IfStatement node) {
-        if (hasUnlabeledBreak(node)) {
-            return true;
+    public boolean visit(final Block node) {
+        SeveralIfVisitor severalIfVisitor= new SeveralIfVisitor(cuRewrite, node);
+        node.accept(severalIfVisitor);
+        return severalIfVisitor.getResult();
+    }
+
+    private final class SeveralIfVisitor extends BlockSubVisitor {
+        public SeveralIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+            super(cuRewrite, startNode);
         }
 
-        Variable variable= extractVariableAndValues(node);
-        if (variable == null) {
-            return true;
-        }
-
-        Expression switchExpression= variable.name;
-        List<SwitchCaseSection> cases= new ArrayList<>();
-        Statement remainingStatement= null;
-
-        Set<String> variableDeclarationIds= new HashSet<>();
-        IfStatement currentNode= node;
-        while (ASTNodes.isSameVariable(switchExpression, variable.name)) {
-            if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
-                // Cannot declare two variables with the same name in two cases
+        @Override
+        public boolean visit(final IfStatement node) {
+            if (!getResult() || hasUnlabeledBreak(node)) {
                 return true;
             }
 
-            cases.add(new SwitchCaseSection(variable.constantValues, ASTNodes.asList(currentNode.getThenStatement())));
-            remainingStatement= currentNode.getElseStatement();
-
-            variable= extractVariableAndValues(remainingStatement);
-
+            Variable variable= extractVariableAndValues(node);
             if (variable == null) {
-                break;
+                return true;
             }
 
-            currentNode= (IfStatement) remainingStatement;
+            Expression switchExpression= variable.name;
+            List<IfStatement> ifStatements= new ArrayList<>();
+            List<SwitchCaseSection> cases= new ArrayList<>();
+            Statement remainingStatement= null;
+
+            Set<String> variableDeclarationIds= new HashSet<>();
+            IfStatement ifStatement= node;
+            boolean isFallingThrough= true;
+
+            do {
+                IfStatement currentNode= ifStatement;
+
+                while (ASTNodes.isSameVariable(switchExpression, variable.name)) {
+                    if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
+                        // Cannot declare two variables with the same name in two cases
+                        return true;
+                    }
+
+                    cases.add(new SwitchCaseSection(variable.constantValues,
+                            ASTNodes.asList(currentNode.getThenStatement())));
+
+                    if (!ASTNodes.fallsThrough(currentNode.getThenStatement())) {
+                        isFallingThrough= false;
+                    }
+
+                    remainingStatement= currentNode.getElseStatement();
+
+                    if (remainingStatement == null) {
+                        break;
+                    }
+
+                    variable= extractVariableAndValues(remainingStatement);
+
+                    if (variable == null) {
+                        break;
+                    }
+
+                    currentNode= (IfStatement) remainingStatement;
+                }
+
+                ifStatements.add(ifStatement);
+                ifStatement= ASTNodes.as(ASTNodes.getNextSibling(ifStatement), IfStatement.class);
+                variable= extractVariableAndValues(ifStatement);
+            } while (isFallingThrough && ifStatement != null && remainingStatement == null && variable != null && ASTNodes.isSameVariable(switchExpression, variable.name));
+
+            List<SwitchCaseSection> filteredCases= filterDuplicateCaseValues(cases);
+            return maybeReplaceWithSwitchStatement(ifStatements, switchExpression, filteredCases, remainingStatement);
         }
 
-        List<SwitchCaseSection> filteredCases= filterDuplicateCaseValues(cases);
-        return maybeReplaceWithSwitchStatement(node, switchExpression, filteredCases, remainingStatement);
+        private boolean maybeReplaceWithSwitchStatement(final List<IfStatement> ifStatements, final Expression switchExpression,
+                final List<SwitchCaseSection> cases, final Statement remainingStatement) {
+            if (switchExpression != null && cases.size() > 2) {
+                replaceWithSwitchStatement(ifStatements, switchExpression, cases, remainingStatement);
+                setResult(false);
+                return false;
+            }
+
+            return true;
+        }
     }
 
     private boolean hasUnlabeledBreak(final IfStatement node) {
@@ -289,16 +337,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         return false;
-    }
-
-    private boolean maybeReplaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
-            final List<SwitchCaseSection> cases, final Statement remainingStatement) {
-        if (switchExpression != null && cases.size() > 2) {
-            replaceWithSwitchStatement(node, switchExpression, cases, remainingStatement);
-            return false;
-        }
-
-        return true;
     }
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
@@ -330,7 +368,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         return results;
     }
 
-    private void replaceWithSwitchStatement(final IfStatement node, final Expression switchExpression,
+    private void replaceWithSwitchStatement(final List<IfStatement> ifStatements, final Expression switchExpression,
             final List<SwitchCaseSection> cases, final Statement remainingStatement) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -344,7 +382,11 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             addCaseWithStatements(switchStatement, null, ASTNodes.asList(remainingStatement));
         }
 
-        cuRewrite.getASTRewrite().replace(node, switchStatement, null);
+        for (int i= 0; i < ifStatements.size() - 1; i++) {
+            rewrite.removeButKeepComment(ifStatements.get(i), null);
+        }
+
+        rewrite.replace(ifStatements.get(ifStatements.size() - 1), switchStatement, null);
     }
 
     private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
