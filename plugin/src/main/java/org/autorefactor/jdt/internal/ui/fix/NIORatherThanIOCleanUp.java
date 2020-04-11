@@ -63,13 +63,11 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final MethodInvocation node) {
-            return NIORatherThanIOCleanUp.this
-                    .maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
         }
         @Override
         public boolean visit(final Block node) {
-            return NIORatherThanIOCleanUp.this
-                    .maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

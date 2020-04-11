@@ -47,7 +47,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final ForStatement node) {
-            return FillRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
+            return maybeRefactorForStatement(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
     }

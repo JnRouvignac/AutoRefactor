@@ -52,8 +52,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final IfStatement node) {
-            return ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this
-                    .maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

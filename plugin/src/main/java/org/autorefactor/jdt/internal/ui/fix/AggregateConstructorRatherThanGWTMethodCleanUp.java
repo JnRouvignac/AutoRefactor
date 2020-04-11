@@ -50,8 +50,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
     private final class RefactoringWithArrayListOrHashMapClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final MethodInvocation node) {
-            return AggregateConstructorRatherThanGWTMethodCleanUp.this
-                    .maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

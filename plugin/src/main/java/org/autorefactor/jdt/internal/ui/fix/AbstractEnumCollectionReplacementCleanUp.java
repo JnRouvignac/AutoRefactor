@@ -52,8 +52,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final ClassInstanceCreation node) {
-            return AbstractEnumCollectionReplacementCleanUp.this
-                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

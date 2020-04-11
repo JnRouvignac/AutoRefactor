@@ -58,14 +58,12 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final MethodInvocation node) {
-            return AbstractUnitTestCleanUp.this
-                    .maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
         }
 
         @Override
         public boolean visit(final IfStatement node) {
-            return AbstractUnitTestCleanUp.this
-                    .maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

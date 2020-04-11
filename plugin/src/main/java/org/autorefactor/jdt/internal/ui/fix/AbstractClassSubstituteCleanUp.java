@@ -56,7 +56,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final Block node) {
-            return AbstractClassSubstituteCleanUp.this.maybeRefactorBlock(node,
+            return maybeRefactorBlock(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
     }

@@ -95,14 +95,12 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final ClassInstanceCreation node) {
-            return LambdaExpressionRatherThanComparatorCleanUp.this
-                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
+            return maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
         }
 
         @Override
         public boolean visit(final LambdaExpression node) {
-            return LambdaExpressionRatherThanComparatorCleanUp.this
-                    .maybeRefactorLambdaExpression(node, getClassesToUseWithImport());
+            return maybeRefactorLambdaExpression(node, getClassesToUseWithImport());
         }
     }
 

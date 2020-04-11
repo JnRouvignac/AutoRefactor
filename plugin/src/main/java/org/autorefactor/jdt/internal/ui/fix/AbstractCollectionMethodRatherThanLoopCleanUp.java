@@ -67,8 +67,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final Block node) {
-            return AbstractCollectionMethodRatherThanLoopCleanUp.this
-                    .maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

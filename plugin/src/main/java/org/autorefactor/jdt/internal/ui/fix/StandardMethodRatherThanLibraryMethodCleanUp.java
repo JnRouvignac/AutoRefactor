@@ -46,7 +46,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final MethodInvocation node) {
-            return StandardMethodRatherThanLibraryMethodCleanUp.this.maybeRefactorMethodInvocation(node,
+            return maybeRefactorMethodInvocation(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
     }

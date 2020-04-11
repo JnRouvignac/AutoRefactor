@@ -61,8 +61,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final Block node) {
-            return PatternRatherThanRegExStringCleanUp.this
-                    .maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 

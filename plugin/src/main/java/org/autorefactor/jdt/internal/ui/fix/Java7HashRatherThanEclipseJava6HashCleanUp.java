@@ -170,8 +170,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(final MethodDeclaration node) {
-            return Java7HashRatherThanEclipseJava6HashCleanUp.this
-                    .maybeRefactorMethodDeclaration(node, getClassesToUseWithImport(), getImportsToAdd());
+            return maybeRefactorMethodDeclaration(node, getClassesToUseWithImport(), getImportsToAdd());
         }
     }
 
