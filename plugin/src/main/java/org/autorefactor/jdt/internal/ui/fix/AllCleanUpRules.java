@@ -115,6 +115,7 @@ public final class AllCleanUpRules {
                 new CollectionCleanUp(), new AddAllRatherThanLoopCleanUp(),
                 new FillRatherThanLoopCleanUp(),
                 new JoinRatherThanLoopCleanUp(),
+                new CollectionsAddAllRatherThanAsListCleanUp(),
                 new ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp(), new BreakRatherThanPassiveIterationsCleanUp(),
                 new UpdateSetRatherThanTestingFirstCleanUp(), new IsEmptyRatherThanSizeCleanUp(), new MapCleanUp(),
                 new EntrySetRatherThanKeySetAndValueSearchCleanUp(), new MethodOnMapRatherThanMethodOnKeySetCleanUp(),
