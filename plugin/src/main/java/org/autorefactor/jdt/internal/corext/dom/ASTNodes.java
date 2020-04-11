@@ -2094,19 +2094,19 @@ public final class ASTNodes {
      * provided method signature. The method signature is compared against the
      * erasure of the invoked method.
      *
-     * @param node                         the method invocation to compare
-     * @param typeQualifiedName            the qualified name of the type declaring
-     *                                     the method
-     * @param methodName                   the method name
-     * @param parameterTypesQualifiedNames the qualified names of the parameter
+     * @param actualMethod                 the actual method declaration
+     * @param typeQualifiedName            the expected qualified name of the type declaring
+     *                                     the expected method
+     * @param methodName                   the expected method name
+     * @param parameterTypesQualifiedNames the expected qualified names of the parameter
      *                                     types
      * @return true if the provided method invocation matches the provided method
      *         signature, false otherwise
      */
-    public static boolean usesGivenSignature(final MethodInvocation node, final String typeQualifiedName, final String methodName,
+    public static boolean usesGivenSignature(final MethodInvocation actualMethod, final String typeQualifiedName, final String methodName,
             final String... parameterTypesQualifiedNames) {
-        return node != null
-                && usesGivenSignature(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+        return actualMethod != null
+                && usesGivenSignature(actualMethod.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -2114,45 +2114,45 @@ public final class ASTNodes {
      * provided method signature. The method signature is compared against the
      * erasure of the declared method.
      *
-     * @param node                         the method declaration to compare
-     * @param typeQualifiedName            the qualified name of the type declaring
-     *                                     the method
-     * @param methodName                   the method name
-     * @param parameterTypesQualifiedNames the qualified names of the parameter
+     * @param actualMethod                 the actual method declaration
+     * @param typeQualifiedName            the expected qualified name of the type declaring
+     *                                     the expected method
+     * @param methodName                   the expected method name
+     * @param parameterTypesQualifiedNames the expected qualified names of the parameter
      *                                     types
      * @return true if the provided method declaration matches the provided method
      *         signature, false otherwise
      */
-    public static boolean usesGivenSignature(final MethodDeclaration node, final String typeQualifiedName, final String methodName,
+    public static boolean usesGivenSignature(final MethodDeclaration actualMethod, final String typeQualifiedName, final String methodName,
             final String... parameterTypesQualifiedNames) {
-        return node != null
-                && usesGivenSignature(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+        return actualMethod != null
+                && usesGivenSignature(actualMethod.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
      * Returns whether the provided method binding has the provided method signature. The method
      * signature is compared against the erasure of the invoked method.
      *
-     * @param methodBinding the method binding to compare
-     * @param typeQualifiedName the qualified name of the type declaring the method
-     * @param methodName the method name
-     * @param parameterTypesQualifiedNames the qualified names of the parameter types
+     * @param actualMethodBinding          the actual method binding
+     * @param typeQualifiedName            the expected qualified name of the type declaring the method
+     * @param methodName                   the expected method name
+     * @param parameterTypesQualifiedNames the expected qualified names of the parameter types
      * @return true if the provided method invocation matches the provided method signature, false
      *         otherwise
      */
-    public static boolean usesGivenSignature(final IMethodBinding methodBinding, final String typeQualifiedName, final String methodName,
+    public static boolean usesGivenSignature(final IMethodBinding actualMethodBinding, final String typeQualifiedName, final String methodName,
             final String... parameterTypesQualifiedNames) {
         // Let's do the fast checks first
-        if (methodBinding == null || !methodName.equals(methodBinding.getName())
-                || methodBinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
+        if (actualMethodBinding == null || !methodName.equals(actualMethodBinding.getName())
+                || actualMethodBinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
             return false;
         }
 
         // OK more heavy checks now
-        ITypeBinding declaringClass= methodBinding.getDeclaringClass();
+        ITypeBinding declaringClass= actualMethodBinding.getDeclaringClass();
         ITypeBinding implementedType= findImplementedType(declaringClass, typeQualifiedName);
 
-        if (parameterTypesMatch(implementedType, methodBinding, parameterTypesQualifiedNames)) {
+        if (parameterTypesMatch(implementedType, actualMethodBinding, parameterTypesQualifiedNames)) {
             return true;
         }
 
@@ -2160,12 +2160,12 @@ public final class ASTNodes {
         IMethodBinding overriddenMethod= findOverridenMethod(declaringClass, typeQualifiedName, methodName,
                 parameterTypesQualifiedNames);
 
-        if (overriddenMethod != null && methodBinding.overrides(overriddenMethod)) {
+        if (overriddenMethod != null && actualMethodBinding.overrides(overriddenMethod)) {
             return true;
         }
 
-        IMethodBinding methodDeclaration= methodBinding.getMethodDeclaration();
-        return methodDeclaration != null && methodDeclaration != methodBinding
+        IMethodBinding methodDeclaration= actualMethodBinding.getMethodDeclaration();
+        return methodDeclaration != null && methodDeclaration != actualMethodBinding
                 && usesGivenSignature(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
