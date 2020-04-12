@@ -37,76 +37,76 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation mi) {
-        MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
+	@Override
+	public boolean visit(final MethodInvocation mi) {
+		MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
 
-        if (miExpression != null && miExpression.getExpression() != null && ASTNodes.as(miExpression.getExpression(), ThisExpression.class) == null
-                && ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
-            }
+		if (miExpression != null && miExpression.getExpression() != null && ASTNodes.as(miExpression.getExpression(), ThisExpression.class) == null
+				&& ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
+				return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
+			}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "size"); //$NON-NLS-1$
-            }
+			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
+				return removeInvocationOfMapKeySet(miExpression, mi, "size"); //$NON-NLS-1$
+			}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "isEmpty"); //$NON-NLS-1$
-            }
+			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
+				return removeInvocationOfMapKeySet(miExpression, mi, "isEmpty"); //$NON-NLS-1$
+			}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    // If parent is not an expression statement, the MethodInvocation must return a
-                    // boolean.
-                    // In that case, we cannot replace because `Map.removeKey(key) != null`
-                    // is not strictly equivalent to `Map.keySet().remove(key)`
-                    && mi.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                return removeInvocationOfMapKeySet(miExpression, mi, "remove"); //$NON-NLS-1$
-            }
+			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+					// If parent is not an expression statement, the MethodInvocation must return a
+					// boolean.
+					// In that case, we cannot replace because `Map.removeKey(key) != null`
+					// is not strictly equivalent to `Map.keySet().remove(key)`
+					&& mi.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+				return removeInvocationOfMapKeySet(miExpression, mi, "remove"); //$NON-NLS-1$
+			}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "containsKey"); //$NON-NLS-1$
-            }
-        }
+			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+				return removeInvocationOfMapKeySet(miExpression, mi, "containsKey"); //$NON-NLS-1$
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
-            final String methodName) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().replace(actualMi,
-                ast.invoke(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))), null);
-        return false;
-    }
+	private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
+			final String methodName) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		cuRewrite.getASTRewrite().replace(actualMi,
+				ast.invoke(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))), null);
+		return false;
+	}
 }

@@ -32,55 +32,55 @@ import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
 public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+	@Override
+	public boolean visit(final IfStatement node) {
+		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-        if (secondIf != null && ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(secondIf.getExpression())
-                && ASTSemanticMatcher.INSTANCE.matchOpposite(node.getExpression(), secondIf.getExpression())
-                && (secondIf.getElseStatement() == null || !ASTNodes.isExceptionExpected(node))
-                && (!ASTNodes.fallsThrough(node.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getThenStatement()))) {
-            removeCondition(secondIf);
+		if (secondIf != null && ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(secondIf.getExpression())
+				&& ASTSemanticMatcher.INSTANCE.matchOpposite(node.getExpression(), secondIf.getExpression())
+				&& (secondIf.getElseStatement() == null || !ASTNodes.isExceptionExpected(node))
+				&& (!ASTNodes.fallsThrough(node.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getThenStatement()))) {
+			removeCondition(secondIf);
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void removeCondition(final IfStatement secondIf) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void removeCondition(final IfStatement secondIf) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getThenStatement()), null);
-    }
+		rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getThenStatement()), null);
+	}
 }

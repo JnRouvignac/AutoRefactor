@@ -32,40 +32,40 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 /** Helper implementation for Eclipse preferences. */
 public class EclipsePreferences implements Preferences {
-    private final IPreferenceStore preferenceStore;
+	private final IPreferenceStore preferenceStore;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param preferenceStore the preference store
-     */
-    public EclipsePreferences(IPreferenceStore preferenceStore) {
-        this.preferenceStore= preferenceStore;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param preferenceStore the preference store
+	 */
+	public EclipsePreferences(IPreferenceStore preferenceStore) {
+		this.preferenceStore= preferenceStore;
+	}
 
-    private boolean getBoolean(PreferenceConstants pref) {
-        return preferenceStore.getBoolean(pref.getName());
-    }
+	private boolean getBoolean(PreferenceConstants pref) {
+		return preferenceStore.getBoolean(pref.getName());
+	}
 
-    /**
-     * True if debug mode is on.
-     *
-     * @return True if debug mode is on.
-     */
-    @Override
-    public boolean debugModeOn() {
-        return getBoolean(PreferenceConstants.DEBUG_MODE_ON);
-    }
+	/**
+	 * True if debug mode is on.
+	 *
+	 * @return True if debug mode is on.
+	 */
+	@Override
+	public boolean debugModeOn() {
+		return getBoolean(PreferenceConstants.DEBUG_MODE_ON);
+	}
 
-    /**
-     * True if it is enabled.
-     *
-     * @param clazz the class
-     *
-     * @return True if it is enabled.
-     */
-    @Override
-    public boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz) {
-        return preferenceStore.getBoolean(clazz.getCanonicalName());
-    }
+	/**
+	 * True if it is enabled.
+	 *
+	 * @param clazz the class
+	 *
+	 * @return True if it is enabled.
+	 */
+	@Override
+	public boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz) {
+		return preferenceStore.getBoolean(clazz.getCanonicalName());
+	}
 }

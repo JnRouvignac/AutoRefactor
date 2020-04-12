@@ -42,145 +42,145 @@ import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
 public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(cuRewrite,
-                node);
-        node.accept(catchesAndFollowingCodeVisitor);
-        return catchesAndFollowingCodeVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(cuRewrite,
+				node);
+		node.accept(catchesAndFollowingCodeVisitor);
+		return catchesAndFollowingCodeVisitor.getResult();
+	}
 
-    private static final class CatchesAndFollowingCodeVisitor extends BlockSubVisitor {
-        public CatchesAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private static final class CatchesAndFollowingCodeVisitor extends BlockSubVisitor {
+		public CatchesAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final TryStatement node) {
-            return visitStatement(node);
-        }
+		@Override
+		public boolean visit(final TryStatement node) {
+			return visitStatement(node);
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            return visitStatement(node);
-        }
+		@Override
+		public boolean visit(final IfStatement node) {
+			return visitStatement(node);
+		}
 
-        private boolean visitStatement(final Statement node) {
-            if (getResult()) {
-                List<Statement> redundantStatements= new ArrayList<>();
-                collectStatements(node, redundantStatements);
-                return maybeRemoveRedundantCode(node, redundantStatements);
-            }
+		private boolean visitStatement(final Statement node) {
+			if (getResult()) {
+				List<Statement> redundantStatements= new ArrayList<>();
+				collectStatements(node, redundantStatements);
+				return maybeRemoveRedundantCode(node, redundantStatements);
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        @SuppressWarnings("unchecked")
-        private void collectStatements(final Statement node, final List<Statement> redundantStatements) {
-            if (node == null) {
-                return;
-            }
+		@SuppressWarnings("unchecked")
+		private void collectStatements(final Statement node, final List<Statement> redundantStatements) {
+			if (node == null) {
+				return;
+			}
 
-            TryStatement ts= ASTNodes.as(node, TryStatement.class);
-            IfStatement is= ASTNodes.as(node, IfStatement.class);
+			TryStatement ts= ASTNodes.as(node, TryStatement.class);
+			IfStatement is= ASTNodes.as(node, IfStatement.class);
 
-            if (ts != null && ts.getFinally() == null) {
-                for (CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
-                    doCollectStatements(catchClause.getBody(), redundantStatements);
-                }
-            } else if (is != null) {
-                doCollectStatements(is.getThenStatement(), redundantStatements);
-                doCollectStatements(is.getElseStatement(), redundantStatements);
-            }
-        }
+			if (ts != null && ts.getFinally() == null) {
+				for (CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
+					doCollectStatements(catchClause.getBody(), redundantStatements);
+				}
+			} else if (is != null) {
+				doCollectStatements(is.getThenStatement(), redundantStatements);
+				doCollectStatements(is.getElseStatement(), redundantStatements);
+			}
+		}
 
-        private void doCollectStatements(Statement node, final List<Statement> redundantStatements) {
-            if (node == null) {
-                return;
-            }
+		private void doCollectStatements(Statement node, final List<Statement> redundantStatements) {
+			if (node == null) {
+				return;
+			}
 
-            redundantStatements.add(node);
-            List<Statement> statements= ASTNodes.asList(node);
+			redundantStatements.add(node);
+			List<Statement> statements= ASTNodes.asList(node);
 
-            if (Utils.isEmpty(statements)) {
-                return;
-            }
+			if (Utils.isEmpty(statements)) {
+				return;
+			}
 
-            node= statements.get(statements.size() - 1);
-            collectStatements(node, redundantStatements);
-        }
+			node= statements.get(statements.size() - 1);
+			collectStatements(node, redundantStatements);
+		}
 
-        private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
-            if (redundantStatements.isEmpty()) {
-                return true;
-            }
+		private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
+			if (redundantStatements.isEmpty()) {
+				return true;
+			}
 
-            List<Statement> referenceStatements= new ArrayList<>();
+			List<Statement> referenceStatements= new ArrayList<>();
 
-            Statement nextSibling= ASTNodes.getNextSibling(node);
-            while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {
-                referenceStatements.add(nextSibling);
-                nextSibling= ASTNodes.getNextSibling(nextSibling);
-            }
+			Statement nextSibling= ASTNodes.getNextSibling(node);
+			while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {
+				referenceStatements.add(nextSibling);
+				nextSibling= ASTNodes.getNextSibling(nextSibling);
+			}
 
-            if (nextSibling != null) {
-                referenceStatements.add(nextSibling);
-                ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			if (nextSibling != null) {
+				referenceStatements.add(nextSibling);
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-                for (Statement redundantStatement : redundantStatements) {
-                    List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
+				for (Statement redundantStatement : redundantStatements) {
+					List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
 
-                    if (stmtsToCompare.size() > referenceStatements.size()) {
-                        stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStatements.size(),
-                                stmtsToCompare.size());
-                    }
+					if (stmtsToCompare.size() > referenceStatements.size()) {
+						stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStatements.size(),
+								stmtsToCompare.size());
+					}
 
-                    if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
-                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+					if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
+						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                        if (redundantStatement instanceof Block) {
-                            rewrite.remove(stmtsToCompare, null);
-                        } else {
-                            rewrite.replace(redundantStatement, ast.block(), null);
-                        }
+						if (redundantStatement instanceof Block) {
+							rewrite.remove(stmtsToCompare, null);
+						} else {
+							rewrite.replace(redundantStatement, ast.block(), null);
+						}
 
-                        setResult(false);
-                        return false;
-                    }
-                }
-            }
+						setResult(false);
+						return false;
+					}
+				}
+			}
 
-            return true;
-        }
-    }
+			return true;
+		}
+	}
 }

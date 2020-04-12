@@ -32,34 +32,34 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * are not handled.
  */
 public class NotImplementedException extends AutoRefactorException {
-    private static final String DEFAULT_MESSAGE= "Code is not implemented"; //$NON-NLS-1$
+	private static final String DEFAULT_MESSAGE= "Code is not implemented"; //$NON-NLS-1$
 
-    /**
-     * Class constructor to use when some code is not implemented.
-     *
-     * @param node the node from which to retrieve the source location
-     */
-    public NotImplementedException(final ASTNode node) {
-        this(node, node);
-    }
+	/**
+	 * Class constructor to use when some code is not implemented.
+	 *
+	 * @param node the node from which to retrieve the source location
+	 */
+	public NotImplementedException(final ASTNode node) {
+		this(node, node);
+	}
 
-    /**
-     * Constructor to use when the provided object was not expected.
-     *
-     * @param node  the node from which to retrieve the source location
-     * @param cause the unexpected object
-     */
-    public NotImplementedException(final ASTNode node, final Object cause) {
-        this(node, "for an object of type " + (cause != null ? cause.getClass() : null)); //$NON-NLS-1$
-    }
+	/**
+	 * Constructor to use when the provided object was not expected.
+	 *
+	 * @param node  the node from which to retrieve the source location
+	 * @param cause the unexpected object
+	 */
+	public NotImplementedException(final ASTNode node, final Object cause) {
+		this(node, "for an object of type " + (cause != null ? cause.getClass() : null)); //$NON-NLS-1$
+	}
 
-    /**
-     * Constructor to use with a provided reason.
-     *
-     * @param node   the node from which to retrieve the source location
-     * @param reason an additional message
-     */
-    public NotImplementedException(final ASTNode node, final String reason) {
-        super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	/**
+	 * Constructor to use with a provided reason.
+	 *
+	 * @param node   the node from which to retrieve the source location
+	 * @param reason an additional message
+	 */
+	public NotImplementedException(final ASTNode node, final String reason) {
+		super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

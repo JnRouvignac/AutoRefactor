@@ -26,59 +26,59 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class DoubleCompareRatherThanEqualitySample {
-    public boolean rewriteThoseprimitiveDoubleComparisons(double primitiveDouble1, double primitiveDouble2) {
-        boolean b;
+	public boolean rewriteThoseprimitiveDoubleComparisons(double primitiveDouble1, double primitiveDouble2) {
+		boolean b;
 
-        // Keep this comment
-        b = Double.compare(primitiveDouble1, primitiveDouble2) == 0;
-        b = Double.compare(primitiveDouble1, primitiveDouble2) != 0;
-        b = Double.compare(primitiveDouble1, primitiveDouble2) < 0;
-        b = Double.compare(primitiveDouble1, primitiveDouble2) > 0;
-        b = Double.compare(primitiveDouble1, primitiveDouble2) <= 0;
-        b = Double.compare(primitiveDouble1, primitiveDouble2) >= 0;
+		// Keep this comment
+		b = Double.compare(primitiveDouble1, primitiveDouble2) == 0;
+		b = Double.compare(primitiveDouble1, primitiveDouble2) != 0;
+		b = Double.compare(primitiveDouble1, primitiveDouble2) < 0;
+		b = Double.compare(primitiveDouble1, primitiveDouble2) > 0;
+		b = Double.compare(primitiveDouble1, primitiveDouble2) <= 0;
+		b = Double.compare(primitiveDouble1, primitiveDouble2) >= 0;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseObjectDoubleComparisons(Double objectDouble1, Double objectDouble2) {
-        boolean b;
+	public boolean rewriteThoseObjectDoubleComparisons(Double objectDouble1, Double objectDouble2) {
+		boolean b;
 
-        // Keep this comment
-        b = Double.compare(objectDouble1, objectDouble2) == 0;
-        b = Double.compare(objectDouble1, objectDouble2) != 0;
-        b = Double.compare(objectDouble1, objectDouble2) < 0;
-        b = Double.compare(objectDouble1, objectDouble2) > 0;
-        b = Double.compare(objectDouble1, objectDouble2) <= 0;
-        b = Double.compare(objectDouble1, objectDouble2) >= 0;
+		// Keep this comment
+		b = Double.compare(objectDouble1, objectDouble2) == 0;
+		b = Double.compare(objectDouble1, objectDouble2) != 0;
+		b = Double.compare(objectDouble1, objectDouble2) < 0;
+		b = Double.compare(objectDouble1, objectDouble2) > 0;
+		b = Double.compare(objectDouble1, objectDouble2) <= 0;
+		b = Double.compare(objectDouble1, objectDouble2) >= 0;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseDoubleComparisons(double primitiveDouble, Double objectDouble) {
-        boolean b;
+	public boolean rewriteThoseDoubleComparisons(double primitiveDouble, Double objectDouble) {
+		boolean b;
 
-        // Keep this comment
-        b = Double.compare(primitiveDouble, objectDouble) == 0;
-        b = Double.compare(primitiveDouble, objectDouble) != 0;
-        b = Double.compare(primitiveDouble, objectDouble) < 0;
-        b = Double.compare(primitiveDouble, objectDouble) > 0;
-        b = Double.compare(primitiveDouble, objectDouble) <= 0;
-        b = Double.compare(primitiveDouble, objectDouble) >= 0;
+		// Keep this comment
+		b = Double.compare(primitiveDouble, objectDouble) == 0;
+		b = Double.compare(primitiveDouble, objectDouble) != 0;
+		b = Double.compare(primitiveDouble, objectDouble) < 0;
+		b = Double.compare(primitiveDouble, objectDouble) > 0;
+		b = Double.compare(primitiveDouble, objectDouble) <= 0;
+		b = Double.compare(primitiveDouble, objectDouble) >= 0;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseExpression(double primitiveDouble, Double objectDouble) {
-        boolean b;
+	public boolean rewriteThoseExpression(double primitiveDouble, Double objectDouble) {
+		boolean b;
 
-        // Keep this comment
-        b = Double.compare(primitiveDouble, objectDouble * 2) == 0;
-        b = Double.compare(primitiveDouble, objectDouble * 2) != 0;
-        b = Double.compare(primitiveDouble, objectDouble * 2) < 0;
-        b = Double.compare(primitiveDouble, objectDouble * 2) > 0;
-        b = Double.compare(primitiveDouble, objectDouble * 2) <= 0;
-        b = Double.compare(primitiveDouble, objectDouble * 2) >= 0;
+		// Keep this comment
+		b = Double.compare(primitiveDouble, objectDouble * 2) == 0;
+		b = Double.compare(primitiveDouble, objectDouble * 2) != 0;
+		b = Double.compare(primitiveDouble, objectDouble * 2) < 0;
+		b = Double.compare(primitiveDouble, objectDouble * 2) > 0;
+		b = Double.compare(primitiveDouble, objectDouble * 2) <= 0;
+		b = Double.compare(primitiveDouble, objectDouble * 2) >= 0;
 
-        return b;
-    }
+		return b;
+	}
 }

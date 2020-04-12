@@ -38,44 +38,44 @@ import org.eclipse.text.edits.TextEdit;
 
 /** Directly rewrites source code. */
 public class SourceRewriter {
-    private final Set<SourceLocation> removals= new LinkedHashSet<>();
-    private final Map<SourceLocation, String> replacements= new LinkedHashMap<>();
+	private final Set<SourceLocation> removals= new LinkedHashSet<>();
+	private final Map<SourceLocation, String> replacements= new LinkedHashMap<>();
 
-    /**
-     * Removes the provided source location from the source.
-     *
-     * @param toRemove the source location to remove
-     */
-    public void remove(final SourceLocation toRemove) {
-        this.removals.add(toRemove);
-    }
+	/**
+	 * Removes the provided source location from the source.
+	 *
+	 * @param toRemove the source location to remove
+	 */
+	public void remove(final SourceLocation toRemove) {
+		this.removals.add(toRemove);
+	}
 
-    /**
-     * Replaces the provided source location with the replacement string in the
-     * source.
-     *
-     * @param toReplace   the source location to replace
-     * @param replacement the replacement string
-     */
-    public void replace(final SourceLocation toReplace, final String replacement) {
-        this.replacements.put(toReplace, replacement);
-    }
+	/**
+	 * Replaces the provided source location with the replacement string in the
+	 * source.
+	 *
+	 * @param toReplace   the source location to replace
+	 * @param replacement the replacement string
+	 */
+	public void replace(final SourceLocation toReplace, final String replacement) {
+		this.replacements.put(toReplace, replacement);
+	}
 
-    /**
-     * Adds the edits contained in the current instance to the provided edits for
-     * the provided document.
-     *
-     * @param document the document to edit
-     * @param edits    where to add edits
-     */
-    public void addEdits(final IDocument document, final TextEdit edits) {
-        for (SourceLocation loc : this.removals) {
-            edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
-        }
-        for (Entry<SourceLocation, String> entry : this.replacements.entrySet()) {
-            SourceLocation loc= entry.getKey();
-            String replacement= entry.getValue();
-            edits.addChild(new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement));
-        }
-    }
+	/**
+	 * Adds the edits contained in the current instance to the provided edits for
+	 * the provided document.
+	 *
+	 * @param document the document to edit
+	 * @param edits    where to add edits
+	 */
+	public void addEdits(final IDocument document, final TextEdit edits) {
+		for (SourceLocation loc : this.removals) {
+			edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
+		}
+		for (Entry<SourceLocation, String> entry : this.replacements.entrySet()) {
+			SourceLocation loc= entry.getKey();
+			String replacement= entry.getValue();
+			edits.addChild(new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement));
+		}
+	}
 }

@@ -37,58 +37,58 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  * {@link #getRefactorings(CompilationUnit)} is called next.
  */
 public interface RefactoringRule {
-    /**
-     * Returns the name of the cleanup rule suitable for displaying to the user.
-     *
-     * @return the name
-     */
-    String getName();
+	/**
+	 * Returns the name of the cleanup rule suitable for displaying to the user.
+	 *
+	 * @return the name
+	 */
+	String getName();
 
-    /**
-     * Returns a description of the cleanup rule suitable for displaying to the
-     * user.
-     *
-     * @return the description
-     */
-    String getDescription();
+	/**
+	 * Returns a description of the cleanup rule suitable for displaying to the
+	 * user.
+	 *
+	 * @return the description
+	 */
+	String getDescription();
 
-    /**
-     * Returns the motivation of the cleanup rule suitable for displaying to the
-     * user.
-     *
-     * @return the motivation
-     */
-    String getReason();
+	/**
+	 * Returns the motivation of the cleanup rule suitable for displaying to the
+	 * user.
+	 *
+	 * @return the motivation
+	 */
+	String getReason();
 
-    /**
-     * Returns all the cleanups determined for the provided compilation unit
-     * after analysis.
-     *
-     * @param astRoot the compilation unit to refactor
-     * @return all the determined cleanups
-     */
-    ASTRewrite getRefactorings(CompilationUnit astRoot);
+	/**
+	 * Returns all the cleanups determined for the provided compilation unit
+	 * after analysis.
+	 *
+	 * @param astRoot the compilation unit to refactor
+	 * @return all the determined cleanups
+	 */
+	ASTRewrite getRefactorings(CompilationUnit astRoot);
 
-    /**
-     * True if the cleanup is pre-configured.
-     *
-     * @return True if the cleanup is pre-configured.
-     */
-    boolean isByDefault();
+	/**
+	 * True if the cleanup is pre-configured.
+	 *
+	 * @return True if the cleanup is pre-configured.
+	 */
+	boolean isByDefault();
 
-    /**
-     * Returns whether the current cleanup is enabled by the preferences.
-     *
-     * @param preferences the preferences
-     * @return true if the current cleanup is enabled by the preferences, false
-     *         otherwise.
-     */
-    boolean isEnabled(Preferences preferences);
+	/**
+	 * Returns whether the current cleanup is enabled by the preferences.
+	 *
+	 * @param preferences the preferences
+	 * @return true if the current cleanup is enabled by the preferences, false
+	 *         otherwise.
+	 */
+	boolean isEnabled(Preferences preferences);
 
-    /**
-     * Sets the cleanup context before analysis.
-     *
-     * @param cuRewrite the cleanup context
-     */
-    void setRefactoringContext(CompilationUnitRewrite cuRewrite);
+	/**
+	 * Sets the cleanup context before analysis.
+	 *
+	 * @param cuRewrite the cleanup context
+	 */
+	void setRefactoringContext(CompilationUnitRewrite cuRewrite);
 }

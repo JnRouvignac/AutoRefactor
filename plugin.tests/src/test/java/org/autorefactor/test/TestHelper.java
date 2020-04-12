@@ -58,107 +58,107 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 public final class TestHelper {
-    /** Environment for unit tests. */
-    public static final Environment TEST_ENVIRONMENT= new Environment(new CurrentThreadEventLoop(), null,
-            new ThrowingLogger(), null);
+	/** Environment for unit tests. */
+	public static final Environment TEST_ENVIRONMENT= new Environment(new CurrentThreadEventLoop(), null,
+			new ThrowingLogger(), null);
 
-    private TestHelper() {
-    }
+	private TestHelper() {
+	}
 
-    public static void runTest(Callable<Void> test) throws Exception {
-        try {
-            test.call();
-        } catch (RuntimeException e) {
-            if ("org.autorefactor.util.UnhandledException".equals(e.getClass().getName()) //$NON-NLS-1$
-                    || "Unexpected exception".equals(e.getMessage())) { //$NON-NLS-1$
-                throw (Exception) e.getCause();
-            }
-            throw e;
-        }
-    }
+	public static void runTest(Callable<Void> test) throws Exception {
+		try {
+			test.call();
+		} catch (RuntimeException e) {
+			if ("org.autorefactor.util.UnhandledException".equals(e.getClass().getName()) //$NON-NLS-1$
+					|| "Unexpected exception".equals(e.getMessage())) { //$NON-NLS-1$
+				throw (Exception) e.getCause();
+			}
+			throw e;
+		}
+	}
 
-    public static String readAll(File file) throws IOException {
-        final StringBuilder sb= new StringBuilder();
-        FileInputStream input= null;
-        Reader reader= null;
-        try {
-            input= new FileInputStream(file);
-            reader= new InputStreamReader(input, "UTF-8"); //$NON-NLS-1$
-            int c= 0;
-            while ((c= reader.read()) != -1) {
-                sb.append((char) c);
-            }
-        } finally {
-            if (input != null) {
-                input.close();
-            }
-            if (reader != null) {
-                reader.close();
-            }
-        }
+	public static String readAll(File file) throws IOException {
+		final StringBuilder sb= new StringBuilder();
+		FileInputStream input= null;
+		Reader reader= null;
+		try {
+			input= new FileInputStream(file);
+			reader= new InputStreamReader(input, "UTF-8"); //$NON-NLS-1$
+			int c= 0;
+			while ((c= reader.read()) != -1) {
+				sb.append((char) c);
+			}
+		} finally {
+			if (input != null) {
+				input.close();
+			}
+			if (reader != null) {
+				reader.close();
+			}
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    public static JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
-        final JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
-        options.setTabSize(tabSize);
-        options.setJavaSERelease(javaSE);
-        return options;
-    }
+	public static JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
+		final JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
+		options.setTabSize(tabSize);
+		options.setJavaSERelease(javaSE);
+		return options;
+	}
 
-    public static String normalizeJavaSourceCode(String source) {
-        final CodeFormatter codeFormatter= createCodeFormatter(getJava7Options());
+	public static String normalizeJavaSourceCode(String source) {
+		final CodeFormatter codeFormatter= createCodeFormatter(getJava7Options());
 
-        final TextEdit edit= codeFormatter.format(K_COMPILATION_UNIT, source, 0, source.length(), // source to format
-                0, System.getProperty("line.separator") // initial indentation and line separator //$NON-NLS-1$
-        );
+		final TextEdit edit= codeFormatter.format(K_COMPILATION_UNIT, source, 0, source.length(), // source to format
+				0, System.getProperty("line.separator") // initial indentation and line separator //$NON-NLS-1$
+		);
 
-        try {
-            final IDocument document= new Document(source);
-            edit.apply(document);
-            return document.get();
-        } catch (MalformedTreeException | BadLocationException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		try {
+			final IDocument document= new Document(source);
+			edit.apply(document);
+			return document.get();
+		} catch (MalformedTreeException | BadLocationException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private static Map<String, String> getJava7Options() {
-        Map<String, String> options= DefaultCodeFormatterConstants.getEclipseDefaultSettings();
-        options.put(COMPILER_COMPLIANCE, VERSION_1_7);
-        options.put(COMPILER_CODEGEN_TARGET_PLATFORM, VERSION_1_7);
-        options.put(COMPILER_SOURCE, VERSION_1_7);
-        return options;
-    }
+	private static Map<String, String> getJava7Options() {
+		Map<String, String> options= DefaultCodeFormatterConstants.getEclipseDefaultSettings();
+		options.put(COMPILER_COMPLIANCE, VERSION_1_7);
+		options.put(COMPILER_CODEGEN_TARGET_PLATFORM, VERSION_1_7);
+		options.put(COMPILER_SOURCE, VERSION_1_7);
+		return options;
+	}
 
-    public static Collection<Object[]> samples(String samplesBaseDir, Collection<Class<?>> whitelistRules,
-            Collection<Class<?>> blacklistRules) {
-        final File samplesDir= new File(samplesBaseDir, "samples_in"); //$NON-NLS-1$
-        final File[] sampleFiles= samplesDir.listFiles(new EndsWithFileFilter("Sample.java")); //$NON-NLS-1$
-        Arrays.sort(sampleFiles);
+	public static Collection<Object[]> samples(String samplesBaseDir, Collection<Class<?>> whitelistRules,
+			Collection<Class<?>> blacklistRules) {
+		final File samplesDir= new File(samplesBaseDir, "samples_in"); //$NON-NLS-1$
+		final File[] sampleFiles= samplesDir.listFiles(new EndsWithFileFilter("Sample.java")); //$NON-NLS-1$
+		Arrays.sort(sampleFiles);
 
-        final Collection<String> whitelist= toSampleNames(whitelistRules);
-        final Collection<String> blacklist= toSampleNames(blacklistRules);
+		final Collection<String> whitelist= toSampleNames(whitelistRules);
+		final Collection<String> blacklist= toSampleNames(blacklistRules);
 
-        final List<Object[]> output= new ArrayList<>(sampleFiles.length);
-        for (File file : sampleFiles) {
-            final String fileName= file.getName();
+		final List<Object[]> output= new ArrayList<>(sampleFiles.length);
+		for (File file : sampleFiles) {
+			final String fileName= file.getName();
 
-            if (!whitelist.isEmpty() ? whitelist.contains(fileName) : !blacklist.contains(fileName)) {
-                output.add(new Object[] { fileName });
-            }
-        }
+			if (!whitelist.isEmpty() ? whitelist.contains(fileName) : !blacklist.contains(fileName)) {
+				output.add(new Object[] { fileName });
+			}
+		}
 
-        return output;
-    }
+		return output;
+	}
 
-    private static Collection<String> toSampleNames(Collection<Class<?>> clazzes) {
-        final Collection<String> results= new ArrayList<>();
-        for (Class<?> clazz : clazzes) {
-            final String name= clazz.getSimpleName();
-            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+	private static Collection<String> toSampleNames(Collection<Class<?>> clazzes) {
+		final Collection<String> results= new ArrayList<>();
+		for (Class<?> clazz : clazzes) {
+			final String name= clazz.getSimpleName();
+			results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
-        return results;
-    }
+		return results;
+	}
 }

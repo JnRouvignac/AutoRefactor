@@ -38,81 +38,81 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
 
-        if (elseCode != null && elseCode.size() == 1) {
-            IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
+		if (elseCode != null && elseCode.size() == 1) {
+			IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
 
-            if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-                return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
-                        && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
-            }
-        }
+			if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+				return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
+						&& maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStatements,
-            final Statement remainingStatements, final boolean isPositive) {
-        if (doubleStatements != null && ASTNodes.match(node.getThenStatement(), doubleStatements)) {
-            refactorBlocks(node.getExpression(), subNode, remainingStatements, isPositive);
-            return false;
-        }
+	private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStatements,
+			final Statement remainingStatements, final boolean isPositive) {
+		if (doubleStatements != null && ASTNodes.match(node.getThenStatement(), doubleStatements)) {
+			refactorBlocks(node.getExpression(), subNode, remainingStatements, isPositive);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
-            final Statement remainingStatements, final boolean isPositive) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
+			final Statement remainingStatements, final boolean isPositive) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Expression additionalCondition;
-        if (isPositive) {
-            additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
-        } else {
-            additionalCondition= ast.negate(subNode.getExpression(), Copy.COPY);
-        }
+		Expression additionalCondition;
+		if (isPositive) {
+			additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
+		} else {
+			additionalCondition= ast.negate(subNode.getExpression(), Copy.COPY);
+		}
 
-        rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
-                InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)), null);
+		rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
+				InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)), null);
 
-        if (remainingStatements != null) {
-            rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements), null);
-        } else {
-            rewrite.remove(subNode, null);
-        }
-    }
+		if (remainingStatements != null) {
+			rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements), null);
+		} else {
+			rewrite.remove(subNode, null);
+		}
+	}
 }

@@ -38,36 +38,36 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
  * @param <R> type of the results returned by this finder visitor
  */
 public class CollectorVisitor<R> extends ASTVisitor {
-    /** The actual boolean result. */
-    private final List<R> results= new ArrayList<>();
+	/** The actual boolean result. */
+	private final List<R> results= new ArrayList<>();
 
-    /**
-     * Adds the provided result to the list of results.
-     *
-     * @param result a new result
-     */
-    protected void addResult(final R result) {
-        this.results.add(result);
-    }
+	/**
+	 * Adds the provided result to the list of results.
+	 *
+	 * @param result a new result
+	 */
+	protected void addResult(final R result) {
+		this.results.add(result);
+	}
 
-    /**
-     * Adds the provided result to the list of results.
-     *
-     * @param results the new results
-     */
-    protected void addResults(final Collection<R> results) {
-        this.results.addAll(results);
-    }
+	/**
+	 * Adds the provided result to the list of results.
+	 *
+	 * @param results the new results
+	 */
+	protected void addResults(final Collection<R> results) {
+		this.results.addAll(results);
+	}
 
-    /**
-     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
-     * found result if one exists, or the default value.
-     *
-     * @param nodeToVisit the node to visit
-     * @return the results found, may be empty
-     */
-    public List<R> collect(final ASTNode nodeToVisit) {
-        nodeToVisit.accept(this);
-        return results;
-    }
+	/**
+	 * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
+	 * found result if one exists, or the default value.
+	 *
+	 * @param nodeToVisit the node to visit
+	 * @return the results found, may be empty
+	 */
+	public List<R> collect(final ASTNode nodeToVisit) {
+		nodeToVisit.accept(this);
+		return results;
+	}
 }

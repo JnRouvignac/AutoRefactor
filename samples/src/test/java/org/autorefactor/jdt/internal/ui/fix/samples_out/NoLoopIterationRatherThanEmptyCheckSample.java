@@ -28,258 +28,258 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class NoLoopIterationRatherThanEmptyCheckSample {
-    public int removeCondition(int[] integerArray) {
-        int sum = 0;
+	public int removeCondition(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeConditionOnExpression(int[] integerArray) {
-        int sum = 0;
+	public int removeConditionOnExpression(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeReversedCondition(int[] integerArray) {
-        int sum = 0;
+	public int removeReversedCondition(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeInequality(int[] integerArray) {
-        int sum = 0;
+	public int removeInequality(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeLessEquals(int[] integerArray) {
-        int sum = 0;
+	public int removeLessEquals(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeGreaterEquals(int[] integerArray) {
-        int sum = 0;
+	public int removeGreaterEquals(int[] integerArray) {
+		int sum = 0;
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i : integerArray) {
-            sum += i;
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i : integerArray) {
+			sum += i;
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeSecondCondition(int[] integerArray, boolean isEnabled) {
-        int sum = 0;
+	public int removeSecondCondition(int[] integerArray, boolean isEnabled) {
+		int sum = 0;
 
-        // Keep this comment
-        if (isEnabled) {
-            // Keep this comment too
-            for (int i : integerArray) {
-                sum += i;
-            }
-        }
+		// Keep this comment
+		if (isEnabled) {
+			// Keep this comment too
+			for (int i : integerArray) {
+				sum += i;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeLastCondition(int[] integerArray, boolean isEnabled) {
-        int sum = 0;
+	public int removeLastCondition(int[] integerArray, boolean isEnabled) {
+		int sum = 0;
 
-        // Keep this comment
-        if (isEnabled && integerArray != null) {
-            // Keep this comment too
-            for (int i : integerArray) {
-                sum += i;
-            }
-        }
+		// Keep this comment
+		if (isEnabled && integerArray != null) {
+			// Keep this comment too
+			for (int i : integerArray) {
+				sum += i;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public int removeMandatoryCondition(int[] integerArray, boolean isEnabled) {
-        int sum = 0;
+	public int removeMandatoryCondition(int[] integerArray, boolean isEnabled) {
+		int sum = 0;
 
-        // Keep this comment
-        if (isEnabled) {
-            // Keep this comment too
-            for (int i : integerArray) {
-                sum += i;
-            }
-        }
+		// Keep this comment
+		if (isEnabled) {
+			// Keep this comment too
+			for (int i : integerArray) {
+				sum += i;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    public String removeConditionForObjectArray(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String removeConditionForObjectArray(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        // Keep this comment
-        // Keep this comment too
-        for (String text : texts) {
-            builder.append(text);
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (String text : texts) {
+			builder.append(text);
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String removeConditionWithClassicForLoop(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String removeConditionWithClassicForLoop(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        // Keep this comment
-        // Keep this comment too
-        for (int i = 0; i < texts.length; i++) {
-            String text = texts[i];
-            builder.append(text);
-        }
+		// Keep this comment
+		// Keep this comment too
+		for (int i = 0; i < texts.length; i++) {
+			String text = texts[i];
+			builder.append(text);
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorNonStandardLoop(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorNonStandardLoop(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 0) {
-            for (int i = 1; i < texts.length; i++) {
-                String text = texts[i];
-                builder.append(text);
-            }
-        }
+		if (texts.length > 0) {
+			for (int i = 1; i < texts.length; i++) {
+				String text = texts[i];
+				builder.append(text);
+			}
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRemoveElse(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRemoveElse(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 0) {
-            for (int i = 0; i < texts.length; i++) {
-                String text = texts[i];
-                builder.append(text);
-            }
-        } else {
-            System.out.println("Do not lose me!");
-        }
+		if (texts.length > 0) {
+			for (int i = 0; i < texts.length; i++) {
+				String text = texts[i];
+				builder.append(text);
+			}
+		} else {
+			System.out.println("Do not lose me!");
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorElse(String[] texts, boolean isEnabled) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorElse(String[] texts, boolean isEnabled) {
+		StringBuilder builder = new StringBuilder();
 
-        if (isEnabled && texts.length > 0) {
-            for (int i = 0; i < texts.length; i++) {
-                String text = texts[i];
-                builder.append(text);
-            }
-        } else {
-            System.out.println("I want empty arrays!");
-        }
+		if (isEnabled && texts.length > 0) {
+			for (int i = 0; i < texts.length; i++) {
+				String text = texts[i];
+				builder.append(text);
+			}
+		} else {
+			System.out.println("I want empty arrays!");
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorWithRemainingStatement(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorWithRemainingStatement(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 0) {
-            for (String text : texts) {
-                builder.append(text);
-            }
-            System.out.println("I don't want empty arrays!");
-        }
+		if (texts.length > 0) {
+			for (String text : texts) {
+				builder.append(text);
+			}
+			System.out.println("I don't want empty arrays!");
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorDynamicArray(List<String> texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorDynamicArray(List<String> texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.toArray(new String[0]).length > 0) {
-            for (String text : texts.toArray(new String[0])) {
-                builder.append(text);
-            }
-        }
+		if (texts.toArray(new String[0]).length > 0) {
+			for (String text : texts.toArray(new String[0])) {
+				builder.append(text);
+			}
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorDifferentArray(String[] texts, String[] anotherTexts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorDifferentArray(String[] texts, String[] anotherTexts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 0) {
-            for (String text : anotherTexts) {
-                builder.append(text);
-            }
-        }
+		if (texts.length > 0) {
+			for (String text : anotherTexts) {
+				builder.append(text);
+			}
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorFirstCondition(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorFirstCondition(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 0 && (texts = new String[0]) != null) {
-            for (String text : texts) {
-                builder.append(text);
-            }
-        }
+		if (texts.length > 0 && (texts = new String[0]) != null) {
+			for (String text : texts) {
+				builder.append(text);
+			}
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public String doNotRefactorOtherCondition(String[] texts) {
-        StringBuilder builder = new StringBuilder();
+	public String doNotRefactorOtherCondition(String[] texts) {
+		StringBuilder builder = new StringBuilder();
 
-        if (texts.length > 1) {
-            for (String text : texts) {
-                builder.append(text);
-            }
-        }
+		if (texts.length > 1) {
+			for (String text : texts) {
+				builder.append(text);
+			}
+		}
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 
-    public int doNotRemoveORCondition(int[] integerArray, boolean isEnabled) {
-        int sum = 0;
+	public int doNotRemoveORCondition(int[] integerArray, boolean isEnabled) {
+		int sum = 0;
 
-        if (isEnabled || integerArray.length > 0) {
-            for (int i : integerArray) {
-                sum += i;
-            }
-        }
+		if (isEnabled || integerArray.length > 0) {
+			for (int i : integerArray) {
+				sum += i;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 }

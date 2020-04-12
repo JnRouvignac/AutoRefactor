@@ -30,110 +30,110 @@ import java.util.Set;
 
 public class UpdateSetRatherThanTestingFirstSample {
 
-    public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
-        // Keep this comment
-        if (!col.contains(s)) {
-            col.add(s);
-            System.out.println("OK");
-        } else {
-            System.out.println("KO");
-        }
-    }
+	public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
+		// Keep this comment
+		if (!col.contains(s)) {
+			col.add(s);
+			System.out.println("OK");
+		} else {
+			System.out.println("KO");
+		}
+	}
 
-    public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
-        // Keep this comment
-        if (col.contains(s)) {
-            System.out.println("KO");
-        } else {
-            col.add(s);
-            System.out.println("OK");
-        }
-    }
+	public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
+		// Keep this comment
+		if (col.contains(s)) {
+			System.out.println("KO");
+		} else {
+			col.add(s);
+			System.out.println("OK");
+		}
+	}
 
-    public void replaceCheckOnSetContainsOneAddStatement(Set<String> col, String s) {
-        // Keep this comment
-        if (col.contains(s)) {
-        } else {
-            col.add(s);
-        }
-    }
+	public void replaceCheckOnSetContainsOneAddStatement(Set<String> col, String s) {
+		// Keep this comment
+		if (col.contains(s)) {
+		} else {
+			col.add(s);
+		}
+	}
 
-    public void replaceCheckOnSetNotContainsOneAddStatement(Set<String> col, String s) {
-        // Keep this comment
-        if (!col.contains(s)) {
-            col.add(s);
-        }
-    }
+	public void replaceCheckOnSetNotContainsOneAddStatement(Set<String> col, String s) {
+		// Keep this comment
+		if (!col.contains(s)) {
+			col.add(s);
+		}
+	}
 
-    public void replaceCheckOnSetContainsBeforeRemove(Set<String> col, String s) {
-        // Keep this comment
-        if (!col.contains(s)) {
-            System.out.println("KO");
-        } else {
-            col.remove(s);
-            System.out.println("OK");
-        }
-    }
+	public void replaceCheckOnSetContainsBeforeRemove(Set<String> col, String s) {
+		// Keep this comment
+		if (!col.contains(s)) {
+			System.out.println("KO");
+		} else {
+			col.remove(s);
+			System.out.println("OK");
+		}
+	}
 
-    public void replaceCheckOnSetNotContainsBeforeRemove(Set<String> col, String s) {
-        // Keep this comment
-        if (col.contains(s)) {
-            col.remove(s);
-            System.out.println("OK");
-        } else {
-            System.out.println("KO");
-        }
-    }
+	public void replaceCheckOnSetNotContainsBeforeRemove(Set<String> col, String s) {
+		// Keep this comment
+		if (col.contains(s)) {
+			col.remove(s);
+			System.out.println("OK");
+		} else {
+			System.out.println("KO");
+		}
+	}
 
-    public void replaceCheckOnSetContainsOneRemoveStatement(Set<String> col, String s) {
-        // Keep this comment
-        if (col.contains(s)) {
-            col.remove(s);
-        }
-    }
+	public void replaceCheckOnSetContainsOneRemoveStatement(Set<String> col, String s) {
+		// Keep this comment
+		if (col.contains(s)) {
+			col.remove(s);
+		}
+	}
 
-    public void replaceCheckOnSetNotContainsOneRemoveStatement(Set<String> col, String s) {
-        // Keep this comment
-        if (!col.contains(s)) {
-        } else {
-            col.remove(s);
-        }
-    }
+	public void replaceCheckOnSetNotContainsOneRemoveStatement(Set<String> col, String s) {
+		// Keep this comment
+		if (!col.contains(s)) {
+		} else {
+			col.remove(s);
+		}
+	}
 
-    public void doNotReplaceWhenCheckedValueIsDifferent(Set<String> col) {
-        if (!col.contains("this")) {
-            col.add("that");
-            System.out.println("OK");
-        }
-        if (col.contains("this")) {
-            col.remove("that");
-            System.out.println("OK");
-        }
-    }
+	public void doNotReplaceWhenCheckedValueIsDifferent(Set<String> col) {
+		if (!col.contains("this")) {
+			col.add("that");
+			System.out.println("OK");
+		}
+		if (col.contains("this")) {
+			col.remove("that");
+			System.out.println("OK");
+		}
+	}
 
-    public void doNotReplaceWhenCollectionsAreDifferent(Set<String> col1, Set<String> col2) {
-        if (!col1.contains("that")) {
-            col2.add("that");
-            System.out.println("OK");
-        }
-        if (col1.contains("that")) {
-            col2.remove("that");
-            System.out.println("OK");
-        }
-    }
+	public void doNotReplaceWhenCollectionsAreDifferent(Set<String> col1, Set<String> col2) {
+		if (!col1.contains("that")) {
+			col2.add("that");
+			System.out.println("OK");
+		}
+		if (col1.contains("that")) {
+			col2.remove("that");
+			System.out.println("OK");
+		}
+	}
 
-    public void doNotReplaceCheckOnListContainsBeforeAdd(List<String> col, String s) {
-        if (!col.contains(s)) {
-            col.add(s);
-            System.out.println("OK");
-        } else {
-            System.out.println("KO");
-        }
-        if (!col.contains(s)) {
-            System.out.println("KO");
-        } else {
-            col.remove(s);
-            System.out.println("OK");
-        }
-    }
+	public void doNotReplaceCheckOnListContainsBeforeAdd(List<String> col, String s) {
+		if (!col.contains(s)) {
+			col.add(s);
+			System.out.println("OK");
+		} else {
+			System.out.println("KO");
+		}
+		if (!col.contains(s)) {
+			System.out.println("KO");
+		} else {
+			col.remove(s);
+			System.out.println("OK");
+		}
+	}
 }

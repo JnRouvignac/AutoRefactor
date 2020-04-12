@@ -47,192 +47,192 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        if (ASTNodes.fallsThrough(node.getBody())) {
-            ContinueVisitor continueVisitor= new ContinueVisitor(node);
-            continueVisitor.visitNode(node);
+	@Override
+	public boolean visit(final WhileStatement node) {
+		if (ASTNodes.fallsThrough(node.getBody())) {
+			ContinueVisitor continueVisitor= new ContinueVisitor(node);
+			continueVisitor.visitNode(node);
 
-            if (continueVisitor.canBeRefactored()) {
-                BreakVisitor breakVisitor= new BreakVisitor(node);
-                breakVisitor.visitNode(node);
+			if (continueVisitor.canBeRefactored()) {
+				BreakVisitor breakVisitor= new BreakVisitor(node);
+				breakVisitor.visitNode(node);
 
-                if (breakVisitor.canBeRefactored()) {
-                    replaceByIf(node, breakVisitor);
-                    return false;
-                }
-            }
-        }
+				if (breakVisitor.canBeRefactored()) {
+					replaceByIf(node, breakVisitor);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
-            if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                rewrite.remove(breakStatement, null);
-            } else {
-                rewrite.replace(breakStatement, ast.block(), null);
-            }
-        }
+		for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
+			if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(breakStatement, null);
+			} else {
+				rewrite.replace(breakStatement, ast.block(), null);
+			}
+		}
 
-        rewrite.replace(node, ast.if0(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
-    }
+		rewrite.replace(node, ast.if0(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
+	}
 
-    private static class BreakVisitor extends InterruptibleVisitor {
-        private final WhileStatement root;
-        private final List<BreakStatement> breaks= new ArrayList<>();
-        private boolean canBeRefactored= true;
+	private static class BreakVisitor extends InterruptibleVisitor {
+		private final WhileStatement root;
+		private final List<BreakStatement> breaks= new ArrayList<>();
+		private boolean canBeRefactored= true;
 
-        public BreakVisitor(final WhileStatement root) {
-            this.root= root;
-        }
+		public BreakVisitor(final WhileStatement root) {
+			this.root= root;
+		}
 
-        public List<BreakStatement> getBreaks() {
-            return breaks;
-        }
+		public List<BreakStatement> getBreaks() {
+			return breaks;
+		}
 
-        public boolean canBeRefactored() {
-            return canBeRefactored;
-        }
+		public boolean canBeRefactored() {
+			return canBeRefactored;
+		}
 
-        @Override
-        public boolean visit(final BreakStatement aBreak) {
-            if (aBreak.getLabel() != null) {
-                canBeRefactored= false;
-                return interruptVisit();
-            }
+		@Override
+		public boolean visit(final BreakStatement aBreak) {
+			if (aBreak.getLabel() != null) {
+				canBeRefactored= false;
+				return interruptVisit();
+			}
 
-            Statement parent= aBreak;
-            do {
-                parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
-            } while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
+			Statement parent= aBreak;
+			do {
+				parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
+			} while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
 
-            if (parent != root) {
-                canBeRefactored= false;
-                return interruptVisit();
-            }
+			if (parent != root) {
+				canBeRefactored= false;
+				return interruptVisit();
+			}
 
-            breaks.add(aBreak);
+			breaks.add(aBreak);
 
-            return true;
-        }
+			return true;
+		}
 
-        @Override
-        public boolean visit(final WhileStatement node) {
-            return root.equals(node);
-        }
+		@Override
+		public boolean visit(final WhileStatement node) {
+			return root.equals(node);
+		}
 
-        @Override
-        public boolean visit(final DoStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final DoStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final ForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final SwitchStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final SwitchStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final AnonymousClassDeclaration node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final AnonymousClassDeclaration node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final LambdaExpression node) {
-            return false;
-        }
-    }
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return false;
+		}
+	}
 
-    private static class ContinueVisitor extends InterruptibleVisitor {
-        private final WhileStatement root;
-        private boolean canBeRefactored= true;
+	private static class ContinueVisitor extends InterruptibleVisitor {
+		private final WhileStatement root;
+		private boolean canBeRefactored= true;
 
-        public ContinueVisitor(final WhileStatement root) {
-            this.root= root;
-        }
+		public ContinueVisitor(final WhileStatement root) {
+			this.root= root;
+		}
 
-        public boolean canBeRefactored() {
-            return canBeRefactored;
-        }
+		public boolean canBeRefactored() {
+			return canBeRefactored;
+		}
 
-        @Override
-        public boolean visit(final ContinueStatement node) {
-            canBeRefactored= false;
-            return interruptVisit();
-        }
+		@Override
+		public boolean visit(final ContinueStatement node) {
+			canBeRefactored= false;
+			return interruptVisit();
+		}
 
-        @Override
-        public boolean visit(final WhileStatement node) {
-            return root.equals(node);
-        }
+		@Override
+		public boolean visit(final WhileStatement node) {
+			return root.equals(node);
+		}
 
-        @Override
-        public boolean visit(final DoStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final DoStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final ForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final AnonymousClassDeclaration node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final AnonymousClassDeclaration node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final LambdaExpression node) {
-            return false;
-        }
-    }
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return false;
+		}
+	}
 }

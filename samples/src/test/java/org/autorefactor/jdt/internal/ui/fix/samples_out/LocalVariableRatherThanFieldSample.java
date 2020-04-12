@@ -47,131 +47,131 @@ public class LocalVariableRatherThanFieldSample {
 	@Deprecated
 	private int doNotRefactorFieldWithAnnotation;
 
-    public void refactorField() {
-    	// Keep this comment
-    	long refactorField = 123;
-        System.out.println(refactorField);
-    }
+	public void refactorField() {
+		// Keep this comment
+		long refactorField = 123;
+		System.out.println(refactorField);
+	}
 
-    public void refactorInitializedField() {
-    	// Keep this comment
-    	long refactorInitializedField = 123;
-        System.out.println(refactorInitializedField);
-    }
+	public void refactorInitializedField() {
+		// Keep this comment
+		long refactorInitializedField = 123;
+		System.out.println(refactorInitializedField);
+	}
 
-    public void refactorFieldWithComplexUse(boolean b, List<String> texts) {
-    	// Keep this comment
-    	short refactorFieldWithComplexUse = 123;
-    	if (b) {
-            System.out.println(refactorFieldWithComplexUse);
-    	} else {
-        	refactorFieldWithComplexUse = 321;
+	public void refactorFieldWithComplexUse(boolean b, List<String> texts) {
+		// Keep this comment
+		short refactorFieldWithComplexUse = 123;
+		if (b) {
+			System.out.println(refactorFieldWithComplexUse);
+		} else {
+			refactorFieldWithComplexUse = 321;
 
-    		for (String text : texts) {
-                System.out.println(text);
-                System.out.println(refactorFieldWithComplexUse);
+			for (String text : texts) {
+				System.out.println(text);
+				System.out.println(refactorFieldWithComplexUse);
 			}
-    	}
-    }
+		}
+	}
 
-    public void refactorArray() {
-    	// Keep this comment
-    	int refactorArray[] = new int[]{123};
-        System.out.println(refactorArray);
-    }
+	public void refactorArray() {
+		// Keep this comment
+		int refactorArray[] = new int[]{123};
+		System.out.println(refactorArray);
+	}
 
-    public void refactorOneFragment() {
-    	// Keep this comment
-    	int refactorOneFragment = 123;
-        System.out.println(refactorOneFragment);
-    }
+	public void refactorOneFragment() {
+		// Keep this comment
+		int refactorOneFragment = 123;
+		System.out.println(refactorOneFragment);
+	}
 
-    public void severalUses() {
-    	severalUses = 123;
-        System.out.println(severalUses);
-    }
+	public void severalUses() {
+		severalUses = 123;
+		System.out.println(severalUses);
+	}
 
-    public void severalUses(int i) {
-    	severalUses = i;
-        System.out.println(severalUses);
-    }
+	public void severalUses(int i) {
+		severalUses = i;
+		System.out.println(severalUses);
+	}
 
-    public void refactorStaticField() {
-    	// Keep this comment
-    	long refactorStaticField = 123;
-        System.out.println(refactorStaticField);
-    }
+	public void refactorStaticField() {
+		// Keep this comment
+		long refactorStaticField = 123;
+		System.out.println(refactorStaticField);
+	}
 
-    public void doNotRefactorPublicField() {
-    	doNotRefactorPublicField = 123;
-        System.out.println(doNotRefactorPublicField);
-    }
+	public void doNotRefactorPublicField() {
+		doNotRefactorPublicField = 123;
+		System.out.println(doNotRefactorPublicField);
+	}
 
-    public void doNotRefactorProtectedField() {
-    	doNotRefactorProtectedField = 123;
-        System.out.println(doNotRefactorProtectedField);
-    }
+	public void doNotRefactorProtectedField() {
+		doNotRefactorProtectedField = 123;
+		System.out.println(doNotRefactorProtectedField);
+	}
 
-    public void doNotRefactorPackageField() {
-    	doNotRefactorPackageField = 123;
-        System.out.println(doNotRefactorPackageField);
-    }
+	public void doNotRefactorPackageField() {
+		doNotRefactorPackageField = 123;
+		System.out.println(doNotRefactorPackageField);
+	}
 
-    public void doNotRefactorFieldsInSeveralMethods() {
-    	doNotRefactorFieldsInSeveralMethods = 123;
-        System.out.println(doNotRefactorFieldsInSeveralMethods);
-    }
+	public void doNotRefactorFieldsInSeveralMethods() {
+		doNotRefactorFieldsInSeveralMethods = 123;
+		System.out.println(doNotRefactorFieldsInSeveralMethods);
+	}
 
-    public void doNotRefactorFieldsInSeveralMethods(int i) {
-    	doNotRefactorFieldsInSeveralMethods = i;
-        System.out.println(doNotRefactorFieldsInSeveralMethods);
-    }
+	public void doNotRefactorFieldsInSeveralMethods(int i) {
+		doNotRefactorFieldsInSeveralMethods = i;
+		System.out.println(doNotRefactorFieldsInSeveralMethods);
+	}
 
-    public void doNotRefactorFieldConflictingLocalVariable() {
-    	doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
-    }
+	public void doNotRefactorFieldConflictingLocalVariable() {
+		doNotRefactorFieldConflictingLocalVariable = 123;
+		System.out.println(doNotRefactorFieldConflictingLocalVariable);
+	}
 
-    public void methodWithLocalVariable() {
-    	long doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
-    }
+	public void methodWithLocalVariable() {
+		long doNotRefactorFieldConflictingLocalVariable = 123;
+		System.out.println(doNotRefactorFieldConflictingLocalVariable);
+	}
 
-    public void doNotRefactorReadFieldBeforeAssignment() {
-        System.out.println(doNotRefactorReadFieldBeforeAssignment);
-    	doNotRefactorReadFieldBeforeAssignment = 123;
-        System.out.println(doNotRefactorReadFieldBeforeAssignment);
-    }
+	public void doNotRefactorReadFieldBeforeAssignment() {
+		System.out.println(doNotRefactorReadFieldBeforeAssignment);
+		doNotRefactorReadFieldBeforeAssignment = 123;
+		System.out.println(doNotRefactorReadFieldBeforeAssignment);
+	}
 
-    public void doNotRefactorFieldInOtherField() {
-    	doNotRefactorFieldInOtherField = 123;
-        System.out.println(doNotRefactorFieldInOtherField);
-    }
+	public void doNotRefactorFieldInOtherField() {
+		doNotRefactorFieldInOtherField = 123;
+		System.out.println(doNotRefactorFieldInOtherField);
+	}
 
-    public void doNotRefactorFieldWithConflictingName() {
-    	out = 123;
-        System.out.println(out);
-    }
+	public void doNotRefactorFieldWithConflictingName() {
+		out = 123;
+		System.out.println(out);
+	}
 
-    public void doNotRefactorFieldWithActiveInitializer() {
-    	doNotRefactorFieldWithActiveInitializer = true;
-        System.out.println(doNotRefactorFieldWithActiveInitializer);
-    }
+	public void doNotRefactorFieldWithActiveInitializer() {
+		doNotRefactorFieldWithActiveInitializer = true;
+		System.out.println(doNotRefactorFieldWithActiveInitializer);
+	}
 
-    public void doNotRefactorObject() {
-    	doNotRefactorObject = new Runnable() {
+	public void doNotRefactorObject() {
+		doNotRefactorObject = new Runnable() {
 			@Override
 			public void run() {
 				while (true) {
-			        System.out.println("Don't stop me!");
+					System.out.println("Don't stop me!");
 				}
 			}
-    	};
-    	doNotRefactorObject.run();
-    }
+		};
+		doNotRefactorObject.run();
+	}
 
-    public void doNotRefactorFieldWithAnnotation() {
-    	doNotRefactorFieldWithAnnotation = 123456;
-        System.out.println(doNotRefactorFieldWithAnnotation);
-    }
+	public void doNotRefactorFieldWithAnnotation() {
+		doNotRefactorFieldWithAnnotation = 123456;
+		System.out.println(doNotRefactorFieldWithAnnotation);
+	}
 }

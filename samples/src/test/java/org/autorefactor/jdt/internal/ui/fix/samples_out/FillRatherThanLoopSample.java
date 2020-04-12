@@ -28,153 +28,153 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.Arrays;
 
 public class FillRatherThanLoopSample {
-    private boolean[] booleanArray = new boolean[10];
+	private boolean[] booleanArray = new boolean[10];
 
-    public boolean[] refactorBooleanArray() {
-        boolean[] array = new boolean[10];
+	public boolean[] refactorBooleanArray() {
+		boolean[] array = new boolean[10];
 
-        // Keep this comment
-        Arrays.fill(array, true);
-        // Keep this comment too
-        Arrays.fill(array, false);
+		// Keep this comment
+		Arrays.fill(array, true);
+		// Keep this comment too
+		Arrays.fill(array, false);
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] refactorNumberArray() {
-        int[] array = new int[10];
+	public int[] refactorNumberArray() {
+		int[] array = new int[10];
 
-        // Keep this comment
-        Arrays.fill(array, 123);
-        // Keep this comment too
-        Arrays.fill(array, Integer.MAX_VALUE);
+		// Keep this comment
+		Arrays.fill(array, 123);
+		// Keep this comment too
+		Arrays.fill(array, Integer.MAX_VALUE);
 
-        return array;
-    }
+		return array;
+	}
 
-    public char[] refactorCharacterArray() {
-        char[] array = new char[10];
+	public char[] refactorCharacterArray() {
+		char[] array = new char[10];
 
-        // Keep this comment
-        Arrays.fill(array, '!');
-        // Keep this comment too
-        Arrays.fill(array, '\\');
+		// Keep this comment
+		Arrays.fill(array, '!');
+		// Keep this comment too
+		Arrays.fill(array, '\\');
 
-        return array;
-    }
+		return array;
+	}
 
-    public String[] refactorStringArray() {
-        String[] array = new String[10];
+	public String[] refactorStringArray() {
+		String[] array = new String[10];
 
-        // Keep this comment
-        Arrays.fill(array, "foo");
-        // Keep this comment too
-        Arrays.fill(array, null);
+		// Keep this comment
+		Arrays.fill(array, "foo");
+		// Keep this comment too
+		Arrays.fill(array, null);
 
-        return array;
-    }
+		return array;
+	}
 
-    public String[] refactorBackwardLoopOnArrary() {
-        String[] array = new String[10];
+	public String[] refactorBackwardLoopOnArrary() {
+		String[] array = new String[10];
 
-        // Keep this comment
-        Arrays.fill(array, "foo");
-        // Keep this comment too
-        Arrays.fill(array, "foo");
+		// Keep this comment
+		Arrays.fill(array, "foo");
+		// Keep this comment too
+		Arrays.fill(array, "foo");
 
-        return array;
-    }
+		return array;
+	}
 
-    public void refactorExternalArray() {
-        // Keep this comment
-        Arrays.fill(booleanArray, true);
-        // Keep this comment too
-        Arrays.fill(this.booleanArray, false);
-    }
+	public void refactorExternalArray() {
+		// Keep this comment
+		Arrays.fill(booleanArray, true);
+		// Keep this comment too
+		Arrays.fill(this.booleanArray, false);
+	}
 
-    public boolean[] doNotReplaceNonForEachLoop() {
-        boolean[] array = new boolean[10];
+	public boolean[] doNotReplaceNonForEachLoop() {
+		boolean[] array = new boolean[10];
 
-        for (int i = 1; i < array.length; i++) {
-            array[i] = true;
-        }
-        for (int i = 0; i < array.length - 1; i++) {
-            array[i] = false;
-        }
+		for (int i = 1; i < array.length; i++) {
+			array[i] = true;
+		}
+		for (int i = 0; i < array.length - 1; i++) {
+			array[i] = false;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public boolean[] doNotReplaceWierdLoop(int j) {
-        boolean[] array = new boolean[10];
+	public boolean[] doNotReplaceWierdLoop(int j) {
+		boolean[] array = new boolean[10];
 
-        for (int i = 0; j++ < array.length; i++) {
-            array[i] = true;
-        }
+		for (int i = 0; j++ < array.length; i++) {
+			array[i] = true;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] doNotRefactorInitWithoutConstant(int j) {
-        int[] array = new int[10];
+	public int[] doNotRefactorInitWithoutConstant(int j) {
+		int[] array = new int[10];
 
-        for (int i = 0; i < array.length; i++) {
-            array[i] = i*i;
-        }
-        for (int i = array.length - 1; i >= 0; i--) {
-            array[i] = j++;
-        }
+		for (int i = 0; i < array.length; i++) {
+			array[i] = i*i;
+		}
+		for (int i = array.length - 1; i >= 0; i--) {
+			array[i] = j++;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] doNotRefactorWithAnotherStatement() {
-        int[] array = new int[10];
+	public int[] doNotRefactorWithAnotherStatement() {
+		int[] array = new int[10];
 
-        for (int i = 0; i < array.length; i++) {
-            array[i] = 123;
-            System.out.println("Do not forget me!");
-        }
-        for (int i = array.length - 1; i >= 0; i--) {
-            System.out.println("Do not forget me!");
-            array[i] = 123;
-        }
+		for (int i = 0; i < array.length; i++) {
+			array[i] = 123;
+			System.out.println("Do not forget me!");
+		}
+		for (int i = array.length - 1; i >= 0; i--) {
+			System.out.println("Do not forget me!");
+			array[i] = 123;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] doNotRefactorWithSpecificIndex() {
-        int[] array = new int[10];
+	public int[] doNotRefactorWithSpecificIndex() {
+		int[] array = new int[10];
 
-        for (int i = 0; i < array.length; i++) {
-            array[0] = 123;
-        }
-        for (int i = 0; i < array.length; i++) {
-            array[array.length - i] = 123;
-        }
+		for (int i = 0; i < array.length; i++) {
+			array[0] = 123;
+		}
+		for (int i = 0; i < array.length; i++) {
+			array[array.length - i] = 123;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] doNotRefactorAnotherArray(int[] array3) {
-        int[] array = new int[10];
-        int[] array2 = new int[10];
+	public int[] doNotRefactorAnotherArray(int[] array3) {
+		int[] array = new int[10];
+		int[] array2 = new int[10];
 
-        for (int i = 0; i < array.length; i++) {
-            array2[i] = 123;
-        }
-        for (int i = 0; i < array.length; i++) {
-            array3[i] = 123;
-        }
+		for (int i = 0; i < array.length; i++) {
+			array2[i] = 123;
+		}
+		for (int i = 0; i < array.length; i++) {
+			array3[i] = 123;
+		}
 
-        return array;
-    }
+		return array;
+	}
 
-    public int[] doNotRefactorSpecialAssignment(int[] array) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] += 123;
-        }
+	public int[] doNotRefactorSpecialAssignment(int[] array) {
+		for (int i = 0; i < array.length; i++) {
+			array[i] += 123;
+		}
 
-        return array;
-    }
+		return array;
+	}
 }

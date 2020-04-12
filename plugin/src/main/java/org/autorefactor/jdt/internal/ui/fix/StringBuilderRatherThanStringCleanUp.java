@@ -66,403 +66,403 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
-    private static class VarOccurrenceVisitor extends ASTVisitor {
-        private final Set<SimpleName> searchedVariables;
-        private final Set<SimpleName> foundVariables= new HashSet<>();
-        private final boolean hasToVisitLoops;
-
-        /**
-         * The constructor.
-         *
-         * @param searchedVariables The variable to search
-         * @param hasToVisitLoops Has to visit loops
-         */
-        public VarOccurrenceVisitor(final Set<SimpleName> searchedVariables, final boolean hasToVisitLoops) {
-            this.searchedVariables= searchedVariables;
-            this.hasToVisitLoops= hasToVisitLoops;
-        }
-
-        /**
-         * Returns the found variables.
-         *
-         * @return the found variables.
-         */
-        public Set<SimpleName> getFoundVariables() {
-            return foundVariables;
-        }
-
-        @Override
-        public boolean visit(final SimpleName aVariable) {
-            if (searchedVariables.contains(aVariable)) {
-                foundVariables.add(aVariable);
-            }
-
-            return true;
-        }
-
-        @Override
-        public boolean visit(final ForStatement node) {
-            return hasToVisitLoops;
-        }
-
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            return hasToVisitLoops;
-        }
-
-        @Override
-        public boolean visit(final WhileStatement node) {
-            return hasToVisitLoops;
-        }
-
-        @Override
-        public boolean visit(final DoStatement node) {
-            return hasToVisitLoops;
-        }
-
-        @Override
-        public boolean visit(final TypeDeclaration node) {
-            return false;
-        }
-
-        @Override
-        public boolean visit(final LambdaExpression node) {
-            return false;
-        }
-    }
-
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name;
-    }
-
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_description;
-    }
-
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_reason;
-    }
-
-    @Override
-    public boolean visit(final Block node) {
-        StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(cuRewrite, node);
-        node.accept(stringOccurrencesVisitor);
-        return stringOccurrencesVisitor.getResult();
-    }
-
-    private final class StringOccurrencesVisitor extends BlockSubVisitor {
-        private Block blockNode;
-
-        public StringOccurrencesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-
-            blockNode= startNode;
-        }
-
-        @Override
-        public boolean visit(final VariableDeclarationStatement node) {
-            if (node.fragments().size() != 1) {
-                return true;
-            }
-
-            VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-            return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
-        }
-
-        @Override
-        public boolean visit(final VariableDeclarationExpression node) {
-            if (node.fragments().size() != 1) {
-                return true;
-            }
-
-            VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-            return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
-        }
-
-        @Override
-        public boolean visit(final SingleVariableDeclaration node) {
-            return visitVariable(node.getType(), node.resolveBinding(), node.getExtraDimensions(), node.getName(), node.getInitializer());
-        }
-
-        private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final SimpleName declaration, final Expression initializer) {
-            if (getResult() && ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
-                    && extraDimensions == 0
-                    && initializer != null
-                    && ASTNodes.as(initializer, NullLiteral.class) == null) {
-                VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-                        blockNode, true).find();
-
-                List<SimpleName> reads= varOccurrencesVisitor.getReads();
-                List<SimpleName> writes= varOccurrencesVisitor.getWrites();
-                writes.remove(declaration);
-
-                Set<SimpleName> unvisitedReads= new HashSet<>(reads);
-                Set<SimpleName> assignmentWrites= new HashSet<>();
-                Set<SimpleName> concatenationWrites= new HashSet<>();
-
-                for (SimpleName simpleName : writes) {
-                    if (!isWriteValid(simpleName, unvisitedReads, assignmentWrites, concatenationWrites)) {
-                        return true;
-                    }
-                }
-
-                if (unvisitedReads.size() == 1
-                        && !writes.isEmpty()
-                        && writes.size() == assignmentWrites.size() + concatenationWrites.size()) {
-                    Statement declarationStatement= ASTNodes.getAncestorOrNull(type, Statement.class);
-                    SimpleName finalRead= unvisitedReads.iterator().next();
-
-                    if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {
-                        replaceString(type, initializer, assignmentWrites, concatenationWrites, finalRead);
-
-                        setResult(false);
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private void replaceString(final Type type, final Expression initializer, final Set<SimpleName> assignmentWrites,
-                final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-            Class<?> builder;
-            if (getJavaMinorVersion() >= 5) {
-                builder= StringBuilder.class;
-            } else {
-                builder= StringBuffer.class;
-            }
-
-            rewrite.replace(type, ast.type(builder.getSimpleName()), null);
-
-            StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
-
-            if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-                rewrite.replace(initializer, ast.new0(builder.getSimpleName()), null);
-            } else {
-                rewrite.replace(initializer, ast.new0(builder.getSimpleName(), rewrite.createMoveTarget(initializer)), null);
-            }
-
-            for (SimpleName simpleName : assignmentWrites) {
-                Assignment assignment= (Assignment) simpleName.getParent();
-                InfixExpression concatenation= ASTNodes.as(assignment.getRightHandSide(), InfixExpression.class);
-
-                List<Expression> operands;
-                if (concatenation != null
-                        && ASTNodes.hasOperator(concatenation, InfixExpression.Operator.PLUS)) {
-                    operands= ASTNodes.allOperands(concatenation);
-                } else {
-                    operands= Arrays.asList(assignment.getRightHandSide());
-                }
-
-                Expression newExpression= rewrite.createMoveTarget(assignment.getLeftHandSide());
-
-                for (Object operand : operands) {
-                    newExpression= ast.invoke(newExpression, "append", rewrite.createMoveTarget((Expression) operand)); //$NON-NLS-1$
-                }
-
-                rewrite.replace(assignment, newExpression, null);
-            }
-
-            for (SimpleName simpleName : concatenationWrites) {
-                Assignment assignment= (Assignment) simpleName.getParent();
-                InfixExpression concatenation= (InfixExpression) assignment.getRightHandSide();
-
-                Expression newExpression= ast.invoke(rewrite.createMoveTarget(assignment.getLeftHandSide()), "append", rewrite.createMoveTarget(concatenation.getRightOperand())); //$NON-NLS-1$
-
-                if (concatenation.hasExtendedOperands()) {
-                    for (Object operand : concatenation.extendedOperands()) {
-                        newExpression= ast.invoke(newExpression, "append", rewrite.createMoveTarget((Expression) operand)); //$NON-NLS-1$
-                    }
-                }
-
-                rewrite.replace(assignment, newExpression, null);
-            }
-
-            rewrite.replace(finalRead, ast.invoke(rewrite.createMoveTarget(finalRead), "toString"), null); //$NON-NLS-1$
-        }
-
-        private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,
-                final SimpleName finalRead) {
-            if (declaration != null) {
-                Set<SimpleName> remainingWrites= new HashSet<>(writes);
-                Set<SimpleName> remainingReads= new HashSet<>(reads);
-                remainingReads.remove(finalRead);
-                Set<SimpleName> foundVariables= findVariables(declaration, remainingReads, remainingWrites,
-                        finalRead);
-
-                if (foundVariables.isEmpty()) {
-                    List<Statement> statements= ASTNodes.getNextSiblings(declaration);
-                    AtomicBoolean hasFinalReadBeenFound= new AtomicBoolean(false);
-
-                    if (isOccurrenceValid(statements, remainingWrites, remainingReads, finalRead, hasFinalReadBeenFound)) {
-                        return hasFinalReadBeenFound.get() && remainingReads.isEmpty() && remainingWrites.isEmpty();
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private boolean isOccurrenceValid(final List<Statement> statements, final Set<SimpleName> remainingWrites,
-                final Set<SimpleName> remainingReads, final SimpleName finalRead, final AtomicBoolean hasFinalReadBeenFound) {
-            for (Statement statement : statements) {
-                Set<SimpleName> foundVariables= findVariables(statement, remainingReads, remainingWrites,
-                        finalRead);
-
-                if (foundVariables.contains(finalRead)) {
-                    hasFinalReadBeenFound.set(true);
-
-                    if (!findVariables(statement, remainingReads, remainingWrites,
-                            finalRead, false).contains(finalRead)) {
-                        return false;
-                    }
-
-                    if (remainingReads.isEmpty() && remainingWrites.isEmpty()) {
-                        return true;
-                    }
-
-                    if (!foundVariables.containsAll(remainingReads)
-                            || !foundVariables.containsAll(remainingWrites)) {
-                        return false;
-                    }
-
-                    IfStatement ifStatement= ASTNodes.as(statement, IfStatement.class);
-
-                    if (ifStatement != null) {
-                        if (findVariables(ifStatement.getExpression(), remainingReads, remainingWrites,
-                                finalRead).isEmpty()
-                                && isBlockValid(remainingWrites, remainingReads, finalRead, ifStatement.getThenStatement())
-                                && isBlockValid(remainingWrites, remainingReads, finalRead, ifStatement.getElseStatement())) {
-                            remainingWrites.removeAll(foundVariables);
-                            remainingReads.removeAll(foundVariables);
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-
-                    TryStatement tryStatement= ASTNodes.as(statement, TryStatement.class);
-
-                    if (tryStatement != null
-                            && isEmptyNodes(tryStatement.resources(), remainingReads, remainingWrites,
-                                    finalRead)
-                            && isBlockValid(remainingWrites, remainingReads, finalRead, tryStatement.getBody())) {
-                        for (Object catchClause : tryStatement.catchClauses()) {
-                            if (!isBlockValid(remainingWrites, remainingReads, finalRead, ((CatchClause) catchClause).getBody())) {
-                                return false;
-                            }
-                        }
-
-                        return isBlockValid(remainingWrites, remainingReads, finalRead, tryStatement.getFinally());
-                    }
-
-                    return false;
-                }
-
-                remainingWrites.removeAll(foundVariables);
-                remainingReads.removeAll(foundVariables);
-            }
-
-            return true;
-        }
-
-        private boolean isBlockValid(final Set<SimpleName> remainingWrites, final Set<SimpleName> remainingReads,
-                final SimpleName finalRead, final Statement subStatement) {
-            Set<SimpleName> subRemainingWrites= new HashSet<>(remainingWrites);
-            Set<SimpleName> subRemainingReads= new HashSet<>(remainingReads);
-            AtomicBoolean subHasFinalReadBeenFound= new AtomicBoolean(false);
-
-            return isOccurrenceValid(ASTNodes.asList(subStatement), subRemainingWrites, subRemainingReads, finalRead, subHasFinalReadBeenFound)
-                    && subHasFinalReadBeenFound.get() == (subRemainingReads.isEmpty() && subRemainingWrites.isEmpty());
-        }
-
-        private boolean isEmptyNodes(final List<?> nodes, final Set<SimpleName> remainingReads,
-                final Set<SimpleName> remainingWrites, final SimpleName finalRead) {
-            if (nodes != null) {
-                for (Object currentNode : nodes) {
-                    if (!findVariables((ASTNode) currentNode, remainingReads, remainingWrites,
-                            finalRead).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private Set<SimpleName> findVariables(final ASTNode currentNode, final Set<SimpleName> remainingReads,
-                final Set<SimpleName> remainingWrites, final SimpleName finalRead) {
-            return findVariables(currentNode, remainingReads, remainingWrites, finalRead, true);
-        }
-
-        private Set<SimpleName> findVariables(final ASTNode currentNode, final Set<SimpleName> remainingReads,
-                final Set<SimpleName> remainingWrites, final SimpleName finalRead, final boolean hasToVisitLoops) {
-            if (currentNode == null) {
-                return new HashSet<>(0);
-            }
-
-            Set<SimpleName> searchedVariables= new HashSet<>(remainingReads);
-            searchedVariables.addAll(remainingWrites);
-            searchedVariables.add(finalRead);
-            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(searchedVariables, hasToVisitLoops);
-            currentNode.accept(varOccurrenceVisitor);
-
-            return varOccurrenceVisitor.getFoundVariables();
-        }
-
-        private boolean isWriteValid(final SimpleName simpleName, final Set<SimpleName> unvisitedReads, final Set<SimpleName> assignmentWrites, final Set<SimpleName> concatenationWrites) {
-            if (simpleName.getParent() instanceof Assignment) {
-                Assignment assignment= (Assignment) simpleName.getParent();
-
-                if (assignment.getParent() instanceof ExpressionStatement
-                        && simpleName.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY) {
-                    if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN)) {
-                        assignmentWrites.add(simpleName);
-                        return true;
-                    }
-
-                    if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
-                        InfixExpression concatenation= ASTNodes.as(assignment.getRightHandSide(), InfixExpression.class);
-
-                        if (concatenation != null
-                                && ASTNodes.hasOperator(concatenation, InfixExpression.Operator.PLUS)) {
-                            SimpleName stringRead= ASTNodes.as(concatenation.getLeftOperand(), SimpleName.class);
-
-                            if (stringRead != null
-                                    && unvisitedReads.contains(stringRead)) {
-                                unvisitedReads.remove(stringRead);
-                                concatenationWrites.add(simpleName);
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-    }
+	private static class VarOccurrenceVisitor extends ASTVisitor {
+		private final Set<SimpleName> searchedVariables;
+		private final Set<SimpleName> foundVariables= new HashSet<>();
+		private final boolean hasToVisitLoops;
+
+		/**
+		 * The constructor.
+		 *
+		 * @param searchedVariables The variable to search
+		 * @param hasToVisitLoops Has to visit loops
+		 */
+		public VarOccurrenceVisitor(final Set<SimpleName> searchedVariables, final boolean hasToVisitLoops) {
+			this.searchedVariables= searchedVariables;
+			this.hasToVisitLoops= hasToVisitLoops;
+		}
+
+		/**
+		 * Returns the found variables.
+		 *
+		 * @return the found variables.
+		 */
+		public Set<SimpleName> getFoundVariables() {
+			return foundVariables;
+		}
+
+		@Override
+		public boolean visit(final SimpleName aVariable) {
+			if (searchedVariables.contains(aVariable)) {
+				foundVariables.add(aVariable);
+			}
+
+			return true;
+		}
+
+		@Override
+		public boolean visit(final ForStatement node) {
+			return hasToVisitLoops;
+		}
+
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			return hasToVisitLoops;
+		}
+
+		@Override
+		public boolean visit(final WhileStatement node) {
+			return hasToVisitLoops;
+		}
+
+		@Override
+		public boolean visit(final DoStatement node) {
+			return hasToVisitLoops;
+		}
+
+		@Override
+		public boolean visit(final TypeDeclaration node) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return false;
+		}
+	}
+
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name;
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_description;
+	}
+
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_reason;
+	}
+
+	@Override
+	public boolean visit(final Block node) {
+		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(cuRewrite, node);
+		node.accept(stringOccurrencesVisitor);
+		return stringOccurrencesVisitor.getResult();
+	}
+
+	private final class StringOccurrencesVisitor extends BlockSubVisitor {
+		private Block blockNode;
+
+		public StringOccurrencesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+
+			blockNode= startNode;
+		}
+
+		@Override
+		public boolean visit(final VariableDeclarationStatement node) {
+			if (node.fragments().size() != 1) {
+				return true;
+			}
+
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
+		}
+
+		@Override
+		public boolean visit(final VariableDeclarationExpression node) {
+			if (node.fragments().size() != 1) {
+				return true;
+			}
+
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
+		}
+
+		@Override
+		public boolean visit(final SingleVariableDeclaration node) {
+			return visitVariable(node.getType(), node.resolveBinding(), node.getExtraDimensions(), node.getName(), node.getInitializer());
+		}
+
+		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final SimpleName declaration, final Expression initializer) {
+			if (getResult() && ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
+					&& extraDimensions == 0
+					&& initializer != null
+					&& ASTNodes.as(initializer, NullLiteral.class) == null) {
+				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
+						blockNode, true).find();
+
+				List<SimpleName> reads= varOccurrencesVisitor.getReads();
+				List<SimpleName> writes= varOccurrencesVisitor.getWrites();
+				writes.remove(declaration);
+
+				Set<SimpleName> unvisitedReads= new HashSet<>(reads);
+				Set<SimpleName> assignmentWrites= new HashSet<>();
+				Set<SimpleName> concatenationWrites= new HashSet<>();
+
+				for (SimpleName simpleName : writes) {
+					if (!isWriteValid(simpleName, unvisitedReads, assignmentWrites, concatenationWrites)) {
+						return true;
+					}
+				}
+
+				if (unvisitedReads.size() == 1
+						&& !writes.isEmpty()
+						&& writes.size() == assignmentWrites.size() + concatenationWrites.size()) {
+					Statement declarationStatement= ASTNodes.getAncestorOrNull(type, Statement.class);
+					SimpleName finalRead= unvisitedReads.iterator().next();
+
+					if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {
+						replaceString(type, initializer, assignmentWrites, concatenationWrites, finalRead);
+
+						setResult(false);
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		private void replaceString(final Type type, final Expression initializer, final Set<SimpleName> assignmentWrites,
+				final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			Class<?> builder;
+			if (getJavaMinorVersion() >= 5) {
+				builder= StringBuilder.class;
+			} else {
+				builder= StringBuffer.class;
+			}
+
+			rewrite.replace(type, ast.type(builder.getSimpleName()), null);
+
+			StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
+
+			if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
+				rewrite.replace(initializer, ast.new0(builder.getSimpleName()), null);
+			} else {
+				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), rewrite.createMoveTarget(initializer)), null);
+			}
+
+			for (SimpleName simpleName : assignmentWrites) {
+				Assignment assignment= (Assignment) simpleName.getParent();
+				InfixExpression concatenation= ASTNodes.as(assignment.getRightHandSide(), InfixExpression.class);
+
+				List<Expression> operands;
+				if (concatenation != null
+						&& ASTNodes.hasOperator(concatenation, InfixExpression.Operator.PLUS)) {
+					operands= ASTNodes.allOperands(concatenation);
+				} else {
+					operands= Arrays.asList(assignment.getRightHandSide());
+				}
+
+				Expression newExpression= rewrite.createMoveTarget(assignment.getLeftHandSide());
+
+				for (Object operand : operands) {
+					newExpression= ast.invoke(newExpression, "append", rewrite.createMoveTarget((Expression) operand)); //$NON-NLS-1$
+				}
+
+				rewrite.replace(assignment, newExpression, null);
+			}
+
+			for (SimpleName simpleName : concatenationWrites) {
+				Assignment assignment= (Assignment) simpleName.getParent();
+				InfixExpression concatenation= (InfixExpression) assignment.getRightHandSide();
+
+				Expression newExpression= ast.invoke(rewrite.createMoveTarget(assignment.getLeftHandSide()), "append", rewrite.createMoveTarget(concatenation.getRightOperand())); //$NON-NLS-1$
+
+				if (concatenation.hasExtendedOperands()) {
+					for (Object operand : concatenation.extendedOperands()) {
+						newExpression= ast.invoke(newExpression, "append", rewrite.createMoveTarget((Expression) operand)); //$NON-NLS-1$
+					}
+				}
+
+				rewrite.replace(assignment, newExpression, null);
+			}
+
+			rewrite.replace(finalRead, ast.invoke(rewrite.createMoveTarget(finalRead), "toString"), null); //$NON-NLS-1$
+		}
+
+		private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,
+				final SimpleName finalRead) {
+			if (declaration != null) {
+				Set<SimpleName> remainingWrites= new HashSet<>(writes);
+				Set<SimpleName> remainingReads= new HashSet<>(reads);
+				remainingReads.remove(finalRead);
+				Set<SimpleName> foundVariables= findVariables(declaration, remainingReads, remainingWrites,
+						finalRead);
+
+				if (foundVariables.isEmpty()) {
+					List<Statement> statements= ASTNodes.getNextSiblings(declaration);
+					AtomicBoolean hasFinalReadBeenFound= new AtomicBoolean(false);
+
+					if (isOccurrenceValid(statements, remainingWrites, remainingReads, finalRead, hasFinalReadBeenFound)) {
+						return hasFinalReadBeenFound.get() && remainingReads.isEmpty() && remainingWrites.isEmpty();
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private boolean isOccurrenceValid(final List<Statement> statements, final Set<SimpleName> remainingWrites,
+				final Set<SimpleName> remainingReads, final SimpleName finalRead, final AtomicBoolean hasFinalReadBeenFound) {
+			for (Statement statement : statements) {
+				Set<SimpleName> foundVariables= findVariables(statement, remainingReads, remainingWrites,
+						finalRead);
+
+				if (foundVariables.contains(finalRead)) {
+					hasFinalReadBeenFound.set(true);
+
+					if (!findVariables(statement, remainingReads, remainingWrites,
+							finalRead, false).contains(finalRead)) {
+						return false;
+					}
+
+					if (remainingReads.isEmpty() && remainingWrites.isEmpty()) {
+						return true;
+					}
+
+					if (!foundVariables.containsAll(remainingReads)
+							|| !foundVariables.containsAll(remainingWrites)) {
+						return false;
+					}
+
+					IfStatement ifStatement= ASTNodes.as(statement, IfStatement.class);
+
+					if (ifStatement != null) {
+						if (findVariables(ifStatement.getExpression(), remainingReads, remainingWrites,
+								finalRead).isEmpty()
+								&& isBlockValid(remainingWrites, remainingReads, finalRead, ifStatement.getThenStatement())
+								&& isBlockValid(remainingWrites, remainingReads, finalRead, ifStatement.getElseStatement())) {
+							remainingWrites.removeAll(foundVariables);
+							remainingReads.removeAll(foundVariables);
+
+							return true;
+						}
+
+						return false;
+					}
+
+					TryStatement tryStatement= ASTNodes.as(statement, TryStatement.class);
+
+					if (tryStatement != null
+							&& isEmptyNodes(tryStatement.resources(), remainingReads, remainingWrites,
+									finalRead)
+							&& isBlockValid(remainingWrites, remainingReads, finalRead, tryStatement.getBody())) {
+						for (Object catchClause : tryStatement.catchClauses()) {
+							if (!isBlockValid(remainingWrites, remainingReads, finalRead, ((CatchClause) catchClause).getBody())) {
+								return false;
+							}
+						}
+
+						return isBlockValid(remainingWrites, remainingReads, finalRead, tryStatement.getFinally());
+					}
+
+					return false;
+				}
+
+				remainingWrites.removeAll(foundVariables);
+				remainingReads.removeAll(foundVariables);
+			}
+
+			return true;
+		}
+
+		private boolean isBlockValid(final Set<SimpleName> remainingWrites, final Set<SimpleName> remainingReads,
+				final SimpleName finalRead, final Statement subStatement) {
+			Set<SimpleName> subRemainingWrites= new HashSet<>(remainingWrites);
+			Set<SimpleName> subRemainingReads= new HashSet<>(remainingReads);
+			AtomicBoolean subHasFinalReadBeenFound= new AtomicBoolean(false);
+
+			return isOccurrenceValid(ASTNodes.asList(subStatement), subRemainingWrites, subRemainingReads, finalRead, subHasFinalReadBeenFound)
+					&& subHasFinalReadBeenFound.get() == (subRemainingReads.isEmpty() && subRemainingWrites.isEmpty());
+		}
+
+		private boolean isEmptyNodes(final List<?> nodes, final Set<SimpleName> remainingReads,
+				final Set<SimpleName> remainingWrites, final SimpleName finalRead) {
+			if (nodes != null) {
+				for (Object currentNode : nodes) {
+					if (!findVariables((ASTNode) currentNode, remainingReads, remainingWrites,
+							finalRead).isEmpty()) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		private Set<SimpleName> findVariables(final ASTNode currentNode, final Set<SimpleName> remainingReads,
+				final Set<SimpleName> remainingWrites, final SimpleName finalRead) {
+			return findVariables(currentNode, remainingReads, remainingWrites, finalRead, true);
+		}
+
+		private Set<SimpleName> findVariables(final ASTNode currentNode, final Set<SimpleName> remainingReads,
+				final Set<SimpleName> remainingWrites, final SimpleName finalRead, final boolean hasToVisitLoops) {
+			if (currentNode == null) {
+				return new HashSet<>(0);
+			}
+
+			Set<SimpleName> searchedVariables= new HashSet<>(remainingReads);
+			searchedVariables.addAll(remainingWrites);
+			searchedVariables.add(finalRead);
+			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(searchedVariables, hasToVisitLoops);
+			currentNode.accept(varOccurrenceVisitor);
+
+			return varOccurrenceVisitor.getFoundVariables();
+		}
+
+		private boolean isWriteValid(final SimpleName simpleName, final Set<SimpleName> unvisitedReads, final Set<SimpleName> assignmentWrites, final Set<SimpleName> concatenationWrites) {
+			if (simpleName.getParent() instanceof Assignment) {
+				Assignment assignment= (Assignment) simpleName.getParent();
+
+				if (assignment.getParent() instanceof ExpressionStatement
+						&& simpleName.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY) {
+					if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN)) {
+						assignmentWrites.add(simpleName);
+						return true;
+					}
+
+					if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+						InfixExpression concatenation= ASTNodes.as(assignment.getRightHandSide(), InfixExpression.class);
+
+						if (concatenation != null
+								&& ASTNodes.hasOperator(concatenation, InfixExpression.Operator.PLUS)) {
+							SimpleName stringRead= ASTNodes.as(concatenation.getLeftOperand(), SimpleName.class);
+
+							if (stringRead != null
+									&& unvisitedReads.contains(stringRead)) {
+								unvisitedReads.remove(stringRead);
+								concatenationWrites.add(simpleName);
+								return true;
+							}
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+	}
 }

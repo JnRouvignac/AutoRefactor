@@ -46,193 +46,193 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final SwitchStatement node) {
-        if (!ASTNodes.isPassive(node.getExpression())) {
-            return true;
-        }
+	@Override
+	public boolean visit(final SwitchStatement node) {
+		if (!ASTNodes.isPassive(node.getExpression())) {
+			return true;
+		}
 
-        List<?> statements= node.statements();
+		List<?> statements= node.statements();
 
-        if (statements.isEmpty()) {
-            return true;
-        }
+		if (statements.isEmpty()) {
+			return true;
+		}
 
-        Set<String> previousVarIds= new HashSet<>();
-        Set<String> caseVarIds= new HashSet<>();
-        List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
-        List<Expression> caseExprs= new ArrayList<>();
-        List<Statement> caseStatements= new ArrayList<>();
+		Set<String> previousVarIds= new HashSet<>();
+		Set<String> caseVarIds= new HashSet<>();
+		List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
+		List<Expression> caseExprs= new ArrayList<>();
+		List<Statement> caseStatements= new ArrayList<>();
 
-        boolean isPreviousStmtACase= true;
-        int caseNb= 0;
-        int caseIndexWithDefault= -1;
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		boolean isPreviousStmtACase= true;
+		int caseNb= 0;
+		int caseIndexWithDefault= -1;
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        for (Object object : statements) {
-            Statement statement= (Statement) object;
+		for (Object object : statements) {
+			Statement statement= (Statement) object;
 
-            if (statement instanceof SwitchCase) {
-                if (!isPreviousStmtACase) {
-                    caseNb++;
+			if (statement instanceof SwitchCase) {
+				if (!isPreviousStmtACase) {
+					caseNb++;
 
-                    if (caseNb > 2) {
-                        return true;
-                    }
+					if (caseNb > 2) {
+						return true;
+					}
 
-                    previousVarIds.addAll(caseVarIds);
-                    caseVarIds.clear();
+					previousVarIds.addAll(caseVarIds);
+					caseVarIds.clear();
 
-                    switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-                    caseExprs= new ArrayList<>();
-                    caseStatements= new ArrayList<>();
-                }
+					switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
+					caseExprs= new ArrayList<>();
+					caseStatements= new ArrayList<>();
+				}
 
-                if (((SwitchCase) statement).isDefault()) {
-                    caseIndexWithDefault= caseNb;
-                } else {
-                    caseExprs.add(((SwitchCase) statement).getExpression());
-                }
+				if (((SwitchCase) statement).isDefault()) {
+					caseIndexWithDefault= caseNb;
+				} else {
+					caseExprs.add(((SwitchCase) statement).getExpression());
+				}
 
-                isPreviousStmtACase= true;
-            } else {
-                VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
-                varOccurrenceVisitor.visitNode(statement);
+				isPreviousStmtACase= true;
+			} else {
+				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
+				varOccurrenceVisitor.visitNode(statement);
 
-                if (varOccurrenceVisitor.isVarUsed()) {
-                    return true;
-                }
+				if (varOccurrenceVisitor.isVarUsed()) {
+					return true;
+				}
 
-                caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(statement, false));
-                caseStatements.add(statement);
+				caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(statement, false));
+				caseStatements.add(statement);
 
-                isPreviousStmtACase= false;
-            }
-        }
+				isPreviousStmtACase= false;
+			}
+		}
 
-        switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-        caseNb++;
+		switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
+		caseNb++;
 
-        if (caseNb > 2) {
-            return true;
-        }
+		if (caseNb > 2) {
+			return true;
+		}
 
-        if (caseIndexWithDefault != -1) {
-            Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
-            switchStructure.add(caseWithDefault);
-        }
+		if (caseIndexWithDefault != -1) {
+			Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
+			switchStructure.add(caseWithDefault);
+		}
 
-        for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-            Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+			Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
-            if (!ASTNodes.fallsThrough(lastStatement)) {
-                return true;
-            }
+			if (!ASTNodes.fallsThrough(lastStatement)) {
+				return true;
+			}
 
-            BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
+			BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
 
-            if (bs != null && bs.getLabel() == null) {
-                caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
-            }
-        }
+			if (bs != null && bs.getLabel() == null) {
+				caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
+			}
+		}
 
-        replaceSwitch(node, switchStructure, caseIndexWithDefault, ast);
+		replaceSwitch(node, switchStructure, caseIndexWithDefault, ast);
 
-        return false;
-    }
+		return false;
+	}
 
-    private void replaceSwitch(final SwitchStatement node,
-            final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
-            final ASTNodeFactory ast) {
-        int localCaseIndexWithDefault= caseIndexWithDefault;
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceSwitch(final SwitchStatement node,
+			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
+			final ASTNodeFactory ast) {
+		int localCaseIndexWithDefault= caseIndexWithDefault;
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Expression discriminant= node.getExpression();
-        Statement currentBlock= null;
+		Expression discriminant= node.getExpression();
+		Statement currentBlock= null;
 
-        for (int i= switchStructure.size() - 1; i >= 0; i--) {
-            Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
+		for (int i= switchStructure.size() - 1; i >= 0; i--) {
+			Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
-            Expression newCondition;
-            if (caseStructure.getFirst().isEmpty()) {
-                newCondition= null;
-            } else if (caseStructure.getFirst().size() == 1) {
-                newCondition= buildEquality(ast, discriminant, caseStructure.getFirst().get(0));
-            } else {
-                List<Expression> equalities= new ArrayList<>();
+			Expression newCondition;
+			if (caseStructure.getFirst().isEmpty()) {
+				newCondition= null;
+			} else if (caseStructure.getFirst().size() == 1) {
+				newCondition= buildEquality(ast, discriminant, caseStructure.getFirst().get(0));
+			} else {
+				List<Expression> equalities= new ArrayList<>();
 
-                for (Expression value : caseStructure.getFirst()) {
-                    equalities.add(ast.parenthesizeIfNeeded(buildEquality(ast, discriminant, value)));
-                }
-                newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
-            }
+				for (Expression value : caseStructure.getFirst()) {
+					equalities.add(ast.parenthesizeIfNeeded(buildEquality(ast, discriminant, value)));
+				}
+				newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
+			}
 
-            Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
+			Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
 
-            for (int j= 0; j < caseStructure.getSecond().size(); j++) {
-                copyOfStatements[j]= ast.createCopyTarget(caseStructure.getSecond().get(j));
-            }
+			for (int j= 0; j < caseStructure.getSecond().size(); j++) {
+				copyOfStatements[j]= ast.createCopyTarget(caseStructure.getSecond().get(j));
+			}
 
-            Block newBlock= ast.block(copyOfStatements);
+			Block newBlock= ast.block(copyOfStatements);
 
-            if (currentBlock != null) {
-                currentBlock= ast.if0(newCondition, newBlock, currentBlock);
-            } else if (copyOfStatements.length == 0) {
-                localCaseIndexWithDefault= -1;
-            } else if (localCaseIndexWithDefault == -1) {
-                currentBlock= ast.if0(newCondition, newBlock);
-            } else {
-                currentBlock= newBlock;
-            }
-        }
+			if (currentBlock != null) {
+				currentBlock= ast.if0(newCondition, newBlock, currentBlock);
+			} else if (copyOfStatements.length == 0) {
+				localCaseIndexWithDefault= -1;
+			} else if (localCaseIndexWithDefault == -1) {
+				currentBlock= ast.if0(newCondition, newBlock);
+			} else {
+				currentBlock= newBlock;
+			}
+		}
 
-        rewrite.replace(node, currentBlock, null);
-    }
+		rewrite.replace(node, currentBlock, null);
+	}
 
-    private Expression buildEquality(final ASTNodeFactory ast, final Expression discriminant, final Expression value) {
-        Expression equality;
+	private Expression buildEquality(final ASTNodeFactory ast, final Expression discriminant, final Expression value) {
+		Expression equality;
 
-        if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
-                Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-            equality= ast.invoke(ast.createCopyTarget(value), "equals", ast.createCopyTarget(discriminant)); //$NON-NLS-1$
-        } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-            equality= ast.infixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
-                    ast.name(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
-        } else {
-            equality= ast.infixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
-                    ast.createCopyTarget(value));
-        }
+		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
+				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
+			equality= ast.invoke(ast.createCopyTarget(value), "equals", ast.createCopyTarget(discriminant)); //$NON-NLS-1$
+		} else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
+			equality= ast.infixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
+					ast.name(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+		} else {
+			equality= ast.infixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
+					ast.createCopyTarget(value));
+		}
 
-        return equality;
-    }
+		return equality;
+	}
 }

@@ -32,25 +32,25 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
  * An interruptible visitor.
  */
 public class InterruptibleVisitor extends ASTVisitor {
-    /**
-     * Visit the node.
-     *
-     * @param node The visited node.
-     */
-    public void visitNode(final ASTNode node) {
-        try {
-            node.accept(this);
-        } catch (AbortSearchException e) {
-            return;
-        }
-    }
+	/**
+	 * Visit the node.
+	 *
+	 * @param node The visited node.
+	 */
+	public void visitNode(final ASTNode node) {
+		try {
+			node.accept(this);
+		} catch (AbortSearchException e) {
+			return;
+		}
+	}
 
-    /**
-     * Interrupt the visit of a tree.
-     *
-     * @return nothing
-     */
-    public boolean interruptVisit() {
-        throw new AbortSearchException();
-    }
+	/**
+	 * Interrupt the visit of a tree.
+	 *
+	 * @return nothing
+	 */
+	public boolean interruptVisit() {
+		throw new AbortSearchException();
+	}
 }

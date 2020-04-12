@@ -30,42 +30,42 @@ import java.util.logging.Logger;
 
 public class NamedMethodRatherThanLogLevelParameterSample {
 
-    private Logger log = Logger.getGlobal();
+	private Logger log = Logger.getGlobal();
 
-    public void replaceLevelByMethodName() {
-        // Keep this comment
-        log.log(Level.SEVERE, "One log in severe level.");
-        log.log(Level.WARNING, "One log in warning level.");
-        log.log(Level.INFO, "One log in info level.");
-        log.log(Level.FINE, "One log in fine level.");
-        log.log(Level.FINER, "One log in finer level.");
-        log.log(Level.FINEST, "One log in finest level.");
-    }
+	public void replaceLevelByMethodName() {
+		// Keep this comment
+		log.log(Level.SEVERE, "One log in severe level.");
+		log.log(Level.WARNING, "One log in warning level.");
+		log.log(Level.INFO, "One log in info level.");
+		log.log(Level.FINE, "One log in fine level.");
+		log.log(Level.FINER, "One log in finer level.");
+		log.log(Level.FINEST, "One log in finest level.");
+	}
 
-    public void doNotRefactorDynamicLevel(Level level) {
-        log.log(level, "One log in dynamic level.");
-    }
+	public void doNotRefactorDynamicLevel(Level level) {
+		log.log(level, "One log in dynamic level.");
+	}
 
-    public void doNotRefactorSpecialLevel() {
-        log.log(Level.ALL, "One log in ALL level.");
-        log.log(Level.OFF, "One log in OFF level.");
-    }
+	public void doNotRefactorSpecialLevel() {
+		log.log(Level.ALL, "One log in ALL level.");
+		log.log(Level.OFF, "One log in OFF level.");
+	}
 
-    public void doNotRefactorWithParameters(int returnCode) {
-        log.log(Level.SEVERE, "One log in severe level with return code {0}.", returnCode);
-        log.log(Level.WARNING, "One log in warning level with return code {0}.", returnCode);
-        log.log(Level.INFO, "One log in info level with return code {0}.", returnCode);
-        log.log(Level.FINE, "One log in fine level with return code {0}.", returnCode);
-        log.log(Level.FINER, "One log in finer level with return code {0}.", returnCode);
-        log.log(Level.FINEST, "One log in finest level with return code {0}.", returnCode);
-    }
+	public void doNotRefactorWithParameters(int returnCode) {
+		log.log(Level.SEVERE, "One log in severe level with return code {0}.", returnCode);
+		log.log(Level.WARNING, "One log in warning level with return code {0}.", returnCode);
+		log.log(Level.INFO, "One log in info level with return code {0}.", returnCode);
+		log.log(Level.FINE, "One log in fine level with return code {0}.", returnCode);
+		log.log(Level.FINER, "One log in finer level with return code {0}.", returnCode);
+		log.log(Level.FINEST, "One log in finest level with return code {0}.", returnCode);
+	}
 
-    public void doNotRefactorWithParameters(Throwable t) {
-        log.log(Level.SEVERE, "One log in severe level with error.", t);
-        log.log(Level.WARNING, "One log in warning level with error.", t);
-        log.log(Level.INFO, "One log in info level with error.", t);
-        log.log(Level.FINE, "One log in fine level with error.", t);
-        log.log(Level.FINER, "One log in finer level with error.", t);
-        log.log(Level.FINEST, "One log in finest level with error.", t);
-    }
+	public void doNotRefactorWithParameters(Throwable t) {
+		log.log(Level.SEVERE, "One log in severe level with error.", t);
+		log.log(Level.WARNING, "One log in warning level with error.", t);
+		log.log(Level.INFO, "One log in info level with error.", t);
+		log.log(Level.FINE, "One log in fine level with error.", t);
+		log.log(Level.FINER, "One log in finer level with error.", t);
+		log.log(Level.FINEST, "One log in finest level with error.", t);
+	}
 }

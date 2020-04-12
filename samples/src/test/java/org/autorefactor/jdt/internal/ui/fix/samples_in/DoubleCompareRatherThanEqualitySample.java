@@ -26,59 +26,59 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class DoubleCompareRatherThanEqualitySample {
-    public boolean rewriteThoseprimitiveDoubleComparisons(double primitiveDouble1, double primitiveDouble2) {
-        boolean b;
+	public boolean rewriteThoseprimitiveDoubleComparisons(double primitiveDouble1, double primitiveDouble2) {
+		boolean b;
 
-        // Keep this comment
-        b = primitiveDouble1 == primitiveDouble2;
-        b = primitiveDouble1 != primitiveDouble2;
-        b = primitiveDouble1 < primitiveDouble2;
-        b = primitiveDouble1 > primitiveDouble2;
-        b = primitiveDouble1 <= primitiveDouble2;
-        b = primitiveDouble1 >= primitiveDouble2;
+		// Keep this comment
+		b = primitiveDouble1 == primitiveDouble2;
+		b = primitiveDouble1 != primitiveDouble2;
+		b = primitiveDouble1 < primitiveDouble2;
+		b = primitiveDouble1 > primitiveDouble2;
+		b = primitiveDouble1 <= primitiveDouble2;
+		b = primitiveDouble1 >= primitiveDouble2;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseObjectDoubleComparisons(Double objectDouble1, Double objectDouble2) {
-        boolean b;
+	public boolean rewriteThoseObjectDoubleComparisons(Double objectDouble1, Double objectDouble2) {
+		boolean b;
 
-        // Keep this comment
-        b = objectDouble1 == objectDouble2;
-        b = objectDouble1 != objectDouble2;
-        b = objectDouble1 < objectDouble2;
-        b = objectDouble1 > objectDouble2;
-        b = objectDouble1 <= objectDouble2;
-        b = objectDouble1 >= objectDouble2;
+		// Keep this comment
+		b = objectDouble1 == objectDouble2;
+		b = objectDouble1 != objectDouble2;
+		b = objectDouble1 < objectDouble2;
+		b = objectDouble1 > objectDouble2;
+		b = objectDouble1 <= objectDouble2;
+		b = objectDouble1 >= objectDouble2;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseDoubleComparisons(double primitiveDouble, Double objectDouble) {
-        boolean b;
+	public boolean rewriteThoseDoubleComparisons(double primitiveDouble, Double objectDouble) {
+		boolean b;
 
-        // Keep this comment
-        b = primitiveDouble == objectDouble;
-        b = primitiveDouble != objectDouble;
-        b = primitiveDouble < objectDouble;
-        b = primitiveDouble > objectDouble;
-        b = primitiveDouble <= objectDouble;
-        b = primitiveDouble >= objectDouble;
+		// Keep this comment
+		b = primitiveDouble == objectDouble;
+		b = primitiveDouble != objectDouble;
+		b = primitiveDouble < objectDouble;
+		b = primitiveDouble > objectDouble;
+		b = primitiveDouble <= objectDouble;
+		b = primitiveDouble >= objectDouble;
 
-        return b;
-    }
+		return b;
+	}
 
-    public boolean rewriteThoseExpression(double primitiveDouble, Double objectDouble) {
-        boolean b;
+	public boolean rewriteThoseExpression(double primitiveDouble, Double objectDouble) {
+		boolean b;
 
-        // Keep this comment
-        b = primitiveDouble == objectDouble * 2;
-        b = primitiveDouble != objectDouble * 2;
-        b = primitiveDouble < objectDouble * 2;
-        b = primitiveDouble > objectDouble * 2;
-        b = primitiveDouble <= objectDouble * 2;
-        b = primitiveDouble >= objectDouble * 2;
+		// Keep this comment
+		b = primitiveDouble == objectDouble * 2;
+		b = primitiveDouble != objectDouble * 2;
+		b = primitiveDouble < objectDouble * 2;
+		b = primitiveDouble > objectDouble * 2;
+		b = primitiveDouble <= objectDouble * 2;
+		b = primitiveDouble >= objectDouble * 2;
 
-        return b;
-    }
+		return b;
+	}
 }

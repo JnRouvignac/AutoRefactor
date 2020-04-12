@@ -60,82 +60,82 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value= Parameterized.class)
 public class CleanUpTest {
-    private static final String SAMPLES_ALL_BASE_DIR= "../samples/src/test/java/org/autorefactor/jdt/internal/ui/fix/all"; //$NON-NLS-1$
-    private static final String PACKAGE_NAME= "org.autorefactor.jdt.internal.ui.fix.all.samples_in"; //$NON-NLS-1$
+	private static final String SAMPLES_ALL_BASE_DIR= "../samples/src/test/java/org/autorefactor/jdt/internal/ui/fix/all"; //$NON-NLS-1$
+	private static final String PACKAGE_NAME= "org.autorefactor.jdt.internal.ui.fix.all.samples_in"; //$NON-NLS-1$
 
-    /** If not empty, then only run the test samples present in this collection. */
-    private static final Collection<Class<?>> WHITELIST= Arrays.<Class<?>>asList();
-    /**
-     * When {@link #WHITELIST} is empty, the test samples present in this collection
-     * will never be run.
-     */
-    private static final Collection<Class<?>> BLACKLIST= Arrays.<Class<?>>asList();
+	/** If not empty, then only run the test samples present in this collection. */
+	private static final Collection<Class<?>> WHITELIST= Arrays.<Class<?>>asList();
+	/**
+	 * When {@link #WHITELIST} is empty, the test samples present in this collection
+	 * will never be run.
+	 */
+	private static final Collection<Class<?>> BLACKLIST= Arrays.<Class<?>>asList();
 
-    private final String sampleName;
+	private final String sampleName;
 
-    public CleanUpTest(String testName) {
-        this.sampleName= testName;
-    }
+	public CleanUpTest(String testName) {
+		this.sampleName= testName;
+	}
 
-    @Parameters(name= "{0}CleanUp")
-    public static Collection<Object[]> data() {
-        return samples(SAMPLES_ALL_BASE_DIR, WHITELIST, BLACKLIST);
-    }
+	@Parameters(name= "{0}CleanUp")
+	public static Collection<Object[]> data() {
+		return samples(SAMPLES_ALL_BASE_DIR, WHITELIST, BLACKLIST);
+	}
 
-    @Test
-    public void testRefactoring() throws Exception {
-        runTest(new Callable<Void>() {
-            /**
-             * Call.
-             *
-             * @return the void.
-             */
-            public Void call() throws Exception {
-                testRefactoring0();
-                return null;
-            }
-        });
-    }
+	@Test
+	public void testRefactoring() throws Exception {
+		runTest(new Callable<Void>() {
+			/**
+			 * Call.
+			 *
+			 * @return the void.
+			 */
+			public Void call() throws Exception {
+				testRefactoring0();
+				return null;
+			}
+		});
+	}
 
-    private void testRefactoring0() throws Exception {
-        final File samplesDir= new File(SAMPLES_ALL_BASE_DIR);
-        final File sampleIn= new File(samplesDir, "samples_in/" + sampleName); //$NON-NLS-1$
-        assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ //$NON-NLS-2$
-        final File sampleOut= new File(samplesDir, "samples_out/" + sampleName); //$NON-NLS-1$
-        assertTrue(sampleName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+	private void testRefactoring0() throws Exception {
+		final File samplesDir= new File(SAMPLES_ALL_BASE_DIR);
+		final File sampleIn= new File(samplesDir, "samples_in/" + sampleName); //$NON-NLS-1$
+		assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+		final File sampleOut= new File(samplesDir, "samples_out/" + sampleName); //$NON-NLS-1$
+		assertTrue(sampleName + ": sample out file " + sampleOut + " should exist", sampleOut.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final String sampleInSource= readAll(sampleIn);
-        final String sampleOutSource= readAll(sampleOut);
+		final String sampleInSource= readAll(sampleIn);
+		final String sampleOutSource= readAll(sampleOut);
 
-        given(sampleInSource, sampleOutSource);
+		given(sampleInSource, sampleOutSource);
 
-        final IDocument doc= when(sampleInSource);
+		final IDocument doc= when(sampleInSource);
 
-        then(sampleOutSource, doc);
-    }
+		then(sampleOutSource, doc);
+	}
 
-    private void given(final String sampleInSource, final String sampleOutSource) {
-        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
-        final String expected= normalizeJavaSourceCode(sampleOutSource);
-        assertNotEquals(sampleName + ": verify nothing;", expected, actual); //$NON-NLS-1$
-    }
+	private void given(final String sampleInSource, final String sampleOutSource) {
+		final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String expected= normalizeJavaSourceCode(sampleOutSource);
+		assertNotEquals(sampleName + ": verify nothing;", expected, actual); //$NON-NLS-1$
+	}
 
-    private IDocument when(final String sampleInSource) throws Exception, JavaModelException {
-        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
-        final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, sampleInSource, true, null);
-        cu.getBuffer().setContents(sampleInSource);
-        cu.save(null, true);
+	private IDocument when(final String sampleInSource) throws Exception, JavaModelException {
+		final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
+		final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, sampleInSource, true, null);
+		cu.getBuffer().setContents(sampleInSource);
+		cu.save(null, true);
 
-        final IDocument doc= new Document(sampleInSource);
-        new ApplyRefactoringsJob(null, null, TEST_ENVIRONMENT).applyRefactoring(doc, cu,
-                new AggregateASTVisitor(AllCleanUpRules.getAllCleanUpRules()),
-                newJavaProjectOptions(Release.javaSE("1.8.0"), 4), SubMonitor.convert(new NullProgressMonitor()), true); //$NON-NLS-1$
-        return doc;
-    }
+		final IDocument doc= new Document(sampleInSource);
+		new ApplyRefactoringsJob(null, null, TEST_ENVIRONMENT).applyRefactoring(doc, cu,
+				new AggregateASTVisitor(AllCleanUpRules.getAllCleanUpRules()),
+				newJavaProjectOptions(Release.javaSE("1.8.0"), 4), SubMonitor.convert(new NullProgressMonitor()), true); //$NON-NLS-1$
+		return doc;
+	}
 
-    private void then(final String sampleOutSource, final IDocument doc) {
-        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
-        final String expected= normalizeJavaSourceCode(sampleOutSource);
-        assertEquals(sampleName + ": wrong output;", expected, actual); //$NON-NLS-1$
-    }
+	private void then(final String sampleOutSource, final IDocument doc) {
+		final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String expected= normalizeJavaSourceCode(sampleOutSource);
+		assertEquals(sampleName + ": wrong output;", expected, actual); //$NON-NLS-1$
+	}
 }

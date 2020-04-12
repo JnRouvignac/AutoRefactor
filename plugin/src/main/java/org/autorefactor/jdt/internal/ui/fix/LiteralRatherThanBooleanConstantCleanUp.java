@@ -32,56 +32,56 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 
 /** See {@link #getDescription()} method. */
 public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final QualifiedName node) {
-        ITypeBinding typeBinding= ASTNodes.getTargetType(node);
+	@Override
+	public boolean visit(final QualifiedName node) {
+		ITypeBinding typeBinding= ASTNodes.getTargetType(node);
 
-        if (typeBinding != null && typeBinding.isPrimitive()) {
-            if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
-                replaceWithBooleanLiteral(node, true);
-                return false;
-            }
-            if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
-                replaceWithBooleanLiteral(node, false);
-                return false;
-            }
-        }
+		if (typeBinding != null && typeBinding.isPrimitive()) {
+			if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
+				replaceWithBooleanLiteral(node, true);
+				return false;
+			}
+			if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+				replaceWithBooleanLiteral(node, false);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
-        BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().boolean0(val);
-        cuRewrite.getASTRewrite().replace(node, booleanLiteral, null);
-    }
+	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
+		BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().boolean0(val);
+		cuRewrite.getASTRewrite().replace(node, booleanLiteral, null);
+	}
 }

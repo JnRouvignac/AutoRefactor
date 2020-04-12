@@ -45,93 +45,93 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
  * Replaces HashSet for enum type creation to EnumSet factory static methods.
  */
 public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectionReplacementCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
+	}
 
-    @Override
-    public String getImplType() {
-        return HashSet.class.getCanonicalName();
-    }
+	@Override
+	public String getImplType() {
+		return HashSet.class.getCanonicalName();
+	}
 
-    @Override
-    public String getInterfaceType() {
-        return Set.class.getCanonicalName();
-    }
+	@Override
+	public String getInterfaceType() {
+		return Set.class.getCanonicalName();
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(EnumSet.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(EnumSet.class.getCanonicalName()));
+	}
 
-    /**
-     * Cleanup is not correct if argument for HashSet constructor is a
-     * Collection, but other than EnumSet. <br>
-     * In case of empty collection <code>EnumSet.copyOf</code> will throw an
-     * <code>IllegalArgumentException</code>, <br>
-     * and HashSet(Collection) will not. <br>
-     * <br>
-     * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code>
-     * method. <br>
-     * <br>
-     *
-     * @param cic  - class instance creation node to be replaced
-     * @param type - type argument of the declaration
-     * @see java.util.EnumSet#noneOf(Class) <br>
-     */
-    @Override
-    boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
-            final Type... types) {
-        if (types == null || types.length < 1) {
-            return true;
-        }
+	/**
+	 * Cleanup is not correct if argument for HashSet constructor is a
+	 * Collection, but other than EnumSet. <br>
+	 * In case of empty collection <code>EnumSet.copyOf</code> will throw an
+	 * <code>IllegalArgumentException</code>, <br>
+	 * and HashSet(Collection) will not. <br>
+	 * <br>
+	 * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code>
+	 * method. <br>
+	 * <br>
+	 *
+	 * @param cic  - class instance creation node to be replaced
+	 * @param type - type argument of the declaration
+	 * @see java.util.EnumSet#noneOf(Class) <br>
+	 */
+	@Override
+	boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+			final Type... types) {
+		if (types == null || types.length < 1) {
+			return true;
+		}
 
-        Type type= types[0];
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        List<Expression> arguments= ASTNodes.arguments(cic);
-        MethodInvocation invocation;
-        Name newClassName= ast.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
+		Type type= types[0];
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		List<Expression> arguments= ASTNodes.arguments(cic);
+		MethodInvocation invocation;
+		Name newClassName= ast.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
 
-        if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
-            Expression typeArg= arguments.get(0);
-            if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
-                return true;
-            }
-            invocation= ast.invoke(newClassName, "copyOf", ast.createCopyTarget(typeArg)); //$NON-NLS-1$
-        } else {
-            TypeLiteral newTypeLiteral= cuRewrite.getAST().newTypeLiteral();
-            newTypeLiteral.setType(ast.createCopyTarget(type));
-            invocation= ast.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
-        }
+		if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
+			Expression typeArg= arguments.get(0);
+			if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
+				return true;
+			}
+			invocation= ast.invoke(newClassName, "copyOf", ast.createCopyTarget(typeArg)); //$NON-NLS-1$
+		} else {
+			TypeLiteral newTypeLiteral= cuRewrite.getAST().newTypeLiteral();
+			newTypeLiteral.setType(ast.createCopyTarget(type));
+			invocation= ast.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
+		}
 
-        cuRewrite.getASTRewrite().replace(cic, invocation, null);
-        importsToAdd.add(EnumSet.class.getCanonicalName());
-        return false;
-    }
+		cuRewrite.getASTRewrite().replace(cic, invocation, null);
+		importsToAdd.add(EnumSet.class.getCanonicalName());
+		return false;
+	}
 }

@@ -37,78 +37,78 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /** See {@link #getDescription()} method. */
 public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ArrayCreation node) {
-        if (node.getInitializer() != null || isVoid(node)) {
-            ITypeBinding arrayType= node.resolveTypeBinding();
-            ITypeBinding destinationType= ASTNodes.getTargetType(node);
+	@Override
+	public boolean visit(final ArrayCreation node) {
+		if (node.getInitializer() != null || isVoid(node)) {
+			ITypeBinding arrayType= node.resolveTypeBinding();
+			ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
-            if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
-                refactorWithInitializer(node);
-                return false;
-            }
-        }
+			if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
+				refactorWithInitializer(node);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorWithInitializer(final ArrayCreation node) {
-        if (node.getInitializer() != null) {
-            cuRewrite.getASTRewrite().replace(node, node.getInitializer(), null);
-        } else {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            cuRewrite.getASTRewrite().replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
-        }
-    }
+	private void refactorWithInitializer(final ArrayCreation node) {
+		if (node.getInitializer() != null) {
+			cuRewrite.getASTRewrite().replace(node, node.getInitializer(), null);
+		} else {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			cuRewrite.getASTRewrite().replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
+		}
+	}
 
-    private boolean isDestinationAllowed(final ASTNode node) {
-        int parentType= node.getParent().getNodeType();
+	private boolean isDestinationAllowed(final ASTNode node) {
+		int parentType= node.getParent().getNodeType();
 
-        return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
-                || parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
-    }
+		return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
+				|| parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
+	}
 
-    private boolean isVoid(final ArrayCreation node) {
-        @SuppressWarnings("unchecked") List<Expression> dimensions= node.dimensions();
+	private boolean isVoid(final ArrayCreation node) {
+		@SuppressWarnings("unchecked") List<Expression> dimensions= node.dimensions();
 
-        for (Expression dimension : dimensions) {
-            Object dimensionLiteral= dimension.resolveConstantExpressionValue();
+		for (Expression dimension : dimensions) {
+			Object dimensionLiteral= dimension.resolveConstantExpressionValue();
 
-            if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
-                return false;
-            }
-        }
+			if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

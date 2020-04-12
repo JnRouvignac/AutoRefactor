@@ -43,235 +43,235 @@ import java.util.Map;
 @SuppressWarnings("javadoc")
 public class SimpleNameRatherThanQualifiedNameSample {
 
-    private static final String TOP_LEVEL_PRIVATE_CONSTANT = "visible from sublevel";
+	private static final String TOP_LEVEL_PRIVATE_CONSTANT = "visible from sublevel";
 
-    static long classField;
+	static long classField;
 
-    java.lang.Long instanceField = java.lang.Long.MIN_VALUE;
+	java.lang.Long instanceField = java.lang.Long.MIN_VALUE;
 
-    static {
-        long classField = 0l;
-        SimpleNameRatherThanQualifiedNameSample.classField = java.lang.Long.MAX_VALUE + classField;
-    }
+	static {
+		long classField = 0l;
+		SimpleNameRatherThanQualifiedNameSample.classField = java.lang.Long.MAX_VALUE + classField;
+	}
 
-    public SimpleNameRatherThanQualifiedNameSample(java.lang.Long long1) {
-        java.lang.Long long2 = java.lang.Long.valueOf(long1 + 1);
-    }
+	public SimpleNameRatherThanQualifiedNameSample(java.lang.Long long1) {
+		java.lang.Long long2 = java.lang.Long.valueOf(long1 + 1);
+	}
 
-    public java.util.List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
-        return l;
-    }
+	public java.util.List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
+		return l;
+	}
 
-    public java.util.Calendar removeQualifiedNameForImportWithWildcard(Calendar cal) {
-        return cal;
-    }
+	public java.util.Calendar removeQualifiedNameForImportWithWildcard(Calendar cal) {
+		return cal;
+	}
 
-    public int removeQualifiedNameForStaticImportWithWildcard() {
-        // Keep this comment
-        return java.util.Calendar.DATE;
-    }
+	public int removeQualifiedNameForStaticImportWithWildcard() {
+		// Keep this comment
+		return java.util.Calendar.DATE;
+	}
 
-    public boolean removeQualifiedNameForStaticMethodImport() {
-        // Keep this comment
-        return java.util.Collections.emptyList().containsAll(Collections.emptyList());
-    }
+	public boolean removeQualifiedNameForStaticMethodImport() {
+		// Keep this comment
+		return java.util.Collections.emptyList().containsAll(Collections.emptyList());
+	}
 
-    public boolean removeQualifiedNameForStaticFieldImport() {
-        // Keep this comment
-        return java.util.Collections.EMPTY_LIST.containsAll(Collections.EMPTY_LIST);
-    }
+	public boolean removeQualifiedNameForStaticFieldImport() {
+		// Keep this comment
+		return java.util.Collections.EMPTY_LIST.containsAll(Collections.EMPTY_LIST);
+	}
 
-    public void doNotRemoveQualifiedNameForGenericStaticMethodImport() {
-        acceptListString(Collections.<String> emptyList());
-    }
+	public void doNotRemoveQualifiedNameForGenericStaticMethodImport() {
+		acceptListString(Collections.<String> emptyList());
+	}
 
-    public long removeQualifiedNameForParameterType(java.lang.Long i) {
-        return i;
-    }
+	public long removeQualifiedNameForParameterType(java.lang.Long i) {
+		return i;
+	}
 
-    private void acceptListString(List<String> l) {
-        // Nothing to do
-    }
+	private void acceptListString(List<String> l) {
+		// Nothing to do
+	}
 
-    public boolean removeQualifiedNameForStaticTypeImport(Map.Entry<?, ?> e) {
-        return e.getKey() != null;
-    }
+	public boolean removeQualifiedNameForStaticTypeImport(Map.Entry<?, ?> e) {
+		return e.getKey() != null;
+	}
 
-    public BigDecimal doNotRemoveQualifiedNameForConflictingFieldSimpleNameFromStaticImports() {
-        return BigDecimal.ZERO;
-    }
+	public BigDecimal doNotRemoveQualifiedNameForConflictingFieldSimpleNameFromStaticImports() {
+		return BigDecimal.ZERO;
+	}
 
-    public BigDecimal removeQualifiedNameForOverridingFieldSimpleNameFromStaticImports() {
-        // Keep this comment
-        return BigDecimal.ONE;
-    }
+	public BigDecimal removeQualifiedNameForOverridingFieldSimpleNameFromStaticImports() {
+		// Keep this comment
+		return BigDecimal.ONE;
+	}
 
-    public Map<Object, Object> doNotRemoveQualifiedNameForConflictingMethodSimpleName() {
-        return Collections.emptyMap();
-    }
+	public Map<Object, Object> doNotRemoveQualifiedNameForConflictingMethodSimpleName() {
+		return Collections.emptyMap();
+	}
 
-    public int removeQualifiedNameForNonConflictingLocalMethodSimpleName() {
-        // Keep this comment
-        return SimpleNameRatherThanQualifiedNameSample.emptyMap();
-    }
+	public int removeQualifiedNameForNonConflictingLocalMethodSimpleName() {
+		// Keep this comment
+		return SimpleNameRatherThanQualifiedNameSample.emptyMap();
+	}
 
-    private static int emptyMap() {
-        return 0;
-    }
+	private static int emptyMap() {
+		return 0;
+	}
 
-    public java.lang.Boolean removeQualifiedNameForJavaLangPackage() {
-        // Keep this comment
-        return java.lang.Boolean.TRUE;
-    }
+	public java.lang.Boolean removeQualifiedNameForJavaLangPackage() {
+		// Keep this comment
+		return java.lang.Boolean.TRUE;
+	}
 
-    public java.lang.Integer doNotRemoveQualifiedNameForConflictingTypeFromJavaLangPackage() {
-        return new java.lang.Integer(0);
-    }
+	public java.lang.Integer doNotRemoveQualifiedNameForConflictingTypeFromJavaLangPackage() {
+		return new java.lang.Integer(0);
+	}
 
-    public Integer removeQualifiedNameForNonConflictingLocalType() {
-        // Keep this comment
-        return new SimpleNameRatherThanQualifiedNameSample.Integer();
-    }
+	public Integer removeQualifiedNameForNonConflictingLocalType() {
+		// Keep this comment
+		return new SimpleNameRatherThanQualifiedNameSample.Integer();
+	}
 
-    private static final class Integer {
-    }
+	private static final class Integer {
+	}
 
-    public int doNotRemoveQualifiedNameForConflictingFieldSimpleName() {
-        return Calendar.DAY_OF_WEEK_IN_MONTH;
-    }
+	public int doNotRemoveQualifiedNameForConflictingFieldSimpleName() {
+		return Calendar.DAY_OF_WEEK_IN_MONTH;
+	}
 
-    public String removeQualifiedNameForNonConflictingLocalField() {
-        // Keep this comment
-        return SimpleNameRatherThanQualifiedNameSample.DAY_OF_WEEK_IN_MONTH;
-    }
+	public String removeQualifiedNameForNonConflictingLocalField() {
+		// Keep this comment
+		return SimpleNameRatherThanQualifiedNameSample.DAY_OF_WEEK_IN_MONTH;
+	}
 
-    private static final String DAY_OF_WEEK_IN_MONTH = "DAY_OF_WEEK_IN_MONTH";
+	private static final String DAY_OF_WEEK_IN_MONTH = "DAY_OF_WEEK_IN_MONTH";
 
-    static class A {
-        private int replaceFromEnclosingType() {
-            // Keep this comment
-            return SimpleNameRatherThanQualifiedNameSample.emptyMap();
-        }
-    }
+	static class A {
+		private int replaceFromEnclosingType() {
+			// Keep this comment
+			return SimpleNameRatherThanQualifiedNameSample.emptyMap();
+		}
+	}
 
-    static class B {
-        private int doNotReplaceCurrentTypeDiffers() {
-            return SimpleNameRatherThanQualifiedNameSample.emptyMap();
-        }
+	static class B {
+		private int doNotReplaceCurrentTypeDiffers() {
+			return SimpleNameRatherThanQualifiedNameSample.emptyMap();
+		}
 
-        static int emptyMap() {
-            return 0;
-        }
-    }
+		static int emptyMap() {
+			return 0;
+		}
+	}
 
-    static class C {
-        private static final String PRIVATE_CONSTANT = "not visible";
+	static class C {
+		private static final String PRIVATE_CONSTANT = "not visible";
 
-        private int replaceFromCurrentType() {
-            // Keep this comment
-            return C.emptyMap();
-        }
+		private int replaceFromCurrentType() {
+			// Keep this comment
+			return C.emptyMap();
+		}
 
-        static int emptyMap() {
-            return 0;
-        }
-    }
+		static int emptyMap() {
+			return 0;
+		}
+	}
 
-    static class D extends C {
-        private int replaceFromSuperType() {
-            // Keep this comment
-            return C.emptyMap();
-        }
+	static class D extends C {
+		private int replaceFromSuperType() {
+			// Keep this comment
+			return C.emptyMap();
+		}
 
-        public void replaceThisTopLevelPrivateConstant() {
-            System.out.println("value is " + SimpleNameRatherThanQualifiedNameSample.TOP_LEVEL_PRIVATE_CONSTANT);
-        }
+		public void replaceThisTopLevelPrivateConstant() {
+			System.out.println("value is " + SimpleNameRatherThanQualifiedNameSample.TOP_LEVEL_PRIVATE_CONSTANT);
+		}
 
-        public void doNotRefactorThisPrivateConstant() {
-            System.out.println("value is " + C.PRIVATE_CONSTANT);
-        }
-    }
+		public void doNotRefactorThisPrivateConstant() {
+			System.out.println("value is " + C.PRIVATE_CONSTANT);
+		}
+	}
 
-    public class Z {
-        public Integer i;
+	public class Z {
+		public Integer i;
 
-        private Boolean b() {
-            return Boolean.FALSE;
-        }
+		private Boolean b() {
+			return Boolean.FALSE;
+		}
 
-        public boolean isEqualTo(Z other) {
-            if (other == null) {
-                return false;
-            }
-            if (this == other) {
-                return true;
-            }
-            return b().equals(other.b())
-                && i.equals(other.i);
-        }
-    }
+		public boolean isEqualTo(Z other) {
+			if (other == null) {
+				return false;
+			}
+			if (this == other) {
+				return true;
+			}
+			return b().equals(other.b())
+				&& i.equals(other.i);
+		}
+	}
 
-    public void doNotConflictInstanceFieldAndLocalVariable(long instanceField) {
-        this.instanceField = instanceField;
-    }
+	public void doNotConflictInstanceFieldAndLocalVariable(long instanceField) {
+		this.instanceField = instanceField;
+	}
 
-    public void doNotConflictClassFieldAndLocalVariable(long classField) {
-        SimpleNameRatherThanQualifiedNameSample.classField = classField;
-    }
+	public void doNotConflictClassFieldAndLocalVariable(long classField) {
+		SimpleNameRatherThanQualifiedNameSample.classField = classField;
+	}
 
-    static String property;
-    static void setProperty(String property) {
-        SimpleNameRatherThanQualifiedNameSample.property = property;
-    }
+	static String property;
+	static void setProperty(String property) {
+		SimpleNameRatherThanQualifiedNameSample.property = property;
+	}
 
-    public void doNotConflictClassFieldAndOuterClassField(String property) {
-        Outer.property = property;
-        Outer.NestedOuter.property = property;
-    }
+	public void doNotConflictClassFieldAndOuterClassField(String property) {
+		Outer.property = property;
+		Outer.NestedOuter.property = property;
+	}
 
-    static class Inner {
-        static class InnerInner {
-            // Empty
-        }
-        private static final Inner INSTANCE = new Inner();
-        private static Inner getInstance() {
-            return INSTANCE;
-        }
-    }
+	static class Inner {
+		static class InnerInner {
+			// Empty
+		}
+		private static final Inner INSTANCE = new Inner();
+		private static Inner getInstance() {
+			return INSTANCE;
+		}
+	}
 
-    public String doNotReplaceFieldUseOfInnerClass() {
-        return Inner.INSTANCE.toString();
-    }
+	public String doNotReplaceFieldUseOfInnerClass() {
+		return Inner.INSTANCE.toString();
+	}
 
-    public String doNotReplaceMethodUseOfInnerClass() {
-        return Inner.getInstance().toString();
-    }
+	public String doNotReplaceMethodUseOfInnerClass() {
+		return Inner.getInstance().toString();
+	}
 
-    public Class<Inner.InnerInner> doNotReplaceTypeUseOfInnerClass() {
-        return Inner.InnerInner.class;
-    }
+	public Class<Inner.InnerInner> doNotReplaceTypeUseOfInnerClass() {
+		return Inner.InnerInner.class;
+	}
 }
 
 class Outer {
-    static java.lang.String property;
+	static java.lang.String property;
 
-    void doNotRefactorTopLevelClassCall() {
-        SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
-    }
+	void doNotRefactorTopLevelClassCall() {
+		SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
+	}
 
-    static class NestedOuter {
-        private static final String PRIVATE_CONSTANT = "not visible";
+	static class NestedOuter {
+		private static final String PRIVATE_CONSTANT = "not visible";
 
-        static java.lang.String property;
+		static java.lang.String property;
 
-        void doNotRefactorTopLevelClassCall() {
-            SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
-        }
-    }
+		void doNotRefactorTopLevelClassCall() {
+			SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
+		}
+	}
 
-    public static class OuterInheritedClass extends NestedOuter {
-        public void doNotRefactorThisPrivateConstant() {
-            System.out.println("value is " + NestedOuter.PRIVATE_CONSTANT);
-        }
-    }
+	public static class OuterInheritedClass extends NestedOuter {
+		public void doNotRefactorThisPrivateConstant() {
+			System.out.println("value is " + NestedOuter.PRIVATE_CONSTANT);
+		}
+	}
 }

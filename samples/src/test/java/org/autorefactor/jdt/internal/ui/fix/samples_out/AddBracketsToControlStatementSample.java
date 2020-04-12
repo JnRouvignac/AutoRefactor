@@ -29,33 +29,33 @@ import java.util.List;
 
 public class AddBracketsToControlStatementSample {
 
-    public static void main(String[] args) {
-        int i = 0;
-        // Keep this comment
-        if (true) {
-            i++;
-        } else {
-            i++;
-        }
+	public static void main(String[] args) {
+		int i = 0;
+		// Keep this comment
+		if (true) {
+			i++;
+		} else {
+			i++;
+		}
 
-        if (true) {
-            i++;
-        } else if (false) {
-            if (false) {
-                i++;
-            }
-        }
+		if (true) {
+			i++;
+		} else if (false) {
+			if (false) {
+				i++;
+			}
+		}
 
-        for (i = 0; i < args.length; i++) {
-            i++;
-        }
+		for (i = 0; i < args.length; i++) {
+			i++;
+		}
 
-        for (Object obj : (List) null) {
-            i++;
-        }
+		for (Object obj : (List) null) {
+			i++;
+		}
 
-        while (i < 10) {
-            i++;
-        }
-    }
+		while (i < 10) {
+			i++;
+		}
+	}
 }

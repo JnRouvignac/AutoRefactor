@@ -30,229 +30,229 @@ import java.util.Observable;
 
 public class CharPrimitiveRatherThanWrapperSample {
 
-    public Character doNotRefactorFields = Character.MIN_VALUE;
+	public Character doNotRefactorFields = Character.MIN_VALUE;
 
-    public char charField;
+	public char charField;
 
-    public Character wrapperField;
+	public Character wrapperField;
 
-    public Object objectField;
+	public Object objectField;
 
-    public void replaceWrapper(char c) {
-        // Keep this comment
-        Character alwaysInitializedVar = Character.MIN_VALUE;
-        if (alwaysInitializedVar > c) {
-            System.out.println("True!");
-        }
-    }
+	public void replaceWrapper(char c) {
+		// Keep this comment
+		Character alwaysInitializedVar = Character.MIN_VALUE;
+		if (alwaysInitializedVar > c) {
+			System.out.println("True!");
+		}
+	}
 
-    public void replaceFullyQualifiedWrapper(char c) {
-        // Keep this comment
-        java.lang.Character alwaysInitializedVar = Character.MIN_VALUE;
-        if (alwaysInitializedVar < c) {
-            System.out.println("True!");
-        }
-    }
+	public void replaceFullyQualifiedWrapper(char c) {
+		// Keep this comment
+		java.lang.Character alwaysInitializedVar = Character.MIN_VALUE;
+		if (alwaysInitializedVar < c) {
+			System.out.println("True!");
+		}
+	}
 
-    public int replacePreDecrementWrapper(char c) {
-        // Keep this comment
-        Character preDecrementVar = --c;
-        return preDecrementVar - 1;
-    }
+	public int replacePreDecrementWrapper(char c) {
+		// Keep this comment
+		Character preDecrementVar = --c;
+		return preDecrementVar - 1;
+	}
 
-    public int replacePreIncrementWrapper(char c) {
-        // Keep this comment
-        Character preDecrementVar = ++c;
-        return preDecrementVar + 1;
-    }
+	public int replacePreIncrementWrapper(char c) {
+		// Keep this comment
+		Character preDecrementVar = ++c;
+		return preDecrementVar + 1;
+	}
 
-    public int replacePostDecrementWrapper(char c) {
-        // Keep this comment
-        Character postDecrementVar = c--;
-        return -postDecrementVar;
-    }
+	public int replacePostDecrementWrapper(char c) {
+		// Keep this comment
+		Character postDecrementVar = c--;
+		return -postDecrementVar;
+	}
 
-    public char replacePostIncrementWrapper(char c) {
-        // Keep this comment
-        Character postIncrementVar = c++;
-        return postIncrementVar++;
-    }
+	public char replacePostIncrementWrapper(char c) {
+		// Keep this comment
+		Character postIncrementVar = c++;
+		return postIncrementVar++;
+	}
 
-    public int replaceWrapperFromValueOf(char c1) {
-        // Keep this comment
-        Character varFromValueOf = Character.valueOf(c1);
-        return +varFromValueOf;
-    }
+	public int replaceWrapperFromValueOf(char c1) {
+		// Keep this comment
+		Character varFromValueOf = Character.valueOf(c1);
+		return +varFromValueOf;
+	}
 
-    public char replaceCastWrapper(Character c) {
-        // Keep this comment
-        Character castVar = (char) c;
-        return castVar++;
-    }
+	public char replaceCastWrapper(Character c) {
+		// Keep this comment
+		Character castVar = (char) c;
+		return castVar++;
+	}
 
-    public char replaceObjectCastWrapper() {
-        // Keep this comment
-        Character castVar = (Character) Character.MIN_VALUE;
-        return castVar++;
-    }
+	public char replaceObjectCastWrapper() {
+		// Keep this comment
+		Character castVar = (Character) Character.MIN_VALUE;
+		return castVar++;
+	}
 
-    public char replaceWrapperInPreIncrement() {
-        // Keep this comment
-        Character alwaysInitializedVar = Character.MIN_VALUE;
-        return ++alwaysInitializedVar;
-    }
+	public char replaceWrapperInPreIncrement() {
+		// Keep this comment
+		Character alwaysInitializedVar = Character.MIN_VALUE;
+		return ++alwaysInitializedVar;
+	}
 
-    public char replaceWrapperInPreDecrement() {
-        // Keep this comment
-        Character alwaysInitializedVar = Character.MIN_VALUE;
-        return --alwaysInitializedVar;
-    }
+	public char replaceWrapperInPreDecrement() {
+		// Keep this comment
+		Character alwaysInitializedVar = Character.MIN_VALUE;
+		return --alwaysInitializedVar;
+	}
 
-    public char replaceWrapperInPostDecrement() {
-        // Keep this comment
-        Character alwaysInitializedVar = Character.MIN_VALUE;
-        return alwaysInitializedVar--;
-    }
+	public char replaceWrapperInPostDecrement() {
+		// Keep this comment
+		Character alwaysInitializedVar = Character.MIN_VALUE;
+		return alwaysInitializedVar--;
+	}
 
-    public char replaceWrapperInPostIncrement() {
-        // Keep this comment
-        Character alwaysInitializedVar = Character.MIN_VALUE;
-        return alwaysInitializedVar++;
-    }
+	public char replaceWrapperInPostIncrement() {
+		// Keep this comment
+		Character alwaysInitializedVar = Character.MIN_VALUE;
+		return alwaysInitializedVar++;
+	}
 
-    public void replaceWrapperInSwitch() {
-        // Keep this comment
-        Character charInSwitch = Character.MIN_VALUE;
-        switch (charInSwitch) {
-        case 1:
-            System.out.println("One");
-            break;
+	public void replaceWrapperInSwitch() {
+		// Keep this comment
+		Character charInSwitch = Character.MIN_VALUE;
+		switch (charInSwitch) {
+		case 1:
+			System.out.println("One");
+			break;
 
-        case 2:
-            System.out.println("Two");
-            break;
+		case 2:
+			System.out.println("Two");
+			break;
 
-        default:
-            break;
-        }
-    }
+		default:
+			break;
+		}
+	}
 
-    public String replaceWrapperInArrayAccess(String[] strings) {
-        // Keep this comment
-        Character charInArrayAccess = Character.MIN_VALUE;
-        return strings[charInArrayAccess];
-    }
+	public String replaceWrapperInArrayAccess(String[] strings) {
+		// Keep this comment
+		Character charInArrayAccess = Character.MIN_VALUE;
+		return strings[charInArrayAccess];
+	}
 
-    public char replaceReturnedWrapper() {
-        // Keep this comment
-        Character returnedCharacter = Character.MIN_VALUE;
-        return returnedCharacter;
-    }
+	public char replaceReturnedWrapper() {
+		// Keep this comment
+		Character returnedCharacter = Character.MIN_VALUE;
+		return returnedCharacter;
+	}
 
-    public Object doNotBreakAutoboxing() {
-        Character returnedObject = Character.MIN_VALUE;
-        return returnedObject;
-    }
+	public Object doNotBreakAutoboxing() {
+		Character returnedObject = Character.MIN_VALUE;
+		return returnedObject;
+	}
 
-    public char replaceMultiReturnedWrapper(char c) {
-        // Keep this comment
-        Character returnedCharacter = Character.MIN_VALUE;
-        if (c > 0) {
-            System.out.println("Positive");
-            return returnedCharacter;
-        } else {
-            System.out.println("Negative");
-            return returnedCharacter;
-        }
-    }
+	public char replaceMultiReturnedWrapper(char c) {
+		// Keep this comment
+		Character returnedCharacter = Character.MIN_VALUE;
+		if (c > 0) {
+			System.out.println("Positive");
+			return returnedCharacter;
+		} else {
+			System.out.println("Negative");
+			return returnedCharacter;
+		}
+	}
 
-    public Character replaceReturnedAutoBoxedWrapper(char c) {
-        // Keep this comment
-        Character returnedCharacter = Character.MIN_VALUE;
-        if (c > 0) {
-            System.out.println("Positive");
-            return returnedCharacter;
-        } else {
-            System.out.println("Negative");
-            return returnedCharacter;
-        }
-    }
+	public Character replaceReturnedAutoBoxedWrapper(char c) {
+		// Keep this comment
+		Character returnedCharacter = Character.MIN_VALUE;
+		if (c > 0) {
+			System.out.println("Positive");
+			return returnedCharacter;
+		} else {
+			System.out.println("Negative");
+			return returnedCharacter;
+		}
+	}
 
-    public void replaceReassignedWrapper() {
-        // Keep this comment
-        Character reassignedCharacter = Character.MIN_VALUE;
-        reassignedCharacter = 123;
-    }
+	public void replaceReassignedWrapper() {
+		// Keep this comment
+		Character reassignedCharacter = Character.MIN_VALUE;
+		reassignedCharacter = 123;
+	}
 
-    public void replaceMultiReassignedWrapper() {
-        // Keep this comment
-        Character multiReassignedCharacter = Character.MIN_VALUE;
-        multiReassignedCharacter = 123;
-        multiReassignedCharacter = 456;
-    }
+	public void replaceMultiReassignedWrapper() {
+		// Keep this comment
+		Character multiReassignedCharacter = Character.MIN_VALUE;
+		multiReassignedCharacter = 123;
+		multiReassignedCharacter = 456;
+	}
 
-    public void doNotReplaceNullWrapper() {
-        Character reassignedCharacter = Character.MIN_VALUE;
-        reassignedCharacter = null;
-    }
+	public void doNotReplaceNullWrapper() {
+		Character reassignedCharacter = Character.MIN_VALUE;
+		reassignedCharacter = null;
+	}
 
-    public void doNotReplaceWrapperPassedAsObject(Map<Character, Observable> obsByCharacter) {
-        Character reassignedCharacter = Character.MIN_VALUE;
-        obsByCharacter.get(reassignedCharacter).notifyObservers();
-    }
+	public void doNotReplaceWrapperPassedAsObject(Map<Character, Observable> obsByCharacter) {
+		Character reassignedCharacter = Character.MIN_VALUE;
+		obsByCharacter.get(reassignedCharacter).notifyObservers();
+	}
 
-    public void replaceAssignedWrapper() {
-        // Keep this comment
-        Character assignedCharacter = Character.MIN_VALUE;
-        Character anotherCharacter = assignedCharacter;
-    }
+	public void replaceAssignedWrapper() {
+		// Keep this comment
+		Character assignedCharacter = Character.MIN_VALUE;
+		Character anotherCharacter = assignedCharacter;
+	}
 
-    public void replaceWrapperAssignedOnCharacterField() {
-        // Keep this comment
-        Character assignedCharacter = Character.MIN_VALUE;
-        charField = assignedCharacter;
-    }
+	public void replaceWrapperAssignedOnCharacterField() {
+		// Keep this comment
+		Character assignedCharacter = Character.MIN_VALUE;
+		charField = assignedCharacter;
+	}
 
-    public void replaceWrapperAssignedOnWrapperField() {
-        // Keep this comment
-        Character assignedCharacter = Character.MIN_VALUE;
-        wrapperField = assignedCharacter;
-    }
+	public void replaceWrapperAssignedOnWrapperField() {
+		// Keep this comment
+		Character assignedCharacter = Character.MIN_VALUE;
+		wrapperField = assignedCharacter;
+	}
 
-    public void doNotReplaceWrapperAssignedOnObjectField() {
-        Character assignedCharacter = Character.MIN_VALUE;
-        objectField = assignedCharacter;
-    }
+	public void doNotReplaceWrapperAssignedOnObjectField() {
+		Character assignedCharacter = Character.MIN_VALUE;
+		objectField = assignedCharacter;
+	}
 
-    public void doNotReplaceMultiAssignedWrapper() {
-        Character assignedCharacter = Character.MIN_VALUE;
-        Character anotherCharacter = assignedCharacter;
-        Character yetAnotherCharacter = assignedCharacter;
-    }
+	public void doNotReplaceMultiAssignedWrapper() {
+		Character assignedCharacter = Character.MIN_VALUE;
+		Character anotherCharacter = assignedCharacter;
+		Character yetAnotherCharacter = assignedCharacter;
+	}
 
-    public void replaceBitAssignedWrapper(int anInteger, int anotherInteger,
-            int yetAnotherInteger) {
-        // Keep this comment
-        Character assignedCharacter = Character.MIN_VALUE;
-        anInteger &= assignedCharacter;
-        anotherInteger += assignedCharacter;
-        yetAnotherInteger ^= assignedCharacter;
-    }
+	public void replaceBitAssignedWrapper(int anInteger, int anotherInteger,
+			int yetAnotherInteger) {
+		// Keep this comment
+		Character assignedCharacter = Character.MIN_VALUE;
+		anInteger &= assignedCharacter;
+		anotherInteger += assignedCharacter;
+		yetAnotherInteger ^= assignedCharacter;
+	}
 
-    public Character doNotReplaceMultiAutoBoxedWrapper() {
-        Character assignedCharacter = Character.MIN_VALUE;
-        Character anotherCharacter = assignedCharacter;
-        return assignedCharacter;
-    }
+	public Character doNotReplaceMultiAutoBoxedWrapper() {
+		Character assignedCharacter = Character.MIN_VALUE;
+		Character anotherCharacter = assignedCharacter;
+		return assignedCharacter;
+	}
 
-    public void doNotBreakAutoboxingOnAssignment() {
-        Character returnedObject = Character.MIN_VALUE;
-        Object anotherObject = returnedObject;
-    }
+	public void doNotBreakAutoboxingOnAssignment() {
+		Character returnedObject = Character.MIN_VALUE;
+		Object anotherObject = returnedObject;
+	}
 
-    public Character doNotReplaceAssignedAndReturnedWrapper(Character c) {
-        Character returnedObject = Character.MIN_VALUE;
-        returnedObject = c;
-        return returnedObject;
-    }
+	public Character doNotReplaceAssignedAndReturnedWrapper(Character c) {
+		Character returnedObject = Character.MIN_VALUE;
+		returnedObject = c;
+		return returnedObject;
+	}
 }

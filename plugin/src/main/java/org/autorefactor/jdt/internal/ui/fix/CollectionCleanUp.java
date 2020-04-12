@@ -65,132 +65,132 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class CollectionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(cuRewrite, node);
-        node.accept(newAndAddAllMethodVisitor);
-        return newAndAddAllMethodVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(cuRewrite, node);
+		node.accept(newAndAddAllMethodVisitor);
+		return newAndAddAllMethodVisitor.getResult();
+	}
 
-    private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
-        public NewAndAddAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
+		public NewAndAddAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final ExpressionStatement node) {
-            MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
+		@Override
+		public boolean visit(final ExpressionStatement node) {
+			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
-            if (getResult() && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-                Expression arg0= ASTNodes.arguments(mi).get(0);
-                Statement previousStatement= ASTNodes.getPreviousSibling(node);
+			if (getResult() && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
+				Expression arg0= ASTNodes.arguments(mi).get(0);
+				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-                Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
-                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                    SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+				Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
+				if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
+					SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
 
-                    if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
-                        return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
-                    }
-                } else if (previousStatement instanceof VariableDeclarationStatement) {
-                    VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
-                            previousStatement);
-                    if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
-                        return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
-                    }
-                }
-            }
+					if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
+						return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
+					}
+				} else if (previousStatement instanceof VariableDeclarationStatement) {
+					VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
+							previousStatement);
+					if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
+						return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
+					}
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
-                final ExpressionStatement nodeToRemove) {
-            ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+		private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
+				final ExpressionStatement nodeToRemove) {
+			ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
-            if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                ASTNodeFactory ast= cuRewrite.getASTBuilder();
-                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                rewrite.replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)), null);
-                rewrite.remove(nodeToRemove, null);
-                setResult(false);
-                return false;
-            }
+				rewrite.replace(nodeToReplace, ast.new0(rewrite.createMoveTarget(cic.getType()), rewrite.createMoveTarget(arg0)), null);
+				rewrite.remove(nodeToRemove, null);
+				setResult(false);
+				return false;
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceCollection) {
-            if (cic == null || cic.getAnonymousClassDeclaration() != null) {
-                return false;
-            }
+		private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceCollection) {
+			if (cic == null || cic.getAnonymousClassDeclaration() != null) {
+				return false;
+			}
 
-            List<Expression> args= ASTNodes.arguments(cic);
-            boolean noArgsCtor= args.isEmpty();
+			List<Expression> args= ASTNodes.arguments(cic);
+			boolean noArgsCtor= args.isEmpty();
 
-            if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
-                    ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
-                    CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
-                    DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), LinkedTransferQueue.class.getCanonicalName(),
-                    PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
-                    HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
-                    TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName())) {
-                return true;
-            }
+			if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
+					ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
+					CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
+					DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
+					LinkedBlockingQueue.class.getCanonicalName(), LinkedTransferQueue.class.getCanonicalName(),
+					PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
+					HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
+					TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName())) {
+				return true;
+			}
 
-            boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
+			boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
 
-            return colCapacityCtor && ASTNodes.hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
-                    ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(), HashSet.class.getCanonicalName(),
-                    LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName());
-        }
+			return colCapacityCtor && ASTNodes.hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
+					LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
+					ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(), HashSet.class.getCanonicalName(),
+					LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName());
+		}
 
-        private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
-            if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
-                Object constant= args.get(0).resolveConstantExpressionValue();
-                MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
+		private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
+			if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
+				Object constant= args.get(0).resolveConstantExpressionValue();
+				MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
 
-                if (constant != null) {
-                    return constant.equals(0);
-                }
+				if (constant != null) {
+					return constant.equals(0);
+				}
 
-                return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
-            }
+				return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
+			}
 
-            return false;
-        }
-    }
+			return false;
+		}
+	}
 }

@@ -35,52 +35,52 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * that caused a failure.
  */
 public class AutoRefactorException extends RuntimeException {
-    /**
-     * Constructor.
-     *
-     * @param node the node from which to retrieve the source location
-     */
-    public AutoRefactorException(final ASTNode node) {
-        super(ASTNodes.getSourceLocation(node));
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param node the node from which to retrieve the source location
+	 */
+	public AutoRefactorException(final ASTNode node) {
+		super(ASTNodes.getSourceLocation(node));
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param node    the node from which to retrieve the source location
-     * @param message the exception message
-     */
-    public AutoRefactorException(final ASTNode node, final String message) {
-        super(buildMessage(node, message));
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param node    the node from which to retrieve the source location
+	 * @param message the exception message
+	 */
+	public AutoRefactorException(final ASTNode node, final String message) {
+		super(buildMessage(node, message));
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param node  the node from which to retrieve the source location
-     * @param cause the cause
-     */
-    public AutoRefactorException(final ASTNode node, final Throwable cause) {
-        super(ASTNodes.getSourceLocation(node), cause);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param node  the node from which to retrieve the source location
+	 * @param cause the cause
+	 */
+	public AutoRefactorException(final ASTNode node, final Throwable cause) {
+		super(ASTNodes.getSourceLocation(node), cause);
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param node    the node from which to retrieve the source location
-     * @param message the exception message
-     * @param cause   the cause
-     */
-    public AutoRefactorException(final ASTNode node, final String message, final Throwable cause) {
-        super(buildMessage(node, message), cause);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param node    the node from which to retrieve the source location
+	 * @param message the exception message
+	 * @param cause   the cause
+	 */
+	public AutoRefactorException(final ASTNode node, final String message, final Throwable cause) {
+		super(buildMessage(node, message), cause);
+	}
 
-    private static String buildMessage(final ASTNode node, final String message) {
-        String sourceLocation= ASTNodes.getSourceLocation(node);
-        if (!sourceLocation.isEmpty()) {
-            return sourceLocation + ":" + message; //$NON-NLS-1$
-        }
+	private static String buildMessage(final ASTNode node, final String message) {
+		String sourceLocation= ASTNodes.getSourceLocation(node);
+		if (!sourceLocation.isEmpty()) {
+			return sourceLocation + ":" + message; //$NON-NLS-1$
+		}
 
-        return message;
-    }
+		return message;
+	}
 }

@@ -31,47 +31,47 @@ import java.util.function.Predicate;
 
 public class RemoveFieldsDefaultValuesSample {
 
-    private interface Constants {
-        String NULL = null;
-    }
+	private interface Constants {
+		String NULL = null;
+	}
 
-    private static final int MY_CONSTANT = 0;
-    private int keepInitializer = MY_CONSTANT;
+	private static final int MY_CONSTANT = 0;
+	private int keepInitializer = MY_CONSTANT;
 
-    private final boolean final_bo = false;
+	private final boolean final_bo = false;
 
-    private Object doNotRemoveInitializer = new Object();
+	private Object doNotRemoveInitializer = new Object();
 
-    private Object obj;
-    private String st;
-    private byte by1, by2;
-    private boolean bo;
-    private char c1, c2;
-    private short sh;
-    private int i;
-    private long l1, l2, l3;
-    private float f1, f2, f3, f4;
-    private double d1, d2;
-    private Predicate<String> doNotRemoveLambdaExpression = x -> "foo".equals(x);
+	private Object obj;
+	private String st;
+	private byte by1, by2;
+	private boolean bo;
+	private char c1, c2;
+	private short sh;
+	private int i;
+	private long l1, l2, l3;
+	private float f1, f2, f3, f4;
+	private double d1, d2;
+	private Predicate<String> doNotRemoveLambdaExpression = x -> "foo".equals(x);
 
-    public Iterable<String> getIterable() {
-        return new Iterable<String>() {
-            private Collection<String> aField;
+	public Iterable<String> getIterable() {
+		return new Iterable<String>() {
+			private Collection<String> aField;
 
-            @Override
-            public Iterator<String> iterator() {
-                return aField.iterator();
-            }
-        };
-    }
+			@Override
+			public Iterator<String> iterator() {
+				return aField.iterator();
+			}
+		};
+	}
 
-    private enum MyEnum {
-        ONE, TWO;
+	private enum MyEnum {
+		ONE, TWO;
 
-        String aField;
-    }
+		String aField;
+	}
 
-    private @interface MyAnnotation {
-        String aField = null;
-    }
+	private @interface MyAnnotation {
+		String aField = null;
+	}
 }

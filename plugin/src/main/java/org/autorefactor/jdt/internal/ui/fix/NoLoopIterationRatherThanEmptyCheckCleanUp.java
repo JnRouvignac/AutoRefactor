@@ -43,154 +43,154 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        if (node.getElseStatement() == null) {
-            List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		if (node.getElseStatement() == null) {
+			List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
-            if (statements != null
-                    && statements.size() == 1) {
-                Expression container= getContainer(statements);
+			if (statements != null
+					&& statements.size() == 1) {
+				Expression container= getContainer(statements);
 
-                if (ASTNodes.isArray(container) && ASTNodes.isPassive(container)) {
-                    InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+				if (ASTNodes.isArray(container) && ASTNodes.isPassive(container)) {
+					InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
 
-                    if (isConditionValid(condition, container)) {
-                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                        rewrite.replace(node, rewrite.createMoveTarget(statements.get(0)), null);
-                        return false;
-                    }
+					if (isConditionValid(condition, container)) {
+						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+						rewrite.replace(node, rewrite.createMoveTarget(statements.get(0)), null);
+						return false;
+					}
 
-                    if (ASTNodes.hasOperator(condition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-                        List<Expression> operands= ASTNodes.allOperands(condition);
-                        Expression operand= ASTNodes.as(operands.get(operands.size() - 1), InfixExpression.class);
+					if (ASTNodes.hasOperator(condition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
+						List<Expression> operands= ASTNodes.allOperands(condition);
+						Expression operand= ASTNodes.as(operands.get(operands.size() - 1), InfixExpression.class);
 
-                        if (isConditionValid(operand, container)) {
-                            removeCondition(condition, operands);
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
+						if (isConditionValid(operand, container)) {
+							removeCondition(condition, operands);
+							return false;
+						}
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isConditionValid(final Expression expression, final Expression container) {
-        InfixExpression condition= ASTNodes.as(expression, InfixExpression.class);
-        return condition != null
-                && !condition.hasExtendedOperands() && ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
-                        InfixExpression.Operator.GREATER,
-                        InfixExpression.Operator.GREATER_EQUALS,
-                        InfixExpression.Operator.LESS,
-                        InfixExpression.Operator.LESS_EQUALS)
-                && (isConditionValid(condition, container, condition.getLeftOperand(), condition.getRightOperand(), true)
-                        || isConditionValid(condition, container, condition.getRightOperand(), condition.getLeftOperand(), false));
-    }
+	private boolean isConditionValid(final Expression expression, final Expression container) {
+		InfixExpression condition= ASTNodes.as(expression, InfixExpression.class);
+		return condition != null
+				&& !condition.hasExtendedOperands() && ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
+						InfixExpression.Operator.GREATER,
+						InfixExpression.Operator.GREATER_EQUALS,
+						InfixExpression.Operator.LESS,
+						InfixExpression.Operator.LESS_EQUALS)
+				&& (isConditionValid(condition, container, condition.getLeftOperand(), condition.getRightOperand(), true)
+						|| isConditionValid(condition, container, condition.getRightOperand(), condition.getLeftOperand(), false));
+	}
 
-    private boolean isConditionValid(final InfixExpression condition, final Expression container, final Expression arrayOperand,
-            final Expression literalOperand, final boolean isArrayOnLeft) {
-        Expression array= getArray(container, arrayOperand);
-        Long literal= ASTNodes.integerLiteral(literalOperand);
+	private boolean isConditionValid(final InfixExpression condition, final Expression container, final Expression arrayOperand,
+			final Expression literalOperand, final boolean isArrayOnLeft) {
+		Expression array= getArray(container, arrayOperand);
+		Long literal= ASTNodes.integerLiteral(literalOperand);
 
-        if (array != null
-                && literal != null) {
-            long value= literal;
+		if (array != null
+				&& literal != null) {
+			long value= literal;
 
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
-                return value == 0;
-            }
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER)) {
-                return isArrayOnLeft && value == 0;
-            }
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER_EQUALS)) {
-                return isArrayOnLeft && value == 1;
-            }
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS)) {
-                return !isArrayOnLeft && value == 0;
-            }
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS_EQUALS)) {
-                return !isArrayOnLeft && value == 1;
-            }
-        }
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS)) {
+				return value == 0;
+			}
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER)) {
+				return isArrayOnLeft && value == 0;
+			}
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.GREATER_EQUALS)) {
+				return isArrayOnLeft && value == 1;
+			}
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS)) {
+				return !isArrayOnLeft && value == 0;
+			}
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.LESS_EQUALS)) {
+				return !isArrayOnLeft && value == 1;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private Expression getArray(final Expression container, final Expression operand) {
-        FieldAccess fieldAccess= ASTNodes.as(operand, FieldAccess.class);
-        QualifiedName name= ASTNodes.as(operand, QualifiedName.class);
+	private Expression getArray(final Expression container, final Expression operand) {
+		FieldAccess fieldAccess= ASTNodes.as(operand, FieldAccess.class);
+		QualifiedName name= ASTNodes.as(operand, QualifiedName.class);
 
-        if (fieldAccess != null) {
-            if (ASTNodes.isSameVariable(fieldAccess.getExpression(), container) && "length".equals(fieldAccess.getName().getIdentifier())) { //$NON-NLS-1$
-                return fieldAccess.getExpression();
-            }
-        } else if (name != null && ASTNodes.isSameVariable(name.getQualifier(), container) && "length".equals(name.getName().getIdentifier())) { //$NON-NLS-1$
-            return name.getQualifier();
-        }
+		if (fieldAccess != null) {
+			if (ASTNodes.isSameVariable(fieldAccess.getExpression(), container) && "length".equals(fieldAccess.getName().getIdentifier())) { //$NON-NLS-1$
+				return fieldAccess.getExpression();
+			}
+		} else if (name != null && ASTNodes.isSameVariable(name.getQualifier(), container) && "length".equals(name.getName().getIdentifier())) { //$NON-NLS-1$
+			return name.getQualifier();
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private Expression getContainer(final List<Statement> statements) {
-        ForStatement forStatement= ASTNodes.as(statements.get(0), ForStatement.class);
-        EnhancedForStatement enhancedForStatement= ASTNodes.as(statements.get(0), EnhancedForStatement.class);
+	private Expression getContainer(final List<Statement> statements) {
+		ForStatement forStatement= ASTNodes.as(statements.get(0), ForStatement.class);
+		EnhancedForStatement enhancedForStatement= ASTNodes.as(statements.get(0), EnhancedForStatement.class);
 
-        if (forStatement != null) {
-            ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(forStatement);
+		if (forStatement != null) {
+			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(forStatement);
 
-            if (loopContent != null) {
-                return loopContent.getContainerVariable();
-            }
-        } else if (enhancedForStatement != null) {
-            return enhancedForStatement.getExpression();
-        }
+			if (loopContent != null) {
+				return loopContent.getContainerVariable();
+			}
+		} else if (enhancedForStatement != null) {
+			return enhancedForStatement.getExpression();
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        if (operands.size() == 2) {
-            rewrite.replace(condition, rewrite.createMoveTarget(operands.get(0)), null);
-        } else {
-            operands.remove(operands.size() - 1);
-            InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
+		if (operands.size() == 2) {
+			rewrite.replace(condition, rewrite.createMoveTarget(operands.get(0)), null);
+		} else {
+			operands.remove(operands.size() - 1);
+			InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
-            rewrite.replace(condition, newCondition, null);
-        }
-    }
+			rewrite.replace(condition, newCondition, null);
+		}
+	}
 }

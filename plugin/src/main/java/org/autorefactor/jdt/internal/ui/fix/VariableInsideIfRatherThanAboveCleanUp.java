@@ -42,125 +42,125 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor(cuRewrite, node);
-        node.accept(newAndPutAllMethodVisitor);
-        return newAndPutAllMethodVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor(cuRewrite, node);
+		node.accept(newAndPutAllMethodVisitor);
+		return newAndPutAllMethodVisitor.getResult();
+	}
 
-    private static final class VariableAndIfVisitor extends BlockSubVisitor {
-        public VariableAndIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private static final class VariableAndIfVisitor extends BlockSubVisitor {
+		public VariableAndIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            if (getResult()) {
-                Statement variableAssignment= ASTNodes.getPreviousSibling(node);
-                VariableDeclarationFragment variable= getVariable(variableAssignment);
+		@Override
+		public boolean visit(final IfStatement node) {
+			if (getResult()) {
+				Statement variableAssignment= ASTNodes.getPreviousSibling(node);
+				VariableDeclarationFragment variable= getVariable(variableAssignment);
 
-                if (variable == null || isVarUsed(variable, node.getExpression())) {
-                    return true;
-                }
+				if (variable == null || isVarUsed(variable, node.getExpression())) {
+					return true;
+				}
 
-                for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                    if (isVarUsed(variable, statement)) {
-                        return true;
-                    }
-                }
+				for (Statement statement : ASTNodes.getNextSiblings(node)) {
+					if (isVarUsed(variable, statement)) {
+						return true;
+					}
+				}
 
-                if (isVarUsed(variable, node.getThenStatement())) {
-                    if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
-                        return true;
-                    }
+				if (isVarUsed(variable, node.getThenStatement())) {
+					if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+						return true;
+					}
 
-                    return maybeMoveAssignment(variableAssignment, node.getThenStatement());
-                }
+					return maybeMoveAssignment(variableAssignment, node.getThenStatement());
+				}
 
-                if (node.getElseStatement() != null) {
-                    return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
-                }
-            }
+				if (node.getElseStatement() != null) {
+					return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
-            VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true).find();
-            return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
-        }
+		private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
+			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true).find();
+			return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
+		}
 
-        private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
-            VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
+		private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
+			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
 
-            if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
-                VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
+			if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
+				VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
 
-                if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-                    return fragment;
-                }
-            }
+				if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+					return fragment;
+				}
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-        private boolean maybeMoveAssignment(final Statement variableAssignment, final Statement statement) {
-            List<Statement> statements= ASTNodes.asList(statement);
+		private boolean maybeMoveAssignment(final Statement variableAssignment, final Statement statement) {
+			List<Statement> statements= ASTNodes.asList(statement);
 
-            if (statements.isEmpty()) {
-                return true;
-            }
+			if (statements.isEmpty()) {
+				return true;
+			}
 
-            moveAssignmentInsideIf(variableAssignment, statement, statements);
-            setResult(false);
-            return false;
-        }
+			moveAssignmentInsideIf(variableAssignment, statement, statements);
+			setResult(false);
+			return false;
+		}
 
-        private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
-                final List<Statement> statements) {
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
+				final List<Statement> statements) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            if (statement instanceof Block) {
-                rewrite.insertBefore(rewrite.createMoveTarget(variableAssignment), statements.get(0), null);
-                rewrite.remove(variableAssignment, null);
-            } else {
-                List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
-                copyOfThenStatements.add(0, rewrite.createMoveTarget(variableAssignment));
-                Block block= ast.block(copyOfThenStatements);
-                rewrite.replace(statement, block, null);
-            }
-        }
-    }
+			if (statement instanceof Block) {
+				rewrite.insertBefore(rewrite.createMoveTarget(variableAssignment), statements.get(0), null);
+				rewrite.remove(variableAssignment, null);
+			} else {
+				List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
+				copyOfThenStatements.add(0, rewrite.createMoveTarget(variableAssignment));
+				Block block= ast.block(copyOfThenStatements);
+				rewrite.replace(statement, block, null);
+			}
+		}
+	}
 }

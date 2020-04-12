@@ -37,77 +37,77 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        boolean result= maybeAddBrackets(node.getThenStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		boolean result= maybeAddBrackets(node.getThenStatement());
 
-        if (!(node.getElseStatement() instanceof IfStatement)) {
-            result&= maybeAddBrackets(node.getElseStatement());
-        }
+		if (!(node.getElseStatement() instanceof IfStatement)) {
+			result&= maybeAddBrackets(node.getElseStatement());
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public boolean visit(final EnhancedForStatement node) {
-        return maybeAddBrackets(node.getBody());
-    }
+	@Override
+	public boolean visit(final EnhancedForStatement node) {
+		return maybeAddBrackets(node.getBody());
+	}
 
-    @Override
-    public boolean visit(final ForStatement node) {
-        return maybeAddBrackets(node.getBody());
-    }
+	@Override
+	public boolean visit(final ForStatement node) {
+		return maybeAddBrackets(node.getBody());
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        return maybeAddBrackets(node.getBody());
-    }
+	@Override
+	public boolean visit(final WhileStatement node) {
+		return maybeAddBrackets(node.getBody());
+	}
 
-    @Override
-    public boolean visit(final DoStatement node) {
-        return maybeAddBrackets(node.getBody());
-    }
+	@Override
+	public boolean visit(final DoStatement node) {
+		return maybeAddBrackets(node.getBody());
+	}
 
-    private boolean maybeAddBrackets(final Statement statement) {
-        if (statement == null || statement instanceof Block) {
-            return true;
-        }
+	private boolean maybeAddBrackets(final Statement statement) {
+		if (statement == null || statement instanceof Block) {
+			return true;
+		}
 
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Block block= ast.block(rewrite.createMoveTarget(statement));
-        rewrite.replace(statement, block, null);
-        return false;
-    }
+		Block block= ast.block(rewrite.createMoveTarget(statement));
+		rewrite.replace(statement, block, null);
+		return false;
+	}
 }

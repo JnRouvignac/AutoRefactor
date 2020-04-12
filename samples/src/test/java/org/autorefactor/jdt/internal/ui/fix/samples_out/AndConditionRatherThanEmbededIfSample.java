@@ -26,71 +26,71 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class AndConditionRatherThanEmbededIfSample {
-    public void collapseIfStatements(boolean isActive, boolean isValid) {
-        // Keep this comment
-        // Keep this comment too
-        if (isActive && isValid) {
-            // Keep this comment also
-            int i = 0;
-        }
-    }
+	public void collapseIfStatements(boolean isActive, boolean isValid) {
+		// Keep this comment
+		// Keep this comment too
+		if (isActive && isValid) {
+			// Keep this comment also
+			int i = 0;
+		}
+	}
 
-    public void collapseWithFourOperands(int i1, int i2) {
-        // Keep this comment
-        // Keep this comment too
-        if ((0 < i1 && i1 < 10) && (0 < i2 && i2 < 10)) {
-        	// Keep this comment also
-        	int i = 0;
-        }
-    }
+	public void collapseWithFourOperands(int i1, int i2) {
+		// Keep this comment
+		// Keep this comment too
+		if ((0 < i1 && i1 < 10) && (0 < i2 && i2 < 10)) {
+			// Keep this comment also
+			int i = 0;
+		}
+	}
 
-    public void doNotCollapseWithFiveOperands(int i1, int i2) {
-        // Keep this comment
-        if (0 < i1 && i1 < 10) {
-            // Keep this comment too
-            if (100 < i2 && i2 < 200 || i2 < 0) {
-                // Keep this comment also
-                int i = 0;
-            }
-        }
-    }
+	public void doNotCollapseWithFiveOperands(int i1, int i2) {
+		// Keep this comment
+		if (0 < i1 && i1 < 10) {
+			// Keep this comment too
+			if (100 < i2 && i2 < 200 || i2 < 0) {
+				// Keep this comment also
+				int i = 0;
+			}
+		}
+	}
 
-    public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean isActive, boolean isValid, boolean isEditMode) {
-        // Keep this comment 1
-        // Keep this comment 2
-        if (isActive && (isValid || isEditMode)) {
-            // Keep this comment 3
-            int i = 0;
-        }
-    }
+	public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean isActive, boolean isValid, boolean isEditMode) {
+		// Keep this comment 1
+		// Keep this comment 2
+		if (isActive && (isValid || isEditMode)) {
+			// Keep this comment 3
+			int i = 0;
+		}
+	}
 
-    public void collapseIfWithOROperator(boolean isActive, boolean isValid, boolean isEditMode) {
-        // Keep this comment 1
-        // Keep this comment 2
-        if (isActive && (isValid | isEditMode)) {
-            // Keep this comment 3
-            int i = 0;
-        }
-    }
+	public void collapseIfWithOROperator(boolean isActive, boolean isValid, boolean isEditMode) {
+		// Keep this comment 1
+		// Keep this comment 2
+		if (isActive && (isValid | isEditMode)) {
+			// Keep this comment 3
+			int i = 0;
+		}
+	}
 
-    public void doNotCollapseOuterIfWithElseStatement(boolean isActive, boolean isValid) {
-        if (isActive) {
-            if (isValid) {
-                int i = 0;
-            }
-        } else {
-            int i = 0;
-        }
-    }
+	public void doNotCollapseOuterIfWithElseStatement(boolean isActive, boolean isValid) {
+		if (isActive) {
+			if (isValid) {
+				int i = 0;
+			}
+		} else {
+			int i = 0;
+		}
+	}
 
-    public void doNotCollapseIfWithElseStatement2(boolean isActive, boolean isValid) {
-        if (isActive) {
-            if (isValid) {
-                int i = 0;
-            } else {
-                int i = 0;
-            }
-        }
-    }
+	public void doNotCollapseIfWithElseStatement2(boolean isActive, boolean isValid) {
+		if (isActive) {
+			if (isValid) {
+				int i = 0;
+			} else {
+				int i = 0;
+			}
+		}
+	}
 
 }

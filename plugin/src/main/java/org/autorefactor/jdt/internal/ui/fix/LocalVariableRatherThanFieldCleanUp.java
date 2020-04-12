@@ -54,284 +54,284 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
-    private static final class FieldUseVisitor extends ASTVisitor {
-        private final SimpleName field;
-        private final List<SimpleName> occurrences= new ArrayList<>();
+	private static final class FieldUseVisitor extends ASTVisitor {
+		private final SimpleName field;
+		private final List<SimpleName> occurrences= new ArrayList<>();
 
-        private FieldUseVisitor(final SimpleName field) {
-            this.field= field;
-        }
+		private FieldUseVisitor(final SimpleName field) {
+			this.field= field;
+		}
 
-        @Override
-        public boolean visit(final SimpleName aVariable) {
-            if (field != aVariable
-                    && field.getIdentifier().equals(aVariable.getIdentifier())
-                    && !(aVariable.getParent() instanceof MethodDeclaration)
-                    && (!(aVariable.getParent() instanceof MethodInvocation) || aVariable.getLocationInParent() != MethodInvocation.NAME_PROPERTY)) {
-                occurrences.add(aVariable);
-            }
+		@Override
+		public boolean visit(final SimpleName aVariable) {
+			if (field != aVariable
+					&& field.getIdentifier().equals(aVariable.getIdentifier())
+					&& !(aVariable.getParent() instanceof MethodDeclaration)
+					&& (!(aVariable.getParent() instanceof MethodInvocation) || aVariable.getLocationInParent() != MethodInvocation.NAME_PROPERTY)) {
+				occurrences.add(aVariable);
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private List<SimpleName> getOccurrences() {
-            return occurrences;
-        }
-    }
+		private List<SimpleName> getOccurrences() {
+			return occurrences;
+		}
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final TypeDeclaration node) {
-        for (FieldDeclaration field : node.getFields()) {
-            if (!maybeReplaceFieldByLocalVariable(node, field)) {
-                return false;
-            }
-        }
+	@Override
+	public boolean visit(final TypeDeclaration node) {
+		for (FieldDeclaration field : node.getFields()) {
+			if (!maybeReplaceFieldByLocalVariable(node, field)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration node, final FieldDeclaration field) {
-        if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && !hasAnnotation(field) && field.getType().isPrimitiveType()) {
-            for (Object object : field.fragments()) {
-                VariableDeclarationFragment fragment= (VariableDeclarationFragment) object;
+	private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration node, final FieldDeclaration field) {
+		if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && !hasAnnotation(field) && field.getType().isPrimitiveType()) {
+			for (Object object : field.fragments()) {
+				VariableDeclarationFragment fragment= (VariableDeclarationFragment) object;
 
-                if (!maybeReplaceFragmentByLocalVariable(node, field, fragment)) {
-                    return false;
-                }
-            }
-        }
+				if (!maybeReplaceFragmentByLocalVariable(node, field, fragment)) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeReplaceFragmentByLocalVariable(final TypeDeclaration node, final FieldDeclaration field,
-            final VariableDeclarationFragment fragment) {
-        if (fragment.getInitializer() != null && !ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-            return true;
-        }
+	private boolean maybeReplaceFragmentByLocalVariable(final TypeDeclaration node, final FieldDeclaration field,
+			final VariableDeclarationFragment fragment) {
+		if (fragment.getInitializer() != null && !ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+			return true;
+		}
 
-        FieldUseVisitor fieldUseVisitor= new FieldUseVisitor(fragment.getName());
-        node.accept(fieldUseVisitor);
-        List<SimpleName> occurrences= fieldUseVisitor.getOccurrences();
+		FieldUseVisitor fieldUseVisitor= new FieldUseVisitor(fragment.getName());
+		node.accept(fieldUseVisitor);
+		List<SimpleName> occurrences= fieldUseVisitor.getOccurrences();
 
-        MethodDeclaration oneMethodDeclaration= null;
+		MethodDeclaration oneMethodDeclaration= null;
 
-        for (SimpleName occurrence : occurrences) {
-            MethodDeclaration currentMethodDeclaration= ASTNodes.getAncestorOrNull(occurrence, MethodDeclaration.class);
+		for (SimpleName occurrence : occurrences) {
+			MethodDeclaration currentMethodDeclaration= ASTNodes.getAncestorOrNull(occurrence, MethodDeclaration.class);
 
-            if (isVariableDeclaration(occurrence)
-                    || isExternalField(occurrence)
-                    || currentMethodDeclaration == null
-                    || (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
-                return true;
-            }
+			if (isVariableDeclaration(occurrence)
+					|| isExternalField(occurrence)
+					|| currentMethodDeclaration == null
+					|| (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
+				return true;
+			}
 
-            oneMethodDeclaration= currentMethodDeclaration;
-        }
+			oneMethodDeclaration= currentMethodDeclaration;
+		}
 
-        if (oneMethodDeclaration == null) {
-            return true;
-        }
+		if (oneMethodDeclaration == null) {
+			return true;
+		}
 
-        boolean isReassigned= isAlwaysErased(occurrences);
+		boolean isReassigned= isAlwaysErased(occurrences);
 
-        if (isReassigned) {
-            SimpleName reassignment= findReassignment(occurrences);
+		if (isReassigned) {
+			SimpleName reassignment= findReassignment(occurrences);
 
-            if (reassignment != null && reassignment.getParent() instanceof Assignment) {
-                replaceFieldByLocalVariable(field, fragment, reassignment);
-                return false;
-            }
-        }
+			if (reassignment != null && reassignment.getParent() instanceof Assignment) {
+				replaceFieldByLocalVariable(field, fragment, reassignment);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        boolean isFieldKept= field.fragments().size() != 1;
+		boolean isFieldKept= field.fragments().size() != 1;
 
-        Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
-        VariableDeclarationFragment newFragment= ast.declareFragment(rewrite.createMoveTarget(reassignment), rewrite.createMoveTarget(reassignmentAssignment.getRightHandSide()));
-        @SuppressWarnings("unchecked")
-        List<Dimension> extraDimensions= fragment.extraDimensions();
-        @SuppressWarnings("unchecked")
-        List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-        newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
-        VariableDeclarationStatement newDeclareStatement= ast.declareStatement(isFieldKept ? rewrite.createMoveTarget(field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
-        @SuppressWarnings("unchecked")
-        List<IExtendedModifier> modifiers= field.modifiers();
-        @SuppressWarnings("unchecked")
-        List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
+		Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
+		VariableDeclarationFragment newFragment= ast.declareFragment(rewrite.createMoveTarget(reassignment), rewrite.createMoveTarget(reassignmentAssignment.getRightHandSide()));
+		@SuppressWarnings("unchecked")
+		List<Dimension> extraDimensions= fragment.extraDimensions();
+		@SuppressWarnings("unchecked")
+		List<Dimension> newExtraDimensions= newFragment.extraDimensions();
+		newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+		VariableDeclarationStatement newDeclareStatement= ast.declareStatement(isFieldKept ? rewrite.createMoveTarget(field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> modifiers= field.modifiers();
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
 
-        for (IExtendedModifier iExtendedModifier : modifiers) {
-            Modifier modifier= (Modifier) iExtendedModifier;
+		for (IExtendedModifier iExtendedModifier : modifiers) {
+			Modifier modifier= (Modifier) iExtendedModifier;
 
-            if (!modifier.isPrivate() && !modifier.isStatic()) {
-                newModifiers.add(isFieldKept ? rewrite.createMoveTarget(modifier) : ast.createCopyTarget(modifier));
-            }
-        }
+			if (!modifier.isPrivate() && !modifier.isStatic()) {
+				newModifiers.add(isFieldKept ? rewrite.createMoveTarget(modifier) : ast.createCopyTarget(modifier));
+			}
+		}
 
-        rewrite.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
-                newDeclareStatement, null);
+		rewrite.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
+				newDeclareStatement, null);
 
-        if (isFieldKept) {
-            rewrite.remove(fragment, null);
-            rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), null);
-        } else {
-            rewrite.remove(field, null);
-        }
-    }
+		if (isFieldKept) {
+			rewrite.remove(fragment, null);
+			rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), null);
+		} else {
+			rewrite.remove(field, null);
+		}
+	}
 
-    private SimpleName findReassignment(final List<SimpleName> occurrences) {
-        for (SimpleName reassignment : occurrences) {
-            if (isReassigned(reassignment) && isReassignmentForAll(reassignment, occurrences)) {
-                return reassignment;
-            }
-        }
+	private SimpleName findReassignment(final List<SimpleName> occurrences) {
+		for (SimpleName reassignment : occurrences) {
+			if (isReassigned(reassignment) && isReassignmentForAll(reassignment, occurrences)) {
+				return reassignment;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private boolean isReassignmentForAll(final SimpleName reassignment, final List<SimpleName> occurrences) {
-        for (SimpleName occurrence : occurrences) {
-            if (reassignment != occurrence) {
-                Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
-                boolean isReassigned= false;
+	private boolean isReassignmentForAll(final SimpleName reassignment, final List<SimpleName> occurrences) {
+		for (SimpleName occurrence : occurrences) {
+			if (reassignment != occurrence) {
+				Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
+				boolean isReassigned= false;
 
-                while (statement != null) {
-                    ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
+				while (statement != null) {
+					ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
 
-                    if (expressionStatement != null) {
-                        Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
+					if (expressionStatement != null) {
+						Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
 
-                        if (assignment != null
-                                && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
-                                && assignment.getLeftHandSide() == reassignment) {
-                            isReassigned= true;
-                            break;
-                        }
-                    }
+						if (assignment != null
+								&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+								&& assignment.getLeftHandSide() == reassignment) {
+							isReassigned= true;
+							break;
+						}
+					}
 
-                    statement= ASTNodes.getPreviousStatement(statement);
-                }
+					statement= ASTNodes.getPreviousStatement(statement);
+				}
 
-                if (!isReassigned) {
-                    return false;
-                }
-            }
-        }
+				if (!isReassigned) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isAlwaysErased(final List<SimpleName> occurrences) {
-        for (SimpleName occurrence : occurrences) {
-            if (!isReassigned(occurrence)) {
-                Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
-                boolean isReassigned= false;
+	private boolean isAlwaysErased(final List<SimpleName> occurrences) {
+		for (SimpleName occurrence : occurrences) {
+			if (!isReassigned(occurrence)) {
+				Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
+				boolean isReassigned= false;
 
-                while (statement != null) {
-                    statement= ASTNodes.getPreviousStatement(statement);
-                    ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
+				while (statement != null) {
+					statement= ASTNodes.getPreviousStatement(statement);
+					ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
 
-                    if (expressionStatement != null) {
-                        Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
+					if (expressionStatement != null) {
+						Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
 
-                        if (assignment != null
-                                && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
-                                && ASTNodes.areSameVariables(assignment.getLeftHandSide(), occurrence)) {
-                            isReassigned= true;
-                            break;
-                        }
-                    }
-                }
+						if (assignment != null
+								&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+								&& ASTNodes.areSameVariables(assignment.getLeftHandSide(), occurrence)) {
+							isReassigned= true;
+							break;
+						}
+					}
+				}
 
-                if (!isReassigned) {
-                    return false;
-                }
-            }
-        }
+				if (!isReassigned) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isReassigned(final SimpleName occurrence) {
-        return occurrence.getParent() instanceof Assignment
-                && occurrence.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY
-                && ASTNodes.hasOperator((Assignment) occurrence.getParent(), Assignment.Operator.ASSIGN);
-    }
+	private boolean isReassigned(final SimpleName occurrence) {
+		return occurrence.getParent() instanceof Assignment
+				&& occurrence.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY
+				&& ASTNodes.hasOperator((Assignment) occurrence.getParent(), Assignment.Operator.ASSIGN);
+	}
 
-    private static boolean isExternalField(final SimpleName occurrence) {
-        FieldAccess fieldAccess= ASTNodes.as(occurrence, FieldAccess.class);
+	private static boolean isExternalField(final SimpleName occurrence) {
+		FieldAccess fieldAccess= ASTNodes.as(occurrence, FieldAccess.class);
 
-        if (fieldAccess != null && fieldAccess.getExpression() instanceof ThisExpression) {
-            return true;
-        }
+		if (fieldAccess != null && fieldAccess.getExpression() instanceof ThisExpression) {
+			return true;
+		}
 
-        QualifiedName qualifiedName= ASTNodes.as(occurrence, QualifiedName.class);
+		QualifiedName qualifiedName= ASTNodes.as(occurrence, QualifiedName.class);
 
-        return qualifiedName != null;
-    }
+		return qualifiedName != null;
+	}
 
-    private static boolean isVariableDeclaration(final SimpleName occurrence) {
-        switch (occurrence.getParent().getNodeType()) {
-        case ASTNode.SINGLE_VARIABLE_DECLARATION:
-        case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-            return occurrence.getLocationInParent() == SingleVariableDeclaration.NAME_PROPERTY;
+	private static boolean isVariableDeclaration(final SimpleName occurrence) {
+		switch (occurrence.getParent().getNodeType()) {
+		case ASTNode.SINGLE_VARIABLE_DECLARATION:
+		case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+			return occurrence.getLocationInParent() == SingleVariableDeclaration.NAME_PROPERTY;
 
-        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-            return occurrence.getLocationInParent() == VariableDeclarationExpression.FRAGMENTS_PROPERTY;
+		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+			return occurrence.getLocationInParent() == VariableDeclarationExpression.FRAGMENTS_PROPERTY;
 
-        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-            return occurrence.getLocationInParent() == VariableDeclarationFragment.NAME_PROPERTY;
+		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+			return occurrence.getLocationInParent() == VariableDeclarationFragment.NAME_PROPERTY;
 
-        default:
-            return false;
-        }
-    }
+		default:
+			return false;
+		}
+	}
 
-    private boolean hasAnnotation(final FieldDeclaration field) {
-        @SuppressWarnings("unchecked") List<IExtendedModifier> modifiers= field.modifiers();
+	private boolean hasAnnotation(final FieldDeclaration field) {
+		@SuppressWarnings("unchecked") List<IExtendedModifier> modifiers= field.modifiers();
 
-        for (IExtendedModifier em : modifiers) {
-            if (em.isAnnotation()) {
-                return true;
-            }
-        }
+		for (IExtendedModifier em : modifiers) {
+			if (em.isAnnotation()) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

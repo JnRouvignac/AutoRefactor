@@ -27,25 +27,25 @@ package org.autorefactor.environment;
 
 /** Interface to use for logging. */
 public interface Logger {
-    /**
-     * Logs an error message into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     */
-    void error(String message);
+	/**
+	 * Logs an error message into Eclipse workspace logs.
+	 *
+	 * @param message the message to log
+	 */
+	void error(String message);
 
-    /**
-     * Logs an error message with an exception into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     * @param e       the exception to log
-     */
-    void error(String message, Exception e);
+	/**
+	 * Logs an error message with an exception into Eclipse workspace logs.
+	 *
+	 * @param message the message to log
+	 * @param e       the exception to log
+	 */
+	void error(String message, Exception e);
 
-    /**
-     * Logs a warning message into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     */
-    void warn(String message);
+	/**
+	 * Logs a warning message into Eclipse workspace logs.
+	 *
+	 * @param message the message to log
+	 */
+	void warn(String message);
 }

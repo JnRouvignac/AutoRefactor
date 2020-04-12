@@ -37,85 +37,85 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
+	}
 
-    @Override
-    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
-        if (ASTNodes.as(iterable, ThisExpression.class) != null) {
-            return null;
-        }
+	@Override
+	protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
+		if (ASTNodes.as(iterable, ThisExpression.class) != null) {
+			return null;
+		}
 
-        Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
+		Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
+		Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
 
-        if (ASTNodes.isSameVariable(forVar, expression)) {
-            return arg0;
-        }
+		if (ASTNodes.isSameVariable(forVar, expression)) {
+			return arg0;
+		}
 
-        if (ASTNodes.isSameVariable(forVar, arg0)) {
-            return expression;
-        }
+		if (ASTNodes.isSameVariable(forVar, arg0)) {
+			return expression;
+		}
 
-        if (ASTNodes.match(forVar, expression)) {
-            return arg0;
-        }
+		if (ASTNodes.match(forVar, expression)) {
+			return arg0;
+		}
 
-        if (ASTNodes.match(forVar, arg0)) {
-            return expression;
-        }
+		if (ASTNodes.match(forVar, arg0)) {
+			return expression;
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    protected MethodInvocation getMethodToReplace(final Expression condition) {
-        MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
+	@Override
+	protected MethodInvocation getMethodToReplace(final Expression condition) {
+		MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
 
-        if (ASTNodes.usesGivenSignature(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            return method;
-        }
+		if (ASTNodes.usesGivenSignature(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			return method;
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        MethodInvocation invoke= ast.invoke(rewrite.createMoveTarget(iterable), "contains", rewrite.createMoveTarget(toFind)); //$NON-NLS-1$
+	@Override
+	protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		MethodInvocation invoke= ast.invoke(rewrite.createMoveTarget(iterable), "contains", rewrite.createMoveTarget(toFind)); //$NON-NLS-1$
 
-        if (isPositive) {
-            return invoke;
-        }
+		if (isPositive) {
+			return invoke;
+		}
 
-        return ast.not(invoke);
-    }
+		return ast.not(invoke);
+	}
 }

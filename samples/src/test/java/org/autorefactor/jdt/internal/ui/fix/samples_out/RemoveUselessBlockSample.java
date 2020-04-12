@@ -26,54 +26,54 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class RemoveUselessBlockSample {
-    {
-        System.out.println("Don't touch to the static initializer");
-    }
+	{
+		System.out.println("Don't touch to the static initializer");
+	}
 
-    public int removeUselessBlock(int i) {
-        // Keep this comment
-        // Keep this comment too
-        return i + 1;
-    }
+	public int removeUselessBlock(int i) {
+		// Keep this comment
+		// Keep this comment too
+		return i + 1;
+	}
 
-    public int removeUselessBlockWithForwardCode(int i) {
-        // Keep this comment
-        // Keep this comment too
-        System.out.println("The next value of " + i);
-        return i + 1;
-    }
+	public int removeUselessBlockWithForwardCode(int i) {
+		// Keep this comment
+		// Keep this comment too
+		System.out.println("The next value of " + i);
+		return i + 1;
+	}
 
-    public int removeUselessBlockWithPreviousCode(int i) {
-        System.out.println("Let's start");
-        // Keep this comment
-        // Keep this comment too
-        System.out.println("The next value of " + i);
-        return i + 1;
-    }
+	public int removeUselessBlockWithPreviousCode(int i) {
+		System.out.println("Let's start");
+		// Keep this comment
+		// Keep this comment too
+		System.out.println("The next value of " + i);
+		return i + 1;
+	}
 
-    public int doNotRemoveBlockWithDuplicateVariable() {
-        {
-            int i = 0;
-            System.out.println("The next value of " + i);
-        }
-        int i = 0;
-        return i + 1;
-    }
+	public int doNotRemoveBlockWithDuplicateVariable() {
+		{
+			int i = 0;
+			System.out.println("The next value of " + i);
+		}
+		int i = 0;
+		return i + 1;
+	}
 
-    public int removeLastBlockWithDuplicateVariable() {
-        {
-            int i = 0;
-            System.out.println("The next value of " + i);
-        }
-        // Keep this comment
-        // Keep this comment too
-        int i = 0;
-        return i + 1;
-    }
+	public int removeLastBlockWithDuplicateVariable() {
+		{
+			int i = 0;
+			System.out.println("The next value of " + i);
+		}
+		// Keep this comment
+		// Keep this comment too
+		int i = 0;
+		return i + 1;
+	}
 
-    public void doNotRemoveIfBlock(int i) {
-        if (i > 0) {
-            System.out.println("i is positive.");
-        }
-    }
+	public void doNotRemoveIfBlock(int i) {
+		if (i > 0) {
+			System.out.println("i is positive.");
+		}
+	}
 }

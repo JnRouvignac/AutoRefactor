@@ -37,148 +37,148 @@ import org.autorefactor.util.IllegalArgumentException;
  * </p>
  */
 public final class Release {
-    private final int[] version;
-    private final String releaseName;
+	private final int[] version;
+	private final String releaseName;
 
-    private Release(final String releaseName, final int... versionNumbers) {
-        this.releaseName= releaseName;
-        this.version= normalize(versionNumbers);
-    }
+	private Release(final String releaseName, final int... versionNumbers) {
+		this.releaseName= releaseName;
+		this.version= normalize(versionNumbers);
+	}
 
-    private int[] normalize(final int[] versionNumbers) {
-        int i;
-        for (i= versionNumbers.length - 1; i >= 0; i--) {
-            if (versionNumbers[i] != 0) {
-                break;
-            }
-        }
-        if (i == versionNumbers.length - 1) {
-            return versionNumbers;
-        }
-        int[] newVersionNumbers= new int[i + 1];
-        System.arraycopy(versionNumbers, 0, newVersionNumbers, 0, i + 1);
-        return newVersionNumbers;
-    }
+	private int[] normalize(final int[] versionNumbers) {
+		int i;
+		for (i= versionNumbers.length - 1; i >= 0; i--) {
+			if (versionNumbers[i] != 0) {
+				break;
+			}
+		}
+		if (i == versionNumbers.length - 1) {
+			return versionNumbers;
+		}
+		int[] newVersionNumbers= new int[i + 1];
+		System.arraycopy(versionNumbers, 0, newVersionNumbers, 0, i + 1);
+		return newVersionNumbers;
+	}
 
-    /**
-     * Factory method that builds a release instance for Java SE with the version
-     * provided as a string.
-     *
-     * @param version the string representation of the version
-     * @return a release instance for Java SE
-     * @throws RuntimeException if the provided version is not valid
-     */
-    public static Release javaSE(final String version) {
-        return javaSE(toIntegerArray(version));
-    }
+	/**
+	 * Factory method that builds a release instance for Java SE with the version
+	 * provided as a string.
+	 *
+	 * @param version the string representation of the version
+	 * @return a release instance for Java SE
+	 * @throws RuntimeException if the provided version is not valid
+	 */
+	public static Release javaSE(final String version) {
+		return javaSE(toIntegerArray(version));
+	}
 
-    /**
-     * Factory method that builds a release instance for Java SE with the version
-     * provided as integer varargs.
-     *
-     * @param version the integer varargs representation of the version
-     * @return a release instance for Java SE
-     * @throws RuntimeException if the provided version is not valid
-     */
-    public static Release javaSE(final int... version) {
-        Release release= new Release("JavaSE", version); //$NON-NLS-1$
-        if (!release.isVersionValid()) {
-            throw new IllegalArgumentException(null, "Invalid version for " + release); //$NON-NLS-1$
-        }
+	/**
+	 * Factory method that builds a release instance for Java SE with the version
+	 * provided as integer varargs.
+	 *
+	 * @param version the integer varargs representation of the version
+	 * @return a release instance for Java SE
+	 * @throws RuntimeException if the provided version is not valid
+	 */
+	public static Release javaSE(final int... version) {
+		Release release= new Release("JavaSE", version); //$NON-NLS-1$
+		if (!release.isVersionValid()) {
+			throw new IllegalArgumentException(null, "Invalid version for " + release); //$NON-NLS-1$
+		}
 
-        return release;
-    }
+		return release;
+	}
 
-    private boolean isVersionValid() {
-        if ("JavaSE".equals(this.releaseName)) { //$NON-NLS-1$
-            if (this.version.length >= 2) {
-                return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 13;
-            }
+	private boolean isVersionValid() {
+		if ("JavaSE".equals(this.releaseName)) { //$NON-NLS-1$
+			if (this.version.length >= 2) {
+				return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 13;
+			}
 
-            return 9 <= this.version[0] && this.version[0] <= 13;
-        }
+			return 9 <= this.version[0] && this.version[0] <= 13;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private static int[] toIntegerArray(final String version) {
-        String[] versionNumbers= version.split("\\."); //$NON-NLS-1$
-        int[] result= new int[versionNumbers.length];
-        for (int i= 0; i < versionNumbers.length; i++) {
-            String nb= versionNumbers[i];
-            result[i]= Integer.parseInt(nb);
-        }
+	private static int[] toIntegerArray(final String version) {
+		String[] versionNumbers= version.split("\\."); //$NON-NLS-1$
+		int[] result= new int[versionNumbers.length];
+		for (int i= 0; i < versionNumbers.length; i++) {
+			String nb= versionNumbers[i];
+			result[i]= Integer.parseInt(nb);
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    /**
-     * Returns whether the current release is compatible with the required release.
-     * Newer releases are considered compatible with older releases.
-     *
-     * @param requiredRelease the required release
-     * @return true if the current release is compatible with the required release,
-     *         false otherwise
-     */
-    public boolean isCompatibleWith(final Release requiredRelease) {
-        if (!this.releaseName.equals(requiredRelease.releaseName)) {
-            return false;
-        }
-        int min= Math.min(this.version.length, requiredRelease.version.length);
-        for (int i= 0; i < min; i++) {
-            int nb= this.version[i];
-            int requiredNb= requiredRelease.version[i];
-            if (nb < requiredNb) {
-                return false;
-            }
-            if (nb > requiredNb) {
-                return true;
-            }
-        }
+	/**
+	 * Returns whether the current release is compatible with the required release.
+	 * Newer releases are considered compatible with older releases.
+	 *
+	 * @param requiredRelease the required release
+	 * @return true if the current release is compatible with the required release,
+	 *         false otherwise
+	 */
+	public boolean isCompatibleWith(final Release requiredRelease) {
+		if (!this.releaseName.equals(requiredRelease.releaseName)) {
+			return false;
+		}
+		int min= Math.min(this.version.length, requiredRelease.version.length);
+		for (int i= 0; i < min; i++) {
+			int nb= this.version[i];
+			int requiredNb= requiredRelease.version[i];
+			if (nb < requiredNb) {
+				return false;
+			}
+			if (nb > requiredNb) {
+				return true;
+			}
+		}
 
-        return this.version.length >= requiredRelease.version.length;
-    }
+		return this.version.length >= requiredRelease.version.length;
+	}
 
-    /**
-     * Returns the major version of a release. For example, if the release version
-     * is "1.3.5", then this method will return "1".
-     *
-     * @return the major version of a release
-     */
-    public int getMajorVersion() {
-        return getVersionNumber(0);
-    }
+	/**
+	 * Returns the major version of a release. For example, if the release version
+	 * is "1.3.5", then this method will return "1".
+	 *
+	 * @return the major version of a release
+	 */
+	public int getMajorVersion() {
+		return getVersionNumber(0);
+	}
 
-    /**
-     * Returns the minor version of a release. For example, if the release version
-     * is "1.3.5", then this method will return "3".
-     *
-     * @return the minor version of a release
-     */
-    public int getMinorVersion() {
-        return getVersionNumber(1);
-    }
+	/**
+	 * Returns the minor version of a release. For example, if the release version
+	 * is "1.3.5", then this method will return "3".
+	 *
+	 * @return the minor version of a release
+	 */
+	public int getMinorVersion() {
+		return getVersionNumber(1);
+	}
 
-    /**
-     * Returns the patch version of a release. For example, if the release version
-     * is "1.3.5", then this method will return "5".
-     *
-     * @return the patch version of a release
-     */
-    public int getPatchVersion() {
-        return getVersionNumber(2);
-    }
+	/**
+	 * Returns the patch version of a release. For example, if the release version
+	 * is "1.3.5", then this method will return "5".
+	 *
+	 * @return the patch version of a release
+	 */
+	public int getPatchVersion() {
+		return getVersionNumber(2);
+	}
 
-    private int getVersionNumber(final int i) {
-        if (this.version.length >= i + 1) {
-            return this.version[i];
-        }
+	private int getVersionNumber(final int i) {
+		if (this.version.length >= i + 1) {
+			return this.version[i];
+		}
 
-        return 0;
-    }
+		return 0;
+	}
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" + releaseName + " " + Arrays.toString(version) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    }
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(" + releaseName + " " + Arrays.toString(version) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 }

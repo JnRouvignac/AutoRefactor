@@ -63,102 +63,102 @@ import org.eclipse.jdt.core.dom.Statement;
  * @see #getDescription()
  */
 public class OppositeConditionRatherThanDuplicateConditionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        InfixExpression firstCondition= ASTNodes.as(node.getExpression(), InfixExpression.class);
-        IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+	@Override
+	public boolean visit(final IfStatement node) {
+		InfixExpression firstCondition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-        if (firstCondition != null
-                && !firstCondition.hasExtendedOperands()
-                && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
-                && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
-                && secondIf != null
-                && secondIf.getElseStatement() != null) {
-            return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
-                    firstCondition.getRightOperand())
-                    && maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
-                            firstCondition.getLeftOperand());
-        }
+		if (firstCondition != null
+				&& !firstCondition.hasExtendedOperands()
+				&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
+				&& ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
+				&& secondIf != null
+				&& secondIf.getElseStatement() != null) {
+			return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
+					firstCondition.getRightOperand())
+					&& maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
+							firstCondition.getLeftOperand());
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
-            final Expression duplicateExpression, final Expression notDuplicateExpression) {
-        if (ASTNodes.match(duplicateExpression, secondIf.getExpression())) {
-            refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),
-                    secondIf.getElseStatement());
-            return false;
-        }
+	private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
+			final Expression duplicateExpression, final Expression notDuplicateExpression) {
+		if (ASTNodes.match(duplicateExpression, secondIf.getExpression())) {
+			refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),
+					secondIf.getElseStatement());
+			return false;
+		}
 
-        if (ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateExpression, secondIf.getExpression())) {
-            refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
-                    secondIf.getThenStatement());
-            return false;
-        }
+		if (ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateExpression, secondIf.getExpression())) {
+			refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
+					secondIf.getThenStatement());
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
-            final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
+			final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Statement negativeStmtCopy;
-        if (negativeStatement instanceof IfStatement) {
-            negativeStmtCopy= ast.block(rewrite.createMoveTarget(negativeStatement));
-        } else {
-            negativeStmtCopy= rewrite.createMoveTarget(negativeStatement);
-        }
+		Statement negativeStmtCopy;
+		if (negativeStatement instanceof IfStatement) {
+			negativeStmtCopy= ast.block(rewrite.createMoveTarget(negativeStatement));
+		} else {
+			negativeStmtCopy= rewrite.createMoveTarget(negativeStatement);
+		}
 
-        Expression secondCond;
-        Statement secondStmtCopy;
-        Statement thirdStmtCopy;
-        PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
+		Expression secondCond;
+		Statement secondStmtCopy;
+		Statement thirdStmtCopy;
+		PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
 
-        if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
-            secondCond= negativeCond.getOperand();
-            secondStmtCopy= rewrite.createMoveTarget(positiveStatement);
-            thirdStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
-        } else {
-            secondCond= notDuplicateExpression;
-            secondStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
-            thirdStmtCopy= rewrite.createMoveTarget(positiveStatement);
-        }
+		if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
+			secondCond= negativeCond.getOperand();
+			secondStmtCopy= rewrite.createMoveTarget(positiveStatement);
+			thirdStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
+		} else {
+			secondCond= notDuplicateExpression;
+			secondStmtCopy= rewrite.createMoveTarget(node.getThenStatement());
+			thirdStmtCopy= rewrite.createMoveTarget(positiveStatement);
+		}
 
-        cuRewrite.getASTRewrite().replace(node,
-                ast.if0(ast.parenthesizeIfNeeded(ast.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
-                        ast.if0(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)), null);
-    }
+		cuRewrite.getASTRewrite().replace(node,
+				ast.if0(ast.parenthesizeIfNeeded(ast.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
+						ast.if0(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)), null);
+	}
 }

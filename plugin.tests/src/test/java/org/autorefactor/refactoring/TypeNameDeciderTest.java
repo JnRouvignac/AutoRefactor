@@ -45,52 +45,52 @@ import org.junit.runners.Parameterized.Parameters;
 @SuppressWarnings("javadoc")
 @RunWith(value= Parameterized.class)
 public class TypeNameDeciderTest {
-    private String qualifiedName;
-    private TreeSet<String> imports;
-    private String expectedResult;
+	private String qualifiedName;
+	private TreeSet<String> imports;
+	private String expectedResult;
 
-    public TypeNameDeciderTest(String qualifiedName, TreeSet<String> imports, String expectedResult) {
-        this.qualifiedName= qualifiedName;
-        this.imports= imports;
-        this.expectedResult= expectedResult;
-    }
+	public TypeNameDeciderTest(String qualifiedName, TreeSet<String> imports, String expectedResult) {
+		this.qualifiedName= qualifiedName;
+		this.imports= imports;
+		this.expectedResult= expectedResult;
+	}
 
-    @Parameters // (name = "{0} + imports{1} => {2}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { Map.class.getCanonicalName(), imports(), Map.class.getCanonicalName() },
-                { Map.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map" }, //$NON-NLS-1$
-                { Map.class.getCanonicalName(), imports("java.util.*"), "Map" }, //$NON-NLS-1$ //$NON-NLS-2$
-                { Entry.class.getCanonicalName(), imports(), Entry.class.getCanonicalName() },
-                { Entry.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map.Entry" }, //$NON-NLS-1$
-                { Entry.class.getCanonicalName(), imports("java.util.*"), "Map.Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
-                { Entry.class.getCanonicalName(), imports(Entry.class.getCanonicalName()), "Entry" }, //$NON-NLS-1$
-                { Entry.class.getCanonicalName(), imports("java.util.Map.*"), "Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
-                { Callable.class.getCanonicalName(), imports("java.util.*"), Callable.class.getCanonicalName() }, }); //$NON-NLS-1$
-    }
+	@Parameters // (name = "{0} + imports{1} => {2}")
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][] { { Map.class.getCanonicalName(), imports(), Map.class.getCanonicalName() },
+				{ Map.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map" }, //$NON-NLS-1$
+				{ Map.class.getCanonicalName(), imports("java.util.*"), "Map" }, //$NON-NLS-1$ //$NON-NLS-2$
+				{ Entry.class.getCanonicalName(), imports(), Entry.class.getCanonicalName() },
+				{ Entry.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map.Entry" }, //$NON-NLS-1$
+				{ Entry.class.getCanonicalName(), imports("java.util.*"), "Map.Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
+				{ Entry.class.getCanonicalName(), imports(Entry.class.getCanonicalName()), "Entry" }, //$NON-NLS-1$
+				{ Entry.class.getCanonicalName(), imports("java.util.Map.*"), "Entry" }, //$NON-NLS-1$ //$NON-NLS-2$
+				{ Callable.class.getCanonicalName(), imports("java.util.*"), Callable.class.getCanonicalName() }, }); //$NON-NLS-1$
+	}
 
-    @Test
-    public void testUseSimplestPossibleName() throws Exception {
-        assertEquals(expectedResult, useSimplestPossibleName(qualifiedName));
-    }
+	@Test
+	public void testUseSimplestPossibleName() throws Exception {
+		assertEquals(expectedResult, useSimplestPossibleName(qualifiedName));
+	}
 
-    private String useSimplestPossibleName(String qualifiedName) {
-        return new TypeNameDecider(new TypeNameDecider.ResolveTypeBindingStrategy() {
-            /**
-             * Get the type binding.
-             *
-             * @param fullyQualifiedName fullyQualifiedName.
-             *
-             * @return the type binding.
-             */
-            public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
-                return new TypeBindingStub(fullyQualifiedName);
-            }
-        }, imports).useSimplestPossibleName(qualifiedName);
-    }
+	private String useSimplestPossibleName(String qualifiedName) {
+		return new TypeNameDecider(new TypeNameDecider.ResolveTypeBindingStrategy() {
+			/**
+			 * Get the type binding.
+			 *
+			 * @param fullyQualifiedName fullyQualifiedName.
+			 *
+			 * @return the type binding.
+			 */
+			public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
+				return new TypeBindingStub(fullyQualifiedName);
+			}
+		}, imports).useSimplestPossibleName(qualifiedName);
+	}
 
-    private static TreeSet<String> imports(String... imports) {
-        final TreeSet<String> results= new TreeSet<>();
-        Collections.addAll(results, imports);
-        return results;
-    }
+	private static TreeSet<String> imports(String... imports) {
+		final TreeSet<String> results= new TreeSet<>();
+		Collections.addAll(results, imports);
+		return results;
+	}
 }

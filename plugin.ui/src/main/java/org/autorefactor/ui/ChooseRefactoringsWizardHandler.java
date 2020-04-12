@@ -46,40 +46,40 @@ import org.eclipse.ui.handlers.HandlerUtil;
  *      >Creating Eclipse Wizards - Tutorial </a>
  */
 public class ChooseRefactoringsWizardHandler extends AbstractHandler {
-    /**
-     * Execute.
-     *
-     * @param event The event
-     *
-     * @return An object
-     *
-     * @throws ExecutionException ExecutionException
-     */
-    @Override
-    public Object execute(final ExecutionEvent event) throws ExecutionException {
-        final Shell shell= HandlerUtil.getActiveShell(event);
-        try {
-            // Retrieve the targeted java element before the menu item is disposed by the
-            // framework
-            final Wizard wizard= new ChooseCleanupsWizard(AutoRefactorHandler.getSelectedJavaElements(event));
-            final WizardDialog dialog= new WizardDialog(shell, wizard);
-            dialog.open();
-        } catch (final Exception e) {
-            Display.getDefault().asyncExec(new Runnable() {
-                /**
-                 * Run.
-                 */
-                @Override
-                public void run() {
-                    final StringWriter sw= new StringWriter();
-                    final PrintWriter pw= new PrintWriter(sw);
-                    e.printStackTrace(pw);
+	/**
+	 * Execute.
+	 *
+	 * @param event The event
+	 *
+	 * @return An object
+	 *
+	 * @throws ExecutionException ExecutionException
+	 */
+	@Override
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+		final Shell shell= HandlerUtil.getActiveShell(event);
+		try {
+			// Retrieve the targeted java element before the menu item is disposed by the
+			// framework
+			final Wizard wizard= new ChooseCleanupsWizard(AutoRefactorHandler.getSelectedJavaElements(event));
+			final WizardDialog dialog= new WizardDialog(shell, wizard);
+			dialog.open();
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(new Runnable() {
+				/**
+				 * Run.
+				 */
+				@Override
+				public void run() {
+					final StringWriter sw= new StringWriter();
+					final PrintWriter pw= new PrintWriter(sw);
+					e.printStackTrace(pw);
 
-                    MessageDialog.openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-            });
-        }
+					MessageDialog.openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			});
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

@@ -30,48 +30,48 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 // And the '{' character in this line comment.
 public class RemoveEmptyLinesSample
 {
-    private int aField;
+	private int aField;
 
-    private int anotherField;
+	private int anotherField;
 
-    /** Ignore the '{' character in this javadoc. */
-    public void aMethod() throws Exception
-    {
-        System.out.println("Remove empty line before me");
-    }
+	/** Ignore the '{' character in this javadoc. */
+	public void aMethod() throws Exception
+	{
+		System.out.println("Remove empty line before me");
+	}
 
-    public void anotherMethod() throws Exception
-    {
-    }
+	public void anotherMethod() throws Exception
+	{
+	}
 
-    public void doNotRefactorMultipleBracesSameLine() throws Exception {
-        try {
-        } catch (Exception e) { }
-    }
+	public void doNotRefactorMultipleBracesSameLine() throws Exception {
+		try {
+		} catch (Exception e) { }
+	}
 
-    public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception {
-        try {
-          System.out.println();
-        } catch (Exception e) {
-        }
-    }
+	public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception {
+		try {
+		  System.out.println();
+		} catch (Exception e) {
+		}
+	}
 
-    public void doNotRemoveCodeOnSameLineAsTry() {
-        try { Thread.sleep(100);
-        }
-        catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-        }
-    }
+	public void doNotRemoveCodeOnSameLineAsTry() {
+		try { Thread.sleep(100);
+		}
+		catch (InterruptedException e) {
+		  Thread.currentThread().interrupt();
+		}
+	}
 
-    private interface MethodDeclarationsWithoutBody
-    {
-        void aMethod();
+	private interface MethodDeclarationsWithoutBody
+	{
+		void aMethod();
 
-        boolean aBoolean();
+		boolean aBoolean();
 
-        int anInt();
-    }
+		int anInt();
+	}
 
-    private static enum WeekOfDay { MONDAY, TUESDAY, WEDNESDAY, THRUSDAY, FRIDAY, SATURDAY, SUNDAY }
+	private static enum WeekOfDay { MONDAY, TUESDAY, WEDNESDAY, THRUSDAY, FRIDAY, SATURDAY, SUNDAY }
 }

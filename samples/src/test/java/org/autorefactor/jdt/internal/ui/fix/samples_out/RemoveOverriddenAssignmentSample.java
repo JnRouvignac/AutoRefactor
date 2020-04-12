@@ -29,120 +29,120 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RemoveOverriddenAssignmentSample {
-    public boolean removeUselessInitialization() {
-        // Keep this comment
-        boolean reassignedVar;
-        reassignedVar = "\n".equals(System.lineSeparator());
-        return reassignedVar;
-    }
+	public boolean removeUselessInitialization() {
+		// Keep this comment
+		boolean reassignedVar;
+		reassignedVar = "\n".equals(System.lineSeparator());
+		return reassignedVar;
+	}
 
-    public long removeInitForLong() {
-        // Keep this comment
-        long reassignedVar;
-        reassignedVar = System.currentTimeMillis();
-        return reassignedVar;
-    }
+	public long removeInitForLong() {
+		// Keep this comment
+		long reassignedVar;
+		reassignedVar = System.currentTimeMillis();
+		return reassignedVar;
+	}
 
-    public String removeInitForString() {
-        // Keep this comment
-        String reassignedVar;
-        reassignedVar = System.lineSeparator();
-        return reassignedVar;
-    }
+	public String removeInitForString() {
+		// Keep this comment
+		String reassignedVar;
+		reassignedVar = System.lineSeparator();
+		return reassignedVar;
+	}
 
-    public long doNotRemoveWithPlusAssignment() {
-        long incrementedVar = 123;
-        incrementedVar += 456;
-        incrementedVar = 789;
-        return incrementedVar;
-    }
+	public long doNotRemoveWithPlusAssignment() {
+		long incrementedVar = 123;
+		incrementedVar += 456;
+		incrementedVar = 789;
+		return incrementedVar;
+	}
 
-    public long doNotRemoveWithMinusAssignment() {
-        long decrementedVar = 123;
-        decrementedVar -= 456;
-        decrementedVar = 789;
-        return decrementedVar;
-    }
+	public long doNotRemoveWithMinusAssignment() {
+		long decrementedVar = 123;
+		decrementedVar -= 456;
+		decrementedVar = 789;
+		return decrementedVar;
+	}
 
-    public List<String> doNotRemoveActiveInit() {
-        List<String> aList = Arrays.asList("lorem", "ipsum");
+	public List<String> doNotRemoveActiveInit() {
+		List<String> aList = Arrays.asList("lorem", "ipsum");
 
-        boolean reassignedVar = aList.remove("lorem");
-        reassignedVar = "\n".equals(System.lineSeparator());
-        return aList;
-    }
+		boolean reassignedVar = aList.remove("lorem");
+		reassignedVar = "\n".equals(System.lineSeparator());
+		return aList;
+	}
 
-    public String doNotRemoveInitWithoutOverriding() {
-        String usedVar = "";
-        return usedVar;
-    }
+	public String doNotRemoveInitWithoutOverriding() {
+		String usedVar = "";
+		return usedVar;
+	}
 
-    public String doNotRemoveInitWithUse() {
-        String usedVar = "";
-        System.out.println(usedVar);
-        usedVar = System.lineSeparator();
-        return usedVar;
-    }
+	public String doNotRemoveInitWithUse() {
+		String usedVar = "";
+		System.out.println(usedVar);
+		usedVar = System.lineSeparator();
+		return usedVar;
+	}
 
-    public String doNotRemoveInitWithUseInIf() {
-        String usedVar = "";
-        if ("\n".equals(System.lineSeparator())) {
-            System.out.println(usedVar);
-        }
-        usedVar = System.lineSeparator();
-        return usedVar;
-    }
+	public String doNotRemoveInitWithUseInIf() {
+		String usedVar = "";
+		if ("\n".equals(System.lineSeparator())) {
+			System.out.println(usedVar);
+		}
+		usedVar = System.lineSeparator();
+		return usedVar;
+	}
 
-    public String doNotRemoveInitWithCall() {
-        String usedVar = "";
-        usedVar.length();
-        usedVar = System.lineSeparator();
-        return usedVar;
-    }
+	public String doNotRemoveInitWithCall() {
+		String usedVar = "";
+		usedVar.length();
+		usedVar = System.lineSeparator();
+		return usedVar;
+	}
 
-    public char[] doNotRemoveInitWithIndex() {
-        char[] usedVar = new char[] {'a', 'b', 'c'};
-        char oneChar = usedVar[1];
-        usedVar = new char[] {'d', 'e', 'f'};
-        return usedVar;
-    }
+	public char[] doNotRemoveInitWithIndex() {
+		char[] usedVar = new char[] {'a', 'b', 'c'};
+		char oneChar = usedVar[1];
+		usedVar = new char[] {'d', 'e', 'f'};
+		return usedVar;
+	}
 
-    public byte doNotRemoveInitWhenUsed() {
-        byte usedVar = 0;
-        usedVar = usedVar++;
-        return usedVar;
-    }
+	public byte doNotRemoveInitWhenUsed() {
+		byte usedVar = 0;
+		usedVar = usedVar++;
+		return usedVar;
+	}
 
-    public String doNotRemoveInitWhenOverriddenInIf() {
-        String usedVar = "";
-        if ("\n".equals(System.lineSeparator())) {
-            usedVar = System.lineSeparator();
-        }
-        return usedVar;
-    }
+	public String doNotRemoveInitWhenOverriddenInIf() {
+		String usedVar = "";
+		if ("\n".equals(System.lineSeparator())) {
+			usedVar = System.lineSeparator();
+		}
+		return usedVar;
+	}
 
-    public boolean doNotRemoveActiveInitialization(List<String> aList) {
-        boolean reassignedActiveVar = aList.remove("foo");
-        reassignedActiveVar = "\n".equals(System.lineSeparator());
-        return reassignedActiveVar;
-    }
+	public boolean doNotRemoveActiveInitialization(List<String> aList) {
+		boolean reassignedActiveVar = aList.remove("foo");
+		reassignedActiveVar = "\n".equals(System.lineSeparator());
+		return reassignedActiveVar;
+	}
 
-    public int doNotRemoveInitializationWithIncrement(int i) {
-        int reassignedActiveVar = i++;
-        reassignedActiveVar = 123;
-        return reassignedActiveVar + i;
-    }
+	public int doNotRemoveInitializationWithIncrement(int i) {
+		int reassignedActiveVar = i++;
+		reassignedActiveVar = 123;
+		return reassignedActiveVar + i;
+	}
 
-    public long doNotRemoveInitializationWithAssignment(long i, long j) {
-        long reassignedActiveVar = i = j;
-        reassignedActiveVar = 123;
-        return reassignedActiveVar + i + j;
-    }
+	public long doNotRemoveInitializationWithAssignment(long i, long j) {
+		long reassignedActiveVar = i = j;
+		reassignedActiveVar = 123;
+		return reassignedActiveVar + i + j;
+	}
 
-    public boolean removePassiveInitialization(int i) {
-        // Keep this comment
-        boolean reassignedPassiveVar;
-        reassignedPassiveVar = "\n".equals(System.lineSeparator());
-        return reassignedPassiveVar;
-    }
+	public boolean removePassiveInitialization(int i) {
+		// Keep this comment
+		boolean reassignedPassiveVar;
+		reassignedPassiveVar = "\n".equals(System.lineSeparator());
+		return reassignedPassiveVar;
+	}
 }

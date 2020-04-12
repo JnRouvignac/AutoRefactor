@@ -32,102 +32,102 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class NIORatherThanIOSample {
-    private File fileOnDisk= new File("C:/");
-    private Path pathOnDisk= Paths.get("C:/");
-    private URI uri= Paths.get("C:/").toUri();
+	private File fileOnDisk= new File("C:/");
+	private Path pathOnDisk= Paths.get("C:/");
+	private URI uri= Paths.get("C:/").toUri();
 
-    public Path usePath() {
-        // Keep this comment
-        Path fileOnDisk= Paths.get("C:/");
+	public Path usePath() {
+		// Keep this comment
+		Path fileOnDisk= Paths.get("C:/");
 
-        // Keep this comment too
-        return fileOnDisk;
-    }
+		// Keep this comment too
+		return fileOnDisk;
+	}
 
-    public URI usePathAmongStatements(String filepath) {
-        // Keep this comment
-        Path fileOnDisk= Paths.get(filepath);
-        System.out.println("Do other things");
+	public URI usePathAmongStatements(String filepath) {
+		// Keep this comment
+		Path fileOnDisk= Paths.get(filepath);
+		System.out.println("Do other things");
 
-        // Keep this comment too
-        return fileOnDisk.toUri();
-    }
+		// Keep this comment too
+		return fileOnDisk.toUri();
+	}
 
-    public Path usePathForSeveralUses(String filepath) {
-        // Keep this comment
-        Path fileOnDisk= Paths.get(filepath);
+	public Path usePathForSeveralUses(String filepath) {
+		// Keep this comment
+		Path fileOnDisk= Paths.get(filepath);
 
-        // Keep this comment too
-        Path path= fileOnDisk;
+		// Keep this comment too
+		Path path= fileOnDisk;
 
-        // Keep this comment also
-        return fileOnDisk;
-    }
+		// Keep this comment also
+		return fileOnDisk;
+	}
 
-    public Path doNotUsePathWithSeveralInstances(String filepath, String filepath2) {
-        File fileOnDisk= new File(filepath);
-        fileOnDisk= new File(filepath2);
+	public Path doNotUsePathWithSeveralInstances(String filepath, String filepath2) {
+		File fileOnDisk= new File(filepath);
+		fileOnDisk= new File(filepath2);
 
-        return fileOnDisk.toPath();
-    }
+		return fileOnDisk.toPath();
+	}
 
-    public Path doNotUsePathWithOtherUse(String filepath) {
-        File fileOnDisk= new File(filepath);
-        System.out.println("The pattern is: " + fileOnDisk);
+	public Path doNotUsePathWithOtherUse(String filepath) {
+		File fileOnDisk= new File(filepath);
+		System.out.println("The pattern is: " + fileOnDisk);
 
-        return fileOnDisk.toPath();
-    }
+		return fileOnDisk.toPath();
+	}
 
-    public boolean doNotUsePathWithOtherMethod(String filepath) {
-        File fileOnDisk= new File(filepath);
+	public boolean doNotUsePathWithOtherMethod(String filepath) {
+		File fileOnDisk= new File(filepath);
 
-        return fileOnDisk.canExecute();
-    }
+		return fileOnDisk.canExecute();
+	}
 
-    public boolean usePathForReplace(String filepath) {
-        // Keep this comment
-        Path fileOnDisk= Paths.get(filepath);
+	public boolean usePathForReplace(String filepath) {
+		// Keep this comment
+		Path fileOnDisk= Paths.get(filepath);
 
-        // Keep this comment too
-        URI dateText1= fileOnDisk.toUri();
+		// Keep this comment too
+		URI dateText1= fileOnDisk.toUri();
 
-        return dateText1 != null;
-    }
+		return dateText1 != null;
+	}
 
-    public Path doNotUsePathInMultiDeclaration(String filepath, String filepath2) {
-        File fileOnDisk= new File(filepath), foo= new File(filepath2);
+	public Path doNotUsePathInMultiDeclaration(String filepath, String filepath2) {
+		File fileOnDisk= new File(filepath), foo= new File(filepath2);
 
-        return fileOnDisk.toPath();
-    }
+		return fileOnDisk.toPath();
+	}
 
-    public Path usePathForLocalVariableOnly(String filepath) {
-        Path dateText1= fileOnDisk.toPath();
-        // Keep this comment
-        Path fileOnDisk= Paths.get(filepath);
+	public Path usePathForLocalVariableOnly(String filepath) {
+		Path dateText1= fileOnDisk.toPath();
+		// Keep this comment
+		Path fileOnDisk= Paths.get(filepath);
 
-        // Keep this comment too
-        Path dateText2= fileOnDisk;
+		// Keep this comment too
+		Path dateText2= fileOnDisk;
 
-        return dateText2;
-    }
+		return dateText2;
+	}
 
-    public boolean doNotUsePathOnMisplacedUse(String filepath) {
-        File fileOnDisk= new File(filepath);
+	public boolean doNotUsePathOnMisplacedUse(String filepath) {
+		File fileOnDisk= new File(filepath);
 
-        return fileOnDisk.exists();
-    }
+		return fileOnDisk.exists();
+	}
 
-    public Path doNotUsePathOnMisplacedParameter(File fileOnDisk) {
-        Path dateText1= fileOnDisk.toPath();
+	public Path doNotUsePathOnMisplacedParameter(File fileOnDisk) {
+		Path dateText1= fileOnDisk.toPath();
 
-        return dateText1;
-    }
+		return dateText1;
+	}
 
-    public Path usePathFromVariable(String filepath) {
-        // Keep this comment
-        Path fileOnDisk= Paths.get(filepath);
+	public Path usePathFromVariable(String filepath) {
+		// Keep this comment
+		Path fileOnDisk= Paths.get(filepath);
 
-        // Keep this comment too
-        return fileOnDisk;
-    }
+		// Keep this comment too
+		return fileOnDisk;
+	}
 }

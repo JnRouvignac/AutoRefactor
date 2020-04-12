@@ -31,95 +31,95 @@ import java.util.Objects;
 import java.util.Observable;
 
 public class Java7HashRatherThanEclipseJava6HashSample {
-    public class RefactoredClass {
-        private Map<Integer, String> innerTextById;
-        private Observable innerObservable;
-        private String innerText;
-        private String[] innerTexts;
-        private int[] innerIntegers;
-        private char innerChar;
-        private byte innerByte;
-        private boolean innerBoolean;
-        private int innerInt;
-        private long innerLong;
-        private double innerDouble;
-        private short innerShort;
-        private float innerFloat;
-        private double innerOtherDouble;
+	public class RefactoredClass {
+		private Map<Integer, String> innerTextById;
+		private Observable innerObservable;
+		private String innerText;
+		private String[] innerTexts;
+		private int[] innerIntegers;
+		private char innerChar;
+		private byte innerByte;
+		private boolean innerBoolean;
+		private int innerInt;
+		private long innerLong;
+		private double innerDouble;
+		private short innerShort;
+		private float innerFloat;
+		private double innerOtherDouble;
 
-        @Override
-        public int hashCode() {
-            // Keep this comment
-            return Objects.hash(getEnclosingInstance().hashCode(), innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt,
-                    Arrays.hashCode(innerIntegers), innerLong, innerObservable, innerOtherDouble, innerShort, innerText,
-                    innerTextById, Arrays.hashCode(innerTexts));
-        }
+		@Override
+		public int hashCode() {
+			// Keep this comment
+			return Objects.hash(getEnclosingInstance().hashCode(), innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt,
+					Arrays.hashCode(innerIntegers), innerLong, innerObservable, innerOtherDouble, innerShort, innerText,
+					innerTextById, Arrays.hashCode(innerTexts));
+		}
 
-        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
-            return Java7HashRatherThanEclipseJava6HashSample.this;
-        }
-    }
+		private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+			return Java7HashRatherThanEclipseJava6HashSample.this;
+		}
+	}
 
-    public class DoNotRefactorNewClass {
-        private boolean innerBoolean;
+	public class DoNotRefactorNewClass {
+		private boolean innerBoolean;
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result= prime * result + getEnclosingInstance().hashCode();
-            result = prime * result + (innerBoolean ? 1231 : 1237);
-            return result;
-        }
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result= prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + (innerBoolean ? 1231 : 1237);
+			return result;
+		}
 
-        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
-            return new Java7HashRatherThanEclipseJava6HashSample();
-        }
-    }
+		private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+			return new Java7HashRatherThanEclipseJava6HashSample();
+		}
+	}
 
-    public class DoNotRefactorCustomHash {
-        private boolean innerBoolean;
+	public class DoNotRefactorCustomHash {
+		private boolean innerBoolean;
 
-        @Override
-        public int hashCode() {
-            final int prime = 63;
-            int result = 1;
-            result = prime * result + (innerBoolean ? 1231 : 1237);
-            return result;
-        }
-    }
+		@Override
+		public int hashCode() {
+			final int prime = 63;
+			int result = 1;
+			result = prime * result + (innerBoolean ? 1231 : 1237);
+			return result;
+		}
+	}
 
-    public class DoNotRefactorSpecialAssignment {
-        private boolean innerBoolean;
+	public class DoNotRefactorSpecialAssignment {
+		private boolean innerBoolean;
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result += prime * result + (innerBoolean ? 1231 : 1237);
-            return result;
-        }
-    }
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result += prime * result + (innerBoolean ? 1231 : 1237);
+			return result;
+		}
+	}
 
-    private Map<Integer, String> textById;
-    private Observable anObservable;
-    private String aText;
-    private String[] texts;
-    private int[] integers;
-    private char aChar;
-    private byte aByte;
-    private boolean aBoolean;
-    private int anInt;
-    private long aLong;
-    private double aDouble;
-    private short aShort;
-    private float aFloat;
-    private double anotherDouble;
+	private Map<Integer, String> textById;
+	private Observable anObservable;
+	private String aText;
+	private String[] texts;
+	private int[] integers;
+	private char aChar;
+	private byte aByte;
+	private boolean aBoolean;
+	private int anInt;
+	private long aLong;
+	private double aDouble;
+	private short aShort;
+	private float aFloat;
+	private double anotherDouble;
 
-    @Override
-    public int hashCode() {
-        // Keep this comment
-        return Objects.hash(aBoolean, aByte, aChar, aFloat, aLong, aDouble, aShort, aText, anInt, anObservable,
-                Arrays.hashCode(integers), textById, Arrays.hashCode(texts), anotherDouble);
-    }
+	@Override
+	public int hashCode() {
+		// Keep this comment
+		return Objects.hash(aBoolean, aByte, aChar, aFloat, aLong, aDouble, aShort, aText, anInt, anObservable,
+				Arrays.hashCode(integers), textById, Arrays.hashCode(texts), anotherDouble);
+	}
 }

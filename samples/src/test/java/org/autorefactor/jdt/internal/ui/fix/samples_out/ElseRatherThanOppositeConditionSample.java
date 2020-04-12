@@ -29,122 +29,122 @@ import java.io.IOException;
 import java.util.List;
 
 public class ElseRatherThanOppositeConditionSample {
-    public int removeOppositeCondition(boolean b1, boolean b2) {
-        int i = -1;
-        // Keep this comment
-        if (b1 && b2) {
-            i = 0;
-        } else {
-            i = 1;
-        }
+	public int removeOppositeCondition(boolean b1, boolean b2) {
+		int i = -1;
+		// Keep this comment
+		if (b1 && b2) {
+			i = 0;
+		} else {
+			i = 1;
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int removeOppositeConditionWithElse(int i1, int i2) {
-        int i = -1;
-        // Keep this comment
-        if (i1 < i2) {
-            i = 0;
-        } else {
-            i = 1;
-        }
+	public int removeOppositeConditionWithElse(int i1, int i2) {
+		int i = -1;
+		// Keep this comment
+		if (i1 < i2) {
+			i = 0;
+		} else {
+			i = 1;
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int removeOppositeConditionAmongOthers(int i1, int i2) {
-        int i = -1;
-        // Keep this comment
-        if (i1 == 0) {
-            i = -1;
-        } else if (i1 < i2 + 1) {
-            i = 0;
-        } else {
-            i = 1;
-        }
+	public int removeOppositeConditionAmongOthers(int i1, int i2) {
+		int i = -1;
+		// Keep this comment
+		if (i1 == 0) {
+			i = -1;
+		} else if (i1 < i2 + 1) {
+			i = 0;
+		} else {
+			i = 1;
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int doNotRemoveDifferentCondition(boolean b1, boolean b2) {
-        int i = -1;
-        if (b1 && b2) {
-            i = 0;
-        } else if (b2 || b1) {
-            i = 1;
-        }
+	public int doNotRemoveDifferentCondition(boolean b1, boolean b2) {
+		int i = -1;
+		if (b1 && b2) {
+			i = 0;
+		} else if (b2 || b1) {
+			i = 1;
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int doNotRemoveActiveCondition(List<String> myList) {
-        int i = -1;
-        if (myList.remove("I will be removed")) {
-            i = 0;
-        } else if (myList.remove("I will be removed")) {
-            i = 1;
-        }
+	public int doNotRemoveActiveCondition(List<String> myList) {
+		int i = -1;
+		if (myList.remove("I will be removed")) {
+			i = 0;
+		} else if (myList.remove("I will be removed")) {
+			i = 1;
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int refactorCaughtCode(boolean b1, boolean b2) {
-        int i = -1;
-        try {
-            // Keep this comment
-            if (b1 && b2) {
-                i = 0;
-            } else {
-                throw new IOException();
-            }
-        } catch (IOException e) {
-            System.out.println("I should be reachable");
-        }
+	public int refactorCaughtCode(boolean b1, boolean b2) {
+		int i = -1;
+		try {
+			// Keep this comment
+			if (b1 && b2) {
+				i = 0;
+			} else {
+				throw new IOException();
+			}
+		} catch (IOException e) {
+			System.out.println("I should be reachable");
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int doNotRemoveCaughtCode(boolean b1, boolean b2) {
-        int i = -1;
-        try {
-            if (b1 && b2) {
-                i = 0;
-            } else if (!b2 || !b1) {
-                i = 1;
-            } else {
-                throw new IOException();
-            }
-        } catch (IOException e) {
-            System.out.println("I should be reachable");
-        }
+	public int doNotRemoveCaughtCode(boolean b1, boolean b2) {
+		int i = -1;
+		try {
+			if (b1 && b2) {
+				i = 0;
+			} else if (!b2 || !b1) {
+				i = 1;
+			} else {
+				throw new IOException();
+			}
+		} catch (IOException e) {
+			System.out.println("I should be reachable");
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int removeUncaughtCode(boolean b1, boolean b2) {
-        int i = -1;
-        try {
-            // Keep this comment
-            if (b1 && b2) {
-                i = 0;
-            } else {
-                i = 1;
-            }
-        } finally {
-            System.out.println("I should be reachable");
-        }
+	public int removeUncaughtCode(boolean b1, boolean b2) {
+		int i = -1;
+		try {
+			// Keep this comment
+			if (b1 && b2) {
+				i = 0;
+			} else {
+				i = 1;
+			}
+		} finally {
+			System.out.println("I should be reachable");
+		}
 
-        return i;
-    }
+		return i;
+	}
 
-    public int doNotRefactorFallThroughBlocks(boolean b1, boolean b2) {
-        if (b1 && b2) {
-            return 0;
-        } else if (!b2 || !b1) {
-            return 1;
-        }
+	public int doNotRefactorFallThroughBlocks(boolean b1, boolean b2) {
+		if (b1 && b2) {
+			return 0;
+		} else if (!b2 || !b1) {
+			return 1;
+		}
 
-        return 2;
-    }
+		return 2;
+	}
 }

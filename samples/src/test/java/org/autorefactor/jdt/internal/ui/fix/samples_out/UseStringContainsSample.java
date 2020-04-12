@@ -26,45 +26,45 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class UseStringContainsSample {
-    public boolean replaceStringIndexOf(String s) {
-        // Keep this comment
-        boolean b1 = s.contains("test");
-        // Keep this comment
-        boolean b2 = !s.contains("test");
-        // Keep this comment
-        boolean b3 = s.contains("test");
-        // Keep this comment
-        boolean b4 = !s.contains("test");
-        // Keep this comment
-        boolean b5 = s.contains("test");
-        // Keep this comment
-        boolean b6 = !s.contains("test");
+	public boolean replaceStringIndexOf(String s) {
+		// Keep this comment
+		boolean b1 = s.contains("test");
+		// Keep this comment
+		boolean b2 = !s.contains("test");
+		// Keep this comment
+		boolean b3 = s.contains("test");
+		// Keep this comment
+		boolean b4 = !s.contains("test");
+		// Keep this comment
+		boolean b5 = s.contains("test");
+		// Keep this comment
+		boolean b6 = !s.contains("test");
 
-        return b1 && b2 && b3 && b4 && b5 && b6;
-    }
+		return b1 && b2 && b3 && b4 && b5 && b6;
+	}
 
-    public boolean replaceStringLastIndexOf(String s) {
-        // Keep this comment
-        boolean b1 = s.contains("test");
-        // Keep this comment
-        boolean b2 = !s.contains("test");
-        // Keep this comment
-        boolean b3 = s.contains("test");
-        // Keep this comment
-        boolean b4 = !s.contains("test");
-        // Keep this comment
-        boolean b5 = s.contains("test");
-        // Keep this comment
-        boolean b6 = !s.contains("test");
+	public boolean replaceStringLastIndexOf(String s) {
+		// Keep this comment
+		boolean b1 = s.contains("test");
+		// Keep this comment
+		boolean b2 = !s.contains("test");
+		// Keep this comment
+		boolean b3 = s.contains("test");
+		// Keep this comment
+		boolean b4 = !s.contains("test");
+		// Keep this comment
+		boolean b5 = s.contains("test");
+		// Keep this comment
+		boolean b6 = !s.contains("test");
 
-        return b1 && b2 && b3 && b4 && b5 && b6;
-    }
+		return b1 && b2 && b3 && b4 && b5 && b6;
+	}
 
-    public boolean doNotReplaceStringIndexOfCharacter(String s) {
-        return s.indexOf(':') >= 0;
-    }
+	public boolean doNotReplaceStringIndexOfCharacter(String s) {
+		return s.indexOf(':') >= 0;
+	}
 
-    public boolean doNotReplaceStringLastIndexOfCharacter(String s) {
-        return s.lastIndexOf(':') >= 0;
-    }
+	public boolean doNotReplaceStringLastIndexOfCharacter(String s) {
+		return s.lastIndexOf(':') >= 0;
+	}
 }

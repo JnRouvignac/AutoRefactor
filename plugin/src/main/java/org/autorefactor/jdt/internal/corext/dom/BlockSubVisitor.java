@@ -34,46 +34,46 @@ import org.eclipse.jdt.core.dom.Block;
  * visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
-    /**
-     * The cleanup context.
-     */
-    protected CompilationUnitRewrite cuRewrite;
+	/**
+	 * The cleanup context.
+	 */
+	protected CompilationUnitRewrite cuRewrite;
 
-    private Block startNode;
+	private Block startNode;
 
-    private boolean result= true;
+	private boolean result= true;
 
-    /**
-     * Constructor.
-     *
-     * @param cuRewrite       The cleanup context
-     * @param startNode The start node block
-     */
-    public BlockSubVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-        this.cuRewrite= cuRewrite;
-        this.startNode= startNode;
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param cuRewrite       The cleanup context
+	 * @param startNode The start node block
+	 */
+	public BlockSubVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+		this.cuRewrite= cuRewrite;
+		this.startNode= startNode;
+	}
 
-    /**
-     * Get the result.
-     *
-     * @return The result
-     */
-    public boolean getResult() {
-        return result;
-    }
+	/**
+	 * Get the result.
+	 *
+	 * @return The result
+	 */
+	public boolean getResult() {
+		return result;
+	}
 
-    /**
-     * Set the result.
-     *
-     * @param result The result
-     */
-    public void setResult(final boolean result) {
-        this.result= result;
-    }
+	/**
+	 * Set the result.
+	 *
+	 * @param result The result
+	 */
+	public void setResult(final boolean result) {
+		this.result= result;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        return startNode == node;
-    }
+	@Override
+	public boolean visit(final Block node) {
+		return startNode == node;
+	}
 }

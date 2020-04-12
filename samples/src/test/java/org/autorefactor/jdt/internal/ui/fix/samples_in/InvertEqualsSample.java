@@ -27,49 +27,49 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class InvertEqualsSample {
 
-    public static interface Itf {
-        int primitiveConstant = 1;
-        String objConstant = "fkjfkjf";
-        String objNullConstant = null;
-        MyEnum enumConstant = MyEnum.NOT_NULL;
-        MyEnum enumNullConstant = null;
-    }
+	public static interface Itf {
+		int primitiveConstant = 1;
+		String objConstant = "fkjfkjf";
+		String objNullConstant = null;
+		MyEnum enumConstant = MyEnum.NOT_NULL;
+		MyEnum enumNullConstant = null;
+	}
 
-    private static enum MyEnum {
-        NOT_NULL
-    }
+	private static enum MyEnum {
+		NOT_NULL
+	}
 
-    private int primitiveField;
+	private int primitiveField;
 
-    public boolean invertEquals(Object obj) {
-        // Keep this comment 1
-        return obj.equals("")
-                && obj.equals(Itf.objConstant)
-                && obj.equals("" + Itf.objConstant)
-                && obj.equals(MyEnum.NOT_NULL);
-                // && obj.equals(Itf.enumConstant);
-                // should become:
-                // && Itf.enumConstant.equals(obj);
-    }
+	public boolean invertEquals(Object obj) {
+		// Keep this comment 1
+		return obj.equals("")
+				&& obj.equals(Itf.objConstant)
+				&& obj.equals("" + Itf.objConstant)
+				&& obj.equals(MyEnum.NOT_NULL);
+				// && obj.equals(Itf.enumConstant);
+				// should become:
+				// && Itf.enumConstant.equals(obj);
+	}
 
-    public boolean doNotInvertEqualsWhenParameterIsNull(Object obj) {
-        return obj.equals(Itf.objNullConstant) && obj.equals(Itf.enumNullConstant);
-    }
+	public boolean doNotInvertEqualsWhenParameterIsNull(Object obj) {
+		return obj.equals(Itf.objNullConstant) && obj.equals(Itf.enumNullConstant);
+	}
 
-    public boolean doNotInvertEqualsWithPrimitiveParameter(Object obj) {
-        return obj.equals(1)
-            && obj.equals(Itf.primitiveConstant)
-            && obj.equals(primitiveField);
-    }
+	public boolean doNotInvertEqualsWithPrimitiveParameter(Object obj) {
+		return obj.equals(1)
+			&& obj.equals(Itf.primitiveConstant)
+			&& obj.equals(primitiveField);
+	}
 
-    public boolean invertEqualsIgnoreCase(String s) {
-        // Keep this comment 1
-        return s.equalsIgnoreCase("")
-                && s.equalsIgnoreCase(Itf.objConstant)
-                && s.equalsIgnoreCase("" + Itf.objConstant);
-    }
+	public boolean invertEqualsIgnoreCase(String s) {
+		// Keep this comment 1
+		return s.equalsIgnoreCase("")
+				&& s.equalsIgnoreCase(Itf.objConstant)
+				&& s.equalsIgnoreCase("" + Itf.objConstant);
+	}
 
-    public boolean doNotInvertEqualsIgnoreCaseWhenParameterIsNull(String s) {
-        return s.equalsIgnoreCase(Itf.objNullConstant);
-    }
+	public boolean doNotInvertEqualsIgnoreCaseWhenParameterIsNull(String s) {
+		return s.equalsIgnoreCase(Itf.objNullConstant);
+	}
 }

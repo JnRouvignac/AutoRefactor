@@ -31,58 +31,58 @@ import java.util.List;
 import java.util.Set;
 
 public class CollectionsAddAllRatherThanAsListSample {
-    public void useCollections(List<String> texts, String[] additionalTexts) {
-        // Keep this comment
-        texts.addAll(Arrays.asList(additionalTexts));
-    }
+	public void useCollections(List<String> texts, String[] additionalTexts) {
+		// Keep this comment
+		texts.addAll(Arrays.asList(additionalTexts));
+	}
 
-    public boolean useCollectionsAndReturnBoolean(List<String> texts, String[] additionalTexts) {
-        // Keep this comment
-        return texts.addAll(Arrays.asList(additionalTexts));
-    }
+	public boolean useCollectionsAndReturnBoolean(List<String> texts, String[] additionalTexts) {
+		// Keep this comment
+		return texts.addAll(Arrays.asList(additionalTexts));
+	}
 
-    public void useCollectionsOnInteger(List<Integer> numbers, Integer[] additionalNumbers) {
-        // Keep this comment
-        numbers.addAll(Arrays.asList(additionalNumbers));
-    }
+	public void useCollectionsOnInteger(List<Integer> numbers, Integer[] additionalNumbers) {
+		// Keep this comment
+		numbers.addAll(Arrays.asList(additionalNumbers));
+	}
 
-    public void useCollectionsOnSet(Set<String> texts, String[] additionalTexts) {
-        // Keep this comment
-        texts.addAll(Arrays.asList(additionalTexts));
-    }
+	public void useCollectionsOnSet(Set<String> texts, String[] additionalTexts) {
+		// Keep this comment
+		texts.addAll(Arrays.asList(additionalTexts));
+	}
 
-    public void useCollectionsOnVarArg(List<Integer> numbers, Integer additionalNumber1, Integer additionalNumber2, Integer additionalNumber3) {
-        // Keep this comment
-        numbers.addAll(Arrays.asList(additionalNumber1, additionalNumber2, additionalNumber3));
-    }
+	public void useCollectionsOnVarArg(List<Integer> numbers, Integer additionalNumber1, Integer additionalNumber2, Integer additionalNumber3) {
+		// Keep this comment
+		numbers.addAll(Arrays.asList(additionalNumber1, additionalNumber2, additionalNumber3));
+	}
 
-    public List<Integer> doNotUseCollectionsOnVariable(List<Integer> numbers, Integer[] additionalNumbers) {
-        List<Integer> additionalList= Arrays.asList(additionalNumbers);
-        numbers.addAll(additionalList);
-        return additionalList;
-    }
+	public List<Integer> doNotUseCollectionsOnVariable(List<Integer> numbers, Integer[] additionalNumbers) {
+		List<Integer> additionalList= Arrays.asList(additionalNumbers);
+		numbers.addAll(additionalList);
+		return additionalList;
+	}
 
-    public void doNotUseCollectionsForRemoving(List<Integer> numbers, Integer[] additionalNumbers) {
-        numbers.removeAll(Arrays.asList(additionalNumbers));
-    }
+	public void doNotUseCollectionsForRemoving(List<Integer> numbers, Integer[] additionalNumbers) {
+		numbers.removeAll(Arrays.asList(additionalNumbers));
+	}
 
-    public class DoNotRefactorCollectionImplementation<E> extends ArrayList<E> {
-        private static final long serialVersionUID= 8837962990422334107L;
+	public class DoNotRefactorCollectionImplementation<E> extends ArrayList<E> {
+		private static final long serialVersionUID= 8837962990422334107L;
 
-        @Override
-        public boolean add(E additionalText) {
-            addAll(Arrays.asList(additionalText, additionalText));
-            return true;
-        }
-    }
+		@Override
+		public boolean add(E additionalText) {
+			addAll(Arrays.asList(additionalText, additionalText));
+			return true;
+		}
+	}
 
-    public class DoNotRefactorThisCollectionImplementation<E> extends ArrayList<E> {
-        private static final long serialVersionUID= 8837962990422334107L;
+	public class DoNotRefactorThisCollectionImplementation<E> extends ArrayList<E> {
+		private static final long serialVersionUID= 8837962990422334107L;
 
-        @Override
-        public boolean add(E additionalText) {
-            this.addAll(Arrays.asList(additionalText, additionalText));
-            return true;
-        }
-    }
+		@Override
+		public boolean add(E additionalText) {
+			this.addAll(Arrays.asList(additionalText, additionalText));
+			return true;
+		}
+	}
 }

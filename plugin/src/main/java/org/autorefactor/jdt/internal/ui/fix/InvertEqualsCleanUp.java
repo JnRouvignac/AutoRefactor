@@ -39,65 +39,65 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  * </p>
  */
 public class InvertEqualsCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (node.getExpression() == null) {
-            return true;
-        }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (node.getExpression() == null) {
+			return true;
+		}
 
-        boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
-        boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+		boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
+		boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
 
-        if (isEquals || isStringEqualsIgnoreCase) {
-            Expression expression= node.getExpression();
-            Expression arg0= ASTNodes.arguments(node).get(0);
+		if (isEquals || isStringEqualsIgnoreCase) {
+			Expression expression= node.getExpression();
+			Expression arg0= ASTNodes.arguments(node).get(0);
 
-            if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
-                invertEqualsInvocation(node, isEquals, expression, arg0);
-                return false;
-            }
-        }
+			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
+				invertEqualsInvocation(node, isEquals, expression, arg0);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
-            final Expression arg0) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
+			final Expression arg0) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
-        rewrite.replace(node,
-                ast.invoke(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(arg0)), methodName, rewrite.createMoveTarget(expression)), null);
-    }
+		String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
+		rewrite.replace(node,
+				ast.invoke(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(arg0)), methodName, rewrite.createMoveTarget(expression)), null);
+	}
 }

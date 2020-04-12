@@ -39,103 +39,103 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final FieldDeclaration node) {
-        return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), node.getJavadoc());
-    }
+	@Override
+	public boolean visit(final FieldDeclaration node) {
+		return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), node.getJavadoc());
+	}
 
-    @Override
-    public boolean visit(final VariableDeclarationStatement node) {
-        return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), null);
-    }
+	@Override
+	public boolean visit(final VariableDeclarationStatement node) {
+		return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), null);
+	}
 
-    @SuppressWarnings("rawtypes")
-    private boolean visitMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
-            final List fragments, final Javadoc docComment) {
-        if (fragments != null && fragments.size() > 1) {
-            refactorMultiDeclaration(node, modifiers, type, fragments, docComment);
+	@SuppressWarnings("rawtypes")
+	private boolean visitMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
+			final List fragments, final Javadoc docComment) {
+		if (fragments != null && fragments.size() > 1) {
+			refactorMultiDeclaration(node, modifiers, type, fragments, docComment);
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @SuppressWarnings("rawtypes")
-    private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
-            final List fragments, final Javadoc docComment) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+	@SuppressWarnings("rawtypes")
+	private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
+			final List fragments, final Javadoc docComment) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        for (int i= fragments.size() - 1; 0 <= i; i--) {
-            VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
+		for (int i= fragments.size() - 1; 0 <= i; i--) {
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
 
-            SimpleName copyOfFragment= ast.createCopyTarget(fragment.getName());
-            Type copyOfType= ast.createCopyTarget(type);
-            Expression copyOfInitializer;
-            if (fragment.getInitializer() != null) {
-                copyOfInitializer= ast.createCopyTarget(fragment.getInitializer());
-            } else {
-                copyOfInitializer= null;
-            }
+			SimpleName copyOfFragment= ast.createCopyTarget(fragment.getName());
+			Type copyOfType= ast.createCopyTarget(type);
+			Expression copyOfInitializer;
+			if (fragment.getInitializer() != null) {
+				copyOfInitializer= ast.createCopyTarget(fragment.getInitializer());
+			} else {
+				copyOfInitializer= null;
+			}
 
-            VariableDeclarationFragment newFragment= ast.declareFragment(copyOfFragment, copyOfInitializer);
-            ASTNode newNode;
-            if (node instanceof VariableDeclarationStatement) {
-                VariableDeclarationStatement newStatement= ast.declareStatement(copyOfType, newFragment);
-                updateModifiers(ast, modifiers, newStatement.modifiers());
-                newNode= newStatement;
-            } else {
-                FieldDeclaration newField= ast.declareField(copyOfType, newFragment);
-                if (docComment != null) {
-                    newField.setJavadoc(ast.createCopyTarget(docComment));
-                }
-                updateModifiers(ast, modifiers, newField.modifiers());
-                newNode= newField;
-            }
+			VariableDeclarationFragment newFragment= ast.declareFragment(copyOfFragment, copyOfInitializer);
+			ASTNode newNode;
+			if (node instanceof VariableDeclarationStatement) {
+				VariableDeclarationStatement newStatement= ast.declareStatement(copyOfType, newFragment);
+				updateModifiers(ast, modifiers, newStatement.modifiers());
+				newNode= newStatement;
+			} else {
+				FieldDeclaration newField= ast.declareField(copyOfType, newFragment);
+				if (docComment != null) {
+					newField.setJavadoc(ast.createCopyTarget(docComment));
+				}
+				updateModifiers(ast, modifiers, newField.modifiers());
+				newNode= newField;
+			}
 
-            if (i > 0) {
-                cuRewrite.getASTRewrite().insertAfter(newNode, node, null);
-            } else {
-                cuRewrite.getASTRewrite().replace(node, newNode, null);
-            }
-        }
-    }
+			if (i > 0) {
+				cuRewrite.getASTRewrite().insertAfter(newNode, node, null);
+			} else {
+				cuRewrite.getASTRewrite().replace(node, newNode, null);
+			}
+		}
+	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    private void updateModifiers(final ASTNodeFactory ast, final List modifiers, final List newModifiers) {
-        newModifiers.clear();
-        for (Object modifier : modifiers) {
-            newModifiers.add(ast.createCopyTarget((ASTNode) modifier));
-        }
-    }
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
+	private void updateModifiers(final ASTNodeFactory ast, final List modifiers, final List newModifiers) {
+		newModifiers.clear();
+		for (Object modifier : modifiers) {
+			newModifiers.add(ast.createCopyTarget((ASTNode) modifier));
+		}
+	}
 }

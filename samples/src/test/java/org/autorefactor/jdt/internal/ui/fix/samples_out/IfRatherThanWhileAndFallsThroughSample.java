@@ -26,109 +26,109 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class IfRatherThanWhileAndFallsThroughSample {
-    public void replaceWhileByIf(boolean isValid) {
-        // Keep this comment
-        if (isValid) {
-            System.out.println("foo");
-            return;
-        }
-    }
+	public void replaceWhileByIf(boolean isValid) {
+		// Keep this comment
+		if (isValid) {
+			System.out.println("foo");
+			return;
+		}
+	}
 
-    public void replaceWhileThrowingExceptions(boolean isEnabled) {
-        // Keep this comment
-        if (isEnabled) {
-            System.out.println("foo");
-            throw new NullPointerException();
-        }
-    }
+	public void replaceWhileThrowingExceptions(boolean isEnabled) {
+		// Keep this comment
+		if (isEnabled) {
+			System.out.println("foo");
+			throw new NullPointerException();
+		}
+	}
 
-    public void replaceWhileByIfAndRemoveBreak(boolean isVisible) {
-        // Keep this comment
-        if (isVisible) {
-            System.out.println("foo");
-        }
-    }
+	public void replaceWhileByIfAndRemoveBreak(boolean isVisible) {
+		// Keep this comment
+		if (isVisible) {
+			System.out.println("foo");
+		}
+	}
 
-    public void replaceWhileByIfAndReplaceBreaksByBlocks(boolean isVisible, int i) {
-        // Keep this comment
-        if (isVisible) {
-            if (i > 0) {
-            }
-        }
-    }
+	public void replaceWhileByIfAndReplaceBreaksByBlocks(boolean isVisible, int i) {
+		// Keep this comment
+		if (isVisible) {
+			if (i > 0) {
+			}
+		}
+	}
 
-    public void doNotReplaceWhileEndedByContinue(boolean b) {
-        while (b) {
-            System.out.println("foo");
-            continue;
-        }
-    }
+	public void doNotReplaceWhileEndedByContinue(boolean b) {
+		while (b) {
+			System.out.println("foo");
+			continue;
+		}
+	}
 
-    public void doNotReplaceWhileUsingContinue(boolean b1, boolean b2) {
-        while (b1) {
-            if (b2) {
-                System.out.println("bar");
-                continue;
-            }
-            System.out.println("foo");
-            return;
-        }
-    }
+	public void doNotReplaceWhileUsingContinue(boolean b1, boolean b2) {
+		while (b1) {
+			if (b2) {
+				System.out.println("bar");
+				continue;
+			}
+			System.out.println("foo");
+			return;
+		}
+	}
 
-    public void replaceWhileWithComplexCode(boolean b1, boolean b2) {
-        // Keep this comment
-        if (b1) {
-            System.out.println("foo");
-            if (b2) {
-                System.out.println("bar");
-                return;
-            } else {
-                throw new NullPointerException();
-            }
-        }
-    }
+	public void replaceWhileWithComplexCode(boolean b1, boolean b2) {
+		// Keep this comment
+		if (b1) {
+			System.out.println("foo");
+			if (b2) {
+				System.out.println("bar");
+				return;
+			} else {
+				throw new NullPointerException();
+			}
+		}
+	}
 
-    public void doNotReplaceWhileThatMayHaveSeveralIterations(int i) {
-        while (i-- > 0) {
-            System.out.println("foo");
-            if (i == 1) {
-                System.out.println("bar");
-                return;
-            } else if (i == 2) {
-                throw new NullPointerException();
-            }
-        }
-    }
+	public void doNotReplaceWhileThatMayHaveSeveralIterations(int i) {
+		while (i-- > 0) {
+			System.out.println("foo");
+			if (i == 1) {
+				System.out.println("bar");
+				return;
+			} else if (i == 2) {
+				throw new NullPointerException();
+			}
+		}
+	}
 
-    public void replaceWhileButOnlyRemoveBreakForTheWhileLoop(boolean b, int magicValue) {
-        // Keep this comment
-        if (b) {
-            for (int i = 0; i < 10; i++) {
-                if (i == magicValue) {
-                    System.out.println("Magic value! Goodbye!");
-                    break;
-                } else {
-                    System.out.println("Current value: " + i);
-                }
-            }
-        }
-    }
+	public void replaceWhileButOnlyRemoveBreakForTheWhileLoop(boolean b, int magicValue) {
+		// Keep this comment
+		if (b) {
+			for (int i = 0; i < 10; i++) {
+				if (i == magicValue) {
+					System.out.println("Magic value! Goodbye!");
+					break;
+				} else {
+					System.out.println("Current value: " + i);
+				}
+			}
+		}
+	}
 
-    public void doNotReplaceWhileThatHasLabeledBreak(boolean b) {
-        doNotTrashThisSpecialBreak:while (b) {
-            System.out.println("foo");
-            break doNotTrashThisSpecialBreak;
-        }
-    }
+	public void doNotReplaceWhileThatHasLabeledBreak(boolean b) {
+		doNotTrashThisSpecialBreak:while (b) {
+			System.out.println("foo");
+			break doNotTrashThisSpecialBreak;
+		}
+	}
 
-    public void doNotRemoveBreakThatShortcutsCode(boolean b1, boolean b2) {
-        while (b1) {
-            if (b2) {
-                System.out.println("foo");
-                break;
-            }
-            System.out.println("bar");
-            break;
-        }
-    }
+	public void doNotRemoveBreakThatShortcutsCode(boolean b1, boolean b2) {
+		while (b1) {
+			if (b2) {
+				System.out.println("foo");
+				break;
+			}
+			System.out.println("bar");
+			break;
+		}
+	}
 }

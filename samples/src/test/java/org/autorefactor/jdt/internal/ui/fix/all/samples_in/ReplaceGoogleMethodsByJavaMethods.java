@@ -30,13 +30,13 @@ import java.util.Date;
 import com.google.gwt.thirdparty.guava.common.base.Objects;
 
 public class ReplaceGoogleMethodsByJavaMethods {
-    public String replaceGoogleMethods(Date object1, Date object2) {
-        // Keep this comment
-        boolean b1 = Objects.equal(object1, object2);
+	public String replaceGoogleMethods(Date object1, Date object2) {
+		// Keep this comment
+		boolean b1 = Objects.equal(object1, object2);
 
-        // Keep this comment too
-        int i2 = Objects.hashCode(object1, object2);
+		// Keep this comment too
+		int i2 = Objects.hashCode(object1, object2);
 
-        return String.valueOf(b1) + i2;
-    }
+		return String.valueOf(b1) + i2;
+	}
 }

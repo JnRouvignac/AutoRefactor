@@ -33,178 +33,178 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 public abstract class AndroidViewHolderSample extends BaseAdapter {
-    @Override
-    public int getCount() {
-        return 0;
-    }
+	@Override
+	public int getCount() {
+		return 0;
+	}
 
-    @Override
-    public Object getItem(int position) {
-        return null;
-    }
+	@Override
+	public Object getItem(int position) {
+		return null;
+	}
 
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
+	@Override
+	public long getItemId(int position) {
+		return 0;
+	}
 
-    /** Nothing to refactor: no perf impact. */
-    public static class AdapterOk extends AndroidViewHolderSample {
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            return null;
-        }
-    }
+	/** Nothing to refactor: no perf impact. */
+	public static class AdapterOk extends AndroidViewHolderSample {
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			return null;
+		}
+	}
 
-    /** Refactor to use the view holder pattern. */
-    public static class AdapterUsingRecycledView extends AndroidViewHolderSample {
-        LayoutInflater mInflater;
+	/** Refactor to use the view holder pattern. */
+	public static class AdapterUsingRecycledView extends AndroidViewHolderSample {
+		LayoutInflater mInflater;
 
-        private static class ViewHolderItem {
-            private TextView text;
-        }
+		private static class ViewHolderItem {
+			private TextView text;
+		}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolderItem viewHolderItem;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.your_layout, null);
-                viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView
-                        .findViewById(R.id.text);
-                convertView.setTag(viewHolderItem);
-            } else {
-                viewHolderItem = (ViewHolderItem) convertView.getTag();
-            }
-            TextView text = viewHolderItem.text;
-            text.setText("Position " + position);
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolderItem viewHolderItem;
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.your_layout, null);
+				viewHolderItem = new ViewHolderItem();
+				viewHolderItem.text = (TextView) convertView
+						.findViewById(R.id.text);
+				convertView.setTag(viewHolderItem);
+			} else {
+				viewHolderItem = (ViewHolderItem) convertView.getTag();
+			}
+			TextView text = viewHolderItem.text;
+			text.setText("Position " + position);
 
-            return convertView;
-        }
-    }
+			return convertView;
+		}
+	}
 
-    /** Refactor to use the view holder pattern. */
-    public static class AdapterNotReturningRecycledView extends AndroidViewHolderSample {
-        LayoutInflater mInflater;
+	/** Refactor to use the view holder pattern. */
+	public static class AdapterNotReturningRecycledView extends AndroidViewHolderSample {
+		LayoutInflater mInflater;
 
-        private static class ViewHolderItem {
-            private TextView text;
-        }
+		private static class ViewHolderItem {
+			private TextView text;
+		}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolderItem viewHolderItem;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.your_layout, null);
-                viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView
-                        .findViewById(R.id.text);
-                convertView.setTag(viewHolderItem);
-            } else {
-                viewHolderItem = (ViewHolderItem) convertView.getTag();
-            }
-            TextView text = viewHolderItem.text;
-            text.setText("Position " + position);
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolderItem viewHolderItem;
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.your_layout, null);
+				viewHolderItem = new ViewHolderItem();
+				viewHolderItem.text = (TextView) convertView
+						.findViewById(R.id.text);
+				convertView.setTag(viewHolderItem);
+			} else {
+				viewHolderItem = (ViewHolderItem) convertView.getTag();
+			}
+			TextView text = viewHolderItem.text;
+			text.setText("Position " + position);
 
-            return convertView;
-        }
-    }
+			return convertView;
+		}
+	}
 
-    /** Refactor to use the view holder pattern. */
-    public static class AdapterUsingDifferentView extends AndroidViewHolderSample {
-        LayoutInflater mInflater;
+	/** Refactor to use the view holder pattern. */
+	public static class AdapterUsingDifferentView extends AndroidViewHolderSample {
+		LayoutInflater mInflater;
 
-        private static class ViewHolderItem {
-            private TextView text;
-        }
+		private static class ViewHolderItem {
+			private TextView text;
+		}
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolderItem viewHolderItem;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.your_layout, null);
-                viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView
-                        .findViewById(R.id.text);
-                convertView.setTag(viewHolderItem);
-            } else {
-                viewHolderItem = (ViewHolderItem) convertView.getTag();
-            }
-            View v = convertView;
-            TextView text = viewHolderItem.text;
-            text.setText("Position " + position);
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolderItem viewHolderItem;
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.your_layout, null);
+				viewHolderItem = new ViewHolderItem();
+				viewHolderItem.text = (TextView) convertView
+						.findViewById(R.id.text);
+				convertView.setTag(viewHolderItem);
+			} else {
+				viewHolderItem = (ViewHolderItem) convertView.getTag();
+			}
+			View v = convertView;
+			TextView text = viewHolderItem.text;
+			text.setText("Position " + position);
 
-            return v;
-        }
-    }
+			return v;
+		}
+	}
 
-    /** Do not refactor: it already uses the view holder pattern. */
-    public static class AdapterUsingViewHolder extends AndroidViewHolderSample {
-        LayoutInflater mInflater;
+	/** Do not refactor: it already uses the view holder pattern. */
+	public static class AdapterUsingViewHolder extends AndroidViewHolderSample {
+		LayoutInflater mInflater;
 
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Already using View Holder pattern
-            convertView = convertView == null ? mInflater.inflate(R.layout.your_layout, null) : convertView;
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// Already using View Holder pattern
+			convertView = convertView == null ? mInflater.inflate(R.layout.your_layout, null) : convertView;
 
-            TextView text = (TextView) convertView.findViewById(R.id.text);
-            text.setText("Position " + position);
+			TextView text = (TextView) convertView.findViewById(R.id.text);
+			text.setText("Position " + position);
 
-            return convertView;
-        }
-    }
+			return convertView;
+		}
+	}
 
-    public static class AdapterUsingViewHolderSwitch extends AndroidViewHolderSample {
-        LayoutInflater inflater;
+	public static class AdapterUsingViewHolderSwitch extends AndroidViewHolderSample {
+		LayoutInflater inflater;
 
-        @Override
-        public View getView(final int position, final View convertView, final ViewGroup parent) {
-            View rootView = convertView;
-            final int itemViewType = getItemViewType(position);
-            switch (itemViewType) {
-            case 0:
-                if (rootView != null) {
-                    return rootView;
-                }
-                rootView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                break;
-            }
-            return rootView;
-        }
-    }
+		@Override
+		public View getView(final int position, final View convertView, final ViewGroup parent) {
+			View rootView = convertView;
+			final int itemViewType = getItemViewType(position);
+			switch (itemViewType) {
+			case 0:
+				if (rootView != null) {
+					return rootView;
+				}
+				rootView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+				break;
+			}
+			return rootView;
+		}
+	}
 
-    /** TODO low priority ViewHolder cornercase. */
-    public static class CornerCase extends AndroidViewHolderSample {
-        LayoutInflater inflater;
+	/** TODO low priority ViewHolder cornercase. */
+	public static class CornerCase extends AndroidViewHolderSample {
+		LayoutInflater inflater;
 
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            View rootView = convertView;
-            // This should not be refactored
-            if (rootView != null) {
-                return rootView;
-            }
-            if (convertView == null) {
-                convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-            }
-            rootView = convertView;
-            return rootView;
-        }
-    }
+		@Override
+		public View getView(final int position, View convertView, final ViewGroup parent) {
+			View rootView = convertView;
+			// This should not be refactored
+			if (rootView != null) {
+				return rootView;
+			}
+			if (convertView == null) {
+				convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+			}
+			rootView = convertView;
+			return rootView;
+		}
+	}
 
-    /**
-     * GUI resources are defined using XML and can have the attribute {@code id}.
-     * <p>
-     * This {@code id} is later used to get that resource in the code.
-     * <p>
-     * {@code R.id.<id_of_resource>} is the way it's done.
-     */
-    private static class R {
-        public static class layout {
-            public static final int your_layout = 2;
-        }
+	/**
+	 * GUI resources are defined using XML and can have the attribute {@code id}.
+	 * <p>
+	 * This {@code id} is later used to get that resource in the code.
+	 * <p>
+	 * {@code R.id.<id_of_resource>} is the way it's done.
+	 */
+	private static class R {
+		public static class layout {
+			public static final int your_layout = 2;
+		}
 
-        public static class id {
-            public static final int text = 2;
-        }
-    }
+		public static class id {
+			public static final int text = 2;
+		}
+	}
 }

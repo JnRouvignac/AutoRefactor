@@ -29,17 +29,17 @@ import org.eclipse.core.runtime.jobs.Job;
 
 /** Interface to use for managing jobs. */
 public interface JobManager {
-    /**
-     * Registers the provided job.
-     *
-     * @param job the job to register
-     */
-    void register(Job job);
+	/**
+	 * Registers the provided job.
+	 *
+	 * @param job the job to register
+	 */
+	void register(Job job);
 
-    /**
-     * Unregisters the provided job.
-     *
-     * @param job the job to unregister
-     */
-    void unregister(Job job);
+	/**
+	 * Unregisters the provided job.
+	 *
+	 * @param job the job to unregister
+	 */
+	void unregister(Job job);
 }

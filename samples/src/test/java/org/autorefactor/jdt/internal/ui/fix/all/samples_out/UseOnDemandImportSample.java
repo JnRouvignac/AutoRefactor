@@ -28,11 +28,11 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 import java.util.*;
 
 public class UseOnDemandImportSample {
-    private Observable observable;
+	private Observable observable;
 
-    @Override
-    public int hashCode() {
-        // Keep this comment
-        return Objects.hash(observable);
-    }
+	@Override
+	public int hashCode() {
+		// Keep this comment
+		return Objects.hash(observable);
+	}
 }

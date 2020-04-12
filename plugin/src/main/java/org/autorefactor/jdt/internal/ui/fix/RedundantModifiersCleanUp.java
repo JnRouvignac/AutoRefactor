@@ -54,275 +54,275 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 /** See {@link #getDescription()} method. */
 public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
+	}
 
-    private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
-        /**
-         * Compare objects.
-         *
-         * @param o1 First item
-         * @param o2 Second item
-         *
-         * @return -1, 0 or 1
-         */
-        @Override
-        public int compare(final IExtendedModifier o1, final IExtendedModifier o2) {
-            if (o1.isAnnotation()) {
-                if (o2.isAnnotation()) {
-                    return 0;
-                }
+	private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
+		/**
+		 * Compare objects.
+		 *
+		 * @param o1 First item
+		 * @param o2 Second item
+		 *
+		 * @return -1, 0 or 1
+		 */
+		@Override
+		public int compare(final IExtendedModifier o1, final IExtendedModifier o2) {
+			if (o1.isAnnotation()) {
+				if (o2.isAnnotation()) {
+					return 0;
+				}
 
-                return -1;
-            }
-            if (o2.isAnnotation()) {
-                return 1;
-            }
-            int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-            int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
-            if (i1 == -1) {
-                throw new NotImplementedException((Modifier) o1, "cannot determine order for modifier " + o1); //$NON-NLS-1$
-            }
-            if (i2 == -1) {
-                throw new NotImplementedException((Modifier) o2, "cannot compare modifier " + o2); //$NON-NLS-1$
-            }
+				return -1;
+			}
+			if (o2.isAnnotation()) {
+				return 1;
+			}
+			int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+			int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+			if (i1 == -1) {
+				throw new NotImplementedException((Modifier) o1, "cannot determine order for modifier " + o1); //$NON-NLS-1$
+			}
+			if (i2 == -1) {
+				throw new NotImplementedException((Modifier) o2, "cannot compare modifier " + o2); //$NON-NLS-1$
+			}
 
-            return i1 - i2;
-        }
-    }
+			return i1 - i2;
+		}
+	}
 
-    private static final List<ModifierKeyword> ORDERED_MODIFIERS= Collections.unmodifiableList(Arrays.asList(
-            ModifierKeyword.PUBLIC_KEYWORD, ModifierKeyword.PROTECTED_KEYWORD, ModifierKeyword.PRIVATE_KEYWORD,
-            ModifierKeyword.ABSTRACT_KEYWORD, ModifierKeyword.STATIC_KEYWORD, ModifierKeyword.FINAL_KEYWORD,
-            ModifierKeyword.TRANSIENT_KEYWORD, ModifierKeyword.VOLATILE_KEYWORD, ModifierKeyword.SYNCHRONIZED_KEYWORD,
-            ModifierKeyword.NATIVE_KEYWORD, ModifierKeyword.STRICTFP_KEYWORD));
+	private static final List<ModifierKeyword> ORDERED_MODIFIERS= Collections.unmodifiableList(Arrays.asList(
+			ModifierKeyword.PUBLIC_KEYWORD, ModifierKeyword.PROTECTED_KEYWORD, ModifierKeyword.PRIVATE_KEYWORD,
+			ModifierKeyword.ABSTRACT_KEYWORD, ModifierKeyword.STATIC_KEYWORD, ModifierKeyword.FINAL_KEYWORD,
+			ModifierKeyword.TRANSIENT_KEYWORD, ModifierKeyword.VOLATILE_KEYWORD, ModifierKeyword.SYNCHRONIZED_KEYWORD,
+			ModifierKeyword.NATIVE_KEYWORD, ModifierKeyword.STRICTFP_KEYWORD));
 
-    @Override
-    public boolean visit(final FieldDeclaration node) {
-        if (isInterface(node.getParent())) {
-            return maybeRemovePublicStaticFinalModifiers(node);
-        }
+	@Override
+	public boolean visit(final FieldDeclaration node) {
+		if (isInterface(node.getParent())) {
+			return maybeRemovePublicStaticFinalModifiers(node);
+		}
 
-        if (Modifier.isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
-            return removeProtectedModifier(node);
-        }
+		if (Modifier.isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
+			return removeProtectedModifier(node);
+		}
 
-        return ensureModifiersOrder(node);
-    }
+		return ensureModifiersOrder(node);
+	}
 
-    private boolean maybeRemovePublicStaticFinalModifiers(final FieldDeclaration node) {
-        // Remove modifiers implied by the context
-        boolean result= true;
+	private boolean maybeRemovePublicStaticFinalModifiers(final FieldDeclaration node) {
+		// Remove modifiers implied by the context
+		boolean result= true;
 
-        for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
-            if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
-                cuRewrite.getASTRewrite().remove(modifier, null);
-                result= false;
-            }
-        }
+		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+			if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
+				cuRewrite.getASTRewrite().remove(modifier, null);
+				result= false;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private boolean isInterface(final ASTNode node) {
-        return node instanceof TypeDeclaration && ((TypeDeclaration) node).isInterface();
-    }
+	private boolean isInterface(final ASTNode node) {
+		return node instanceof TypeDeclaration && ((TypeDeclaration) node).isInterface();
+	}
 
-    private boolean isFinalClass(final ASTNode node) {
-        return node instanceof TypeDeclaration && Modifier.isFinal(((TypeDeclaration) node).getModifiers());
-    }
+	private boolean isFinalClass(final ASTNode node) {
+		return node instanceof TypeDeclaration && Modifier.isFinal(((TypeDeclaration) node).getModifiers());
+	}
 
-    @Override
-    public boolean visit(final MethodDeclaration node) {
-        if (isInterface(node.getParent())) {
-            // Remove modifiers implied by the context
-            return removePublicAbstractModifiers(node);
-        }
+	@Override
+	public boolean visit(final MethodDeclaration node) {
+		if (isInterface(node.getParent())) {
+			// Remove modifiers implied by the context
+			return removePublicAbstractModifiers(node);
+		}
 
-        int modifiers= node.getModifiers();
+		int modifiers= node.getModifiers();
 
-        if (Modifier.isFinal(modifiers) && (isFinalClass(node.getParent()) || Modifier.isPrivate(modifiers))) {
-            return removeFinalModifier(ASTNodes.modifiers(node));
-        }
+		if (Modifier.isFinal(modifiers) && (isFinalClass(node.getParent()) || Modifier.isPrivate(modifiers))) {
+			return removeFinalModifier(ASTNodes.modifiers(node));
+		}
 
-        if (Modifier.isProtected(node.getModifiers()) && (node.isConstructor() ? isFinalClass(node.getParent())
-                : isFinalClassWithoutInheritance(node.getParent()))) {
-            return removeProtectedModifier(node);
-        }
+		if (Modifier.isProtected(node.getModifiers()) && (node.isConstructor() ? isFinalClass(node.getParent())
+				: isFinalClassWithoutInheritance(node.getParent()))) {
+			return removeProtectedModifier(node);
+		}
 
-        return ensureModifiersOrder(node);
-    }
+		return ensureModifiersOrder(node);
+	}
 
-    private boolean isFinalClassWithoutInheritance(final ASTNode node) {
-        if (node instanceof TypeDeclaration) {
-            TypeDeclaration clazz= (TypeDeclaration) node;
-            return isFinalClass(clazz) && clazz.superInterfaceTypes().isEmpty() && (clazz.getSuperclassType() == null
-                    || ASTNodes.hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
-        }
+	private boolean isFinalClassWithoutInheritance(final ASTNode node) {
+		if (node instanceof TypeDeclaration) {
+			TypeDeclaration clazz= (TypeDeclaration) node;
+			return isFinalClass(clazz) && clazz.superInterfaceTypes().isEmpty() && (clazz.getSuperclassType() == null
+					|| ASTNodes.hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private boolean removeProtectedModifier(final BodyDeclaration node) {
-        for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
-            if (modifier.isProtected()) {
-                cuRewrite.getASTRewrite().remove(modifier, null);
-                return false;
-            }
-        }
+	private boolean removeProtectedModifier(final BodyDeclaration node) {
+		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+			if (modifier.isProtected()) {
+				cuRewrite.getASTRewrite().remove(modifier, null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean removePublicAbstractModifiers(final BodyDeclaration node) {
-        boolean result= true;
+	private boolean removePublicAbstractModifiers(final BodyDeclaration node) {
+		boolean result= true;
 
-        for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
-            if (modifier.isPublic() || modifier.isAbstract()) {
-                cuRewrite.getASTRewrite().remove(modifier, null);
-                result= false;
-            }
-        }
+		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+			if (modifier.isPublic() || modifier.isAbstract()) {
+				cuRewrite.getASTRewrite().remove(modifier, null);
+				result= false;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public boolean visit(final AnnotationTypeDeclaration node) {
-        return ensureModifiersOrder(node);
-    }
+	@Override
+	public boolean visit(final AnnotationTypeDeclaration node) {
+		return ensureModifiersOrder(node);
+	}
 
-    @Override
-    public boolean visit(final AnnotationTypeMemberDeclaration node) {
-        return removePublicAbstractModifiers(node);
-    }
+	@Override
+	public boolean visit(final AnnotationTypeMemberDeclaration node) {
+		return removePublicAbstractModifiers(node);
+	}
 
-    @Override
-    public boolean visit(final EnumDeclaration node) {
-        return removeStaticAbstractModifier(ASTNodes.modifiers(node)) && ensureModifiersOrder(node);
-    }
+	@Override
+	public boolean visit(final EnumDeclaration node) {
+		return removeStaticAbstractModifier(ASTNodes.modifiers(node)) && ensureModifiersOrder(node);
+	}
 
-    @Override
-    public boolean visit(final TryStatement node) {
-        boolean result= true;
+	@Override
+	public boolean visit(final TryStatement node) {
+		boolean result= true;
 
-        for (VariableDeclarationExpression resource : ASTNodes.resources(node)) {
-            result&= removeFinalModifier(ASTNodes.modifiers(resource));
-        }
+		for (VariableDeclarationExpression resource : ASTNodes.resources(node)) {
+			result&= removeFinalModifier(ASTNodes.modifiers(resource));
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public boolean visit(final TypeDeclaration node) {
-        return (!isInterface(node) || removeStaticAbstractModifier(ASTNodes.modifiers(node))) && ensureModifiersOrder(node);
-    }
+	@Override
+	public boolean visit(final TypeDeclaration node) {
+		return (!isInterface(node) || removeStaticAbstractModifier(ASTNodes.modifiers(node))) && ensureModifiersOrder(node);
+	}
 
-    private boolean ensureModifiersOrder(final BodyDeclaration node) {
-        List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
-        List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
-        Collections.sort(reorderedModifiers, new ModifierOrderComparator());
+	private boolean ensureModifiersOrder(final BodyDeclaration node) {
+		List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
+		List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
+		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
-        if (!extendedModifiers.equals(reorderedModifiers)) {
-            reorderModifiers(reorderedModifiers);
-            return false;
-        }
+		if (!extendedModifiers.equals(reorderedModifiers)) {
+			reorderModifiers(reorderedModifiers);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        for (int i= 0; i < reorderedModifiers.size(); i++) {
-            IExtendedModifier extendedModifier= reorderedModifiers.get(i);
+		for (int i= 0; i < reorderedModifiers.size(); i++) {
+			IExtendedModifier extendedModifier= reorderedModifiers.get(i);
 
-            if (extendedModifier.isModifier()) {
-                rewrite.moveToIndex((Modifier) extendedModifier, i, rewrite.createMoveTarget((Modifier) extendedModifier), null);
-            } else {
-                rewrite.moveToIndex((Annotation) extendedModifier, i, rewrite.createMoveTarget((Annotation) extendedModifier), null);
-            }
-        }
-    }
+			if (extendedModifier.isModifier()) {
+				rewrite.moveToIndex((Modifier) extendedModifier, i, rewrite.createMoveTarget((Modifier) extendedModifier), null);
+			} else {
+				rewrite.moveToIndex((Annotation) extendedModifier, i, rewrite.createMoveTarget((Annotation) extendedModifier), null);
+			}
+		}
+	}
 
-    private boolean removeStaticAbstractModifier(final List<IExtendedModifier> modifiers) {
-        boolean result= true;
+	private boolean removeStaticAbstractModifier(final List<IExtendedModifier> modifiers) {
+		boolean result= true;
 
-        for (Modifier modifier : getModifiersOnly(modifiers)) {
-            if (modifier.isStatic() || modifier.isAbstract()) {
-                cuRewrite.getASTRewrite().remove(modifier, null);
-                result= false;
-            }
-        }
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
+			if (modifier.isStatic() || modifier.isAbstract()) {
+				cuRewrite.getASTRewrite().remove(modifier, null);
+				result= false;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public boolean visit(final SingleVariableDeclaration node) {
-        ASTNode parent= node.getParent();
+	@Override
+	public boolean visit(final SingleVariableDeclaration node) {
+		ASTNode parent= node.getParent();
 
-        if (parent instanceof MethodDeclaration) {
-            MethodDeclaration method= (MethodDeclaration) parent;
-            TypeDeclaration type= ASTNodes.getAncestorOrNull(method, TypeDeclaration.class);
+		if (parent instanceof MethodDeclaration) {
+			MethodDeclaration method= (MethodDeclaration) parent;
+			TypeDeclaration type= ASTNodes.getAncestorOrNull(method, TypeDeclaration.class);
 
-            if (Modifier.isAbstract(method.getModifiers()) || isInterface(type)) {
-                return removeFinalModifier(ASTNodes.modifiers(node));
-            }
-        }
+			if (Modifier.isAbstract(method.getModifiers()) || isInterface(type)) {
+				return removeFinalModifier(ASTNodes.modifiers(node));
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean removeFinalModifier(final List<IExtendedModifier> modifiers) {
-        boolean result= true;
+	private boolean removeFinalModifier(final List<IExtendedModifier> modifiers) {
+		boolean result= true;
 
-        for (Modifier modifier : getModifiersOnly(modifiers)) {
-            if (modifier.isFinal()) {
-                cuRewrite.getASTRewrite().remove(modifier, null);
-                result= false;
-            }
-        }
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
+			if (modifier.isFinal()) {
+				cuRewrite.getASTRewrite().remove(modifier, null);
+				result= false;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        List<Modifier> results= new ArrayList<>();
+	private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
+		List<Modifier> results= new ArrayList<>();
 
-        for (IExtendedModifier extendedModifier : modifiers) {
-            if (extendedModifier.isModifier()) {
-                results.add((Modifier) extendedModifier);
-            }
-        }
+		for (IExtendedModifier extendedModifier : modifiers) {
+			if (extendedModifier.isModifier()) {
+				results.add((Modifier) extendedModifier);
+			}
+		}
 
-        return results;
-    }
+		return results;
+	}
 }

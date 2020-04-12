@@ -29,34 +29,34 @@ import org.autorefactor.environment.Logger;
 import org.autorefactor.util.UnhandledException;
 
 class ThrowingLogger implements Logger {
-    /**
-     * Log a error message.
-     *
-     * @param message the message
-     */
-    public void error(String message) {
-        throw new RuntimeException(message);
-    }
+	/**
+	 * Log a error message.
+	 *
+	 * @param message the message
+	 */
+	public void error(String message) {
+		throw new RuntimeException(message);
+	}
 
-    /**
-     * Log a error message with exception.
-     *
-     * @param message the message
-     * @param e       the exception
-     */
-    public void error(String message, Exception e) {
-        if (e instanceof RuntimeException) {
-            throw (RuntimeException) e;
-        }
-        throw new UnhandledException(null, message, e);
-    }
+	/**
+	 * Log a error message with exception.
+	 *
+	 * @param message the message
+	 * @param e       the exception
+	 */
+	public void error(String message, Exception e) {
+		if (e instanceof RuntimeException) {
+			throw (RuntimeException) e;
+		}
+		throw new UnhandledException(null, message, e);
+	}
 
-    /**
-     * Log a warning message.
-     *
-     * @param message the message
-     */
-    public void warn(String message) {
-        throw new RuntimeException(message);
-    }
+	/**
+	 * Log a warning message.
+	 *
+	 * @param message the message
+	 */
+	public void warn(String message) {
+		throw new RuntimeException(message);
+	}
 }

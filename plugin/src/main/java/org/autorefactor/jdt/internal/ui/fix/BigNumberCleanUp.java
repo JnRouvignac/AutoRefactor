@@ -47,216 +47,216 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class BigNumberCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ClassInstanceCreation node) {
-        ITypeBinding typeBinding= node.getType().resolveBinding();
+	@Override
+	public boolean visit(final ClassInstanceCreation node) {
+		ITypeBinding typeBinding= node.getType().resolveBinding();
 
-        if (node.getAnonymousClassDeclaration() == null
-                && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
-                && ASTNodes.arguments(node).size() == 1) {
-            Expression arg0= ASTNodes.arguments(node).get(0);
+		if (node.getAnonymousClassDeclaration() == null
+				&& ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
+				&& ASTNodes.arguments(node).size() == 1) {
+			Expression arg0= ASTNodes.arguments(node).get(0);
 
-            if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
-                String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "").replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
+				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "").replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-                if (token.contains(".")) { //$NON-NLS-1$
-                    // Only instantiation from double, not from integer
-                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(token), null);
-                    return false;
-                }
+				if (token.contains(".")) { //$NON-NLS-1$
+					// Only instantiation from double, not from integer
+					cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(token), null);
+					return false;
+				}
 
-                if (getJavaMinorVersion() >= 5) {
-                    if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
-                        return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                    }
+				if (getJavaMinorVersion() >= 5) {
+					if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
+						return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
+					}
 
-                    if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                        return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                    }
+					if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+						return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+					}
 
-                    if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                        return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                    }
+					if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+						return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+					}
 
-                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), token), null);
-                    return false;
-                }
-            } else if (arg0 instanceof StringLiteral) {
-                if (getJavaMinorVersion() < 5) {
-                    return true;
-                }
+					cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), token), null);
+					return false;
+				}
+			} else if (arg0 instanceof StringLiteral) {
+				if (getJavaMinorVersion() < 5) {
+					return true;
+				}
 
-                String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+				String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-                if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    // Only instantiation from double, not from integer
-                    cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(literalValue.replace("_", "")), null); //$NON-NLS-1$ //$NON-NLS-2$
-                    return false;
-                }
+				if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
+					// Only instantiation from double, not from integer
+					cuRewrite.getASTRewrite().replace(arg0, getStringLiteral(literalValue.replace("_", "")), null); //$NON-NLS-1$ //$NON-NLS-2$
+					return false;
+				}
 
-                if (literalValue.matches("0+")) { //$NON-NLS-1$
-                    return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                }
+				if (literalValue.matches("0+")) { //$NON-NLS-1$
+					return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
+				}
 
-                if (literalValue.matches("0+1")) { //$NON-NLS-1$
-                    return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                }
+				if (literalValue.matches("0+1")) { //$NON-NLS-1$
+					return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+				}
 
-                if (literalValue.matches("0+10")) { //$NON-NLS-1$
-                    return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                }
+				if (literalValue.matches("0+10")) { //$NON-NLS-1$
+					return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+				}
 
-                if (literalValue.matches("\\d+")) { //$NON-NLS-1$
-                    cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), literalValue), null);
-                    return false;
-                }
-            }
-        }
+				if (literalValue.matches("\\d+")) { //$NON-NLS-1$
+					cuRewrite.getASTRewrite().replace(node, getValueOf(typeBinding.getName(), literalValue), null);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
-        cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field), null);
-        return false;
-    }
+	private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
+		cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field), null);
+		return false;
+	}
 
-    private ASTNode getValueOf(final String name, final String numberLiteral) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        return ast.invoke(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
-    }
+	private ASTNode getValueOf(final String name, final String numberLiteral) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		return ast.invoke(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
+	}
 
-    private StringLiteral getStringLiteral(final String numberLiteral) {
-        return cuRewrite.getASTBuilder().string(numberLiteral);
-    }
+	private StringLiteral getStringLiteral(final String numberLiteral) {
+		return cuRewrite.getASTBuilder().string(numberLiteral);
+	}
 
-    @Override
-    public boolean visit(final PrefixExpression node) {
-        MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
-        return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || mi == null || maybeReplaceEquals(false, node, mi);
-    }
+	@Override
+	public boolean visit(final PrefixExpression node) {
+		MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+		return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || mi == null || maybeReplaceEquals(false, node, mi);
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (node.getExpression() == null) {
-            return true;
-        }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (node.getExpression() == null) {
+			return true;
+		}
 
-        if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
-            ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-            Expression arg0= ASTNodes.arguments(node).get(0);
+		if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
+			ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
+			Expression arg0= ASTNodes.arguments(node).get(0);
 
-            if (arg0 instanceof NumberLiteral) {
-                String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (arg0 instanceof NumberLiteral) {
+				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-                if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
-                    cuRewrite.getASTRewrite().replace(node,
-                            getClassInstanceCreatorNode(node.getExpression(), token), null);
-                } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                } else {
-                    return true;
-                }
+				if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
+					cuRewrite.getASTRewrite().replace(node,
+							getClassInstanceCreatorNode(node.getExpression(), token), null);
+				} else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
+					replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
+				} else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+					replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+				} else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+					replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+				} else {
+					return true;
+				}
 
-                return false;
-            }
-        } else if (!(node.getParent() instanceof PrefixExpression)
-                || !ASTNodes.hasOperator((PrefixExpression) node.getParent(), PrefixExpression.Operator.NOT)) {
-            return maybeReplaceEquals(true, node, node);
-        }
+				return false;
+			}
+		} else if (!(node.getParent() instanceof PrefixExpression)
+				|| !ASTNodes.hasOperator((PrefixExpression) node.getParent(), PrefixExpression.Operator.NOT)) {
+			return maybeReplaceEquals(true, node, node);
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-        if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            Expression arg0= ASTNodes.arguments(mi).get(0);
+	private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
+		if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			Expression arg0= ASTNodes.arguments(mi).get(0);
 
-            if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
-                if (isInStringAppend(mi.getParent())) {
-                    ASTNodeFactory ast= cuRewrite.getASTBuilder();
-                    cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)), null);
-                } else {
-                    cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi), null);
-                }
+			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
+				if (isInStringAppend(mi.getParent())) {
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+					cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)), null);
+				} else {
+					cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi), null);
+				}
 
-                return false;
-            }
-        }
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isInStringAppend(final ASTNode node) {
-        if (node instanceof InfixExpression) {
-            InfixExpression expression= (InfixExpression) node;
+	private boolean isInStringAppend(final ASTNode node) {
+		if (node instanceof InfixExpression) {
+			InfixExpression expression= (InfixExpression) node;
 
-            if (ASTNodes.hasOperator(expression, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expression.getLeftOperand(), String.class.getCanonicalName())
-                    || ASTNodes.hasType(expression.getRightOperand(), String.class.getCanonicalName())) {
-                return true;
-            }
-        }
+			if (ASTNodes.hasOperator(expression, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expression.getLeftOperand(), String.class.getCanonicalName())
+					|| ASTNodes.hasType(expression.getRightOperand(), String.class.getCanonicalName())) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private ASTNode getClassInstanceCreatorNode(final Expression expression, final String numberLiteral) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+	private ASTNode getClassInstanceCreatorNode(final Expression expression, final String numberLiteral) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        String fullyQualifiedName;
-        if (expression instanceof Name) {
-            fullyQualifiedName= ((Name) expression).getFullyQualifiedName();
-        } else if (expression instanceof FieldAccess) {
-            fullyQualifiedName= ((FieldAccess) expression).getName().getFullyQualifiedName();
-        } else {
-            throw new IllegalArgumentException();
-        }
+		String fullyQualifiedName;
+		if (expression instanceof Name) {
+			fullyQualifiedName= ((Name) expression).getFullyQualifiedName();
+		} else if (expression instanceof FieldAccess) {
+			fullyQualifiedName= ((FieldAccess) expression).getName().getFullyQualifiedName();
+		} else {
+			throw new IllegalArgumentException();
+		}
 
-        return ast.new0(fullyQualifiedName, ast.string(numberLiteral));
-    }
+		return ast.new0(fullyQualifiedName, ast.string(numberLiteral));
+	}
 
-    private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        MethodInvocation mi= ast.invoke(rewrite.createMoveTarget(node.getExpression()), "compareTo", rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
+	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		MethodInvocation mi= ast.invoke(rewrite.createMoveTarget(node.getExpression()), "compareTo", rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
-        return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
-    }
+		return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
+	}
 }

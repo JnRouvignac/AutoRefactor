@@ -29,28 +29,28 @@ import java.sql.SQLException;
 
 public class RemoveUncheckedThrowsClausesSample {
 
-    public void refactorMethod() throws NullPointerException, Exception, Error {
-        // Some code
-    }
+	public void refactorMethod() throws NullPointerException, Exception, Error {
+		// Some code
+	}
 
-    public void refactorMethod2() throws IllegalArgumentException {
-        // Some code
-    }
+	public void refactorMethod2() throws IllegalArgumentException {
+		// Some code
+	}
 
-    public void doNotRefactor() throws Exception, SQLException {
-        // Some code
-    }
+	public void doNotRefactor() throws Exception, SQLException {
+		// Some code
+	}
 
-    // Remove unchecked descendants from constructor
-    public RemoveUncheckedThrowsClausesSample() throws AssertionError,
-            NullPointerException, SQLException {
-        // Some code
-    }
+	// Remove unchecked descendants from constructor
+	public RemoveUncheckedThrowsClausesSample() throws AssertionError,
+			NullPointerException, SQLException {
+		// Some code
+	}
 
-    // Remove unchecked from constructor
-    public RemoveUncheckedThrowsClausesSample(int i)
-            throws RuntimeException, Error, Exception {
-        // Some code
-    }
+	// Remove unchecked from constructor
+	public RemoveUncheckedThrowsClausesSample(int i)
+			throws RuntimeException, Error, Exception {
+		// Some code
+	}
 
 }

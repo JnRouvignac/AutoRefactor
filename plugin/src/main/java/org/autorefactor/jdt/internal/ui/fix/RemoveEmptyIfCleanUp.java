@@ -35,66 +35,66 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	@Override
+	public boolean visit(final IfStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        Statement thenStatement= node.getThenStatement();
-        Statement elseStatement= node.getElseStatement();
-        if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-            rewrite.remove(elseStatement, null);
-            return false;
-        }
-        if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		Statement thenStatement= node.getThenStatement();
+		Statement elseStatement= node.getElseStatement();
+		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
+			rewrite.remove(elseStatement, null);
+			return false;
+		}
+		if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            Expression condition= node.getExpression();
-            if (elseStatement != null) {
-                rewrite.replace(node, ast.if0(ast.negate(condition), rewrite.createMoveTarget(elseStatement)), null);
-            } else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
-                removeBlock(node, rewrite, ast);
-                return false;
-            }
-        }
+			Expression condition= node.getExpression();
+			if (elseStatement != null) {
+				rewrite.replace(node, ast.if0(ast.negate(condition), rewrite.createMoveTarget(elseStatement)), null);
+			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
+				removeBlock(node, rewrite, ast);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void removeBlock(final IfStatement node, final ASTRewrite rewrite, final ASTNodeFactory ast) {
-        if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-            rewrite.remove(node, null);
-        } else {
-            rewrite.replace(node, ast.block(), null);
-        }
-    }
+	private void removeBlock(final IfStatement node, final ASTRewrite rewrite, final ASTNodeFactory ast) {
+		if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+			rewrite.remove(node, null);
+		} else {
+			rewrite.replace(node, ast.block(), null);
+		}
+	}
 }

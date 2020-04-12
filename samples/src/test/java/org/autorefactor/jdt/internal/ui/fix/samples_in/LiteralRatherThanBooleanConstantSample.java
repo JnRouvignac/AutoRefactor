@@ -27,20 +27,20 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class LiteralRatherThanBooleanConstantSample {
 
-    public static boolean replaceUselessUnboxing() {
-        // Keep this comment
-        boolean bo1 = Boolean.TRUE;
-        boolean bo2 = Boolean.FALSE;
-        bo1 = Boolean.TRUE;
-        if (Boolean.TRUE) {
-            bo2 = Boolean.FALSE;
-        }
-        return bo1 && bo2;
-    }
+	public static boolean replaceUselessUnboxing() {
+		// Keep this comment
+		boolean bo1 = Boolean.TRUE;
+		boolean bo2 = Boolean.FALSE;
+		bo1 = Boolean.TRUE;
+		if (Boolean.TRUE) {
+			bo2 = Boolean.FALSE;
+		}
+		return bo1 && bo2;
+	}
 
-    public static boolean doNotCreateUselessAutoboxing() {
-        Boolean bo = Boolean.TRUE;
-        bo = Boolean.FALSE;
-        return bo;
-    }
+	public static boolean doNotCreateUselessAutoboxing() {
+		Boolean bo = Boolean.TRUE;
+		bo = Boolean.FALSE;
+		return bo;
+	}
 }

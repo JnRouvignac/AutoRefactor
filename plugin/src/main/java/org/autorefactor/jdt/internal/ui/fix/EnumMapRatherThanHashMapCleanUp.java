@@ -44,114 +44,114 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
  * Replaces HashMap for enum type creation to EnumMap.
  */
 public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectionReplacementCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_reason;
+	}
 
-    @Override
-    public String getImplType() {
-        return HashMap.class.getCanonicalName();
-    }
+	@Override
+	public String getImplType() {
+		return HashMap.class.getCanonicalName();
+	}
 
-    @Override
-    public String getInterfaceType() {
-        return Map.class.getCanonicalName();
-    }
+	@Override
+	public String getInterfaceType() {
+		return Map.class.getCanonicalName();
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(EnumMap.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(EnumMap.class.getCanonicalName()));
+	}
 
-    /**
-     * Replace given class instance creation with suitable EnumMap constructor. <br>
-     * <br>
-     * Replacement is not correct if HashMap constructor accepts map <br>
-     * other than EnumMap, because it throws <code>IllegalArgumentException</code>
-     * if map is empty, <br>
-     * and HashMap(Map) does not. Therefore, for correctness reasons, it should not
-     * be refactored. <br>
-     *
-     * @see {@link java.util.EnumMap#EnumMap(java.util.Map)}
-     * @see {@link java.util.HashMap#HashMap(java.util.Map)}
-     */
-    @Override
-    boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
-            final Type... types) {
-        if (types == null || types.length < 2) {
-            return true;
-        }
+	/**
+	 * Replace given class instance creation with suitable EnumMap constructor. <br>
+	 * <br>
+	 * Replacement is not correct if HashMap constructor accepts map <br>
+	 * other than EnumMap, because it throws <code>IllegalArgumentException</code>
+	 * if map is empty, <br>
+	 * and HashMap(Map) does not. Therefore, for correctness reasons, it should not
+	 * be refactored. <br>
+	 *
+	 * @see {@link java.util.EnumMap#EnumMap(java.util.Map)}
+	 * @see {@link java.util.HashMap#HashMap(java.util.Map)}
+	 */
+	@Override
+	boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+			final Type... types) {
+		if (types == null || types.length < 2) {
+			return true;
+		}
 
-        Type keyType= types[0];
-        Type valueType= types[1];
-        List<Expression> arguments= ASTNodes.arguments(cic);
+		Type keyType= types[0];
+		Type valueType= types[1];
+		List<Expression> arguments= ASTNodes.arguments(cic);
 
-        if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
-                && !ASTNodes.hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
-            return true;
-        }
+		if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
+				&& !ASTNodes.hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
+			return true;
+		}
 
-        replace(cic, alreadyImportedClasses, keyType, valueType, arguments);
-        importsToAdd.add(EnumMap.class.getCanonicalName());
-        return false;
-    }
+		replace(cic, alreadyImportedClasses, keyType, valueType, arguments);
+		importsToAdd.add(EnumMap.class.getCanonicalName());
+		return false;
+	}
 
-    private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
-            final Type valueType, final List<Expression> arguments) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        Expression newParam= resolveParameter(keyType, arguments);
-        Type newType= ast.genericType(
-                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), ast.createCopyTarget(keyType),
-                ast.createCopyTarget(valueType));
+	private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
+			final Type valueType, final List<Expression> arguments) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		Expression newParam= resolveParameter(keyType, arguments);
+		Type newType= ast.genericType(
+				alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), ast.createCopyTarget(keyType),
+				ast.createCopyTarget(valueType));
 
-        // If there were no type args in original creation (diamond operator),
-        // remove them from replacement
-        if (typeArgs(cic.getType()).isEmpty()) {
-            typeArgs(newType).clear();
-        }
+		// If there were no type args in original creation (diamond operator),
+		// remove them from replacement
+		if (typeArgs(cic.getType()).isEmpty()) {
+			typeArgs(newType).clear();
+		}
 
-        cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), null);
-    }
+		cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), null);
+	}
 
-    /**
-     * Map parameter for HashMap constructor to EnumMap constructor. HashMap(Map) ->
-     * EnumMap(EnumMap) <br/>
-     * other HashMap constructors -> EnumMap(Class) <br>
-     *
-     * @return correct parameter for EnumMap constructor
-     */
-    private Expression resolveParameter(final Type keyType, final List<Expression> originalArgs) {
-        if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
-            return cuRewrite.getASTBuilder().createCopyTarget(originalArgs.get(0));
-        }
-        TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();
-        keyTypeLiteral.setType(cuRewrite.getASTBuilder().createCopyTarget(keyType));
-        return keyTypeLiteral;
-    }
+	/**
+	 * Map parameter for HashMap constructor to EnumMap constructor. HashMap(Map) ->
+	 * EnumMap(EnumMap) <br/>
+	 * other HashMap constructors -> EnumMap(Class) <br>
+	 *
+	 * @return correct parameter for EnumMap constructor
+	 */
+	private Expression resolveParameter(final Type keyType, final List<Expression> originalArgs) {
+		if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
+			return cuRewrite.getASTBuilder().createCopyTarget(originalArgs.get(0));
+		}
+		TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();
+		keyTypeLiteral.setType(cuRewrite.getASTBuilder().createCopyTarget(keyType));
+		return keyTypeLiteral;
+	}
 }

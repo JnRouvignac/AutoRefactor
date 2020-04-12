@@ -51,192 +51,192 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /** The Eclipse preference page for AutoRefactor. */
 public class WorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-    /**
-     * The fields.
-     */
-    protected List<FieldEditor> fields;
+	/**
+	 * The fields.
+	 */
+	protected List<FieldEditor> fields;
 
-    private Button toggleAllRules;
+	private Button toggleAllRules;
 
-    private List<BooleanFieldEditor> rules;
+	private List<BooleanFieldEditor> rules;
 
-    private FieldEditor invalidFieldEditor;
+	private FieldEditor invalidFieldEditor;
 
-    private Composite fieldEditorParent;
+	private Composite fieldEditorParent;
 
-    /** Default constructor. */
-    public WorkspacePreferencePage() {
-        super("AutoRefactor workbench preferences"); //$NON-NLS-1$
-        setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
-    }
+	/** Default constructor. */
+	public WorkspacePreferencePage() {
+		super("AutoRefactor workbench preferences"); //$NON-NLS-1$
+		setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
+	}
 
-    /**
-     * Get the property name.
-     *
-     * @param refactoringRule a cleanup rule
-     * @return the property name
-     */
-    public String getPropertyName(final RefactoringRule refactoringRule) {
-        return refactoringRule.getClass().getCanonicalName();
-    }
+	/**
+	 * Get the property name.
+	 *
+	 * @param refactoringRule a cleanup rule
+	 * @return the property name
+	 */
+	public String getPropertyName(final RefactoringRule refactoringRule) {
+		return refactoringRule.getClass().getCanonicalName();
+	}
 
-    /**
-     * Initialization.
-     *
-     * @param workbench The workbench
-     */
-    @Override
-    public void init(IWorkbench workbench) {
-    }
+	/**
+	 * Initialization.
+	 *
+	 * @param workbench The workbench
+	 */
+	@Override
+	public void init(IWorkbench workbench) {
+	}
 
-    @Override
-    protected Control createContents(Composite parent) {
-        final List<RefactoringRule> allRefactoringRules= AllCleanUpRules.getAllCleanUpRules();
-        Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
-            /**
-             * Compare objects.
-             *
-             * @param o1 First item
-             * @param o2 Second item
-             *
-             * @return -1, 0 or 1
-             */
-            @Override
-            public int compare(final RefactoringRule o1, final RefactoringRule o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
+	@Override
+	protected Control createContents(Composite parent) {
+		final List<RefactoringRule> allRefactoringRules= AllCleanUpRules.getAllCleanUpRules();
+		Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
+			/**
+			 * Compare objects.
+			 *
+			 * @param o1 First item
+			 * @param o2 Second item
+			 *
+			 * @return -1, 0 or 1
+			 */
+			@Override
+			public int compare(final RefactoringRule o1, final RefactoringRule o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
 
-        final Group ruleGroup= createControls(parent, allRefactoringRules);
+		final Group ruleGroup= createControls(parent, allRefactoringRules);
 
-        initialize();
-        invalidateToggleRules(ruleGroup);
+		initialize();
+		invalidateToggleRules(ruleGroup);
 
-        checkState();
-        return fieldEditorParent;
-    }
+		checkState();
+		return fieldEditorParent;
+	}
 
-    private Group createControls(final Composite parent, final List<RefactoringRule> allRefactoringRules) {
-        fieldEditorParent= new Composite(parent, SWT.FILL);
+	private Group createControls(final Composite parent, final List<RefactoringRule> allRefactoringRules) {
+		fieldEditorParent= new Composite(parent, SWT.FILL);
 
-        initFields(allRefactoringRules);
+		initFields(allRefactoringRules);
 
-        final Group ruleGroup= new Group(fieldEditorParent, SWT.FILL);
-        ruleGroup.setText("Rules by default"); //$NON-NLS-1$
+		final Group ruleGroup= new Group(fieldEditorParent, SWT.FILL);
+		ruleGroup.setText("Rules by default"); //$NON-NLS-1$
 
-        // All rule checkbox
-        toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
-        toggleAllRules.setFont(ruleGroup.getFont());
-        toggleAllRules.setText("Toggle all the rules"); //$NON-NLS-1$
-        toggleAllRules.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                boolean isSelected= WorkspacePreferencePage.this.toggleAllRules.getSelection();
-                for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
-                    ((Button) rule.getDescriptionControl(ruleGroup)).setSelection(isSelected);
-                }
-            }
-        });
+		// All rule checkbox
+		toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
+		toggleAllRules.setFont(ruleGroup.getFont());
+		toggleAllRules.setText("Toggle all the rules"); //$NON-NLS-1$
+		toggleAllRules.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean isSelected= WorkspacePreferencePage.this.toggleAllRules.getSelection();
+				for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
+					((Button) rule.getDescriptionControl(ruleGroup)).setSelection(isSelected);
+				}
+			}
+		});
 
-        // Add a space
-        Composite spacer= new Composite(ruleGroup, SWT.NULL);
-        spacer.setLayoutData(new GridData(0, 5));
+		// Add a space
+		Composite spacer= new Composite(ruleGroup, SWT.NULL);
+		spacer.setLayoutData(new GridData(0, 5));
 
-        rules= new ArrayList<>(allRefactoringRules.size());
-        for (RefactoringRule refactoringRule : allRefactoringRules) {
-            final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
-                    refactoringRule.getName(), SWT.WRAP, ruleGroup);
-            booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
-            ((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(final SelectionEvent e) {
-                    invalidateToggleRules(ruleGroup);
-                }
-            });
-            rules.add(booleanFieldEditor);
-        }
-        fields.addAll(rules);
-        return ruleGroup;
-    }
+		rules= new ArrayList<>(allRefactoringRules.size());
+		for (RefactoringRule refactoringRule : allRefactoringRules) {
+			final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
+					refactoringRule.getName(), SWT.WRAP, ruleGroup);
+			booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
+			((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					invalidateToggleRules(ruleGroup);
+				}
+			});
+			rules.add(booleanFieldEditor);
+		}
+		fields.addAll(rules);
+		return ruleGroup;
+	}
 
-    /**
-     * Initialize the fields.
-     *
-     * @param allRefactoringRules allCleanupRules
-     */
-    protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields= new ArrayList<>(1 + allRefactoringRules.size());
+	/**
+	 * Initialize the fields.
+	 *
+	 * @param allRefactoringRules allCleanupRules
+	 */
+	protected void initFields(final List<RefactoringRule> allRefactoringRules) {
+		fields= new ArrayList<>(1 + allRefactoringRules.size());
 
-        fields.add(new BooleanFieldEditor(PreferenceConstants.DEBUG_MODE_ON.getName(), PreferenceConstants.DEBUG_MODE_ON.getDescription(), fieldEditorParent));
-    }
+		fields.add(new BooleanFieldEditor(PreferenceConstants.DEBUG_MODE_ON.getName(), PreferenceConstants.DEBUG_MODE_ON.getDescription(), fieldEditorParent));
+	}
 
-    private void invalidateToggleRules(final Composite ruleGroup) {
-        boolean isAllRulesChecked= true;
-        for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
-            isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
-            if (!isAllRulesChecked) {
-                break;
-            }
-        }
-        toggleAllRules.setSelection(isAllRulesChecked);
-    }
+	private void invalidateToggleRules(final Composite ruleGroup) {
+		boolean isAllRulesChecked= true;
+		for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
+			isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
+			if (!isAllRulesChecked) {
+				break;
+			}
+		}
+		toggleAllRules.setSelection(isAllRulesChecked);
+	}
 
-    /** Initialize. */
-    protected void initialize() {
-        if (fields != null) {
-            for (FieldEditor field : fields) {
-                field.setPage(this);
-                field.setPreferenceStore(getPreferenceStore());
-                field.load();
-            }
-        }
-    }
+	/** Initialize. */
+	protected void initialize() {
+		if (fields != null) {
+			for (FieldEditor field : fields) {
+				field.setPage(this);
+				field.setPreferenceStore(getPreferenceStore());
+				field.load();
+			}
+		}
+	}
 
-    /** Check the state. */
-    protected void checkState() {
-        boolean valid= true;
-        invalidFieldEditor= null;
+	/** Check the state. */
+	protected void checkState() {
+		boolean valid= true;
+		invalidFieldEditor= null;
 
-        if (fields != null) {
-            for (FieldEditor field : fields) {
-                valid= field.isValid();
-                if (!valid) {
-                    invalidFieldEditor= field;
-                    break;
-                }
-            }
-        }
-        setValid(valid);
-    }
+		if (fields != null) {
+			for (FieldEditor field : fields) {
+				valid= field.isValid();
+				if (!valid) {
+					invalidFieldEditor= field;
+					break;
+				}
+			}
+		}
+		setValid(valid);
+	}
 
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (visible && invalidFieldEditor != null) {
-            invalidFieldEditor.setFocus();
-        }
-    }
+	@Override
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		if (visible && invalidFieldEditor != null) {
+			invalidFieldEditor.setFocus();
+		}
+	}
 
-    @Override
-    protected void performDefaults() {
-        if (fields != null) {
-            for (FieldEditor field : fields) {
-                field.loadDefault();
-            }
-        }
+	@Override
+	protected void performDefaults() {
+		if (fields != null) {
+			for (FieldEditor field : fields) {
+				field.loadDefault();
+			}
+		}
 
-        checkState();
-        super.performDefaults();
-    }
+		checkState();
+		super.performDefaults();
+	}
 
-    @Override
-    public boolean performOk() {
-        if (fields != null) {
-            for (FieldEditor field : fields) {
-                field.store();
-            }
-        }
+	@Override
+	public boolean performOk() {
+		if (fields != null) {
+			for (FieldEditor field : fields) {
+				field.store();
+			}
+		}
 
-        return super.performOk();
-    }
+		return super.performOk();
+	}
 }

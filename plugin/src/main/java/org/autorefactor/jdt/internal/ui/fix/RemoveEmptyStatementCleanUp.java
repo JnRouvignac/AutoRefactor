@@ -46,172 +46,172 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * @see #getDescription()
  */
 public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-            boolean isThenEmpty= isEmptyCode(node.getThenStatement());
-            boolean isElseEmpty= isEmptyCode(node.getElseStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
+			boolean isThenEmpty= isEmptyCode(node.getThenStatement());
+			boolean isElseEmpty= isEmptyCode(node.getElseStatement());
 
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
-                if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                    rewrite.remove(node, null);
-                } else {
-                    rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
-                }
+			if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
+				if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+					rewrite.remove(node, null);
+				} else {
+					rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+				}
 
-                return false;
-            }
-            if (isElseEmpty) {
-                rewrite.remove(node.getElseStatement(), null);
-                return false;
-            }
-        }
+				return false;
+			}
+			if (isElseEmpty) {
+				rewrite.remove(node.getElseStatement(), null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final EnhancedForStatement node) {
-        if (node.getExpression().resolveTypeBinding() != null
-                && node.getExpression().resolveTypeBinding().isArray()
-                && ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
+	@Override
+	public boolean visit(final EnhancedForStatement node) {
+		if (node.getExpression().resolveTypeBinding() != null
+				&& node.getExpression().resolveTypeBinding().isArray()
+				&& ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
+			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final ForStatement node) {
-        if (node.getExpression() != null && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())
-                && arePassive(node.initializers()) && ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
+	@Override
+	public boolean visit(final ForStatement node) {
+		if (node.getExpression() != null && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())
+				&& arePassive(node.initializers()) && ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
+			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
-                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
+	@Override
+	public boolean visit(final WhileStatement node) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
+				&& !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
+			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final DoStatement node) {
-        if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
-                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
+	@Override
+	public boolean visit(final DoStatement node) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
+				&& !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
+			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
-            cuRewrite.getASTRewrite().remove(node, null);
-            return false;
-        }
+	@Override
+	public boolean visit(final Block node) {
+		if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
+			cuRewrite.getASTRewrite().remove(node, null);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public boolean visit(final EmptyStatement node) {
-        if (isEmptyCode(node)) {
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	@Override
+	public boolean visit(final EmptyStatement node) {
+		if (isEmptyCode(node)) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                rewrite.remove(node, null);
-                return false;
-            }
+			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(node, null);
+				return false;
+			}
 
-            if (node instanceof EmptyStatement) {
-                rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
-                return false;
-            }
-        }
+			if (node instanceof EmptyStatement) {
+				rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean arePassive(final List<?> initializers) {
-        if (initializers != null) {
-            for (Object initializer : initializers) {
-                if (!ASTNodes.isPassiveWithoutFallingThrough((Expression) initializer)) {
-                    return false;
-                }
-            }
-        }
+	private boolean arePassive(final List<?> initializers) {
+		if (initializers != null) {
+			for (Object initializer : initializers) {
+				if (!ASTNodes.isPassiveWithoutFallingThrough((Expression) initializer)) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
-        if (isEmptyCode(emptyCode)) {
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
+		if (isEmptyCode(emptyCode)) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                rewrite.remove(node, null);
-                return false;
-            }
+			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(node, null);
+				return false;
+			}
 
-            if (node instanceof EmptyStatement) {
-                rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
-                return false;
-            }
-        }
+			if (node instanceof EmptyStatement) {
+				rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isEmptyCode(final Statement emptyCode) {
-        if (emptyCode instanceof EmptyStatement) {
-            return true;
-        }
+	private boolean isEmptyCode(final Statement emptyCode) {
+		if (emptyCode instanceof EmptyStatement) {
+			return true;
+		}
 
-        if (emptyCode instanceof Block) {
-            Block block= (Block) emptyCode;
-            return Utils.isEmpty(block.statements());
-        }
+		if (emptyCode instanceof Block) {
+			Block block= (Block) emptyCode;
+			return Utils.isEmpty(block.statements());
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

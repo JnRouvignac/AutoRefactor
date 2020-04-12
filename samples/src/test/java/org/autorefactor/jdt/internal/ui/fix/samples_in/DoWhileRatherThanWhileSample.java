@@ -27,20 +27,20 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class DoWhileRatherThanWhileSample {
 
-    private void replaceWhileByDoWhile(int i) {
-        // Keep this comment
-        while (true) {
-            // Keep this comment too
-            if (i > 100) {
-                return;
-            }
-            i *= 2;
-        }
-    }
+	private void replaceWhileByDoWhile(int i) {
+		// Keep this comment
+		while (true) {
+			// Keep this comment too
+			if (i > 100) {
+				return;
+			}
+			i *= 2;
+		}
+	}
 
-    private void doNotReplaceWhileWithCondition(int i) {
-        while (i <= 100) {
-            i *= 2;
-        }
-    }
+	private void doNotReplaceWhileWithCondition(int i) {
+		while (i <= 100) {
+			i *= 2;
+		}
+	}
 }

@@ -44,98 +44,98 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
-    private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-        @Override
-        public boolean visit(final ForStatement node) {
-            return maybeRefactorForStatement(node,
-                    getClassesToUseWithImport(), getImportsToAdd());
-        }
-    }
+	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
+		@Override
+		public boolean visit(final ForStatement node) {
+			return maybeRefactorForStatement(node,
+					getClassesToUseWithImport(), getImportsToAdd());
+		}
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_reason;
+	}
 
-    @Override
-    public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass();
-    }
+	@Override
+	public RefactoringWithObjectsClass getRefactoringClassInstance() {
+		return new RefactoringWithObjectsClass();
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(Arrays.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Arrays.class.getCanonicalName()));
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 2;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 2;
+	}
 
-    @Override
-    public boolean visit(final ForStatement node) {
-        return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
-    }
+	@Override
+	public boolean visit(final ForStatement node) {
+		return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	}
 
-    private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-        List<Statement> statements= ASTNodes.asList(node.getBody());
+	private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+		List<Statement> statements= ASTNodes.asList(node.getBody());
 
-        if (loopContent != null && loopContent.getLoopVariable() != null && loopContent.getContainerType() == ContainerType.ARRAY && statements.size() == 1) {
-            Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
+		if (loopContent != null && loopContent.getLoopVariable() != null && loopContent.getContainerType() == ContainerType.ARRAY && statements.size() == 1) {
+			Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
 
-            if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
-                ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
+			if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
+				ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
 
-                if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
-                    replaceWithArraysFill(node, classesToUseWithImport, importsToAdd, assignment, arrayAccess);
-                    return false;
-                }
-            }
-        }
+				if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
+					replaceWithArraysFill(node, classesToUseWithImport, importsToAdd, assignment, arrayAccess);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceWithArraysFill(final ForStatement node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd, final Assignment assignment, final ArrayAccess arrayAccess) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
-        rewrite.replace(node,
-                ast.toStatement(ast.invoke(ast.name(classname),
-                        "fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
-                        rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
-    }
+	private void replaceWithArraysFill(final ForStatement node, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd, final Assignment assignment, final ArrayAccess arrayAccess) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
+		rewrite.replace(node,
+				ast.toStatement(ast.invoke(ast.name(classname),
+						"fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
+						rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
+	}
 
-    private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
-        return arrayAccess != null && ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
-                && ASTNodes.isSameLocalVariable(arrayAccess.getIndex(), loopContent.getLoopVariable());
-    }
+	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
+		return arrayAccess != null && ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
+				&& ASTNodes.isSameLocalVariable(arrayAccess.getIndex(), loopContent.getLoopVariable());
+	}
 }

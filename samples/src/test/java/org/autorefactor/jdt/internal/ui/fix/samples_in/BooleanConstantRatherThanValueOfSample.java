@@ -27,14 +27,14 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class BooleanConstantRatherThanValueOfSample {
 
-    public void useBooleanConstants() {
-        // Keep this comment
-        Boolean b1 = Boolean.valueOf(true);
-        Boolean b2 = Boolean.valueOf(false);
-    }
+	public void useBooleanConstants() {
+		// Keep this comment
+		Boolean b1 = Boolean.valueOf(true);
+		Boolean b2 = Boolean.valueOf(false);
+	}
 
-    public void doNotUseBooleanConstants(boolean b) {
-        // Keep this comment
-        Boolean b1 = Boolean.valueOf(b);
-    }
+	public void doNotUseBooleanConstants(boolean b) {
+		// Keep this comment
+		Boolean b1 = Boolean.valueOf(b);
+	}
 }

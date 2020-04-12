@@ -27,41 +27,41 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class SuperCallRatherThanUselessOverridingSample {
 
-    public class Parent {
-        void removeUselessOverride() {
-        }
-        void removeOverrideWithInsignificantAnnotations() {
-        }
-        void doNotRemoveSignificantAnnotation() {
-        }
-        protected void doNotRemoveVisibilityChange() {
-        }
-        public void doNotRemoveOverrideWithOtherParam(String classname) {
-        }
-        public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
-        }
-    }
+	public class Parent {
+		void removeUselessOverride() {
+		}
+		void removeOverrideWithInsignificantAnnotations() {
+		}
+		void doNotRemoveSignificantAnnotation() {
+		}
+		protected void doNotRemoveVisibilityChange() {
+		}
+		public void doNotRemoveOverrideWithOtherParam(String classname) {
+		}
+		public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
+		}
+	}
 
-    public class Child extends Parent {
-        @Deprecated
-        @Override
-        void doNotRemoveSignificantAnnotation() {
-            super.doNotRemoveSignificantAnnotation();
-        }
+	public class Child extends Parent {
+		@Deprecated
+		@Override
+		void doNotRemoveSignificantAnnotation() {
+			super.doNotRemoveSignificantAnnotation();
+		}
 
-        @Override
-        public void doNotRemoveVisibilityChange() {
-            super.doNotRemoveVisibilityChange();
-        }
+		@Override
+		public void doNotRemoveVisibilityChange() {
+			super.doNotRemoveVisibilityChange();
+		}
 
-        @Override
-        public void doNotRemoveOverrideWithOtherParam(String classname) {
-            super.doNotRemoveOverrideWithOtherParam("java.util." + classname);
-        }
+		@Override
+		public void doNotRemoveOverrideWithOtherParam(String classname) {
+			super.doNotRemoveOverrideWithOtherParam("java.util." + classname);
+		}
 
-        @Override
-        public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
-            super.doNotRemoveOverrideWithUnorderedParam(lastname, firstname);
-        }
-    }
+		@Override
+		public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
+			super.doNotRemoveOverrideWithUnorderedParam(lastname, firstname);
+		}
+	}
 }

@@ -35,33 +35,33 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 /** Initializes the Eclipse preferences for AutoRefactor. */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
-    @Override
-    public void initializeDefaultPreferences() {
-        // TODO initialize preferences from the JDT preferences like:
-        // code style/cleanup/formatting
-        final IPreferenceStore store= AutoRefactorPlugin.getDefault().getPreferenceStore();
-        for (PreferenceConstants preference : PreferenceConstants.values()) {
-            final String name= preference.getName();
-            final Object defaultValue= preference.getDefaultValue();
-            if (defaultValue instanceof Boolean) {
-                store.setDefault(name, (Boolean) defaultValue);
-            } else if (defaultValue instanceof Integer) {
-                store.setDefault(name, (Integer) defaultValue);
-            } else if (defaultValue instanceof Long) {
-                store.setDefault(name, (Long) defaultValue);
-            } else if (defaultValue instanceof Double) {
-                store.setDefault(name, (Double) defaultValue);
-            } else if (defaultValue instanceof Float) {
-                store.setDefault(name, (Float) defaultValue);
-            } else if (defaultValue instanceof String) {
-                store.setDefault(name, (String) defaultValue);
-            } else {
-                throw new NotImplementedException(null, defaultValue);
-            }
-        }
+	@Override
+	public void initializeDefaultPreferences() {
+		// TODO initialize preferences from the JDT preferences like:
+		// code style/cleanup/formatting
+		final IPreferenceStore store= AutoRefactorPlugin.getDefault().getPreferenceStore();
+		for (PreferenceConstants preference : PreferenceConstants.values()) {
+			final String name= preference.getName();
+			final Object defaultValue= preference.getDefaultValue();
+			if (defaultValue instanceof Boolean) {
+				store.setDefault(name, (Boolean) defaultValue);
+			} else if (defaultValue instanceof Integer) {
+				store.setDefault(name, (Integer) defaultValue);
+			} else if (defaultValue instanceof Long) {
+				store.setDefault(name, (Long) defaultValue);
+			} else if (defaultValue instanceof Double) {
+				store.setDefault(name, (Double) defaultValue);
+			} else if (defaultValue instanceof Float) {
+				store.setDefault(name, (Float) defaultValue);
+			} else if (defaultValue instanceof String) {
+				store.setDefault(name, (String) defaultValue);
+			} else {
+				throw new NotImplementedException(null, defaultValue);
+			}
+		}
 
-        for (RefactoringRule refactoringRule : AllCleanUpRules.getAllCleanUpRules()) {
-            store.setDefault(refactoringRule.getClass().getCanonicalName(), refactoringRule.isByDefault());
-        }
-    }
+		for (RefactoringRule refactoringRule : AllCleanUpRules.getAllCleanUpRules()) {
+			store.setDefault(refactoringRule.getClass().getCanonicalName(), refactoringRule.isByDefault());
+		}
+	}
 }

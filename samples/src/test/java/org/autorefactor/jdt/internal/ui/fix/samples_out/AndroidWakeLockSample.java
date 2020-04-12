@@ -34,97 +34,97 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 class AndroidWakeLockSample {
-    class SimpleWakeLockActivity extends Activity {
-        private WakeLock wl;
+	class SimpleWakeLockActivity extends Activity {
+		private WakeLock wl;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
-            wl.acquire();
-        }
+			PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+			wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
+			wl.acquire();
+		}
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            if (!wl.isHeld()) {
-                wl.release();
-            }
-        }
+		@Override
+		protected void onPause() {
+			super.onPause();
+			if (!wl.isHeld()) {
+				wl.release();
+			}
+		}
 
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-        }
-    }
+		@Override
+		public void onDestroy() {
+			super.onDestroy();
+		}
+	}
 
-    class SimpleWakeLockWithoutOnPauseActivity extends Activity {
-        private WakeLock wl;
+	class SimpleWakeLockWithoutOnPauseActivity extends Activity {
+		private WakeLock wl;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
-            wl.acquire();
-        }
+			PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+			wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
+			wl.acquire();
+		}
 
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-        }
+		@Override
+		public void onDestroy() {
+			super.onDestroy();
+		}
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            if (!wl.isHeld()) {
-                wl.release();
-            }
-        }
-    }
+		@Override
+		protected void onPause() {
+			super.onPause();
+			if (!wl.isHeld()) {
+				wl.release();
+			}
+		}
+	}
 
-    class SimpleWakeLockWithoutReleaseActivity extends Activity {
-        private WakeLock wl;
+	class SimpleWakeLockWithoutReleaseActivity extends Activity {
+		private WakeLock wl;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
-            wl.acquire();
-        }
+			PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+			wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
+			wl.acquire();
+		}
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            if (!wl.isHeld()) {
-                wl.release();
-            }
-        }
-    }
+		@Override
+		protected void onPause() {
+			super.onPause();
+			if (!wl.isHeld()) {
+				wl.release();
+			}
+		}
+	}
 
-    class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
-        private WakeLock wl;
+	class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
+		private WakeLock wl;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+		@Override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
-            wl.acquire();
-        }
+			PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+			wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
+			wl.acquire();
+		}
 
-        @Override
-        protected void onPause() {
-            super.onPause();
-            if (!wl.isHeld()) {
-                wl.release();
-            }
-        }
-    }
+		@Override
+		protected void onPause() {
+			super.onPause();
+			if (!wl.isHeld()) {
+				wl.release();
+			}
+		}
+	}
 }

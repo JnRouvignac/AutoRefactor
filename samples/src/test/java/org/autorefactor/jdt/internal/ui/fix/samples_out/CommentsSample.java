@@ -30,118 +30,118 @@ import java.util.concurrent.Callable;
 
 public class CommentsSample implements Runnable, Callable<Void>, Closeable {
 
-    /** @NonNull */
-    public Object o = new Object();
+	/** @NonNull */
+	public Object o = new Object();
 
-    public Object f(int i) throws Exception {
-        return null;
-    }
+	public Object f(int i) throws Exception {
+		return null;
+	}
 
-    /** Uppercase first word. */
-    private int i;
-    /** This must be attached as a javadoc to field 'j' * /. */
-    private int j;
-    /** Uppercase. */
-    private int k;
-    /** First part of javadoc Second part of javadoc * /. */
-    private int l;
+	/** Uppercase first word. */
+	private int i;
+	/** This must be attached as a javadoc to field 'j' * /. */
+	private int j;
+	/** Uppercase. */
+	private int k;
+	/** First part of javadoc Second part of javadoc * /. */
+	private int l;
 
-    private String s = "Do not refactor line comment"; //$NON-NLS-1$
+	private String s = "Do not refactor line comment"; //$NON-NLS-1$
 
-    /** Convert to a javadoc * /. */
-    public CommentsSample() {
-    }
+	/** Convert to a javadoc * /. */
+	public CommentsSample() {
+	}
 
-    /**
-     * Convert to a javadoc * /
-     * and correctly indent characters closing the javadoc.
-     */
-    public void test0() {
-    }
+	/**
+	 * Convert to a javadoc * /
+	 * and correctly indent characters closing the javadoc.
+	 */
+	public void test0() {
+	}
 
-    /** Remove javadoc below, current comment will be converted to javadoc. */
-    private boolean test1(int j) {
-        // Remove comment line just below
-        return false;
-    }
+	/** Remove javadoc below, current comment will be converted to javadoc. */
+	private boolean test1(int j) {
+		// Remove comment line just below
+		return false;
+	}
 
-    // Do not convert this line comment to javadoc
-    /** Convert to a javadoc. */
-    public static void main(String[] args) {
-        // Remove block comment just below
-        // Remove comment lines just above and below
+	// Do not convert this line comment to javadoc
+	/** Convert to a javadoc. */
+	public static void main(String[] args) {
+		// Remove block comment just below
+		// Remove comment lines just above and below
 
-        try {
-            args[0] = "blue";
-        } catch (Exception e) {
-        }
-    }
+		try {
+			args[0] = "blue";
+		} catch (Exception e) {
+		}
+	}
 
-    /** This javadoc must have a period added at the end of this sentence. */
-    public void test2() {
-        /* This is a javadoc that must be transformed to a blockcomment */
-        /* This is a blockcomment that must be kept */
-        // This is a linecomment that must be kept
-    }
+	/** This javadoc must have a period added at the end of this sentence. */
+	public void test2() {
+		/* This is a javadoc that must be transformed to a blockcomment */
+		/* This is a blockcomment that must be kept */
+		// This is a linecomment that must be kept
+	}
 
-    /**
-     * Add period at the end of this line.
-     * @param i an integer argument
-     */
-    public int test3(int i) {
-        return i;
-    }
+	/**
+	 * Add period at the end of this line.
+	 * @param i an integer argument
+	 */
+	public int test3(int i) {
+		return i;
+	}
 
-    /**
-      Add period at the end of this line.
-      @param i an integer argument
-     */
-    public int test4(int i) {
-        return i;
-    }
+	/**
+	  Add period at the end of this line.
+	  @param i an integer argument
+	 */
+	public int test4(int i) {
+		return i;
+	}
 
-    /** Do not add period at the end of this line! */
-    public void test5() {
-    }
+	/** Do not add period at the end of this line! */
+	public void test5() {
+	}
 
-    @Override
-    public void run() {
-    }
+	@Override
+	public void run() {
+	}
 
-    /** {@inheritDoc} */
-    public Void call() {
-        return null;
-    }
+	/** {@inheritDoc} */
+	public Void call() {
+		return null;
+	}
 
-    public void close() {
-    }
+	public void close() {
+	}
 
-    /** Remove empty line at start and end of this javadoc. */
-    public void removeEmptyLineAtEndOfJavadoc() {
-        /* Remove empty line at start and end of this block comment. */
-    }
+	/** Remove empty line at start and end of this javadoc. */
+	public void removeEmptyLineAtEndOfJavadoc() {
+		/* Remove empty line at start and end of this block comment. */
+	}
 
-    /** // single line starts with 4 slashes. */
-    public int bewareOfSlashesAfterSlashes;
+	/** // single line starts with 4 slashes. */
+	public int bewareOfSlashesAfterSlashes;
 
-    /**
-     * // single line starts with 4 slashes
-     * // second line starts with 4 slashes too.
-     */
-    public int bewareOfSlashesAfterSlashesAfterJavaElement;
+	/**
+	 * // single line starts with 4 slashes
+	 * // second line starts with 4 slashes too.
+	 */
+	public int bewareOfSlashesAfterSlashesAfterJavaElement;
 
-    /**
-     * First line
-     * // second line starts with 4 slashes and may trigger compilation errors.
-     */
-    public void bewareOfSlashesAfterSlashes2() {
-    }
+	/**
+	 * First line
+	 * // second line starts with 4 slashes and may trigger compilation errors.
+	 */
+	public void bewareOfSlashesAfterSlashes2() {
+	}
 
-    class Sample
-    {
-    Object SEED=1;
-    /** Should refactor correctly with no indentation. */
-    Sample f;
-    public void doSomething(){}
-    }
+	class Sample
+	{
+	Object SEED=1;
+	/** Should refactor correctly with no indentation. */
+	Sample f;
+	public void doSomething(){}
+	}
 }

@@ -30,12 +30,12 @@ import org.eclipse.jdt.ui.cleanup.ICleanUpOptionsInitializer;
 
 /** AutoRefactorOptionsInitializer. */
 public class AutoRefactorSaveActionOptionsInitializer implements ICleanUpOptionsInitializer {
-    /**
-     * Set the Default Options.
-     *
-     * @param options options
-     */
-    public void setDefaultOptions(CleanUpOptions options) {
-        options.setOption("org.autorefactor.ui.autorefactor_clean_up", CleanUpOptions.FALSE); //$NON-NLS-1$
-    }
+	/**
+	 * Set the Default Options.
+	 *
+	 * @param options options
+	 */
+	public void setDefaultOptions(CleanUpOptions options) {
+		options.setOption("org.autorefactor.ui.autorefactor_clean_up", CleanUpOptions.FALSE); //$NON-NLS-1$
+	}
 }

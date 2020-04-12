@@ -69,11 +69,6 @@
        should require it anyway in order to avoid obfuscated diffs -->
   <module name="NewlineAtEndOfFile" />
   
-  <!-- Disallow all tab characters. Tabs are bad bad bad -->
-  <module name="FileTabCharacter">
-    <property name="eachLine" value="true" />
-  </module>
-  
   <!-- Disallow trailing white space since some editors remove it automatically
        resulting in obfuscated diffs -->
   <module name="RegexpSingleline">
@@ -296,12 +291,6 @@
     <!--  As per Sun conventions -->
     <module name="ArrayTypeStyle" />
     <module name="UpperEll" />
-
-    <!--  Require 4 character indent -->
-    <module name="Indentation">
-      <property name="caseIndent" value="0" />
-      <property name="throwsIndent" value="8" />
-    </module>
     
     <!--  Require that file name corresponds to class name -->
     <module name="OuterTypeFilename" />

@@ -34,82 +34,82 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 5;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 5;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null //$NON-NLS-1$
-                && node.resolveMethodBinding() != null
-                && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
-            ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
-            ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null //$NON-NLS-1$
+				&& node.resolveMethodBinding() != null
+				&& (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
+			ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
+			ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 
-            ITypeBinding actualResultType= ASTNodes.getTargetType(node);
-            ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
+			ITypeBinding actualResultType= ASTNodes.getTargetType(node);
+			ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
 
-            if (actualResultType != null
-                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
-                    || actualParameterType != null && actualParameterType.equals(wrapperClass)) {
-                useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
-                return false;
-            }
-        }
+			if (actualResultType != null
+					&& (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
+					|| actualParameterType != null && actualParameterType.equals(wrapperClass)) {
+				useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
-            final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
-            final ITypeBinding actualResultType) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
+			final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
+			final ITypeBinding actualResultType) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        if (primitiveType != null && !primitiveType.equals(actualParameterType)
-                && !primitiveType.equals(actualResultType)
-                && (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-            cuRewrite.getASTRewrite().replace(node, ast.cast(ast.type(primitiveType.getName()), rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))), null);
-        } else {
-            cuRewrite.getASTRewrite().replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)), null);
-        }
-    }
+		if (primitiveType != null && !primitiveType.equals(actualParameterType)
+				&& !primitiveType.equals(actualResultType)
+				&& (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
+			cuRewrite.getASTRewrite().replace(node, ast.cast(ast.type(primitiveType.getName()), rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))), null);
+		} else {
+			cuRewrite.getASTRewrite().replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)), null);
+		}
+	}
 }

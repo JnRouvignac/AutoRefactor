@@ -41,82 +41,82 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_reason;
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 5;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 5;
+	}
 
-    @Override
-    protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
-        Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
+	@Override
+	protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
+		Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
+		Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
 
-        if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
-            return expression;
-        }
+		if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
+			return expression;
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    protected MethodInvocation getMethodToReplace(final Expression condition) {
-        MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
+	@Override
+	protected MethodInvocation getMethodToReplace(final Expression condition) {
+		MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
 
-        if (ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-                && method.getExpression() != null
-                && ASTNodes.as(method.getExpression(), ThisExpression.class) == null) {
-            return method;
-        }
+		if (ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+				&& method.getExpression() != null
+				&& ASTNodes.as(method.getExpression(), ThisExpression.class) == null) {
+			return method;
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
-        MethodInvocation invoke= ast.invoke(classname, "disjoint", rewrite.createMoveTarget(toFind), rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
+	@Override
+	protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
+		MethodInvocation invoke= ast.invoke(classname, "disjoint", rewrite.createMoveTarget(toFind), rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
 
-        if (isPositive) {
-            return ast.not(invoke);
-        }
+		if (isPositive) {
+			return ast.not(invoke);
+		}
 
-        return invoke;
-    }
+		return invoke;
+	}
 }

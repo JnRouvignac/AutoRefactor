@@ -50,313 +50,313 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
+	}
 
-    // TODO handle switch statements
-    // TODO also handle ternary operator, ConditionalExpression
+	// TODO handle switch statements
+	// TODO also handle ternary operator, ConditionalExpression
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        if (node.getElseStatement() == null) {
-            return true;
-        }
+	@Override
+	public boolean visit(final IfStatement node) {
+		if (node.getElseStatement() == null) {
+			return true;
+		}
 
-        List<ASTNode> allCases= new ArrayList<>();
-        List<List<Statement>> allCasesStatements= new ArrayList<>();
+		List<ASTNode> allCases= new ArrayList<>();
+		List<List<Statement>> allCasesStatements= new ArrayList<>();
 
-        // Collect all the if / else if / else if / ... / else cases
-        if (collectAllCases(allCasesStatements, node, allCases)) {
-            List<List<Statement>> caseStmtsToRemove= new ArrayList<>(allCasesStatements.size());
+		// Collect all the if / else if / else if / ... / else cases
+		if (collectAllCases(allCasesStatements, node, allCases)) {
+			List<List<Statement>> caseStmtsToRemove= new ArrayList<>(allCasesStatements.size());
 
-            // Initialize removedCaseStatements list
-            for (int i= 0; i < allCasesStatements.size(); i++) {
-                caseStmtsToRemove.add(new LinkedList<Statement>());
-            }
+			// Initialize removedCaseStatements list
+			for (int i= 0; i < allCasesStatements.size(); i++) {
+				caseStmtsToRemove.add(new LinkedList<Statement>());
+			}
 
-            // If all cases exist
-            ASTSemanticMatcher matcher= new ASTMatcherSameVariablesAndMethods();
-            int minSize= minSize(allCasesStatements);
-            List<Integer> casesToRefactor= getMatchingCases(allCasesStatements, matcher);
+			// If all cases exist
+			ASTSemanticMatcher matcher= new ASTMatcherSameVariablesAndMethods();
+			int minSize= minSize(allCasesStatements);
+			List<Integer> casesToRefactor= getMatchingCases(allCasesStatements, matcher);
 
-            if (casesToRefactor == null || casesToRefactor.size() <= 1) {
-                return true;
-            }
+			if (casesToRefactor == null || casesToRefactor.size() <= 1) {
+				return true;
+			}
 
-            // Identify matching statements starting from the end of each case
-            for (int stmtIndex= 1; stmtIndex <= minSize; stmtIndex++) {
-                if (!match(matcher, allCasesStatements, stmtIndex, casesToRefactor)) {
-                    break;
-                }
-                flagStmtsToRemove(allCasesStatements, stmtIndex, caseStmtsToRemove, casesToRefactor);
-            }
+			// Identify matching statements starting from the end of each case
+			for (int stmtIndex= 1; stmtIndex <= minSize; stmtIndex++) {
+				if (!match(matcher, allCasesStatements, stmtIndex, casesToRefactor)) {
+					break;
+				}
+				flagStmtsToRemove(allCasesStatements, stmtIndex, caseStmtsToRemove, casesToRefactor);
+			}
 
-            if (!hasVariableConflict(node, caseStmtsToRemove)) {
-                removeIdenticalTrailingCode(node, allCases, allCasesStatements, caseStmtsToRemove, casesToRefactor);
-                return false;
-            }
-        }
+			if (!hasVariableConflict(node, caseStmtsToRemove)) {
+				removeIdenticalTrailingCode(node, allCases, allCasesStatements, caseStmtsToRemove, casesToRefactor);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private List<Integer> getMatchingCases(final List<List<Statement>> allCasesStatements,
-            final ASTSemanticMatcher matcher) {
-        List<Pair<Statement, List<Integer>>> matchingCases= new ArrayList<>();
+	private List<Integer> getMatchingCases(final List<List<Statement>> allCasesStatements,
+			final ASTSemanticMatcher matcher) {
+		List<Pair<Statement, List<Integer>>> matchingCases= new ArrayList<>();
 
-        for (int i= 0; i < allCasesStatements.size(); i++) {
-            boolean isMatching= false;
-            Statement currentStatement= allCasesStatements.get(i).get(allCasesStatements.get(i).size() - 1);
+		for (int i= 0; i < allCasesStatements.size(); i++) {
+			boolean isMatching= false;
+			Statement currentStatement= allCasesStatements.get(i).get(allCasesStatements.get(i).size() - 1);
 
-            for (Pair<Statement, List<Integer>> pair : matchingCases) {
-                if (ASTNodes.match(matcher, pair.getFirst(), currentStatement)) {
-                    pair.getSecond().add(i);
-                    isMatching= true;
-                    break;
-                }
-            }
+			for (Pair<Statement, List<Integer>> pair : matchingCases) {
+				if (ASTNodes.match(matcher, pair.getFirst(), currentStatement)) {
+					pair.getSecond().add(i);
+					isMatching= true;
+					break;
+				}
+			}
 
-            if (!isMatching) {
-                Pair<Statement, List<Integer>> newPair= Pair.<Statement, List<Integer>>of(currentStatement, new ArrayList<>());
-                newPair.getSecond().add(i);
-                matchingCases.add(newPair);
-            }
-        }
+			if (!isMatching) {
+				Pair<Statement, List<Integer>> newPair= Pair.<Statement, List<Integer>>of(currentStatement, new ArrayList<>());
+				newPair.getSecond().add(i);
+				matchingCases.add(newPair);
+			}
+		}
 
-        if (matchingCases.isEmpty()) {
-            return null;
-        }
+		if (matchingCases.isEmpty()) {
+			return null;
+		}
 
-        Collections.sort(matchingCases, new Comparator<Pair<Statement, List<Integer>>>() {
-            @Override
-            public int compare(final Pair<Statement, List<Integer>> o1, final Pair<Statement, List<Integer>> o2) {
-                return Integer.compare(o2.getSecond().size(), o1.getSecond().size());
-            }
-        });
-        Pair<Statement, List<Integer>> notFallingThroughCase= null;
+		Collections.sort(matchingCases, new Comparator<Pair<Statement, List<Integer>>>() {
+			@Override
+			public int compare(final Pair<Statement, List<Integer>> o1, final Pair<Statement, List<Integer>> o2) {
+				return Integer.compare(o2.getSecond().size(), o1.getSecond().size());
+			}
+		});
+		Pair<Statement, List<Integer>> notFallingThroughCase= null;
 
-        for (Pair<Statement, List<Integer>> matchingCase : matchingCases) {
-            if (!ASTNodes.fallsThrough(matchingCase.getFirst())) {
-                if (notFallingThroughCase != null) {
-                    return null;
-                }
+		for (Pair<Statement, List<Integer>> matchingCase : matchingCases) {
+			if (!ASTNodes.fallsThrough(matchingCase.getFirst())) {
+				if (notFallingThroughCase != null) {
+					return null;
+				}
 
-                notFallingThroughCase= matchingCase;
-            }
-        }
+				notFallingThroughCase= matchingCase;
+			}
+		}
 
-        if (notFallingThroughCase != null) {
-            return notFallingThroughCase.getSecond();
-        }
+		if (notFallingThroughCase != null) {
+			return notFallingThroughCase.getSecond();
+		}
 
-        return matchingCases.get(0).getSecond();
-    }
+		return matchingCases.get(0).getSecond();
+	}
 
-    private void flagStmtsToRemove(final List<List<Statement>> allCasesStatements, final int stmtIndex,
-            final List<List<Statement>> removedCaseStatements, final List<Integer> casesToRefactor) {
-        for (int i : casesToRefactor) {
-            List<Statement> caseStatements= allCasesStatements.get(i);
-            Statement stmtToRemove= caseStatements.get(caseStatements.size() - stmtIndex);
-            removedCaseStatements.get(i).add(stmtToRemove);
-        }
-    }
+	private void flagStmtsToRemove(final List<List<Statement>> allCasesStatements, final int stmtIndex,
+			final List<List<Statement>> removedCaseStatements, final List<Integer> casesToRefactor) {
+		for (int i : casesToRefactor) {
+			List<Statement> caseStatements= allCasesStatements.get(i);
+			Statement stmtToRemove= caseStatements.get(caseStatements.size() - stmtIndex);
+			removedCaseStatements.get(i).add(stmtToRemove);
+		}
+	}
 
-    private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
-            final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
+			final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        // Remove the nodes common to all cases
-        boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
-        Arrays.fill(areCasesRemovable, false);
-        removeStmtsFromCases(allCases, allCasesStatements, caseStmtsToRemove, areCasesRemovable, casesToRefactor);
-        List<Statement> oneCaseToRemove= caseStmtsToRemove.get(casesToRefactor.get(0));
+		// Remove the nodes common to all cases
+		boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
+		Arrays.fill(areCasesRemovable, false);
+		removeStmtsFromCases(allCases, allCasesStatements, caseStmtsToRemove, areCasesRemovable, casesToRefactor);
+		List<Statement> oneCaseToRemove= caseStmtsToRemove.get(casesToRefactor.get(0));
 
-        if (allRemovable(areCasesRemovable, 0)) {
-            if (ASTNodes.canHaveSiblings(node)) {
-                insertIdenticalCode(node, oneCaseToRemove, rewrite);
+		if (allRemovable(areCasesRemovable, 0)) {
+			if (ASTNodes.canHaveSiblings(node)) {
+				insertIdenticalCode(node, oneCaseToRemove, rewrite);
 
-                rewrite.removeButKeepComment(node, null);
-            } else {
-                List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
-                for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
-                }
-                rewrite.replace(node, ast.block(orderedStatements), null);
-            }
-        } else {
-            // Remove empty cases
-            for (int i : casesToRefactor) {
-                ASTNode parent= allCases.get(i);
+				rewrite.removeButKeepComment(node, null);
+			} else {
+				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
+				for (Statement stmtToRemove : oneCaseToRemove) {
+					orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
+				}
+				rewrite.replace(node, ast.block(orderedStatements), null);
+			}
+		} else {
+			// Remove empty cases
+			for (int i : casesToRefactor) {
+				ASTNode parent= allCases.get(i);
 
-                if (areCasesRemovable[i]) {
-                    if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
-                        // Then clause is empty and there is only one else clause
-                        // => revert if statement
-                        rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), rewrite.createMoveTarget(((IfStatement) parent).getElseStatement())), null);
-                        break;
-                    }
-                    if (allRemovable(areCasesRemovable, i)) {
-                        rewrite.remove(parent, null);
-                        break;
-                    }
-                    rewrite.replace(((IfStatement) parent).getThenStatement(), ast.block(), null);
-                }
-            }
+				if (areCasesRemovable[i]) {
+					if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
+						// Then clause is empty and there is only one else clause
+						// => revert if statement
+						rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), rewrite.createMoveTarget(((IfStatement) parent).getElseStatement())), null);
+						break;
+					}
+					if (allRemovable(areCasesRemovable, i)) {
+						rewrite.remove(parent, null);
+						break;
+					}
+					rewrite.replace(((IfStatement) parent).getThenStatement(), ast.block(), null);
+				}
+			}
 
-            if (ASTNodes.canHaveSiblings(node)) {
-                insertIdenticalCode(node, oneCaseToRemove, rewrite);
-            } else {
-                List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
-                for (Statement stmtToRemove : oneCaseToRemove) {
-                    orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
-                }
-                orderedStatements.add(0, rewrite.createMoveTarget(node));
-                rewrite.replace(node, ast.block(orderedStatements), null);
-            }
-        }
-    }
+			if (ASTNodes.canHaveSiblings(node)) {
+				insertIdenticalCode(node, oneCaseToRemove, rewrite);
+			} else {
+				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
+				for (Statement stmtToRemove : oneCaseToRemove) {
+					orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
+				}
+				orderedStatements.add(0, rewrite.createMoveTarget(node));
+				rewrite.replace(node, ast.block(orderedStatements), null);
+			}
+		}
+	}
 
-    private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTRewrite rewrite) {
-        for (Statement stmtToRemove : stmtsToRemove) {
-            rewrite.insertAfter(rewrite.createMoveTarget(stmtToRemove), node, null);
-        }
-    }
+	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTRewrite rewrite) {
+		for (Statement stmtToRemove : stmtsToRemove) {
+			rewrite.insertAfter(rewrite.createMoveTarget(stmtToRemove), node, null);
+		}
+	}
 
-    private boolean allRemovable(final boolean[] areCasesRemovable, final int start) {
-        for (int i= start; i < areCasesRemovable.length; i++) {
-            if (!areCasesRemovable[i]) {
-                return false;
-            }
-        }
+	private boolean allRemovable(final boolean[] areCasesRemovable, final int start) {
+		for (int i= start; i < areCasesRemovable.length; i++) {
+			if (!areCasesRemovable[i]) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void removeStmtsFromCases(final List<ASTNode> allCases, final List<List<Statement>> allCasesStatements,
-            final List<List<Statement>> removedCaseStatements, final boolean[] areCasesRemovable, final List<Integer> casesToRefactor) {
-        for (int i : casesToRefactor) {
-            List<Statement> removedStatements= removedCaseStatements.get(i);
-            ASTNode parent= allCases.get(i);
+	private void removeStmtsFromCases(final List<ASTNode> allCases, final List<List<Statement>> allCasesStatements,
+			final List<List<Statement>> removedCaseStatements, final boolean[] areCasesRemovable, final List<Integer> casesToRefactor) {
+		for (int i : casesToRefactor) {
+			List<Statement> removedStatements= removedCaseStatements.get(i);
+			ASTNode parent= allCases.get(i);
 
-            if (removedStatements.containsAll(allCasesStatements.get(i))
-                    && (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
-                areCasesRemovable[i]= true;
-            } else {
-                cuRewrite.getASTRewrite().remove(removedStatements, null);
-            }
-        }
-    }
+			if (removedStatements.containsAll(allCasesStatements.get(i))
+					&& (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
+				areCasesRemovable[i]= true;
+			} else {
+				cuRewrite.getASTRewrite().remove(removedStatements, null);
+			}
+		}
+	}
 
-    private boolean match(final ASTSemanticMatcher matcher, final List<List<Statement>> allCasesStatements, final int stmtIndex, final List<Integer> casesToRefactor) {
-        List<Statement> firstCaseToRefactor= allCasesStatements.get(casesToRefactor.get(0));
+	private boolean match(final ASTSemanticMatcher matcher, final List<List<Statement>> allCasesStatements, final int stmtIndex, final List<Integer> casesToRefactor) {
+		List<Statement> firstCaseToRefactor= allCasesStatements.get(casesToRefactor.get(0));
 
-        for (int i= 1; i < casesToRefactor.size(); i++) {
-            List<Statement> anotherCaseToRefactor= allCasesStatements.get(casesToRefactor.get(i));
+		for (int i= 1; i < casesToRefactor.size(); i++) {
+			List<Statement> anotherCaseToRefactor= allCasesStatements.get(casesToRefactor.get(i));
 
-            if (!ASTNodes.match(matcher, firstCaseToRefactor.get(firstCaseToRefactor.size() - stmtIndex),
-                    anotherCaseToRefactor.get(anotherCaseToRefactor.size() - stmtIndex))) {
-                return false;
-            }
-        }
+			if (!ASTNodes.match(matcher, firstCaseToRefactor.get(firstCaseToRefactor.size() - stmtIndex),
+					anotherCaseToRefactor.get(anotherCaseToRefactor.size() - stmtIndex))) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private int minSize(final List<List<Statement>> allCasesStatements) {
-        if (allCasesStatements.isEmpty()) {
-            throw new IllegalStateException(null, "allCasesStatements List must not be empty"); //$NON-NLS-1$
-        }
+	private int minSize(final List<List<Statement>> allCasesStatements) {
+		if (allCasesStatements.isEmpty()) {
+			throw new IllegalStateException(null, "allCasesStatements List must not be empty"); //$NON-NLS-1$
+		}
 
-        int min= allCasesStatements.get(0).size();
+		int min= allCasesStatements.get(0).size();
 
-        for (List<Statement> statements : allCasesStatements) {
-            min= Math.min(min, statements.size());
-        }
+		for (List<Statement> statements : allCasesStatements) {
+			min= Math.min(min, statements.size());
+		}
 
-        return min;
-    }
+		return min;
+	}
 
-    /**
-     * Collects all cases (if/else, if/else if/else, etc.) and returns whether all
-     * are covered.
-     *
-     * @param allCasesStatements the output collection for all the cases
-     * @param node     the {@link IfStatement} to examine
-     * @param allCases All the cases
-     * @return true if all cases (if/else, if/else if/else, etc.) are covered, false
-     *         otherwise
-     */
-    private boolean collectAllCases(final List<List<Statement>> allCasesStatements, final IfStatement node, final List<ASTNode> allCases) {
-        List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
-        List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+	/**
+	 * Collects all cases (if/else, if/else if/else, etc.) and returns whether all
+	 * are covered.
+	 *
+	 * @param allCasesStatements the output collection for all the cases
+	 * @param node     the {@link IfStatement} to examine
+	 * @param allCases All the cases
+	 * @return true if all cases (if/else, if/else if/else, etc.) are covered, false
+	 *         otherwise
+	 */
+	private boolean collectAllCases(final List<List<Statement>> allCasesStatements, final IfStatement node, final List<ASTNode> allCases) {
+		List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+		List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
 
-        if (thenStatements.isEmpty() || elseStatements.isEmpty()) {
-            // If the then or else clause is empty, then there is no common code whatsoever.
-            // let other cleanups take care of removing empty blocks.
-            return false;
-        }
+		if (thenStatements.isEmpty() || elseStatements.isEmpty()) {
+			// If the then or else clause is empty, then there is no common code whatsoever.
+			// let other cleanups take care of removing empty blocks.
+			return false;
+		}
 
-        allCases.add(node);
-        allCasesStatements.add(thenStatements);
+		allCases.add(node);
+		allCasesStatements.add(thenStatements);
 
-        if (elseStatements.size() == 1) {
-            IfStatement is= ASTNodes.as(elseStatements.get(0), IfStatement.class);
-            if (is != null) {
-                return collectAllCases(allCasesStatements, is, allCases);
-            }
-        }
+		if (elseStatements.size() == 1) {
+			IfStatement is= ASTNodes.as(elseStatements.get(0), IfStatement.class);
+			if (is != null) {
+				return collectAllCases(allCasesStatements, is, allCases);
+			}
+		}
 
-        allCases.add(node.getElseStatement());
-        allCasesStatements.add(elseStatements);
-        return true;
-    }
+		allCases.add(node.getElseStatement());
+		allCasesStatements.add(elseStatements);
+		return true;
+	}
 
-    private boolean hasVariableConflict(final IfStatement node, final List<List<Statement>> casesStmtsToRemove) {
-        Set<String> ifVariableNames= new HashSet<>();
+	private boolean hasVariableConflict(final IfStatement node, final List<List<Statement>> casesStmtsToRemove) {
+		Set<String> ifVariableNames= new HashSet<>();
 
-        for (List<Statement> caseStmtsToRemove : casesStmtsToRemove) {
-            for (Statement caseStmtToRemove : caseStmtsToRemove) {
-                ifVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(caseStmtToRemove, false));
-            }
-        }
+		for (List<Statement> caseStmtsToRemove : casesStmtsToRemove) {
+			for (Statement caseStmtToRemove : caseStmtsToRemove) {
+				ifVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(caseStmtToRemove, false));
+			}
+		}
 
-        for (Statement statement : ASTNodes.getNextSiblings(node)) {
-            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames, true);
-            varOccurrenceVisitor.visitNode(statement);
+		for (Statement statement : ASTNodes.getNextSiblings(node)) {
+			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames, true);
+			varOccurrenceVisitor.visitNode(statement);
 
-            if (varOccurrenceVisitor.isVarUsed()) {
-                return true;
-            }
-        }
+			if (varOccurrenceVisitor.isVarUsed()) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

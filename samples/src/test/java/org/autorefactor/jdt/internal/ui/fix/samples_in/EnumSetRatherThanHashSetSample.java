@@ -33,109 +33,109 @@ import java.util.Set;
 
 public class EnumSetRatherThanHashSetSample {
 
-    enum Example {
-        ONE, TWO, THREE
-    }
+	enum Example {
+		ONE, TWO, THREE
+	}
 
-    public Set<DayOfWeek> refactorVariableDeclarationStatement() {
-        // Keep this comment
-        Set<DayOfWeek> set = new HashSet<DayOfWeek>();
-        return set;
-    }
+	public Set<DayOfWeek> refactorVariableDeclarationStatement() {
+		// Keep this comment
+		Set<DayOfWeek> set = new HashSet<DayOfWeek>();
+		return set;
+	}
 
-    public Set<DayOfWeek> refactorVariableDeclarationStatementWithDiamond() {
-        // Keep this comment
-        Set<DayOfWeek> set = new HashSet<>();
-        return set;
-    }
+	public Set<DayOfWeek> refactorVariableDeclarationStatementWithDiamond() {
+		// Keep this comment
+		Set<DayOfWeek> set = new HashSet<>();
+		return set;
+	}
 
-    public Set<DayOfWeek> doNotRefactorRawVariableDeclarationStatement() {
-        Set set = new HashSet<DayOfWeek>();
-        return set;
-    }
+	public Set<DayOfWeek> doNotRefactorRawVariableDeclarationStatement() {
+		Set set = new HashSet<DayOfWeek>();
+		return set;
+	}
 
-    public Set<DayOfWeek> refactorReturnStatement() {
-        // Keep this comment
-        return new HashSet<DayOfWeek>();
-    }
+	public Set<DayOfWeek> refactorReturnStatement() {
+		// Keep this comment
+		return new HashSet<DayOfWeek>();
+	}
 
-    public Set<Example> refactorReturnStatementWithDiamondOperator() {
-        // Keep this comment
-        return new HashSet<>();
-    }
+	public Set<Example> refactorReturnStatementWithDiamondOperator() {
+		// Keep this comment
+		return new HashSet<>();
+	}
 
-    public Set doNotRefactorRawReturnStatement() {
-        return new HashSet<Example>();
-    }
+	public Set doNotRefactorRawReturnStatement() {
+		return new HashSet<Example>();
+	}
 
-    public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
-        // Keep this comment
-        Set<Example> set = ((new HashSet<Example>()));
-        return set;
-    }
+	public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
+		// Keep this comment
+		Set<Example> set = ((new HashSet<Example>()));
+		return set;
+	}
 
-    public Set<Example> refactorAssignment() {
-        // Keep this comment
-        Set<Example> set;
-        set = new HashSet<Example>();
-        return set;
-    }
+	public Set<Example> refactorAssignment() {
+		// Keep this comment
+		Set<Example> set;
+		set = new HashSet<Example>();
+		return set;
+	}
 
-    public Set<Example> doNotRefactorRawAssignment() {
-        Set set;
-        set = new HashSet<Example>();
-        return set;
-    }
+	public Set<Example> doNotRefactorRawAssignment() {
+		Set set;
+		set = new HashSet<Example>();
+		return set;
+	}
 
-    public Set<Example> refactorConditionalAssignment() {
-        // Keep this comment
-        Set<Example> set;
-        set = true ? new HashSet<Example>() : new HashSet<Example>();
-        return set;
-    }
+	public Set<Example> refactorConditionalAssignment() {
+		// Keep this comment
+		Set<Example> set;
+		set = true ? new HashSet<Example>() : new HashSet<Example>();
+		return set;
+	}
 
-    public Set<Example> refactorConstrutorWithInt() {
-        // Keep this comment
-        Set<Example> set = new HashSet<Example>(1);
-        return set;
-    }
+	public Set<Example> refactorConstrutorWithInt() {
+		// Keep this comment
+		Set<Example> set = new HashSet<Example>(1);
+		return set;
+	}
 
-    public Set<Example> refactorConstrutorWithIntAndFloat() {
-        // Keep this comment
-        Set<Example> set = new HashSet<Example>(1, 0.75F);
-        return set;
-    }
+	public Set<Example> refactorConstrutorWithIntAndFloat() {
+		// Keep this comment
+		Set<Example> set = new HashSet<Example>(1, 0.75F);
+		return set;
+	}
 
-    public Set<Example> doNotRefactorConstrutorWithCollection(
-            Collection<Example> col) {
-        Set<Example> set = new HashSet<Example>(col);
-        return set;
-    }
+	public Set<Example> doNotRefactorConstrutorWithCollection(
+			Collection<Example> col) {
+		Set<Example> set = new HashSet<Example>(col);
+		return set;
+	}
 
-    public Set<Example> refactorConstrutorWithEnumSet(java.util.EnumSet<Example> s) {
-        // Keep this comment
-        Set<Example> set = new HashSet<Example>(s);
-        return set;
-    }
+	public Set<Example> refactorConstrutorWithEnumSet(java.util.EnumSet<Example> s) {
+		// Keep this comment
+		Set<Example> set = new HashSet<Example>(s);
+		return set;
+	}
 
-    public void doNotRefactorMethodArgument() {
-        Set<Example> set = Collections
-                .synchronizedSet(new HashSet<Example>());
-        System.out.println(set);
-    }
+	public void doNotRefactorMethodArgument() {
+		Set<Example> set = Collections
+				.synchronizedSet(new HashSet<Example>());
+		System.out.println(set);
+	}
 
-    public Set<Example> doNotRefactor() {
-        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
-        set.addAll(java.util.EnumSet.allOf(Example.class));
-        return set;
-    }
+	public Set<Example> doNotRefactor() {
+		Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+		set.addAll(java.util.EnumSet.allOf(Example.class));
+		return set;
+	}
 
-    public Set<Example> doNotRefactorAnonymousClass() {
-        return new HashSet<Example>() {
-            @Override
-            public String toString() {
-                return super.toString();
-            }
-        };
-    }
+	public Set<Example> doNotRefactorAnonymousClass() {
+		return new HashSet<Example>() {
+			@Override
+			public String toString() {
+				return super.toString();
+			}
+		};
+	}
 }

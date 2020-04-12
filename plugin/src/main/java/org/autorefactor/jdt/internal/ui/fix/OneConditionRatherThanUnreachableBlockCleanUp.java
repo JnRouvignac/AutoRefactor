@@ -31,58 +31,58 @@ import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
 public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
-        if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
-                && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(node.getExpression(), secondIf.getExpression())
-                && (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
-                        || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
-            refactorCondition(secondIf);
+	@Override
+	public boolean visit(final IfStatement node) {
+		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+		if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
+				&& ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(node.getExpression(), secondIf.getExpression())
+				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
+						|| ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
+			refactorCondition(secondIf);
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorCondition(final IfStatement secondIf) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void refactorCondition(final IfStatement secondIf) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        if (secondIf.getElseStatement() == null) {
-            rewrite.remove(secondIf, null);
-        } else {
-            rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getElseStatement()), null);
-        }
-    }
+		if (secondIf.getElseStatement() == null) {
+			rewrite.remove(secondIf, null);
+		} else {
+			rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getElseStatement()), null);
+		}
+	}
 }

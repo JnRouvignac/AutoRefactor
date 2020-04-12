@@ -29,37 +29,37 @@ import java.util.Map;
 import java.util.Observable;
 
 public class ObjectsEqualsRatherThanEqualsAndNullCheckSample {
-    private Map<Integer, String> textById;
-    private Observable anObservable;
-    private String aText;
+	private Map<Integer, String> textById;
+	private Observable anObservable;
+	private String aText;
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ObjectsEqualsRatherThanEqualsAndNullCheckSample other = (ObjectsEqualsRatherThanEqualsAndNullCheckSample) obj;
-        if (aText == null) {
-            if (other.aText != null)
-                return false;
-        } else if (!aText.equals(other.aText))
-            return false;
-        if (null == anObservable) {
-            if (null != other.anObservable)
-                return false;
-        } else if (!anObservable.equals(other.anObservable))
-            return false;
-        if (this.textById == null) {
-            if (other.textById != null)
-                return false;
-        } else if (!this.textById.equals(other.textById))
-            return false;
-        return true;
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ObjectsEqualsRatherThanEqualsAndNullCheckSample other = (ObjectsEqualsRatherThanEqualsAndNullCheckSample) obj;
+		if (aText == null) {
+			if (other.aText != null)
+				return false;
+		} else if (!aText.equals(other.aText))
+			return false;
+		if (null == anObservable) {
+			if (null != other.anObservable)
+				return false;
+		} else if (!anObservable.equals(other.anObservable))
+			return false;
+		if (this.textById == null) {
+			if (other.textById != null)
+				return false;
+		} else if (!this.textById.equals(other.textById))
+			return false;
+		return true;
+	}
 }

@@ -42,127 +42,127 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
-    private static class TopLevelClassMemberVisitor extends InterruptibleVisitor {
-        private final TypeDeclaration topLevelClass;
-        private final TypeDeclaration innerClass;
-        private boolean isTopLevelClassMemberUsed;
+	private static class TopLevelClassMemberVisitor extends InterruptibleVisitor {
+		private final TypeDeclaration topLevelClass;
+		private final TypeDeclaration innerClass;
+		private boolean isTopLevelClassMemberUsed;
 
-        public TopLevelClassMemberVisitor(final TypeDeclaration topLevelClass, final TypeDeclaration innerClass) {
-            this.topLevelClass= topLevelClass;
-            this.innerClass= innerClass;
-        }
+		public TopLevelClassMemberVisitor(final TypeDeclaration topLevelClass, final TypeDeclaration innerClass) {
+			this.topLevelClass= topLevelClass;
+			this.innerClass= innerClass;
+		}
 
-        public boolean isTopLevelClassMemberUsed() {
-            return isTopLevelClassMemberUsed;
-        }
+		public boolean isTopLevelClassMemberUsed() {
+			return isTopLevelClassMemberUsed;
+		}
 
-        @Override
-        public boolean visit(final SimpleName node) {
-            if (innerClass.getName() == node) {
-                return true;
-            }
+		@Override
+		public boolean visit(final SimpleName node) {
+			if (innerClass.getName() == node) {
+				return true;
+			}
 
-            IBinding binding= node.resolveBinding();
-            ASTNode root= node.getRoot();
+			IBinding binding= node.resolveBinding();
+			ASTNode root= node.getRoot();
 
-            if (binding == null || !(root instanceof CompilationUnit)) {
-                isTopLevelClassMemberUsed= true;
-                return interruptVisit();
-            }
+			if (binding == null || !(root instanceof CompilationUnit)) {
+				isTopLevelClassMemberUsed= true;
+				return interruptVisit();
+			}
 
-            if (!Modifier.isStatic(binding.getModifiers())) {
-                ASTNode declaration= ((CompilationUnit) root).findDeclaringNode(binding);
+			if (!Modifier.isStatic(binding.getModifiers())) {
+				ASTNode declaration= ((CompilationUnit) root).findDeclaringNode(binding);
 
-                if (!ASTNodes.isParent(declaration, innerClass) && ASTNodes.isParent(declaration, topLevelClass)) {
-                    isTopLevelClassMemberUsed= true;
-                    return interruptVisit();
-                }
-            }
+				if (!ASTNodes.isParent(declaration, innerClass) && ASTNodes.isParent(declaration, topLevelClass)) {
+					isTopLevelClassMemberUsed= true;
+					return interruptVisit();
+				}
+			}
 
-            return true;
-        }
-    }
+			return true;
+		}
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final TypeDeclaration node) {
-        if (!node.isInterface()) {
-            TypeDeclaration parent= ASTNodes.getAncestorOrNull(node, TypeDeclaration.class);
-            TypeDeclaration topLevelClass= null;
+	@Override
+	public boolean visit(final TypeDeclaration node) {
+		if (!node.isInterface()) {
+			TypeDeclaration parent= ASTNodes.getAncestorOrNull(node, TypeDeclaration.class);
+			TypeDeclaration topLevelClass= null;
 
-            while (parent != null) {
-                topLevelClass= parent;
-                parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
+			while (parent != null) {
+				topLevelClass= parent;
+				parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
 
-                if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
-                    return true;
-                }
-            }
+				if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
+					return true;
+				}
+			}
 
-            if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
-                TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(topLevelClass, node);
-                topLevelClassMemberVisitor.visitNode(node);
+			if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
+				TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(topLevelClass, node);
+				topLevelClassMemberVisitor.visitNode(node);
 
-                if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
-                    makeStatic(node);
-                    return false;
-                }
-            }
-        }
+				if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
+					makeStatic(node);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void makeStatic(final TypeDeclaration node) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void makeStatic(final TypeDeclaration node) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        List<?> modifiers= node.modifiers();
-        Modifier static0= ast.static0();
+		List<?> modifiers= node.modifiers();
+		Modifier static0= ast.static0();
 
-        if (modifiers.isEmpty()) {
-            rewrite.insertBefore(static0, node, null);
-        } else {
-            IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
+		if (modifiers.isEmpty()) {
+			rewrite.insertBefore(static0, node, null);
+		} else {
+			IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
 
-            if (lastModifier.isModifier()) {
-                if (((Modifier) lastModifier).isFinal()) {
-                    rewrite.insertBefore(static0, (Modifier) lastModifier, null);
-                } else {
-                    rewrite.insertAfter(static0, (Modifier) lastModifier, null);
-                }
-            } else {
-                rewrite.insertAfter(static0, (Annotation) lastModifier, null);
-            }
-        }
-    }
+			if (lastModifier.isModifier()) {
+				if (((Modifier) lastModifier).isFinal()) {
+					rewrite.insertBefore(static0, (Modifier) lastModifier, null);
+				} else {
+					rewrite.insertAfter(static0, (Modifier) lastModifier, null);
+				}
+			} else {
+				rewrite.insertAfter(static0, (Annotation) lastModifier, null);
+			}
+		}
+	}
 }

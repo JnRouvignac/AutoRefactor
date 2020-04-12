@@ -33,64 +33,64 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 5;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 5;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (node.getExpression() != null
-                && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ //$NON-NLS-2$
-                        || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
-            ITypeBinding actualResultType= ASTNodes.getTargetType(node);
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (node.getExpression() != null
+				&& (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ //$NON-NLS-2$
+						|| ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
+						|| ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
+			ITypeBinding actualResultType= ASTNodes.getTargetType(node);
 
-            if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
-                useUnboxing(node);
-                return false;
-            }
-        }
+			if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
+				useUnboxing(node);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void useUnboxing(final MethodInvocation node) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, rewrite.createMoveTarget(node.getExpression()), null);
-    }
+	private void useUnboxing(final MethodInvocation node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.replace(node, rewrite.createMoveTarget(node.getExpression()), null);
+	}
 }

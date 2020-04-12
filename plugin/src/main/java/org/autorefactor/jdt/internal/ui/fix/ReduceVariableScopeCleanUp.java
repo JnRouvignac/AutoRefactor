@@ -73,384 +73,384 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * @see {@link #getDescription()}
  */
 public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return "Reduce scope of variable"; //$NON-NLS-1$
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return "Reduce scope of variable"; //$NON-NLS-1$
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return "Reduces the scope of local variables."; //$NON-NLS-1$
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return "Reduces the scope of local variables."; //$NON-NLS-1$
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return "It reduces the reading and debugging cost."; //$NON-NLS-1$
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return "It reduces the reading and debugging cost."; //$NON-NLS-1$
+	}
 
-    private static final int DECL= 1 << 0;
-    private static final int READ= 1 << 1;
-    private static final int WRITE= 1 << 2;
+	private static final int DECL= 1 << 0;
+	private static final int READ= 1 << 1;
+	private static final int WRITE= 1 << 2;
 
-    private static final class VariableName {
-        private final Name name;
+	private static final class VariableName {
+		private final Name name;
 
-        public VariableName(final Name name) {
-            this.name= name;
-        }
+		public VariableName(final Name name) {
+			this.name= name;
+		}
 
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj instanceof VariableName) {
-                VariableName other= (VariableName) obj;
-                if (this.name instanceof SimpleName && other.name instanceof SimpleName) {
-                    return ASTNodes.isEqual((SimpleName) this.name, (SimpleName) other.name);
-                }
-                // if (this.name instanceof QualifiedName
-                // && other.name instanceof QualifiedName) {
-                // throw new IllegalStateException();
-                // }
-            }
-            // Return false;
-            throw new NotImplementedException(name, name);
-        }
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj instanceof VariableName) {
+				VariableName other= (VariableName) obj;
+				if (this.name instanceof SimpleName && other.name instanceof SimpleName) {
+					return ASTNodes.isEqual((SimpleName) this.name, (SimpleName) other.name);
+				}
+				// if (this.name instanceof QualifiedName
+				// && other.name instanceof QualifiedName) {
+				// throw new IllegalStateException();
+				// }
+			}
+			// Return false;
+			throw new NotImplementedException(name, name);
+		}
 
-        @Override
-        public int hashCode() {
-            if (this.name instanceof SimpleName) {
-                return ((SimpleName) this.name).getIdentifier().hashCode();
-            }
-            // if (this.name instanceof QualifiedName) {
-            // throw new IllegalStateException();
-            // }
-            throw new NotImplementedException(name, name);
-        }
+		@Override
+		public int hashCode() {
+			if (this.name instanceof SimpleName) {
+				return ((SimpleName) this.name).getIdentifier().hashCode();
+			}
+			// if (this.name instanceof QualifiedName) {
+			// throw new IllegalStateException();
+			// }
+			throw new NotImplementedException(name, name);
+		}
 
-        @Override
-        public String toString() {
-            return this.name.toString();
-        }
-    }
+		@Override
+		public String toString() {
+			return this.name.toString();
+		}
+	}
 
-    private static final class VariableAccess {
-        private final Name variableName;
-        private final int accessType;
-        private final ASTNode scope;
+	private static final class VariableAccess {
+		private final Name variableName;
+		private final int accessType;
+		private final ASTNode scope;
 
-        public VariableAccess(final Name variableName, final int accessType, final ASTNode scope) {
-            if (accessType == 0) {
-                throw new IllegalArgumentException(null, "accessType must not be null"); //$NON-NLS-1$
-            }
-            this.variableName= variableName;
-            this.accessType= accessType;
-            this.scope= scope;
-        }
+		public VariableAccess(final Name variableName, final int accessType, final ASTNode scope) {
+			if (accessType == 0) {
+				throw new IllegalArgumentException(null, "accessType must not be null"); //$NON-NLS-1$
+			}
+			this.variableName= variableName;
+			this.accessType= accessType;
+			this.scope= scope;
+		}
 
-        public Name getVariableName() {
-            return variableName;
-        }
+		public Name getVariableName() {
+			return variableName;
+		}
 
-        public int getAccessType() {
-            return accessType;
-        }
+		public int getAccessType() {
+			return accessType;
+		}
 
-        public ASTNode getScope() {
-            return scope;
-        }
+		public ASTNode getScope() {
+			return scope;
+		}
 
-        @Override
-        public String toString() {
-            StringBuilder sb= new StringBuilder();
-            if ((this.accessType & DECL) != 0) {
-                sb.append("DECL"); //$NON-NLS-1$
-            }
-            if ((this.accessType & READ) != 0) {
-                if (sb.length() > 0) {
-                    sb.append(" | "); //$NON-NLS-1$
-                }
-                sb.append("READ"); //$NON-NLS-1$
-            }
-            if ((this.accessType & WRITE) != 0) {
-                if (sb.length() > 0) {
-                    sb.append(" | "); //$NON-NLS-1$
-                }
-                sb.append("WRITE"); //$NON-NLS-1$
-            }
-            sb.append("\n"); //$NON-NLS-1$
-            sb.append(scope);
-            return sb.toString();
-        }
-    }
+		@Override
+		public String toString() {
+			StringBuilder sb= new StringBuilder();
+			if ((this.accessType & DECL) != 0) {
+				sb.append("DECL"); //$NON-NLS-1$
+			}
+			if ((this.accessType & READ) != 0) {
+				if (sb.length() > 0) {
+					sb.append(" | "); //$NON-NLS-1$
+				}
+				sb.append("READ"); //$NON-NLS-1$
+			}
+			if ((this.accessType & WRITE) != 0) {
+				if (sb.length() > 0) {
+					sb.append(" | "); //$NON-NLS-1$
+				}
+				sb.append("WRITE"); //$NON-NLS-1$
+			}
+			sb.append("\n"); //$NON-NLS-1$
+			sb.append(scope);
+			return sb.toString();
+		}
+	}
 
-    private final Map<VariableName, List<VariableAccess>> allVariableAccesses= new HashMap<>();
-    private static final Pair<Integer, ASTNode> NULL_PAIR= Pair.of(0, null);
+	private final Map<VariableName, List<VariableAccess>> allVariableAccesses= new HashMap<>();
+	private static final Pair<Integer, ASTNode> NULL_PAIR= Pair.of(0, null);
 
-    @Override
-    public boolean visit(final SimpleName node) {
-        findVariableAccesses(node);
-        return true;
-    }
+	@Override
+	public boolean visit(final SimpleName node) {
+		findVariableAccesses(node);
+		return true;
+	}
 
-    @Override
-    public boolean visit(final QualifiedName node) {
-        findVariableAccesses(node);
-        return true;
-    }
+	@Override
+	public boolean visit(final QualifiedName node) {
+		findVariableAccesses(node);
+		return true;
+	}
 
-    private void findVariableAccesses(final Name node) {
-        Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
-        if (accessTypeAndScope.getFirst().intValue() != 0) {
-            VariableName varName= new VariableName(node);
-            List<VariableAccess> list= this.allVariableAccesses.get(varName);
-            if (list == null) {
-                list= new ArrayList<>();
-                this.allVariableAccesses.put(varName, list);
-            }
-            if (list.isEmpty() || !Utils.getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
-                // Only keep first write in scope
-                list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
-            }
-        }
-    }
+	private void findVariableAccesses(final Name node) {
+		Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
+		if (accessTypeAndScope.getFirst().intValue() != 0) {
+			VariableName varName= new VariableName(node);
+			List<VariableAccess> list= this.allVariableAccesses.get(varName);
+			if (list == null) {
+				list= new ArrayList<>();
+				this.allVariableAccesses.put(varName, list);
+			}
+			if (list.isEmpty() || !Utils.getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
+				// Only keep first write in scope
+				list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
+			}
+		}
+	}
 
-    private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode node) {
-        ASTNode parent= node.getParent();
-        if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
-                || parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
-                || parent instanceof WhileStatement) {
-            return getAccessTypeAndScope(parent);
-        }
-        if (parent instanceof ImportDeclaration || parent instanceof MethodDeclaration
-                || parent instanceof MethodInvocation || parent instanceof PackageDeclaration || parent instanceof Type
-                || parent instanceof TypeDeclaration) {
-            return NULL_PAIR;
-        }
-        if (parent instanceof SingleVariableDeclaration) {
-            SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
-            return getAccessTypeAndScope(var.getParent());
-        }
-        if (parent instanceof VariableDeclarationFragment) {
-            VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
-            return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL, getScope(var));
-        }
-        if (parent instanceof Assignment) {
-            return Pair.of(WRITE, getScope(parent.getParent()));
-        }
-        if (parent instanceof InfixExpression) {
-            return Pair.of(READ, getScope(parent.getParent()));
-        }
-        if (parent instanceof PostfixExpression) {
-            return Pair.of(READ | WRITE, getScope(parent.getParent()));
-        }
-        throw new NotImplementedException(parent);
-    }
+	private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode node) {
+		ASTNode parent= node.getParent();
+		if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
+				|| parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
+				|| parent instanceof WhileStatement) {
+			return getAccessTypeAndScope(parent);
+		}
+		if (parent instanceof ImportDeclaration || parent instanceof MethodDeclaration
+				|| parent instanceof MethodInvocation || parent instanceof PackageDeclaration || parent instanceof Type
+				|| parent instanceof TypeDeclaration) {
+			return NULL_PAIR;
+		}
+		if (parent instanceof SingleVariableDeclaration) {
+			SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
+			return getAccessTypeAndScope(var.getParent());
+		}
+		if (parent instanceof VariableDeclarationFragment) {
+			VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
+			return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL, getScope(var));
+		}
+		if (parent instanceof Assignment) {
+			return Pair.of(WRITE, getScope(parent.getParent()));
+		}
+		if (parent instanceof InfixExpression) {
+			return Pair.of(READ, getScope(parent.getParent()));
+		}
+		if (parent instanceof PostfixExpression) {
+			return Pair.of(READ | WRITE, getScope(parent.getParent()));
+		}
+		throw new NotImplementedException(parent);
+	}
 
-    private ASTNode getScope(final ASTNode node) {
-        if (node instanceof Block || node instanceof EnhancedForStatement || node instanceof ForStatement
-                || node instanceof IfStatement || node instanceof WhileStatement) {
-            return node;
-        }
-        if (node instanceof Expression || node instanceof Statement || node instanceof VariableDeclaration) {
-            return getScope(node.getParent());
-        }
-        throw new NotImplementedException(node);
-    }
+	private ASTNode getScope(final ASTNode node) {
+		if (node instanceof Block || node instanceof EnhancedForStatement || node instanceof ForStatement
+				|| node instanceof IfStatement || node instanceof WhileStatement) {
+			return node;
+		}
+		if (node instanceof Expression || node instanceof Statement || node instanceof VariableDeclaration) {
+			return getScope(node.getParent());
+		}
+		throw new NotImplementedException(node);
+	}
 
-    @Override
-    public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
-        astRoot.accept(this);
+	@Override
+	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
+		astRoot.accept(this);
 
-        for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
-            List<VariableAccess> variableAccesses= entry.getValue();
-            if (canReduceVariableScope(variableAccesses)) {
-                VariableAccess varDecl= variableAccesses.get(0);
-                remove(varDecl.getVariableName());
+		for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
+			List<VariableAccess> variableAccesses= entry.getValue();
+			if (canReduceVariableScope(variableAccesses)) {
+				VariableAccess varDecl= variableAccesses.get(0);
+				remove(varDecl.getVariableName());
 
-                for (VariableAccess varAccess : variableAccesses) {
-                    if (varAccess.getAccessType() == WRITE) {
-                        replace(varDecl, varAccess);
-                    } // TODO JNR if (varAccess.getAccessType() & WRITE) {
-                }
-            }
-        }
+				for (VariableAccess varAccess : variableAccesses) {
+					if (varAccess.getAccessType() == WRITE) {
+						replace(varDecl, varAccess);
+					} // TODO JNR if (varAccess.getAccessType() & WRITE) {
+				}
+			}
+		}
 
-        // TODO JNR remove writes when there are no reads after
-        // TODO JNR remove double writes when there are no reads after
+		// TODO JNR remove writes when there are no reads after
+		// TODO JNR remove double writes when there are no reads after
 
-        return cuRewrite.getASTRewrite();
-    }
+		return cuRewrite.getASTRewrite();
+	}
 
-    private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTNode scope= varAccess.getScope();
-        Name varName= varAccess.getVariableName();
-        Type varType= getType(varDecl.getVariableName().getParent());
-        if (scope instanceof Block) {
-            List<Statement> statements= ASTNodes.statements((Block) scope);
-            for (Statement statement : statements) {
-                Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
-                Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
-                if (statement.equals(parentStatement)) {
-                    VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
-                    VariableDeclarationStatement vds= ast.getAST().newVariableDeclarationStatement(vdf);
-                    vds.setType(varType);
-                    cuRewrite.getASTRewrite().replace(statement, vds, null);
-                    break;
-                }
-            }
-        } else if (scope instanceof EnhancedForStatement) {
-            EnhancedForStatement efs= (EnhancedForStatement) scope;
-            EnhancedForStatement newEfs= ast.createCopyTarget(efs);
-            newEfs.setParameter(ast.createCopyTarget(efs.getParameter()));
-            newEfs.setExpression(ast.createCopyTarget(efs.getExpression()));
-            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
-                newEfs.setBody(copy(efs.getBody(), varName));
-            }
-            cuRewrite.getASTRewrite().replace(efs, newEfs, null);
-        } else if (scope instanceof ForStatement) {
-            ForStatement fs= (ForStatement) scope;
-            ForStatement newFs= ast.createCopyTarget(fs);
-            List<Expression> initializers= ASTNodes.initializers(newFs);
-            if (initializers.size() != 1) {
-                throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
-            }
-            Expression init= initializers.remove(0);
-            VariableDeclarationFragment vdf= getVariableDeclarationFragment(init, varName);
-            VariableDeclarationExpression vde= ast.getAST().newVariableDeclarationExpression(vdf);
-            vde.setType(varType);
-            initializers.add(vde);
-            cuRewrite.getASTRewrite().replace(fs, newFs, null);
-            // TODO JNR
-            // if (equalNotNull(fs.getBody(), parentStatement)) {
-            // newFs.setBody(copy(fs.getBody()));
-            // }
-        } else if (scope instanceof WhileStatement) {
-            WhileStatement ws= (WhileStatement) scope;
-            WhileStatement newWs= ast.getAST().newWhileStatement();
-            newWs.setExpression(ast.createCopyTarget(ws.getExpression()));
-            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
-                newWs.setBody(copy(ws.getBody(), varName));
-            }
-            cuRewrite.getASTRewrite().replace(ws, newWs, null);
-        } else if (scope instanceof IfStatement) {
-            IfStatement is= (IfStatement) scope;
-            IfStatement newIs= ast.getAST().newIfStatement();
-            newIs.setExpression(ast.createCopyTarget(is.getExpression()));
-            Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
-                newIs.setThenStatement(copy(is.getThenStatement(), varName));
-                if (is.getElseStatement() != null) {
-                    newIs.setElseStatement(ast.createCopyTarget(is.getElseStatement()));
-                }
-            } else if (Utils.equalNotNull(is.getElseStatement(), parentStatement)) {
-                if (is.getThenStatement() != null) {
-                    newIs.setThenStatement(ast.createCopyTarget(is.getThenStatement()));
-                }
-                newIs.setElseStatement(copy(is.getElseStatement(), varName));
-            } else {
-                throw new IllegalStateException(is,
-                        "Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
-            }
-            cuRewrite.getASTRewrite().replace(is, newIs, null);
-        } else {
-            throw new NotImplementedException(scope);
-        }
-    }
+	private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTNode scope= varAccess.getScope();
+		Name varName= varAccess.getVariableName();
+		Type varType= getType(varDecl.getVariableName().getParent());
+		if (scope instanceof Block) {
+			List<Statement> statements= ASTNodes.statements((Block) scope);
+			for (Statement statement : statements) {
+				Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
+				Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
+				if (statement.equals(parentStatement)) {
+					VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
+					VariableDeclarationStatement vds= ast.getAST().newVariableDeclarationStatement(vdf);
+					vds.setType(varType);
+					cuRewrite.getASTRewrite().replace(statement, vds, null);
+					break;
+				}
+			}
+		} else if (scope instanceof EnhancedForStatement) {
+			EnhancedForStatement efs= (EnhancedForStatement) scope;
+			EnhancedForStatement newEfs= ast.createCopyTarget(efs);
+			newEfs.setParameter(ast.createCopyTarget(efs.getParameter()));
+			newEfs.setExpression(ast.createCopyTarget(efs.getExpression()));
+			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
+				newEfs.setBody(copy(efs.getBody(), varName));
+			}
+			cuRewrite.getASTRewrite().replace(efs, newEfs, null);
+		} else if (scope instanceof ForStatement) {
+			ForStatement fs= (ForStatement) scope;
+			ForStatement newFs= ast.createCopyTarget(fs);
+			List<Expression> initializers= ASTNodes.initializers(newFs);
+			if (initializers.size() != 1) {
+				throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
+			}
+			Expression init= initializers.remove(0);
+			VariableDeclarationFragment vdf= getVariableDeclarationFragment(init, varName);
+			VariableDeclarationExpression vde= ast.getAST().newVariableDeclarationExpression(vdf);
+			vde.setType(varType);
+			initializers.add(vde);
+			cuRewrite.getASTRewrite().replace(fs, newFs, null);
+			// TODO JNR
+			// if (equalNotNull(fs.getBody(), parentStatement)) {
+			// newFs.setBody(copy(fs.getBody()));
+			// }
+		} else if (scope instanceof WhileStatement) {
+			WhileStatement ws= (WhileStatement) scope;
+			WhileStatement newWs= ast.getAST().newWhileStatement();
+			newWs.setExpression(ast.createCopyTarget(ws.getExpression()));
+			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
+				newWs.setBody(copy(ws.getBody(), varName));
+			}
+			cuRewrite.getASTRewrite().replace(ws, newWs, null);
+		} else if (scope instanceof IfStatement) {
+			IfStatement is= (IfStatement) scope;
+			IfStatement newIs= ast.getAST().newIfStatement();
+			newIs.setExpression(ast.createCopyTarget(is.getExpression()));
+			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
+				newIs.setThenStatement(copy(is.getThenStatement(), varName));
+				if (is.getElseStatement() != null) {
+					newIs.setElseStatement(ast.createCopyTarget(is.getElseStatement()));
+				}
+			} else if (Utils.equalNotNull(is.getElseStatement(), parentStatement)) {
+				if (is.getThenStatement() != null) {
+					newIs.setThenStatement(ast.createCopyTarget(is.getThenStatement()));
+				}
+				newIs.setElseStatement(copy(is.getElseStatement(), varName));
+			} else {
+				throw new IllegalStateException(is,
+						"Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
+			}
+			cuRewrite.getASTRewrite().replace(is, newIs, null);
+		} else {
+			throw new NotImplementedException(scope);
+		}
+	}
 
-    private Block copy(final Statement stmtToCopy, final Name varName) {
-        if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
-            Block block= cuRewrite.getAST().newBlock();
-            Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
-            if (a == null) {
-                throw new NotImplementedException(stmtToCopy);
-            }
-            VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
-            ASTNodes.statements(block).add(cuRewrite.getAST().newVariableDeclarationStatement(vdf));
-            return block;
-        }
-        // We should never come here if we had a Block statement, see the replace()
-        // method
-        throw new NotImplementedException(stmtToCopy);
-    }
+	private Block copy(final Statement stmtToCopy, final Name varName) {
+		if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
+			Block block= cuRewrite.getAST().newBlock();
+			Assignment a= ASTNodes.asExpression(stmtToCopy, Assignment.class);
+			if (a == null) {
+				throw new NotImplementedException(stmtToCopy);
+			}
+			VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
+			ASTNodes.statements(block).add(cuRewrite.getAST().newVariableDeclarationStatement(vdf));
+			return block;
+		}
+		// We should never come here if we had a Block statement, see the replace()
+		// method
+		throw new NotImplementedException(stmtToCopy);
+	}
 
-    private Type getType(final ASTNode node) {
-        if (node instanceof VariableDeclarationStatement) {
-            VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
-            return cuRewrite.getASTBuilder().createCopyTarget(vds.getType());
-        }
+	private Type getType(final ASTNode node) {
+		if (node instanceof VariableDeclarationStatement) {
+			VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
+			return cuRewrite.getASTBuilder().createCopyTarget(vds.getType());
+		}
 
-        return getType(node.getParent());
-    }
+		return getType(node.getParent());
+	}
 
-    private VariableDeclarationFragment getVariableDeclarationFragment(final Expression exprToReplace, final Name varName) {
-        if (exprToReplace instanceof Assignment) {
-            Assignment a= (Assignment) exprToReplace;
-            if (a.getLeftHandSide() instanceof SimpleName) {
-                SimpleName sn= (SimpleName) a.getLeftHandSide();
-                if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    ASTNodeFactory ast= cuRewrite.getASTBuilder();
-                    VariableDeclarationFragment vdf= ast.getAST().newVariableDeclarationFragment();
-                    vdf.setInitializer(ast.createCopyTarget(a.getRightHandSide()));
-                    vdf.setName(ast.createCopyTarget(sn));
-                    return vdf;
-                }
-            }
-            throw new NotImplementedException(a.getLeftHandSide());
-        }
-        throw new NotImplementedException(exprToReplace);
-    }
+	private VariableDeclarationFragment getVariableDeclarationFragment(final Expression exprToReplace, final Name varName) {
+		if (exprToReplace instanceof Assignment) {
+			Assignment a= (Assignment) exprToReplace;
+			if (a.getLeftHandSide() instanceof SimpleName) {
+				SimpleName sn= (SimpleName) a.getLeftHandSide();
+				if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+					VariableDeclarationFragment vdf= ast.getAST().newVariableDeclarationFragment();
+					vdf.setInitializer(ast.createCopyTarget(a.getRightHandSide()));
+					vdf.setName(ast.createCopyTarget(sn));
+					return vdf;
+				}
+			}
+			throw new NotImplementedException(a.getLeftHandSide());
+		}
+		throw new NotImplementedException(exprToReplace);
+	}
 
-    private void remove(final ASTNode node) {
-        if (node instanceof VariableDeclarationFragment) {
-            cuRewrite.getASTRewrite().remove(node.getParent(), null);
-        } else {
-            remove(node.getParent());
-        }
-    }
+	private void remove(final ASTNode node) {
+		if (node instanceof VariableDeclarationFragment) {
+			cuRewrite.getASTRewrite().remove(node.getParent(), null);
+		} else {
+			remove(node.getParent());
+		}
+	}
 
-    private boolean canReduceVariableScope(final List<VariableAccess> variableAccesses) {
-        VariableAccess varDecl= variableAccesses.get(0);
+	private boolean canReduceVariableScope(final List<VariableAccess> variableAccesses) {
+		VariableAccess varDecl= variableAccesses.get(0);
 
-        VariableAccess lastWrite= null;
-        for (VariableAccess varAccess : variableAccesses) {
-            if (varAccess.getAccessType() == WRITE) {
-                // Is only write
-                lastWrite= varAccess;
-            } else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
-                    && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(varAccess.getScope(),
-                            lastWrite.getScope(), varDecl.getScope())) {
-                // TODO JNR return sublist of reduceable scope
-                return false;
-            }
-        }
+		VariableAccess lastWrite= null;
+		for (VariableAccess varAccess : variableAccesses) {
+			if (varAccess.getAccessType() == WRITE) {
+				// Is only write
+				lastWrite= varAccess;
+			} else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
+					&& !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(varAccess.getScope(),
+							lastWrite.getScope(), varDecl.getScope())) {
+				// TODO JNR return sublist of reduceable scope
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(final ASTNode readScope, final ASTNode writeScope,
-            final ASTNode varScope) {
-        return !varScope.equals(readScope) && !varScope.equals(writeScope)
-                && (readScope.equals(writeScope) || isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                        readScope.getParent(), writeScope, varScope));
-    }
+	private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(final ASTNode readScope, final ASTNode writeScope,
+			final ASTNode varScope) {
+		return !varScope.equals(readScope) && !varScope.equals(writeScope)
+				&& (readScope.equals(writeScope) || isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
+						readScope.getParent(), writeScope, varScope));
+	}
 }

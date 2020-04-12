@@ -31,75 +31,75 @@ import org.eclipse.jdt.core.ICompilationUnit;
 
 /** Work item for the {@link ApplyRefactoringsJob}. */
 public class RefactoringUnit implements Comparable {
-    private final ICompilationUnit compilationUnit;
-    private final JavaProjectOptions options;
+	private final ICompilationUnit compilationUnit;
+	private final JavaProjectOptions options;
 
-    /**
-     * CleanupUnit.
-     *
-     * @param compilationUnit compilationUnit
-     * @param options         options
-     */
-    public RefactoringUnit(final ICompilationUnit compilationUnit, final JavaProjectOptions options) {
-        this.compilationUnit= compilationUnit;
-        this.options= options;
-    }
+	/**
+	 * CleanupUnit.
+	 *
+	 * @param compilationUnit compilationUnit
+	 * @param options         options
+	 */
+	public RefactoringUnit(final ICompilationUnit compilationUnit, final JavaProjectOptions options) {
+		this.compilationUnit= compilationUnit;
+		this.options= options;
+	}
 
-    ICompilationUnit getCompilationUnit() {
-        return compilationUnit;
-    }
+	ICompilationUnit getCompilationUnit() {
+		return compilationUnit;
+	}
 
-    JavaProjectOptions getOptions() {
-        return options;
-    }
+	JavaProjectOptions getOptions() {
+		return options;
+	}
 
-    @Override
-    public String toString() {
-        return getCompilationUnit().toString();
-    }
+	@Override
+	public String toString() {
+		return getCompilationUnit().toString();
+	}
 
-    @Override
-    public int compareTo(final Object o) {
-        if (equals(o)) {
-            return 0;
-        }
+	@Override
+	public int compareTo(final Object o) {
+		if (equals(o)) {
+			return 0;
+		}
 
-        if (o == null || !(o instanceof RefactoringUnit)) {
-            return 1;
-        }
+		if (o == null || !(o instanceof RefactoringUnit)) {
+			return 1;
+		}
 
-        RefactoringUnit other= (RefactoringUnit) o;
+		RefactoringUnit other= (RefactoringUnit) o;
 
-        if (this.compilationUnit == null) {
-            if (other.compilationUnit == null) {
-                return 0;
-            }
+		if (this.compilationUnit == null) {
+			if (other.compilationUnit == null) {
+				return 0;
+			}
 
-            return 1;
-        }
-        if (other.compilationUnit == null) {
-            return -1;
-        }
+			return 1;
+		}
+		if (other.compilationUnit == null) {
+			return -1;
+		}
 
-        return compilationUnit.getElementName().compareTo(other.compilationUnit.getElementName());
-    }
+		return compilationUnit.getElementName().compareTo(other.compilationUnit.getElementName());
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(compilationUnit);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(compilationUnit);
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
 
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
 
-        RefactoringUnit other= (RefactoringUnit) obj;
-        return Objects.equals(compilationUnit, other.compilationUnit);
-    }
+		RefactoringUnit other= (RefactoringUnit) obj;
+		return Objects.equals(compilationUnit, other.compilationUnit);
+	}
 }

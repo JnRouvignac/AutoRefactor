@@ -34,78 +34,78 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ConditionalExpression node) {
-        InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+	@Override
+	public boolean visit(final ConditionalExpression node) {
+		InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
 
-        if (condition != null
-                && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                && !condition.hasExtendedOperands()) {
-            Expression hardCodedExpression;
-            Expression valuedExpression;
+		if (condition != null
+				&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+				&& !condition.hasExtendedOperands()) {
+			Expression hardCodedExpression;
+			Expression valuedExpression;
 
-            if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
-                hardCodedExpression= node.getThenExpression();
-                valuedExpression= node.getElseExpression();
-            } else {
-                hardCodedExpression= node.getElseExpression();
-                valuedExpression= node.getThenExpression();
-            }
+			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
+				hardCodedExpression= node.getThenExpression();
+				valuedExpression= node.getElseExpression();
+			} else {
+				hardCodedExpression= node.getElseExpression();
+				valuedExpression= node.getThenExpression();
+			}
 
-            if (ASTNodes.isHardCoded(hardCodedExpression) && ASTNodes.isPassive(valuedExpression)) {
-                return maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getRightOperand(), condition.getLeftOperand())
-                        && maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getLeftOperand(), condition.getRightOperand());
-            }
-        }
+			if (ASTNodes.isHardCoded(hardCodedExpression) && ASTNodes.isPassive(valuedExpression)) {
+				return maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getRightOperand(), condition.getLeftOperand())
+						&& maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getLeftOperand(), condition.getRightOperand());
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeReplaceWithValue(final ConditionalExpression node, final Expression hardCodedExpression,
-            final Expression valuedExpression, final Expression hardCodedOperand, final Expression valuedOperand) {
-        if (ASTNodes.match(hardCodedOperand, hardCodedExpression)
-                && ASTNodes.match(valuedOperand, valuedExpression)) {
-            replaceWithValue(node, valuedExpression);
-            return false;
-        }
+	private boolean maybeReplaceWithValue(final ConditionalExpression node, final Expression hardCodedExpression,
+			final Expression valuedExpression, final Expression hardCodedOperand, final Expression valuedOperand) {
+		if (ASTNodes.match(hardCodedOperand, hardCodedExpression)
+				&& ASTNodes.match(valuedOperand, valuedExpression)) {
+			replaceWithValue(node, valuedExpression);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(valuedExpression)), null);
-    }
+		rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(valuedExpression)), null);
+	}
 }

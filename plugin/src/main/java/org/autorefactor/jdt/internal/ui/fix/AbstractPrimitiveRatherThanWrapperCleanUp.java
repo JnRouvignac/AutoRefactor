@@ -55,315 +55,315 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the wrapper fully qualified name.
-     *
-     * @return the wrapper fully qualified name.
-     */
-    public abstract String getWrapperFullyQualifiedName();
+	/**
+	 * Get the wrapper fully qualified name.
+	 *
+	 * @return the wrapper fully qualified name.
+	 */
+	public abstract String getWrapperFullyQualifiedName();
 
-    /**
-     * Get the primitive type name.
-     *
-     * @return the primitive type name.
-     */
-    public abstract String getPrimitiveTypeName();
+	/**
+	 * Get the primitive type name.
+	 *
+	 * @return the primitive type name.
+	 */
+	public abstract String getPrimitiveTypeName();
 
-    /**
-     * Get the literal class.
-     *
-     * @return the literal class.
-     */
-    public abstract Class<? extends Expression> getLiteralClass();
+	/**
+	 * Get the literal class.
+	 *
+	 * @return the literal class.
+	 */
+	public abstract Class<? extends Expression> getLiteralClass();
 
-    /**
-     * Get the prefix in safe operators.
-     *
-     * @return the prefix in safe operators.
-     */
-    public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the prefix in safe operators.
+	 *
+	 * @return the prefix in safe operators.
+	 */
+	public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the Infix In Safe Operators.
-     *
-     * @return the Infix In Safe Operators.
-     */
-    public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the Infix In Safe Operators.
+	 *
+	 * @return the Infix In Safe Operators.
+	 */
+	public List<InfixExpression.Operator> getInfixInSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the postfix in safe operators.
-     *
-     * @return the postfix in safe operators.
-     */
-    public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the postfix in safe operators.
+	 *
+	 * @return the postfix in safe operators.
+	 */
+	public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the prefix out safe operators.
-     *
-     * @return the prefix out safe operators.
-     */
-    public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the prefix out safe operators.
+	 *
+	 * @return the prefix out safe operators.
+	 */
+	public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the infix out safe operators.
-     *
-     * @return the infix out safe operators.
-     */
-    public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the infix out safe operators.
+	 *
+	 * @return the infix out safe operators.
+	 */
+	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the postfix out safe operators.
-     *
-     * @return the postfix out safe operators.
-     */
-    public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the postfix out safe operators.
+	 *
+	 * @return the postfix out safe operators.
+	 */
+	public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the assignment out safe operators.
-     *
-     * @return the assignment out safe operators.
-     */
-    public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return new ArrayList<>(0);
-    }
+	/**
+	 * Get the assignment out safe operators.
+	 *
+	 * @return the assignment out safe operators.
+	 */
+	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
+		return new ArrayList<>(0);
+	}
 
-    /**
-     * Get the safe in constants.
-     *
-     * @return the safe in constants.
-     */
-    public String[] getSafeInConstants() {
-        return new String[0];
-    }
+	/**
+	 * Get the safe in constants.
+	 *
+	 * @return the safe in constants.
+	 */
+	public String[] getSafeInConstants() {
+		return new String[0];
+	}
 
-    /**
-     * True if the specific primitive is allowed.
-     *
-     * @param node The node
-     *
-     * @return True if the specific primitive is allowed.
-     */
-    public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        return false;
-    }
+	/**
+	 * True if the specific primitive is allowed.
+	 *
+	 * @param node The node
+	 *
+	 * @return True if the specific primitive is allowed.
+	 */
+	public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
+		return false;
+	}
 
-    @Override
-    public boolean visit(final VariableDeclarationStatement node) {
-        if (node.fragments().size() == 1) {
-            VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+	@Override
+	public boolean visit(final VariableDeclarationStatement node) {
+		if (node.fragments().size() == 1) {
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
-            if (fragment.resolveBinding() != null
-                    && ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
-                    && fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
-                VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
-                Block parentBlock= ASTNodes.getAncestorOrNull(fragment, Block.class);
+			if (fragment.resolveBinding() != null
+					&& ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
+					&& fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
+				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
+				Block parentBlock= ASTNodes.getAncestorOrNull(fragment, Block.class);
 
-                if (parentBlock != null) {
-                    varOccurrenceVisitor.visitNode(parentBlock);
+				if (parentBlock != null) {
+					varOccurrenceVisitor.visitNode(parentBlock);
 
-                    if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-                        refactorWrapper(node);
-                        return false;
-                    }
-                }
-            }
-        }
+					if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
+						refactorWrapper(node);
+						return false;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorWrapper(final VariableDeclarationStatement node) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        Type primitiveType= ast.type(getPrimitiveTypeName());
-        cuRewrite.getASTRewrite().replace(node.getType(), primitiveType, null);
-    }
+	private void refactorWrapper(final VariableDeclarationStatement node) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		Type primitiveType= ast.type(getPrimitiveTypeName());
+		cuRewrite.getASTRewrite().replace(node.getType(), primitiveType, null);
+	}
 
-    private boolean isNotNull(final Expression expression) {
-        if (expression instanceof ParenthesizedExpression) {
-            ParenthesizedExpression parenthesizedExpression= (ParenthesizedExpression) expression;
-            return isNotNull(parenthesizedExpression.getExpression());
-        }
+	private boolean isNotNull(final Expression expression) {
+		if (expression instanceof ParenthesizedExpression) {
+			ParenthesizedExpression parenthesizedExpression= (ParenthesizedExpression) expression;
+			return isNotNull(parenthesizedExpression.getExpression());
+		}
 
-        if (expression instanceof ConditionalExpression) {
-            ConditionalExpression prefixExpression= (ConditionalExpression) expression;
-            return isNotNull(prefixExpression.getThenExpression()) && isNotNull(prefixExpression.getElseExpression());
-        }
+		if (expression instanceof ConditionalExpression) {
+			ConditionalExpression prefixExpression= (ConditionalExpression) expression;
+			return isNotNull(prefixExpression.getThenExpression()) && isNotNull(prefixExpression.getElseExpression());
+		}
 
-        if (getLiteralClass().equals(expression.getClass())) {
-            return true;
-        }
+		if (getLiteralClass().equals(expression.getClass())) {
+			return true;
+		}
 
-        if (expression instanceof QualifiedName) {
-            QualifiedName qualifiedName= (QualifiedName) expression;
-            return ASTNodes.hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
-                    && (ASTNodes.isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
-                            || ASTNodes.isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
-        }
+		if (expression instanceof QualifiedName) {
+			QualifiedName qualifiedName= (QualifiedName) expression;
+			return ASTNodes.hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
+					&& (ASTNodes.isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
+							|| ASTNodes.isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
+		}
 
-        if (expression instanceof InfixExpression) {
-            InfixExpression infixExpression= (InfixExpression) expression;
-            return getInfixInSafeOperators().contains(infixExpression.getOperator());
-        }
+		if (expression instanceof InfixExpression) {
+			InfixExpression infixExpression= (InfixExpression) expression;
+			return getInfixInSafeOperators().contains(infixExpression.getOperator());
+		}
 
-        if (expression instanceof PrefixExpression) {
-            PrefixExpression prefixExpression= (PrefixExpression) expression;
-            return getPrefixInSafeOperators().contains(prefixExpression.getOperator());
-        }
+		if (expression instanceof PrefixExpression) {
+			PrefixExpression prefixExpression= (PrefixExpression) expression;
+			return getPrefixInSafeOperators().contains(prefixExpression.getOperator());
+		}
 
-        if (expression instanceof PostfixExpression) {
-            PostfixExpression postfixExpression= (PostfixExpression) expression;
-            return getPostfixInSafeOperators().contains(postfixExpression.getOperator());
-        }
+		if (expression instanceof PostfixExpression) {
+			PostfixExpression postfixExpression= (PostfixExpression) expression;
+			return getPostfixInSafeOperators().contains(postfixExpression.getOperator());
+		}
 
-        if (expression instanceof CastExpression) {
-            CastExpression castExpression= (CastExpression) expression;
-            return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-                    || ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpression.getExpression());
-        }
+		if (expression instanceof CastExpression) {
+			CastExpression castExpression= (CastExpression) expression;
+			return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
+					|| ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+							&& isNotNull(castExpression.getExpression());
+		}
 
-        if (expression instanceof MethodInvocation) {
-            MethodInvocation mi= (MethodInvocation) expression;
-            return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
-        }
+		if (expression instanceof MethodInvocation) {
+			MethodInvocation mi= (MethodInvocation) expression;
+			return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private class VarOccurrenceVisitor extends InterruptibleVisitor {
-        private final VariableDeclarationFragment varDecl;
+	private class VarOccurrenceVisitor extends InterruptibleVisitor {
+		private final VariableDeclarationFragment varDecl;
 
-        private boolean isPrimitiveAllowed= true;
+		private boolean isPrimitiveAllowed= true;
 
-        private boolean isVarReturned;
+		private boolean isVarReturned;
 
-        private int autoBoxingCount;
+		private int autoBoxingCount;
 
-        public VarOccurrenceVisitor(final VariableDeclarationFragment var) {
-            varDecl= var;
-        }
+		public VarOccurrenceVisitor(final VariableDeclarationFragment var) {
+			varDecl= var;
+		}
 
-        public boolean isPrimitiveAllowed() {
-            return isPrimitiveAllowed;
-        }
+		public boolean isPrimitiveAllowed() {
+			return isPrimitiveAllowed;
+		}
 
-        public int getAutoBoxingCount() {
-            return autoBoxingCount;
-        }
+		public int getAutoBoxingCount() {
+			return autoBoxingCount;
+		}
 
-        @Override
-        public boolean visit(final SimpleName aVar) {
-            if (isPrimitiveAllowed && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
-                    && !aVar.getParent().equals(varDecl)) {
-                isPrimitiveAllowed= isPrimitiveAllowed(aVar);
+		@Override
+		public boolean visit(final SimpleName aVar) {
+			if (isPrimitiveAllowed && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
+					&& !aVar.getParent().equals(varDecl)) {
+				isPrimitiveAllowed= isPrimitiveAllowed(aVar);
 
-                if (!isPrimitiveAllowed) {
-                    return interruptVisit();
-                }
-            }
+				if (!isPrimitiveAllowed) {
+					return interruptVisit();
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean isPrimitiveAllowed(final ASTNode node) {
-            ASTNode parentNode= node.getParent();
+		private boolean isPrimitiveAllowed(final ASTNode node) {
+			ASTNode parentNode= node.getParent();
 
-            switch (parentNode.getNodeType()) {
-            case ASTNode.PARENTHESIZED_EXPRESSION:
-                return isPrimitiveAllowed(parentNode);
+			switch (parentNode.getNodeType()) {
+			case ASTNode.PARENTHESIZED_EXPRESSION:
+				return isPrimitiveAllowed(parentNode);
 
-            case ASTNode.CAST_EXPRESSION:
-                CastExpression castExpression= (CastExpression) parentNode;
-                return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName());
+			case ASTNode.CAST_EXPRESSION:
+				CastExpression castExpression= (CastExpression) parentNode;
+				return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName());
 
-            case ASTNode.ASSIGNMENT:
-                Assignment assignment= (Assignment) parentNode;
+			case ASTNode.ASSIGNMENT:
+				Assignment assignment= (Assignment) parentNode;
 
-                if (getAssignmentOutSafeOperators().contains(assignment.getOperator())) {
-                    return true;
-                }
+				if (getAssignmentOutSafeOperators().contains(assignment.getOperator())) {
+					return true;
+				}
 
-                if (assignment.getLeftHandSide().equals(node)) {
-                    return isNotNull(assignment.getRightHandSide());
-                }
+				if (assignment.getLeftHandSide().equals(node)) {
+					return isNotNull(assignment.getRightHandSide());
+				}
 
-                if (assignment.getRightHandSide().equals(node)) {
-                    if (assignment.getLeftHandSide() instanceof Name) {
-                        return isOfType(((Name) assignment.getLeftHandSide()).resolveTypeBinding());
-                    }
-                    if (assignment.getLeftHandSide() instanceof FieldAccess) {
-                        return isOfType(((FieldAccess) assignment.getLeftHandSide()).resolveTypeBinding());
-                    }
-                }
+				if (assignment.getRightHandSide().equals(node)) {
+					if (assignment.getLeftHandSide() instanceof Name) {
+						return isOfType(((Name) assignment.getLeftHandSide()).resolveTypeBinding());
+					}
+					if (assignment.getLeftHandSide() instanceof FieldAccess) {
+						return isOfType(((FieldAccess) assignment.getLeftHandSide()).resolveTypeBinding());
+					}
+				}
 
-                return false;
+				return false;
 
-            case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-                VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
-                return fragment.getInitializer().equals(node) && isOfType(fragment.getName().resolveTypeBinding());
+			case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+				VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
+				return fragment.getInitializer().equals(node) && isOfType(fragment.getName().resolveTypeBinding());
 
-            case ASTNode.RETURN_STATEMENT:
-                ReturnStatement returnStatement= (ReturnStatement) parentNode;
-                if (returnStatement.getExpression().equals(node)) {
-                    MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
+			case ASTNode.RETURN_STATEMENT:
+				ReturnStatement returnStatement= (ReturnStatement) parentNode;
+				if (returnStatement.getExpression().equals(node)) {
+					MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
 
-                    if (method != null && method.getReturnType2() != null) {
-                        if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
-                            return true;
-                        }
-                        if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
-                            if (!isVarReturned) {
-                                isVarReturned= true;
-                                autoBoxingCount++;
-                            }
+					if (method != null && method.getReturnType2() != null) {
+						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
+							return true;
+						}
+						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
+							if (!isVarReturned) {
+								isVarReturned= true;
+								autoBoxingCount++;
+							}
 
-                            return true;
-                        }
-                    }
-                }
+							return true;
+						}
+					}
+				}
 
-                return false;
+				return false;
 
-            case ASTNode.CONDITIONAL_EXPRESSION:
-                ConditionalExpression conditionalExpression= (ConditionalExpression) parentNode;
-                return conditionalExpression.getExpression().equals(node);
+			case ASTNode.CONDITIONAL_EXPRESSION:
+				ConditionalExpression conditionalExpression= (ConditionalExpression) parentNode;
+				return conditionalExpression.getExpression().equals(node);
 
-            case ASTNode.PREFIX_EXPRESSION:
-                return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());
+			case ASTNode.PREFIX_EXPRESSION:
+				return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());
 
-            case ASTNode.INFIX_EXPRESSION:
-                return getInfixOutSafeOperators().contains(((InfixExpression) parentNode).getOperator());
+			case ASTNode.INFIX_EXPRESSION:
+				return getInfixOutSafeOperators().contains(((InfixExpression) parentNode).getOperator());
 
-            case ASTNode.POSTFIX_EXPRESSION:
-                return getPostfixOutSafeOperators().contains(((PostfixExpression) parentNode).getOperator());
+			case ASTNode.POSTFIX_EXPRESSION:
+				return getPostfixOutSafeOperators().contains(((PostfixExpression) parentNode).getOperator());
 
-            default:
-                return isSpecificPrimitiveAllowed(node);
-            }
-        }
+			default:
+				return isSpecificPrimitiveAllowed(node);
+			}
+		}
 
-        private boolean isOfType(final ITypeBinding resolveTypeBinding) {
-            if (ASTNodes.hasType(resolveTypeBinding, getPrimitiveTypeName())) {
-                return true;
-            }
-            if (ASTNodes.hasType(resolveTypeBinding, getWrapperFullyQualifiedName())) {
-                autoBoxingCount++;
-                return true;
-            }
+		private boolean isOfType(final ITypeBinding resolveTypeBinding) {
+			if (ASTNodes.hasType(resolveTypeBinding, getPrimitiveTypeName())) {
+				return true;
+			}
+			if (ASTNodes.hasType(resolveTypeBinding, getWrapperFullyQualifiedName())) {
+				autoBoxingCount++;
+				return true;
+			}
 
-            return false;
-        }
-    }
+			return false;
+		}
+	}
 }

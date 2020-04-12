@@ -39,103 +39,103 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 2;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 2;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-            replaceWith(node, "get"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            replaceWith(node, "add"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-            replaceWithAndSwapArguments(node, "add"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-            replaceWith(node, "toArray"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
-            replaceWith(node, "clear"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            replaceWithSpecial(node, "remove"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-            replaceWith(node, "remove"); //$NON-NLS-1$
-        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-            replaceWithAndSwapArguments(node, "set"); //$NON-NLS-1$
-        } else {
-            return true;
-        }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWith(node, "get"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWith(node, "add"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWithAndSwapArguments(node, "add"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWith(node, "toArray"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+			replaceWith(node, "clear"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWithSpecial(node, "remove"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWith(node, "remove"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWithAndSwapArguments(node, "set"); //$NON-NLS-1$
+		} else {
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private void replaceWith(final MethodInvocation node, final String newMethodName) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
-    }
+	private void replaceWith(final MethodInvocation node, final String newMethodName) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
+	}
 
-    private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
-        List<Expression> args= ASTNodes.arguments(node);
-        assertSize(args, 1);
-        Expression arg0= args.get(0);
+	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
+		List<Expression> args= ASTNodes.arguments(node);
+		assertSize(args, 1);
+		Expression arg0= args.get(0);
 
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
-        if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), rewrite.createMoveTarget(arg0)), null);
-        }
-    }
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
+		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
+			rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), rewrite.createMoveTarget(arg0)), null);
+		}
+	}
 
-    private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
-        List<Expression> args= ASTNodes.arguments(node);
-        assertSize(args, 2);
-        Expression arg1= args.get(1);
+	private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
+		List<Expression> args= ASTNodes.arguments(node);
+		assertSize(args, 2);
+		Expression arg1= args.get(1);
 
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
-        rewrite.moveToIndex(arg1, 0, rewrite.createMoveTarget(arg1), null);
-    }
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
+		rewrite.moveToIndex(arg1, 0, rewrite.createMoveTarget(arg1), null);
+	}
 
-    private void assertSize(final List<Expression> args, final int expectedSize) {
-        if (args == null) {
-            throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (args.size() != expectedSize) {
-            Expression node= !args.isEmpty() ? args.get(0) : null;
-            throw new IllegalArgumentException(node,
-                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        }
-    }
+	private void assertSize(final List<Expression> args, final int expectedSize) {
+		if (args == null) {
+			throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (args.size() != expectedSize) {
+			Expression node= !args.isEmpty() ? args.get(0) : null;
+			throw new IllegalArgumentException(node,
+					"Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}
+	}
 }

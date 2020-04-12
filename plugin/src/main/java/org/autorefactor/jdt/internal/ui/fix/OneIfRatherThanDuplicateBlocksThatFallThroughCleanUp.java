@@ -42,110 +42,110 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(cuRewrite, node);
-        node.accept(successiveIfVisitor);
-        return successiveIfVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(cuRewrite, node);
+		node.accept(successiveIfVisitor);
+		return successiveIfVisitor.getResult();
+	}
 
-    private static final class SuccessiveIfVisitor extends BlockSubVisitor {
-        public SuccessiveIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private static final class SuccessiveIfVisitor extends BlockSubVisitor {
+		public SuccessiveIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            if (getResult()
-                    && ASTNodes.fallsThrough(node.getThenStatement())) {
-                List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
-                AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
-                duplicateIfBlocks.add(node);
+		@Override
+		public boolean visit(final IfStatement node) {
+			if (getResult()
+					&& ASTNodes.fallsThrough(node.getThenStatement())) {
+				List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
+				AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
+				duplicateIfBlocks.add(node);
 
-                while (addOneMoreIf(duplicateIfBlocks, operandCount)) {
-                    // OK continue
-                }
+				while (addOneMoreIf(duplicateIfBlocks, operandCount)) {
+					// OK continue
+				}
 
-                if (duplicateIfBlocks.size() > 1) {
-                    mergeCode(duplicateIfBlocks);
-                    setResult(false);
-                    return false;
-                }
+				if (duplicateIfBlocks.size() > 1) {
+					mergeCode(duplicateIfBlocks);
+					setResult(false);
+					return false;
+				}
 
-                return true;
-            }
+				return true;
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final AtomicInteger operandCount) {
-            IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
+		private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final AtomicInteger operandCount) {
+			IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
 
-            if (lastBlock.getElseStatement() == null) {
-                IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
+			if (lastBlock.getElseStatement() == null) {
+				IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
-                if (nextSibling != null && nextSibling.getElseStatement() == null
-                        && !cuRewrite.getASTRewrite().hasBeenRefactored(nextSibling)
-                        && ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())
-                        && operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-                    operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
-                    duplicateIfBlocks.add(nextSibling);
-                    return true;
-                }
-            }
+				if (nextSibling != null && nextSibling.getElseStatement() == null
+						&& !cuRewrite.getASTRewrite().hasBeenRefactored(nextSibling)
+						&& ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())
+						&& operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+					operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
+					duplicateIfBlocks.add(nextSibling);
+					return true;
+				}
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
+			List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 
-            for (IfStatement ifStatement : duplicateIfBlocks) {
-                newConditions.add(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ifStatement.getExpression())));
-            }
+			for (IfStatement ifStatement : duplicateIfBlocks) {
+				newConditions.add(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ifStatement.getExpression())));
+			}
 
-            InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
-            IfStatement newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
+			InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
+			IfStatement newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
 
-            Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-            rewrite.replace(iterator.next(), newIf, null);
+			Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
+			rewrite.replace(iterator.next(), newIf, null);
 
-            while (iterator.hasNext()) {
-                rewrite.remove(iterator.next(), null);
-            }
-        }
-    }
+			while (iterator.hasNext()) {
+				rewrite.remove(iterator.next(), null);
+			}
+		}
+	}
 }

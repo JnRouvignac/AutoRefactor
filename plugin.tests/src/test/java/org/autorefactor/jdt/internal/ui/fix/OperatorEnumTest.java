@@ -38,73 +38,73 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.junit.Test;
 
 public class OperatorEnumTest {
-    // @DataProvider
-    public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
-        final List<Object[]> results= new ArrayList<>();
-        for (int i= 0; i < OperatorEnum.values().length; i++) {
-            OperatorEnum op1= OperatorEnum.values()[i];
-            for (int j= i; j < OperatorEnum.values().length; j++) {
-                OperatorEnum op2= OperatorEnum.values()[j];
-                if (op1 != op2 && op1.getPrecedence() == op2.getPrecedence()) {
-                    results.add(new Object[] { op1, op2 });
-                }
-            }
-        }
+	// @DataProvider
+	public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
+		final List<Object[]> results= new ArrayList<>();
+		for (int i= 0; i < OperatorEnum.values().length; i++) {
+			OperatorEnum op1= OperatorEnum.values()[i];
+			for (int j= i; j < OperatorEnum.values().length; j++) {
+				OperatorEnum op2= OperatorEnum.values()[j];
+				if (op1 != op2 && op1.getPrecedence() == op2.getPrecedence()) {
+					results.add(new Object[] { op1, op2 });
+				}
+			}
+		}
 
-        return results.iterator();
-    }
+		return results.iterator();
+	}
 
-    // @DataProvider
-    public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
-        final List<Object[]> results= new ArrayList<>();
-        for (int i= 0; i < OperatorEnum.values().length; i++) {
-            OperatorEnum op1= OperatorEnum.values()[i];
-            for (int j= i + 1; j < OperatorEnum.values().length; j++) {
-                OperatorEnum op2= OperatorEnum.values()[j];
-                if (op1.getPrecedence() != op2.getPrecedence()) {
-                    results.add(new Object[] { op1, op2 });
-                }
-            }
-        }
+	// @DataProvider
+	public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
+		final List<Object[]> results= new ArrayList<>();
+		for (int i= 0; i < OperatorEnum.values().length; i++) {
+			OperatorEnum op1= OperatorEnum.values()[i];
+			for (int j= i + 1; j < OperatorEnum.values().length; j++) {
+				OperatorEnum op2= OperatorEnum.values()[j];
+				if (op1.getPrecedence() != op2.getPrecedence()) {
+					results.add(new Object[] { op1, op2 });
+				}
+			}
+		}
 
-        return results.iterator();
-    }
+		return results.iterator();
+	}
 
-    @Test
-    public void compareSamePrecedenceOperators() {
-        for (final Iterator<Object[]> iter= getPairsOfOperatorsWithSamePrecedence(); iter.hasNext();) {
-            final Object[] args= iter.next();
-            compareSamePrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
-        }
-    }
+	@Test
+	public void compareSamePrecedenceOperators() {
+		for (final Iterator<Object[]> iter= getPairsOfOperatorsWithSamePrecedence(); iter.hasNext();) {
+			final Object[] args= iter.next();
+			compareSamePrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
+		}
+	}
 
-    public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-        assertEquals("Expected but did not get: " + op1 + " == " + op2, 0, OperatorEnum.compareTo(op1, op2)); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
+		assertEquals("Expected but did not get: " + op1 + " == " + op2, 0, OperatorEnum.compareTo(op1, op2)); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
-    @Test
-    public void compareDifferentPrecedenceOperators() {
-        for (final Iterator<Object[]> iter= getPairsOfOperatorsWithDifferentPrecedence(); iter.hasNext();) {
-            final Object[] args= iter.next();
-            compareDifferentPrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
-        }
-    }
+	@Test
+	public void compareDifferentPrecedenceOperators() {
+		for (final Iterator<Object[]> iter= getPairsOfOperatorsWithDifferentPrecedence(); iter.hasNext();) {
+			final Object[] args= iter.next();
+			compareDifferentPrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
+		}
+	}
 
-    public void compareDifferentPrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-        assertTrue("Expected but did not get: " + op1 + " > " + op2, OperatorEnum.compareTo(op1, op2) > 0); //$NON-NLS-1$ //$NON-NLS-2$
-        assertTrue("Expected but did not get: " + op1 + " < " + op2, OperatorEnum.compareTo(op2, op1) < 0); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	public void compareDifferentPrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
+		assertTrue("Expected but did not get: " + op1 + " > " + op2, OperatorEnum.compareTo(op1, op2) > 0); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue("Expected but did not get: " + op1 + " < " + op2, OperatorEnum.compareTo(op2, op1) < 0); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
-    @Test
-    public void simpleTestCompareExpressions() {
-        final AST ast= AST.newAST(AST.JLS8);
-        final Assignment op1= ast.newAssignment();
-        op1.setOperator(Assignment.Operator.ASSIGN);
-        final InfixExpression op2= ast.newInfixExpression();
-        op2.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
+	@Test
+	public void simpleTestCompareExpressions() {
+		final AST ast= AST.newAST(AST.JLS8);
+		final Assignment op1= ast.newAssignment();
+		op1.setOperator(Assignment.Operator.ASSIGN);
+		final InfixExpression op2= ast.newInfixExpression();
+		op2.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
 
-        assertTrue(OperatorEnum.compareTo(op1, op2) < 0);
+		assertTrue(OperatorEnum.compareTo(op1, op2) < 0);
 
-        assertEquals("Comparing unknown objects result in no decision", 0, OperatorEnum.compareTo(op1, null)); //$NON-NLS-1$
-    }
+		assertEquals("Comparing unknown objects result in no decision", 0, OperatorEnum.compareTo(op1, null)); //$NON-NLS-1$
+	}
 }

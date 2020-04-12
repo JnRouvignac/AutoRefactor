@@ -37,102 +37,102 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-            List<Expression> operands= ASTNodes.allOperands(node);
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
+			List<Expression> operands= ASTNodes.allOperands(node);
 
-            for (int i= 1; i < operands.size(); i++) {
-                Expression leftOperand= operands.get(i - 1);
-                Expression rightOperand= operands.get(i);
+			for (int i= 1; i < operands.size(); i++) {
+				Expression leftOperand= operands.get(i - 1);
+				Expression rightOperand= operands.get(i);
 
-                if (!maybeRefactorCondition(leftOperand, rightOperand) || !maybeRefactorCondition(rightOperand, leftOperand)) {
-                    return false;
-                }
-            }
-        }
+				if (!maybeRefactorCondition(leftOperand, rightOperand) || !maybeRefactorCondition(rightOperand, leftOperand)) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeRefactorCondition(final Expression operandWithRedundance, final Expression redundantOperand) {
-        InfixExpression complexCondition= ASTNodes.as(operandWithRedundance, InfixExpression.class);
+	private boolean maybeRefactorCondition(final Expression operandWithRedundance, final Expression redundantOperand) {
+		InfixExpression complexCondition= ASTNodes.as(operandWithRedundance, InfixExpression.class);
 
-        if (ASTNodes.isPrimitive(redundantOperand)
-                && ASTNodes.isPassive(redundantOperand)
-                && complexCondition != null
-                && ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-            List<Expression> operands= ASTNodes.allOperands(complexCondition);
+		if (ASTNodes.isPrimitive(redundantOperand)
+				&& ASTNodes.isPassive(redundantOperand)
+				&& complexCondition != null
+				&& ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
+			List<Expression> operands= ASTNodes.allOperands(complexCondition);
 
-            for (int i= 0; i < operands.size(); i++) {
-                List<Expression> previousOperands= operands.subList(0, i);
-                Expression duplicateOperand= operands.get(i);
-                List<Expression> nextOperands= operands.subList(i + 1, operands.size());
+			for (int i= 0; i < operands.size(); i++) {
+				List<Expression> previousOperands= operands.subList(0, i);
+				Expression duplicateOperand= operands.get(i);
+				List<Expression> nextOperands= operands.subList(i + 1, operands.size());
 
-                if (ASTNodes.isPrimitive(duplicateOperand)
-                        && ASTNodes.isPassive(duplicateOperand)
-                        && isPrimitiveAndPassive(nextOperands)
-                        && ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateOperand, redundantOperand)) {
-                    replaceDuplicateExpression(previousOperands, nextOperands, operandWithRedundance, complexCondition.getOperator());
-                    return false;
-                }
-            }
-        }
+				if (ASTNodes.isPrimitive(duplicateOperand)
+						&& ASTNodes.isPassive(duplicateOperand)
+						&& isPrimitiveAndPassive(nextOperands)
+						&& ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateOperand, redundantOperand)) {
+					replaceDuplicateExpression(previousOperands, nextOperands, operandWithRedundance, complexCondition.getOperator());
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isPrimitiveAndPassive(final List<Expression> operands) {
-        for (Expression operand : operands) {
-            if (!ASTNodes.isPrimitive(operand) || !ASTNodes.isPassive(operand)) {
-                return false;
-            }
-        }
+	private boolean isPrimitiveAndPassive(final List<Expression> operands) {
+		for (Expression operand : operands) {
+			if (!ASTNodes.isPrimitive(operand) || !ASTNodes.isPassive(operand)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        List<Expression> copyOfOperands= rewrite.createMoveTarget(previousOperands);
-        copyOfOperands.addAll(rewrite.createMoveTarget(nextOperands));
+		List<Expression> copyOfOperands= rewrite.createMoveTarget(previousOperands);
+		copyOfOperands.addAll(rewrite.createMoveTarget(nextOperands));
 
-        if (copyOfOperands.size() == 1) {
-            rewrite.replace(operandWithRedundance, copyOfOperands.get(0), null);
-        } else {
-            rewrite.replace(operandWithRedundance, ast.infixExpression(operator, copyOfOperands), null);
-        }
-    }
+		if (copyOfOperands.size() == 1) {
+			rewrite.replace(operandWithRedundance, copyOfOperands.get(0), null);
+		} else {
+			rewrite.replace(operandWithRedundance, ast.infixExpression(operator, copyOfOperands), null);
+		}
+	}
 }

@@ -31,22 +31,22 @@ import org.eclipse.core.runtime.jobs.Job;
  * Abstract super class of all refactoring jobs, marking them as belonging to a certain family, thereby simplifying the cancellation of multiple jobs.
  */
 public abstract class AbstractRefactoringJob extends Job {
-    /**
-     * Abstract super class of all refactoring jobs.
-     *
-     * @param name The job name
-     */
-    public AbstractRefactoringJob(final String name) {
-        super(name);
-    }
+	/**
+	 * Abstract super class of all refactoring jobs.
+	 *
+	 * @param name The job name
+	 */
+	public AbstractRefactoringJob(final String name) {
+		super(name);
+	}
 
-    /**
-     * All instances of this job belong to this family.
-     */
-    public static final Object FAMILY = new Object();
+	/**
+	 * All instances of this job belong to this family.
+	 */
+	public static final Object FAMILY = new Object();
 
-    @Override
-    public final boolean belongsTo(final Object family) {
-        return FAMILY == family || super.belongsTo(family);
-    }
+	@Override
+	public final boolean belongsTo(final Object family) {
+		return FAMILY == family || super.belongsTo(family);
+	}
 }

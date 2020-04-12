@@ -42,95 +42,95 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 /** AutoRefactorCleanUp. */
 public class AutoRefactorCleanUp implements ICleanUp {
-    private static final String KEY= "org.autorefactor.ui.autorefactor_clean_up"; //$NON-NLS-1$
+	private static final String KEY= "org.autorefactor.ui.autorefactor_clean_up"; //$NON-NLS-1$
 
-    private CleanUpOptions fOptions;
+	private CleanUpOptions fOptions;
 
-    private RefactoringStatus fStatus;
+	private RefactoringStatus fStatus;
 
-    /**
-     * Create the fix.
-     *
-     * @param context context
-     * @return Clean up fix
-     * @throws CoreException CoreException
-     */
-    public ICleanUpFix createFix(CleanUpContext context) throws CoreException {
-        CompilationUnit compilationUnit= context.getAST();
-        if (compilationUnit != null && fOptions.isEnabled(KEY)) {
-            return AutoRefactorFix.createCleanUp(compilationUnit, fOptions.isEnabled(KEY), fOptions);
-        }
+	/**
+	 * Create the fix.
+	 *
+	 * @param context context
+	 * @return Clean up fix
+	 * @throws CoreException CoreException
+	 */
+	public ICleanUpFix createFix(CleanUpContext context) throws CoreException {
+		CompilationUnit compilationUnit= context.getAST();
+		if (compilationUnit != null && fOptions.isEnabled(KEY)) {
+			return AutoRefactorFix.createCleanUp(compilationUnit, fOptions.isEnabled(KEY), fOptions);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * Get the requirements.
-     *
-     * @return Clean up requirements
-     */
-    public CleanUpRequirements getRequirements() {
-        return new CleanUpRequirements(true, true, true, new HashMap<String, String>());
-    }
+	/**
+	 * Get the requirements.
+	 *
+	 * @return Clean up requirements
+	 */
+	public CleanUpRequirements getRequirements() {
+		return new CleanUpRequirements(true, true, true, new HashMap<String, String>());
+	}
 
-    /**
-     * Get the step descriptions.
-     *
-     * @return The step descriptions.
-     */
-    public String[] getStepDescriptions() {
-        if (fOptions.isEnabled(KEY)) {
-            return new String[] { "AutoRefactor (only 1 pass)" }; //$NON-NLS-1$
-        } else {
-            return new String[0];
-        }
-    }
+	/**
+	 * Get the step descriptions.
+	 *
+	 * @return The step descriptions.
+	 */
+	public String[] getStepDescriptions() {
+		if (fOptions.isEnabled(KEY)) {
+			return new String[] { "AutoRefactor (only 1 pass)" }; //$NON-NLS-1$
+		} else {
+			return new String[0];
+		}
+	}
 
-    /**
-     * Set the options.
-     *
-     * @param options options
-     */
-    public void setOptions(CleanUpOptions options) {
-        Assert.isLegal(options != null);
-        Assert.isTrue(fOptions == null);
-        fOptions= options;
-    }
+	/**
+	 * Set the options.
+	 *
+	 * @param options options
+	 */
+	public void setOptions(CleanUpOptions options) {
+		Assert.isLegal(options != null);
+		Assert.isTrue(fOptions == null);
+		fOptions= options;
+	}
 
-    /**
-     * Check the pre-conditions.
-     *
-     * @param project          project
-     * @param compilationUnits compilation units
-     * @param monitor          monitor
-     * @return Cleanup status
-     * @throws CoreException CoreException
-     */
-    public RefactoringStatus checkPreConditions(IJavaProject project, ICompilationUnit[] compilationUnits,
-            IProgressMonitor monitor) throws CoreException {
-        if (fOptions.isEnabled(KEY)) {
-            fStatus= new RefactoringStatus();
-        }
+	/**
+	 * Check the pre-conditions.
+	 *
+	 * @param project          project
+	 * @param compilationUnits compilation units
+	 * @param monitor          monitor
+	 * @return Cleanup status
+	 * @throws CoreException CoreException
+	 */
+	public RefactoringStatus checkPreConditions(IJavaProject project, ICompilationUnit[] compilationUnits,
+			IProgressMonitor monitor) throws CoreException {
+		if (fOptions.isEnabled(KEY)) {
+			fStatus= new RefactoringStatus();
+		}
 
-        return new RefactoringStatus();
-    }
+		return new RefactoringStatus();
+	}
 
-    /**
-     * Check the post-conditions.
-     *
-     * @param monitor monitor
-     * @return Cleanup Status
-     * @throws CoreException CoreException
-     */
-    public RefactoringStatus checkPostConditions(IProgressMonitor monitor) throws CoreException {
-        try {
-            if (fStatus == null || fStatus.isOK()) {
-                return new RefactoringStatus();
-            } else {
-                return fStatus;
-            }
-        } finally {
-            fStatus= null;
-        }
-    }
+	/**
+	 * Check the post-conditions.
+	 *
+	 * @param monitor monitor
+	 * @return Cleanup Status
+	 * @throws CoreException CoreException
+	 */
+	public RefactoringStatus checkPostConditions(IProgressMonitor monitor) throws CoreException {
+		try {
+			if (fStatus == null || fStatus.isOK()) {
+				return new RefactoringStatus();
+			} else {
+				return fStatus;
+			}
+		} finally {
+			fStatus= null;
+		}
+	}
 }

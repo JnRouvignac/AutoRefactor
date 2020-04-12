@@ -28,14 +28,14 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 import org.testng.collections.Objects;
 
 public class UseObjectsWhileOtherImportConflictsSample {
-    private Objects testNGObject;
+	private Objects testNGObject;
 
-    @Override
-    public int hashCode() {
-        // Keep this comment
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((testNGObject == null) ? 0 : testNGObject.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		// Keep this comment
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((testNGObject == null) ? 0 : testNGObject.hashCode());
+		return result;
+	}
 }

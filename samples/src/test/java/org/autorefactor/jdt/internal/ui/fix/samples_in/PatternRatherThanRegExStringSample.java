@@ -28,107 +28,107 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.Arrays;
 
 public class PatternRatherThanRegExStringSample {
-    private String dateValidation= ".*";
+	private String dateValidation= ".*";
 
 	public boolean usePattern(String date1, String date2) {
-    	// Keep this comment
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+		// Keep this comment
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	// Keep this comment too
-    	return date1.matches(dateValidation) && date2.matches(dateValidation);
-    }
+		// Keep this comment too
+		return date1.matches(dateValidation) && date2.matches(dateValidation);
+	}
 
 	public boolean usePatternAmongStatements(String date1, String date2) {
-    	// Keep this comment
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
-        System.out.println("Do other things");
+		// Keep this comment
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+		System.out.println("Do other things");
 
-    	// Keep this comment too
-    	return date1.matches(dateValidation) && date2.matches(dateValidation);
-    }
+		// Keep this comment too
+		return date1.matches(dateValidation) && date2.matches(dateValidation);
+	}
 
-    public boolean doNotUsePatternForOneUse(String date) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public boolean doNotUsePatternForOneUse(String date) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	return date.matches(dateValidation);
-    }
+		return date.matches(dateValidation);
+	}
 
-    public boolean doNotUsePatternWithOtherUse(String date1, String date2) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
-        System.out.println("The pattern is: " + dateValidation);
+	public boolean doNotUsePatternWithOtherUse(String date1, String date2) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+		System.out.println("The pattern is: " + dateValidation);
 
-    	return date1.matches(dateValidation) && date2.matches(dateValidation);
-    }
+		return date1.matches(dateValidation) && date2.matches(dateValidation);
+	}
 
-    public boolean doNotUsePatternWithOtherMethod(String date1, String date2) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public boolean doNotUsePatternWithOtherMethod(String date1, String date2) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	return date1.matches(dateValidation) && "".equals(date2.replace(dateValidation, ""));
-    }
+		return date1.matches(dateValidation) && "".equals(date2.replace(dateValidation, ""));
+	}
 
-    public String usePatternForReplace(String date1, String date2) {
-    	// Keep this comment
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public String usePatternForReplace(String date1, String date2) {
+		// Keep this comment
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	// Keep this comment too
-    	String dateText1= date1.replaceFirst(dateValidation, "0000-00-00");
-    	// Keep this comment also
-    	String dateText2= date2.replaceAll(dateValidation, "0000-00-00");
+		// Keep this comment too
+		String dateText1= date1.replaceFirst(dateValidation, "0000-00-00");
+		// Keep this comment also
+		String dateText2= date2.replaceAll(dateValidation, "0000-00-00");
 
-    	return dateText1 + dateText2;
-    }
+		return dateText1 + dateText2;
+	}
 
-    public String usePatternForSplit(String speech1, String speech2) {
-    	// Keep this comment
-    	String line= "\\r?\\n";
+	public String usePatternForSplit(String speech1, String speech2) {
+		// Keep this comment
+		String line= "\\r?\\n";
 
-    	// Keep this comment too
-    	String[] phrases1= speech1.split(line);
-    	// Keep this comment also
-    	String[] phrases2= speech2.split(line, 123);
+		// Keep this comment too
+		String[] phrases1= speech1.split(line);
+		// Keep this comment also
+		String[] phrases2= speech2.split(line, 123);
 
-    	return Arrays.toString(phrases1) + Arrays.toString(phrases2);
-    }
+		return Arrays.toString(phrases1) + Arrays.toString(phrases2);
+	}
 
-    public boolean doNotUsePatternInMultiDeclaration(String date1, String date2) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}", foo= "bar";
+	public boolean doNotUsePatternInMultiDeclaration(String date1, String date2) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}", foo= "bar";
 
-    	return date1.matches(dateValidation) && date2.matches(dateValidation);
-    }
+		return date1.matches(dateValidation) && date2.matches(dateValidation);
+	}
 
-    public String usePatternForLocalVariableOnly(String date1, String date2, String date3) {
-    	String dateText1= date1.replaceFirst(dateValidation, "0000-00-00");
-    	// Keep this comment
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public String usePatternForLocalVariableOnly(String date1, String date2, String date3) {
+		String dateText1= date1.replaceFirst(dateValidation, "0000-00-00");
+		// Keep this comment
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	// Keep this comment too
-    	String dateText2= date2.replaceFirst(dateValidation, "0000-00-00");
-    	// Keep this comment also
-    	String dateText3= date3.replaceAll(dateValidation, "0000-00-00");
+		// Keep this comment too
+		String dateText2= date2.replaceFirst(dateValidation, "0000-00-00");
+		// Keep this comment also
+		String dateText3= date3.replaceAll(dateValidation, "0000-00-00");
 
-    	return dateText1 + dateText2 + dateText3;
-    }
+		return dateText1 + dateText2 + dateText3;
+	}
 
-    public boolean doNotUsePatternOnMisplacedUse(String date1, String date2) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public boolean doNotUsePatternOnMisplacedUse(String date1, String date2) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	return dateValidation.matches(date1) && dateValidation.matches(date2);
-    }
+		return dateValidation.matches(date1) && dateValidation.matches(date2);
+	}
 
-    public String doNotUsePatternOnMisplacedParameter(String date1, String date2) {
-    	String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
+	public String doNotUsePatternOnMisplacedParameter(String date1, String date2) {
+		String dateValidation= "\\d{4}\\-\\d{2}\\-\\d{2}";
 
-    	String dateText1= date1.replaceFirst("0000-00-00", dateValidation);
-    	String dateText2= date2.replaceAll("0000-00-00", dateValidation);
+		String dateText1= date1.replaceFirst("0000-00-00", dateValidation);
+		String dateText2= date2.replaceAll("0000-00-00", dateValidation);
 
-    	return dateText1 + dateText2;
-    }
+		return dateText1 + dateText2;
+	}
 
 	public boolean usePatternFromVariable(String regex, String date1, String date2) {
-    	// Keep this comment
-    	String dateValidation= regex;
+		// Keep this comment
+		String dateValidation= regex;
 
-    	// Keep this comment too
-    	return date1.matches(dateValidation) && "".equals(date2.replaceFirst(dateValidation, ""));
-    }
+		// Keep this comment too
+		return date1.matches(dateValidation) && "".equals(date2.replaceFirst(dateValidation, ""));
+	}
 }

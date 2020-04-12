@@ -43,131 +43,131 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /** Class holding necessary data for a refactoring. */
 public class CompilationUnitRewrite {
-    private final ICompilationUnit compilationUnit;
-    private final CompilationUnit astRoot;
-    private final ASTRewrite refactorings;
-    private final ASTNodeFactory astBuilder;
-    private final JavaProjectOptions options;
-    private final SubMonitor monitor;
-    private final Environment environment;
+	private final ICompilationUnit compilationUnit;
+	private final CompilationUnit astRoot;
+	private final ASTRewrite refactorings;
+	private final ASTNodeFactory astBuilder;
+	private final JavaProjectOptions options;
+	private final SubMonitor monitor;
+	private final Environment environment;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param compilationUnit the compilation unit to refactor
-     * @param astRoot         the compilation unit, root of the AST
-     * @param options         the Java project options used to compile the project
-     * @param monitor         the progress monitor of the current job
-     * @param environment     the environment
-     */
-    public CompilationUnitRewrite(final ICompilationUnit compilationUnit, final CompilationUnit astRoot, final JavaProjectOptions options,
-            final SubMonitor monitor, final Environment environment) {
-        this.compilationUnit= compilationUnit;
-        this.astRoot= astRoot;
-        this.monitor= monitor;
-        this.environment= environment;
-        this.refactorings= new ASTRewrite(astRoot, environment.getEventLoop(), monitor);
-        this.astBuilder= new ASTNodeFactory(refactorings);
-        this.options= options;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param compilationUnit the compilation unit to refactor
+	 * @param astRoot         the compilation unit, root of the AST
+	 * @param options         the Java project options used to compile the project
+	 * @param monitor         the progress monitor of the current job
+	 * @param environment     the environment
+	 */
+	public CompilationUnitRewrite(final ICompilationUnit compilationUnit, final CompilationUnit astRoot, final JavaProjectOptions options,
+			final SubMonitor monitor, final Environment environment) {
+		this.compilationUnit= compilationUnit;
+		this.astRoot= astRoot;
+		this.monitor= monitor;
+		this.environment= environment;
+		this.refactorings= new ASTRewrite(astRoot, environment.getEventLoop(), monitor);
+		this.astBuilder= new ASTNodeFactory(refactorings);
+		this.options= options;
+	}
 
-    /**
-     * Returns the {@link AST} object to use in the cleanup.
-     *
-     * @return the {@link AST} object to use in the cleanup
-     */
-    public AST getAST() {
-        return refactorings.getAST();
-    }
+	/**
+	 * Returns the {@link AST} object to use in the cleanup.
+	 *
+	 * @return the {@link AST} object to use in the cleanup
+	 */
+	public AST getAST() {
+		return refactorings.getAST();
+	}
 
-    /**
-     * Returns a new {@link ASTNodeFactory} object to use in the cleanup.
-     *
-     * @return a new {@link ASTNodeFactory} object to use in the cleanup
-     */
-    public ASTNodeFactory getASTBuilder() {
-        return astBuilder;
-    }
+	/**
+	 * Returns a new {@link ASTNodeFactory} object to use in the cleanup.
+	 *
+	 * @return a new {@link ASTNodeFactory} object to use in the cleanup
+	 */
+	public ASTNodeFactory getASTBuilder() {
+		return astBuilder;
+	}
 
-    /**
-     * Returns the compilation unit to refactor.
-     *
-     * @return the compilation unit to refactor
-     */
-    public ICompilationUnit getCompilationUnit() {
-        return compilationUnit;
-    }
+	/**
+	 * Returns the compilation unit to refactor.
+	 *
+	 * @return the compilation unit to refactor
+	 */
+	public ICompilationUnit getCompilationUnit() {
+		return compilationUnit;
+	}
 
-    /**
-     * Returns the Java project options used to compile the project.
-     *
-     * @return the Java project options used to compile the project
-     */
-    public JavaProjectOptions getJavaProjectOptions() {
-        return options;
-    }
+	/**
+	 * Returns the Java project options used to compile the project.
+	 *
+	 * @return the Java project options used to compile the project
+	 */
+	public JavaProjectOptions getJavaProjectOptions() {
+		return options;
+	}
 
-    /**
-     * Returns the progress monitor of the current job.
-     *
-     * @return the progress monitor of the current job
-     */
-    public SubMonitor getProgressMonitor() {
-        return monitor;
-    }
+	/**
+	 * Returns the progress monitor of the current job.
+	 *
+	 * @return the progress monitor of the current job
+	 */
+	public SubMonitor getProgressMonitor() {
+		return monitor;
+	}
 
-    /**
-     * Returns the {@link ASTRewrite} object containing the changes that must be
-     * applied to the AST.
-     *
-     * @return the {@link ASTRewrite} object containing the changes that must be
-     *         applied to the AST
-     */
-    public ASTRewrite getASTRewrite() {
-        return refactorings;
-    }
+	/**
+	 * Returns the {@link ASTRewrite} object containing the changes that must be
+	 * applied to the AST.
+	 *
+	 * @return the {@link ASTRewrite} object containing the changes that must be
+	 *         applied to the AST
+	 */
+	public ASTRewrite getASTRewrite() {
+		return refactorings;
+	}
 
-    /**
-     * Get the source.
-     *
-     * @param node The node
-     * @return The source
-     */
-    public String getSource(final ASTNode node) {
-        try {
-            return compilationUnit.getSource();
-        } catch (JavaModelException e) {
-            throw new UnhandledException(node, e);
-        }
-    }
+	/**
+	 * Get the source.
+	 *
+	 * @param node The node
+	 * @return The source
+	 */
+	public String getSource(final ASTNode node) {
+		try {
+			return compilationUnit.getSource();
+		} catch (JavaModelException e) {
+			throw new UnhandledException(node, e);
+		}
+	}
 
-    /**
-     * Is in comment.
-     *
-     * @param position The position
-     * @return True if it is in comment
-     */
-    public boolean isInComment(final int position) {
-        for (Comment comment : ASTNodes.getCommentList(astRoot)) {
-            if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
-                return true;
-            }
-            if (position < comment.getStartPosition()) {
-                // Since comment list is "arranged in order of increasing source position"
-                // it is impossible for this position to be surrounded by a comment
-                return false;
-            }
-        }
+	/**
+	 * Is in comment.
+	 *
+	 * @param position The position
+	 * @return True if it is in comment
+	 */
+	public boolean isInComment(final int position) {
+		for (Comment comment : ASTNodes.getCommentList(astRoot)) {
+			if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
+				return true;
+			}
+			if (position < comment.getStartPosition()) {
+				// Since comment list is "arranged in order of increasing source position"
+				// it is impossible for this position to be surrounded by a comment
+				return false;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    /**
-     * Returns the logger.
-     *
-     * @return the logger
-     */
-    public Logger getLogger() {
-        return environment.getLogger();
-    }
+	/**
+	 * Returns the logger.
+	 *
+	 * @return the logger
+	 */
+	public Logger getLogger() {
+		return environment.getLogger();
+	}
 }

@@ -34,279 +34,279 @@ import java.util.List;
 
 public class ArrayDequeRatherThanStackSample {
 
-    public void replaceStackInstanceCreation() {
-        // Keep this comment
-        Object[] stringArray = new ArrayDeque<String>().toArray(new Integer[10]);
-        // Keep this comment too
-        int size = new ArrayDeque<String>().size();
-    }
+	public void replaceStackInstanceCreation() {
+		// Keep this comment
+		Object[] stringArray = new ArrayDeque<String>().toArray(new Integer[10]);
+		// Keep this comment too
+		int size = new ArrayDeque<String>().size();
+	}
 
-    public void replaceRawStack() {
-        // Keep this comment
-        Object[] objectArray = new ArrayDeque().toArray();
-        // Keep this comment too
-        int size = new ArrayDeque().size();
-    }
+	public void replaceRawStack() {
+		// Keep this comment
+		Object[] objectArray = new ArrayDeque().toArray();
+		// Keep this comment too
+		int size = new ArrayDeque().size();
+	}
 
-    public void replaceFullyQualifiedStack() {
-        // Keep this comment
-        Object[] dateArray = new ArrayDeque<Date>().toArray();
-        // Keep this comment too
-        int size = new ArrayDeque().size();
-    }
+	public void replaceFullyQualifiedStack() {
+		// Keep this comment
+		Object[] dateArray = new ArrayDeque<Date>().toArray();
+		// Keep this comment too
+		int size = new ArrayDeque().size();
+	}
 
-    public void replaceStackVariableDeclaration() {
-        // Keep this comment
-        ArrayDeque<String> queue = new ArrayDeque<String>();
-    }
+	public void replaceStackVariableDeclaration() {
+		// Keep this comment
+		ArrayDeque<String> queue = new ArrayDeque<String>();
+	}
 
-    public void replaceVectorVariableDeclaration() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-    }
+	public void replaceVectorVariableDeclaration() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+	}
 
-    public void replaceCollectionVariableDeclaration() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-    }
+	public void replaceCollectionVariableDeclaration() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+	}
 
-    public void replaceStackVariableDeclarationWithDiamondOperator() {
-        // Keep this comment
-        ArrayDeque<String> queue = new ArrayDeque<>();
-    }
+	public void replaceStackVariableDeclarationWithDiamondOperator() {
+		// Keep this comment
+		ArrayDeque<String> queue = new ArrayDeque<>();
+	}
 
-    public void doNotReplaceInterface() {
-        // Keep this comment
-        List<String> queue = new Stack<String>();
-    }
+	public void doNotReplaceInterface() {
+		// Keep this comment
+		List<String> queue = new Stack<String>();
+	}
 
-    public void replaceStackVariableUse() {
-        // Keep this comment
-        ArrayDeque<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.add("bar");
-    }
+	public void replaceStackVariableUse() {
+		// Keep this comment
+		ArrayDeque<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.add("bar");
+	}
 
-    public void replaceVectorVariableUse() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.add("bar");
-    }
+	public void replaceVectorVariableUse() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.add("bar");
+	}
 
-    public void replaceCollectionVariableUse() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.add("bar");
-    }
+	public void replaceCollectionVariableUse() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.add("bar");
+	}
 
-    public void refactorMethod() {
-        // Keep this comment
-        ArrayDeque<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.toArray();
-    }
+	public void refactorMethod() {
+		// Keep this comment
+		ArrayDeque<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.toArray();
+	}
 
-    public void refactorVectorMethod() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.toArray();
-    }
+	public void refactorVectorMethod() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.toArray();
+	}
 
-    public void refactorCollectionMethod() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        // Keep this comment too
-        queue.toArray();
-    }
+	public void refactorCollectionMethod() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		// Keep this comment too
+		queue.toArray();
+	}
 
-    public String replaceStackWithLoop(List<Date> dates) {
-        // Keep this comment
-        ArrayDeque<Date> queue = new ArrayDeque<Date>();
-        for (Date date : dates) {
-            queue.add(date);
-        }
+	public String replaceStackWithLoop(List<Date> dates) {
+		// Keep this comment
+		ArrayDeque<Date> queue = new ArrayDeque<Date>();
+		for (Date date : dates) {
+			queue.add(date);
+		}
 
-        return queue.toString();
-    }
+		return queue.toString();
+	}
 
-    public String replaceVectorWithLoop(List<Date> dates) {
-        // Keep this comment
-        Collection<Date> queue = new ArrayDeque<Date>();
-        for (Date date : dates) {
-            queue.add(date);
-        }
+	public String replaceVectorWithLoop(List<Date> dates) {
+		// Keep this comment
+		Collection<Date> queue = new ArrayDeque<Date>();
+		for (Date date : dates) {
+			queue.add(date);
+		}
 
-        return queue.toString();
-    }
+		return queue.toString();
+	}
 
-    public String replaceCollectionWithLoop(List<Date> dates) {
-        // Keep this comment
-        Collection<Date> queue = new ArrayDeque<Date>();
-        for (Date date : dates) {
-            queue.add(date);
-        }
+	public String replaceCollectionWithLoop(List<Date> dates) {
+		// Keep this comment
+		Collection<Date> queue = new ArrayDeque<Date>();
+		for (Date date : dates) {
+			queue.add(date);
+		}
 
-        return queue.toString();
-    }
+		return queue.toString();
+	}
 
-    public void replaceStackWithModifier() {
-        // Keep this comment
-        final ArrayDeque<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceStackWithModifier() {
+		// Keep this comment
+		final ArrayDeque<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public void replaceVectorWithModifier() {
-        // Keep this comment
-        final Collection<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceVectorWithModifier() {
+		// Keep this comment
+		final Collection<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public void replaceCollectionWithModifier() {
-        // Keep this comment
-        final Collection<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceCollectionWithModifier() {
+		// Keep this comment
+		final Collection<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public void replaceStackWithParameter() {
-        // Keep this comment
-        ArrayDeque<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceStackWithParameter() {
+		// Keep this comment
+		ArrayDeque<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public void replaceVectorWithParameter() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceVectorWithParameter() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public void replaceCollectionWithParameter() {
-        // Keep this comment
-        Collection<String> queue = new ArrayDeque<String>();
-        queue.add("bar");
-    }
+	public void replaceCollectionWithParameter() {
+		// Keep this comment
+		Collection<String> queue = new ArrayDeque<String>();
+		queue.add("bar");
+	}
 
-    public Object[] replaceReassignedStack() {
-        // Keep this comment
-        ArrayDeque<String> queue1 = new ArrayDeque<String>();
-        queue1.add("FOO");
+	public Object[] replaceReassignedStack() {
+		// Keep this comment
+		ArrayDeque<String> queue1 = new ArrayDeque<String>();
+		queue1.add("FOO");
 
-        // Keep this comment too
-        ArrayDeque<String> queue2 = queue1;
-        queue2.add("BAR");
+		// Keep this comment too
+		ArrayDeque<String> queue2 = queue1;
+		queue2.add("BAR");
 
-        return queue2.toArray();
-    }
+		return queue2.toArray();
+	}
 
-    public Object[] replaceReassignedVector() {
-        // Keep this comment
-        ArrayDeque<String> queue1 = new ArrayDeque<String>();
-        queue1.add("FOO");
+	public Object[] replaceReassignedVector() {
+		// Keep this comment
+		ArrayDeque<String> queue1 = new ArrayDeque<String>();
+		queue1.add("FOO");
 
-        // Keep this comment too
-        Collection<String> queue2 = queue1;
-        queue2.add("BAR");
+		// Keep this comment too
+		Collection<String> queue2 = queue1;
+		queue2.add("BAR");
 
-        return queue2.toArray();
-    }
+		return queue2.toArray();
+	}
 
-    public Object[] replaceReassignedCollection() {
-        // Keep this comment
-        ArrayDeque<String> queue1 = new ArrayDeque<String>();
-        queue1.add("FOO");
+	public Object[] replaceReassignedCollection() {
+		// Keep this comment
+		ArrayDeque<String> queue1 = new ArrayDeque<String>();
+		queue1.add("FOO");
 
-        // Keep this comment too
-        Collection<String> queue2 = queue1;
-        queue2.add("BAR");
+		// Keep this comment too
+		Collection<String> queue2 = queue1;
+		queue2.add("BAR");
 
-        return queue2.toArray();
-    }
+		return queue2.toArray();
+	}
 
-    public void doNotReplaceStackParameter(Stack<String> aStack) {
-        Stack<String> stack = aStack;
-        stack.add("bar");
-    }
+	public void doNotReplaceStackParameter(Stack<String> aStack) {
+		Stack<String> stack = aStack;
+		stack.add("bar");
+	}
 
-    public void doNotReplaceStackPassedToAMethod() {
-        String p3 = String.valueOf(new Stack<String>());
-    }
+	public void doNotReplaceStackPassedToAMethod() {
+		String p3 = String.valueOf(new Stack<String>());
+	}
 
-    public Stack<Date> doNotReplaceReturnedStack() {
-        return new Stack<Date>();
-    }
+	public Stack<Date> doNotReplaceReturnedStack() {
+		return new Stack<Date>();
+	}
 
-    public void doNotReplaceReassignedVariable() {
-        Stack<String> stack = new Stack<String>();
-        stack = new Stack<String>();
-    }
+	public void doNotReplaceReassignedVariable() {
+		Stack<String> stack = new Stack<String>();
+		stack = new Stack<String>();
+	}
 
-    public void replaceOldMethod() {
-        ArrayDeque<Integer> queue = new ArrayDeque<Integer>();
-        // Keep this comment
-        queue.add(42);
-        queue.toArray(new Object[10]);
-        queue.remove(123);
-        queue.clear();
-        queue.getFirst();
-        queue.getLast();
-        queue.isEmpty();
-    }
+	public void replaceOldMethod() {
+		ArrayDeque<Integer> queue = new ArrayDeque<Integer>();
+		// Keep this comment
+		queue.add(42);
+		queue.toArray(new Object[10]);
+		queue.remove(123);
+		queue.clear();
+		queue.getFirst();
+		queue.getLast();
+		queue.isEmpty();
+	}
 
-    public String doNotReplaceSpecificMethod() {
-        Stack<String> stack = new Stack<String>();
-        stack.removeElementAt(1);
-        return stack.elementAt(0);
-    }
+	public String doNotReplaceSpecificMethod() {
+		Stack<String> stack = new Stack<String>();
+		stack.removeElementAt(1);
+		return stack.elementAt(0);
+	}
 
-    public void replaceStackWithRunnable() {
-        // Keep this comment
-        final ArrayDeque<String> queue = new ArrayDeque<String>();
-        new Runnable() {
+	public void replaceStackWithRunnable() {
+		// Keep this comment
+		final ArrayDeque<String> queue = new ArrayDeque<String>();
+		new Runnable() {
 
-            @Override
-            public void run() {
-                final ArrayDeque<String> localQueue = new ArrayDeque<String>();
-                localQueue.add("Local, it's safe.");
-            }
-        };
-    }
+			@Override
+			public void run() {
+				final ArrayDeque<String> localQueue = new ArrayDeque<String>();
+				localQueue.add("Local, it's safe.");
+			}
+		};
+	}
 
-    public void replaceVectorWithRunnable() {
-        // Keep this comment
-        final Collection<String> queue = new ArrayDeque<String>();
-        new Runnable() {
+	public void replaceVectorWithRunnable() {
+		// Keep this comment
+		final Collection<String> queue = new ArrayDeque<String>();
+		new Runnable() {
 
-            @Override
-            public void run() {
-                final Collection<String> localQueue = new ArrayDeque<String>();
-                localQueue.add("Local, it's safe.");
-            }
-        };
-    }
+			@Override
+			public void run() {
+				final Collection<String> localQueue = new ArrayDeque<String>();
+				localQueue.add("Local, it's safe.");
+			}
+		};
+	}
 
-    public void replaceCollectionWithRunnable() {
-        // Keep this comment
-        final Collection<String> queue = new ArrayDeque<String>();
-        new Runnable() {
+	public void replaceCollectionWithRunnable() {
+		// Keep this comment
+		final Collection<String> queue = new ArrayDeque<String>();
+		new Runnable() {
 
-            @Override
-            public void run() {
-                final Collection<String> localQueue = new ArrayDeque<String>();
-                localQueue.add("Local, it's safe.");
-            }
-        };
-    }
+			@Override
+			public void run() {
+				final Collection<String> localQueue = new ArrayDeque<String>();
+				localQueue.add("Local, it's safe.");
+			}
+		};
+	}
 
-    public void doNotReplaceThreadSharedStack() {
-        final Stack<String> stack = new Stack<String>();
-        new Runnable() {
+	public void doNotReplaceThreadSharedStack() {
+		final Stack<String> stack = new Stack<String>();
+		new Runnable() {
 
-            @Override
-            public void run() {
-                stack.add("No conflict please");
-            }
-        };
-    }
+			@Override
+			public void run() {
+				stack.add("No conflict please");
+			}
+		};
+	}
 }

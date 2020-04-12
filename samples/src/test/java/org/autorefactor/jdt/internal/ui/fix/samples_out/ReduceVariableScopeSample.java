@@ -29,38 +29,38 @@ import java.util.List;
 
 public class ReduceVariableScopeSample {
 
-    public static void main(String[] args) {
-        // Push variable into for loops initializers
-        int i;
-        {
-            i = 0;
-        }
-        for (i = 0; i < args.length; i++) {
-            i = 0;
-        }
-        for (i = 0; i < args.length; i++)
-            i = 0;
-        for (Object obj : (List) null) {
-            i = 0;
-        }
-        for (Object obj : (List) null)
-            i = 0;
-        if (isOk()) {
-            i = 0;
-        }
-        if (isOk())
-            i = 0;
-        while (isOk()) {
-            i = 0;
-        }
-        while (isOk())
-            i = 0;
-    }
+	public static void main(String[] args) {
+		// Push variable into for loops initializers
+		int i;
+		{
+			i = 0;
+		}
+		for (i = 0; i < args.length; i++) {
+			i = 0;
+		}
+		for (i = 0; i < args.length; i++)
+			i = 0;
+		for (Object obj : (List) null) {
+			i = 0;
+		}
+		for (Object obj : (List) null)
+			i = 0;
+		if (isOk()) {
+			i = 0;
+		}
+		if (isOk())
+			i = 0;
+		while (isOk()) {
+			i = 0;
+		}
+		while (isOk())
+			i = 0;
+	}
 
-    private static boolean isOk() {
-        return false;
-    }
+	private static boolean isOk() {
+		return false;
+	}
 
-    private static void doIt() {
-    }
+	private static void doIt() {
+	}
 }

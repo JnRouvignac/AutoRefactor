@@ -29,21 +29,21 @@ import java.util.Vector;
 
 public class VectorOldToNewAPISample {
 
-    public void main() {
-        byte b = 43;
-        short s = 44;
-        Vector<Integer> v = new Vector<Integer>();
-        // Keep this comment
-        v.add(42);
-        v.add(1, 43);
-        v.get(0);
-        v.toArray(new Object[10]);
-        v.remove((Object) 42);
-        v.remove((Object) b);
-        v.remove((Object) s);
-        v.remove(1);
-        v.clear();
-        v.set(0, 999);
-    }
+	public void main() {
+		byte b = 43;
+		short s = 44;
+		Vector<Integer> v = new Vector<Integer>();
+		// Keep this comment
+		v.add(42);
+		v.add(1, 43);
+		v.get(0);
+		v.toArray(new Object[10]);
+		v.remove((Object) 42);
+		v.remove((Object) b);
+		v.remove((Object) s);
+		v.remove(1);
+		v.clear();
+		v.set(0, 999);
+	}
 
 }

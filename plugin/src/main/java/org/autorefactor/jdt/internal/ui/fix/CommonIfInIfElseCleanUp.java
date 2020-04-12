@@ -61,54 +61,54 @@ import org.eclipse.jdt.core.dom.IfStatement;
  * @see #getDescription()
  */
 public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
-        IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+	@Override
+	public boolean visit(final IfStatement node) {
+		IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
+		IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-        if (ASTNodes.isPassive(node.getExpression()) && thenInnerIfStatement != null && elseInnerIfStatement != null
-                && thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
-                && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
-                && ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		if (ASTNodes.isPassive(node.getExpression()) && thenInnerIfStatement != null && elseInnerIfStatement != null
+				&& thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
+				&& ASTNodes.isPassive(thenInnerIfStatement.getExpression())
+				&& ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            rewrite.replace(node,
-                    ast.if0(rewrite.createMoveTarget(thenInnerIfStatement.getExpression()), ast.block(ast.if0(rewrite.createMoveTarget(node.getExpression()),
-                            rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))), null);
-            return false;
-        }
+			rewrite.replace(node,
+					ast.if0(rewrite.createMoveTarget(thenInnerIfStatement.getExpression()), ast.block(ast.if0(rewrite.createMoveTarget(node.getExpression()),
+							rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))), null);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

@@ -33,32 +33,32 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * @param <N> ASTNode type.
  */
 public abstract class NodeMatcher<N extends ASTNode> {
-    /**
-     * Returns true if it matches, false if it is a boolean expression and it matches the opposite, or null otherwise.
-     *
-     * @param node The node
-     * @return true if it matches, false if it is a boolean expression and it matches the opposite, or null otherwise.
-     */
-    public abstract Boolean isMatching(N node);
+	/**
+	 * Returns true if it matches, false if it is a boolean expression and it matches the opposite, or null otherwise.
+	 *
+	 * @param node The node
+	 * @return true if it matches, false if it is a boolean expression and it matches the opposite, or null otherwise.
+	 */
+	public abstract Boolean isMatching(N node);
 
-    /**
-     * Returns true if it is a boolean expression and it matches the opposite, false if it matches, or null otherwise.
-     *
-     * @return true if it is a boolean expression and it matches the opposite, false if it matches, or null otherwise.
-     */
-    public NodeMatcher<N> negate() {
-        final NodeMatcher<N> thisNodeMatcher= this;
-        return new NodeMatcher<N>() {
-            @Override
-            public Boolean isMatching(final N node) {
-                Boolean isMatching= thisNodeMatcher.isMatching(node);
+	/**
+	 * Returns true if it is a boolean expression and it matches the opposite, false if it matches, or null otherwise.
+	 *
+	 * @return true if it is a boolean expression and it matches the opposite, false if it matches, or null otherwise.
+	 */
+	public NodeMatcher<N> negate() {
+		final NodeMatcher<N> thisNodeMatcher= this;
+		return new NodeMatcher<N>() {
+			@Override
+			public Boolean isMatching(final N node) {
+				Boolean isMatching= thisNodeMatcher.isMatching(node);
 
-                if (isMatching == null) {
-                    return null;
-                }
+				if (isMatching == null) {
+					return null;
+				}
 
-                return !isMatching;
-            }
-        };
-    }
+				return !isMatching;
+			}
+		};
+	}
 }

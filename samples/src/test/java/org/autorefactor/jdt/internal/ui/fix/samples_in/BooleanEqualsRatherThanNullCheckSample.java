@@ -27,42 +27,42 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class BooleanEqualsRatherThanNullCheckSample {
 
-    private static int staticField = 0;
+	private static int staticField = 0;
 
-    public void replaceNullCheck(Boolean b1) {
-        // Keep this comment
-        boolean newBoolean1 = b1 != null && b1;
-        boolean newBoolean2 = b1 == null || b1;
-        boolean newBoolean3 = b1 != null && !b1;
-        boolean newBoolean4 = b1 == null || !b1;
+	public void replaceNullCheck(Boolean b1) {
+		// Keep this comment
+		boolean newBoolean1 = b1 != null && b1;
+		boolean newBoolean2 = b1 == null || b1;
+		boolean newBoolean3 = b1 != null && !b1;
+		boolean newBoolean4 = b1 == null || !b1;
 
-        boolean newBoolean5 = b1 != null & b1;
-        boolean newBoolean6 = b1 == null | b1;
-        boolean newBoolean7 = b1 != null & !b1;
-        boolean newBoolean8 = b1 == null | !b1;
+		boolean newBoolean5 = b1 != null & b1;
+		boolean newBoolean6 = b1 == null | b1;
+		boolean newBoolean7 = b1 != null & !b1;
+		boolean newBoolean8 = b1 == null | !b1;
 
-        boolean newBoolean9 = null != b1 && b1;
-        boolean newBoolean10 = null == b1 || b1;
-        boolean newBoolean11 = null != b1 && !b1;
-        boolean newBoolean12 = null == b1 || !b1;
+		boolean newBoolean9 = null != b1 && b1;
+		boolean newBoolean10 = null == b1 || b1;
+		boolean newBoolean11 = null != b1 && !b1;
+		boolean newBoolean12 = null == b1 || !b1;
 
-        boolean newBoolean13 = null != b1 & b1;
-        boolean newBoolean14 = null == b1 | b1;
-        boolean newBoolean15 = null != b1 & !b1;
-        boolean newBoolean16 = null == b1 | !b1;
-    }
+		boolean newBoolean13 = null != b1 & b1;
+		boolean newBoolean14 = null == b1 | b1;
+		boolean newBoolean15 = null != b1 & !b1;
+		boolean newBoolean16 = null == b1 | !b1;
+	}
 
-    private static class SideEffect {
-        private static Boolean isActive() {
-            staticField++;
-            return Boolean.TRUE;
-        }
-    }
+	private static class SideEffect {
+		private static Boolean isActive() {
+			staticField++;
+			return Boolean.TRUE;
+		}
+	}
 
-    public void doNotReplaceNullCheckWithMethods() {
-        boolean newBoolean1 = SideEffect.isActive() != null && SideEffect.isActive();
-        boolean newBoolean2 = SideEffect.isActive() == null || SideEffect.isActive();
-        boolean newBoolean3 = SideEffect.isActive() != null && !SideEffect.isActive();
-        boolean newBoolean4 = SideEffect.isActive() == null || !SideEffect.isActive();
-    }
+	public void doNotReplaceNullCheckWithMethods() {
+		boolean newBoolean1 = SideEffect.isActive() != null && SideEffect.isActive();
+		boolean newBoolean2 = SideEffect.isActive() == null || SideEffect.isActive();
+		boolean newBoolean3 = SideEffect.isActive() != null && !SideEffect.isActive();
+		boolean newBoolean4 = SideEffect.isActive() == null || !SideEffect.isActive();
+	}
 }

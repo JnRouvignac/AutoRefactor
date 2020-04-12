@@ -45,177 +45,177 @@ import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
 public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(cuRewrite, node);
-        node.accept(ifAndFollowingCodeVisitor);
-        return ifAndFollowingCodeVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(cuRewrite, node);
+		node.accept(ifAndFollowingCodeVisitor);
+		return ifAndFollowingCodeVisitor.getResult();
+	}
 
-    private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
-        public IfAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
+		public IfAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final TryStatement node) {
-            if (getResult() && node.resources().isEmpty()) {
-                List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+		@Override
+		public boolean visit(final TryStatement node) {
+			if (getResult() && node.resources().isEmpty()) {
+				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
-                if (tryStatements.isEmpty()) {
-                    List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+				if (tryStatements.isEmpty()) {
+					List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
 
-                    if (!finallyStatements.isEmpty()) {
-                        return maybeInlineBlock(node, node.getFinally());
-                    }
+					if (!finallyStatements.isEmpty()) {
+						return maybeInlineBlock(node, node.getFinally());
+					}
 
-                    ASTRewrite rewrite= cuRewrite.getASTRewrite();
+					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                    if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                        rewrite.remove(node, null);
-                    } else {
-                        rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
-                    }
+					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+						rewrite.remove(node, null);
+					} else {
+						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+					}
 
-                    setResult(false);
-                    return false;
-                }
-            }
+					setResult(false);
+					return false;
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            if (getResult()) {
-                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		@Override
+		public boolean visit(final IfStatement node) {
+			if (getResult()) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                Statement thenStatement= node.getThenStatement();
-                Statement elseStatement= node.getElseStatement();
-                Expression condition= node.getExpression();
+				Statement thenStatement= node.getThenStatement();
+				Statement elseStatement= node.getElseStatement();
+				Expression condition= node.getExpression();
 
-                Object constantCondition= peremptoryValue(condition);
+				Object constantCondition= peremptoryValue(condition);
 
-                if (Boolean.TRUE.equals(constantCondition)) {
-                    return maybeInlineBlock(node, thenStatement);
-                }
+				if (Boolean.TRUE.equals(constantCondition)) {
+					return maybeInlineBlock(node, thenStatement);
+				}
 
-                if (Boolean.FALSE.equals(constantCondition)) {
-                    if (elseStatement != null) {
-                        return maybeInlineBlock(node, elseStatement);
-                    }
+				if (Boolean.FALSE.equals(constantCondition)) {
+					if (elseStatement != null) {
+						return maybeInlineBlock(node, elseStatement);
+					}
 
-                    if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-                        rewrite.remove(node, null);
-                    } else {
-                        rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
-                    }
+					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+						rewrite.remove(node, null);
+					} else {
+						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+					}
 
-                    setResult(false);
-                    return false;
-                }
-            }
+					setResult(false);
+					return false;
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
-            if (ASTNodes.fallsThrough(unconditionnalStatement)) {
-                replaceBlockByPlainCode(node, unconditionnalStatement);
-                removeForwardCode(node, unconditionnalStatement);
-                setResult(false);
-                return false;
-            }
+		private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
+			if (ASTNodes.fallsThrough(unconditionnalStatement)) {
+				replaceBlockByPlainCode(node, unconditionnalStatement);
+				removeForwardCode(node, unconditionnalStatement);
+				setResult(false);
+				return false;
+			}
 
-            Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
-            Set<String> followingVariableNames= new HashSet<>();
+			Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
+			Set<String> followingVariableNames= new HashSet<>();
 
-            for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
-            }
+			for (Statement statement : ASTNodes.getNextSiblings(node)) {
+				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+			}
 
-            if (!ifVariableNames.removeAll(followingVariableNames)) {
-                replaceBlockByPlainCode(node, unconditionnalStatement);
-                setResult(false);
-                return false;
-            }
+			if (!ifVariableNames.removeAll(followingVariableNames)) {
+				replaceBlockByPlainCode(node, unconditionnalStatement);
+				setResult(false);
+				return false;
+			}
 
-            return true;
-        }
-    }
+			return true;
+		}
+	}
 
-    private Object peremptoryValue(final Expression condition) {
-        Object constantCondition= condition.resolveConstantExpressionValue();
+	private Object peremptoryValue(final Expression condition) {
+		Object constantCondition= condition.resolveConstantExpressionValue();
 
-        if (constantCondition != null) {
-            return constantCondition;
-        }
+		if (constantCondition != null) {
+			return constantCondition;
+		}
 
-        InfixExpression infixExpression= ASTNodes.as(condition, InfixExpression.class);
+		InfixExpression infixExpression= ASTNodes.as(condition, InfixExpression.class);
 
-        if (infixExpression != null
-                && !infixExpression.hasExtendedOperands()
-                && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                && ASTNodes.isPassiveWithoutFallingThrough(infixExpression.getLeftOperand())) {
-            if (ASTNodes.match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
-                return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
-            }
+		if (infixExpression != null
+				&& !infixExpression.hasExtendedOperands()
+				&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+				&& ASTNodes.isPassiveWithoutFallingThrough(infixExpression.getLeftOperand())) {
+			if (ASTNodes.match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
+			}
 
-            if (ASTSemanticMatcher.INSTANCE.matchOpposite(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
-                return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
-            }
-        }
+			if (ASTSemanticMatcher.INSTANCE.matchOpposite(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-            rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);
-        } else {
-            rewrite.replace(sourceNode, rewrite.createMoveTarget(unconditionnalStatement), null);
-        }
-    }
+		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
+			rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);
+		} else {
+			rewrite.replace(sourceNode, rewrite.createMoveTarget(unconditionnalStatement), null);
+		}
+	}
 
-    private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
-        if (ASTNodes.canHaveSiblings(astNode)) {
-            cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), null);
-            removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
-        } else if (astNode.getParent() instanceof TryStatement) {
-            removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);
-        }
-    }
+	private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
+		if (ASTNodes.canHaveSiblings(astNode)) {
+			cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), null);
+			removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
+		} else if (astNode.getParent() instanceof TryStatement) {
+			removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);
+		}
+	}
 }

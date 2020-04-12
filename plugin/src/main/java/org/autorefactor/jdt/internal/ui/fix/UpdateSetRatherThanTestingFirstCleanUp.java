@@ -40,85 +40,85 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        Statement elseStatement= node.getElseStatement();
-        Statement thenStatement= node.getThenStatement();
-        PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
+	@Override
+	public boolean visit(final IfStatement node) {
+		Statement elseStatement= node.getElseStatement();
+		Statement thenStatement= node.getThenStatement();
+		PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
 
-        if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-            return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
-        }
+		if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
+			return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
+		}
 
-        return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
-    }
+		return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
+	}
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
-            final Statement statement, final Statement oppositeStatement, final boolean negate) {
-        return maybeReplaceSetContains(ifStmtToReplace, ifExpression, statement, oppositeStatement, negate, "add") //$NON-NLS-1$
-                && maybeReplaceSetContains(ifStmtToReplace, ifExpression, oppositeStatement, statement, !negate, "remove"); //$NON-NLS-1$
-    }
+	private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
+			final Statement statement, final Statement oppositeStatement, final boolean negate) {
+		return maybeReplaceSetContains(ifStmtToReplace, ifExpression, statement, oppositeStatement, negate, "add") //$NON-NLS-1$
+				&& maybeReplaceSetContains(ifStmtToReplace, ifExpression, oppositeStatement, statement, !negate, "remove"); //$NON-NLS-1$
+	}
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
-            final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
-        List<Statement> statements= ASTNodes.asList(statement);
-        MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
+	private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
+			final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
+		List<Statement> statements= ASTNodes.asList(statement);
+		MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
 
-        if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            Statement firstStatement= Utils.getFirst(statements);
-            MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
+		if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			Statement firstStatement= Utils.getFirst(statements);
+			MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
 
-            if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
-                    && ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
-                    && ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
-                ASTNodeFactory ast= cuRewrite.getASTBuilder();
-                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
+					&& ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
+					&& ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-                if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
-                    // Only one statement: replace if statement with col.add() (or col.remove())
-                    rewrite.replace(ifStmtToReplace, rewrite.createMoveTarget(firstStatement), null);
-                } else {
-                    // There are other statements, replace the if condition with col.add() (or
-                    // col.remove())
-                    rewrite.replace(ifStmtToReplace.getExpression(),
-                            negate ? ast.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : rewrite.createMoveTarget(miAddOrRemove), null);
-                    rewrite.remove(firstStatement, null);
-                }
+				if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
+					// Only one statement: replace if statement with col.add() (or col.remove())
+					rewrite.replace(ifStmtToReplace, rewrite.createMoveTarget(firstStatement), null);
+				} else {
+					// There are other statements, replace the if condition with col.add() (or
+					// col.remove())
+					rewrite.replace(ifStmtToReplace.getExpression(),
+							negate ? ast.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : rewrite.createMoveTarget(miAddOrRemove), null);
+					rewrite.remove(firstStatement, null);
+				}
 
-                return false;
-            }
-        }
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

@@ -32,27 +32,27 @@ import org.eclipse.jdt.core.dom.Statement;
  * Represents an expected workflow.
  */
 public interface ControlWorkflowMatcherCompletable extends ControlWorkflowMatcherCreable {
-    /**
-     * Add a condition to the existing ones on the current workflow. All the conditions form an AND expression.
-     *
-     * @param expectedCondition The new condition.
-     * @return The matcher
-     */
-    ControlWorkflowMatcherCompletable condition(NodeMatcher<Expression> expectedCondition);
+	/**
+	 * Add a condition to the existing ones on the current workflow. All the conditions form an AND expression.
+	 *
+	 * @param expectedCondition The new condition.
+	 * @return The matcher
+	 */
+	ControlWorkflowMatcherCompletable condition(NodeMatcher<Expression> expectedCondition);
 
-    /**
-     * Add a statement that should be found following the workflow conditions.
-     *
-     * @param expectedStatement The statement
-     * @return The matcher
-     */
-    ControlWorkflowMatcherCompletable statement(NodeMatcher<Statement> expectedStatement);
+	/**
+	 * Add a statement that should be found following the workflow conditions.
+	 *
+	 * @param expectedStatement The statement
+	 * @return The matcher
+	 */
+	ControlWorkflowMatcherCompletable statement(NodeMatcher<Statement> expectedStatement);
 
-    /**
-     * Add a returned value that should be found following the workflow conditions.
-     *
-     * @param expectedExpression The returned value
-     * @return The matcher
-     */
-    ControlWorkflowMatcherRunnable returnedValue(NodeMatcher<Expression> expectedExpression);
+	/**
+	 * Add a returned value that should be found following the workflow conditions.
+	 *
+	 * @param expectedExpression The returned value
+	 * @return The matcher
+	 */
+	ControlWorkflowMatcherRunnable returnedValue(NodeMatcher<Expression> expectedExpression);
 }

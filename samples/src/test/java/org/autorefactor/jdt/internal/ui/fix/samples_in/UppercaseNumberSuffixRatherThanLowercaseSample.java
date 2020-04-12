@@ -26,24 +26,24 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class UppercaseNumberSuffixRatherThanLowercaseSample {
-    private long usual = 101l;
-    private long octal = 0121l;
-    private long hex = 0xdafdafdafl;
-    private long binary = 0b1110010111l;
-    private long withUnderscore = 101_101l;
+	private long usual = 101l;
+	private long octal = 0121l;
+	private long hex = 0xdafdafdafl;
+	private long binary = 0b1110010111l;
+	private long withUnderscore = 101_101l;
 
-    private float usualFloat = 101f;
-    private float octalFloat = 0121f;
+	private float usualFloat = 101f;
+	private float octalFloat = 0121f;
 
-    public float refactorIt() {
-        long localVar = 11l;
-        float localFloat = 11f;
-        return localVar + 333l + localFloat + 11f;
-    }
+	public float refactorIt() {
+		long localVar = 11l;
+		float localFloat = 11f;
+		return localVar + 333l + localFloat + 11f;
+	}
 
-    public float doNotRefactor() {
-        long l = 11L;
-        float f = 11F;
-        return l + 101L + f + 11F;
-    }
+	public float doNotRefactor() {
+		long l = 11L;
+		float f = 11F;
+		return l + 101L + f + 11F;
+	}
 }

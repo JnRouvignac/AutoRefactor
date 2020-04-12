@@ -26,17 +26,17 @@
 package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 
 public class DoNotVisitNodesThatAreBeingChangedSample {
-    public Boolean b;
-    public Integer i;
+	public Boolean b;
+	public Integer i;
 
-    public boolean isEqualTo(DoNotVisitNodesThatAreBeingChangedSample other) {
-        if (other == null) {
-            return false;
-        }
-        if (this == other) {
-            return true;
-        }
-        return b.equals(other.b)
-            && i.equals(other.i);
-    }
+	public boolean isEqualTo(DoNotVisitNodesThatAreBeingChangedSample other) {
+		if (other == null) {
+			return false;
+		}
+		if (this == other) {
+			return true;
+		}
+		return b.equals(other.b)
+			&& i.equals(other.i);
+	}
 }

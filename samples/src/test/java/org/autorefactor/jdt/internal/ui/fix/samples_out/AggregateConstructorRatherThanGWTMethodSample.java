@@ -46,52 +46,52 @@ import java.util.TreeMap;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
 
 public class AggregateConstructorRatherThanGWTMethodSample {
-    public List<String> replaceGWTMethodByListConstructor() {
-        // Keep this comment
-        return new ArrayList<>();
-    }
+	public List<String> replaceGWTMethodByListConstructor() {
+		// Keep this comment
+		return new ArrayList<>();
+	}
 
-    public List<String> replaceGWTMethodByLinkedListConstructor() {
-        // Keep this comment
-        return new LinkedList<>();
-    }
+	public List<String> replaceGWTMethodByLinkedListConstructor() {
+		// Keep this comment
+		return new LinkedList<>();
+	}
 
-    public Map<String, Integer> replaceGWTMethodByMapConstructor() {
-        // Keep this comment
-        return new HashMap<>();
-    }
+	public Map<String, Integer> replaceGWTMethodByMapConstructor() {
+		// Keep this comment
+		return new HashMap<>();
+	}
 
-    public Map<String, Integer> replaceGWTMethodByTreeMapConstructor() {
-        // Keep this comment
-        return new TreeMap<>();
-    }
+	public Map<String, Integer> replaceGWTMethodByTreeMapConstructor() {
+		// Keep this comment
+		return new TreeMap<>();
+	}
 
-    public Map<String, Integer> replaceGWTMethodByLinkedHashMapConstructor() {
-        // Keep this comment
-        return new LinkedHashMap<>();
-    }
+	public Map<String, Integer> replaceGWTMethodByLinkedHashMapConstructor() {
+		// Keep this comment
+		return new LinkedHashMap<>();
+	}
 
-    public Map<String, Integer> replaceGWTMethodByIdentityHashMapConstructor() {
-        // Keep this comment
-        return new IdentityHashMap<>();
-    }
+	public Map<String, Integer> replaceGWTMethodByIdentityHashMapConstructor() {
+		// Keep this comment
+		return new IdentityHashMap<>();
+	}
 
-    public Map<DayOfWeek, Integer> replaceGWTMethodByEnumMapConstructor() {
-        // Keep this comment
-        return new EnumMap<>(DayOfWeek.class);
-    }
+	public Map<DayOfWeek, Integer> replaceGWTMethodByEnumMapConstructor() {
+		// Keep this comment
+		return new EnumMap<>(DayOfWeek.class);
+	}
 
-    public List<Date> replaceGuavaMethodByListConstructor() {
-        // Keep this comment
-        return new ArrayList<>();
-    }
+	public List<Date> replaceGuavaMethodByListConstructor() {
+		// Keep this comment
+		return new ArrayList<>();
+	}
 
-    public Map<String, Observer> replaceGuavaMethodByMapConstructor() {
-        // Keep this comment
-        return new HashMap<>();
-    }
+	public Map<String, Observer> replaceGuavaMethodByMapConstructor() {
+		// Keep this comment
+		return new HashMap<>();
+	}
 
-    public List<String> doNotReplaceWithParameters() {
-        return Lists.newArrayList("foo", "bar");
-    }
+	public List<String> doNotReplaceWithParameters() {
+		return Lists.newArrayList("foo", "bar");
+	}
 }

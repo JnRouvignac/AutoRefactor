@@ -37,94 +37,94 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_reason;
+	}
 
-    @Override
-    public String getWrapperFullyQualifiedName() {
-        return Boolean.class.getCanonicalName();
-    }
+	@Override
+	public String getWrapperFullyQualifiedName() {
+		return Boolean.class.getCanonicalName();
+	}
 
-    @Override
-    public String getPrimitiveTypeName() {
-        return boolean.class.getSimpleName();
-    }
+	@Override
+	public String getPrimitiveTypeName() {
+		return boolean.class.getSimpleName();
+	}
 
-    @Override
-    public Class<? extends Expression> getLiteralClass() {
-        return BooleanLiteral.class;
-    }
+	@Override
+	public Class<? extends Expression> getLiteralClass() {
+		return BooleanLiteral.class;
+	}
 
-    @Override
-    public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
-    }
+	@Override
+	public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
+	}
 
-    @Override
-    public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.EQUALS, InfixExpression.Operator.GREATER,
-                InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.OR, InfixExpression.Operator.XOR);
-    }
+	@Override
+	public List<InfixExpression.Operator> getInfixInSafeOperators() {
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.EQUALS, InfixExpression.Operator.GREATER,
+				InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.OR, InfixExpression.Operator.XOR);
+	}
 
-    @Override
-    public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
-    }
+	@Override
+	public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
+	}
 
-    @Override
-    public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR);
-    }
+	@Override
+	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR);
+	}
 
-    @Override
-    public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN);
-    }
+	@Override
+	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
+		return Arrays.<Assignment.Operator>asList(Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN);
+	}
 
-    @Override
-    public String[] getSafeInConstants() {
-        return new String[] { "TRUE", "FALSE" }; //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	@Override
+	public String[] getSafeInConstants() {
+		return new String[] { "TRUE", "FALSE" }; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
-    @Override
-    public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        ASTNode parentNode= node.getParent();
+	@Override
+	public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
+		ASTNode parentNode= node.getParent();
 
-        switch (parentNode.getNodeType()) {
-        case ASTNode.IF_STATEMENT:
-        case ASTNode.WHILE_STATEMENT:
-        case ASTNode.DO_STATEMENT:
-            return true;
+		switch (parentNode.getNodeType()) {
+		case ASTNode.IF_STATEMENT:
+		case ASTNode.WHILE_STATEMENT:
+		case ASTNode.DO_STATEMENT:
+			return true;
 
-        default:
-            return false;
-        }
-    }
+		default:
+			return false;
+		}
+	}
 }

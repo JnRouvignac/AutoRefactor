@@ -31,154 +31,154 @@ import java.io.File;
 import java.util.Arrays;
 
 public class StaticInnerClassThanNonStaticSample {
-    public static class RefactorThisInnerClass {
-        int i;
+	public static class RefactorThisInnerClass {
+		int i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    public interface DoNotRefactorInnerInterface {
-        boolean anotherMethod();
-    }
+	public interface DoNotRefactorInnerInterface {
+		boolean anotherMethod();
+	}
 
-    public static class RefactorThisInnerClassThatUsesStaticField {
-        int i;
+	public static class RefactorThisInnerClassThatUsesStaticField {
+		int i;
 
-        public boolean anotherMethod() {
-            return CONSTANT != null;
-        }
-    }
+		public boolean anotherMethod() {
+			return CONSTANT != null;
+		}
+	}
 
-    public class DoNotRefactorThisInnerClass {
-        int i;
+	public class DoNotRefactorThisInnerClass {
+		int i;
 
-        public boolean anotherMethod() {
-            return aString != null;
-        }
-    }
+		public boolean anotherMethod() {
+			return aString != null;
+		}
+	}
 
-    public static class RefactorInnerClassThatOnlyUsesItsFields {
-        int i;
+	public static class RefactorInnerClassThatOnlyUsesItsFields {
+		int i;
 
-        public boolean anotherMethod() {
-            return i == 0;
-        }
-    }
+		public boolean anotherMethod() {
+			return i == 0;
+		}
+	}
 
-    public static class RefactorInnerClassThatUsesStaticMethod {
-        int i;
+	public static class RefactorInnerClassThatUsesStaticMethod {
+		int i;
 
-        public boolean anotherMethod() {
-            return aStaticMethod();
-        }
-    }
+		public boolean anotherMethod() {
+			return aStaticMethod();
+		}
+	}
 
-    public class DoNotRefactorInnerClassThatUsesMethod {
-        int i;
+	public class DoNotRefactorInnerClassThatUsesMethod {
+		int i;
 
-        public boolean anotherMethod() {
-            return aMethod();
-        }
-    }
+		public boolean anotherMethod() {
+			return aMethod();
+		}
+	}
 
-    public static class DoNotRefactorAlreadyStaticInnerClass {
-        int i;
+	public static class DoNotRefactorAlreadyStaticInnerClass {
+		int i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    public static final class RefactorThisFinalInnerClass {
-        int i;
+	public static final class RefactorThisFinalInnerClass {
+		int i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    static
+	static
 
-    class RefactorThisInnerClassWithoutModifier {
-        int i;
+	class RefactorThisInnerClassWithoutModifier {
+		int i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    @Deprecated
-    static
-    class RefactorThisInnerClassWithAnnotation {
-        int i;
+	@Deprecated
+	static
+	class RefactorThisInnerClassWithAnnotation {
+		int i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    public static class RefactorInnerClassThatUsesStaticImport {
-        int i;
+	public static class RefactorInnerClassThatUsesStaticImport {
+		int i;
 
-        public int anotherMethod() {
-            return bitCount(0);
-        }
-    }
+		public int anotherMethod() {
+			return bitCount(0);
+		}
+	}
 
-    public static class RefactorInnerClassThatUsesStaticField {
-        int i;
+	public static class RefactorInnerClassThatUsesStaticField {
+		int i;
 
-        public char anotherMethod() {
-            return File.separatorChar;
-        }
-    }
+		public char anotherMethod() {
+			return File.separatorChar;
+		}
+	}
 
-    public static class RefactorInheritedInnerClass extends File {
-        private static final long serialVersionUID = -1124849036813595100L;
-        private int i;
+	public static class RefactorInheritedInnerClass extends File {
+		private static final long serialVersionUID = -1124849036813595100L;
+		private int i;
 
-        public RefactorInheritedInnerClass(File arg0, String arg1) {
-            super(arg0, arg1);
-        }
+		public RefactorInheritedInnerClass(File arg0, String arg1) {
+			super(arg0, arg1);
+		}
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    public static class RefactorGenericInnerClass<T> {
-        T i;
+	public static class RefactorGenericInnerClass<T> {
+		T i;
 
-        public boolean anotherMethod() {
-            return true;
-        }
-    }
+		public boolean anotherMethod() {
+			return true;
+		}
+	}
 
-    public class NotStaticClass {
-        public class DoNotRefactorInnerClassInNotStaticClass {
-            int i;
+	public class NotStaticClass {
+		public class DoNotRefactorInnerClassInNotStaticClass {
+			int i;
 
-            public boolean anotherMethod() {
-                return true;
-            }
-        }
+			public boolean anotherMethod() {
+				return true;
+			}
+		}
 
-        public boolean anotherMethod() {
-            return aMethod();
-        }
-    }
+		public boolean anotherMethod() {
+			return aMethod();
+		}
+	}
 
-    private static final String CONSTANT= "foo";
+	private static final String CONSTANT= "foo";
 
-    private String aString= "bar";
+	private String aString= "bar";
 
-    public static boolean aStaticMethod() {
-        return false;
-    }
+	public static boolean aStaticMethod() {
+		return false;
+	}
 
-    public boolean aMethod() {
-        return true;
-    }
+	public boolean aMethod() {
+		return true;
+	}
 }

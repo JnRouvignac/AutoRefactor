@@ -36,66 +36,66 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        List<Statement> whileStatements= ASTNodes.asList(node.getBody());
+	@Override
+	public boolean visit(final WhileStatement node) {
+		List<Statement> whileStatements= ASTNodes.asList(node.getBody());
 
-        if (whileStatements.isEmpty()) {
-            return true;
-        }
+		if (whileStatements.isEmpty()) {
+			return true;
+		}
 
-        List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
+		List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
 
-        Statement previousStatement= ASTNodes.getPreviousSibling(node);
-        int i= whileStatements.size() - 1;
-        while (i >= 0) {
-            if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
-                return true;
-            }
-            i--;
-            previousStatements.add(previousStatement);
-            previousStatement= ASTNodes.getPreviousSibling(previousStatement);
-        }
+		Statement previousStatement= ASTNodes.getPreviousSibling(node);
+		int i= whileStatements.size() - 1;
+		while (i >= 0) {
+			if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
+				return true;
+			}
+			i--;
+			previousStatements.add(previousStatement);
+			previousStatement= ASTNodes.getPreviousSibling(previousStatement);
+		}
 
-        replaceWithDoWhile(node, previousStatements);
-        return false;
-    }
+		replaceWithDoWhile(node, previousStatements);
+		return false;
+	}
 
-    private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.remove(previousStatements, null);
+	private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.remove(previousStatements, null);
 
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
-    }
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
+	}
 }

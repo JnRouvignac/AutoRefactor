@@ -38,63 +38,63 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        List<Statement> statements= ASTNodes.statements(node);
-        if (statements.size() == 1 && statements.get(0) instanceof Block) {
-            replaceBlock((Block) statements.get(0));
-            return false;
-        }
-        if (node.getParent() instanceof Block) {
-            Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+	@Override
+	public boolean visit(final Block node) {
+		List<Statement> statements= ASTNodes.statements(node);
+		if (statements.size() == 1 && statements.get(0) instanceof Block) {
+			replaceBlock((Block) statements.get(0));
+			return false;
+		}
+		if (node.getParent() instanceof Block) {
+			Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
 
-            Set<String> followingVariableNames= new HashSet<>();
-            for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
-            }
+			Set<String> followingVariableNames= new HashSet<>();
+			for (Statement statement : ASTNodes.getNextSiblings(node)) {
+				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+			}
 
-            if (!ifVariableNames.removeAll(followingVariableNames)) {
-                replaceBlock(node);
-                return false;
-            }
-        }
+			if (!ifVariableNames.removeAll(followingVariableNames)) {
+				replaceBlock(node);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceBlock(final Block node) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        rewrite.replace(node, ast.copyRange(ASTNodes.statements(node)), null);
-    }
+	private void replaceBlock(final Block node) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.replace(node, ast.copyRange(ASTNodes.statements(node)), null);
+	}
 }

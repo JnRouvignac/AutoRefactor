@@ -37,128 +37,128 @@ import java.util.TreeSet;
 
 public class UseDiamondOperatorSample {
 
-    public List<String> refactorVariableDeclarationStatement() {
-        // Keep this comment
-        List<String> l = new ArrayList<String>();
-        return l;
-    }
+	public List<String> refactorVariableDeclarationStatement() {
+		// Keep this comment
+		List<String> l = new ArrayList<String>();
+		return l;
+	}
 
-    public List<String> refactorVariableDeclarationStatementWithParentheses() {
-        // Keep this comment
-        List<String> l = ((new ArrayList<String>()));
-        return l;
-    }
+	public List<String> refactorVariableDeclarationStatementWithParentheses() {
+		// Keep this comment
+		List<String> l = ((new ArrayList<String>()));
+		return l;
+	}
 
-    public List<String> refactorAssignment() {
-        List<String> l;
-        // Keep this comment
-        l = new ArrayList<String>();
-        return l;
-    }
+	public List<String> refactorAssignment() {
+		List<String> l;
+		// Keep this comment
+		l = new ArrayList<String>();
+		return l;
+	}
 
-    public List<String> refactorReturnStatement() {
-        // Keep this comment
-        return new ArrayList<String>();
-    }
+	public List<String> refactorReturnStatement() {
+		// Keep this comment
+		return new ArrayList<String>();
+	}
 
-    public List<String> refactorReturnStatementWithParameter(List<String> l) {
-        // Keep this comment
-        return new ArrayList<String>(l);
-    }
+	public List<String> refactorReturnStatementWithParameter(List<String> l) {
+		// Keep this comment
+		return new ArrayList<String>(l);
+	}
 
-    public Map<String, String> refactorReturnStatementWithParameter(Map<String, String> l) {
-        // Keep this comment
-        return new HashMap<String, String>(l);
-    }
+	public Map<String, String> refactorReturnStatementWithParameter(Map<String, String> l) {
+		// Keep this comment
+		return new HashMap<String, String>(l);
+	}
 
-    public List<Object> doNotRefactorChangeOfType(List<String> col) {
-        return new ArrayList<Object>(col);
-    }
+	public List<Object> doNotRefactorChangeOfType(List<String> col) {
+		return new ArrayList<Object>(col);
+	}
 
-    public Map<String, Object> doNotRefactorChangeOfType(Map<String, String> col) {
-        return new HashMap<String, Object>(col);
-    }
+	public Map<String, Object> doNotRefactorChangeOfType(Map<String, String> col) {
+		return new HashMap<String, Object>(col);
+	}
 
-    /**
-     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
-     * When Should Diamond Be Used?</a>
-     */
-    public void doNotRefactorMethodArgument() {
-        List<String> list2 = Collections.synchronizedList(new ArrayList<String>());
-        System.out.println(list2);
-    }
+	/**
+	 * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+	 * When Should Diamond Be Used?</a>
+	 */
+	public void doNotRefactorMethodArgument() {
+		List<String> list2 = Collections.synchronizedList(new ArrayList<String>());
+		System.out.println(list2);
+	}
 
-    /**
-     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
-     * When Should Diamond Be Used?</a>
-     */
-    public void refactorMethodArgumentInferToObject() {
-        List<Object> list3 = Collections.synchronizedList(new ArrayList<Object>()); // FIXME refactor
-        System.out.println(list3);
-    }
+	/**
+	 * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+	 * When Should Diamond Be Used?</a>
+	 */
+	public void refactorMethodArgumentInferToObject() {
+		List<Object> list3 = Collections.synchronizedList(new ArrayList<Object>()); // FIXME refactor
+		System.out.println(list3);
+	}
 
-    /**
-     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
-     * When Should Diamond Be Used?</a>
-     */
-    public void refactorMethodArgumentInferTypeFromOutside(List<String> l) {
-        List<String> list4 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
-        System.out.println(list4);
-    }
+	/**
+	 * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+	 * When Should Diamond Be Used?</a>
+	 */
+	public void refactorMethodArgumentInferTypeFromOutside(List<String> l) {
+		List<String> list4 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
+		System.out.println(list4);
+	}
 
-    /**
-     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
-     * When Should Diamond Be Used?</a>
-     */
-    public void refactorMethodArgumentInferTypeFromOutside2(List<String> l) {
-        List<? extends String> list6 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
-        System.out.println(list6);
-    }
+	/**
+	 * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+	 * When Should Diamond Be Used?</a>
+	 */
+	public void refactorMethodArgumentInferTypeFromOutside2(List<String> l) {
+		List<? extends String> list6 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
+		System.out.println(list6);
+	}
 
-    /**
-     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/type-inference-generic-instance-creation.html">
-     * Type Inference for Generic Instance Creation</a>
-     */
-    public List<String> doNotRefactor() {
-        List<String> list = new ArrayList<>();
-        list.addAll(new ArrayList<String>());
-        return list;
-    }
+	/**
+	 * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/type-inference-generic-instance-creation.html">
+	 * Type Inference for Generic Instance Creation</a>
+	 */
+	public List<String> doNotRefactor() {
+		List<String> list = new ArrayList<>();
+		list.addAll(new ArrayList<String>());
+		return list;
+	}
 
-    public List<String> doNotRefactorAnonymousClass() {
-        return new ArrayList<String>() {
-            @Override
-            public String toString() {
-                return super.toString();
-            }
-        };
-    }
+	public List<String> doNotRefactorAnonymousClass() {
+		return new ArrayList<String>() {
+			@Override
+			public String toString() {
+				return super.toString();
+			}
+		};
+	}
 
-    private static class StringComparator implements Comparator<String> {
-        @Override
-        public int compare(String s1, String s2) {
-            return s1.compareTo(s2);
-        }
-    }
+	private static class StringComparator implements Comparator<String> {
+		@Override
+		public int compare(String s1, String s2) {
+			return s1.compareTo(s2);
+		}
+	}
 
-    public Set<String> noExceptionThrownByRefactoringRule() {
-        Set<String> s = new TreeSet<>(new StringComparator());
-        return s;
-    }
+	public Set<String> noExceptionThrownByRefactoringRule() {
+		Set<String> s = new TreeSet<>(new StringComparator());
+		return s;
+	}
 
-    public Set<String> refactorRemoveGenericType() {
-        // Keep this comment
-        Set<String> s = new TreeSet<String>(new StringComparator());
-        return s;
-    }
+	public Set<String> refactorRemoveGenericType() {
+		// Keep this comment
+		Set<String> s = new TreeSet<String>(new StringComparator());
+		return s;
+	}
 
-    public static final ParameterizedType EMPTY_NODE = null;
+	public static final ParameterizedType EMPTY_NODE = null;
 
-    class ParameterizedType<T extends Comparable<T>> {
-        ParameterizedType(ParameterizedType<? extends Date> parameterizedArgument) {}
-    }
+	class ParameterizedType<T extends Comparable<T>> {
+		ParameterizedType(ParameterizedType<? extends Date> parameterizedArgument) {}
+	}
 
-    <T extends Comparable<T>> ParameterizedType<T> doNotUseDiamondOperatorForNotParameterizedArgument() {
-        return new ParameterizedType<T>(EMPTY_NODE);
-    }
+	<T extends Comparable<T>> ParameterizedType<T> doNotUseDiamondOperatorForNotParameterizedArgument() {
+		return new ParameterizedType<T>(EMPTY_NODE);
+	}
 }

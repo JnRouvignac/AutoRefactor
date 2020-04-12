@@ -38,34 +38,34 @@ import org.eclipse.jface.wizard.Wizard;
  * selected java elements.
  */
 public class ChooseCleanupsWizard extends Wizard {
-    private final ChooseRefactoringWizardPage chooseCleanupsPage= new ChooseRefactoringWizardPage();
-    private final List<IJavaElement> javaElements;
+	private final ChooseRefactoringWizardPage chooseCleanupsPage= new ChooseRefactoringWizardPage();
+	private final List<IJavaElement> javaElements;
 
-    /**
-     * Builds an instance of this class, with the provided java element.
-     *
-     * @param javaElements the java elements from where to extract the project
-     *                     options
-     */
-    public ChooseCleanupsWizard(List<IJavaElement> javaElements) {
-        setNeedsProgressMonitor(true);
-        this.javaElements= javaElements;
-    }
+	/**
+	 * Builds an instance of this class, with the provided java element.
+	 *
+	 * @param javaElements the java elements from where to extract the project
+	 *                     options
+	 */
+	public ChooseCleanupsWizard(List<IJavaElement> javaElements) {
+		setNeedsProgressMonitor(true);
+		this.javaElements= javaElements;
+	}
 
-    @Override
-    public String getWindowTitle() {
-        return "Choose cleanups..."; //$NON-NLS-1$
-    }
+	@Override
+	public String getWindowTitle() {
+		return "Choose cleanups..."; //$NON-NLS-1$
+	}
 
-    @Override
-    public void addPages() {
-        addPage(chooseCleanupsPage);
-    }
+	@Override
+	public void addPages() {
+		addPage(chooseCleanupsPage);
+	}
 
-    @Override
-    public boolean performFinish() {
-        final List<RefactoringRule> refactoringRules= chooseCleanupsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactoringRules, AutoRefactorPlugin.getEnvironment()).schedule();
-        return !refactoringRules.isEmpty();
-    }
+	@Override
+	public boolean performFinish() {
+		final List<RefactoringRule> refactoringRules= chooseCleanupsPage.getSelectedRefactorings();
+		new PrepareApplyRefactoringsJob(javaElements, refactoringRules, AutoRefactorPlugin.getEnvironment()).schedule();
+		return !refactoringRules.isEmpty();
+	}
 }

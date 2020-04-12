@@ -45,99 +45,99 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportCleanUp {
-    private static final String ADD_ALL_METHOD= "addAll"; //$NON-NLS-1$
-    private static final String AS_LIST_METHOD= "asList"; //$NON-NLS-1$
-    private static final String OF_METHOD= "of"; //$NON-NLS-1$
+	private static final String ADD_ALL_METHOD= "addAll"; //$NON-NLS-1$
+	private static final String AS_LIST_METHOD= "asList"; //$NON-NLS-1$
+	private static final String OF_METHOD= "of"; //$NON-NLS-1$
 
-    private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-        @Override
-        public boolean visit(final MethodInvocation node) {
-            return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
-        }
-    }
+	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
+		@Override
+		public boolean visit(final MethodInvocation node) {
+			return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+		}
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 5;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 5;
+	}
 
-    @Override
-    public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass();
-    }
+	@Override
+	public RefactoringWithObjectsClass getRefactoringClassInstance() {
+		return new RefactoringWithObjectsClass();
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
-    }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	}
 
-    private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        if (node.getExpression() != null && ASTNodes.as(node.getExpression(), ThisExpression.class) == null && ASTNodes.usesGivenSignature(node, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
-            MethodInvocation asListMethod= ASTNodes.as((Expression) node.arguments().get(0), MethodInvocation.class);
+	private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		if (node.getExpression() != null && ASTNodes.as(node.getExpression(), ThisExpression.class) == null && ASTNodes.usesGivenSignature(node, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
+			MethodInvocation asListMethod= ASTNodes.as((Expression) node.arguments().get(0), MethodInvocation.class);
 
-            if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(node.getExpression(), Set.class.getCanonicalName()))) {
-                refactorMethod(node, asListMethod, classesToUseWithImport, importsToAdd);
-                return false;
-            }
-        }
+			if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(node.getExpression(), Set.class.getCanonicalName()))) {
+				refactorMethod(node, asListMethod, classesToUseWithImport, importsToAdd);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean usesGivenVarArgSignature(final MethodInvocation actualMethod, final String className, final String methodName) {
-        IMethodBinding binding= actualMethod.resolveMethodBinding();
-        return binding != null && ASTNodes.hasType(binding.getDeclaringClass(), className) && Utils.equalNotNull(methodName, actualMethod.getName().getIdentifier()) && binding.getParameterTypes() != null && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].isArray();
-    }
+	private boolean usesGivenVarArgSignature(final MethodInvocation actualMethod, final String className, final String methodName) {
+		IMethodBinding binding= actualMethod.resolveMethodBinding();
+		return binding != null && ASTNodes.hasType(binding.getDeclaringClass(), className) && Utils.equalNotNull(methodName, actualMethod.getName().getIdentifier()) && binding.getParameterTypes() != null && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].isArray();
+	}
 
-    private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+	private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
+		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 
-        List<Expression> copyOfArguments= new ArrayList<>(asListMethod.arguments().size() + 1);
-        copyOfArguments.add(rewrite.createMoveTarget(node.getExpression()));
+		List<Expression> copyOfArguments= new ArrayList<>(asListMethod.arguments().size() + 1);
+		copyOfArguments.add(rewrite.createMoveTarget(node.getExpression()));
 
-        for (Object argument : asListMethod.arguments()) {
-            copyOfArguments.add(rewrite.createMoveTarget((Expression) argument));
-        }
+		for (Object argument : asListMethod.arguments()) {
+			copyOfArguments.add(rewrite.createMoveTarget((Expression) argument));
+		}
 
-        MethodInvocation newCollectionsAddAllMethod= ast.invoke(ast.name(collectionsName), ADD_ALL_METHOD, copyOfArguments);
-        rewrite.replace(node, newCollectionsAddAllMethod, null);
-    }
+		MethodInvocation newCollectionsAddAllMethod= ast.invoke(ast.name(collectionsName), ADD_ALL_METHOD, copyOfArguments);
+		rewrite.replace(node, newCollectionsAddAllMethod, null);
+	}
 }

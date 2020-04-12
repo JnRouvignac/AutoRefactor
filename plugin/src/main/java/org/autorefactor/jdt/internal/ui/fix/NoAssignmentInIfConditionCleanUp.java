@@ -56,186 +56,186 @@ import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
-    }
+	/**
+	 * Get the name.
+	 *
+	 * @return the name.
+	 */
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
-    }
+	/**
+	 * Get the description.
+	 *
+	 * @return the description.
+	 */
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
-    }
+	/**
+	 * Get the reason.
+	 *
+	 * @return the reason.
+	 */
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(cuRewrite, node);
-        node.accept(ifWithAssignmentVisitor);
-        return ifWithAssignmentVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(cuRewrite, node);
+		node.accept(ifWithAssignmentVisitor);
+		return ifWithAssignmentVisitor.getResult();
+	}
 
-    private static final class IfWithAssignmentVisitor extends BlockSubVisitor {
-        public IfWithAssignmentVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-            super(cuRewrite, startNode);
-        }
+	private static final class IfWithAssignmentVisitor extends BlockSubVisitor {
+		public IfWithAssignmentVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            return !getResult() || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
-        }
+		@Override
+		public boolean visit(final IfStatement node) {
+			return !getResult() || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
+		}
 
-        private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
-            Assignment assignment= ASTNodes.as(expression, Assignment.class);
+		private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
+			Assignment assignment= ASTNodes.as(expression, Assignment.class);
 
-            if (assignment != null) {
-                return moveAssignmentBeforeIfStatement(node, assignment, evaluatedExpression);
-            }
+			if (assignment != null) {
+				return moveAssignmentBeforeIfStatement(node, assignment, evaluatedExpression);
+			}
 
-            PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
+			PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
 
-            if (pe != null && ASTNodes.hasOperator(pe,
-                    PrefixExpression.Operator.NOT,
-                    PrefixExpression.Operator.COMPLEMENT,
-                    PrefixExpression.Operator.MINUS,
-                    PrefixExpression.Operator.PLUS)) {
-                return moveAssignmentBeforeIfStatementIfPossible(node, pe.getOperand(), evaluatedExpression);
-            }
+			if (pe != null && ASTNodes.hasOperator(pe,
+					PrefixExpression.Operator.NOT,
+					PrefixExpression.Operator.COMPLEMENT,
+					PrefixExpression.Operator.MINUS,
+					PrefixExpression.Operator.PLUS)) {
+				return moveAssignmentBeforeIfStatementIfPossible(node, pe.getOperand(), evaluatedExpression);
+			}
 
-            InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
+			InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
 
-            if (ie != null) {
-                List<Expression> operands= ASTNodes.allOperands(ie);
-                boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
-                        InfixExpression.Operator.EQUALS,
-                        InfixExpression.Operator.NOT_EQUALS,
-                        InfixExpression.Operator.PLUS,
-                        InfixExpression.Operator.MINUS,
-                        InfixExpression.Operator.DIVIDE,
-                        InfixExpression.Operator.TIMES,
-                        InfixExpression.Operator.XOR,
-                        InfixExpression.Operator.GREATER,
-                        InfixExpression.Operator.GREATER_EQUALS,
-                        InfixExpression.Operator.LEFT_SHIFT,
-                        InfixExpression.Operator.LESS,
-                        InfixExpression.Operator.LESS_EQUALS,
-                        InfixExpression.Operator.REMAINDER,
-                        InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
-                        InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
-                        InfixExpression.Operator.AND,
-                        InfixExpression.Operator.OR);
+			if (ie != null) {
+				List<Expression> operands= ASTNodes.allOperands(ie);
+				boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
+						InfixExpression.Operator.EQUALS,
+						InfixExpression.Operator.NOT_EQUALS,
+						InfixExpression.Operator.PLUS,
+						InfixExpression.Operator.MINUS,
+						InfixExpression.Operator.DIVIDE,
+						InfixExpression.Operator.TIMES,
+						InfixExpression.Operator.XOR,
+						InfixExpression.Operator.GREATER,
+						InfixExpression.Operator.GREATER_EQUALS,
+						InfixExpression.Operator.LEFT_SHIFT,
+						InfixExpression.Operator.LESS,
+						InfixExpression.Operator.LESS_EQUALS,
+						InfixExpression.Operator.REMAINDER,
+						InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
+						InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+						InfixExpression.Operator.AND,
+						InfixExpression.Operator.OR);
 
-                for (Expression operand : operands) {
-                    if (!moveAssignmentBeforeIfStatementIfPossible(node, operand, evaluatedExpression)) {
-                        return false;
-                    }
+				for (Expression operand : operands) {
+					if (!moveAssignmentBeforeIfStatementIfPossible(node, operand, evaluatedExpression)) {
+						return false;
+					}
 
-                    if (!isAllOperandsEvaluated || !ASTNodes.isPassive(operand)) {
-                        break;
-                    }
+					if (!isAllOperandsEvaluated || !ASTNodes.isPassive(operand)) {
+						break;
+					}
 
-                    evaluatedExpression.add(operand);
-                }
-            }
+					evaluatedExpression.add(operand);
+				}
+			}
 
-            ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
+			ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
 
-            return ce == null || moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
-        }
+			return ce == null || moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
+		}
 
-        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
-            Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
+		private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
+			Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
 
-            if (!evaluatedExpression.isEmpty()) {
-                Name mame= ASTNodes.as(lhs, Name.class);
-                FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
-                IVariableBinding variableBinding;
+			if (!evaluatedExpression.isEmpty()) {
+				Name mame= ASTNodes.as(lhs, Name.class);
+				FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
+				IVariableBinding variableBinding;
 
-                if (fieldAccess != null) {
-                    variableBinding= fieldAccess.resolveFieldBinding();
-                } else if (mame != null) {
-                    IBinding binding= mame.resolveBinding();
+				if (fieldAccess != null) {
+					variableBinding= fieldAccess.resolveFieldBinding();
+				} else if (mame != null) {
+					IBinding binding= mame.resolveBinding();
 
-                    if (!(binding instanceof IVariableBinding)) {
-                        return true;
-                    }
+					if (!(binding instanceof IVariableBinding)) {
+						return true;
+					}
 
-                    variableBinding= (IVariableBinding) binding;
-                } else {
-                    return true;
-                }
+					variableBinding= (IVariableBinding) binding;
+				} else {
+					return true;
+				}
 
-                for (Expression expression : evaluatedExpression) {
-                    VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-                            expression, true).find();
+				for (Expression expression : evaluatedExpression) {
+					VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
+							expression, true).find();
 
-                    if (!variableUseVisitor.getReads().isEmpty()) {
-                        return true;
-                    }
-                }
-            }
+					if (!variableUseVisitor.getReads().isEmpty()) {
+						return true;
+					}
+				}
+			}
 
-            VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-            VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
+			VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
+			VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
 
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
 
-            if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
-                rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
-                setResult(false);
-                return false;
-            }
+			if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
+				rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
+				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
+				setResult(false);
+				return false;
+			}
 
-            if (!ASTNodes.isInElse(node)) {
-                rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
-                Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(assignment));
+			if (!ASTNodes.isInElse(node)) {
+				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
+				Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(assignment));
 
-                if (ASTNodes.canHaveSiblings(node)) {
-                    rewrite.insertBefore(newAssignment, node, editGroup);
-                } else {
-                    Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(node));
-                    rewrite.replace(node, newBlock, editGroup);
-                }
+				if (ASTNodes.canHaveSiblings(node)) {
+					rewrite.insertBefore(newAssignment, node, editGroup);
+				} else {
+					Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(node));
+					rewrite.replace(node, newBlock, editGroup);
+				}
 
-                setResult(false);
-                return false;
-            }
+				setResult(false);
+				return false;
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
-                final Expression expression) {
-            if (vds != null && expression instanceof SimpleName) {
-                for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
-                    if (ASTNodes.isSameVariable(expression, vdf)) {
-                        return vdf;
-                    }
-                }
-            }
+		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
+				final Expression expression) {
+			if (vds != null && expression instanceof SimpleName) {
+				for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
+					if (ASTNodes.isSameVariable(expression, vdf)) {
+						return vdf;
+					}
+				}
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 }

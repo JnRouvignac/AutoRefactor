@@ -41,108 +41,108 @@ import org.eclipse.jdt.core.dom.QualifiedName;
  * {@link ASTVisitor}s. It centralizes useful features for cleanup rules.
  */
 public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefactoringRule {
-    private static final class LombokVisitor extends InterruptibleVisitor {
-        private boolean useLombok;
+	private static final class LombokVisitor extends InterruptibleVisitor {
+		private boolean useLombok;
 
-        @Override
-        public boolean visit(final QualifiedName node) {
-            if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
-                useLombok= true;
-                return interruptVisit();
-            }
+		@Override
+		public boolean visit(final QualifiedName node) {
+			if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
+				useLombok= true;
+				return interruptVisit();
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        /**
-         * @return the useLombok
-         */
-        public boolean isUseLombok() {
-            return useLombok;
-        }
-    }
+		/**
+		 * @return the useLombok
+		 */
+		public boolean isUseLombok() {
+			return useLombok;
+		}
+	}
 
-    /** The refactoring context of the current visitor. */
-    protected CompilationUnitRewrite cuRewrite;
+	/** The refactoring context of the current visitor. */
+	protected CompilationUnitRewrite cuRewrite;
 
-    /**
-     * True if it is the visitor by default.
-     *
-     * @return true if it is the visitor by default.
-     */
-    @Override
-    public boolean isByDefault() {
-        return true;
-    }
+	/**
+	 * True if it is the visitor by default.
+	 *
+	 * @return true if it is the visitor by default.
+	 */
+	@Override
+	public boolean isByDefault() {
+		return true;
+	}
 
-    /**
-     * True if the visitor is enabled.
-     *
-     * @param preferences The preferences
-     *
-     * @return true if the visitor is enabled.
-     */
-    @Override
-    public boolean isEnabled(final Preferences preferences) {
-        return preferences.isEnabled(getClass());
-    }
+	/**
+	 * True if the visitor is enabled.
+	 *
+	 * @param preferences The preferences
+	 *
+	 * @return true if the visitor is enabled.
+	 */
+	@Override
+	public boolean isEnabled(final Preferences preferences) {
+		return preferences.isEnabled(getClass());
+	}
 
-    /**
-     * True if this Java version is supported.
-     *
-     * @param javaSeRelease The javaSe release
-     *
-     * @return true if this Java version is supported.
-     */
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return true;
-    }
+	/**
+	 * True if this Java version is supported.
+	 *
+	 * @param javaSeRelease The javaSe release
+	 *
+	 * @return true if this Java version is supported.
+	 */
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return true;
+	}
 
-    /**
-     * Get the java minor version.
-     *
-     * @return the java minor version.
-     */
-    public int getJavaMinorVersion() {
-        return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
+	/**
+	 * Get the java minor version.
+	 *
+	 * @return the java minor version.
+	 */
+	public int getJavaMinorVersion() {
+		return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+	}
 
-    /**
-     * Set the cleanup context.
-     *
-     * @param cuRewrite the cleanup context.
-     */
-    @Override
-    public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
-        this.cuRewrite= cuRewrite;
-    }
+	/**
+	 * Set the cleanup context.
+	 *
+	 * @param cuRewrite the cleanup context.
+	 */
+	@Override
+	public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
+		this.cuRewrite= cuRewrite;
+	}
 
-    @Override
-    public boolean preVisit2(final ASTNode node) {
-        if (node instanceof CompilationUnit) {
-            LombokVisitor lombokVisitor= new LombokVisitor();
-            lombokVisitor.visitNode(node);
+	@Override
+	public boolean preVisit2(final ASTNode node) {
+		if (node instanceof CompilationUnit) {
+			LombokVisitor lombokVisitor= new LombokVisitor();
+			lombokVisitor.visitNode(node);
 
-            if (lombokVisitor.isUseLombok()) {
-                return false;
-            }
-        }
-        // Only visit nodes that have not been refactored
-        // to avoid trying to refactor twice the same node (or sub nodes)
-        return !cuRewrite.getASTRewrite().hasBeenRefactored(node);
-    }
+			if (lombokVisitor.isUseLombok()) {
+				return false;
+			}
+		}
+		// Only visit nodes that have not been refactored
+		// to avoid trying to refactor twice the same node (or sub nodes)
+		return !cuRewrite.getASTRewrite().hasBeenRefactored(node);
+	}
 
-    /**
-     * Get the cleanups.
-     *
-     * @param astRoot The AST toot
-     *
-     * @return the cleanups.
-     */
-    @Override
-    public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return cuRewrite.getASTRewrite();
-    }
+	/**
+	 * Get the cleanups.
+	 *
+	 * @param astRoot The AST toot
+	 *
+	 * @return the cleanups.
+	 */
+	@Override
+	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
+		astRoot.accept(this);
+		return cuRewrite.getASTRewrite();
+	}
 }

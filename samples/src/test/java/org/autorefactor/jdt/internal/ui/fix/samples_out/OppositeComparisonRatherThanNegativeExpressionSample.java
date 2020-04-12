@@ -31,97 +31,97 @@ import java.util.Date;
 import java.util.List;
 
 public class OppositeComparisonRatherThanNegativeExpressionSample {
-    public int simplifyDoubleComparison(Double number) {
-        Double anotherNumber = Double.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyDoubleComparison(Double number) {
+		Double anotherNumber = Double.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyFloatComparison(Float number) {
-        Float anotherNumber = Float.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyFloatComparison(Float number) {
+		Float anotherNumber = Float.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyShortComparison(Short number) {
-        Short anotherNumber = Short.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyShortComparison(Short number) {
+		Short anotherNumber = Short.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyIntegerComparison(Integer number) {
-        Integer anotherNumber = Integer.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyIntegerComparison(Integer number) {
+		Integer anotherNumber = Integer.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyLongComparison(Long number) {
-        Long anotherNumber = Long.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyLongComparison(Long number) {
+		Long anotherNumber = Long.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyCharacterComparison(Character number) {
-        Character anotherNumber = Character.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyCharacterComparison(Character number) {
+		Character anotherNumber = Character.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyByteComparison(Byte number) {
-        Byte anotherNumber = Byte.MAX_VALUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyByteComparison(Byte number) {
+		Byte anotherNumber = Byte.MAX_VALUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int simplifyBooleanComparison(Boolean number) {
-        Boolean anotherNumber = Boolean.TRUE;
-        // Keep this comment
-        return anotherNumber.compareTo(number);
-    }
+	public int simplifyBooleanComparison(Boolean number) {
+		Boolean anotherNumber = Boolean.TRUE;
+		// Keep this comment
+		return anotherNumber.compareTo(number);
+	}
 
-    public int doNotRefactorNonFinalBigDecimalComparison() {
-        BigDecimal number = new BigDecimal("10") {
-            @Override
-            public int compareTo(BigDecimal val) {
-                return 0;
-            }
-        };
-        BigDecimal anotherNumber = new BigDecimal("-10") {
-            @Override
-            public int compareTo(BigDecimal val) {
-                return -1;
-            }
-        };
-        return -number.compareTo(anotherNumber);
-    }
+	public int doNotRefactorNonFinalBigDecimalComparison() {
+		BigDecimal number = new BigDecimal("10") {
+			@Override
+			public int compareTo(BigDecimal val) {
+				return 0;
+			}
+		};
+		BigDecimal anotherNumber = new BigDecimal("-10") {
+			@Override
+			public int compareTo(BigDecimal val) {
+				return -1;
+			}
+		};
+		return -number.compareTo(anotherNumber);
+	}
 
-    public int doNotRefactorNonFinalBigIntegerComparison(BigInteger number) {
-        BigInteger anotherNumber = BigInteger.ZERO;
-        return -number.compareTo(anotherNumber);
-    }
+	public int doNotRefactorNonFinalBigIntegerComparison(BigInteger number) {
+		BigInteger anotherNumber = BigInteger.ZERO;
+		return -number.compareTo(anotherNumber);
+	}
 
-    public int doNotRefactorNonFinalDateComparison(Date date) {
-        Date anotherDate = new Date();
-        return -date.compareTo(anotherDate);
-    }
+	public int doNotRefactorNonFinalDateComparison(Date date) {
+		Date anotherDate = new Date();
+		return -date.compareTo(anotherDate);
+	}
 
-    public int callMethodOnExpression(Float number, List<Float> floats) {
-        // Keep this comment
-        return floats.get(0).compareTo(number);
-    }
+	public int callMethodOnExpression(Float number, List<Float> floats) {
+		// Keep this comment
+		return floats.get(0).compareTo(number);
+	}
 
-    public int callMethodOnCast(Float number, List<Object> floats) {
-        // Keep this comment
-        return ((Float) floats.get(0)).compareTo(number);
-    }
+	public int callMethodOnCast(Float number, List<Object> floats) {
+		// Keep this comment
+		return ((Float) floats.get(0)).compareTo(number);
+	}
 
-    public int doNotRefactorNonNegativeExpression(Double number) {
-        Double anotherNumber = Double.MAX_VALUE;
-        return number.compareTo(anotherNumber);
-    }
+	public int doNotRefactorNonNegativeExpression(Double number) {
+		Double anotherNumber = Double.MAX_VALUE;
+		return number.compareTo(anotherNumber);
+	}
 
-    public int doNotCallMethodOnPrimitive(Double number) {
-        double anotherNumber = 123d;
-        return -number.compareTo(anotherNumber);
-    }
+	public int doNotCallMethodOnPrimitive(Double number) {
+		double anotherNumber = 123d;
+		return -number.compareTo(anotherNumber);
+	}
 }

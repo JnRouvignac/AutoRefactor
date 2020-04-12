@@ -26,8 +26,8 @@
 package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 
 public class DoNotOverOptimizeBooleansSample {
-    public static boolean isThirteen(int i) {
-        boolean result = !(i != 13);
-        return result;
-    }
+	public static boolean isThirteen(int i) {
+		boolean result = !(i != 13);
+		return result;
+	}
 }

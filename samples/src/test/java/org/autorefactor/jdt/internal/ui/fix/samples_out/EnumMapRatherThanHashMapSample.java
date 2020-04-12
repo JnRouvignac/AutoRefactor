@@ -34,102 +34,102 @@ import java.util.Map;
 
 public class EnumMapRatherThanHashMapSample {
 
-    enum Example {
-        ONE, TWO, THREE
-    }
+	enum Example {
+		ONE, TWO, THREE
+	}
 
-    public Map<DayOfWeek, String> refactorVariableDeclarationStatement() {
-        // Keep this comment
-        Map<DayOfWeek, String> map = new EnumMap<DayOfWeek, String>(DayOfWeek.class);
-        return map;
-    }
+	public Map<DayOfWeek, String> refactorVariableDeclarationStatement() {
+		// Keep this comment
+		Map<DayOfWeek, String> map = new EnumMap<DayOfWeek, String>(DayOfWeek.class);
+		return map;
+	}
 
-    public Map<DayOfWeek, String> refactorVariableDeclarationStatementWithDiamond() {
-        // Keep this comment
-        Map<DayOfWeek, String> map = new EnumMap<>(DayOfWeek.class);
-        return map;
-    }
+	public Map<DayOfWeek, String> refactorVariableDeclarationStatementWithDiamond() {
+		// Keep this comment
+		Map<DayOfWeek, String> map = new EnumMap<>(DayOfWeek.class);
+		return map;
+	}
 
-    public Map<DayOfWeek, String> refactorReturnStatement() {
-        // Keep this comment
-        return new EnumMap<DayOfWeek, String>(DayOfWeek.class);
-    }
+	public Map<DayOfWeek, String> refactorReturnStatement() {
+		// Keep this comment
+		return new EnumMap<DayOfWeek, String>(DayOfWeek.class);
+	}
 
-    public Map<Example, List<String>> refactorReturnStatementWithParameterizedType() {
-        // Keep this comment
-        return new EnumMap<Example, List<String>>(Example.class);
-    }
+	public Map<Example, List<String>> refactorReturnStatementWithParameterizedType() {
+		// Keep this comment
+		return new EnumMap<Example, List<String>>(Example.class);
+	}
 
-    public Map<Example, String> refactorReturnStatementWithDiamondOperator() {
-        // Keep this comment
-        return new EnumMap<>(Example.class);
-    }
+	public Map<Example, String> refactorReturnStatementWithDiamondOperator() {
+		// Keep this comment
+		return new EnumMap<>(Example.class);
+	}
 
-    public Map<Example, String> refactorVariableDeclarationStatementWithParentheses() {
-        // Keep this comment
-        Map<Example, String> map = ((new EnumMap<Example, String>(Example.class)));
-        return map;
-    }
+	public Map<Example, String> refactorVariableDeclarationStatementWithParentheses() {
+		// Keep this comment
+		Map<Example, String> map = ((new EnumMap<Example, String>(Example.class)));
+		return map;
+	}
 
-    public Map<Example, long[]> refactorAssignment() {
-        // Keep this comment
-        Map<Example, long[]> map;
-        map = new EnumMap<>(Example.class);
-        return map;
-    }
+	public Map<Example, long[]> refactorAssignment() {
+		// Keep this comment
+		Map<Example, long[]> map;
+		map = new EnumMap<>(Example.class);
+		return map;
+	}
 
-    public Map<Example, String> refactorConditionalAssignment(boolean isFeatureEbabled) {
-        // Keep this comment
-        Map<Example, String> map;
-        map = isFeatureEbabled ? new EnumMap<Example, String>(Example.class)
-                : new EnumMap<Example, String>(Example.class);
-        return map;
-    }
+	public Map<Example, String> refactorConditionalAssignment(boolean isFeatureEbabled) {
+		// Keep this comment
+		Map<Example, String> map;
+		map = isFeatureEbabled ? new EnumMap<Example, String>(Example.class)
+				: new EnumMap<Example, String>(Example.class);
+		return map;
+	}
 
-    public Map<Example, String> refactorConstrutorWithInt() {
-        // Keep this comment
-        Map<Example, String> map = new EnumMap<Example, String>(Example.class);
-        return map;
-    }
+	public Map<Example, String> refactorConstrutorWithInt() {
+		// Keep this comment
+		Map<Example, String> map = new EnumMap<Example, String>(Example.class);
+		return map;
+	}
 
-    public Map<Example, String> refactorConstrutorWithIntAndFloat() {
-        // Keep this comment
-        Map<Example, String> map = new EnumMap<Example, String>(Example.class);
-        return map;
-    }
+	public Map<Example, String> refactorConstrutorWithIntAndFloat() {
+		// Keep this comment
+		Map<Example, String> map = new EnumMap<Example, String>(Example.class);
+		return map;
+	}
 
-    public Map<Example, String> doNotRefactorConstrutorWithMap(
-            Map<Example, String> m) {
-        Map<Example, String> map = new HashMap<Example, String>(m);
-        return map;
-    }
+	public Map<Example, String> doNotRefactorConstrutorWithMap(
+			Map<Example, String> m) {
+		Map<Example, String> map = new HashMap<Example, String>(m);
+		return map;
+	}
 
-    public Map<Example, String> refactorConstrutorWithEnumMap(
-            java.util.EnumMap<Example, String> m) {
-        // Keep this comment
-        Map<Example, String> map = new EnumMap<Example, String>(m);
-        return map;
-    }
+	public Map<Example, String> refactorConstrutorWithEnumMap(
+			java.util.EnumMap<Example, String> m) {
+		// Keep this comment
+		Map<Example, String> map = new EnumMap<Example, String>(m);
+		return map;
+	}
 
-    public void doNotRefactorMethodArgument() {
-        Map<Example, String> map = Collections
-                                              .synchronizedMap(new HashMap<Example, String>());
-        System.out.println(map);
-    }
+	public void doNotRefactorMethodArgument() {
+		Map<Example, String> map = Collections
+											  .synchronizedMap(new HashMap<Example, String>());
+		System.out.println(map);
+	}
 
-    public Map<Example, String> doNotRefactor() {
-        Map<Example, String> map = new java.util.EnumMap<>(Example.class);
-        map.putAll(new java.util.EnumMap<Example, String>(Example.class));
-        return map;
-    }
+	public Map<Example, String> doNotRefactor() {
+		Map<Example, String> map = new java.util.EnumMap<>(Example.class);
+		map.putAll(new java.util.EnumMap<Example, String>(Example.class));
+		return map;
+	}
 
-    public Map<Example, String> doNotRefactorAnonymousClass() {
-        return new HashMap<Example, String>() {
-            @Override
-            public String toString() {
-                return super.toString();
-            }
-        };
-    }
+	public Map<Example, String> doNotRefactorAnonymousClass() {
+		return new HashMap<Example, String>() {
+			@Override
+			public String toString() {
+				return super.toString();
+			}
+		};
+	}
 
 }

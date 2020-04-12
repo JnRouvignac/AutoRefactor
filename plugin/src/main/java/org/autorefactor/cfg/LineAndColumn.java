@@ -32,47 +32,47 @@ import java.util.Objects;
  * of the file, the line number and the column number.
  */
 class LineAndColumn {
-    private final int startPosition;
-    private final int lineNo;
-    private final int colNo;
+	private final int startPosition;
+	private final int lineNo;
+	private final int colNo;
 
-    public LineAndColumn(final int position, final int lineNo, final int colNo) {
-        this.startPosition= position;
-        this.lineNo= lineNo;
-        this.colNo= colNo;
-    }
+	public LineAndColumn(final int position, final int lineNo, final int colNo) {
+		this.startPosition= position;
+		this.lineNo= lineNo;
+		this.colNo= colNo;
+	}
 
-    public int getStartPosition() {
-        return startPosition;
-    }
+	public int getStartPosition() {
+		return startPosition;
+	}
 
-    public int getLine() {
-        return lineNo;
-    }
+	public int getLine() {
+		return lineNo;
+	}
 
-    public int getColumn() {
-        return colNo;
-    }
+	public int getColumn() {
+		return colNo;
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        LineAndColumn other= (LineAndColumn) obj;
-        return Objects.equals(startPosition, other.startPosition);
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		LineAndColumn other= (LineAndColumn) obj;
+		return Objects.equals(startPosition, other.startPosition);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(startPosition);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(startPosition);
+	}
 
-    @Override
-    public String toString() {
-        return "LineAndColumn [startPosition=" + startPosition + ", lineNo=" + lineNo + ", colNo=" + colNo + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    }
+	@Override
+	public String toString() {
+		return "LineAndColumn [startPosition=" + startPosition + ", lineNo=" + lineNo + ", colNo=" + colNo + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
 }
