@@ -49,6 +49,8 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassImportCleanUp {
+	private static final String EQUALS_METHOD= "equals"; //$NON-NLS-1$
+
 	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
 		@Override
 		public boolean visit(final IfStatement node) {
@@ -168,12 +170,12 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(nullityCondition, Expression.class, NullLiteral.class);
-		ReturnStatement returnStmt1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
-		ReturnStatement returnStmt2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
+		ReturnStatement returnStatement1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
+		ReturnStatement returnStatement2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
 		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
-		if (nullityTypedCondition != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
-				&& equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier()) //$NON-NLS-1$
+		if (nullityTypedCondition != null && returnStatement1 != null && returnStatement2 != null && equalsMethod != null
+				&& equalsMethod.getExpression() != null && EQUALS_METHOD.equals(equalsMethod.getName().getIdentifier())
 				&& equalsMethod.arguments() != null && equalsMethod.arguments().size() == 1) {
 			Expression secondField= nullityTypedCondition.getFirstOperand();
 
@@ -182,12 +184,12 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 							(ASTNode) equalsMethod.arguments().get(0))
 							|| match(secondField, firstField, equalsMethod.getExpression(),
 									(ASTNode) equalsMethod.arguments().get(0)))) {
-				BooleanLiteral returnFalse1= ASTNodes.as(returnStmt1.getExpression(), BooleanLiteral.class);
-				BooleanLiteral returnFalse2= ASTNodes.as(returnStmt2.getExpression(), BooleanLiteral.class);
+				BooleanLiteral returnFalse1= ASTNodes.as(returnStatement1.getExpression(), BooleanLiteral.class);
+				BooleanLiteral returnFalse2= ASTNodes.as(returnStatement2.getExpression(), BooleanLiteral.class);
 
 				if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
 						&& !returnFalse2.booleanValue()) {
-					replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStmt1);
+					replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStatement1);
 					return false;
 				}
 			}
@@ -203,13 +205,13 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
 	private void replaceEquals(final IfStatement node, final Expression firstField,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd, final Expression secondField,
-			final ReturnStatement returnStmt1) {
+			final ReturnStatement returnStatement) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.if0(ast.not(ast.invoke(ast.name(classname),
-						"equals", rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStmt1))), null); //$NON-NLS-1$
+						EQUALS_METHOD, rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStatement))), null);
 	}
 }
