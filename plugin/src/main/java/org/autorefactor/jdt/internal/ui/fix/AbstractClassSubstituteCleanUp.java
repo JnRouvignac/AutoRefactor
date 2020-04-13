@@ -225,7 +225,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
 	@Override
 	public boolean visit(final Block node) {
-		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	/**

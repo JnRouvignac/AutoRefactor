@@ -102,7 +102,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,

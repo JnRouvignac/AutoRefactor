@@ -138,7 +138,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	/**
@@ -154,7 +154,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final IfStatement node) {
-		return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	/**

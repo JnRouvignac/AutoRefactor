@@ -112,7 +112,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final Block node) {
-		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	private boolean maybeRefactorBlock(final Block node,

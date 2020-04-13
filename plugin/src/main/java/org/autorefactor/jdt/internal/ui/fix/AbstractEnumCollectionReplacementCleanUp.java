@@ -63,7 +63,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
 	@Override
 	public boolean visit(final ClassInstanceCreation node) {
-		return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+		return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
 	}
 
 	private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
