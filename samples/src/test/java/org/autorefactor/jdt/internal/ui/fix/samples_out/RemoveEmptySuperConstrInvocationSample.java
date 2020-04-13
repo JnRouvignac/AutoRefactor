@@ -27,28 +27,28 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class RemoveEmptySuperConstrInvocationSample {
 
-	class A {
+    class A {
 
-		A(int a) {}
+        A(int a) {}
 
-		A() {
-			// Keep this comment
+        A() {
+            // Keep this comment
 
-		}
+        }
 
-	}
+    }
 
-	class B extends A {
+    class B extends A {
 
-		B(int b) {
-			// Keep this comment
-			super(b);
-		}
+        B(int b) {
+            // Keep this comment
+            super(b);
+        }
 
-		B() {
-			// Keep this comment
+        B() {
+            // Keep this comment
 
-		}
-	}
+        }
+    }
 
 }

@@ -27,11 +27,11 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 
 public class NoMalformedTreeException3Sample {
 
-	//
-	// Next empty comment will cause a MalformedTreeException
-	//
+    //
+    // Next empty comment will cause a MalformedTreeException
+    //
 
 
-	public void aMethod() {
-	}
+    public void aMethod() {
+    }
 }

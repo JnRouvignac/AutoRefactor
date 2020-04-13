@@ -33,29 +33,29 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class StandardMethodRatherThanLibraryMethodSample {
-	public String replaceGoogleMethods(Date object1, Date object2) {
-		// Keep comment
-		Date notNullObject1 = java.util.Objects.requireNonNull(object1);
+    public String replaceGoogleMethods(Date object1, Date object2) {
+        // Keep comment
+        Date notNullObject1 = java.util.Objects.requireNonNull(object1);
 
-		// Comment 2
-		Date notNullObject2 = java.util.Objects.requireNonNull(object2, "object2");
+        // Comment 2
+        Date notNullObject2 = java.util.Objects.requireNonNull(object2, "object2");
 
-		// Double check
-		Date justToBeSure1 = java.util.Objects.requireNonNull(notNullObject1);
-		Date justToBeSure2 = java.util.Objects.requireNonNull(notNullObject2, "you never know");
+        // Double check
+        Date justToBeSure1 = java.util.Objects.requireNonNull(notNullObject1);
+        Date justToBeSure2 = java.util.Objects.requireNonNull(notNullObject2, "you never know");
 
-		// Keep questioning...
-		Date justToBeSure3 = java.util.Objects.requireNonNull(justToBeSure1,
-				() -> String.format("message:%s", justToBeSure2));
-		Date justToBeSure4 = java.util.Objects.requireNonNull(notNullObject2,
-				() -> String.format("you never know:%s - %s", justToBeSure3, notNullObject1));
+        // Keep questioning...
+        Date justToBeSure3 = java.util.Objects.requireNonNull(justToBeSure1,
+                () -> String.format("message:%s", justToBeSure2));
+        Date justToBeSure4 = java.util.Objects.requireNonNull(notNullObject2,
+                () -> String.format("you never know:%s - %s", justToBeSure3, notNullObject1));
 
-		// Keep this comment
-		boolean b1 = java.util.Objects.equals(justToBeSure2, justToBeSure4);
+        // Keep this comment
+        boolean b1 = java.util.Objects.equals(justToBeSure2, justToBeSure4);
 
-		// Keep this comment too
-		int i2 = java.util.Objects.hash(object1, object2);
+        // Keep this comment too
+        int i2 = java.util.Objects.hash(object1, object2);
 
-		return String.valueOf(b1) + i2;
-	}
+        return String.valueOf(b1) + i2;
+    }
 }

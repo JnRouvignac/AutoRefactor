@@ -28,252 +28,252 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class DeclarationOutsideLoopRatherThanInsideSample {
-	public String moveObjectDecl(int count) {
-		StringBuilder concat = new StringBuilder();
+    public String moveObjectDecl(int count) {
+        StringBuilder concat = new StringBuilder();
 
-		for (int i = 0; i < count; i++) {
-			// Keep this comment
-			String newNumber = String.valueOf(i);
-			concat.append(newNumber);
-			concat.append(";");
-		}
+        for (int i = 0; i < count; i++) {
+            // Keep this comment
+            String newNumber = String.valueOf(i);
+            concat.append(newNumber);
+            concat.append(";");
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String moveArrayDecl(int count) {
-		StringBuilder concat = new StringBuilder();
+    public String moveArrayDecl(int count) {
+        StringBuilder concat = new StringBuilder();
 
-		for (int i = 0; i < count; i++) {
-			// Keep this comment
-			String newNumber[] = new String[]{String.valueOf(i)};
-			concat.append(newNumber);
-			concat.append(";");
-		}
+        for (int i = 0; i < count; i++) {
+            // Keep this comment
+            String newNumber[] = new String[]{String.valueOf(i)};
+            concat.append(newNumber);
+            concat.append(";");
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String moveObjectDeclFromLoops(int count) {
-		StringBuilder concat = new StringBuilder();
+    public String moveObjectDeclFromLoops(int count) {
+        StringBuilder concat = new StringBuilder();
 
-		for (int i = 0; i < count; i++) {
-			// Keep this comment
-			String newNumber = String.valueOf(i);
-			concat.append(newNumber);
-			concat.append(";");
+        for (int i = 0; i < count; i++) {
+            // Keep this comment
+            String newNumber = String.valueOf(i);
+            concat.append(newNumber);
+            concat.append(";");
 
-			for (int j = 0; j < count; j++) {
-				// Keep this comment
-				String anotherNewNumber = String.valueOf(j);
-				concat.append(anotherNewNumber);
-				concat.append(";");
-			}
-		}
+            for (int j = 0; j < count; j++) {
+                // Keep this comment
+                String anotherNewNumber = String.valueOf(j);
+                concat.append(anotherNewNumber);
+                concat.append(";");
+            }
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public int moveFromEnhancedLoop(List<String> myList) {
-		int total = 0;
+    public int moveFromEnhancedLoop(List<String> myList) {
+        int total = 0;
 
-		for (String number : myList) {
-			// Keep this comment
-			int newNumber = Integer.parseInt(number);
-			total += newNumber;
-		}
+        for (String number : myList) {
+            // Keep this comment
+            int newNumber = Integer.parseInt(number);
+            total += newNumber;
+        }
 
-		return total;
-	}
+        return total;
+    }
 
-	public int moveFromWhile(int max) {
-		int result = 1;
+    public int moveFromWhile(int max) {
+        int result = 1;
 
-		while (result < max) {
-			// Keep this comment
-			int newNumber = result * result;
-			result += newNumber;
-		}
+        while (result < max) {
+            // Keep this comment
+            int newNumber = result * result;
+            result += newNumber;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public int moveFromDoWhile(int max) {
-		int result = 1;
+    public int moveFromDoWhile(int max) {
+        int result = 1;
 
-		do {
-			// Keep this comment
-			int newNumber = result * result;
-			result += newNumber;
-		} while (result < max);
+        do {
+            // Keep this comment
+            int newNumber = result * result;
+            result += newNumber;
+        } while (result < max);
 
-		return result;
-	}
+        return result;
+    }
 
-	public int moveComplexType(int max) {
-		int result = 1;
+    public int moveComplexType(int max) {
+        int result = 1;
 
-		do {
-			// Keep this comment
-			Class<?>[] complexObject = new Class<?>[0];
-			result += complexObject.length + 1;
-		} while (result < max);
+        do {
+            // Keep this comment
+            Class<?>[] complexObject = new Class<?>[0];
+            result += complexObject.length + 1;
+        } while (result < max);
 
-		return result;
-	}
+        return result;
+    }
 
-	public int moveDeclWithoutInit(List<String> myList) {
-		int total = 0;
+    public int moveDeclWithoutInit(List<String> myList) {
+        int total = 0;
 
-		for (String number : myList) {
-			// Keep this comment
-			int newNumber;
-			newNumber = Integer.parseInt(number);
-			total += newNumber;
-		}
+        for (String number : myList) {
+            // Keep this comment
+            int newNumber;
+            newNumber = Integer.parseInt(number);
+            total += newNumber;
+        }
 
-		return total;
-	}
+        return total;
+    }
 
-	public int movePrimitiveTypeDecl(List<String> myList) {
-		int total = 0;
+    public int movePrimitiveTypeDecl(List<String> myList) {
+        int total = 0;
 
-		for (String number : myList) {
-			// Keep this comment
-			int newNumber = Integer.parseInt(number);
-			total += newNumber;
-		}
+        for (String number : myList) {
+            // Keep this comment
+            int newNumber = Integer.parseInt(number);
+            total += newNumber;
+        }
 
-		return total;
-	}
+        return total;
+    }
 
-	public String moveObjectDecls(List<Integer> myList1, List<Integer> myList2) {
-		StringBuilder concat = new StringBuilder();
+    public String moveObjectDecls(List<Integer> myList1, List<Integer> myList2) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList1) {
-			// Keep this comment
-			String newNumber = String.valueOf(number);
-			concat.append(newNumber);
-		}
+        for (Integer number : myList1) {
+            // Keep this comment
+            String newNumber = String.valueOf(number);
+            concat.append(newNumber);
+        }
 
-		for (Integer number : myList2) {
-			// Keep this comment
-			String anotherNumber = String.valueOf(number);
-			concat.append(anotherNumber);
-		}
+        for (Integer number : myList2) {
+            // Keep this comment
+            String anotherNumber = String.valueOf(number);
+            concat.append(anotherNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveFinalDecl(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveFinalDecl(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			final String newNumber = String.valueOf(number);
-			concat.append(newNumber);
-		}
+        for (Integer number : myList) {
+            final String newNumber = String.valueOf(number);
+            concat.append(newNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveMultiFragments(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveMultiFragments(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			String newNumber, sameNumber = String.valueOf(number);
-			newNumber = "0";
-			concat.append(newNumber);
-			concat.append("<");
-			concat.append(sameNumber);
-		}
+        for (Integer number : myList) {
+            String newNumber, sameNumber = String.valueOf(number);
+            newNumber = "0";
+            concat.append(newNumber);
+            concat.append("<");
+            concat.append(sameNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveWhenConflicts(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveWhenConflicts(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			String myNumber = String.valueOf(number);
-			concat.append(myNumber);
-		}
+        for (Integer number : myList) {
+            String myNumber = String.valueOf(number);
+            concat.append(myNumber);
+        }
 
-		String myNumber = " and 10";
+        String myNumber = " and 10";
 
-		return concat.toString() + myNumber;
-	}
+        return concat.toString() + myNumber;
+    }
 
-	public String doNotMoveWhenConflictsInLoopParameter(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveWhenConflictsInLoopParameter(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			String myNumber = String.valueOf(number);
-			concat.append(myNumber);
-		}
+        for (Integer number : myList) {
+            String myNumber = String.valueOf(number);
+            concat.append(myNumber);
+        }
 
-		for (Integer myNumber : myList) {
-			concat.append(myNumber);
-		}
+        for (Integer myNumber : myList) {
+            concat.append(myNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String moveWhenNoConflictsBefore(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String moveWhenNoConflictsBefore(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		{
-			String theNumber = "10 and ";
-			System.out.println(theNumber);
-		}
+        {
+            String theNumber = "10 and ";
+            System.out.println(theNumber);
+        }
 
-		for (Integer number : myList) {
-			// Keep this comment
-			String theNumber = String.valueOf(number);
-			concat.append(theNumber);
-		}
+        for (Integer number : myList) {
+            // Keep this comment
+            String theNumber = String.valueOf(number);
+            concat.append(theNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveWhenConflictsAfter(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveWhenConflictsAfter(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			String oneNumber = String.valueOf(number);
-			concat.append(oneNumber);
-		}
+        for (Integer number : myList) {
+            String oneNumber = String.valueOf(number);
+            concat.append(oneNumber);
+        }
 
-		{
-			String oneNumber = " and 10";
-			System.out.println(oneNumber);
-		}
+        {
+            String oneNumber = " and 10";
+            System.out.println(oneNumber);
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveDeclFromOtherScope(List<Integer> myList) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveDeclFromOtherScope(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Integer number : myList) {
-			if (number > 0) {
-				String aNumber = String.valueOf(number);
-				concat.append(aNumber);
-			}
-		}
+        for (Integer number : myList) {
+            if (number > 0) {
+                String aNumber = String.valueOf(number);
+                concat.append(aNumber);
+            }
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 
-	public String doNotMoveAnnotatedDecl(List<Object> texts) {
-		StringBuilder concat = new StringBuilder();
+    public String doNotMoveAnnotatedDecl(List<Object> texts) {
+        StringBuilder concat = new StringBuilder();
 
-		for (Object object : texts) {
-			@SuppressWarnings("unchecked")
-			List<String> text = (List<String>) object;
-			concat.append(text);
-			concat.append(";");
-		}
+        for (Object object : texts) {
+            @SuppressWarnings("unchecked")
+            List<String> text = (List<String>) object;
+            concat.append(text);
+            concat.append(";");
+        }
 
-		return concat.toString();
-	}
+        return concat.toString();
+    }
 }

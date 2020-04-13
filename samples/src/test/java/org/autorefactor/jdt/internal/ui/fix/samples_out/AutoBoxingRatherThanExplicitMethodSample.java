@@ -26,213 +26,213 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class AutoBoxingRatherThanExplicitMethodSample {
-	public static void useAutoBoxingOnDeclaration() {
-		// Keep this comment
-		Character c = '*';
-		Byte by = (byte) 0;
-		Boolean bo = true;
-		Integer i = 42;
-		Long l1 = 42L;
-		Long l2 = (long) 42;
-		Short s = (short) 42;
-		Float f = 42.42F;
-		Double d = 42.42;
-	}
+    public static void useAutoBoxingOnDeclaration() {
+        // Keep this comment
+        Character c = '*';
+        Byte by = (byte) 0;
+        Boolean bo = true;
+        Integer i = 42;
+        Long l1 = 42L;
+        Long l2 = (long) 42;
+        Short s = (short) 42;
+        Float f = 42.42F;
+        Double d = 42.42;
+    }
 
-	public static void removeUnnecessaryValueOfCallsInPrimitiveDeclaration() {
-		// Keep this comment
-		char c = '*';
-		byte by = (byte) 0;
-		boolean bo = true;
-		int i = 42;
-		long l1 = 42L;
-		long l2 = 42;
-		short s = (short) 42;
-		float f = 42.42F;
-		double d = 42.42;
-	}
+    public static void removeUnnecessaryValueOfCallsInPrimitiveDeclaration() {
+        // Keep this comment
+        char c = '*';
+        byte by = (byte) 0;
+        boolean bo = true;
+        int i = 42;
+        long l1 = 42L;
+        long l2 = 42;
+        short s = (short) 42;
+        float f = 42.42F;
+        double d = 42.42;
+    }
 
-	public static void doNotUseAutoBoxingWithObjectDeclaration() {
-		Object c = Character.valueOf('*');
-		Object by = Byte.valueOf((byte) 0);
-		Object bo = Boolean.valueOf(true);
-		Object i = Integer.valueOf(42);
-		Object l1 = Long.valueOf(42L);
-		Object l2 = Long.valueOf(42);
-		Object s = Short.valueOf((short) 42);
-		Object f = Float.valueOf(42.42F);
-		Object d = Double.valueOf(42.42);
-	}
+    public static void doNotUseAutoBoxingWithObjectDeclaration() {
+        Object c = Character.valueOf('*');
+        Object by = Byte.valueOf((byte) 0);
+        Object bo = Boolean.valueOf(true);
+        Object i = Integer.valueOf(42);
+        Object l1 = Long.valueOf(42L);
+        Object l2 = Long.valueOf(42);
+        Object s = Short.valueOf((short) 42);
+        Object f = Float.valueOf(42.42F);
+        Object d = Double.valueOf(42.42);
+    }
 
-	public static void directlyReturnWrapperParameter(Character c, Byte by, Boolean bo, Integer i, Long l, Short s,
-			Float f, Double d) {
-		Object myObject = null;
+    public static void directlyReturnWrapperParameter(Character c, Byte by, Boolean bo, Integer i, Long l, Short s,
+            Float f, Double d) {
+        Object myObject = null;
 
-		// Keep this comment
-		myObject = c;
-		myObject = by;
-		myObject = bo;
-		myObject = i;
-		myObject = l;
-		myObject = s;
-		myObject = f;
-		myObject = d;
-	}
+        // Keep this comment
+        myObject = c;
+        myObject = by;
+        myObject = bo;
+        myObject = i;
+        myObject = l;
+        myObject = s;
+        myObject = f;
+        myObject = d;
+    }
 
-	public static void useAutoBoxingOnAssignment() {
-		// Keep this comment
-		Character c;
-		c = '*';
-		Byte by;
-		by = (byte) 0;
-		Boolean bo1;
-		bo1 = true;
-		Integer i;
-		i = 42;
-		Long l1;
-		l1 = 42L;
-		Long l2;
-		l2 = (long) 42;
-		Short s;
-		s = (short) 42;
-		Float f;
-		f = 42.42F;
-		Double d;
-		d = 42.42;
-	}
+    public static void useAutoBoxingOnAssignment() {
+        // Keep this comment
+        Character c;
+        c = '*';
+        Byte by;
+        by = (byte) 0;
+        Boolean bo1;
+        bo1 = true;
+        Integer i;
+        i = 42;
+        Long l1;
+        l1 = 42L;
+        Long l2;
+        l2 = (long) 42;
+        Short s;
+        s = (short) 42;
+        Float f;
+        f = 42.42F;
+        Double d;
+        d = 42.42;
+    }
 
-	public static void removeUnnecessaryValueOfCallsInPrimitiveAssignment() {
-		// Keep this comment
-		char c;
-		c = '*';
-		byte by;
-		by = (byte) 0;
-		boolean bo1;
-		bo1 = true;
-		int i;
-		i = 42;
-		long l1;
-		l1 = 42L;
-		long l2;
-		l2 = 42;
-		short s;
-		s = (short) 42;
-		float f;
-		f = 42.42F;
-		double d;
-		d = 42.42;
-	}
+    public static void removeUnnecessaryValueOfCallsInPrimitiveAssignment() {
+        // Keep this comment
+        char c;
+        c = '*';
+        byte by;
+        by = (byte) 0;
+        boolean bo1;
+        bo1 = true;
+        int i;
+        i = 42;
+        long l1;
+        l1 = 42L;
+        long l2;
+        l2 = 42;
+        short s;
+        s = (short) 42;
+        float f;
+        f = 42.42F;
+        double d;
+        d = 42.42;
+    }
 
-	public static void doNotUseAutoBoxingWithObjectAssignment() {
-		Object c;
-		c = Character.valueOf('*');
-		Object by;
-		by = Byte.valueOf((byte) 0);
-		Object bo1;
-		bo1 = Boolean.valueOf(true);
-		Object i;
-		i = Integer.valueOf(42);
-		Object l1;
-		l1 = Long.valueOf(42L);
-		Object l2;
-		l2 = Long.valueOf(42);
-		Object s;
-		s = Short.valueOf((short) 42);
-		Object f;
-		f = Float.valueOf(42.42F);
-		Object d;
-		d = Double.valueOf(42.42);
-	}
+    public static void doNotUseAutoBoxingWithObjectAssignment() {
+        Object c;
+        c = Character.valueOf('*');
+        Object by;
+        by = Byte.valueOf((byte) 0);
+        Object bo1;
+        bo1 = Boolean.valueOf(true);
+        Object i;
+        i = Integer.valueOf(42);
+        Object l1;
+        l1 = Long.valueOf(42L);
+        Object l2;
+        l2 = Long.valueOf(42);
+        Object s;
+        s = Short.valueOf((short) 42);
+        Object f;
+        f = Float.valueOf(42.42F);
+        Object d;
+        d = Double.valueOf(42.42);
+    }
 
-	public static void doNotUseAutoboxingOnString() {
-		Integer i = Integer.valueOf("1");
-		Long l = Long.valueOf("1");
-		Short s = Short.valueOf("1");
-		Float f = Float.valueOf("1");
-		Double d = Double.valueOf("1");
-	}
+    public static void doNotUseAutoboxingOnString() {
+        Integer i = Integer.valueOf("1");
+        Long l = Long.valueOf("1");
+        Short s = Short.valueOf("1");
+        Float f = Float.valueOf("1");
+        Double d = Double.valueOf("1");
+    }
 
-	public static Character removeUnnecessaryValueOfCallsInCharacterWrapper() {
-		// Keep this comment
-		return '*';
-	}
+    public static Character removeUnnecessaryValueOfCallsInCharacterWrapper() {
+        // Keep this comment
+        return '*';
+    }
 
-	public static Byte removeUnnecessaryValueOfCallsInByteWrapper() {
-		// Keep this comment
-		return (byte) 0;
-	}
+    public static Byte removeUnnecessaryValueOfCallsInByteWrapper() {
+        // Keep this comment
+        return (byte) 0;
+    }
 
-	public static Boolean removeUnnecessaryValueOfCallsInBooleanWrapper() {
-		// Keep this comment
-		return true;
-	}
+    public static Boolean removeUnnecessaryValueOfCallsInBooleanWrapper() {
+        // Keep this comment
+        return true;
+    }
 
-	public static Integer removeUnnecessaryValueOfCallsInIntegerWrapper() {
-		// Keep this comment
-		return 42;
-	}
+    public static Integer removeUnnecessaryValueOfCallsInIntegerWrapper() {
+        // Keep this comment
+        return 42;
+    }
 
-	public static Long removeUnnecessaryValueOfCallsInLongWrapper() {
-		// Keep this comment
-		return 42L;
-	}
+    public static Long removeUnnecessaryValueOfCallsInLongWrapper() {
+        // Keep this comment
+        return 42L;
+    }
 
-	public static Short removeUnnecessaryValueOfCallsInShortWrapper() {
-		// Keep this comment
-		return (short) 42;
-	}
+    public static Short removeUnnecessaryValueOfCallsInShortWrapper() {
+        // Keep this comment
+        return (short) 42;
+    }
 
-	public static Float removeUnnecessaryValueOfCallsInFloatWrapper() {
-		// Keep this comment
-		return 42.42F;
-	}
+    public static Float removeUnnecessaryValueOfCallsInFloatWrapper() {
+        // Keep this comment
+        return 42.42F;
+    }
 
-	public static Double removeUnnecessaryValueOfCallsInDoubleWrapper() {
-		// Keep this comment
-		return 42.42;
-	}
+    public static Double removeUnnecessaryValueOfCallsInDoubleWrapper() {
+        // Keep this comment
+        return 42.42;
+    }
 
-	public static char removeUnnecessaryValueOfCallsInCharacterPrimitive() {
-		// Keep this comment
-		return '*';
-	}
+    public static char removeUnnecessaryValueOfCallsInCharacterPrimitive() {
+        // Keep this comment
+        return '*';
+    }
 
-	public static byte removeUnnecessaryValueOfCallsInBytePrimitive() {
-		// Keep this comment
-		return (byte) 0;
-	}
+    public static byte removeUnnecessaryValueOfCallsInBytePrimitive() {
+        // Keep this comment
+        return (byte) 0;
+    }
 
-	public static boolean removeUnnecessaryValueOfCallsInBooleanPrimitive() {
-		// Keep this comment
-		return true;
-	}
+    public static boolean removeUnnecessaryValueOfCallsInBooleanPrimitive() {
+        // Keep this comment
+        return true;
+    }
 
-	public static int removeUnnecessaryValueOfCallsInIntegerPrimitive() {
-		// Keep this comment
-		return 42;
-	}
+    public static int removeUnnecessaryValueOfCallsInIntegerPrimitive() {
+        // Keep this comment
+        return 42;
+    }
 
-	public static long removeUnnecessaryValueOfCallsInLongPrimitive() {
-		// Keep this comment
-		return 42L;
-	}
+    public static long removeUnnecessaryValueOfCallsInLongPrimitive() {
+        // Keep this comment
+        return 42L;
+    }
 
-	public static short removeUnnecessaryValueOfCallsInShortPrimitive() {
-		// Keep this comment
-		return (short) 42;
-	}
+    public static short removeUnnecessaryValueOfCallsInShortPrimitive() {
+        // Keep this comment
+        return (short) 42;
+    }
 
-	public static float removeUnnecessaryValueOfCallsInFloatPrimitive() {
-		// Keep this comment
-		return 42.42F;
-	}
+    public static float removeUnnecessaryValueOfCallsInFloatPrimitive() {
+        // Keep this comment
+        return 42.42F;
+    }
 
-	public static double removeUnnecessaryValueOfCallsInDoublePrimitive() {
-		// Keep this comment
-		return 42.42;
-	}
+    public static double removeUnnecessaryValueOfCallsInDoublePrimitive() {
+        // Keep this comment
+        return 42.42;
+    }
 
-	public static Object doNotUseAutoBoxingReturningObject() {
-		return Character.valueOf('a');
-	}
+    public static Object doNotUseAutoBoxingReturningObject() {
+        return Character.valueOf('a');
+    }
 }

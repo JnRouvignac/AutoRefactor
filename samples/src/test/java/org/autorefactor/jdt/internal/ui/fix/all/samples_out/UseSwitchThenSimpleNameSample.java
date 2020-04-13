@@ -28,15 +28,15 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 import java.time.DayOfWeek;
 
 public class UseSwitchThenSimpleNameSample {
-	public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
-		int i = 0;
-		// Keep this comment
-		if (day == DayOfWeek.MONDAY || day == DayOfWeek.TUESDAY || day == DayOfWeek.WEDNESDAY) {
-			// Keep this comment too
-			i = 0;
-		} else {
-			// Keep this comment also
-			i = 150;
-		}
-	}
+    public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
+        int i = 0;
+        // Keep this comment
+        if (day == DayOfWeek.MONDAY || day == DayOfWeek.TUESDAY || day == DayOfWeek.WEDNESDAY) {
+            // Keep this comment too
+            i = 0;
+        } else {
+            // Keep this comment also
+            i = 150;
+        }
+    }
 }

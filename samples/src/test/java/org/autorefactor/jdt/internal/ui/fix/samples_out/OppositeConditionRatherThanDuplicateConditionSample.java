@@ -28,227 +28,227 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class OppositeConditionRatherThanDuplicateConditionSample {
-	public int mergeDuplicateCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			return 20;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0;
-		} else {
-			return 10;
-		}
-	}
+    public int mergeDuplicateCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            return 20;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0;
+        } else {
+            return 10;
+        }
+    }
 
-	public int doNotMoveExtendedExpression(boolean duplicateCondition, boolean anotherCondition, boolean oneMoreCondition) {
-		if (duplicateCondition && anotherCondition && oneMoreCondition) {
-			return 0;
-		} else if (duplicateCondition) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMoveExtendedExpression(boolean duplicateCondition, boolean anotherCondition, boolean oneMoreCondition) {
+        if (duplicateCondition && anotherCondition && oneMoreCondition) {
+            return 0;
+        } else if (duplicateCondition) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 
-	public int mergeNegativeCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			return 20;
-		} else if (anotherCondition) {
-			return 10;
-		} else {
-			// Keep this comment also
-			return 0;
-		}
-	}
+    public int mergeNegativeCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            return 20;
+        } else if (anotherCondition) {
+            return 10;
+        } else {
+            // Keep this comment also
+            return 0;
+        }
+    }
 
-	public int mergeDuplicateCondition2(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			if (anotherCondition) {
-				return 20;
-			} else {
-				return 30;
-			}
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0;
-		} else {
-			return 10;
-		}
-	}
+    public int mergeDuplicateCondition2(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            if (anotherCondition) {
+                return 20;
+            } else {
+                return 30;
+            }
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0;
+        } else {
+            return 10;
+        }
+    }
 
-	public void mergeDuplicateSecondCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			System.out.println("20");
-		} else if (anotherCondition) {
-			// Keep this comment also
-			System.out.println("0");
-		} else {
-			System.out.println("10");
-		}
-	}
+    public void mergeDuplicateSecondCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            System.out.println("20");
+        } else if (anotherCondition) {
+            // Keep this comment also
+            System.out.println("0");
+        } else {
+            System.out.println("10");
+        }
+    }
 
-	public int mergeInvertedCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			return 1;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0;
-		} else {
-			return 2;
-		}
-	}
+    public int mergeInvertedCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            return 1;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0;
+        } else {
+            return 2;
+        }
+    }
 
-	public int mergeAnotherInvertedCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (duplicateCondition) {
-			return 1;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0;
-		} else {
-			return 2;
-		}
-	}
+    public int mergeAnotherInvertedCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (duplicateCondition) {
+            return 1;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0;
+        } else {
+            return 2;
+        }
+    }
 
-	public int mergeSeveralConditions(boolean duplicateCondition, boolean anotherCondition,
-			boolean yetAnotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			return 400;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 100;
-		} else if (yetAnotherCondition) {
-			return 200;
-		} else {
-			return 300;
-		}
-	}
+    public int mergeSeveralConditions(boolean duplicateCondition, boolean anotherCondition,
+            boolean yetAnotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            return 400;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 100;
+        } else if (yetAnotherCondition) {
+            return 200;
+        } else {
+            return 300;
+        }
+    }
 
-	public int doNotMergeExclusiveCondition(boolean duplicateCondition, boolean anotherCondition) {
-		if (duplicateCondition ^ anotherCondition) {
-			return 0;
-		} else if (duplicateCondition) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMergeExclusiveCondition(boolean duplicateCondition, boolean anotherCondition) {
+        if (duplicateCondition ^ anotherCondition) {
+            return 0;
+        } else if (duplicateCondition) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 
-	public int mergeDuplicateConditionWithoutBrackets(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition)
-			return 20;
-		else if (anotherCondition)
-			return 0;
-		else
-			return 10;
-	}
+    public int mergeDuplicateConditionWithoutBrackets(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition)
+            return 20;
+        else if (anotherCondition)
+            return 0;
+        else
+            return 10;
+    }
 
-	public void mergeDuplicateEagerCondition(boolean duplicateCondition, boolean anotherCondition) {
-		// Keep this comment
-		if (!duplicateCondition) {
-			System.out.println("foo bar");
-		} else if (anotherCondition) {
-			// Keep this comment also
-			System.out.println("foo");
-		} else {
-			System.out.println("bar");
-		}
-	}
+    public void mergeDuplicateEagerCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (!duplicateCondition) {
+            System.out.println("foo bar");
+        } else if (anotherCondition) {
+            // Keep this comment also
+            System.out.println("foo");
+        } else {
+            System.out.println("bar");
+        }
+    }
 
-	public char mergeEmbeddedDuplicateCondition(boolean b, boolean duplicateCondition, boolean anotherCondition) {
-		if (b) {
-			// Keep this comment
-			if (!duplicateCondition) {
-				return 'd';
-			} else if (anotherCondition) {
-				// Keep this comment also
-				return 'g';
-			} else {
-				return 'm';
-			}
-		}
-		return 'z';
-	}
+    public char mergeEmbeddedDuplicateCondition(boolean b, boolean duplicateCondition, boolean anotherCondition) {
+        if (b) {
+            // Keep this comment
+            if (!duplicateCondition) {
+                return 'd';
+            } else if (anotherCondition) {
+                // Keep this comment also
+                return 'g';
+            } else {
+                return 'm';
+            }
+        }
+        return 'z';
+    }
 
-	public String mergeDuplicateExpressionCondition(int i, boolean anotherCondition) {
-		// Keep this comment
-		if (!(i == 0)) {
-			return "foo";
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return "foo bar";
-		} else {
-			return "bar";
-		}
-	}
+    public String mergeDuplicateExpressionCondition(int i, boolean anotherCondition) {
+        // Keep this comment
+        if (!(i == 0)) {
+            return "foo";
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return "foo bar";
+        } else {
+            return "bar";
+        }
+    }
 
-	public double mergeDuplicateComplexCondition(int i, boolean anotherCondition) {
-		// Keep this comment
-		if (!(i < 10 || i > 20)) {
-			return 20.0;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0.0;
-		} else {
-			return 10.0;
-		}
-	}
+    public double mergeDuplicateComplexCondition(int i, boolean anotherCondition) {
+        // Keep this comment
+        if (!(i < 10 || i > 20)) {
+            return 20.0;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0.0;
+        } else {
+            return 10.0;
+        }
+    }
 
-	public double mergeOppositeCondition(int i, boolean anotherCondition) {
-		// Keep this comment
-		if (!(i < 10 || 20 < i)) {
-			return 10.0;
-		} else if (anotherCondition) {
-			// Keep this comment also
-			return 0.0;
-		} else {
-			return 20.0;
-		}
-	}
+    public double mergeOppositeCondition(int i, boolean anotherCondition) {
+        // Keep this comment
+        if (!(i < 10 || 20 < i)) {
+            return 10.0;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0.0;
+        } else {
+            return 20.0;
+        }
+    }
 
-	public int doNotMergeAssignment(int i, boolean assignedCondition) {
-		if (i == 0 && (assignedCondition = i == 0)) {
-			return 0;
-		} else if (assignedCondition = i == 0) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMergeAssignment(int i, boolean assignedCondition) {
+        if (i == 0 && (assignedCondition = i == 0)) {
+            return 0;
+        } else if (assignedCondition = i == 0) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 
-	public int doNotMergeIncrement(int i, int j) {
-		if (i == 0 && (++j == 0)) {
-			return 0;
-		} else if (++j == 0) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMergeIncrement(int i, int j) {
+        if (i == 0 && (++j == 0)) {
+            return 0;
+        } else if (++j == 0) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 
-	public int doNotMergeDecrement(int i, int j) {
-		if (i == 0 && (j-- == 0)) {
-			return 0;
-		} else if (j-- == 0) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMergeDecrement(int i, int j) {
+        if (i == 0 && (j-- == 0)) {
+            return 0;
+        } else if (j-- == 0) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 
-	public int doNotMergeMethod(int i, List<String> changedList) {
-		if (i == 0 && changedList.remove("foo")) {
-			return 0;
-		} else if (changedList.remove("foo")) {
-			return 10;
-		} else {
-			return 20;
-		}
-	}
+    public int doNotMergeMethod(int i, List<String> changedList) {
+        if (i == 0 && changedList.remove("foo")) {
+            return 0;
+        } else if (changedList.remove("foo")) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
 }

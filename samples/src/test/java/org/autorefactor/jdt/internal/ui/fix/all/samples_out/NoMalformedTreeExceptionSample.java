@@ -26,12 +26,12 @@
 package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 
 public class NoMalformedTreeExceptionSample {
-	public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
-		if (o == null) {
-			System.out.println("null");
-		} else /* Convert to block comment */
-		if ("true".equals(o)) {
-			System.out.println("true");
-		}
-	}
+    public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
+        if (o == null) {
+            System.out.println("null");
+        } else /* Convert to block comment */
+        if ("true".equals(o)) {
+            System.out.println("true");
+        }
+    }
 }

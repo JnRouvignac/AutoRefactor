@@ -36,53 +36,53 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.LogRecord;
 
 public class FormattedNumberRatherThanPackedNumberSample {
-	private long usual = 101l;
-	private long octal = 0121l;
-	private long hex = 0xdafdafdafl;
-	private long binary = 0b1110010111l;
-	private long withUnderscore = 101_101l;
+    private long usual = 101l;
+    private long octal = 0121l;
+    private long hex = 0xdafdafdafl;
+    private long binary = 0b1110010111l;
+    private long withUnderscore = 101_101l;
 
-	private float usualFloat = 101f;
-	private float octalFloat = 0121f;
+    private float usualFloat = 101f;
+    private float octalFloat = 0121f;
 
-	public void formatMillisAndNanos() throws InterruptedException {
-		new Thread().join(1000000L);
-		new Thread().join(1000000L, 1000000);
-		Thread.sleep(1000000L);
-		Thread.sleep(1000000L, 1000000);
-		LocalTime.now().minusNanos(1000000L);
-		LocalTime.of(1000000, 1000000, 1000000, 1000000);
-		LocalTime.ofNanoOfDay(1000000L);
-		LocalTime.now().plusNanos(1000000L);
-		LocalTime.now().withNano(1000000);
-		LocalDateTime.now().minusNanos(1000000L);
-		LocalDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000);
-		LocalDateTime.ofEpochSecond(1000000L, 1000000, null);
-		LocalDateTime.now().plusNanos(1000000L);
-		LocalDateTime.now().withNano(1000000);
-		new SimpleTimeZone(0, null).getOffset(1000000, 1000000, 1000000, 1000000, 1000000, 1000000);
-		new SimpleTimeZone(0, null).setDSTSavings(1000000);
-		new SimpleTimeZone(0, null).setRawOffset(1000000);
-		TimeUnit.valueOf("").sleep(1000000L);
-		Instant.now().minusMillis(1000000L);
-		Instant.now().minusNanos(1000000L);
-		Instant.ofEpochMilli(1000000L);
-		Instant.now().plusMillis(1000000L);
-		Instant.now().plusNanos(1000000L);
-		OffsetDateTime.now().minusNanos(1000000L);
-		OffsetDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, null);
-		OffsetDateTime.now().plusNanos(1000000L);
-		OffsetDateTime.now().withNano(1000000);
-		new LogRecord(null, null).setMillis(1000000L);
-		ZonedDateTime.now().minusNanos(1000000L);
-		ZonedDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, null);
-		ZonedDateTime.now().plusNanos(1000000L);
-		ZonedDateTime.now().withNano(1000000);
-		FileTime.fromMillis(1000000L);
-	}
+    public void formatMillisAndNanos() throws InterruptedException {
+        new Thread().join(1000000L);
+        new Thread().join(1000000L, 1000000);
+        Thread.sleep(1000000L);
+        Thread.sleep(1000000L, 1000000);
+        LocalTime.now().minusNanos(1000000L);
+        LocalTime.of(1000000, 1000000, 1000000, 1000000);
+        LocalTime.ofNanoOfDay(1000000L);
+        LocalTime.now().plusNanos(1000000L);
+        LocalTime.now().withNano(1000000);
+        LocalDateTime.now().minusNanos(1000000L);
+        LocalDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000);
+        LocalDateTime.ofEpochSecond(1000000L, 1000000, null);
+        LocalDateTime.now().plusNanos(1000000L);
+        LocalDateTime.now().withNano(1000000);
+        new SimpleTimeZone(0, null).getOffset(1000000, 1000000, 1000000, 1000000, 1000000, 1000000);
+        new SimpleTimeZone(0, null).setDSTSavings(1000000);
+        new SimpleTimeZone(0, null).setRawOffset(1000000);
+        TimeUnit.valueOf("").sleep(1000000L);
+        Instant.now().minusMillis(1000000L);
+        Instant.now().minusNanos(1000000L);
+        Instant.ofEpochMilli(1000000L);
+        Instant.now().plusMillis(1000000L);
+        Instant.now().plusNanos(1000000L);
+        OffsetDateTime.now().minusNanos(1000000L);
+        OffsetDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, null);
+        OffsetDateTime.now().plusNanos(1000000L);
+        OffsetDateTime.now().withNano(1000000);
+        new LogRecord(null, null).setMillis(1000000L);
+        ZonedDateTime.now().minusNanos(1000000L);
+        ZonedDateTime.of(1000000, 1000000, 1000000, 1000000, 1000000, 1000000, 1000000, null);
+        ZonedDateTime.now().plusNanos(1000000L);
+        ZonedDateTime.now().withNano(1000000);
+        FileTime.fromMillis(1000000L);
+    }
 
-	public void doNotFormatFormattedNumbers() throws InterruptedException {
-		new Thread().join(1_000_000L);
-		new Thread().join(1_00_00_00L);
-	}
+    public void doNotFormatFormattedNumbers() throws InterruptedException {
+        new Thread().join(1_000_000L);
+        new Thread().join(1_00_00_00L);
+    }
 }

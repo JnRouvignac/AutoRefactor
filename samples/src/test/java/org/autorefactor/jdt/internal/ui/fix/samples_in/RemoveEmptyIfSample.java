@@ -30,124 +30,124 @@ import java.util.List;
 
 public class RemoveEmptyIfSample {
 
-	public int removeEmptyElseClause(boolean b) {
-		int i = 0;
-		if (b) {
-			i++;
-		} else {
-		}
-		return i;
-	}
+    public int removeEmptyElseClause(boolean b) {
+        int i = 0;
+        if (b) {
+            i++;
+        } else {
+        }
+        return i;
+    }
 
-	public int removeEmptyThenClause(boolean b) {
-		int i = 0;
-		if (b) {
-		} else {
-			i++;
-		}
-		return i;
-	}
+    public int removeEmptyThenClause(boolean b) {
+        int i = 0;
+        if (b) {
+        } else {
+            i++;
+        }
+        return i;
+    }
 
-	public int removeEmptyIfStatement(boolean b) {
-		int i = 0;
-		if (b) {
-		} else {
-		}
-		return i;
-	}
+    public int removeEmptyIfStatement(boolean b) {
+        int i = 0;
+        if (b) {
+        } else {
+        }
+        return i;
+    }
 
-	public interface MethodDeclarationWithoutBody {
-		void aMethod();
-	}
+    public interface MethodDeclarationWithoutBody {
+        void aMethod();
+    }
 
-	public void doNotRemovePackageAccessedMethodOverride() {
-		MyAbstractList<String> l = new MyAbstractList<>();
-		l.removeRange(0, l.size());
-	}
+    public void doNotRemovePackageAccessedMethodOverride() {
+        MyAbstractList<String> l = new MyAbstractList<>();
+        l.removeRange(0, l.size());
+    }
 
-	public static class MyAbstractList<E> extends AbstractList<E> {
-		@Override
-		public E get(int index) {
-			return null;
-		}
+    public static class MyAbstractList<E> extends AbstractList<E> {
+        @Override
+        public E get(int index) {
+            return null;
+        }
 
-		@Override
-		public int size() {
-			return 0;
-		}
+        @Override
+        public int size() {
+            return 0;
+        }
 
-		@Override
-		protected void removeRange(int fromIndex, int toIndex) {
-			super.removeRange(fromIndex, toIndex);
-		}
-	}
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            super.removeRange(fromIndex, toIndex);
+        }
+    }
 
-	public void doNotRemoveIncrement(int i) {
-		if (i++ > 0) {
+    public void doNotRemoveIncrement(int i) {
+        if (i++ > 0) {
 
-		}
-	}
+        }
+    }
 
-	public void doNotRemoveAssgnment(int i) {
-		if ((i = 10) > 0) {
+    public void doNotRemoveAssgnment(int i) {
+        if ((i = 10) > 0) {
 
-		}
-	}
+        }
+    }
 
-	public void doNotRemoveMethod(List<String> list) {
-		if (list.remove("foo")) {
+    public void doNotRemoveMethod(List<String> list) {
+        if (list.remove("foo")) {
 
-		}
-	}
+        }
+    }
 
-	public int replaceDeadCodeByEmptyBlock(int i, byte[] bytes, boolean uselessCondition) {
-		for (;i * 13 < 100; i++) {
-			if (uselessCondition) {
-			}
-		}
+    public int replaceDeadCodeByEmptyBlock(int i, byte[] bytes, boolean uselessCondition) {
+        for (;i * 13 < 100; i++) {
+            if (uselessCondition) {
+            }
+        }
 
-		for (byte oneByte : bytes) {
-			if (uselessCondition) {
-			}
-		}
+        for (byte oneByte : bytes) {
+            if (uselessCondition) {
+            }
+        }
 
-		while ((i++) * 13 < 100) {
-			if (uselessCondition) {
-			}
-		}
+        while ((i++) * 13 < 100) {
+            if (uselessCondition) {
+            }
+        }
 
-		do {
-			if (uselessCondition) {
-			}
-		}
-		while ((i--) * 13 > -200);
+        do {
+            if (uselessCondition) {
+            }
+        }
+        while ((i--) * 13 > -200);
 
-		if (i > 0)
-			i++;
-		else if (uselessCondition) {
-		}
+        if (i > 0)
+            i++;
+        else if (uselessCondition) {
+        }
 
-		return i;
-	}
+        return i;
+    }
 
-	public int replaceDeadCodeByAddingBlock(int i, byte[] bytes, boolean uselessCondition) {
-		for (;i * 13 < 100; i++)
-			if (uselessCondition) {
-			}
+    public int replaceDeadCodeByAddingBlock(int i, byte[] bytes, boolean uselessCondition) {
+        for (;i * 13 < 100; i++)
+            if (uselessCondition) {
+            }
 
-		for (byte oneByte : bytes)
-			if (uselessCondition) {
-			}
+        for (byte oneByte : bytes)
+            if (uselessCondition) {
+            }
 
-		while ((i++) * 13 < 100)
-			if (uselessCondition) {
-			}
+        while ((i++) * 13 < 100)
+            if (uselessCondition) {
+            }
 
-		do
-			if (uselessCondition) {
-			}
-		while ((i--) * 13 > -200);
+        do
+            if (uselessCondition) {
+            }
+        while ((i--) * 13 > -200);
 
-		return i;
-	}
+        return i;
+    }
 }

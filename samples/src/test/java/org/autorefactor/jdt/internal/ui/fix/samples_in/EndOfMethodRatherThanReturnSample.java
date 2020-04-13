@@ -26,101 +26,101 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class EndOfMethodRatherThanReturnSample {
-	public void removeUselessReturn() {
-		return;
-	}
+    public void removeUselessReturn() {
+        return;
+    }
 
-	public void removeUselessReturnWithPreviousCode() {
-		System.out.println("Keep this line");
-		return;
-	}
+    public void removeUselessReturnWithPreviousCode() {
+        System.out.println("Keep this line");
+        return;
+    }
 
-	public int doNotRemoveReturnWithValue() {
-		return 0;
-	}
+    public int doNotRemoveReturnWithValue() {
+        return 0;
+    }
 
-	public void removeUselessReturnWithIf(boolean isValid) {
-		if (isValid) {
-			System.out.println("Keep this line");
-			return;
-		}
-	}
+    public void removeUselessReturnWithIf(boolean isValid) {
+        if (isValid) {
+            System.out.println("Keep this line");
+            return;
+        }
+    }
 
-	public void replaceByBlock(boolean isEnabled) {
-		System.out.println("Keep this line");
-		if (isEnabled)
-			return;
-	}
+    public void replaceByBlock(boolean isEnabled) {
+        System.out.println("Keep this line");
+        if (isEnabled)
+            return;
+    }
 
-	public void removeElseStatement(boolean isValid) {
-		System.out.println("Keep this line");
-		if (isValid)
-			System.out.println("isValid is true");
-		else
-			return;
-	}
+    public void removeElseStatement(boolean isValid) {
+        System.out.println("Keep this line");
+        if (isValid)
+            System.out.println("isValid is true");
+        else
+            return;
+    }
 
-	public void removeUselessReturnWithSwitch(int myNumber) {
-		switch (myNumber) {
-		case 0:
-			System.out.println("Keep this line");
-			return;
-		}
-	}
+    public void removeUselessReturnWithSwitch(int myNumber) {
+        switch (myNumber) {
+        case 0:
+            System.out.println("Keep this line");
+            return;
+        }
+    }
 
-	public void doNotRemoveUselessReturnInMiddleOfSwitch(int myNumber) {
-		switch (myNumber) {
-		case 0:
-			System.out.println("I'm not the last statement");
-			return;
-		case 1:
-			System.out.println("Do some stuff");
-			break;
-		}
-	}
+    public void doNotRemoveUselessReturnInMiddleOfSwitch(int myNumber) {
+        switch (myNumber) {
+        case 0:
+            System.out.println("I'm not the last statement");
+            return;
+        case 1:
+            System.out.println("Do some stuff");
+            break;
+        }
+    }
 
-	public void removeUselessReturnWithIfElse(boolean isValid) {
-		if (isValid) {
-			System.out.println("Keep this line");
-			return;
-		} else {
-			System.out.println("Remove anyway");
-		}
-	}
+    public void removeUselessReturnWithIfElse(boolean isValid) {
+        if (isValid) {
+            System.out.println("Keep this line");
+            return;
+        } else {
+            System.out.println("Remove anyway");
+        }
+    }
 
-	public void doNotRemoveReturnWithFollowingCode(boolean isValid) {
-		if (isValid) {
-			System.out.println("Keep this line");
-			return;
-		}
-		System.out.println("Keep this line");
-	}
+    public void doNotRemoveReturnWithFollowingCode(boolean isValid) {
+        if (isValid) {
+            System.out.println("Keep this line");
+            return;
+        }
+        System.out.println("Keep this line");
+    }
 
-	public void doNotRemoveReturnInWhile(int myNumber) {
-		while (myNumber-- > 0) {
-			System.out.println("Keep this line");
-			return;
-		}
-	}
+    public void doNotRemoveReturnInWhile(int myNumber) {
+        while (myNumber-- > 0) {
+            System.out.println("Keep this line");
+            return;
+        }
+    }
 
-	public void doNotRemoveReturnInDoWhile(int myNumber) {
-		do {
-			System.out.println("Keep this line");
-			return;
-		} while (myNumber-- > 0);
-	}
+    public void doNotRemoveReturnInDoWhile(int myNumber) {
+        do {
+            System.out.println("Keep this line");
+            return;
+        } while (myNumber-- > 0);
+    }
 
-	public void doNotRemoveReturnInFor() {
-		for (int myNumber = 0; myNumber < 10; myNumber++) {
-			System.out.println("Keep this line");
-			return;
-		}
-	}
+    public void doNotRemoveReturnInFor() {
+        for (int myNumber = 0; myNumber < 10; myNumber++) {
+            System.out.println("Keep this line");
+            return;
+        }
+    }
 
-	public void doNotRemoveReturnInForEach(int[] integers) {
-		for (int myNumber : integers) {
-			System.out.println("Only the first value: " + myNumber);
-			return;
-		}
-	}
+    public void doNotRemoveReturnInForEach(int[] integers) {
+        for (int myNumber : integers) {
+            System.out.println("Only the first value: " + myNumber);
+            return;
+        }
+    }
 }

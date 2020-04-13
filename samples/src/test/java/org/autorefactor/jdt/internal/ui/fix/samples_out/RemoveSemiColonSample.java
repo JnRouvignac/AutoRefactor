@@ -5,35 +5,35 @@ import java.io.IOException;
 
 public abstract class RemoveSemiColonSample {
 
-	static {
-	}
+    static {
+    }
 
-	private static enum MyEnum {
-	}
+    private static enum MyEnum {
+    }
 
-	private static @interface MyAnotation {
-	}
+    private static @interface MyAnotation {
+    }
 
-	private int field;
+    private int field;
 
-	private void aMethod() {
-	}
+    private void aMethod() {
+    }
 
-	public abstract void anAbstractMethod();
+    public abstract void anAbstractMethod();
 
-	public abstract void removeComments();/**;*//*;*///;
+    public abstract void removeComments();/**;*//*;*///;
 
-	public int removeLastSemiColonInTryWithResources() throws IOException {
-		try (FileInputStream fis = new FileInputStream("dummy.txt")/*;)*//*;)*/)/*;)*/
-		/*;)*/{
-		  return fis.read();
-		}
-	}
+    public int removeLastSemiColonInTryWithResources() throws IOException {
+        try (FileInputStream fis = new FileInputStream("dummy.txt")/*;)*//*;)*/)/*;)*/
+        /*;)*/{
+          return fis.read();
+        }
+    }
 
-	public void doNotThrowWithTypeDeclarationStatement() throws IOException {
-		class DoNotTriggerAThrow {
-		}
-	}
+    public void doNotThrowWithTypeDeclarationStatement() throws IOException {
+        class DoNotTriggerAThrow {
+        }
+    }
 }
 
 class Unused {

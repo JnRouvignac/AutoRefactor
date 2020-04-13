@@ -27,87 +27,87 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class RemoveUnneededThisExpressionSample {
 
-	public void removeThisExpression() {
-		// Keep this comment
-		testRemoveThisExpression(42);
-		testRemoveThisExpression(42);
-		hashCode();
-	}
+    public void removeThisExpression() {
+        // Keep this comment
+        testRemoveThisExpression(42);
+        testRemoveThisExpression(42);
+        hashCode();
+    }
 
-	public void removeThisExpressionForAnonymousClass() {
-		new Object() {
-			public void testRemoveThisExpression(int i) {
-				// Keep this comment
-				testRemoveThisExpression(i);
-			}
-		}.testRemoveThisExpression(42);
-	}
+    public void removeThisExpressionForAnonymousClass() {
+        new Object() {
+            public void testRemoveThisExpression(int i) {
+                // Keep this comment
+                testRemoveThisExpression(i);
+            }
+        }.testRemoveThisExpression(42);
+    }
 
-	public void doNotRemoveThisExpressionForAnonymousClass() {
-		new Object() {
-			public void testRemoveThisExpression(int i) {
-				RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
-			}
-		}.testRemoveThisExpression(42);
-	}
+    public void doNotRemoveThisExpressionForAnonymousClass() {
+        new Object() {
+            public void testRemoveThisExpression(int i) {
+                RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
+            }
+        }.testRemoveThisExpression(42);
+    }
 
-	public void doNotRemoveThisExpressionForAnonymousClassWithPrimitiveOverloadedMethod() {
-		new Object() {
-			public void doNotRemoveThisExpression(int i) {
-				RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
-			}
+    public void doNotRemoveThisExpressionForAnonymousClassWithPrimitiveOverloadedMethod() {
+        new Object() {
+            public void doNotRemoveThisExpression(int i) {
+                RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
+            }
 
-			public void testRemoveThisExpression(long l) {
-				System.out.println(l);
-			}
-		}.doNotRemoveThisExpression(42);
-	}
+            public void testRemoveThisExpression(long l) {
+                System.out.println(l);
+            }
+        }.doNotRemoveThisExpression(42);
+    }
 
-	public void doNotRemoveThisExpressionForAnonymousClassWithObjectOverloadedMethod() {
-		new Object() {
-			public void doNotRemoveThisExpression(int i) {
-				RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
-			}
+    public void doNotRemoveThisExpressionForAnonymousClassWithObjectOverloadedMethod() {
+        new Object() {
+            public void doNotRemoveThisExpression(int i) {
+                RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(i);
+            }
 
-			public void testRemoveThisExpression(Integer i) {
-				System.out.println(i);
-			}
-		}.doNotRemoveThisExpression(42);
-	}
+            public void testRemoveThisExpression(Integer i) {
+                System.out.println(i);
+            }
+        }.doNotRemoveThisExpression(42);
+    }
 
-	public class InnerClass {
+    public class InnerClass {
 
-		public void removeThisExpression() {
-			// Keep this comment
-			testRemoveThisExpression(42);
-			testRemoveThisExpression(42);
-			testRemoveThisExpression(42);
-		}
+        public void removeThisExpression() {
+            // Keep this comment
+            testRemoveThisExpression(42);
+            testRemoveThisExpression(42);
+            testRemoveThisExpression(42);
+        }
 
-		public void doNotRemoveThisExpression() {
-			RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(42);
-		}
+        public void doNotRemoveThisExpression() {
+            RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(42);
+        }
 
-		public void testRemoveThisExpression(int i) {
-		}
-	}
+        public void testRemoveThisExpression(int i) {
+        }
+    }
 
-	private void testRemoveThisExpression(int i) {
-	}
+    private void testRemoveThisExpression(int i) {
+    }
 
-	public String doNotRemoveThis() {
-		return this.<String>aGenericMethod();
-	}
+    public String doNotRemoveThis() {
+        return this.<String>aGenericMethod();
+    }
 
-	public String removeThisAndUselessTypeParameter() {
-		return this.<Class> notGenericMethod();
-	}
+    public String removeThisAndUselessTypeParameter() {
+        return this.<Class> notGenericMethod();
+    }
 
-	private <T> T aGenericMethod() {
-		return null;
-	}
+    private <T> T aGenericMethod() {
+        return null;
+    }
 
-	private String notGenericMethod() {
-		return null;
-	}
+    private String notGenericMethod() {
+        return null;
+    }
 }

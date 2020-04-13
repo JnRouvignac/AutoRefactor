@@ -34,126 +34,126 @@ import java.util.Date;
 import java.util.Observable;
 
 public class ImplicitDefaultConstructorRatherThanWrittenOneSample {
-	public ImplicitDefaultConstructorRatherThanWrittenOneSample() {
-	}
+    public ImplicitDefaultConstructorRatherThanWrittenOneSample() {
+    }
 
-	public class RemoveDefaultConstructor {
-		public RemoveDefaultConstructor() {}
-	}
+    public class RemoveDefaultConstructor {
+        public RemoveDefaultConstructor() {}
+    }
 
-	public class RemoveDefaultConstructorWithSuperCall {
-		public RemoveDefaultConstructorWithSuperCall() {
-			super();
-		}
-	}
+    public class RemoveDefaultConstructorWithSuperCall {
+        public RemoveDefaultConstructorWithSuperCall() {
+            super();
+        }
+    }
 
-	public class DoNotRemoveConstructorWithCode {
-		public DoNotRemoveConstructorWithCode() {
-			System.out.println("Don't lose me!");
-		}
-	}
+    public class DoNotRemoveConstructorWithCode {
+        public DoNotRemoveConstructorWithCode() {
+            System.out.println("Don't lose me!");
+        }
+    }
 
-	class DoNotRemovePackageConstructorWithCode {
-		DoNotRemovePackageConstructorWithCode() {
-			System.out.println("Don't lose me!");
-		}
-	}
+    class DoNotRemovePackageConstructorWithCode {
+        DoNotRemovePackageConstructorWithCode() {
+            System.out.println("Don't lose me!");
+        }
+    }
 
-	public class DoNotRemoveConstructorWithSuperAndCode {
-		public DoNotRemoveConstructorWithSuperAndCode() {
-			super();
-			System.out.println("Don't lose me!");
-		}
-	}
+    public class DoNotRemoveConstructorWithSuperAndCode {
+        public DoNotRemoveConstructorWithSuperAndCode() {
+            super();
+            System.out.println("Don't lose me!");
+        }
+    }
 
-	public class RemoveDefaultConstructorWithInheritance extends Observable {
-		public RemoveDefaultConstructorWithInheritance() {}
-	}
+    public class RemoveDefaultConstructorWithInheritance extends Observable {
+        public RemoveDefaultConstructorWithInheritance() {}
+    }
 
-	public class RemoveDefaultConstructorWithSuperInheritedCall extends Observable {
-		public RemoveDefaultConstructorWithSuperInheritedCall() {
-			super();
-		}
-	}
+    public class RemoveDefaultConstructorWithSuperInheritedCall extends Observable {
+        public RemoveDefaultConstructorWithSuperInheritedCall() {
+            super();
+        }
+    }
 
-	protected class RemoveProtectedConstructor {
-		protected RemoveProtectedConstructor() {}
-	}
+    protected class RemoveProtectedConstructor {
+        protected RemoveProtectedConstructor() {}
+    }
 
-	class RemovePackageConstructor {
-		RemovePackageConstructor() {}
-	}
+    class RemovePackageConstructor {
+        RemovePackageConstructor() {}
+    }
 
-	private class RemovePrivateConstructor {
-		private RemovePrivateConstructor() {}
-	}
+    private class RemovePrivateConstructor {
+        private RemovePrivateConstructor() {}
+    }
 
-	public class DoNotRemoveProtectedConstructor {
-		protected DoNotRemoveProtectedConstructor() {}
-	}
+    public class DoNotRemoveProtectedConstructor {
+        protected DoNotRemoveProtectedConstructor() {}
+    }
 
-	public class DoNotRemovePackageConstructor {
-		DoNotRemovePackageConstructor() {}
-	}
+    public class DoNotRemovePackageConstructor {
+        DoNotRemovePackageConstructor() {}
+    }
 
-	public class DoNotRemovePrivateConstructor {
-		private DoNotRemovePrivateConstructor() {}
-	}
+    public class DoNotRemovePrivateConstructor {
+        private DoNotRemovePrivateConstructor() {}
+    }
 
-	protected class DoNotRemovePublicConstructor {
-		public DoNotRemovePublicConstructor() {}
-	}
+    protected class DoNotRemovePublicConstructor {
+        public DoNotRemovePublicConstructor() {}
+    }
 
-	public class DoNotRemoveProtectedConstructorWithSuperCall {
-		protected DoNotRemoveProtectedConstructorWithSuperCall() {
-			super();
-		}
-	}
+    public class DoNotRemoveProtectedConstructorWithSuperCall {
+        protected DoNotRemoveProtectedConstructorWithSuperCall() {
+            super();
+        }
+    }
 
-	public class DoNotRemoveAnnotatedConstructor {
-		@ConstructorProperties(value = { "We need an annotation" })
-		public DoNotRemoveAnnotatedConstructor() {}
-	}
+    public class DoNotRemoveAnnotatedConstructor {
+        @ConstructorProperties(value = { "We need an annotation" })
+        public DoNotRemoveAnnotatedConstructor() {}
+    }
 
-	public class DoNotRemoveConstructorWithParameter {
-		public DoNotRemoveConstructorWithParameter(int i) {}
-	}
+    public class DoNotRemoveConstructorWithParameter {
+        public DoNotRemoveConstructorWithParameter(int i) {}
+    }
 
-	public class DoNotRemoveConstructorWithVararg {
-		public DoNotRemoveConstructorWithVararg(int... i) {}
-	}
+    public class DoNotRemoveConstructorWithVararg {
+        public DoNotRemoveConstructorWithVararg(int... i) {}
+    }
 
-	public class DoNotRemoveConstructorWithParameterizedSuperCall extends Date {
-		private static final long serialVersionUID = -2817725354012950325L;
+    public class DoNotRemoveConstructorWithParameterizedSuperCall extends Date {
+        private static final long serialVersionUID = -2817725354012950325L;
 
-		public DoNotRemoveConstructorWithParameterizedSuperCall() {
-			super(0);
-		}
-	}
+        public DoNotRemoveConstructorWithParameterizedSuperCall() {
+            super(0);
+        }
+    }
 
-	public class DoNotRemoveDefaultConstructorWithOtherConstructors {
-		public DoNotRemoveDefaultConstructorWithOtherConstructors() {}
-		public DoNotRemoveDefaultConstructorWithOtherConstructors(int i) {}
-	}
+    public class DoNotRemoveDefaultConstructorWithOtherConstructors {
+        public DoNotRemoveDefaultConstructorWithOtherConstructors() {}
+        public DoNotRemoveDefaultConstructorWithOtherConstructors(int i) {}
+    }
 
-	public class RemoveDefaultConstructorWithMethod {
-		public RemoveDefaultConstructorWithMethod() {}
-		public void process() {}
-	}
+    public class RemoveDefaultConstructorWithMethod {
+        public RemoveDefaultConstructorWithMethod() {}
+        public void process() {}
+    }
 
-	public class RemoveDefaultConstructorWithCheckedException {
-		public RemoveDefaultConstructorWithCheckedException() throws ParseException {}
-	}
+    public class RemoveDefaultConstructorWithCheckedException {
+        public RemoveDefaultConstructorWithCheckedException() throws ParseException {}
+    }
 
-	public class RemoveSerializableConstructorWithCheckedException implements Serializable {
-		public RemoveSerializableConstructorWithCheckedException() throws ParseException {}
-	}
+    public class RemoveSerializableConstructorWithCheckedException implements Serializable {
+        public RemoveSerializableConstructorWithCheckedException() throws ParseException {}
+    }
 
-	public class DoNotRemoveInheritedCheckedException extends UnicastRemoteObject {
-		public DoNotRemoveInheritedCheckedException() throws RemoteException {}
-	}
+    public class DoNotRemoveInheritedCheckedException extends UnicastRemoteObject {
+        public DoNotRemoveInheritedCheckedException() throws RemoteException {}
+    }
 
-	public class RemoveDefaultConstructorWithRuntimeException extends Date {
-		public RemoveDefaultConstructorWithRuntimeException() throws NullPointerException {}
-	}
+    public class RemoveDefaultConstructorWithRuntimeException extends Date {
+        public RemoveDefaultConstructorWithRuntimeException() throws NullPointerException {}
+    }
 }

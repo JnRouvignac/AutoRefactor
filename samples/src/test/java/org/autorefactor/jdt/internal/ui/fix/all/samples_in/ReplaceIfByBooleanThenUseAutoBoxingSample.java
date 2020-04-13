@@ -26,12 +26,12 @@
 package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 
 public class ReplaceIfByBooleanThenUseAutoBoxingSample {
-	public static Boolean returnIfConditionMixedBoolean(boolean b) {
-		// Keep this comment
-		if (b) {
-			return Boolean.TRUE;
-		} else {
-			return false;
-		}
-	}
+    public static Boolean returnIfConditionMixedBoolean(boolean b) {
+        // Keep this comment
+        if (b) {
+            return Boolean.TRUE;
+        } else {
+            return false;
+        }
+    }
 }

@@ -27,162 +27,162 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class RemoveUnnecessaryLocalBeforeReturnSample {
 
-	private int i;
+    private int i;
 
-	private double[] arrayField = new double[] { 42.42 };
+    private double[] arrayField = new double[] { 42.42 };
 
-	public int inlineLocalVariableDeclaration() {
-		return 0;
-	}
+    public int inlineLocalVariableDeclaration() {
+        return 0;
+    }
 
-	public int inlineLocalVariableAssignment(int i) {
-		return 0;
-	}
+    public int inlineLocalVariableAssignment(int i) {
+        return 0;
+    }
 
-	/**
-	 * No need to check for array variable assignments.
-	 * <p>
-	 * Trying to use it reports compile error "Array constants can only be used in initializers"
-	 * <p>
-	 */
-	public String[] inlineStringArrayConstants() {
-		return new String[] { "test" };
-	}
+    /**
+     * No need to check for array variable assignments.
+     * <p>
+     * Trying to use it reports compile error "Array constants can only be used in initializers"
+     * <p>
+     */
+    public String[] inlineStringArrayConstants() {
+        return new String[] { "test" };
+    }
 
-	public String[][] inlineStringArray2Constants() {
-		return new String[][] { { "test" } };
-	}
-	
-	public String[] inlineCStyleStringArrayConstants() {
-		return new String[] { "test" };
-	}
+    public String[][] inlineStringArray2Constants() {
+        return new String[][] { { "test" } };
+    }
+    
+    public String[] inlineCStyleStringArrayConstants() {
+        return new String[] { "test" };
+    }
 
-	public String[][] inlineCStyleStringArray2Constants() {
-		return new String[][] { { "test" } };
-	}
-	
-	public String[][] inlineMixedStyleStringArrayConstantsNotSupportedYet() {
-		String[] array[] = { { "mixtest" } };
-		return array;
-	}
-	
-	public boolean[] inlineBooleanArrayConstants() {
-		return new boolean[] { true };
-	}
+    public String[][] inlineCStyleStringArray2Constants() {
+        return new String[][] { { "test" } };
+    }
+    
+    public String[][] inlineMixedStyleStringArrayConstantsNotSupportedYet() {
+        String[] array[] = { { "mixtest" } };
+        return array;
+    }
+    
+    public boolean[] inlineBooleanArrayConstants() {
+        return new boolean[] { true };
+    }
 
-	public char[] inlineCharArrayConstants() {
-		return new char[] { 'a' };
-	}
+    public char[] inlineCharArrayConstants() {
+        return new char[] { 'a' };
+    }
 
-	public byte[] inlineByteArrayConstants() {
-		return new byte[] { 42 };
-	}
+    public byte[] inlineByteArrayConstants() {
+        return new byte[] { 42 };
+    }
 
-	public short[] inlineShortArrayConstants() {
-		return new short[] { 42 };
-	}
+    public short[] inlineShortArrayConstants() {
+        return new short[] { 42 };
+    }
 
-	public int[] inlineIntArrayConstants() {
-		return new int[] { 42 };
-	}
+    public int[] inlineIntArrayConstants() {
+        return new int[] { 42 };
+    }
 
-	public long[] inlineLongArrayConstants() {
-		return new long[] { 42 };
-	}
+    public long[] inlineLongArrayConstants() {
+        return new long[] { 42 };
+    }
 
-	public float[] inlineFloatArrayConstants() {
-		return new float[] { 42.42f };
-	}
+    public float[] inlineFloatArrayConstants() {
+        return new float[] { 42.42f };
+    }
 
-	public double[] inlineDoubleArrayConstants() {
-		return new double[] { 42.42 };
-	}
+    public double[] inlineDoubleArrayConstants() {
+        return new double[] { 42.42 };
+    }
 
-	public double[] inlineDoubleArrayCreation() {
-		return new double[] { 42.42 };
-	}
+    public double[] inlineDoubleArrayCreation() {
+        return new double[] { 42.42 };
+    }
 
-	public double[] inlineDoubleArrayVariableDeclaration() {
-		return arrayField;
-	}
+    public double[] inlineDoubleArrayVariableDeclaration() {
+        return arrayField;
+    }
 
-	public double[] inlineDoubleArrayAssignment() {
-		double[] array = null;
-		return arrayField;
-	}
+    public double[] inlineDoubleArrayAssignment() {
+        double[] array = null;
+        return arrayField;
+    }
 
-	public int notInlineFieldAssignment1() {
-		i = 0;
-		return i;
-	}
+    public int notInlineFieldAssignment1() {
+        i = 0;
+        return i;
+    }
 
-	public int notInlineFieldAssignment2() {
-		this.i = 0;
-		return i;
-	}
+    public int notInlineFieldAssignment2() {
+        this.i = 0;
+        return i;
+    }
 
-	public Throwable[] inlineStatementWithEmptyArray() {
-		return new Throwable[] {};
-	}
+    public Throwable[] inlineStatementWithEmptyArray() {
+        return new Throwable[] {};
+    }
 
-	public Throwable[] inlineExpressionWithEmptyArray(Throwable[] t) {
-		return new Throwable[] {};
-	}
+    public Throwable[] inlineExpressionWithEmptyArray(Throwable[] t) {
+        return new Throwable[] {};
+    }
 
-	public char[] refactorMethodCall(String s) {
-		return s.toCharArray();
-	}
+    public char[] refactorMethodCall(String s) {
+        return s.toCharArray();
+    }
 
-	public int inlineSeveralReturns(int i1, int i2) {
-		if (i1 == 0) {
-			return 10;
-		} else {
-			return 11;
-		}
-	}
+    public int inlineSeveralReturns(int i1, int i2) {
+        if (i1 == 0) {
+            return 10;
+        } else {
+            return 11;
+        }
+    }
 
-	public int doNotInlineVariableInFinally() {
-		int i = 0;
-		try {
-			i = 1;
-			return i;
-		} finally {
-			System.out.println(i);
-		}
-	}
+    public int doNotInlineVariableInFinally() {
+        int i = 0;
+        try {
+            i = 1;
+            return i;
+        } finally {
+            System.out.println(i);
+        }
+    }
 
-	public int doNotInlineCatchVariableInFinally() {
-		int i = 0;
-		try {
-			return 1;
-		} catch (Exception e) {
-			i = 1;
-			return 2;
-		} finally {
-			System.out.println(i);
-		}
-	}
+    public int doNotInlineCatchVariableInFinally() {
+        int i = 0;
+        try {
+            return 1;
+        } catch (Exception e) {
+            i = 1;
+            return 2;
+        } finally {
+            System.out.println(i);
+        }
+    }
 
-	public int inlineUnusedVariableInFinally() {
-		int i = 0;
-		try {
-			return 1;
-		} finally {
-			System.out.println("Finished");
-		}
-	}
+    public int inlineUnusedVariableInFinally() {
+        int i = 0;
+        try {
+            return 1;
+        } finally {
+            System.out.println("Finished");
+        }
+    }
 
-	public int doNotInlineVariableInFarAwayFinally() {
-		int i = 0;
-		try {
-			try {
-				i = 1;
-				return i;
-			} finally {
-				System.out.println("Finished");
-			}
-		} finally {
-			System.out.println(i);
-		}
-	}
+    public int doNotInlineVariableInFarAwayFinally() {
+        int i = 0;
+        try {
+            try {
+                i = 1;
+                return i;
+            } finally {
+                System.out.println("Finished");
+            }
+        } finally {
+            System.out.println(i);
+        }
+    }
 }

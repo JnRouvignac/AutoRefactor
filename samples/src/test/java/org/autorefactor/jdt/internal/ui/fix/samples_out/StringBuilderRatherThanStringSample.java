@@ -29,285 +29,285 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringBuilderRatherThanStringSample {
-	private String field= "";
+    private String field= "";
 
-	public static String useStringBuilder() {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
-		// Keep this comment also
-		variable.append("foo");
-		// Keep this comment too
-		return variable.toString();
-	}
+    public static String useStringBuilder() {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
+        // Keep this comment also
+        variable.append("foo");
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String useStringBuilderWithInitializer() {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder("foo");
-		// Keep this comment also
-		variable.append("bar");
-		// Keep this comment too
-		return variable.toString();
-	}
+    public static String useStringBuilderWithInitializer() {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder("foo");
+        // Keep this comment also
+        variable.append("bar");
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String doNotRefactorNullString() {
-		String variable= null;
-		variable+= "foo";
-		return variable;
-	}
+    public static String doNotRefactorNullString() {
+        String variable= null;
+        variable+= "foo";
+        return variable;
+    }
 
-	public static String doNotRefactorMultideclaration() {
-		String variable= "", anotherVariable= "";
-		variable+= "foo";
-		return variable;
-	}
+    public static String doNotRefactorMultideclaration() {
+        String variable= "", anotherVariable= "";
+        variable+= "foo";
+        return variable;
+    }
 
-	public static String doNotRefactorStringUsedAsExpression() {
-		String variable= "foo";
-		if ((variable+= "bar").contains("i")) {
-			return "foobar";
-		}
-		return variable;
-	}
+    public static String doNotRefactorStringUsedAsExpression() {
+        String variable= "foo";
+        if ((variable+= "bar").contains("i")) {
+            return "foobar";
+        }
+        return variable;
+    }
 
-	public static String useStringBuilderOnBasicAssignment() {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
-		// Keep this comment also
-		variable.append("foo");
-		// Keep this comment too
-		return variable.toString();
-	}
+    public static String useStringBuilderOnBasicAssignment() {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
+        // Keep this comment also
+        variable.append("foo");
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String doNotUseStringBuilderWithoutAppending() {
-		String variable= "";
-		variable= "foo" + variable;
-		return variable;
-	}
+    public static String doNotUseStringBuilderWithoutAppending() {
+        String variable= "";
+        variable= "foo" + variable;
+        return variable;
+    }
 
-	public static String doNotRefactorWrongAssignmentOperator() {
-		String variable= "";
-		variable= "foo";
-		return variable;
-	}
+    public static String doNotRefactorWrongAssignmentOperator() {
+        String variable= "";
+        variable= "foo";
+        return variable;
+    }
 
-	public static String doNotRefactorBadAssignmentOperator() {
-		String variable= "";
-		variable+= variable + "foo";
-		return variable;
-	}
+    public static String doNotRefactorBadAssignmentOperator() {
+        String variable= "";
+        variable+= variable + "foo";
+        return variable;
+    }
 
-	public static String doNotUseStringBuilderWithoutConcatenation() {
-		String variable= "";
-		return variable;
-	}
+    public static String doNotUseStringBuilderWithoutConcatenation() {
+        String variable= "";
+        return variable;
+    }
 
-	public static void doNotRefactorStringChangedAfterUse(String text) {
-		String variable= "";
-		variable+= text + "foo";
-		System.out.println(variable);
-		variable= variable + text + "bar";
-	}
+    public static void doNotRefactorStringChangedAfterUse(String text) {
+        String variable= "";
+        variable+= text + "foo";
+        System.out.println(variable);
+        variable= variable + text + "bar";
+    }
 
-	public static String useStringBuilderWithExtendedOperation(String text) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
-		// Keep this comment also
-		variable.append(text).append("foo");
-		variable.append(text).append("bar");
-		// Keep this comment too
-		return variable.toString();
-	}
+    public static String useStringBuilderWithExtendedOperation(String text) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
+        // Keep this comment also
+        variable.append(text).append("foo");
+        variable.append(text).append("bar");
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String useStringBuilderWithDifferentAssignment() {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
-		// Keep this comment also
-		variable.append("foo");
-		variable.append("bar");
-		// Keep this comment too
-		return variable.toString();
-	}
+    public static String useStringBuilderWithDifferentAssignment() {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
+        // Keep this comment also
+        variable.append("foo");
+        variable.append("bar");
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String doNotBuildStringSeveralTimes() {
-		String variable= "";
-		variable+= "foo";
-		variable= variable + "bar";
-		return variable + variable;
-	}
+    public static String doNotBuildStringSeveralTimes() {
+        String variable= "";
+        variable+= "foo";
+        variable= variable + "bar";
+        return variable + variable;
+    }
 
-	public static String useStringBuilderWithBlock(boolean isEnabled) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderWithBlock(boolean isEnabled) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		if (isEnabled) {
-			// Keep this comment also
-			variable.append("foo");
-			variable.append("bar");
-		}
+        if (isEnabled) {
+            // Keep this comment also
+            variable.append("foo");
+            variable.append("bar");
+        }
 
-		// Keep this comment too
-		return variable.toString();
-	}
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String useStringBuilderWithLoop(List<String> texts) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderWithLoop(List<String> texts) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		for (String text : texts) {
-			// Keep this comment also
-			variable.append(text);
-			variable.append(",");
-		}
+        for (String text : texts) {
+            // Keep this comment also
+            variable.append(text);
+            variable.append(",");
+        }
 
-		// Keep this comment too
-		return variable.toString();
-	}
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static List<String> doNotStringifySeveralTimes(List<String> texts) {
-		String variable= "";
-		List<String> output= new ArrayList<>();
+    public static List<String> doNotStringifySeveralTimes(List<String> texts) {
+        String variable= "";
+        List<String> output= new ArrayList<>();
 
-		for (String text : texts) {
-			variable+= text;
-			variable= variable + ",";
-			output.add(variable);
-		}
+        for (String text : texts) {
+            variable+= text;
+            variable= variable + ",";
+            output.add(variable);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public static String useStringBuilderWithWhile(String text, int i) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderWithWhile(String text, int i) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		while (i-- > 0) {
-			// Keep this comment also
-			variable.append(text);
-			variable.append(",");
-		}
+        while (i-- > 0) {
+            // Keep this comment also
+            variable.append(text);
+            variable.append(",");
+        }
 
-		// Keep this comment too
-		return variable.toString();
-	}
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String useStringBuilderWithTry(String number, int i) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderWithTry(String number, int i) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		try {
-			while (i-- > 0) {
-				// Keep this comment also
-				variable.append(Integer.parseInt(number)).append(1);
-				variable.append(",");
-			}
-		} catch (NumberFormatException e) {
-			return "0";
-		}
+        try {
+            while (i-- > 0) {
+                // Keep this comment also
+                variable.append(Integer.parseInt(number)).append(1);
+                variable.append(",");
+            }
+        } catch (NumberFormatException e) {
+            return "0";
+        }
 
-		// Keep this comment too
-		return variable.toString();
-	}
+        // Keep this comment too
+        return variable.toString();
+    }
 
-	public static String useStringBuilderWithFinally(String number) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
-		int i= 123;
+    public static String useStringBuilderWithFinally(String number) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
+        int i= 123;
 
-		try {
-			i+= Integer.parseInt(number);
-		} catch (NumberFormatException e) {
-			System.out.println("error");
-		} finally {
-			// Keep this comment also
-			variable.append("foo");
-			variable.append("bar");
-		}
+        try {
+            i+= Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+        } finally {
+            // Keep this comment also
+            variable.append("foo");
+            variable.append("bar");
+        }
 
-		// Keep this comment too
-		return variable.toString() + i;
-	}
+        // Keep this comment too
+        return variable.toString() + i;
+    }
 
-	public static void doNotStringifySeveralTimesToo(List<String> texts) {
-		String variable= "";
-		variable+= "foo";
-		variable= variable + "bar";
+    public static void doNotStringifySeveralTimesToo(List<String> texts) {
+        String variable= "";
+        variable+= "foo";
+        variable= variable + "bar";
 
-		for (String text : texts) {
-			System.out.println(variable);
-		}
-	}
+        for (String text : texts) {
+            System.out.println(variable);
+        }
+    }
 
-	public static String useStringBuilderWithConditionalRead(boolean isEnabled) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderWithConditionalRead(boolean isEnabled) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		if (isEnabled) {
-			// Keep this comment also
-			variable.append("foo");
-			variable.append("bar");
-			// Keep this comment too
-			return variable.toString();
-		}
+        if (isEnabled) {
+            // Keep this comment also
+            variable.append("foo");
+            variable.append("bar");
+            // Keep this comment too
+            return variable.toString();
+        }
 
-		return "";
-	}
+        return "";
+    }
 
-	public static String useStringBuilderInElse(boolean isEnabled) {
-		// Keep this comment
-		StringBuilder variable= new StringBuilder();
+    public static String useStringBuilderInElse(boolean isEnabled) {
+        // Keep this comment
+        StringBuilder variable= new StringBuilder();
 
-		if (isEnabled) {
-			return "OK";
-		} else {
-			// Keep this comment also
-			variable.append("foo");
-			variable.append("bar");
-			// Keep this comment too
-			return variable.toString();
-		}
-	}
+        if (isEnabled) {
+            return "OK";
+        } else {
+            // Keep this comment also
+            variable.append("foo");
+            variable.append("bar");
+            // Keep this comment too
+            return variable.toString();
+        }
+    }
 
-	public static String useTwoStringBuilders(boolean isEnabled) {
-		// Keep this comment
-		StringBuilder variable1= new StringBuilder("First variable");
-		StringBuilder variable2= new StringBuilder("Second variable");
+    public static String useTwoStringBuilders(boolean isEnabled) {
+        // Keep this comment
+        StringBuilder variable1= new StringBuilder("First variable");
+        StringBuilder variable2= new StringBuilder("Second variable");
 
-		if (isEnabled) {
-			// Keep this comment also
-			variable2.append("foo");
-			variable2.append("bar");
-		} else {
-			// Keep this comment also
-			variable1.append("foo");
-			variable1.append("bar");
-		}
+        if (isEnabled) {
+            // Keep this comment also
+            variable2.append("foo");
+            variable2.append("bar");
+        } else {
+            // Keep this comment also
+            variable1.append("foo");
+            variable1.append("bar");
+        }
 
-		// Keep this comment too
-		return variable1.toString() + variable2.toString();
-	}
+        // Keep this comment too
+        return variable1.toString() + variable2.toString();
+    }
 
-	public static String doNotRefactorStringsWithoutConcatenation(boolean isEnabled) {
-		String variable1= "First variable";
-		String variable2= "Second variable";
+    public static String doNotRefactorStringsWithoutConcatenation(boolean isEnabled) {
+        String variable1= "First variable";
+        String variable2= "Second variable";
 
-		if (isEnabled) {
-			variable1+= "foo";
-			variable1= variable2 + "bar";
-		} else {
-			variable2+= "foo";
-			variable2= variable1 + "bar";
-		}
+        if (isEnabled) {
+            variable1+= "foo";
+            variable1= variable2 + "bar";
+        } else {
+            variable2+= "foo";
+            variable2= variable1 + "bar";
+        }
 
-		return variable1 + variable2;
-	}
+        return variable1 + variable2;
+    }
 
-	public static String doNotUseStringBuilderOnParameter(String variable) {
-		variable+= "foo";
-		return variable;
-	}
+    public static String doNotUseStringBuilderOnParameter(String variable) {
+        variable+= "foo";
+        return variable;
+    }
 
-	public String doNotUseStringBuilderOnField() {
-		field+= "foo";
-		return field;
-	}
+    public String doNotUseStringBuilderOnField() {
+        field+= "foo";
+        return field;
+    }
 }

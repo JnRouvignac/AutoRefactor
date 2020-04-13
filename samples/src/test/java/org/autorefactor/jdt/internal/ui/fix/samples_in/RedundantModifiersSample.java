@@ -36,107 +36,107 @@ import java.io.InputStream;
  */
 @Deprecated
 abstract public interface RedundantModifiersSample {
-	/**
-	 * Keep the JavaDoc.
-	 */
-	@Deprecated
-	abstract interface RemoveAbstractModifier {
-	}
+    /**
+     * Keep the JavaDoc.
+     */
+    @Deprecated
+    abstract interface RemoveAbstractModifier {
+    }
 
-	@Deprecated
-	static interface RemoveStaticModifier {
-	}
+    @Deprecated
+    static interface RemoveStaticModifier {
+    }
 
-	abstract public interface RefactorUnorderedSubInterface {
-	}
+    abstract public interface RefactorUnorderedSubInterface {
+    }
 
-	@Deprecated
-	public abstract class DoNotRefactorSubClass {
-	}
+    @Deprecated
+    public abstract class DoNotRefactorSubClass {
+    }
 
-	@Deprecated
-	interface DoNotRefactorSubRightInterface {
-	}
+    @Deprecated
+    interface DoNotRefactorSubRightInterface {
+    }
 
-	@Deprecated
-	abstract @interface DoNotRefactorAnnotation {
-	}
+    @Deprecated
+    abstract @interface DoNotRefactorAnnotation {
+    }
 
-	public static final String MY_FIELD = "";
+    public static final String MY_FIELD = "";
 
-	abstract public void removeAbstractAndPublicModifier(final String removeFinalModifier);
+    abstract public void removeAbstractAndPublicModifier(final String removeFinalModifier);
 
-	abstract static public class FixModifierOrderSampleClass implements Closeable {
+    abstract static public class FixModifierOrderSampleClass implements Closeable {
 
-		final public static String MY_FIELD = "";
+        final public static String MY_FIELD = "";
 
-		final public static void sortModifiers(final String myArg) {
-		}
+        final public static void sortModifiers(final String myArg) {
+        }
 
-		public abstract void abstractMethod(final String removeFinalModifier);
+        public abstract void abstractMethod(final String removeFinalModifier);
 
-		void removeFinalModifierInTryWithResource() throws IOException {
-			try (final InputStream is = new FileInputStream("out.txt")) {
-				is.read();
-			}
-		}
+        void removeFinalModifierInTryWithResource() throws IOException {
+            try (final InputStream is = new FileInputStream("out.txt")) {
+                is.read();
+            }
+        }
 
-		@Deprecated
-		final protected void reorderModifiers() {
-		}
+        @Deprecated
+        final protected void reorderModifiers() {
+        }
 
-		final @Deprecated protected void reorderModifiersAndAnnotations() {
-		}
+        final @Deprecated protected void reorderModifiersAndAnnotations() {
+        }
 
-		@Deprecated
-		@Override
-		synchronized public void close() {
-		}
-	}
+        @Deprecated
+        @Override
+        synchronized public void close() {
+        }
+    }
 
-	static public abstract class AbstractSampleClass {
-	}
+    static public abstract class AbstractSampleClass {
+    }
 
-	class Sample {
-		private static final void refactorIt(){};
-		private final void refactorIt2(){};
+    class Sample {
+        private static final void refactorIt(){};
+        private final void refactorIt2(){};
 
-		final void doNotRefactor(){};
-		private void doNotRefactor2(){};
-	}
+        final void doNotRefactor(){};
+        private void doNotRefactor2(){};
+    }
 
-	static public enum RemoveStaticSampleEnum {
-		VALUE1, VALUE2
-	}
+    static public enum RemoveStaticSampleEnum {
+        VALUE1, VALUE2
+    }
 
-	static public @interface FixModifierOrderSampleAnnotation {
-		abstract public int fixModifierOrder();
-	}
+    static public @interface FixModifierOrderSampleAnnotation {
+        abstract public int fixModifierOrder();
+    }
 
-	final class Class {
-		protected String refactorThisField = "someStr";
+    final class Class {
+        protected String refactorThisField = "someStr";
 
-		protected Class(){}
+        protected Class(){}
 
-		protected void doIt(){}
+        protected void doIt(){}
 
-		protected final void doItThisWay(){}
-	}
+        protected final void doItThisWay(){}
+    }
 
-	final class InheritedClass<E> extends javax.swing.JComboBox<E> {
-		protected String refactorThisField = "someStr";
+    final class InheritedClass<E> extends javax.swing.JComboBox<E> {
+        protected String refactorThisField = "someStr";
 
-		protected InheritedClass(boolean isActive) {}
+        protected InheritedClass(boolean isActive) {}
 
-		@Override
-		protected void fireActionEvent() {}
-	}
+        @Override
+        protected void fireActionEvent() {}
+    }
 
-	class DoNotRefactorNonFinalClass {
-		protected String doNotRefactorThisField = "someStr";
+    class DoNotRefactorNonFinalClass {
+        protected String doNotRefactorThisField = "someStr";
 
-		protected DoNotRefactorNonFinalClass(){}
+        protected DoNotRefactorNonFinalClass(){}
 
-		protected final void doIt(){}
-	}
+        protected final void doIt(){}
+    }
 }

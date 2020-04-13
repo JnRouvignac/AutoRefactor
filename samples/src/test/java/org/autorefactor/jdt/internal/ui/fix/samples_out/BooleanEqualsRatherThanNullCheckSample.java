@@ -27,42 +27,42 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class BooleanEqualsRatherThanNullCheckSample {
 
-	private static int staticField = 0;
+    private static int staticField = 0;
 
-	public void replaceNullCheck(Boolean b1) {
-		// Keep this comment
-		boolean newBoolean1 = Boolean.TRUE.equals(b1);
-		boolean newBoolean2 = !Boolean.FALSE.equals(b1);
-		boolean newBoolean3 = Boolean.FALSE.equals(b1);
-		boolean newBoolean4 = !Boolean.TRUE.equals(b1);
+    public void replaceNullCheck(Boolean b1) {
+        // Keep this comment
+        boolean newBoolean1 = Boolean.TRUE.equals(b1);
+        boolean newBoolean2 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean3 = Boolean.FALSE.equals(b1);
+        boolean newBoolean4 = !Boolean.TRUE.equals(b1);
 
-		boolean newBoolean5 = Boolean.TRUE.equals(b1);
-		boolean newBoolean6 = !Boolean.FALSE.equals(b1);
-		boolean newBoolean7 = Boolean.FALSE.equals(b1);
-		boolean newBoolean8 = !Boolean.TRUE.equals(b1);
+        boolean newBoolean5 = Boolean.TRUE.equals(b1);
+        boolean newBoolean6 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean7 = Boolean.FALSE.equals(b1);
+        boolean newBoolean8 = !Boolean.TRUE.equals(b1);
 
-		boolean newBoolean9 = Boolean.TRUE.equals(b1);
-		boolean newBoolean10 = !Boolean.FALSE.equals(b1);
-		boolean newBoolean11 = Boolean.FALSE.equals(b1);
-		boolean newBoolean12 = !Boolean.TRUE.equals(b1);
+        boolean newBoolean9 = Boolean.TRUE.equals(b1);
+        boolean newBoolean10 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean11 = Boolean.FALSE.equals(b1);
+        boolean newBoolean12 = !Boolean.TRUE.equals(b1);
 
-		boolean newBoolean13 = Boolean.TRUE.equals(b1);
-		boolean newBoolean14 = !Boolean.FALSE.equals(b1);
-		boolean newBoolean15 = Boolean.FALSE.equals(b1);
-		boolean newBoolean16 = !Boolean.TRUE.equals(b1);
-	}
+        boolean newBoolean13 = Boolean.TRUE.equals(b1);
+        boolean newBoolean14 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean15 = Boolean.FALSE.equals(b1);
+        boolean newBoolean16 = !Boolean.TRUE.equals(b1);
+    }
 
-	private static class SideEffect {
-		private static Boolean isActive() {
-			staticField++;
-			return Boolean.TRUE;
-		}
-	}
+    private static class SideEffect {
+        private static Boolean isActive() {
+            staticField++;
+            return Boolean.TRUE;
+        }
+    }
 
-	public void doNotReplaceNullCheckWithMethods() {
-		boolean newBoolean1 = SideEffect.isActive() != null && SideEffect.isActive();
-		boolean newBoolean2 = SideEffect.isActive() == null || SideEffect.isActive();
-		boolean newBoolean3 = SideEffect.isActive() != null && !SideEffect.isActive();
-		boolean newBoolean4 = SideEffect.isActive() == null || !SideEffect.isActive();
-	}
+    public void doNotReplaceNullCheckWithMethods() {
+        boolean newBoolean1 = SideEffect.isActive() != null && SideEffect.isActive();
+        boolean newBoolean2 = SideEffect.isActive() == null || SideEffect.isActive();
+        boolean newBoolean3 = SideEffect.isActive() != null && !SideEffect.isActive();
+        boolean newBoolean4 = SideEffect.isActive() == null || !SideEffect.isActive();
+    }
 }

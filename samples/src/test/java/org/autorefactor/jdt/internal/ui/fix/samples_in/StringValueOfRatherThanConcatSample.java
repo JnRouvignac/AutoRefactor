@@ -27,40 +27,40 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class StringValueOfRatherThanConcatSample {
-	public void replaceForcedConcatenationByStringValueOf(
-			Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
-		// Keep this comment
-		String text = o + "";
+    public void replaceForcedConcatenationByStringValueOf(
+            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
+        // Keep this comment
+        String text = o + "";
 
-		// Keep this comment too
-		text = b + "";
-		text = c + "";
-		text = by + "";
-		text = s + "";
-		text = i + "";
-		text = l + "";
-		text = f + "";
-		text = d + "";
+        // Keep this comment too
+        text = b + "";
+        text = c + "";
+        text = by + "";
+        text = s + "";
+        text = i + "";
+        text = l + "";
+        text = f + "";
+        text = d + "";
 
-		// Keep this comment also
-		text = "" + o;
-		text = "" + b;
-		text = "" + c;
-		text = "" + by;
-		text = "" + s;
-		text = "" + i;
-		text = "" + l;
-		text = "" + f;
-		text = "" + d;
-	}
+        // Keep this comment also
+        text = "" + o;
+        text = "" + b;
+        text = "" + c;
+        text = "" + by;
+        text = "" + s;
+        text = "" + i;
+        text = "" + l;
+        text = "" + f;
+        text = "" + d;
+    }
 
-	public String replaceForcedLongConcatenationByStringValueOf(
-			Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
-		// Keep this comment
-		return o + "" + b + c + by + s + i + l + f + d;
-	}
+    public String replaceForcedLongConcatenationByStringValueOf(
+            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
+        // Keep this comment
+        return o + "" + b + c + by + s + i + l + f + d;
+    }
 
-	public void doNotReplaceConcatenateWithCharArray(char[] chars) {
-		String text = "" + chars;
-	}
+    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
+        String text = "" + chars;
+    }
 }

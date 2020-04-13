@@ -28,14 +28,14 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 import java.util.*;
 
 public class UseOnDemandImportSample {
-	private Observable observable;
+    private Observable observable;
 
-	@Override
-	public int hashCode() {
-		// Keep this comment
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((observable == null) ? 0 : observable.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        // Keep this comment
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((observable == null) ? 0 : observable.hashCode());
+        return result;
+    }
 }

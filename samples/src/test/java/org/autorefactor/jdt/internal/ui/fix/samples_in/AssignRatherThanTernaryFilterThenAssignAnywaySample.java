@@ -32,85 +32,85 @@ import java.util.List;
 import java.util.Map;
 
 public class AssignRatherThanTernaryFilterThenAssignAnywaySample {
-	private final String DEFAULT = "";
-	private String input;
+    private final String DEFAULT = "";
+    private String input;
 
-	public String refactorLocalVariable1(String input) {
-		// Keep this comment
-		return (input == null) ? null : input;
-	}
+    public String refactorLocalVariable1(String input) {
+        // Keep this comment
+        return (input == null) ? null : input;
+    }
 
-	public String doNotRefactorOppositeAssignment(String input) {
-		return (input == null) ? input : null;
-	}
+    public String doNotRefactorOppositeAssignment(String input) {
+        return (input == null) ? input : null;
+    }
 
-	public String doNotRefactorLocalVariable(String input) {
-		return (input == null) ? DEFAULT : input;
-	}
+    public String doNotRefactorLocalVariable(String input) {
+        return (input == null) ? DEFAULT : input;
+    }
 
-	public String doNotRefactorActiveExpression(List<String> input) {
-		return (input.remove(0) == null) ? null : input.remove(0);
-	}
+    public String doNotRefactorActiveExpression(List<String> input) {
+        return (input.remove(0) == null) ? null : input.remove(0);
+    }
 
-	public String refactorLocalVariable2(String input) {
-		// Keep this comment
-		return (null == input) ? null : input;
-	}
+    public String refactorLocalVariable2(String input) {
+        // Keep this comment
+        return (null == input) ? null : input;
+    }
 
-	public String refactorLocalVariable3(String input) {
-		// Keep this comment
-		return (input != null) ? input : null;
-	}
+    public String refactorLocalVariable3(String input) {
+        // Keep this comment
+        return (input != null) ? input : null;
+    }
 
-	public String refactorLocalVariable4(String input) {
-		// Keep this comment
-		return (null != input) ? input : null;
-	}
+    public String refactorLocalVariable4(String input) {
+        // Keep this comment
+        return (null != input) ? input : null;
+    }
 
-	public int removeHardCodedNumber(int input) {
-		// Keep this comment
-		return (123 != input) ? input : 123;
-	}
+    public int removeHardCodedNumber(int input) {
+        // Keep this comment
+        return (123 != input) ? input : 123;
+    }
 
-	public char removeHardCodedCharacter(char input) {
-		// Keep this comment
-		return (input == 'a') ? 'a' : input;
-	}
+    public char removeHardCodedCharacter(char input) {
+        // Keep this comment
+        return (input == 'a') ? 'a' : input;
+    }
 
-	public int removeHardCodedExpression(int input) {
-		// Keep this comment
-		return (input != 1 + 2 + 3) ? input : 3 + 2 + 1 + 0;
-	}
+    public int removeHardCodedExpression(int input) {
+        // Keep this comment
+        return (input != 1 + 2 + 3) ? input : 3 + 2 + 1 + 0;
+    }
 
-	public String refactorLocalVariable5(String input, boolean isValid) {
-		String output = null;
-		if (isValid)
-			// Keep this comment
-			output = (input != null) ? input : null;
-		return output;
-	}
+    public String refactorLocalVariable5(String input, boolean isValid) {
+        String output = null;
+        if (isValid)
+            // Keep this comment
+            output = (input != null) ? input : null;
+        return output;
+    }
 
-	public void doNotRefactorFieldAssign(String input) {
-		this.input = (input == null) ? DEFAULT : input;
-	}
+    public void doNotRefactorFieldAssign(String input) {
+        this.input = (input == null) ? DEFAULT : input;
+    }
 
-	public void refactorFieldAssign1(String input) {
-		// Keep this comment
-		this.input = (input == null) ? null : input;
-	}
+    public void refactorFieldAssign1(String input) {
+        // Keep this comment
+        this.input = (input == null) ? null : input;
+    }
 
-	public void refactorFieldAssign2(String input) {
-		// Keep this comment
-		this.input = (null == input) ? null : input;
-	}
+    public void refactorFieldAssign2(String input) {
+        // Keep this comment
+        this.input = (null == input) ? null : input;
+    }
 
-	public void refactorFieldAssign3(String input) {
-		// Keep this comment
-		this.input = (input != null) ? input : null;
-	}
+    public void refactorFieldAssign3(String input) {
+        // Keep this comment
+        this.input = (input != null) ? input : null;
+    }
 
-	public void refactorFieldAssign4(String input) {
-		// Keep this comment
-		this.input = (null != input) ? input : null;
-	}
+    public void refactorFieldAssign4(String input) {
+        // Keep this comment
+        this.input = (null != input) ? input : null;
+    }
 }

@@ -35,326 +35,326 @@ import java.util.Map;
 import java.util.Set;
 
 public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
-	private java.util.Date[] innerArray = new java.util.Date[10];
+    private java.util.Date[] innerArray = new java.util.Date[10];
 
-	private List<java.util.Date> innerList = new ArrayList<>();
+    private List<java.util.Date> innerList = new ArrayList<>();
 
-	public Collection<? super java.util.Date> replaceAddWithForLoopByCollectionsAddAll(
-			List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
-		// Keep this comment
-		for (int i = 0; i < elems1.length; i++) {
-			output.add(elems1[i]);
-		}
-		for (int i = 0; i < elems2.length; i++) {
-			output.add(elems2[i]);
-		}
+    public Collection<? super java.util.Date> replaceAddWithForLoopByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
+        for (int i = 0; i < elems1.length; i++) {
+            output.add(elems1[i]);
+        }
+        for (int i = 0; i < elems2.length; i++) {
+            output.add(elems2[i]);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<? super java.util.Date> replaceBackwardLoopOnSet(
-			Set<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
-		// Keep this comment
-		for (int i = elems1.length - 1; i >= 0; i--) {
-			output.add(elems1[i]);
-		}
-		for (int i = elems2.length - 1; 0 <= i; i--) {
-			output.add(elems2[i]);
-		}
+    public Collection<? super java.util.Date> replaceBackwardLoopOnSet(
+            Set<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
+        for (int i = elems1.length - 1; i >= 0; i--) {
+            output.add(elems1[i]);
+        }
+        for (int i = elems2.length - 1; 0 <= i; i--) {
+            output.add(elems2[i]);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<? super java.util.Date> doNotReplaceBackwardLoopOnCollection(
-			Collection<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
-		for (int i = elems1.length - 1; i >= 0; i--) {
-			output.add(elems1[i]);
-		}
-		for (int i = elems2.length - 1; 0 <= i; i--) {
-			output.add(elems2[i]);
-		}
+    public Collection<? super java.util.Date> doNotReplaceBackwardLoopOnCollection(
+            Collection<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        for (int i = elems1.length - 1; i >= 0; i--) {
+            output.add(elems1[i]);
+        }
+        for (int i = elems2.length - 1; 0 <= i; i--) {
+            output.add(elems2[i]);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public void replaceAddWithNotEqualOperator(
-			java.util.Date[] dates) {
-		// Keep this comment
-		for (int i = 0; i != dates.length; i++) {
-			add(dates[i]);
-		}
-	}
+    public void replaceAddWithNotEqualOperator(
+            java.util.Date[] dates) {
+        // Keep this comment
+        for (int i = 0; i != dates.length; i++) {
+            add(dates[i]);
+        }
+    }
 
-	public void replaceAddWithForLoopByCollectionsAddAll(
-			java.util.Date[] dates) {
-		// Keep this comment
-		for (int i = 0; i < dates.length; i++) {
-			add(dates[i]);
-		}
-	}
+    public void replaceAddWithForLoopByCollectionsAddAll(
+            java.util.Date[] dates) {
+        // Keep this comment
+        for (int i = 0; i < dates.length; i++) {
+            add(dates[i]);
+        }
+    }
 
-	public void replaceLoopWithFieldArray() {
-		// Keep this comment
-		for (int i = 0; i < innerArray.length; i++) {
-			add(innerArray[i]);
-		}
-	}
+    public void replaceLoopWithFieldArray() {
+        // Keep this comment
+        for (int i = 0; i < innerArray.length; i++) {
+            add(innerArray[i]);
+        }
+    }
 
-	public void replaceForeachWithFieldArray() {
-		// Keep this comment
-		for (java.util.Date d : this.innerArray) {
-			add(d);
-		}
-	}
+    public void replaceForeachWithFieldArray() {
+        // Keep this comment
+        for (java.util.Date d : this.innerArray) {
+            add(d);
+        }
+    }
 
-	public void replaceLoopWithFieldList() {
-		// Keep this comment
-		for (int i = 0; i < this.innerList.size(); i++) {
-			add(this.innerList.get(i));
-		}
-	}
+    public void replaceLoopWithFieldList() {
+        // Keep this comment
+        for (int i = 0; i < this.innerList.size(); i++) {
+            add(this.innerList.get(i));
+        }
+    }
 
-	public void replaceForeachWithFieldList() {
-		// Keep this comment
-		for (java.util.Date d : innerList) {
-			add(d);
-		}
-	}
+    public void replaceForeachWithFieldList() {
+        // Keep this comment
+        for (java.util.Date d : innerList) {
+            add(d);
+        }
+    }
 
-	public Collection replaceAddWithForEachByCollectionsAddAll(
-			List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
-		// Keep this comment
-		for (java.util.Date d : elems1) {
-			output.add(d);
-		}
-		for (java.sql.Date d : elems2) {
-			output.add(d);
-		}
+    public Collection replaceAddWithForEachByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
+        for (java.util.Date d : elems1) {
+            output.add(d);
+        }
+        for (java.sql.Date d : elems2) {
+            output.add(d);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public void replaceAddWithForEachByCollectionsAddAll(
-			java.util.Date[] dates) {
-		// Keep this comment
-		for (java.util.Date date : dates) {
-			add(date);
-		}
-	}
+    public void replaceAddWithForEachByCollectionsAddAll(
+            java.util.Date[] dates) {
+        // Keep this comment
+        for (java.util.Date date : dates) {
+            add(date);
+        }
+    }
 
-	public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithArray(
-			Map<String, List<String>> mapToFill, String[] inputList) {
-		// Keep this comment
-		for (String input : inputList) {
-			mapToFill.get("foo").add(input);
-		}
+    public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithArray(
+            Map<String, List<String>> mapToFill, String[] inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            mapToFill.get("foo").add(input);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Collection replaceLoopOnRawCollectionWithArray(
-			List colToFill, String[] inputList) {
-		// Keep this comment
-		for (String input : inputList) {
-			colToFill.add(input);
-		}
+    public Collection replaceLoopOnRawCollectionWithArray(
+            List colToFill, String[] inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            colToFill.add(input);
+        }
 
-		return colToFill;
-	}
+        return colToFill;
+    }
 
-	public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithList(
-			Map<String, List<String>> mapToFill, List<String> inputList) {
-		// Keep this comment
-		for (String input : inputList) {
-			mapToFill.get("foo").add(input);
-		}
+    public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithList(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            mapToFill.get("foo").add(input);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Collection replaceLoopOnRawCollectionWithList(
-			List colToFill, List<String> inputList) {
-		// Keep this comment
-		for (String input : inputList) {
-			colToFill.add(input);
-		}
+    public Collection replaceLoopOnRawCollectionWithList(
+            List colToFill, List<String> inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            colToFill.add(input);
+        }
 
-		return colToFill;
-	}
+        return colToFill;
+    }
 
-	public void doNotReplaceLoopWithFieldList(List<java.util.Date> input) {
-		for (int i = 0; i < input.size(); i++) {
-			add(innerList.get(i));
-		}
-	}
+    public void doNotReplaceLoopWithFieldList(List<java.util.Date> input) {
+        for (int i = 0; i < input.size(); i++) {
+            add(innerList.get(i));
+        }
+    }
 
-	public Map<String, List<String>> doNotRefactorForEachWithListUsingLoopVariable(
-			Map<String, List<String>> mapToFill, List<String> inputList) {
-		for (String input : inputList) {
-			mapToFill.get(input).add(input);
-		}
+    public Map<String, List<String>> doNotRefactorForEachWithListUsingLoopVariable(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        for (String input : inputList) {
+            mapToFill.get(input).add(input);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Map<String, List<String>> doNotRefactorForLoopWithListUsingLoopIndex(
-			Map<String, List<String>> mapToFill, List<String> inputList) {
-		for (int i = 0; i < inputList.size(); i++) {
-			mapToFill.get(inputList.get(i)).add(inputList.get(i));
-		}
+    public Map<String, List<String>> doNotRefactorForLoopWithListUsingLoopIndex(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        for (int i = 0; i < inputList.size(); i++) {
+            mapToFill.get(inputList.get(i)).add(inputList.get(i));
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Map<String, List<String>> doNotRefactorForLoopWithListUsingLoopIterator(
-			Map<String, List<String>> mapToFill, List<String> inputList) {
-		String input = null;
-		for (Iterator<String> it = inputList.iterator(); it.hasNext(); input = it.next()) {
-			mapToFill.get(input).add(input);
-		}
+    public Map<String, List<String>> doNotRefactorForLoopWithListUsingLoopIterator(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        String input = null;
+        for (Iterator<String> it = inputList.iterator(); it.hasNext(); input = it.next()) {
+            mapToFill.get(input).add(input);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public void doNotRefactorForLoopWithListUsingLoopIterator(List<String> col) {
-		for (Iterator<String> it = col.iterator(); it.hasNext();) {
-			System.out.println(it.next());
-		}
-	}
+    public void doNotRefactorForLoopWithListUsingLoopIterator(List<String> col) {
+        for (Iterator<String> it = col.iterator(); it.hasNext();) {
+            System.out.println(it.next());
+        }
+    }
 
-	public Map<String, List<String>> doNotRefactorForEachWithArrayUsingLoopVariable(
-			Map<String, List<String>> mapToFill, String[] inputArray) {
-		for (String input : inputArray) {
-			mapToFill.get(input).add(input);
-		}
+    public Map<String, List<String>> doNotRefactorForEachWithArrayUsingLoopVariable(
+            Map<String, List<String>> mapToFill, String[] inputArray) {
+        for (String input : inputArray) {
+            mapToFill.get(input).add(input);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Map<String, List<String>> doNotRefactorForLoopWithArrayUsingLoopIndex(
-			Map<String, List<String>> mapToFill, String[] inputArray) {
-		for (int i = 0; i < inputArray.length; i++) {
-			mapToFill.get(inputArray[i]).add(inputArray[i]);
-		}
+    public Map<String, List<String>> doNotRefactorForLoopWithArrayUsingLoopIndex(
+            Map<String, List<String>> mapToFill, String[] inputArray) {
+        for (int i = 0; i < inputArray.length; i++) {
+            mapToFill.get(inputArray[i]).add(inputArray[i]);
+        }
 
-		return mapToFill;
-	}
+        return mapToFill;
+    }
 
-	public Collection<String> doNotRefactorForLoopAddMethodResult(List<String> output, String[] elems) {
-		for (int i = 0; i < elems.length; i++) {
-			output.add(doSomething(elems[i]));
-		}
+    public Collection<String> doNotRefactorForLoopAddMethodResult(List<String> output, String[] elems) {
+        for (int i = 0; i < elems.length; i++) {
+            output.add(doSomething(elems[i]));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> doNotRefactorForEachAddMethodResult(List<String> output, String[] elems) {
-		for (String s : elems) {
-			output.add(doSomething(s));
-		}
+    public Collection<String> doNotRefactorForEachAddMethodResult(List<String> output, String[] elems) {
+        for (String s : elems) {
+            output.add(doSomething(s));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
-		// Keep this comment
-		for (int i = 0; i < col.size(); i++) {
-			output.add(col.get(i));
-		}
+    public Collection<String> replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
+        // Keep this comment
+        for (int i = 0; i < col.size(); i++) {
+            output.add(col.get(i));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
-		// Keep this comment
-		for (String s : col) {
-			output.add(s);
-		}
+    public Collection<String> replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
+        // Keep this comment
+        for (String s : col) {
+            output.add(s);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> doNotRefactorRemoveWithPossibleDoubles() {
-		List<String> col = new ArrayList<>();
-		col.add("redundant");
-		List<String> output = new ArrayList<>();
-		output.add("redundant");
-		output.add("redundant");
+    public Collection<String> doNotRefactorRemoveWithPossibleDoubles() {
+        List<String> col = new ArrayList<>();
+        col.add("redundant");
+        List<String> output = new ArrayList<>();
+        output.add("redundant");
+        output.add("redundant");
 
-		for (int i = 0; i < col.size(); i++) {
-			output.remove(col.get(i));
-		}
+        for (int i = 0; i < col.size(); i++) {
+            output.remove(col.get(i));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> replaceRemoveWithForLoopByRemoveAll(List<String> col, Set<String> output) {
-		// Keep this comment
-		for (int i = 0; i < col.size(); i++) {
-			output.remove(col.get(i));
-		}
+    public Collection<String> replaceRemoveWithForLoopByRemoveAll(List<String> col, Set<String> output) {
+        // Keep this comment
+        for (int i = 0; i < col.size(); i++) {
+            output.remove(col.get(i));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> replaceRemoveWithForEachByRemoveAll(Collection<String> col, Set<String> output) {
-		// Keep this comment
-		for (String s : col) {
-			output.remove(s);
-		}
+    public Collection<String> replaceRemoveWithForEachByRemoveAll(Collection<String> col, Set<String> output) {
+        // Keep this comment
+        for (String s : col) {
+            output.remove(s);
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> doNotRefactorForLoopAddMethodResult(List<String> output, List<String> col) {
-		for (int i = 0; i < col.size(); i++) {
-			output.add(doSomething(col.get(i)));
-		}
+    public Collection<String> doNotRefactorForLoopAddMethodResult(List<String> output, List<String> col) {
+        for (int i = 0; i < col.size(); i++) {
+            output.add(doSomething(col.get(i)));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	public Collection<String> doNotRefactorForEachAddMethodResult(List<String> output, List<String> col) {
-		for (String s : col) {
-			output.add(doSomething(s));
-		}
+    public Collection<String> doNotRefactorForEachAddMethodResult(List<String> output, List<String> col) {
+        for (String s : col) {
+            output.add(doSomething(s));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	private String doSomething(String s) {
-		return null;
-	}
+    private String doSomething(String s) {
+        return null;
+    }
 
-	public class MySet extends AbstractSet<String> {
-		public MySet(List<String> strings) {
-			// Keep this comment
-			for (String s : strings) {
-				add(s);
-			}
-		}
+    public class MySet extends AbstractSet<String> {
+        public MySet(List<String> strings) {
+            // Keep this comment
+            for (String s : strings) {
+                add(s);
+            }
+        }
 
-		@Override
-		public Iterator<String> iterator() {
-			return null;
-		}
+        @Override
+        public Iterator<String> iterator() {
+            return null;
+        }
 
-		@Override
-		public int size() {
-			return 0;
-		}
-	}
+        @Override
+        public int size() {
+            return 0;
+        }
+    }
 
-	public static Set<String> refactorCollectionWithNoTypeArgument(List<String> strings) {
-		class MyHashSet extends HashSet<String> {
-			private static final long serialVersionUID = 1L;
-		}
+    public static Set<String> refactorCollectionWithNoTypeArgument(List<String> strings) {
+        class MyHashSet extends HashSet<String> {
+            private static final long serialVersionUID = 1L;
+        }
 
-		final MyHashSet set = new MyHashSet();
-		// Keep this comment
-		for (String s : strings) {
-			set.add(s);
-		}
-		return set;
-	}
+        final MyHashSet set = new MyHashSet();
+        // Keep this comment
+        for (String s : strings) {
+            set.add(s);
+        }
+        return set;
+    }
 }

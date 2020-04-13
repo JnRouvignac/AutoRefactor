@@ -26,9 +26,9 @@
 package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 
 public class NoMalformedTreeException2Sample {
-	public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
-		StringBuilder sql = new StringBuilder();
-		sql.append(o
-		);
-	}
+    public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(o
+        );
+    }
 }

@@ -29,85 +29,85 @@ import java.util.List;
 
 public class XORRatherThanDuplicateConditionsSample {
 
-	private static int staticField = 0;
+    private static int staticField = 0;
 
-	public void replaceDuplicateConditionsWithEagerOperator(boolean b1, boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 & !b2 | !b1 & b2;
-		boolean newBoolean2 = b1 & b2 | !b1 & !b2;
-	}
+    public void replaceDuplicateConditionsWithEagerOperator(boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 & !b2 | !b1 & b2;
+        boolean newBoolean2 = b1 & b2 | !b1 & !b2;
+    }
 
-	public void replaceDuplicateConditionsWithPrimitiveTypes(boolean b1, boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 && !b2 || !b1 && b2;
-		boolean newBoolean2 = b1 && b2 || !b1 && !b2;
-	}
+    public void replaceDuplicateConditionsWithPrimitiveTypes(boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 && !b2 || !b1 && b2;
+        boolean newBoolean2 = b1 && b2 || !b1 && !b2;
+    }
 
-	public void replaceDuplicateConditionsWithPermutedBooleans(boolean b1, boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 && !b2 || b2 && !b1;
-		boolean newBoolean2 = b1 && b2 || !b2 && !b1;
-	}
+    public void replaceDuplicateConditionsWithPermutedBooleans(boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 && !b2 || b2 && !b1;
+        boolean newBoolean2 = b1 && b2 || !b2 && !b1;
+    }
 
-	public void doNoReplaceDuplicateConditionsWithOtherCondition(boolean b1, boolean b2, boolean b3) {
-		boolean newBoolean1 = b1 && !b2 || !b1 && b2 && b3;
-		boolean newBoolean2 = b1 && b2 || !b1 && !b2 && b3;
-	}
+    public void doNoReplaceDuplicateConditionsWithOtherCondition(boolean b1, boolean b2, boolean b3) {
+        boolean newBoolean1 = b1 && !b2 || !b1 && b2 && b3;
+        boolean newBoolean2 = b1 && b2 || !b1 && !b2 && b3;
+    }
 
-	public void replaceDuplicateConditionsWithWrappers(Boolean b1, Boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 && !b2 || !b1 && b2;
-		boolean newBoolean2 = b1 && b2 || !b1 && !b2;
-	}
+    public void replaceDuplicateConditionsWithWrappers(Boolean b1, Boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 && !b2 || !b1 && b2;
+        boolean newBoolean2 = b1 && b2 || !b1 && !b2;
+    }
 
-	public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4) {
-		// Keep this comment
-		boolean newBoolean1 = (i1 == i2) && !(i3 == i4) || !(i2 == i1) && (i3 == i4);
-		boolean newBoolean2 = (i1 == i2) && (i3 <= i4) || !(i1 == i2) && !(i4 >= i3);
-		boolean newBoolean3 = (i1 == i2) && (i3 != i4) || (i2 != i1) && (i3 == i4);
-		boolean newBoolean4 = (i1 == i2) && (i3 < i4) || (i1 != i2) && (i4 <= i3);
-	}
+    public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        boolean newBoolean1 = (i1 == i2) && !(i3 == i4) || !(i2 == i1) && (i3 == i4);
+        boolean newBoolean2 = (i1 == i2) && (i3 <= i4) || !(i1 == i2) && !(i4 >= i3);
+        boolean newBoolean3 = (i1 == i2) && (i3 != i4) || (i2 != i1) && (i3 == i4);
+        boolean newBoolean4 = (i1 == i2) && (i3 < i4) || (i1 != i2) && (i4 <= i3);
+    }
 
-	public void replaceDuplicateConditionsWithFields() {
-		// Keep this comment
-		boolean newBoolean1 = (staticField > 0) && (staticField < 100) || (staticField <= 0) && (staticField >= 100);
-		boolean newBoolean2 = (staticField > 0) && (staticField < 100) || (staticField >= 100) && !(staticField > 0);
-	}
+    public void replaceDuplicateConditionsWithFields() {
+        // Keep this comment
+        boolean newBoolean1 = (staticField > 0) && (staticField < 100) || (staticField <= 0) && (staticField >= 100);
+        boolean newBoolean2 = (staticField > 0) && (staticField < 100) || (staticField >= 100) && !(staticField > 0);
+    }
 
-	public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
-		boolean newBoolean1 = myList.remove("lorem") && !myList.remove("ipsum") || !myList.remove("lorem")
-				&& myList.remove("ipsum");
-		boolean newBoolean2 = myList.remove("lorem") && myList.remove("ipsum") || !myList.remove("lorem")
-				&& !myList.remove("ipsum");
-	}
+    public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
+        boolean newBoolean1 = myList.remove("lorem") && !myList.remove("ipsum") || !myList.remove("lorem")
+                && myList.remove("ipsum");
+        boolean newBoolean2 = myList.remove("lorem") && myList.remove("ipsum") || !myList.remove("lorem")
+                && !myList.remove("ipsum");
+    }
 
-	public void doNotReplaceDuplicateConditionsWithIncrements(int i1, int i2, int i3, int i4) {
-		boolean newBoolean1 = (i1 == i2) && !(i3 == i4++) || !(i1 == i2) && (i3 == i4++);
-		boolean newBoolean2 = (i1 == i2) && !(i3 == ++i4) || !(i1 == i2) && (i3 == ++i4);
-		boolean newBoolean3 = (i1 == i2) && !(i3 == i4--) || !(i1 == i2) && (i3 == i4--);
-		boolean newBoolean4 = (i1 == i2) && !(i3 == --i4) || !(i1 == i2) && (i3 == --i4);
+    public void doNotReplaceDuplicateConditionsWithIncrements(int i1, int i2, int i3, int i4) {
+        boolean newBoolean1 = (i1 == i2) && !(i3 == i4++) || !(i1 == i2) && (i3 == i4++);
+        boolean newBoolean2 = (i1 == i2) && !(i3 == ++i4) || !(i1 == i2) && (i3 == ++i4);
+        boolean newBoolean3 = (i1 == i2) && !(i3 == i4--) || !(i1 == i2) && (i3 == i4--);
+        boolean newBoolean4 = (i1 == i2) && !(i3 == --i4) || !(i1 == i2) && (i3 == --i4);
 
-		boolean newBoolean5 = (i1 == i2) && (i3 == i4++) || !(i1 == i2) && !(i3 == i4++);
-		boolean newBoolean6 = (i1 == i2) && (i3 == ++i4) || !(i1 == i2) && !(i3 == ++i4);
-		boolean newBoolean7 = (i1 == i2) && (i3 == i4--) || !(i1 == i2) && !(i3 == i4--);
-		boolean newBoolean8 = (i1 == i2) && (i3 == --i4) || !(i1 == i2) && !(i3 == --i4);
-	}
+        boolean newBoolean5 = (i1 == i2) && (i3 == i4++) || !(i1 == i2) && !(i3 == i4++);
+        boolean newBoolean6 = (i1 == i2) && (i3 == ++i4) || !(i1 == i2) && !(i3 == ++i4);
+        boolean newBoolean7 = (i1 == i2) && (i3 == i4--) || !(i1 == i2) && !(i3 == i4--);
+        boolean newBoolean8 = (i1 == i2) && (i3 == --i4) || !(i1 == i2) && !(i3 == --i4);
+    }
 
-	public void doNotReplaceDuplicateConditionsWithAssignments(int i1, int i2, boolean b1, boolean b2) {
-		boolean newBoolean1 = (i1 == i2) && !(b1 = b2) || !(i1 == i2) && (b1 = b2);
-		boolean newBoolean2 = (i1 == i2) && (b1 = b2) || !(i1 == i2) && !(b1 = b2);
-	}
+    public void doNotReplaceDuplicateConditionsWithAssignments(int i1, int i2, boolean b1, boolean b2) {
+        boolean newBoolean1 = (i1 == i2) && !(b1 = b2) || !(i1 == i2) && (b1 = b2);
+        boolean newBoolean2 = (i1 == i2) && (b1 = b2) || !(i1 == i2) && !(b1 = b2);
+    }
 
-	private class SideEffect {
-		private SideEffect() {
-			staticField++;
-		}
-	}
+    private class SideEffect {
+        private SideEffect() {
+            staticField++;
+        }
+    }
 
-	public void doNotReplaceDuplicateConditionsWithInstanciations(Boolean b1) {
-		boolean newBoolean1 = b1 && !(new SideEffect() instanceof SideEffect)
-				|| !b1 && new SideEffect() instanceof SideEffect;
-		boolean newBoolean2 = b1 && new SideEffect() instanceof SideEffect
-				|| !b1 && !(new SideEffect() instanceof SideEffect);
-	}
+    public void doNotReplaceDuplicateConditionsWithInstanciations(Boolean b1) {
+        boolean newBoolean1 = b1 && !(new SideEffect() instanceof SideEffect)
+                || !b1 && new SideEffect() instanceof SideEffect;
+        boolean newBoolean2 = b1 && new SideEffect() instanceof SideEffect
+                || !b1 && !(new SideEffect() instanceof SideEffect);
+    }
 }

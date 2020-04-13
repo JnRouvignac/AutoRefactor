@@ -29,11 +29,11 @@ import static org.junit.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
 public class AssertWithoutImportsSample {
-	public void shouldRefactorNegatedConditions(boolean b) throws Exception {
-		assertTrue(!b);
-	}
+    public void shouldRefactorNegatedConditions(boolean b) throws Exception {
+        assertTrue(!b);
+    }
 
-	public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
-		assertEquals(null, o);
-	}
+    public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
+        assertEquals(null, o);
+    }
 }

@@ -31,47 +31,47 @@ import java.util.function.Predicate;
 
 public class RemoveFieldsDefaultValuesSample {
 
-	private interface Constants {
-		String NULL = null;
-	}
+    private interface Constants {
+        String NULL = null;
+    }
 
-	private static final int MY_CONSTANT = 0;
-	private int keepInitializer = MY_CONSTANT;
+    private static final int MY_CONSTANT = 0;
+    private int keepInitializer = MY_CONSTANT;
 
-	private final boolean final_bo = false;
+    private final boolean final_bo = false;
 
-	private Object doNotRemoveInitializer = new Object();
+    private Object doNotRemoveInitializer = new Object();
 
-	private Object obj = null;
-	private String st = null;
-	private byte by1 = 0x0, by2 = 0;
-	private boolean bo = false;
-	private char c1 = 0, c2 = '\u0000';
-	private short sh = 0;
-	private int i = 0;
-	private long l1 = 0, l2 = 0l, l3 = 0L;
-	private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
-	private double d1 = 0, d2 = 0.0;
-	private Predicate<String> doNotRemoveLambdaExpression = x -> "foo".equals(x);
+    private Object obj = null;
+    private String st = null;
+    private byte by1 = 0x0, by2 = 0;
+    private boolean bo = false;
+    private char c1 = 0, c2 = '\u0000';
+    private short sh = 0;
+    private int i = 0;
+    private long l1 = 0, l2 = 0l, l3 = 0L;
+    private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
+    private double d1 = 0, d2 = 0.0;
+    private Predicate<String> doNotRemoveLambdaExpression = x -> "foo".equals(x);
 
-	public Iterable<String> getIterable() {
-		return new Iterable<String>() {
-			private Collection<String> aField = null;
+    public Iterable<String> getIterable() {
+        return new Iterable<String>() {
+            private Collection<String> aField = null;
 
-			@Override
-			public Iterator<String> iterator() {
-				return aField.iterator();
-			}
-		};
-	}
+            @Override
+            public Iterator<String> iterator() {
+                return aField.iterator();
+            }
+        };
+    }
 
-	private enum MyEnum {
-		ONE, TWO;
+    private enum MyEnum {
+        ONE, TWO;
 
-		String aField = null;
-	}
+        String aField = null;
+    }
 
-	private @interface MyAnnotation {
-		String aField = null;
-	}
+    private @interface MyAnnotation {
+        String aField = null;
+    }
 }

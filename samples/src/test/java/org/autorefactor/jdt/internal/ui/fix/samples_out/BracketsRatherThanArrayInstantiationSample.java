@@ -28,60 +28,60 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.Observable;
 
 public class BracketsRatherThanArrayInstantiationSample {
-	/**
-	 * Keep this comment.
-	 */
-	private double[] refactorThisDoubleArray = { 42.42 };
+    /**
+     * Keep this comment.
+     */
+    private double[] refactorThisDoubleArray = { 42.42 };
 
-	/**
-	 * Keep this comment.
-	 */
-	private int[][] refactorThis2DimensionArray = { { 42 } };
+    /**
+     * Keep this comment.
+     */
+    private int[][] refactorThis2DimensionArray = { { 42 } };
 
-	/**
-	 * Keep this comment.
-	 */
-	private Observable[] refactorThisObserverArray = {};
+    /**
+     * Keep this comment.
+     */
+    private Observable[] refactorThisObserverArray = {};
 
-	/**
-	 * Keep this comment.
-	 */
-	private short[] refactorThisShortArray, andThisArrayToo = {};
+    /**
+     * Keep this comment.
+     */
+    private short[] refactorThisShortArray, andThisArrayToo = {};
 
-	private Byte[] doNotRefactorNotInitializedArray = new Byte[10];
+    private Byte[] doNotRefactorNotInitializedArray = new Byte[10];
 
-	private Object doNotRefactorThisObserverArray = new Observable[0];
+    private Object doNotRefactorThisObserverArray = new Observable[0];
 
-	public void refactorArrayInstantiations() {
-		// Keep this comment
-		double[] refactorLocalDoubleArray = { 42.42 };
-		int[][] refactorLocal2DimensionArray = { { 42 } };
-		Observable[] refactorLocalObserverArray = {};
-		short[] refactorThisShortArray, andThisArrayToo = {};
-	}
+    public void refactorArrayInstantiations() {
+        // Keep this comment
+        double[] refactorLocalDoubleArray = { 42.42 };
+        int[][] refactorLocal2DimensionArray = { { 42 } };
+        Observable[] refactorLocalObserverArray = {};
+        short[] refactorThisShortArray, andThisArrayToo = {};
+    }
 
-	public void doNotRefactorArrayAssignment() {
-		char[] refactorLocalDoubleArray;
-		refactorLocalDoubleArray = new char[] { 'a', 'b' };
-	}
+    public void doNotRefactorArrayAssignment() {
+        char[] refactorLocalDoubleArray;
+        refactorLocalDoubleArray = new char[] { 'a', 'b' };
+    }
 
-	public void doNotRefactorArrayInstantiationsInBrackets() {
-		boolean[] refactorLocalDoubleArray = (new boolean[] { true });
-	}
+    public void doNotRefactorArrayInstantiationsInBrackets() {
+        boolean[] refactorLocalDoubleArray = (new boolean[] { true });
+    }
 
-	public void doNotRefactorCastedArrayInstantiations() {
-		Object refactorLocalDoubleArray = (double[]) new double[] { 42.42 };
-	}
+    public void doNotRefactorCastedArrayInstantiations() {
+        Object refactorLocalDoubleArray = (double[]) new double[] { 42.42 };
+    }
 
-	public double[] doNotRefactorReturnedArrayInstantiation() {
-		return new double[] { 42.42 };
-	}
+    public double[] doNotRefactorReturnedArrayInstantiation() {
+        return new double[] { 42.42 };
+    }
 
-	public void doNotRefactorArrayInstantiationParameter() {
-		System.out.println(new double[] { 42.42 });
-	}
+    public void doNotRefactorArrayInstantiationParameter() {
+        System.out.println(new double[] { 42.42 });
+    }
 
-	public String doNotRefactorArrayInstantiationExpression() {
-		return new float[] { 42.42f }.toString();
-	}
+    public String doNotRefactorArrayInstantiationExpression() {
+        return new float[] { 42.42f }.toString();
+    }
 }

@@ -32,191 +32,191 @@ import java.util.List;
 import java.util.Map;
 
 public class AssignRatherThanFilterThenAssignAnywaySample {
-	private final String DEFAULT = "";
-	private String input;
+    private final String DEFAULT = "";
+    private String input;
 
-	public String refactorLocalVariable1(String input) {
-		String output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public String refactorLocalVariable1(String input) {
+        String output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public String doNotRefactorOppositeAssignment(String input) {
-		String output;
-		if (input == null) {
-			output = input;
-		} else {
-			output = null;
-		}
-		return output;
-	}
+    public String doNotRefactorOppositeAssignment(String input) {
+        String output;
+        if (input == null) {
+            output = input;
+        } else {
+            output = null;
+        }
+        return output;
+    }
 
-	public String doNotRefactorLocalVariable(String input) {
-		String output;
-		if (input == null) {
-			output = DEFAULT;
-		} else {
-			output = input;
-		}
-		return output;
-	}
+    public String doNotRefactorLocalVariable(String input) {
+        String output;
+        if (input == null) {
+            output = DEFAULT;
+        } else {
+            output = input;
+        }
+        return output;
+    }
 
-	public String doNotRefactorActiveExpression(List<String> input) {
-		String result;
-		if (input.remove(0) == null) {
-			result = null;
-		} else {
-			result = input.remove(0);
-		}
-		return result;
-	}
+    public String doNotRefactorActiveExpression(List<String> input) {
+        String result;
+        if (input.remove(0) == null) {
+            result = null;
+        } else {
+            result = input.remove(0);
+        }
+        return result;
+    }
 
-	public String refactorLocalVariable2(String input) {
-		String output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public String refactorLocalVariable2(String input) {
+        String output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public String refactorLocalVariable3(String input) {
-		String output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public String refactorLocalVariable3(String input) {
+        String output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public String refactorLocalVariable4(String input) {
-		String output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public String refactorLocalVariable4(String input) {
+        String output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public int removeHardCodedNumber(int input) {
-		int output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public int removeHardCodedNumber(int input) {
+        int output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public char removeHardCodedCharacter(char input) {
-		char output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public char removeHardCodedCharacter(char input) {
+        char output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public int removeHardCodedExpression(int input) {
-		int output;
-		// Keep this comment
-		output = input;
-		return output;
-	}
+    public int removeHardCodedExpression(int input) {
+        int output;
+        // Keep this comment
+        output = input;
+        return output;
+    }
 
-	public String refactorLocalVariable5(String input, boolean isValid) {
-		String output = null;
-		if (isValid)
-			output = input;
-		return output;
-	}
+    public String refactorLocalVariable5(String input, boolean isValid) {
+        String output = null;
+        if (isValid)
+            output = input;
+        return output;
+    }
 
-	public void doNotRefactorFieldAssignXXX(String input, AssignRatherThanFilterThenAssignAnywaySample other) {
-		if (input == null) {
-			this.input = null;
-		} else {
-			other.input = input;
-		}
-	}
+    public void doNotRefactorFieldAssignXXX(String input, AssignRatherThanFilterThenAssignAnywaySample other) {
+        if (input == null) {
+            this.input = null;
+        } else {
+            other.input = input;
+        }
+    }
 
-	public void doNotRefactorFieldAssign(String input) {
-		if (input == null) {
-			this.input = DEFAULT;
-		} else {
-			this.input = input;
-		}
-	}
+    public void doNotRefactorFieldAssign(String input) {
+        if (input == null) {
+            this.input = DEFAULT;
+        } else {
+            this.input = input;
+        }
+    }
 
-	public void refactorFieldAssign1(String input) {
-		// Keep this comment
-		this.input = input;
-	}
+    public void refactorFieldAssign1(String input) {
+        // Keep this comment
+        this.input = input;
+    }
 
-	public void refactorFieldAssign2(String input) {
-		// Keep this comment
-		this.input = input;
-	}
+    public void refactorFieldAssign2(String input) {
+        // Keep this comment
+        this.input = input;
+    }
 
-	public void refactorFieldAssign3(String input) {
-		// Keep this comment
-		this.input = input;
-	}
+    public void refactorFieldAssign3(String input) {
+        // Keep this comment
+        this.input = input;
+    }
 
-	public void refactorFieldAssign4(String input) {
-		// Keep this comment
-		this.input = input;
-	}
+    public void refactorFieldAssign4(String input) {
+        // Keep this comment
+        this.input = input;
+    }
 
-	public String doNotRefactorReturn1(String input) {
-		if (null != input) {
-			return input;
-		} else {
-			return DEFAULT;
-		}
-	}
+    public String doNotRefactorReturn1(String input) {
+        if (null != input) {
+            return input;
+        } else {
+            return DEFAULT;
+        }
+    }
 
-	public Collection<?> doNotRefactorReturn2(Collection<?> c) {
-		if (c == null) {
-			return Collections.emptySet();
-		} else {
-			return c;
-		}
-	}
+    public Collection<?> doNotRefactorReturn2(Collection<?> c) {
+        if (c == null) {
+            return Collections.emptySet();
+        } else {
+            return c;
+        }
+    }
 
-	public String refactorReturn1(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturn1(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturn2(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturn2(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturn3(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturn3(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturn4(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturn4(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturnNoElse1(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturnNoElse1(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturnNoElse2(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturnNoElse2(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturnNoElse3(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturnNoElse3(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public String refactorReturnNoElse4(String input) {
-		// Keep this comment
-		return input;
-	}
+    public String refactorReturnNoElse4(String input) {
+        // Keep this comment
+        return input;
+    }
 
-	public Date doNotRefactorActiveExpression(Map<Integer, Date> input) {
-		if (null != input.remove(0)) {
-			return input.remove(0);
-		}
-		return null;
-	}
+    public Date doNotRefactorActiveExpression(Map<Integer, Date> input) {
+        if (null != input.remove(0)) {
+            return input.remove(0);
+        }
+        return null;
+    }
 }

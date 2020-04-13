@@ -28,22 +28,22 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_in;
 import java.time.DayOfWeek;
 
 public class UseSwitchThenSimpleNameSample {
-	public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
-		int i = 0;
-		// Keep this comment
-		switch (day) {
-		case MONDAY:
-		case TUESDAY:
-		case WEDNESDAY:
-			// Keep this comment too
-			i = 0;
-			break;
+    public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
+        int i = 0;
+        // Keep this comment
+        switch (day) {
+        case MONDAY:
+        case TUESDAY:
+        case WEDNESDAY:
+            // Keep this comment too
+            i = 0;
+            break;
 
-		case THURSDAY:
-		default:
-			// Keep this comment also
-			i = 150;
-			break;
-		}
-	}
+        case THURSDAY:
+        default:
+            // Keep this comment also
+            i = 150;
+            break;
+        }
+    }
 }

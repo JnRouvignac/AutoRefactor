@@ -28,84 +28,84 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class LazyLogicalRatherThanEagerSample {
-	private static int staticField = 0;
+    private static int staticField = 0;
 
-	public void replaceOperatorWithPrimitiveTypes(boolean b1, boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 & b2;
-		boolean newBoolean2 = b1 | b2;
-	}
+    public void replaceOperatorWithPrimitiveTypes(boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 & b2;
+        boolean newBoolean2 = b1 | b2;
+    }
 
-	public void replaceOperatorWithExtendedOperands(boolean b1, boolean b2, boolean b3) {
-		// Keep this comment
-		boolean newBoolean1 = b1 & b2 & b3;
-		boolean newBoolean2 = b1 | b2 | b3;
-	}
+    public void replaceOperatorWithExtendedOperands(boolean b1, boolean b2, boolean b3) {
+        // Keep this comment
+        boolean newBoolean1 = b1 & b2 & b3;
+        boolean newBoolean2 = b1 | b2 | b3;
+    }
 
-	public void replaceOperatorWithWrappers(Boolean b1, Boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = b1 & b2;
-		boolean newBoolean2 = b1 | b2;
-	}
+    public void replaceOperatorWithWrappers(Boolean b1, Boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = b1 & b2;
+        boolean newBoolean2 = b1 | b2;
+    }
 
-	public void doNotReplaceOperatorWithIntegers(int i1, int i2) {
-		int newInteger1 = i1 & i2;
-		int newInteger2 = i1 | i2;
-	}
+    public void doNotReplaceOperatorWithIntegers(int i1, int i2) {
+        int newInteger1 = i1 & i2;
+        int newInteger2 = i1 | i2;
+    }
 
-	public void replaceOperatorWithExpressions(int i1, int i2, int i3, int i4) {
-		// Keep this comment
-		boolean newBoolean1 = (i1 == i2) & (i3 != i4);
-		boolean newBoolean2 = (i1 == i2) | (i3 != i4);
-	}
+    public void replaceOperatorWithExpressions(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        boolean newBoolean1 = (i1 == i2) & (i3 != i4);
+        boolean newBoolean2 = (i1 == i2) | (i3 != i4);
+    }
 
-	public void doNotReplaceOperatorWithMethods(List<String> myList) {
-		boolean newBoolean1 = myList.remove("lorem") & myList.remove("ipsum");
-		boolean newBoolean2 = myList.remove("lorem") | myList.remove("ipsum");
-	}
+    public void doNotReplaceOperatorWithMethods(List<String> myList) {
+        boolean newBoolean1 = myList.remove("lorem") & myList.remove("ipsum");
+        boolean newBoolean2 = myList.remove("lorem") | myList.remove("ipsum");
+    }
 
-	public void doNotReplaceOperatorWithArrayAccess() {
-		boolean[] booleans = new boolean[] {true, true};
-		boolean newBoolean1 = booleans[0] & booleans[1] & booleans[2];
-		boolean newBoolean2 = booleans[0] | booleans[1] | booleans[2];
-	}
+    public void doNotReplaceOperatorWithArrayAccess() {
+        boolean[] booleans = new boolean[] {true, true};
+        boolean newBoolean1 = booleans[0] & booleans[1] & booleans[2];
+        boolean newBoolean2 = booleans[0] | booleans[1] | booleans[2];
+    }
 
-	public void doNotReplaceOperatorWithDivision(int i1, int i2) {
-		boolean newBoolean1 = (i1 == 123) & ((10 / i1) == i2);
-		boolean newBoolean2 = (i1 == 123) | ((10 / i1) == i2);
-	}
+    public void doNotReplaceOperatorWithDivision(int i1, int i2) {
+        boolean newBoolean1 = (i1 == 123) & ((10 / i1) == i2);
+        boolean newBoolean2 = (i1 == 123) | ((10 / i1) == i2);
+    }
 
-	public void replaceOperatorWithMethodOnLeftOperand(List<String> myList, boolean b1, boolean b2) {
-		// Keep this comment
-		boolean newBoolean1 = myList.remove("lorem") & b1 & b2;
-		boolean newBoolean2 = myList.remove("lorem") | b1 | b2;
-	}
+    public void replaceOperatorWithMethodOnLeftOperand(List<String> myList, boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = myList.remove("lorem") & b1 & b2;
+        boolean newBoolean2 = myList.remove("lorem") | b1 | b2;
+    }
 
-	public void doNotReplaceOperatorWithIncrements(int i1, int i2, int i3, int i4) {
-		boolean newBoolean1 = (i1 == i2) & (i3 != i4++);
-		boolean newBoolean2 = (i1 == i2) & (i3 != ++i4);
-		boolean newBoolean3 = (i1 == i2) & (i3 != i4--);
-		boolean newBoolean4 = (i1 == i2) & (i3 != --i4);
+    public void doNotReplaceOperatorWithIncrements(int i1, int i2, int i3, int i4) {
+        boolean newBoolean1 = (i1 == i2) & (i3 != i4++);
+        boolean newBoolean2 = (i1 == i2) & (i3 != ++i4);
+        boolean newBoolean3 = (i1 == i2) & (i3 != i4--);
+        boolean newBoolean4 = (i1 == i2) & (i3 != --i4);
 
-		boolean newBoolean5 = (i1 == i2) | (i3 != i4++);
-		boolean newBoolean6 = (i1 == i2) | (i3 != ++i4);
-		boolean newBoolean7 = (i1 == i2) | (i3 != i4--);
-		boolean newBoolean8 = (i1 == i2) | (i3 != --i4);
-	}
+        boolean newBoolean5 = (i1 == i2) | (i3 != i4++);
+        boolean newBoolean6 = (i1 == i2) | (i3 != ++i4);
+        boolean newBoolean7 = (i1 == i2) | (i3 != i4--);
+        boolean newBoolean8 = (i1 == i2) | (i3 != --i4);
+    }
 
-	public void doNotReplaceOperatorWithAssignments(int i1, int i2, boolean b1, boolean b2) {
-		boolean newBoolean1 = (i1 == i2) & (b1 = b2);
-		boolean newBoolean2 = (i1 == i2) | (b1 = b2);
-	}
+    public void doNotReplaceOperatorWithAssignments(int i1, int i2, boolean b1, boolean b2) {
+        boolean newBoolean1 = (i1 == i2) & (b1 = b2);
+        boolean newBoolean2 = (i1 == i2) | (b1 = b2);
+    }
 
-	private class SideEffect {
-		private SideEffect() {
-			staticField++;
-		}
-	}
+    private class SideEffect {
+        private SideEffect() {
+            staticField++;
+        }
+    }
 
-	public void doNotReplaceOperatorWithInstanciations(Boolean b1) {
-		boolean newBoolean1 = b1 & new SideEffect() instanceof SideEffect;
-		boolean newBoolean2 = b1 | new SideEffect() instanceof SideEffect;
-	}
+    public void doNotReplaceOperatorWithInstanciations(Boolean b1) {
+        boolean newBoolean1 = b1 & new SideEffect() instanceof SideEffect;
+        boolean newBoolean2 = b1 | new SideEffect() instanceof SideEffect;
+    }
 }

@@ -29,49 +29,49 @@ import java.util.List;
 
 public class DoWhileRatherThanDuplicateCodeSample {
 
-	public void replaceWhileByDoWhile(int i) {
-		System.out.println("Statement 1");
-		System.out.println("Statement 2");
-		// Keep this comment
-		while (i-- > 0) {
-			System.out.println("Statement 1");
-			System.out.println("Statement 2");
-		}
-	}
+    public void replaceWhileByDoWhile(int i) {
+        System.out.println("Statement 1");
+        System.out.println("Statement 2");
+        // Keep this comment
+        while (i-- > 0) {
+            System.out.println("Statement 1");
+            System.out.println("Statement 2");
+        }
+    }
 
-	public void replaceWhileWithoutBlock(int i) {
-		i--;
-		// Keep this comment
-		while (i > 0)
-			i--;
-	}
+    public void replaceWhileWithoutBlock(int i) {
+        i--;
+        // Keep this comment
+        while (i > 0)
+            i--;
+    }
 
-	public void doNotReplaceWhileByDoWhile(int i) {
-		System.out.println("A statement");
-		while (i-- > 0) {
-			System.out.println("Another statement");
-		}
-	}
+    public void doNotReplaceWhileByDoWhile(int i) {
+        System.out.println("A statement");
+        while (i-- > 0) {
+            System.out.println("Another statement");
+        }
+    }
 
-	public void doNotReplaceWithMissingStatement(int i) {
-		System.out.println("A statement");
-		while (i-- > 0) {
-			System.out.println("A statement");
-			System.out.println("A statement");
-		}
-	}
+    public void doNotReplaceWithMissingStatement(int i) {
+        System.out.println("A statement");
+        while (i-- > 0) {
+            System.out.println("A statement");
+            System.out.println("A statement");
+        }
+    }
 
-	public void doNotRemoveVariableDeclaration(int i) {
-		System.out.println("A statement");
-		int j = 0;
-		while (i-- > 0) {
-			System.out.println("A statement");
-			j = 0;
-		}
-	}
+    public void doNotRemoveVariableDeclaration(int i) {
+        System.out.println("A statement");
+        int j = 0;
+        while (i-- > 0) {
+            System.out.println("A statement");
+            j = 0;
+        }
+    }
 
-	public void doNotRemoveEmptyLoop(List listToEmpty) {
-		while (listToEmpty.remove("foo")) {
-		}
-	}
+    public void doNotRemoveEmptyLoop(List listToEmpty) {
+        while (listToEmpty.remove("foo")) {
+        }
+    }
 }

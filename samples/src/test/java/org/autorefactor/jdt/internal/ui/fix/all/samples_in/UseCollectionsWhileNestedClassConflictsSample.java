@@ -29,14 +29,14 @@ import java.util.Date;
 import java.util.List;
 
 public class UseCollectionsWhileNestedClassConflictsSample {
-	public static class Collections {
-	}
+    public static class Collections {
+    }
 
-	public void replaceAddWithForLoopByCollectionsAddAll(
-			List<? super Date> output, Date[] elems1) {
-		// Keep this comment
-		for (int i = 0; i < elems1.length; i++) {
-			output.add(elems1[i]);
-		}
-	}
+    public void replaceAddWithForLoopByCollectionsAddAll(
+            List<? super Date> output, Date[] elems1) {
+        // Keep this comment
+        for (int i = 0; i < elems1.length; i++) {
+            output.add(elems1[i]);
+        }
+    }
 }

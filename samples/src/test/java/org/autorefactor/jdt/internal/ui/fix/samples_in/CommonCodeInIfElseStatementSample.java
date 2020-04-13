@@ -32,567 +32,567 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CommonCodeInIfElseStatementSample {
-	private Date j = new Date();
+    private Date j = new Date();
 
-	/** Common code: i++, Remove if statement */
-	public void ifElseRemoveIfNoBrackets(boolean b, int i) {
-		// Keep this!
-		if (b)
-			// Keep this comment
-			i++;
-		else
-			i = i + 1;
-	}
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIfNoBrackets(boolean b, int i) {
+        // Keep this!
+        if (b)
+            // Keep this comment
+            i++;
+        else
+            i = i + 1;
+    }
 
-	/** Common code: i++, Remove if statement */
-	public void ifElseRemoveIf(boolean b, int number) {
-		if (b) {
-			// Keep this comment
-			number = number + 1;
-		} else {
-			number++;
-		}
-	}
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIf(boolean b, int number) {
+        if (b) {
+            // Keep this comment
+            number = number + 1;
+        } else {
+            number++;
+        }
+    }
 
-	/** No common code, Do not remove anything */
-	public void doNotRemoveNotCommonCode(boolean condition, int number1, int number2) {
-		if (condition) {
-			number1++;
-		} else {
-			number2++;
-		}
-	}
+    /** No common code, Do not remove anything */
+    public void doNotRemoveNotCommonCode(boolean condition, int number1, int number2) {
+        if (condition) {
+            number1++;
+        } else {
+            number2++;
+        }
+    }
 
-	/** Common code: i++, Remove then case */
-	public void ifElseRemoveThen(boolean condition, int i, int j) {
-		if (condition) {
-			// Keep this comment
-			++i;
-		} else {
-			j++;
-			// Keep this comment
-			i = i + 1;
-		}
-	}
+    /** Common code: i++, Remove then case */
+    public void ifElseRemoveThen(boolean condition, int i, int j) {
+        if (condition) {
+            // Keep this comment
+            ++i;
+        } else {
+            j++;
+            // Keep this comment
+            i = i + 1;
+        }
+    }
 
-	/** Common code: i++, Remove else case */
-	public void ifElseRemoveElse(boolean b, int i, int j) {
-		if (b) {
-			j++;
-			// Keep this comment
-			i++;
-		} else {
-			// Keep this comment
-			i++;
-		}
-	}
+    /** Common code: i++, Remove else case */
+    public void ifElseRemoveElse(boolean b, int i, int j) {
+        if (b) {
+            j++;
+            // Keep this comment
+            i++;
+        } else {
+            // Keep this comment
+            i++;
+        }
+    }
 
-	/** Common code: i++, Remove second case */
-	public void reverseMiddle(boolean isActive, boolean isEnabled, int i, int j) {
-		if (isActive) {
-			j++;
-			// Keep this comment
-			i++;
-		} else if (isEnabled) {
-			// Keep this comment
-			i++;
-		} else {
-			j++;
-			// Keep this comment
-			i++;
-		}
-	}
+    /** Common code: i++, Remove second case */
+    public void reverseMiddle(boolean isActive, boolean isEnabled, int i, int j) {
+        if (isActive) {
+            j++;
+            // Keep this comment
+            i++;
+        } else if (isEnabled) {
+            // Keep this comment
+            i++;
+        } else {
+            j++;
+            // Keep this comment
+            i++;
+        }
+    }
 
-	/** Common code: i++, Remove second case */
-	public void reverseEmptySecond(boolean isActive, boolean isEnabled, int i, int j) {
-		if (isActive) {
-			j++;
-			// Keep this comment
-			i++;
-		} else if (isEnabled) {
-			// Keep this comment
-			i++;
-		} else if (i > 0) {
-			j--;
-			// Keep this comment
-			i++;
-		} else {
-			j++;
-			// Keep this comment
-			i++;
-		}
-	}
+    /** Common code: i++, Remove second case */
+    public void reverseEmptySecond(boolean isActive, boolean isEnabled, int i, int j) {
+        if (isActive) {
+            j++;
+            // Keep this comment
+            i++;
+        } else if (isEnabled) {
+            // Keep this comment
+            i++;
+        } else if (i > 0) {
+            j--;
+            // Keep this comment
+            i++;
+        } else {
+            j++;
+            // Keep this comment
+            i++;
+        }
+    }
 
-	/** Only common code, Remove if statement */
-	public void ifElseRemoveIfSeveralStatements(boolean b1, boolean b2, int i, int j) {
-		if (b1) {
-			// Keep this comment
-			i++;
-			if (b2 && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !b2) {
-				j++;
-			} else {
-				i++;
-			}
-		}
-	}
+    /** Only common code, Remove if statement */
+    public void ifElseRemoveIfSeveralStatements(boolean b1, boolean b2, int i, int j) {
+        if (b1) {
+            // Keep this comment
+            i++;
+            if (b2 && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !b2) {
+                j++;
+            } else {
+                i++;
+            }
+        }
+    }
 
-	/** Not all cases covered, Do not remove anything */
-	public void ifElseIfNoElseDoNotTouch(boolean b, int k, int l) {
-		if (b) {
-			k++;
-			l++;
-		} else if (!b) {
-			k++;
-			l++;
-		}
-	}
+    /** Not all cases covered, Do not remove anything */
+    public void ifElseIfNoElseDoNotTouch(boolean b, int k, int l) {
+        if (b) {
+            k++;
+            l++;
+        } else if (!b) {
+            k++;
+            l++;
+        }
+    }
 
-	/** Only common code: remove if statement */
-	public void ifElseIfElseRemoveIf(boolean b, int i, int j) {
-		if (b) {
-			// Keep this comment
-			i++;
-			j++;
-		} else if (!b) {
-			// Keep this comment
-			i++;
-			j++;
-		} else {
-			// Keep this comment
-			i++;
-			j++;
-		}
-	}
+    /** Only common code: remove if statement */
+    public void ifElseIfElseRemoveIf(boolean b, int i, int j) {
+        if (b) {
+            // Keep this comment
+            i++;
+            j++;
+        } else if (!b) {
+            // Keep this comment
+            i++;
+            j++;
+        } else {
+            // Keep this comment
+            i++;
+            j++;
+        }
+    }
 
-	/** Specific code: keep some if statement */
-	public void ifElseIfElseRemoveSomeIf(boolean b1, boolean b2, List<String> modifiableList, int i, int j) {
-		if (b1) {
-			// Keep this comment
-			i++;
-			j++;
-		} else if (b2) {
-			i++;
-			// Keep this comment
-			i++;
-			j++;
-		} else if (modifiableList.remove("foo")) {
-			// Keep this comment
-			i++;
-			j++;
-		} else {
-			// Keep this comment
-			i++;
-			j++;
-		}
-	}
+    /** Specific code: keep some if statement */
+    public void ifElseIfElseRemoveSomeIf(boolean b1, boolean b2, List<String> modifiableList, int i, int j) {
+        if (b1) {
+            // Keep this comment
+            i++;
+            j++;
+        } else if (b2) {
+            i++;
+            // Keep this comment
+            i++;
+            j++;
+        } else if (modifiableList.remove("foo")) {
+            // Keep this comment
+            i++;
+            j++;
+        } else {
+            // Keep this comment
+            i++;
+            j++;
+        }
+    }
 
-	public int doNotRefactorDifferentVariablesInReturn(boolean condition) {
-		if (condition) {
-			int i = 1;
-			return i;
-		} else {
-			int i = 2;
-			return i;
-		}
-	}
+    public int doNotRefactorDifferentVariablesInReturn(boolean condition) {
+        if (condition) {
+            int i = 1;
+            return i;
+        } else {
+            int i = 2;
+            return i;
+        }
+    }
 
-	public void refactorMethodInvocatoin(boolean b, Object o) {
-		if (b) {
-			System.out.println(b);
-			o.toString();
-		} else {
-			o.toString();
-		}
-	}
+    public void refactorMethodInvocatoin(boolean b, Object o) {
+        if (b) {
+            System.out.println(b);
+            o.toString();
+        } else {
+            o.toString();
+        }
+    }
 
-	public int doNotRefactorNoElse(boolean b) {
-		if (b) {
-			return 1;
-		}
-		return 1;
-	}
+    public int doNotRefactorNoElse(boolean b) {
+        if (b) {
+            return 1;
+        }
+        return 1;
+    }
 
-	public int refactorIfElseInThenClause(boolean b1, boolean b2) {
-		if (b1) {
-			if (b2) {
-				return 1;
-			} else {
-				return 1;
-			}
-		} else {
-			return 1;
-		}
-	}
+    public int refactorIfElseInThenClause(boolean b1, boolean b2) {
+        if (b1) {
+            if (b2) {
+                return 1;
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    }
 
-	public int refactorIfElseInElseClause(boolean b1, boolean b2, int increment) {
-		if (b1) {
-			increment++;
-		} else if (b2) {
-			increment--;
-		} else {
-			increment--;
-		}
-		return increment;
-	}
+    public int refactorIfElseInElseClause(boolean b1, boolean b2, int increment) {
+        if (b1) {
+            increment++;
+        } else if (b2) {
+            increment--;
+        } else {
+            increment--;
+        }
+        return increment;
+    }
 
-	public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2, int increment) {
-		if (b1)      increment++;
-		else if (b2) increment--;
-		else         increment--;
-		return increment;
-	}
+    public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2, int increment) {
+        if (b1)      increment++;
+        else if (b2) increment--;
+        else         increment--;
+        return increment;
+    }
 
-	public int doNotRefactorWithNameConflict(boolean isActive) {
-		int i;
+    public int doNotRefactorWithNameConflict(boolean isActive) {
+        int i;
 
-		if (isActive) {
-			int j = 1;
-			i = j + 10;
-		} else {
-			int j = 1;
-			i = j + 10;
-		}
+        if (isActive) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
 
-		int j = 123;
-		System.out.println("Other number: " + j);
-		return i;
-	}
+        int j = 123;
+        System.out.println("Other number: " + j);
+        return i;
+    }
 
-	public int doNotRefactorWithNameConflictInBlock(boolean isActive) {
-		int i;
+    public int doNotRefactorWithNameConflictInBlock(boolean isActive) {
+        int i;
 
-		if (isActive) {
-			int j = 1;
-			i = j + 10;
-		} else {
-			int j = 1;
-			i = j + 10;
-		}
+        if (isActive) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
 
-		if (isActive) {
-			int j = 123;
-			System.out.println("Other number: " + j);
-		}
-		return i;
-	}
+        if (isActive) {
+            int j = 123;
+            System.out.println("Other number: " + j);
+        }
+        return i;
+    }
 
-	public int doNotRefactorWithNameConfusion(boolean b) {
-		int i;
+    public int doNotRefactorWithNameConfusion(boolean b) {
+        int i;
 
-		if (b) {
-			int j = 1;
-			i = j + 10;
-		} else {
-			int j = 1;
-			i = j + 10;
-		}
+        if (b) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
 
-		System.out.println("Today: " + j);
-		return i;
-	}
+        System.out.println("Today: " + j);
+        return i;
+    }
 
-	public int doNotMoveVarOutsideItsScope(boolean b) {
-		if (b) {
-			int dontMoveMeIMLocal = 1;
-			return dontMoveMeIMLocal + 10;
-		} else {
-			int dontMoveMeIMLocal = 2;
-			return dontMoveMeIMLocal + 10;
-		}
-	}
+    public int doNotMoveVarOutsideItsScope(boolean b) {
+        if (b) {
+            int dontMoveMeIMLocal = 1;
+            return dontMoveMeIMLocal + 10;
+        } else {
+            int dontMoveMeIMLocal = 2;
+            return dontMoveMeIMLocal + 10;
+        }
+    }
 
-	/** Common code: i++, Remove if statement */
-	public void ifElseRemoveIfInsideWhile(boolean b, int integer) {
-		while (integer < 100)
-			if (b) {
-				// Keep this comment
-				integer = 1 + integer;
-			} else {
-				integer++;
-			}
-	}
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIfInsideWhile(boolean b, int integer) {
+        while (integer < 100)
+            if (b) {
+                // Keep this comment
+                integer = 1 + integer;
+            } else {
+                integer++;
+            }
+    }
 
-	public static Predicate<String> doNotMergeDifferentLambdaExpression(final boolean caseSensitive, final String... allowedSet) {
-		if (caseSensitive) {
-			return x -> Arrays.stream(allowedSet).anyMatch(y -> (x == null && y == null) || (x != null && x.equals(y)));
-		} else {
-			Function<String,String> toLower = x -> x == null ? null : x.toLowerCase();
-			return x -> Arrays.stream(allowedSet).map(toLower).anyMatch(y -> (x == null && y == null) || (x != null && toLower.apply(x).equals(y)));
-		}
-	}
+    public static Predicate<String> doNotMergeDifferentLambdaExpression(final boolean caseSensitive, final String... allowedSet) {
+        if (caseSensitive) {
+            return x -> Arrays.stream(allowedSet).anyMatch(y -> (x == null && y == null) || (x != null && x.equals(y)));
+        } else {
+            Function<String,String> toLower = x -> x == null ? null : x.toLowerCase();
+            return x -> Arrays.stream(allowedSet).map(toLower).anyMatch(y -> (x == null && y == null) || (x != null && toLower.apply(x).equals(y)));
+        }
+    }
 
-	public String refactorExceptFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			// Keep this comment
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else if (i > 0) {
-			return "Do completely other things";
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-		}
+    public String refactorExceptFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            return "Do completely other things";
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorExceptFirstCase(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			return "Do absolutely other things";
-		} else if (i > 0) {
-			// Keep this comment
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-		}
+    public String refactorExceptFirstCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            return "Do absolutely other things";
+        } else if (i > 0) {
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorExceptLastCase(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			// Keep this comment
-			i++;
-			if (Boolean.TRUE && isEnabled && isValid) {
-				i++;
-			} else {
-				j++;
-			}
-		} else if (i > 0) {
-			// Keep this comment
-			i++;
-			if (!isEnabled || !isValid) {
-				j++;
-			} else {
-				i++;
-			}
-		} else {
-			return "Do completely other stuff";
-		}
+    public String refactorExceptLastCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            // Keep this comment
+            i++;
+            if (Boolean.TRUE && isEnabled && isValid) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            // Keep this comment
+            i++;
+            if (!isEnabled || !isValid) {
+                j++;
+            } else {
+                i++;
+            }
+        } else {
+            return "Do completely other stuff";
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorExceptThrow(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			// Keep this comment
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else if (i > 0) {
-			throw new NullPointerException("Do completely other things");
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-		}
+    public String refactorExceptThrow(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            throw new NullPointerException("Do completely other things");
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorExceptBreak(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
-		for (String text : texts) {
-			if (isValid) {
-				// Keep this comment
-				i++;
-				if (isEnabled && true) {
-					i++;
-				} else {
-					j++;
-				}
-			} else if (i > 0) {
-				break;
-			} else {
-				// Keep this comment
-				i++;
-				if (false || !isEnabled) {
-					j++;
-				} else {
-					i++;
-				}
-			}
-		}
+    public String refactorExceptBreak(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
+        for (String text : texts) {
+            if (isValid) {
+                // Keep this comment
+                i++;
+                if (isEnabled && true) {
+                    i++;
+                } else {
+                    j++;
+                }
+            } else if (i > 0) {
+                break;
+            } else {
+                // Keep this comment
+                i++;
+                if (false || !isEnabled) {
+                    j++;
+                } else {
+                    i++;
+                }
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorExceptContinue(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
-		for (String text : texts) {
-			if (isValid) {
-				// Keep this comment
-				i++;
-				if (isEnabled && true) {
-					i++;
-				} else {
-					j++;
-				}
-			} else if (i > 0) {
-				continue;
-			} else {
-				// Keep this comment
-				i++;
-				if (false || !isEnabled) {
-					j++;
-				} else {
-					i++;
-				}
-			}
-		}
+    public String refactorExceptContinue(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
+        for (String text : texts) {
+            if (isValid) {
+                // Keep this comment
+                i++;
+                if (isEnabled && true) {
+                    i++;
+                } else {
+                    j++;
+                }
+            } else if (i > 0) {
+                continue;
+            } else {
+                // Keep this comment
+                i++;
+                if (false || !isEnabled) {
+                    j++;
+                } else {
+                    i++;
+                }
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String doNotRefactorWithNotFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else if (i > 0) {
-			"Do completely other things".chars();
-		} else {
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-		}
+    public String doNotRefactorWithNotFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            "Do completely other things".chars();
+        } else {
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorSomeFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			// Keep this comment
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-			return "Common code";
-		} else if (i > 0) {
-			return "Do completely other things";
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-			return "Common code";
-		}
-	}
+    public String refactorSomeFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+            return "Common code";
+        } else if (i > 0) {
+            return "Do completely other things";
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+            return "Common code";
+        }
+    }
 
-	public String refactorExceptFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			// Keep this comment
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-		} else if (i > 0) {
-			return "Do completely other things";
-		} else if (i > 10) {
-			return "Do completely another thing";
-		} else {
-			// Keep this comment
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-		}
+    public String refactorExceptFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            return "Do completely other things";
+        } else if (i > 10) {
+            return "Do completely another thing";
+        } else {
+            // Keep this comment
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
 
-		return "Common code";
-	}
+        return "Common code";
+    }
 
-	public String refactorOtherCases(boolean isValid, boolean isEnabled, int i, int j) {
-		if (isValid) {
-			i++;
-			if (isEnabled && true) {
-				i++;
-			} else {
-				j++;
-			}
-			return "Common code";
-		} else if (i > 0) {
-			// Keep this comment
-			return "Do completely other things";
-		} else if (i > 10) {
-			// Keep this comment
-			return "Do completely other things";
-		} else if (i > 20) {
-			// Keep this comment
-			return "Do completely other things";
-		} else {
-			i++;
-			if (false || !isEnabled) {
-				j++;
-			} else {
-				i++;
-			}
-			return "Common code";
-		}
-	}
+    public String refactorOtherCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+            return "Common code";
+        } else if (i > 0) {
+            // Keep this comment
+            return "Do completely other things";
+        } else if (i > 10) {
+            // Keep this comment
+            return "Do completely other things";
+        } else if (i > 20) {
+            // Keep this comment
+            return "Do completely other things";
+        } else {
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+            return "Common code";
+        }
+    }
 
-	/** Common code: i++, Remove if statement */
-	public void ifElseRemoveIfInSwitch(boolean b, int i, int discriminant) {
-		switch (discriminant) {
-		case 0:
-			// Keep this!
-			if (b) {
-				i= i * 2;
-				// Keep this comment
-				i++;
-			} else {
-				i= i * 3;
-				i = i + 1;
-			}
-		case 1:
-			i--;
-		}
-	}
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIfInSwitch(boolean b, int i, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            // Keep this!
+            if (b) {
+                i= i * 2;
+                // Keep this comment
+                i++;
+            } else {
+                i= i * 3;
+                i = i + 1;
+            }
+        case 1:
+            i--;
+        }
+    }
 }

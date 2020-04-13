@@ -32,297 +32,297 @@ import java.util.Date;
 import java.util.List;
 
 public class InlineCodeRatherThanPeremptoryConditionSample {
-	public int removeImpossibleIfClauses() {
-		int i = 0;
-		int j = 0;
-		// Keep this comment
-		i++;
+    public int removeImpossibleIfClauses() {
+        int i = 0;
+        int j = 0;
+        // Keep this comment
+        i++;
 
-		// Keep this comment
-		i++;
+        // Keep this comment
+        i++;
 
-		// Keep this comment
-		j++;
+        // Keep this comment
+        j++;
 
-		// Keep this comment
-		j++;
+        // Keep this comment
+        j++;
 
-		return i + j;
-	}
+        return i + j;
+    }
 
-	public int replaceIfByBlock(int i) {
-		if (i < 0) {
-		}
+    public int replaceIfByBlock(int i) {
+        if (i < 0) {
+        }
 
-		return i;
-	}
+        return i;
+    }
 
-	public int removeElse(int i) {
-		if (i < 0)
-			i--;
+    public int removeElse(int i) {
+        if (i < 0)
+            i--;
 
-		return i;
-	}
+        return i;
+    }
 
-	public int doNotRefactorWithVariableConflict() {
-		if (true) {
-			int j = 0;
-		}
-		int j = 1;
-		return j;
-	}
+    public int doNotRefactorWithVariableConflict() {
+        if (true) {
+            int j = 0;
+        }
+        int j = 1;
+        return j;
+    }
 
-	public int removeConditionWithCompatibleVariables(int i) {
-		if (i == 0) {
-			int j = 0;
-		}
-		// Keep this comment
-		// Keep this comment too
-		int j = 1;
-		return 1;
-	}
+    public int removeConditionWithCompatibleVariables(int i) {
+        if (i == 0) {
+            int j = 0;
+        }
+        // Keep this comment
+        // Keep this comment too
+        int j = 1;
+        return 1;
+    }
 
-	public int removeDeadCodeAfterIfTrueWithReturn(int i) {
-		System.out.println(i);
-		return 1;
-	}
+    public int removeDeadCodeAfterIfTrueWithReturn(int i) {
+        System.out.println(i);
+        return 1;
+    }
 
-	public int removePeremptoryTest(int increment, int j, byte by, boolean b, Long longObject,
-			List<Date> anotherObject) {
+    public int removePeremptoryTest(int increment, int j, byte by, boolean b, Long longObject,
+            List<Date> anotherObject) {
 
-		// Keep this comment 1
-		increment++;
+        // Keep this comment 1
+        increment++;
 
-		// Keep this comment 2
-		increment--;
+        // Keep this comment 2
+        increment--;
 
-		// Keep this comment 3
-		increment++;
+        // Keep this comment 3
+        increment++;
 
-		// Keep this comment 4
-		increment--;
+        // Keep this comment 4
+        increment--;
 
-		// Keep this comment 5
-		increment--;
+        // Keep this comment 5
+        increment--;
 
-		// Keep this comment 6
-		increment++;
+        // Keep this comment 6
+        increment++;
 
-		// Keep this comment 7
-		increment--;
+        // Keep this comment 7
+        increment--;
 
-		// Keep this comment 8
-		increment++;
+        // Keep this comment 8
+        increment++;
 
-		// Keep this comment 9
-		increment--;
+        // Keep this comment 9
+        increment--;
 
-		return increment;
-	}
+        return increment;
+    }
 
-	public int doNotRemoveRealTest(int increment, int i, int j) {
+    public int doNotRemoveRealTest(int increment, int i, int j) {
 
-		// Keep this comment
-		if (i == j) {
-			increment++;
-		} else {
-			increment--;
-		}
+        // Keep this comment
+        if (i == j) {
+            increment++;
+        } else {
+            increment--;
+        }
 
-		return increment;
-	}
+        return increment;
+    }
 
-	public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
-		System.out.println(i);
-		throw new RuntimeException();
-	}
+    public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
+        System.out.println(i);
+        throw new RuntimeException();
+    }
 
-	public int removeDeadCodeAfterIfFalseWithThrow(int i) {
-		System.out.println(i);
-		throw new RuntimeException();
-	}
+    public int removeDeadCodeAfterIfFalseWithThrow(int i) {
+        System.out.println(i);
+        throw new RuntimeException();
+    }
 
-	public int doNotRemoveDeadCodeAfterEmbeddedIfTrueNoThrowOrReturn(int i) {
-		System.out.println(i);
-		return 2;
-	}
+    public int doNotRemoveDeadCodeAfterEmbeddedIfTrueNoThrowOrReturn(int i) {
+        System.out.println(i);
+        return 2;
+    }
 
-	public int doNotRemoveAfterIfFalseNoThrowOrReturn(int i) {
-		System.out.println(i);
-		return 2;
-	}
+    public int doNotRemoveAfterIfFalseNoThrowOrReturn(int i) {
+        System.out.println(i);
+        return 2;
+    }
 
-	public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
-		// Keep this comment
-		if (b) {
-			toString();
-			return 1;
-		} else {
-			System.out.println(i);
-			throw new RuntimeException();
-		}
-	}
+    public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
+        // Keep this comment
+        if (b) {
+            toString();
+            return 1;
+        } else {
+            System.out.println(i);
+            throw new RuntimeException();
+        }
+    }
 
-	public int removeOnlyConstantConditionWithEmbeddedIf(boolean b, int i) {
-		// Keep this comment
-		if (b) {
-			toString();
-		} else {
-			System.out.println(i);
-		}
-		return 2;
-	}
+    public int removeOnlyConstantConditionWithEmbeddedIf(boolean b, int i) {
+        // Keep this comment
+        if (b) {
+            toString();
+        } else {
+            System.out.println(i);
+        }
+        return 2;
+    }
 
-	public int removeOnlyConstantConditionWithEmbeddedIfReturn(boolean b) {
-		// Keep this comment
-		if (b) {
-			toString();
-			return 1;
-		}
-		return 2;
-	}
+    public int removeOnlyConstantConditionWithEmbeddedIfReturn(boolean b) {
+        // Keep this comment
+        if (b) {
+            toString();
+            return 1;
+        }
+        return 2;
+    }
 
-	public int removeEmptyTryEmptyFinally() {
-		int i = 0;
-		return i;
-	}
+    public int removeEmptyTryEmptyFinally() {
+        int i = 0;
+        return i;
+    }
 
-	public int removeEmptyTryNonEmptyFinally() {
-		int i = 0;
-		// Keep this comment
-		i++;
-		return i;
-	}
+    public int removeEmptyTryNonEmptyFinally() {
+        int i = 0;
+        // Keep this comment
+        i++;
+        return i;
+    }
 
-	public int doNotRemoveEmptyTryWithVariableConflict() {
-		try {
-		} finally {
-			int i = 0;
-			i++;
-		}
-		int i = 0;
-		return i;
-	}
+    public int doNotRemoveEmptyTryWithVariableConflict() {
+        try {
+        } finally {
+            int i = 0;
+            i++;
+        }
+        int i = 0;
+        return i;
+    }
 
-	public void doNotRemoveTryWithResources() throws IOException {
-		try (FileInputStream f = new FileInputStream("file.txt")) {
-		}
-	}
+    public void doNotRemoveTryWithResources() throws IOException {
+        try (FileInputStream f = new FileInputStream("file.txt")) {
+        }
+    }
 
-	public void doNotRemoveTryWithResourcesAndFinally() throws IOException {
-		int i = 0;
-		try (FileInputStream f = new FileInputStream("file.txt")) {
-		} finally {
-			i++;
-		}
-	}
+    public void doNotRemoveTryWithResourcesAndFinally() throws IOException {
+        int i = 0;
+        try (FileInputStream f = new FileInputStream("file.txt")) {
+        } finally {
+            i++;
+        }
+    }
 
-	public void inlineAlwaysTrueCondition() {
-		toString();
-	}
+    public void inlineAlwaysTrueCondition() {
+        toString();
+    }
 
-	public void inlineBlockAlwaysTrueCondition() {
-		// Keep this comment
-		toString();
-	}
+    public void inlineBlockAlwaysTrueCondition() {
+        // Keep this comment
+        toString();
+    }
 
-	public void removeAlwaysFalseCondition() {
-	}
+    public void removeAlwaysFalseCondition() {
+    }
 
-	public void inlineAlwaysTrueConditionInStatement(List<String> aList) {
-		if (!aList.isEmpty())
-			aList.remove("foo");
-	}
+    public void inlineAlwaysTrueConditionInStatement(List<String> aList) {
+        if (!aList.isEmpty())
+            aList.remove("foo");
+    }
 
-	public void inlineBlockAlwaysTrueConditionInStatement(List<String> aList) {
-		if (!aList.isEmpty()) {
-			// Keep this comment
-			String forbiddenValue = "foo";
-			aList.remove(forbiddenValue);
-		}
-	}
+    public void inlineBlockAlwaysTrueConditionInStatement(List<String> aList) {
+        if (!aList.isEmpty()) {
+            // Keep this comment
+            String forbiddenValue = "foo";
+            aList.remove(forbiddenValue);
+        }
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturn() {
-		// Keep this comment
-		toString();
-		return 0;
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturn() {
+        // Keep this comment
+        toString();
+        return 0;
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnOnSeveralBlock() {
-		int i = 0;
-		{
-			// Keep this comment
-			toString();
-			return 0;
-		}
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnOnSeveralBlock() {
+        int i = 0;
+        {
+            // Keep this comment
+            toString();
+            return 0;
+        }
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstIf(int i) {
-		int j = 0;
-		if (i == 0) {
-			// Keep this comment
-			toString();
-			return 0;
-		}
-		return j;
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstIf(int i) {
+        int j = 0;
+        if (i == 0) {
+            // Keep this comment
+            toString();
+            return 0;
+        }
+        return j;
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondTryBlock(int i) {
-		int j = 0;
-		try {
-			// Keep this comment
-			toString();
-			return 0;
-		} finally {
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondTryBlock(int i) {
+        int j = 0;
+        try {
+            // Keep this comment
+            toString();
+            return 0;
+        } finally {
 
-		}
-	}
+        }
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstCatchBlock(int i) {
-		int j = 0;
-		try {
-			j = j + 10;
-		} catch (Exception e) {
-			// Keep this comment
-			toString();
-			return 0;
-		}
-		return j;
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstCatchBlock(int i) {
+        int j = 0;
+        try {
+            j = j + 10;
+        } catch (Exception e) {
+            // Keep this comment
+            toString();
+            return 0;
+        }
+        return j;
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondFinallyBlock(int i) {
-		int j = 0;
-		try {
-			j = j + 10;
-		} finally {
-			// Keep this comment
-			toString();
-			return 0;
-		}
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondFinallyBlock(int i) {
+        int j = 0;
+        try {
+            j = j + 10;
+        } finally {
+            // Keep this comment
+            toString();
+            return 0;
+        }
+    }
 
-	public int inlineAlwaysTrueConditionAndRemoveCodeAfterThrow() {
-		// Keep this comment
-		toString();
-		throw new NullPointerException();
-	}
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterThrow() {
+        // Keep this comment
+        toString();
+        throw new NullPointerException();
+    }
 
-	public int removeAlwaysFalseConditionAndKeepCodeAfterThrow() {
-		int i = 0;
-		i = i + 10;
-		return i;
-	}
+    public int removeAlwaysFalseConditionAndKeepCodeAfterThrow() {
+        int i = 0;
+        i = i + 10;
+        return i;
+    }
 
-	public List<String> inlineBlockAlwaysTrueConditionInStatement(List<String> aList, int discriminant) {
-		switch (discriminant) {
-		case 0:
-			// Keep this comment
-			String forbiddenValue = "foo";
-			aList.remove(forbiddenValue);
-			return new ArrayList<>(0);
-		case 1:
-			aList.add("foo");
-		}
-		return aList;
-	}
+    public List<String> inlineBlockAlwaysTrueConditionInStatement(List<String> aList, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            // Keep this comment
+            String forbiddenValue = "foo";
+            aList.remove(forbiddenValue);
+            return new ArrayList<>(0);
+        case 1:
+            aList.add("foo");
+        }
+        return aList;
+    }
 }

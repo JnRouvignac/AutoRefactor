@@ -26,45 +26,45 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class UseStringContainsSample {
-	public boolean replaceStringIndexOf(String s) {
-		// Keep this comment
-		boolean b1 = s.indexOf("test") >= 0;
-		// Keep this comment
-		boolean b2 = s.indexOf("test") < 0;
-		// Keep this comment
-		boolean b3 = s.indexOf("test") != -1;
-		// Keep this comment
-		boolean b4 = s.indexOf("test") == -1;
-		// Keep this comment
-		boolean b5 = 0 <= s.indexOf("test");
-		// Keep this comment
-		boolean b6 = 0 > s.indexOf("test");
+    public boolean replaceStringIndexOf(String s) {
+        // Keep this comment
+        boolean b1 = s.indexOf("test") >= 0;
+        // Keep this comment
+        boolean b2 = s.indexOf("test") < 0;
+        // Keep this comment
+        boolean b3 = s.indexOf("test") != -1;
+        // Keep this comment
+        boolean b4 = s.indexOf("test") == -1;
+        // Keep this comment
+        boolean b5 = 0 <= s.indexOf("test");
+        // Keep this comment
+        boolean b6 = 0 > s.indexOf("test");
 
-		return b1 && b2 && b3 && b4 && b5 && b6;
-	}
+        return b1 && b2 && b3 && b4 && b5 && b6;
+    }
 
-	public boolean replaceStringLastIndexOf(String s) {
-		// Keep this comment
-		boolean b1 = s.lastIndexOf("test") >= 0;
-		// Keep this comment
-		boolean b2 = s.lastIndexOf("test") < 0;
-		// Keep this comment
-		boolean b3 = s.lastIndexOf("test") != -1;
-		// Keep this comment
-		boolean b4 = s.lastIndexOf("test") == -1;
-		// Keep this comment
-		boolean b5 = 0 <= s.lastIndexOf("test");
-		// Keep this comment
-		boolean b6 = 0 > s.lastIndexOf("test");
+    public boolean replaceStringLastIndexOf(String s) {
+        // Keep this comment
+        boolean b1 = s.lastIndexOf("test") >= 0;
+        // Keep this comment
+        boolean b2 = s.lastIndexOf("test") < 0;
+        // Keep this comment
+        boolean b3 = s.lastIndexOf("test") != -1;
+        // Keep this comment
+        boolean b4 = s.lastIndexOf("test") == -1;
+        // Keep this comment
+        boolean b5 = 0 <= s.lastIndexOf("test");
+        // Keep this comment
+        boolean b6 = 0 > s.lastIndexOf("test");
 
-		return b1 && b2 && b3 && b4 && b5 && b6;
-	}
+        return b1 && b2 && b3 && b4 && b5 && b6;
+    }
 
-	public boolean doNotReplaceStringIndexOfCharacter(String s) {
-		return s.indexOf(':') >= 0;
-	}
+    public boolean doNotReplaceStringIndexOfCharacter(String s) {
+        return s.indexOf(':') >= 0;
+    }
 
-	public boolean doNotReplaceStringLastIndexOfCharacter(String s) {
-		return s.lastIndexOf(':') >= 0;
-	}
+    public boolean doNotReplaceStringLastIndexOfCharacter(String s) {
+        return s.lastIndexOf(':') >= 0;
+    }
 }

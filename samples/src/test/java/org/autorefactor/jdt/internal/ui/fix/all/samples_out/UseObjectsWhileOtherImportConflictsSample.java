@@ -28,11 +28,11 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 import org.testng.collections.Objects;
 
 public class UseObjectsWhileOtherImportConflictsSample {
-	private Objects testNGObject;
+    private Objects testNGObject;
 
-	@Override
-	public int hashCode() {
-		// Keep this comment
-		return java.util.Objects.hash(testNGObject);
-	}
+    @Override
+    public int hashCode() {
+        // Keep this comment
+        return java.util.Objects.hash(testNGObject);
+    }
 }

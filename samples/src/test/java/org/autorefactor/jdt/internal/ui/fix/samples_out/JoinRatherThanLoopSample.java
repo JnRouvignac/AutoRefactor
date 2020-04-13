@@ -26,688 +26,688 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class JoinRatherThanLoopSample {
-	public String refactorConcatenation(String[] texts) {
-		// Keep this comment
+    public String refactorConcatenation(String[] texts) {
+        // Keep this comment
 
-		// Keep this comment too
+        // Keep this comment too
 
 
-		// Keep this comment also
-		String concatenation= String.join(", ", texts);
+        // Keep this comment also
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorReassignment(String[] texts) {
+    public String refactorReassignment(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public Runnable refactorFinalConcatenation(String[] names) {
+    public Runnable refactorFinalConcatenation(String[] names) {
 
 
-		// Keep this comment
-		final String concatenation= String.join(", ", names);
+        // Keep this comment
+        final String concatenation= String.join(", ", names);
 
-		Runnable supplier= new Runnable() {
-			@Override
-			public void run() {
-				System.out.println(concatenation);
-			}
-		};
-		return supplier;
-	}
+        Runnable supplier= new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(concatenation);
+            }
+        };
+        return supplier;
+    }
 
-	public String refactorConcatenationWithChar(String[] titles) {
+    public String refactorConcatenationWithChar(String[] titles) {
 
 
-		// Keep this comment
-		String concatenation= String.join(String.valueOf(','), titles);
+        // Keep this comment
+        String concatenation= String.join(String.valueOf(','), titles);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithHardCodedDelimiter(String[] texts) {
+    public String refactorConcatenationWithHardCodedDelimiter(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(" " + 1, texts);
+        // Keep this comment
+        String concatenation= String.join(" " + 1, texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithBuilderFirst(String[] texts) {
+    public String refactorConcatenationWithBuilderFirst(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithStringBuffer(String[] texts) {
+    public String refactorConcatenationWithStringBuffer(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithBooleanObject(String[] texts) {
+    public String refactorConcatenationWithBooleanObject(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithNegatedBoolean(String[] texts) {
+    public String refactorConcatenationWithNegatedBoolean(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithReversedBoolean(String[] texts) {
+    public String refactorConcatenationWithReversedBoolean(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public boolean doNotRefactorUsedBoolean(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		System.out.println(concatenation.toString());
-		return isFirst;
-	}
-
-	public String refactorConcatenationWithLotsOfMethods(String[] texts) {
-
-
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
-
-		System.out.println(concatenation.charAt(0));
-		System.out.println(concatenation.chars());
-		System.out.println(concatenation.codePoints());
-		System.out.println(concatenation.indexOf("foo", 0));
-		System.out.println(concatenation.lastIndexOf("foo"));
-		System.out.println(concatenation.lastIndexOf("foo", 0));
-		System.out.println(concatenation.length());
-		System.out.println(concatenation.subSequence(0, 0));
-		return concatenation;
-	}
-
-	public String doNotRefactorUnhandledMethod(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		System.out.println(concatenation.codePointAt(0));
-		System.out.println(concatenation.codePointBefore(0));
-		System.out.println(concatenation.codePointCount(0, 0));
-		concatenation.getChars(0, 0, new char[0], 0);
-		System.out.println(concatenation.indexOf("foo"));
-		System.out.println(concatenation.offsetByCodePoints(0, 0));
-		System.out.println(concatenation.substring(0));
-		System.out.println(concatenation.substring(0, 0));
-		System.out.println(concatenation.capacity());
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorPartialConcatenation(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 1; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorUnfinishedConcatenation(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length - 1; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorReversedConcatenation(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = texts.length - 1; i >= 0; i--) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithOppositeBoolean(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 1; i < texts.length; i++) {
-			if (isFirst) {
-				concatenation.append(", ");
-			} else {
-				isFirst = false;
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorOnObjects(Object[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithOtherAppending(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		concatenation.append("foo");
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithInitialization(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder("foo");
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongIndex(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[0]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongBoolean(String[] texts, boolean isSecond) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isSecond) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongBoolean(String[] texts) {
-		boolean isSecond = false;
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isSecond = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongArray(String[] texts, String[] names) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(names[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongBuilder(String[] texts, StringBuilder otherBuilder) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			otherBuilder.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithAnotherBuilder(String[] texts, StringBuilder otherBuilder) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				otherBuilder.append(", ");
-			}
-			concatenation.append(texts[i]);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithAdditionalStatement(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i]);
-			System.out.println("Hi!");
-		}
-
-		return concatenation.toString();
-	}
-
-	public String doNotRefactorWithWrongMethod(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
-
-		for (int i = 0; i < texts.length; i++) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(texts[i], 0, 2);
-		}
-
-		return concatenation.toString();
-	}
-
-	public String refactorConcatenationOnForeach(String[] texts) {
-
-
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
-
-		return concatenation;
-	}
-
-	public String doNotRefactorWrongVariable(String[] texts, String test) {
-		StringBuilder concatenation = new StringBuilder();
-		boolean isFirst = true;
-
-		for (String text : texts) {
-			if (isFirst) {
-				isFirst = false;
-			} else {
-				concatenation.append(", ");
-			}
-			concatenation.append(test);
-		}
+    public boolean doNotRefactorUsedBoolean(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        System.out.println(concatenation.toString());
+        return isFirst;
+    }
+
+    public String refactorConcatenationWithLotsOfMethods(String[] texts) {
+
+
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
+
+        System.out.println(concatenation.charAt(0));
+        System.out.println(concatenation.chars());
+        System.out.println(concatenation.codePoints());
+        System.out.println(concatenation.indexOf("foo", 0));
+        System.out.println(concatenation.lastIndexOf("foo"));
+        System.out.println(concatenation.lastIndexOf("foo", 0));
+        System.out.println(concatenation.length());
+        System.out.println(concatenation.subSequence(0, 0));
+        return concatenation;
+    }
+
+    public String doNotRefactorUnhandledMethod(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        System.out.println(concatenation.codePointAt(0));
+        System.out.println(concatenation.codePointBefore(0));
+        System.out.println(concatenation.codePointCount(0, 0));
+        concatenation.getChars(0, 0, new char[0], 0);
+        System.out.println(concatenation.indexOf("foo"));
+        System.out.println(concatenation.offsetByCodePoints(0, 0));
+        System.out.println(concatenation.substring(0));
+        System.out.println(concatenation.substring(0, 0));
+        System.out.println(concatenation.capacity());
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorPartialConcatenation(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 1; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorUnfinishedConcatenation(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length - 1; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorReversedConcatenation(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = texts.length - 1; i >= 0; i--) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithOppositeBoolean(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 1; i < texts.length; i++) {
+            if (isFirst) {
+                concatenation.append(", ");
+            } else {
+                isFirst = false;
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorOnObjects(Object[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithOtherAppending(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        concatenation.append("foo");
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithInitialization(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder("foo");
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongIndex(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[0]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongBoolean(String[] texts, boolean isSecond) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isSecond) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongBoolean(String[] texts) {
+        boolean isSecond = false;
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isSecond = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongArray(String[] texts, String[] names) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(names[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongBuilder(String[] texts, StringBuilder otherBuilder) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            otherBuilder.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithAnotherBuilder(String[] texts, StringBuilder otherBuilder) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                otherBuilder.append(", ");
+            }
+            concatenation.append(texts[i]);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithAdditionalStatement(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i]);
+            System.out.println("Hi!");
+        }
+
+        return concatenation.toString();
+    }
+
+    public String doNotRefactorWithWrongMethod(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
+
+        for (int i = 0; i < texts.length; i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(texts[i], 0, 2);
+        }
+
+        return concatenation.toString();
+    }
+
+    public String refactorConcatenationOnForeach(String[] texts) {
+
+
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
+
+        return concatenation;
+    }
+
+    public String doNotRefactorWrongVariable(String[] texts, String test) {
+        StringBuilder concatenation = new StringBuilder();
+        boolean isFirst = true;
+
+        for (String text : texts) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                concatenation.append(", ");
+            }
+            concatenation.append(test);
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String refactorConcatenationWithConditionOnIndex(String[] texts) {
+    public String refactorConcatenationWithConditionOnIndex(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithInequalityOnIndex(String[] texts) {
+    public String refactorConcatenationWithInequalityOnIndex(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithReversedConditionOnIndex(String[] texts) {
+    public String refactorConcatenationWithReversedConditionOnIndex(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithGreaterOrEqualsOnIndex(String[] texts) {
+    public String refactorConcatenationWithGreaterOrEqualsOnIndex(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithDelimiterAtTheEnd(String[] texts) {
+    public String refactorConcatenationWithDelimiterAtTheEnd(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithMirroredCondition(String[] texts) {
+    public String refactorConcatenationWithMirroredCondition(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithNotEqualsCondition(String[] texts) {
+    public String refactorConcatenationWithNotEqualsCondition(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationWithLessOrEqualsCondition(String[] texts) {
+    public String refactorConcatenationWithLessOrEqualsCondition(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingLength(String[] texts) {
+    public String refactorConcatenationTestingLength(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingNotEmpty(String[] texts) {
+    public String refactorConcatenationTestingNotEmpty(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingGreaterOrEqualsOne(String[] texts) {
+    public String refactorConcatenationTestingGreaterOrEqualsOne(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingLengthMirrored(String[] texts) {
+    public String refactorConcatenationTestingLengthMirrored(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingNotEmptyMirrored(String[] texts) {
+    public String refactorConcatenationTestingNotEmptyMirrored(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConcatenationTestingGreaterOrEqualsOneMirrored(String[] texts) {
+    public String refactorConcatenationTestingGreaterOrEqualsOneMirrored(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorConstantBooleanShift(String[] texts) {
+    public String refactorConstantBooleanShift(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorWithBooleanShiftAtTheEnd(String[] texts) {
+    public String refactorWithBooleanShiftAtTheEnd(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String refactorWithReversedBooleanShift(String[] texts) {
+    public String refactorWithReversedBooleanShift(String[] texts) {
 
 
-		// Keep this comment
-		String concatenation= String.join(", ", texts);
+        // Keep this comment
+        String concatenation= String.join(", ", texts);
 
-		return concatenation;
-	}
+        return concatenation;
+    }
 
-	public String doNotRefactorWithBooleanShiftFirst(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWithBooleanShiftFirst(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			isFirst = false;
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-			concatenation.append(text);
-		}
+        for (String text : texts) {
+            isFirst = false;
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+            concatenation.append(text);
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorWithAppendingFirst(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWithAppendingFirst(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			concatenation.append(text);
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-			isFirst = false;
-		}
+        for (String text : texts) {
+            concatenation.append(text);
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+            isFirst = false;
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorWithConditionAtTheEnd(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWithConditionAtTheEnd(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			concatenation.append(text);
-			isFirst = false;
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-		}
+        for (String text : texts) {
+            concatenation.append(text);
+            isFirst = false;
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorWithNonsense(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWithNonsense(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			isFirst = false;
-			concatenation.append(text);
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-		}
+        for (String text : texts) {
+            isFirst = false;
+            concatenation.append(text);
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorUnshiftedBoolean(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorUnshiftedBoolean(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-			isFirst = true;
-			concatenation.append(text);
-		}
+        for (String text : texts) {
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+            isFirst = true;
+            concatenation.append(text);
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorWrongCondition(String[] texts) {
-		boolean isFirst = true;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWrongCondition(String[] texts) {
+        boolean isFirst = true;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			if (isFirst) {
-				concatenation.append(", ");
-			}
-			isFirst = false;
-			concatenation.append(text);
-		}
+        for (String text : texts) {
+            if (isFirst) {
+                concatenation.append(", ");
+            }
+            isFirst = false;
+            concatenation.append(text);
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 
-	public String doNotRefactorWrongInit(String[] texts) {
-		boolean isFirst = false;
-		StringBuilder concatenation = new StringBuilder();
+    public String doNotRefactorWrongInit(String[] texts) {
+        boolean isFirst = false;
+        StringBuilder concatenation = new StringBuilder();
 
-		for (String text : texts) {
-			if (!isFirst) {
-				concatenation.append(", ");
-			}
-			isFirst = false;
-			concatenation.append(text);
-		}
+        for (String text : texts) {
+            if (!isFirst) {
+                concatenation.append(", ");
+            }
+            isFirst = false;
+            concatenation.append(text);
+        }
 
-		return concatenation.toString();
-	}
+        return concatenation.toString();
+    }
 }

@@ -28,17 +28,17 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class StringRatherThanNewStringSample {
 
-	public String replaceNewString() {
-		// Keep this comment
-		return "";
-	}
+    public String replaceNewString() {
+        // Keep this comment
+        return "";
+    }
 
-	public String doNotReplaceNullableString(String s) {
-		return new String(s);
-	}
+    public String doNotReplaceNullableString(String s) {
+        return new String(s);
+    }
 
-	public String replaceNewStringInMethodInvocation(String s, int i) {
-		// Keep this comment
-		return (s + i).toLowerCase();
-	}
+    public String replaceNewStringInMethodInvocation(String s, int i) {
+        // Keep this comment
+        return (s + i).toLowerCase();
+    }
 }

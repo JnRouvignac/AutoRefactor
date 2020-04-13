@@ -26,67 +26,67 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class SingleDeclarationsRatherThanMultiDeclarationSample {
-	/**
-	 * Keep this comment.
-	 */
-	public static final int x = 10;
+    /**
+     * Keep this comment.
+     */
+    public static final int x = 10;
 
-	/**
-	 * Keep this comment.
-	 */
-	public static final int y = 20;
+    /**
+     * Keep this comment.
+     */
+    public static final int y = 20;
 
-	/**
-	 * Keep this comment.
-	 * @Deprecated
-	 */
-	@Deprecated
-	public int oldX;
+    /**
+     * Keep this comment.
+     * @Deprecated
+     */
+    @Deprecated
+    public int oldX;
 
-	/**
-	 * Keep this comment.
-	 * @Deprecated
-	 */
-	@Deprecated
-	public int oldY;
+    /**
+     * Keep this comment.
+     * @Deprecated
+     */
+    @Deprecated
+    public int oldY;
 
-	/**
-	 * Keep this comment.
-	 */
-	boolean one;
+    /**
+     * Keep this comment.
+     */
+    boolean one;
 
-	/**
-	 * Keep this comment.
-	 */
-	boolean two;
+    /**
+     * Keep this comment.
+     */
+    boolean two;
 
-	/**
-	 * Keep this comment.
-	 */
-	boolean three;
+    /**
+     * Keep this comment.
+     */
+    boolean three;
 
-	public void refactorMultiDecl() {
-		// Keep this comment
-		boolean one;
-		boolean two;
-		boolean three;
+    public void refactorMultiDecl() {
+        // Keep this comment
+        boolean one;
+        boolean two;
+        boolean three;
 
-		// Keep this comment
-		int four = 4;
-		int five = 5;
-		int six = 6;
-	}
+        // Keep this comment
+        int four = 4;
+        int five = 5;
+        int six = 6;
+    }
 
-	public void refactorMultiDeclWithModifier() {
-		// Keep this comment
-		final int seven = 7;
-		final int height = 8;
-		final int nine = 9;
-	}
+    public void refactorMultiDeclWithModifier() {
+        // Keep this comment
+        final int seven = 7;
+        final int height = 8;
+        final int nine = 9;
+    }
 
-	public void doNotRefactorForVar() {
-		for (int counter = 0, ten = 10; counter < ten; counter++) {
-			System.out.println(counter);
-		}
-	}
+    public void doNotRefactorForVar() {
+        for (int counter = 0, ten = 10; counter < ten; counter++) {
+            System.out.println(counter);
+        }
+    }
 }

@@ -27,81 +27,81 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class PushNegationDownSample {
 
-	public boolean replaceDoubleNegation(boolean b) {
-		return !!b;
-	}
+    public boolean replaceDoubleNegation(boolean b) {
+        return !!b;
+    }
 
-	public boolean reduceLiteralExpression() {
-		boolean b = !Boolean.TRUE;
-		return !Boolean.FALSE;
-	}
+    public boolean reduceLiteralExpression() {
+        boolean b = !Boolean.TRUE;
+        return !Boolean.FALSE;
+    }
 
-	public boolean reduceConstantExpression() {
-		boolean b = !true;
-		return !false;
-	}
+    public boolean reduceConstantExpression() {
+        boolean b = !true;
+        return !false;
+    }
 
-	public boolean replaceDoubleNegationWithParentheses(boolean b) {
-		return !(!(b /* another refactoring removes the parentheses */));
-	}
+    public boolean replaceDoubleNegationWithParentheses(boolean b) {
+        return !(!(b /* another refactoring removes the parentheses */));
+    }
 
-	public boolean replaceNegationWithInfixAndOperator(boolean b1, boolean b2, boolean b3) {
-		return !(b1 && b2 && b3); // another refactoring removes the parentheses
-	}
+    public boolean replaceNegationWithInfixAndOperator(boolean b1, boolean b2, boolean b3) {
+        return !(b1 && b2 && b3); // another refactoring removes the parentheses
+    }
 
-	public boolean replaceNegationWithInfixOrOperator(boolean b1, boolean b2, boolean b3) {
-		return !(b1 || b2 || b3); // another refactoring removes the parentheses
-	}
+    public boolean replaceNegationWithInfixOrOperator(boolean b1, boolean b2, boolean b3) {
+        return !(b1 || b2 || b3); // another refactoring removes the parentheses
+    }
 
-	public boolean replaceNegationWithEqualOperator(boolean b1, boolean b2) {
-		return !(b1 == b2); // another refactoring removes the parentheses
-	}
+    public boolean replaceNegationWithEqualOperator(boolean b1, boolean b2) {
+        return !(b1 == b2); // another refactoring removes the parentheses
+    }
 
-	public boolean replaceNegationWithNotEqualOperator(boolean b1, boolean b2) {
-		return !(b1 != b2); // another refactoring removes the parentheses
-	}
+    public boolean replaceNegationWithNotEqualOperator(boolean b1, boolean b2) {
+        return !(b1 != b2); // another refactoring removes the parentheses
+    }
 
-	public boolean replaceNegationRevertInnerExpressions(boolean b1, boolean b2) {
-		return !(!b1 && !b2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationRevertInnerExpressions(boolean b1, boolean b2) {
+        return !(!b1 && !b2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationLeaveParentheses(boolean b1, boolean b2) {
-		return !(!(b1 && b2 /* another refactoring removes the parentheses */));
-	}
+    public boolean replaceNegationLeaveParentheses(boolean b1, boolean b2) {
+        return !(!(b1 && b2 /* another refactoring removes the parentheses */));
+    }
 
-	public boolean replaceNegationRemoveParentheses(boolean b1, boolean b2) {
-		return !((!b1) && (!b2));
-	}
+    public boolean replaceNegationRemoveParentheses(boolean b1, boolean b2) {
+        return !((!b1) && (!b2));
+    }
 
-	public boolean replaceNegateNonBooleanExprs(Object o) {
-		return !(o != null /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegateNonBooleanExprs(Object o) {
+        return !(o != null /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegateNonBooleanPrimitiveExprs(Boolean b) {
-		return !(b != null /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegateNonBooleanPrimitiveExprs(Boolean b) {
+        return !(b != null /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndLessOperator(int i1, int i2) {
-		return !(i1 < i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndLessOperator(int i1, int i2) {
+        return !(i1 < i2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndLessEqualOperator(int i1, int i2) {
-		return !(i1 <= i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndLessEqualOperator(int i1, int i2) {
+        return !(i1 <= i2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndGreaterOperator(int i1, int i2) {
-		return !(i1 > i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndGreaterOperator(int i1, int i2) {
+        return !(i1 > i2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndGreaterEqualOperator(int i1, int i2) {
-		return !(i1 >= i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndGreaterEqualOperator(int i1, int i2) {
+        return !(i1 >= i2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndEqualOperator(int i1, int i2) {
-		return !(i1 == i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndEqualOperator(int i1, int i2) {
+        return !(i1 == i2 /* another refactoring removes the parentheses */);
+    }
 
-	public boolean replaceNegationAndNotEqualOperator(int i1, int i2) {
-		return !(i1 != i2 /* another refactoring removes the parentheses */);
-	}
+    public boolean replaceNegationAndNotEqualOperator(int i1, int i2) {
+        return !(i1 != i2 /* another refactoring removes the parentheses */);
+    }
 }

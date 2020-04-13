@@ -27,13 +27,13 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class IfElseIfSample {
 
-	public void refactor(boolean b1, boolean b2) throws Exception {
-		if (b1) {
-			// Keep this comment
-			System.out.println(b1);
-		} else if (b2) {
-			// Keep this comment
-			System.out.println(b2);
-		}
-	}
+    public void refactor(boolean b1, boolean b2) throws Exception {
+        if (b1) {
+            // Keep this comment
+            System.out.println(b1);
+        } else if (b2) {
+            // Keep this comment
+            System.out.println(b2);
+        }
+    }
 }

@@ -30,42 +30,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MethodOnMapRatherThanMethodOnKeySetSample {
-	public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
-		// Keep this comment
-		int x = map.size();
-		if (map.containsKey("hello")) {
-			map.remove("hello");
-		}
-		if (map.keySet().remove("world")) {
-			// Cannot replace, because `map.removeKey("world") != null` is not strictly equivalent
-			System.out.println(map);
-		}
-		// Keep this comment also
-		map.clear();
-		// Keep this comment too
-		if (map.isEmpty()) {
-			x++;
-		}
-		return x;
-	}
+    public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
+        // Keep this comment
+        int x = map.size();
+        if (map.containsKey("hello")) {
+            map.remove("hello");
+        }
+        if (map.keySet().remove("world")) {
+            // Cannot replace, because `map.removeKey("world") != null` is not strictly equivalent
+            System.out.println(map);
+        }
+        // Keep this comment also
+        map.clear();
+        // Keep this comment too
+        if (map.isEmpty()) {
+            x++;
+        }
+        return x;
+    }
 
-	public class DoNotRefactorMapImplementation<K, V> extends HashMap<K, V> {
-		private static final long serialVersionUID= 8837962990422334107L;
+    public class DoNotRefactorMapImplementation<K, V> extends HashMap<K, V> {
+        private static final long serialVersionUID= 8837962990422334107L;
 
-		@Override
-		public boolean containsKey(Object key) {
-			System.out.println("Using " + key);
-			return keySet().contains(key);
-		}
-	}
+        @Override
+        public boolean containsKey(Object key) {
+            System.out.println("Using " + key);
+            return keySet().contains(key);
+        }
+    }
 
-	public class DoNotRefactorThisMapImplementation<K, V> extends HashMap<K, V> {
-		private static final long serialVersionUID= 8837962990422334107L;
+    public class DoNotRefactorThisMapImplementation<K, V> extends HashMap<K, V> {
+        private static final long serialVersionUID= 8837962990422334107L;
 
-		@Override
-		public boolean containsKey(Object key) {
-			System.out.println("Using " + key);
-			return this.keySet().contains(key);
-		}
-	}
+        @Override
+        public boolean containsKey(Object key) {
+            System.out.println("Using " + key);
+            return this.keySet().contains(key);
+        }
+    }
 }

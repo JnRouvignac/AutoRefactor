@@ -47,82 +47,82 @@ public class RemoveEmptyLinesSample
 {
 
 
-	private int aField;
+    private int aField;
 
 
 
 
 
-	private int anotherField;
+    private int anotherField;
 
 
-	/** Ignore the '{' character in this javadoc. */
-	public void aMethod() throws Exception
+    /** Ignore the '{' character in this javadoc. */
+    public void aMethod() throws Exception
 
 
-	{
+    {
 
-		System.out.println("Remove empty line before me");
-	}
-
-
-
-
-
-	public void anotherMethod() throws Exception
-
-
-	{
-
-	}
-
-
-	public void doNotRefactorMultipleBracesSameLine() throws Exception {
-		try {
-		} catch (Exception e) { }
-	}
-
-
-	public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception {
-		try {
-		  System.out.println();
-		} catch (Exception e) {
-		}
-	}
+        System.out.println("Remove empty line before me");
+    }
 
 
 
-	public void doNotRemoveCodeOnSameLineAsTry() {
-		try { Thread.sleep(100);
-		}
-		catch (InterruptedException e) {
-		  Thread.currentThread().interrupt();
-		}
-	}
 
 
-	private interface MethodDeclarationsWithoutBody
+    public void anotherMethod() throws Exception
 
 
-	{
+    {
+
+    }
 
 
-		void aMethod();
+    public void doNotRefactorMultipleBracesSameLine() throws Exception {
+        try {
+        } catch (Exception e) { }
+    }
 
 
-
-		boolean aBoolean();
-
-
-
-		int anInt();
-
-
-	}
+    public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception {
+        try {
+          System.out.println();
+        } catch (Exception e) {
+        }
+    }
 
 
 
-	private static enum WeekOfDay { MONDAY, TUESDAY, WEDNESDAY, THRUSDAY, FRIDAY, SATURDAY, SUNDAY }
+    public void doNotRemoveCodeOnSameLineAsTry() {
+        try { Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+    }
+
+
+    private interface MethodDeclarationsWithoutBody
+
+
+    {
+
+
+        void aMethod();
+
+
+
+        boolean aBoolean();
+
+
+
+        int anInt();
+
+
+    }
+
+
+
+    private static enum WeekOfDay { MONDAY, TUESDAY, WEDNESDAY, THRUSDAY, FRIDAY, SATURDAY, SUNDAY }
 
 
 

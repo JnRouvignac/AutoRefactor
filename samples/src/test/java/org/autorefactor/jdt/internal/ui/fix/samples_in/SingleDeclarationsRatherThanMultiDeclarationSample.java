@@ -26,39 +26,39 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class SingleDeclarationsRatherThanMultiDeclarationSample {
-	/**
-	 * Keep this comment.
-	 */
-	public static final int x = 10, y = 20;
+    /**
+     * Keep this comment.
+     */
+    public static final int x = 10, y = 20;
 
-	/**
-	 * Keep this comment.
-	 * @Deprecated
-	 */
-	@Deprecated
-	public int oldX, oldY;
+    /**
+     * Keep this comment.
+     * @Deprecated
+     */
+    @Deprecated
+    public int oldX, oldY;
 
-	/**
-	 * Keep this comment.
-	 */
-	boolean one, two, three;
+    /**
+     * Keep this comment.
+     */
+    boolean one, two, three;
 
-	public void refactorMultiDecl() {
-		// Keep this comment
-		boolean one, two, three;
+    public void refactorMultiDecl() {
+        // Keep this comment
+        boolean one, two, three;
 
-		// Keep this comment
-		int four = 4, five = 5, six = 6;
-	}
+        // Keep this comment
+        int four = 4, five = 5, six = 6;
+    }
 
-	public void refactorMultiDeclWithModifier() {
-		// Keep this comment
-		final int seven = 7, height = 8, nine = 9;
-	}
+    public void refactorMultiDeclWithModifier() {
+        // Keep this comment
+        final int seven = 7, height = 8, nine = 9;
+    }
 
-	public void doNotRefactorForVar() {
-		for (int counter = 0, ten = 10; counter < ten; counter++) {
-			System.out.println(counter);
-		}
-	}
+    public void doNotRefactorForVar() {
+        for (int counter = 0, ten = 10; counter < ten; counter++) {
+            System.out.println(counter);
+        }
+    }
 }

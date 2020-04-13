@@ -37,209 +37,209 @@ import java.util.Set;
 
 public class HashMapRatherThanHashtableSample {
 
-	private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
+    private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
 
-	private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
+    private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
 
-	public void replaceHashtableInstanceCreation() {
-		// Keep this comment
-		Set<Entry<String, String>> entrySet = new HashMap<String, String>().entrySet();
-		// Keep this comment too
-		int size = new HashMap<String, String>(10).size();
-	}
+    public void replaceHashtableInstanceCreation() {
+        // Keep this comment
+        Set<Entry<String, String>> entrySet = new HashMap<String, String>().entrySet();
+        // Keep this comment too
+        int size = new HashMap<String, String>(10).size();
+    }
 
-	public void replaceRawHashtable() {
-		// Keep this comment
-		Set<Entry> entrySet = new HashMap().entrySet();
-		// Keep this comment too
-		int size = new HashMap(10).size();
-	}
+    public void replaceRawHashtable() {
+        // Keep this comment
+        Set<Entry> entrySet = new HashMap().entrySet();
+        // Keep this comment too
+        int size = new HashMap(10).size();
+    }
 
-	public void replaceFullyQualifiedHashtable() {
-		// Keep this comment
-		Set<Entry<Integer, Date>> entrySet = new HashMap<Integer, Date>().entrySet();
-		// Keep this comment too
-		int size = new HashMap(10).size();
-	}
+    public void replaceFullyQualifiedHashtable() {
+        // Keep this comment
+        Set<Entry<Integer, Date>> entrySet = new HashMap<Integer, Date>().entrySet();
+        // Keep this comment too
+        int size = new HashMap(10).size();
+    }
 
-	public void replaceHashtableVariableDeclaration() {
-		// Keep this comment
-		HashMap<String, String> map = new HashMap<String, String>();
-	}
+    public void replaceHashtableVariableDeclaration() {
+        // Keep this comment
+        HashMap<String, String> map = new HashMap<String, String>();
+    }
 
-	public void replaceHashtableVariableDeclarationWithDiamondOpertor() {
-		// Keep this comment
-		HashMap<String, String> map = new HashMap<>();
-	}
+    public void replaceHashtableVariableDeclarationWithDiamondOpertor() {
+        // Keep this comment
+        HashMap<String, String> map = new HashMap<>();
+    }
 
-	public void replaceMapVariableDeclaration() {
-		// Keep this comment
-		Map<String, String> map = new HashMap<String, String>();
-	}
+    public void replaceMapVariableDeclaration() {
+        // Keep this comment
+        Map<String, String> map = new HashMap<String, String>();
+    }
 
-	public void replaceHashtableVariableUse() {
-		// Keep this comment
-		HashMap<String, String> map = new HashMap<String, String>();
-		// Keep this comment too
-		map.put("foo", "bar");
-	}
+    public void replaceHashtableVariableUse() {
+        // Keep this comment
+        HashMap<String, String> map = new HashMap<String, String>();
+        // Keep this comment too
+        map.put("foo", "bar");
+    }
 
-	public void replaceMapVariableUse() {
-		// Keep this comment
-		Map<String, String> map = new HashMap<String, String>();
-		// Keep this comment too
-		map.put("foo", "bar");
-	}
+    public void replaceMapVariableUse() {
+        // Keep this comment
+        Map<String, String> map = new HashMap<String, String>();
+        // Keep this comment too
+        map.put("foo", "bar");
+    }
 
-	public void refactorHashtableMethod() {
-		// Keep this comment
-		HashMap<String, List<String>[]> map = new HashMap<String, List<String>[]>();
-		// Keep this comment too
-		map.values();
-	}
+    public void refactorHashtableMethod() {
+        // Keep this comment
+        HashMap<String, List<String>[]> map = new HashMap<String, List<String>[]>();
+        // Keep this comment too
+        map.values();
+    }
 
-	public void refactorMapMethod() {
-		// Keep this comment
-		Map<String, List<String>[]> map = new HashMap<String, List<String>[]>();
-		// Keep this comment too
-		map.values();
-	}
+    public void refactorMapMethod() {
+        // Keep this comment
+        Map<String, List<String>[]> map = new HashMap<String, List<String>[]>();
+        // Keep this comment too
+        map.values();
+    }
 
-	public String replaceHashtableWithLoop(List<Date> dates) {
-		// Keep this comment
-		HashMap<Long, Date> map = new HashMap<Long, Date>();
-		for (Date date : dates) {
-			map.put(date.getTime(), date);
-		}
+    public String replaceHashtableWithLoop(List<Date> dates) {
+        // Keep this comment
+        HashMap<Long, Date> map = new HashMap<Long, Date>();
+        for (Date date : dates) {
+            map.put(date.getTime(), date);
+        }
 
-		return map.toString();
-	}
+        return map.toString();
+    }
 
-	public String replaceMapWithLoop(List<Date> dates) {
-		// Keep this comment
-		Map<Long, Date> map = new HashMap<Long, Date>();
-		for (Date date : dates) {
-			map.put(date.getTime(), date);
-		}
+    public String replaceMapWithLoop(List<Date> dates) {
+        // Keep this comment
+        Map<Long, Date> map = new HashMap<Long, Date>();
+        for (Date date : dates) {
+            map.put(date.getTime(), date);
+        }
 
-		return map.toString();
-	}
+        return map.toString();
+    }
 
-	public void replaceHashtableWithModifier() {
-		// Keep this comment
-		final HashMap<String, int[]> map = new HashMap<String, int[]>();
-		map.put("foo", new int[] {1, 2, 3});
-	}
+    public void replaceHashtableWithModifier() {
+        // Keep this comment
+        final HashMap<String, int[]> map = new HashMap<String, int[]>();
+        map.put("foo", new int[] {1, 2, 3});
+    }
 
-	public void replaceMapWithModifier() {
-		// Keep this comment
-		final Map<String, int[]> map = new HashMap<String, int[]>();
-		map.put("foo", new int[] {1, 2, 3});
-	}
+    public void replaceMapWithModifier() {
+        // Keep this comment
+        final Map<String, int[]> map = new HashMap<String, int[]>();
+        map.put("foo", new int[] {1, 2, 3});
+    }
 
-	public void replaceHashtableWithParameter() {
-		// Keep this comment
-		HashMap<String, String> map = new HashMap<String, String>(10);
-		map.put("foo", "bar");
-	}
+    public void replaceHashtableWithParameter() {
+        // Keep this comment
+        HashMap<String, String> map = new HashMap<String, String>(10);
+        map.put("foo", "bar");
+    }
 
-	public void replaceMapWithParameter() {
-		// Keep this comment
-		Map<String, String> map = new HashMap<String, String>(10);
-		map.put("foo", "bar");
-	}
+    public void replaceMapWithParameter() {
+        // Keep this comment
+        Map<String, String> map = new HashMap<String, String>(10);
+        map.put("foo", "bar");
+    }
 
-	public Set<Entry<String, String>> replaceReassignedHashtable() {
-		// Keep this comment
-		HashMap<String, String> map1 = new HashMap<String, String>();
-		map1.put("foo", "FOO");
+    public Set<Entry<String, String>> replaceReassignedHashtable() {
+        // Keep this comment
+        HashMap<String, String> map1 = new HashMap<String, String>();
+        map1.put("foo", "FOO");
 
-		// Keep this comment too
-		HashMap<String, String> map2 = map1;
-		map2.put("bar", "BAR");
+        // Keep this comment too
+        HashMap<String, String> map2 = map1;
+        map2.put("bar", "BAR");
 
-		return map2.entrySet();
-	}
+        return map2.entrySet();
+    }
 
-	public Set<Entry<String, String>> replaceReassignedMap() {
-		// Keep this comment
-		Map<String, String> map1 = new HashMap<String, String>();
-		map1.put("foo", "FOO");
+    public Set<Entry<String, String>> replaceReassignedMap() {
+        // Keep this comment
+        Map<String, String> map1 = new HashMap<String, String>();
+        map1.put("foo", "FOO");
 
-		// Keep this comment too
-		Map<String, String> map2 = map1;
-		map2.put("bar", "BAR");
+        // Keep this comment too
+        Map<String, String> map2 = map1;
+        map2.put("bar", "BAR");
 
-		return map2.entrySet();
-	}
+        return map2.entrySet();
+    }
 
-	public void doNotReplaceHashtableParameter(Hashtable<String, String> aMap) {
-		Hashtable<String, String> map = aMap;
-		map.put("foo", "bar");
-	}
+    public void doNotReplaceHashtableParameter(Hashtable<String, String> aMap) {
+        Hashtable<String, String> map = aMap;
+        map.put("foo", "bar");
+    }
 
-	public void doNotReplaceHashtablePassedToAMethod() {
-		String text = String.valueOf(new Hashtable<String, String>());
-	}
+    public void doNotReplaceHashtablePassedToAMethod() {
+        String text = String.valueOf(new Hashtable<String, String>());
+    }
 
-	public Hashtable<Integer, Date> doNotReplaceReturnedHashtable() {
-		return new Hashtable<Integer, Date>();
-	}
+    public Hashtable<Integer, Date> doNotReplaceReturnedHashtable() {
+        return new Hashtable<Integer, Date>();
+    }
 
-	public void doNotReplaceReassignedVariable() {
-		Hashtable<String, String> map = new Hashtable<String, String>();
-		map = new Hashtable<String, String>();
-	}
+    public void doNotReplaceReassignedVariable() {
+        Hashtable<String, String> map = new Hashtable<String, String>();
+        map = new Hashtable<String, String>();
+    }
 
-	public void replaceThreadLocalHashtable() {
-		final HashMap<String, String> map = new HashMap<String, String>();
-		map.put("foo", "bar");
-		new Runnable() {
+    public void replaceThreadLocalHashtable() {
+        final HashMap<String, String> map = new HashMap<String, String>();
+        map.put("foo", "bar");
+        new Runnable() {
 
-			@Override
-			public void run() {
-				final HashMap<String, String> localMap = new HashMap<String, String>();
-				localMap.put("foo", "bar");
-			}
-		};
-	}
+            @Override
+            public void run() {
+                final HashMap<String, String> localMap = new HashMap<String, String>();
+                localMap.put("foo", "bar");
+            }
+        };
+    }
 
-	public void replaceThreadLocalMap() {
-		final Map<String, String> map = new HashMap<String, String>();
-		map.put("foo", "bar");
-		new Runnable() {
+    public void replaceThreadLocalMap() {
+        final Map<String, String> map = new HashMap<String, String>();
+        map.put("foo", "bar");
+        new Runnable() {
 
-			@Override
-			public void run() {
-				final Map<String, String> localMap = new HashMap<String, String>();
-				localMap.put("foo", "bar");
-			}
-		};
-	}
+            @Override
+            public void run() {
+                final Map<String, String> localMap = new HashMap<String, String>();
+                localMap.put("foo", "bar");
+            }
+        };
+    }
 
-	public void doNotReplaceThreadSharedHashtable() {
-		final Hashtable<String, String> map = new Hashtable<String, String>();
-		new Runnable() {
+    public void doNotReplaceThreadSharedHashtable() {
+        final Hashtable<String, String> map = new Hashtable<String, String>();
+        new Runnable() {
 
-			@Override
-			public void run() {
-				map.put("No conflict", "please");
-			}
-		};
-	}
+            @Override
+            public void run() {
+                map.put("No conflict", "please");
+            }
+        };
+    }
 
-	public void doNotReplaceField() {
-		Comparator<String> c = new Comparator<String>() {
+    public void doNotReplaceField() {
+        Comparator<String> c = new Comparator<String>() {
 
-			private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
+            private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
 
-			private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
+            private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
 
-			@Override
-			public int compare(String arg0, String arg1) {
-				return doNotReplaceField.get(arg1) - doNotReplaceField.get(arg0);
-			}
+            @Override
+            public int compare(String arg0, String arg1) {
+                return doNotReplaceField.get(arg1) - doNotReplaceField.get(arg0);
+            }
 
-		};
-	}
+        };
+    }
 }
