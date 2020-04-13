@@ -168,30 +168,28 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(nullityCondition, Expression.class, NullLiteral.class);
-		Expression secondField= null;
-
-		if (nullityTypedCondition != null) {
-			secondField= nullityTypedCondition.getFirstOperand();
-		}
-
 		ReturnStatement returnStmt1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
 		ReturnStatement returnStmt2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
 		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
-		if (secondField != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
+		if (nullityTypedCondition != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
 				&& equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier()) //$NON-NLS-1$
-				&& (equalsMethod.arguments() == null || equalsMethod.arguments().size() == 1)
-				&& (match(firstField, secondField, equalsMethod.getExpression(),
-						(ASTNode) equalsMethod.arguments().get(0))
-						|| match(secondField, firstField, equalsMethod.getExpression(),
-								(ASTNode) equalsMethod.arguments().get(0)))) {
-			BooleanLiteral returnFalse1= ASTNodes.as(returnStmt1.getExpression(), BooleanLiteral.class);
-			BooleanLiteral returnFalse2= ASTNodes.as(returnStmt2.getExpression(), BooleanLiteral.class);
+				&& equalsMethod.arguments() != null && equalsMethod.arguments().size() == 1) {
+			Expression secondField= nullityTypedCondition.getFirstOperand();
 
-			if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
-					&& !returnFalse2.booleanValue()) {
-				replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStmt1);
-				return false;
+			if (secondField != null
+					&& (match(firstField, secondField, equalsMethod.getExpression(),
+							(ASTNode) equalsMethod.arguments().get(0))
+							|| match(secondField, firstField, equalsMethod.getExpression(),
+									(ASTNode) equalsMethod.arguments().get(0)))) {
+				BooleanLiteral returnFalse1= ASTNodes.as(returnStmt1.getExpression(), BooleanLiteral.class);
+				BooleanLiteral returnFalse2= ASTNodes.as(returnStmt2.getExpression(), BooleanLiteral.class);
+
+				if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
+						&& !returnFalse2.booleanValue()) {
+					replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStmt1);
+					return false;
+				}
 			}
 		}
 
