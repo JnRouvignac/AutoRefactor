@@ -62,10 +62,12 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCleanUp {
+	private static final String HASH_CODE_METHOD= "hashCode"; //$NON-NLS-1$
+
 	private static final class CollectedData {
 		private List<Expression> fields= new ArrayList<>();
-		private String primeId;
-		private String resultId;
+		private SimpleName primeId;
+		private SimpleName resultId;
 		private Iterator<Statement> stmtIterator;
 		private SimpleName tempVar;
 		private boolean tempValueUsed= true;
@@ -92,28 +94,28 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		/**
 		 * @return the primeId
 		 */
-		public String getPrimeId() {
+		public SimpleName getPrimeId() {
 			return primeId;
 		}
 
 		/**
 		 * @param primeId the primeId to set
 		 */
-		public void setPrimeId(final String primeId) {
+		public void setPrimeId(final SimpleName primeId) {
 			this.primeId= primeId;
 		}
 
 		/**
 		 * @return the resultId
 		 */
-		public String getResultId() {
+		public SimpleName getResultId() {
 			return resultId;
 		}
 
 		/**
 		 * @param resultId the resultId to set
 		 */
-		public void setResultId(final String resultId) {
+		public void setResultId(final SimpleName resultId) {
 			this.resultId= resultId;
 		}
 
@@ -228,7 +230,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		Block body= node.getBody();
 
-		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "hashCode") && body != null) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), HASH_CODE_METHOD) && body != null) {
 			@SuppressWarnings("unchecked")
 			List<Statement> statements= body.statements();
 
@@ -257,7 +259,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		return true;
 	}
 
-	private String isVariableValid(final CollectedData data, final int initValue) {
+	private SimpleName isVariableValid(final CollectedData data, final int initValue) {
 		Statement statement= data.getStmtIterator().next();
 		VariableDeclarationStatement varDecl= ASTNodes.as(statement, VariableDeclarationStatement.class);
 
@@ -265,7 +267,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			VariableDeclarationFragment varFragment= (VariableDeclarationFragment) varDecl.fragments().get(0);
 
 			if (Long.valueOf(initValue).equals(ASTNodes.integerLiteral(varFragment.getInitializer()))) {
-				return varFragment.getName().getIdentifier();
+				return varFragment.getName();
 			}
 		}
 
@@ -328,7 +330,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (isGivenVariable(field, data.getResultId())) {
 				return isHashValid(data, resultComputation);
 			}
-			if (data.getTempVar() != null && isGivenVariable(field, data.getTempVar().getIdentifier())) {
+			if (data.getTempVar() != null && isGivenVariable(field, data.getTempVar())) {
 				SimpleName fieldToFind= isDoubleToLongBitsMethod(data, resultComputation);
 
 				if (fieldToFind != null && data.getStmtIterator().hasNext()) {
@@ -353,8 +355,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		if (doubleToLongBits != null && ASTNodes.usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
 			SimpleName fieldName= ASTNodes.as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
-			if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
-					&& !fieldName.getIdentifier().equals(data.getResultId())) {
+			if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
+					&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
 				fieldToFind= fieldName;
 			}
 		}
@@ -393,8 +395,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
 			SimpleName fieldName= getField(newHash);
 
-			if (!data.getPrimeId().equals(fieldName.getIdentifier())
-					&& !data.getResultId().equals(fieldName.getIdentifier())) {
+			if (!ASTNodes.isSameVariable(data.getPrimeId(), fieldName)
+					&& !ASTNodes.isSameVariable(data.getResultId(), fieldName)) {
 				data.getFields().add(fieldName);
 				return true;
 			}
@@ -409,24 +411,24 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
-				if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
-						&& !fieldName.getIdentifier().equals(data.getResultId())) {
+				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
+						&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
 					data.getFields().add(fieldName);
 					return true;
 				}
-			} else if (ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]") //$NON-NLS-1$ //$NON-NLS-2$
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) { //$NON-NLS-1$ //$NON-NLS-2$
+			} else if (ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, boolean[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, byte[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, char[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, double[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, float[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, int[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, Object[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, long[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, short[].class.getCanonicalName())) {
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
-				if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
-						&& !fieldName.getIdentifier().equals(data.getResultId())) {
+				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
+						&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
 					data.getFields().add(specificMethod);
 					return true;
 				}
@@ -434,7 +436,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					&& innerClass.resolveBinding() != null
 					&& topLevelClass != null
 					&& topLevelClass.resolveBinding() != null
-							&& ASTNodes.usesGivenSignature(specificMethod, topLevelClass.resolveBinding().getQualifiedName(), "hashCode")) { //$NON-NLS-1$
+							&& ASTNodes.usesGivenSignature(specificMethod, topLevelClass.resolveBinding().getQualifiedName(), HASH_CODE_METHOD)) {
 				return isEnclosingHashCode(data, specificMethod, innerClass, topLevelClass);
 			}
 		} else if (newHash instanceof CastExpression) {
@@ -511,7 +513,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
 
 					if (visitedClass != null
-							&& visitedClass.getName().getIdentifier().equals(qualifier.getIdentifier())) {
+							&& ASTNodes.isSameVariable(visitedClass.getName(), qualifier)) {
 						return fieldName.getName();
 					}
 				}
@@ -531,24 +533,20 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			SimpleName field= getField(typedBitwise.getFirstOperand());
 			InfixExpression moveExpression= typedBitwise.getSecondOperand();
 
-			if (field != null) {
-				String fieldName= field.getIdentifier();
+			if (field != null && moveExpression != null && !ASTNodes.isSameVariable(field, data.getPrimeId())
+					&& !ASTNodes.isSameVariable(field, data.getResultId()) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
+				SimpleName againFieldName= getField(moveExpression.getLeftOperand());
+				Long hash= ASTNodes.integerLiteral(moveExpression.getRightOperand());
 
-				if (fieldName != null && moveExpression != null && !fieldName.equals(data.getPrimeId())
-						&& !fieldName.equals(data.getResultId()) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
-					SimpleName againFieldName= getField(moveExpression.getLeftOperand());
-					Long hash= ASTNodes.integerLiteral(moveExpression.getRightOperand());
+				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32).equals(hash)) {
+					if (data.isTempValueUsed()) {
+						data.getFields().add(againFieldName);
+						return true;
+					}
 
-					if (againFieldName != null && againFieldName.getIdentifier().equals(fieldName) && Long.valueOf(32).equals(hash)) {
-						if (data.isTempValueUsed()) {
-							data.getFields().add(againFieldName);
-							return true;
-						}
-
-						if (data.getTempVar().getIdentifier().equals(fieldName)) {
-							data.setTempValueUsed(true);
-							return true;
-						}
+					if (ASTNodes.isSameVariable(data.getTempVar(), field)) {
+						data.setTempValueUsed(true);
+						return true;
 					}
 				}
 			}
@@ -564,8 +562,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 		if (booleanField != null && hashForTrue != null
 				&& hashForFalse != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
-				&& !booleanField.getIdentifier().equals(data.getPrimeId())
-				&& !booleanField.getIdentifier().equals(data.getResultId()) && Long.valueOf(1231).equals(hashForTrue)
+				&& !ASTNodes.isSameVariable(booleanField, data.getPrimeId())
+				&& !ASTNodes.isSameVariable(booleanField, data.getResultId()) && Long.valueOf(1231).equals(hashForTrue)
 				&& Long.valueOf(1237).equals(hashForFalse)) {
 			data.getFields().add(booleanField);
 			return true;
@@ -582,7 +580,6 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			SimpleName field= getField(typedIsFieldNull.getFirstOperand());
 
 			if (field != null) {
-				String fieldName= field.getIdentifier();
 				Long zero;
 				MethodInvocation hashOnField;
 
@@ -595,12 +592,12 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 				}
 
 				if (zero != null && zero.longValue() == 0 && hashOnField != null && hashOnField.getExpression() != null
-						&& "hashCode".equals(hashOnField.getName().getIdentifier()) //$NON-NLS-1$
+						&& HASH_CODE_METHOD.equals(hashOnField.getName().getIdentifier())
 						&& Utils.isEmpty(hashOnField.arguments())) {
 					SimpleName fieldToHash= getField(hashOnField.getExpression());
 
 					if (fieldToHash != null
-							&& fieldName.equals(fieldToHash.getIdentifier())) {
+							&& ASTNodes.isSameVariable(field, fieldToHash)) {
 						data.getFields().add(fieldToHash);
 						return true;
 					}
@@ -611,9 +608,9 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		return false;
 	}
 
-	private boolean isGivenVariable(final Expression expression, final String varId) {
+	private boolean isGivenVariable(final Expression expression, final SimpleName varId) {
 		SimpleName field= getField(expression);
-		return field != null && varId.equals(field.getIdentifier());
+		return field != null && ASTNodes.isSameVariable(varId, field);
 	}
 
 	private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,

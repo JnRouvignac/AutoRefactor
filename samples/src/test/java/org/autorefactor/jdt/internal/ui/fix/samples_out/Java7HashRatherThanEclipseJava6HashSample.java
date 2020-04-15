@@ -51,9 +51,8 @@ public class Java7HashRatherThanEclipseJava6HashSample {
         @Override
         public int hashCode() {
             // Keep this comment
-            return Objects.hash(getEnclosingInstance().hashCode(), innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt,
-                    Arrays.hashCode(innerIntegers), innerLong, innerObservable, innerOtherDouble, innerShort, innerText,
-                    innerTextById, innerBooleanWrapper, Arrays.hashCode(innerTexts));
+            return Objects.hash(getEnclosingInstance().hashCode(), innerBoolean, innerByte, innerChar, innerDouble, innerFloat, innerInt, Arrays.hashCode(innerIntegers), innerLong,
+					innerObservable, innerOtherDouble, innerShort, innerText, innerTextById, innerBooleanWrapper, Arrays.hashCode(innerTexts));
         }
 
         private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
@@ -121,6 +120,6 @@ public class Java7HashRatherThanEclipseJava6HashSample {
     public int hashCode() {
         // Keep this comment
         return Objects.hash(aBoolean, aByte, aChar, aFloat, aLong, aDouble, aShort, aText, anInt, anObservable,
-                Arrays.hashCode(integers), textById, Arrays.hashCode(texts), anotherDouble);
+				Arrays.hashCode(integers), textById, Arrays.hashCode(texts), anotherDouble);
     }
 }
