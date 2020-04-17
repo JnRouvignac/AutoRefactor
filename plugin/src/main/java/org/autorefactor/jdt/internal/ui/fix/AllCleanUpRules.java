@@ -138,6 +138,7 @@ public final class AllCleanUpRules {
 				// FIXME it would be nice if it was only enabled when testng jar is detected for
 				// the project
 				new TestNGAssertCleanUp(), new JUnitAssertCleanUp(), new AssertJCleanUp(),
+				new SeparateAssertionsRatherThanBooleanExpressionCleanUp(),
 				new RemoveEmptyLinesCleanUp(),
 				new RemoveEmptySuperConstrInvocationCleanUp(),
 				new ImplicitDefaultConstructorRatherThanWrittenOneCleanUp(), new AndroidWakeLockCleanUp(),

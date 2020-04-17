@@ -1337,6 +1337,18 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
+	public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
 	public static String CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name;
 	/**
 	 * Automatically filled.
