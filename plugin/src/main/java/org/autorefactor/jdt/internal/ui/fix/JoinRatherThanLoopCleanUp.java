@@ -41,7 +41,7 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
@@ -286,7 +286,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			InfixExpression conditionForDelimiter= ASTNodes.as(delimiterCondition.getExpression(), InfixExpression.class);
 
 			if (conditionForDelimiter != null) {
-				TypedInfixExpression<MethodInvocation, Expression> emptyLength= ASTNodes.typedInfix(conditionForDelimiter, MethodInvocation.class, Expression.class);
+				OrderedInfixExpression<MethodInvocation, Expression> emptyLength= ASTNodes.orderedInfix(conditionForDelimiter, MethodInvocation.class, Expression.class);
 
 				if (emptyLength != null
 						&& ASTNodes.usesGivenSignature(emptyLength.getFirstOperand(), CharSequence.class.getCanonicalName(), "length") //$NON-NLS-1$
@@ -310,7 +310,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 				if (IterationType.INDEX.equals(iterationType)) {
 					if (isDelimiterFirst) {
-						TypedInfixExpression<SimpleName, Expression> typedConditionForDelimiter= ASTNodes.typedInfix(conditionForDelimiter, SimpleName.class, Expression.class);
+						OrderedInfixExpression<SimpleName, Expression> typedConditionForDelimiter= ASTNodes.orderedInfix(conditionForDelimiter, SimpleName.class, Expression.class);
 
 						if (typedConditionForDelimiter != null) {
 							Long literal= ASTNodes.integerLiteral(typedConditionForDelimiter.getSecondOperand());
@@ -329,7 +329,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 							}
 						}
 					} else {
-						TypedInfixExpression<SimpleName, InfixExpression> typedConditionForDelimiter= ASTNodes.typedInfix(conditionForDelimiter, SimpleName.class, InfixExpression.class);
+						OrderedInfixExpression<SimpleName, InfixExpression> typedConditionForDelimiter= ASTNodes.orderedInfix(conditionForDelimiter, SimpleName.class, InfixExpression.class);
 
 						if (typedConditionForDelimiter != null
 								&& ASTNodes.isSameVariable(loopVariable, typedConditionForDelimiter.getFirstOperand())) {

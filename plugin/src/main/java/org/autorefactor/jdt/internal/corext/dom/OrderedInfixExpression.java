@@ -4,51 +4,51 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /**
- * TypedInfixExpression.
+ * Ordered infix expression for commutative operations.
  *
  * @param <F> First operand
  * @param <S> Second operand
  */
-public class TypedInfixExpression<F extends Expression, S extends Expression> {
+public class OrderedInfixExpression<F extends Expression, S extends Expression> {
 	private F firstOperand;
 	private InfixExpression.Operator operator;
 	private S secondOperand;
 
 	/**
-	 * TypedInfixExpression.
+	 * Ordered infix expression.
 	 *
 	 * @param firstOperand first operand
 	 * @param operator operator
 	 * @param secondOperand second operand
 	 */
-	public TypedInfixExpression(final F firstOperand, InfixExpression.Operator operator, final S secondOperand) {
+	public OrderedInfixExpression(final F firstOperand, InfixExpression.Operator operator, final S secondOperand) {
 		this.firstOperand= firstOperand;
 		this.operator= operator;
 		this.secondOperand= secondOperand;
 	}
 
 	/**
-	 * GetFirstOperand.
+	 * Get the first operand.
 	 *
-	 * @return GetFirstOperand.
+	 * @return the first operand.
 	 */
 	public F getFirstOperand() {
 		return firstOperand;
 	}
 
 	/**
-	 * GetOperator.
+	 * Get the operator.
 	 *
-	 * @return GetOperator.
+	 * @return the operator.
 	 */
 	public InfixExpression.Operator getOperator() {
 		return operator;
 	}
 
 	/**
-	 * GetSecondOperand.
+	 * Get the second operand.
 	 *
-	 * @return GetSecondOperand.
+	 * @return the second operand.
 	 */
 	public S getSecondOperand() {
 		return secondOperand;

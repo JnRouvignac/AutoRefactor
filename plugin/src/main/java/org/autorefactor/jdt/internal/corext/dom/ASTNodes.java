@@ -424,7 +424,7 @@ public final class ASTNodes {
 	 * @param secondClass  the class representing the required expression type
 	 * @return the items of an infix expression in the order it is specified. It reverses the operator if needed.
 	 */
-	public static <F extends Expression, S extends Expression> TypedInfixExpression<F, S> typedInfix(final Expression node, final Class<F> firstClass, final Class<S> secondClass) {
+	public static <F extends Expression, S extends Expression> OrderedInfixExpression<F, S> orderedInfix(final Expression node, final Class<F> firstClass, final Class<S> secondClass) {
 		InfixExpression expression= as(node, InfixExpression.class);
 
 		if (expression == null || expression.hasExtendedOperands()) {
@@ -436,14 +436,14 @@ public final class ASTNodes {
 			S second= as(expression.getRightOperand(), secondClass);
 
 			if (first != null && second != null) {
-				return new TypedInfixExpression<>(first, expression.getOperator(), second);
+				return new OrderedInfixExpression<>(first, expression.getOperator(), second);
 			}
 		} else {
 			F leftFirst= as(expression.getLeftOperand(), firstClass);
 			S rightSecond= as(expression.getRightOperand(), secondClass);
 
 			if (leftFirst != null && rightSecond != null) {
-				return new TypedInfixExpression<>(leftFirst, expression.getOperator(), rightSecond);
+				return new OrderedInfixExpression<>(leftFirst, expression.getOperator(), rightSecond);
 			}
 
 			InfixExpression.Operator mirroredOperator= null;
@@ -474,7 +474,7 @@ public final class ASTNodes {
 				S leftSecond= as(expression.getLeftOperand(), secondClass);
 
 				if (rightFirst != null && leftSecond != null) {
-					return new TypedInfixExpression<>(rightFirst, mirroredOperator, leftSecond);
+					return new OrderedInfixExpression<>(rightFirst, mirroredOperator, leftSecond);
 				}
 			}
 		}

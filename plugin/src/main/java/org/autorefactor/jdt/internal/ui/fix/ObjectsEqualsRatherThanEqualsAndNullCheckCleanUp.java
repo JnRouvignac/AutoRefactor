@@ -35,7 +35,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
@@ -118,7 +118,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			if (condition != null && !condition.hasExtendedOperands()
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
 					&& thenStatements != null && thenStatements.size() == 1 && elseStatements != null && elseStatements.size() == 1) {
-				TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(condition, Expression.class, NullLiteral.class);
+				OrderedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.orderedInfix(condition, Expression.class, NullLiteral.class);
 
 				if (nullityTypedCondition != null && ASTNodes.isPassive(nullityTypedCondition.getFirstOperand())) {
 					return maybeReplaceCode(node, condition, thenStatements, elseStatements, nullityTypedCondition.getFirstOperand(), classesToUseWithImport,
@@ -169,7 +169,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final InfixExpression nullityCondition, final List<Statement> nullityStatements,
 			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		TypedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.typedInfix(nullityCondition, Expression.class, NullLiteral.class);
+		OrderedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.orderedInfix(nullityCondition, Expression.class, NullLiteral.class);
 		ReturnStatement returnStatement1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
 		ReturnStatement returnStatement2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
 		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);

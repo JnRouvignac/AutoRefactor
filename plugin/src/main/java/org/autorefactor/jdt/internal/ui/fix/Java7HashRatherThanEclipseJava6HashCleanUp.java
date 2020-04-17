@@ -37,7 +37,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -524,7 +524,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isGreatNumberValid(final CollectedData data, final CastExpression newHash) {
-		TypedInfixExpression<Expression, InfixExpression> typedBitwise= ASTNodes.typedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
+		OrderedInfixExpression<Expression, InfixExpression> typedBitwise= ASTNodes.orderedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
 
 		if (ASTNodes.hasType(newHash, int.class.getSimpleName())
 				&& typedBitwise != null
@@ -573,7 +573,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isObjectValid(final CollectedData data, final ConditionalExpression condition) {
-		TypedInfixExpression<Expression, NullLiteral> typedIsFieldNull= ASTNodes.typedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
+		OrderedInfixExpression<Expression, NullLiteral> typedIsFieldNull= ASTNodes.orderedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
 
 		if (typedIsFieldNull != null
 				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(typedIsFieldNull.getOperator())) {

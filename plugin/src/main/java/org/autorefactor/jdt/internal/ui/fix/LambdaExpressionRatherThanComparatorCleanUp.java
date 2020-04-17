@@ -42,7 +42,7 @@ import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcherRunnable;
 import org.autorefactor.jdt.internal.corext.dom.NodeMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
-import org.autorefactor.jdt.internal.corext.dom.TypedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
@@ -79,7 +79,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 			if (condition != null
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
-				TypedInfixExpression<SimpleName, NullLiteral> typedInfix= ASTNodes.typedInfix(condition, SimpleName.class, NullLiteral.class);
+				OrderedInfixExpression<SimpleName, NullLiteral> typedInfix= ASTNodes.orderedInfix(condition, SimpleName.class, NullLiteral.class);
 
 				if (typedInfix != null
 						&& ASTNodes.isPassive(typedInfix.getFirstOperand())
