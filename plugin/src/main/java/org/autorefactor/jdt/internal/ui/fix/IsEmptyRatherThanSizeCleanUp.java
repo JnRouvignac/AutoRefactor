@@ -101,32 +101,32 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 				}
 
 				if (InfixExpression.Operator.GREATER.equals(operator)) {
-					rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
 					return false;
 				}
 
 				if (InfixExpression.Operator.EQUALS.equals(operator)) {
-					rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
 					return false;
 				}
 
 				if (InfixExpression.Operator.NOT_EQUALS.equals(operator)) {
-					rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
 					return false;
 				}
 
 				if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
-					rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
 					return false;
 				}
 			} else if (literalSize == 1) {
 				if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
-					rewrite.replace(node, ast.not(ast.invoke(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty")), null); //$NON-NLS-1$
 					return false;
 				}
 
 				if (InfixExpression.Operator.LESS.equals(operator)) {
-					rewrite.replace(node, ast.invoke(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
+					rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), "isEmpty"), null); //$NON-NLS-1$
 					return false;
 				}
 			}

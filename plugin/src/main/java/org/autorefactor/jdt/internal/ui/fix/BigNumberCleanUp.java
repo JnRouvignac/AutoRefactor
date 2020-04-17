@@ -153,7 +153,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 	private ASTNode getValueOf(final String name, final String numberLiteral) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		return ast.invoke(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
+		return ast.newMethodInvocation(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
 	}
 
 	private StringLiteral getStringLiteral(final String numberLiteral) {
@@ -255,7 +255,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		MethodInvocation mi= ast.invoke(rewrite.createMoveTarget(node.getExpression()), "compareTo", rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
+		MethodInvocation mi= ast.newMethodInvocation(rewrite.createMoveTarget(node.getExpression()), "compareTo", rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
 		return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
 	}

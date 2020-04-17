@@ -453,17 +453,17 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		Expression comparingMethod= ast.invoke(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
+		Expression comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
 		if (!isForward.get()) {
-			comparingMethod= ast.invoke(comparingMethod, "reversed"); //$NON-NLS-1$
+			comparingMethod= ast.newMethodInvocation(comparingMethod, "reversed"); //$NON-NLS-1$
 		}
 
 		if (isNullFirst != null) {
 			if (isNullFirst) {
-				comparingMethod= ast.invoke(ast.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
+				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
 			} else {
-				comparingMethod= ast.invoke(ast.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
+				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
 			}
 		}
 

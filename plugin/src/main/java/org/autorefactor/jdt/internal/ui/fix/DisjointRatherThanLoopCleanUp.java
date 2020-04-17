@@ -111,7 +111,7 @@ public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
-		MethodInvocation invoke= ast.invoke(classname, "disjoint", rewrite.createMoveTarget(toFind), rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
+		MethodInvocation invoke= ast.newMethodInvocation(classname, "disjoint", rewrite.createMoveTarget(toFind), rewrite.createMoveTarget(iterable)); //$NON-NLS-1$
 
 		if (isPositive) {
 			return ast.not(invoke);

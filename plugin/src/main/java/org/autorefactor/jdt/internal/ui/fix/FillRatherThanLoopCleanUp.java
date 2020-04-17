@@ -129,7 +129,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
-				ast.toStatement(ast.invoke(ast.name(classname),
+				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
 						"fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
 						rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
 	}

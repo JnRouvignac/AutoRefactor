@@ -496,7 +496,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		}
 
 		if (getJavaMinorVersion() >= 4 && Boolean.class.getCanonicalName().equals(expressionTypeName)) {
-			return ast.invoke(booleanName, "valueOf", condition); //$NON-NLS-1$
+			return ast.newMethodInvocation(booleanName, "valueOf", condition); //$NON-NLS-1$
 		}
 
 		return null;

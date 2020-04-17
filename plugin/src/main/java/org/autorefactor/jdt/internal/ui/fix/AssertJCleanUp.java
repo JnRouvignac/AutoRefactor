@@ -266,10 +266,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				copyOfMessages.add(ast.createCopyTarget((Expression) message));
 			}
 
-			return ast.invoke(qualifiedClass, FAIL_METHOD, copyOfMessages);
+			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
 		}
 
-		return ast.invoke(qualifiedClass, FAIL_METHOD, ast.null0());
+		return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, ast.null0());
 	}
 
 	@Override
@@ -278,7 +278,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
 		String finalMethodName= getFinalMethodName(methodName);
 
-		Expression assertionMethod= ast.invoke(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
+		Expression assertionMethod= ast.newMethodInvocation(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
 
 		if (failureMessage != null) {
 			MethodInvocation failureMethod= (MethodInvocation) failureMessage;
@@ -289,19 +289,19 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				copyOfMessages.add(ast.createCopyTarget((Expression) message));
 			}
 
-			assertionMethod= ast.invoke(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
+			assertionMethod= ast.newMethodInvocation(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
 		}
 
 		if (copyOfExpected != null) {
 			if (delta != null && IS_EQUAL_TO_METHOD.equals(finalMethodName)) {
 				importsToAdd.add(OFFSET_CLASS);
-				return ast.invoke(assertionMethod, finalMethodName, copyOfExpected, ast.invoke(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", ast.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
+				return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected, ast.newMethodInvocation(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", ast.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			return ast.invoke(assertionMethod, finalMethodName, copyOfExpected);
+			return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected);
 		}
 
-		return ast.invoke(assertionMethod, finalMethodName);
+		return ast.newMethodInvocation(assertionMethod, finalMethodName);
 	}
 
 	private String getFinalMethodName(final String methodName) {

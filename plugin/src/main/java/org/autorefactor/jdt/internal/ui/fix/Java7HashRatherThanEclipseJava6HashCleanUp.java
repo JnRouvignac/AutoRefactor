@@ -624,7 +624,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		Name objectsClassName= ast.name(classname);
 
 		rewrite.replace(statements.get(0),
-				ast.return0(ast.invoke(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), null); //$NON-NLS-1$
+				ast.return0(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), null); //$NON-NLS-1$
 
 		for (int i= 1; i < statements.size(); i++) {
 			rewrite.remove(statements.get(i), null);

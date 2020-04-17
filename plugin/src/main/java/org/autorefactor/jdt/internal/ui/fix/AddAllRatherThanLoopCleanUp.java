@@ -199,7 +199,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
-				ast.toStatement(ast.invoke(ast.name(classname),
+				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
 						"addAll", mi.getExpression() != null ? rewrite.createMoveTarget(mi.getExpression()) : ast.this0(), //$NON-NLS-1$
 						rewrite.createMoveTarget(iterable))), null);
 	}
@@ -264,9 +264,9 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 		MethodInvocation newMethod;
 		if (affectedCollection != null) {
-			newMethod= ast.invoke(rewrite.createMoveTarget(affectedCollection), methodName, rewrite.createMoveTarget(data));
+			newMethod= ast.newMethodInvocation(rewrite.createMoveTarget(affectedCollection), methodName, rewrite.createMoveTarget(data));
 		} else {
-			newMethod= ast.invoke(methodName, rewrite.createMoveTarget(data));
+			newMethod= ast.newMethodInvocation(methodName, rewrite.createMoveTarget(data));
 		}
 
 		rewrite.replace(toReplace, ast.toStatement(newMethod), null);

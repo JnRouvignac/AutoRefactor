@@ -124,9 +124,9 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				MethodInvocation newMethod;
 
 				if (originalMethod.getExpression() != null) {
-					newMethod= ast.invoke(rewrite.createCopyTarget(originalMethod.getExpression()), originalMethod.getName().getIdentifier(), newArguments);
+					newMethod= ast.newMethodInvocation(rewrite.createCopyTarget(originalMethod.getExpression()), originalMethod.getName().getIdentifier(), newArguments);
 				} else {
-					newMethod= ast.invoke(null, originalMethod.getName().getIdentifier(), newArguments);
+					newMethod= ast.newMethodInvocation(null, originalMethod.getName().getIdentifier(), newArguments);
 				}
 
 				ExpressionStatement newStatement= ast.toStatement(newMethod);

@@ -387,12 +387,12 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 		private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			return ast.invoke(ast.copySubtree(loopContent.getIteratorVariable()), "next"); //$NON-NLS-1$
+			return ast.newMethodInvocation(ast.copySubtree(loopContent.getIteratorVariable()), "next"); //$NON-NLS-1$
 		}
 
 		private MethodInvocation collectionGet(final ForLoopContent loopContent) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			return ast.invoke(ast.copySubtree(loopContent.getContainerVariable()), "get", //$NON-NLS-1$
+			return ast.newMethodInvocation(ast.copySubtree(loopContent.getContainerVariable()), "get", //$NON-NLS-1$
 					ast.copySubtree(loopContent.getLoopVariable()));
 		}
 

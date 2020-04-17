@@ -404,7 +404,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (result == null) {
 				result= finalString;
 			} else {
-				result= ast.invoke(result, "append", finalString); //$NON-NLS-1$
+				result= ast.newMethodInvocation(result, "append", finalString); //$NON-NLS-1$
 			}
 		}
 
@@ -457,9 +457,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		MethodInvocation newAppendSubstring= null;
 
 		if (arg1 == null) {
-			newAppendSubstring= ast.invoke(lastExpression, "append", stringVar, arg0); //$NON-NLS-1$
+			newAppendSubstring= ast.newMethodInvocation(lastExpression, "append", stringVar, arg0); //$NON-NLS-1$
 		} else {
-			newAppendSubstring= ast.invoke(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
+			newAppendSubstring= ast.newMethodInvocation(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
 		}
 
 		cuRewrite.getASTRewrite().replace(node, newAppendSubstring, null);
@@ -570,7 +570,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				return ast.createCopyTarget(expression.getSecond());
 			}
 
-			return ast.invoke(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, expression)); //$NON-NLS-1$
+			return ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, expression)); //$NON-NLS-1$
 
 		default: // >= 2
 			boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
@@ -578,7 +578,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			List<Expression> concatenateStrings= new ArrayList<>(appendedStrings.size());
 			for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
 				if (isFirstAndNotAString) {
-					concatenateStrings.add(ast.invoke(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, typeAndValue))); //$NON-NLS-1$
+					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, typeAndValue))); //$NON-NLS-1$
 					isFirstAndNotAString= false;
 				} else {
 					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(ast, typeAndValue)));

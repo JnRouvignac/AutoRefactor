@@ -848,8 +848,8 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public MethodInvocation invoke(final String expression, final String methodName, final Expression... arguments) {
-		return invoke(name(expression), methodName, arguments);
+	public MethodInvocation newMethodInvocation(final String expression, final String methodName, final Expression... arguments) {
+		return newMethodInvocation(name(expression), methodName, arguments);
 	}
 
 	/**
@@ -860,8 +860,8 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public MethodInvocation invoke(final Expression expression, final String methodName, final Expression... arguments) {
-		MethodInvocation mi= invoke(methodName, arguments);
+	public MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final Expression... arguments) {
+		MethodInvocation mi= newMethodInvocation(methodName, arguments);
 		mi.setExpression(expression);
 		return mi;
 	}
@@ -873,7 +873,7 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public MethodInvocation invoke(final String methodName, final Expression... arguments) {
+	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
 		MethodInvocation mi= ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(methodName));
 		addAll(ASTNodes.arguments(mi), arguments);
@@ -889,7 +889,7 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public <E extends Expression> MethodInvocation invoke(final Expression expression, final String methodName, final List<E> arguments) {
+	public <E extends Expression> MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final List<E> arguments) {
 		MethodInvocation mi= ast.newMethodInvocation();
 		mi.setExpression(expression);
 		mi.setName(ast.newSimpleName(methodName));

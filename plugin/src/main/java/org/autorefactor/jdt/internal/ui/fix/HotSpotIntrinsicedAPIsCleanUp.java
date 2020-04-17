@@ -269,9 +269,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TryStatement tryS= ast.try0(
 				ast.block(ast
-						.toStatement(ast.invoke(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
+						.toStatement(ast.newMethodInvocation(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
 				ast.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
-						ast.throw0(ast.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), ast.invoke("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
+						ast.throw0(ast.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), ast.newMethodInvocation("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		cuRewrite.getASTRewrite().replace(node, tryS, null);
 	}

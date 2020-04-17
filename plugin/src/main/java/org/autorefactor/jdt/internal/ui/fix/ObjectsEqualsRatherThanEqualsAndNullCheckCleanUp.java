@@ -211,7 +211,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
-				ast.if0(ast.not(ast.invoke(ast.name(classname),
+				ast.if0(ast.not(ast.newMethodInvocation(ast.name(classname),
 						EQUALS_METHOD, rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStatement))), null);
 	}
 }

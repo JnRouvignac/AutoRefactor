@@ -88,7 +88,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		rewrite.replace(node, ast.invoke(ast.parenthesizeIfNeeded(rewrite.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
+		rewrite.replace(node, ast.newMethodInvocation(ast.parenthesizeIfNeeded(rewrite.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
 				rewrite.createMoveTarget(mi.getExpression())), null);
 	}
 }
