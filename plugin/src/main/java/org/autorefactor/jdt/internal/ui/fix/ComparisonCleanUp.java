@@ -25,11 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -68,40 +70,29 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final InfixExpression node) {
-		Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
-		Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
+		OrderedInfixExpression<MethodInvocation, Expression> orderedCondition= ASTNodes.orderedInfix(node, MethodInvocation.class, Expression.class);
 
-		return node.hasExtendedOperands() || maybeStandardizeComparison(node, leftOperand,
-				rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand);
-	}
+		if (orderedCondition != null
+				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
+			MethodInvocation comparisonMI= orderedCondition.getFirstOperand();
+			Long literalValue= ASTNodes.integerLiteral(orderedCondition.getSecondOperand());
 
-	private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
-			final Expression literal) {
-		MethodInvocation comparisonMI= ASTNodes.as(comparator, MethodInvocation.class);
-
-		if (comparisonMI != null
-				&& ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-						&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
-						|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-						|| getJavaMinorVersion() >= 2
-						&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
-			Object literalValue= literal.resolveConstantExpressionValue();
-
-			if (literalValue instanceof Number) {
-				Number numberValue= (Number) literalValue;
-				double doubleValue= numberValue.doubleValue();
-
-				if (doubleValue == 0) {
+			if (literalValue != null
+					&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| getJavaMinorVersion() >= 2
+					&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
+				if (literalValue.compareTo(Long.valueOf(0)) == 0) {
 					return true;
 				}
 
-				if (doubleValue < 0) {
-					if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
+				if (literalValue.compareTo(Long.valueOf(0)) < 0) {
+					if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
 						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS);
 					} else {
 						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER_EQUALS);
 					}
-				} else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
+				} else if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
 					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER);
 				} else {
 					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS_EQUALS);
