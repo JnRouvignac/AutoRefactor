@@ -26,15 +26,16 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -89,11 +90,18 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	 * A mapping of child operation to parent operation that mandates using
 	 * parentheses.
 	 */
-	private static final List<Pair<InfixExpression.Operator, InfixExpression.Operator>> SHOULD_HAVE_PARENTHESES= Arrays
-			.<Pair<InfixExpression.Operator, InfixExpression.Operator>>asList(Pair.of(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR), Pair.of(InfixExpression.Operator.AND, InfixExpression.Operator.XOR),
-					Pair.of(InfixExpression.Operator.AND, InfixExpression.Operator.OR), Pair.of(InfixExpression.Operator.XOR, InfixExpression.Operator.OR), Pair.of(InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.OR), Pair.of(InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.AND),
-					Pair.of(InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.OR), Pair.of(InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.AND),
-					Pair.of(InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED, InfixExpression.Operator.OR), Pair.of(InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED, InfixExpression.Operator.AND));
+	private static final Map<InfixExpression.Operator, List<InfixExpression.Operator>> SHOULD_HAVE_PARENTHESES= new HashMap<InfixExpression.Operator, List<InfixExpression.Operator>>() {
+		private static final long serialVersionUID= -8949107654517355855L;
+
+		{
+			put(InfixExpression.Operator.CONDITIONAL_AND, Arrays.asList(InfixExpression.Operator.CONDITIONAL_OR));
+			put(InfixExpression.Operator.AND, Arrays.asList(InfixExpression.Operator.XOR, InfixExpression.Operator.OR));
+			put(InfixExpression.Operator.XOR, Arrays.asList(InfixExpression.Operator.OR));
+			put(InfixExpression.Operator.LEFT_SHIFT, Arrays.asList(InfixExpression.Operator.OR, InfixExpression.Operator.AND));
+			put(InfixExpression.Operator.RIGHT_SHIFT_SIGNED, Arrays.asList(InfixExpression.Operator.OR, InfixExpression.Operator.AND));
+			put(InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED, Arrays.asList(InfixExpression.Operator.OR, InfixExpression.Operator.AND));
+		}
+	};
 
 	// TODO Very few parenthesized expressions are actually needed. They are:
 	// 1) inside InfixExpressions with logical operators (&&, ||, etc.)
@@ -121,9 +129,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	private Expression getExpressionWithoutParentheses(final ParenthesizedExpression node) {
 		ASTNode parent= node.getParent();
 		Expression innerExpression= node.getExpression();
+
 		if (innerExpression instanceof ParenthesizedExpression) {
 			return innerExpression;
 		}
+
 		if (parent instanceof InfixExpression) {
 			InfixExpression parentInfixExpression = (InfixExpression) parent;
 			if (innerExpression instanceof InfixExpression) {
@@ -137,6 +147,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 				}
 			}
 		}
+
 		// Infix, prefix or postfix without parenthesis is not readable
 		if ((parent instanceof InfixExpression
 				&& ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS)
@@ -146,16 +157,21 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 				&& ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) || isInnerExprHardToRead(innerExpression, parent)) {
 			return node;
 		}
+
 		if (isUselessParenthesesInStatement(parent, node)) {
 			return innerExpression;
 		}
+
 		int compareTo= OperatorEnum.compareTo(innerExpression, parent);
+
 		if (compareTo < 0) {
 			return node;
 		}
+
 		if (compareTo > 0) {
 			return innerExpression;
 		}
+
 		if (
 				// TODO JNR can we revert the condition in the InfixExpression?
 				// parentheses are sometimes needed to explicit code,
@@ -184,18 +200,18 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	 * @return true if the expressions is hard to read, false otherwise
 	 */
 	private boolean isInnerExprHardToRead(final Expression innerExpression, final ASTNode parent) {
-		if (parent instanceof InfixExpression) {
-			if (innerExpression instanceof InfixExpression) {
-				InfixExpression innerIe= (InfixExpression) innerExpression;
-				InfixExpression.Operator innerOp= innerIe.getOperator();
-				InfixExpression.Operator parentOp= ((InfixExpression) parent).getOperator();
-				return ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.EQUALS) || shouldHaveParentheses(innerOp, parentOp)
-						|| ASTNodes.is(innerIe.getLeftOperand(), Assignment.class)
-						|| ASTNodes.is(innerIe.getRightOperand(), Assignment.class);
-			}
-		} else if (parent instanceof ConditionalExpression) {
+		if (parent instanceof ConditionalExpression) {
 			return innerExpression instanceof ConditionalExpression || innerExpression instanceof Assignment
 					|| innerExpression instanceof InstanceofExpression || innerExpression instanceof InfixExpression;
+		}
+
+		if (parent instanceof InfixExpression && innerExpression instanceof InfixExpression) {
+			InfixExpression innerIe= (InfixExpression) innerExpression;
+			InfixExpression.Operator innerOp= innerIe.getOperator();
+			InfixExpression.Operator parentOp= ((InfixExpression) parent).getOperator();
+			return ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.EQUALS) || shouldHaveParentheses(innerOp, parentOp)
+					|| ASTNodes.is(innerIe.getLeftOperand(), Assignment.class)
+					|| ASTNodes.is(innerIe.getRightOperand(), Assignment.class);
 		}
 
 		return false;
@@ -366,6 +382,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 			return false;
 		}
+
 		if (rightOppositeExpression != null) {
 			InfixExpression.Operator reverseOp= getReverseOperator(node);
 			rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(leftExpression), reverseOp, rewrite.createMoveTarget(rightOppositeExpression)), null);
@@ -418,11 +435,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceWithNewInfixExpression(final InfixExpression node, final List<Expression> remainingOperands) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		if (remainingOperands.size() == 1) {
-			replaceBy(node, remainingOperands.get(0));
+			rewrite.replace(node, rewrite.createMoveTarget(remainingOperands.get(0)), null);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), null);
 		}
 	}
@@ -439,16 +457,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean shouldHaveParentheses(final InfixExpression.Operator actualChildOp, final InfixExpression.Operator actualParentOp) {
-		for (Pair<InfixExpression.Operator, InfixExpression.Operator> pair : SHOULD_HAVE_PARENTHESES) {
-			InfixExpression.Operator childOp= pair.getFirst();
-			InfixExpression.Operator parentOp= pair.getSecond();
-
-			if (childOp.equals(actualChildOp) && parentOp.equals(actualParentOp)) {
-				return true;
-			}
-		}
-
-		return false;
+		List<InfixExpression.Operator> parentOps= SHOULD_HAVE_PARENTHESES.get(actualChildOp);
+		return parentOps != null && parentOps.contains(actualParentOp);
 	}
 
 	private void addParentheses(final Expression expression) {

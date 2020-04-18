@@ -63,7 +63,7 @@ public class SimplifyExpressionSample {
             boolean b9 = s != null && true && s.startsWith("");
             boolean b10 = s == null || false || s.startsWith("");
             boolean b11 = s != null && s.startsWith("") && true;
-            boolean b12 = s == null  || s.startsWith("") || false;
+            boolean b12 = s == null || s.startsWith("") || false;
         }
     }
 
