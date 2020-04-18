@@ -305,31 +305,28 @@ public class ASTSemanticMatcher extends ASTMatcher {
 		if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
 				&& assignment.getRightHandSide() instanceof InfixExpression) {
 			InfixExpression infixExpression= (InfixExpression) assignment.getRightHandSide();
+
 			if (!infixExpression.hasExtendedOperands() && infixAssociatedOperator.equals(infixExpression.getOperator())) {
 				if (isOneLiteral(infixExpression.getRightOperand())) {
 					return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
 							&& safeSubtreeMatch(prefixOrPostfixOperand, infixExpression.getLeftOperand());
 				}
+
 				if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.PLUS) && isOneLiteral(infixExpression.getLeftOperand())) {
 					return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
 							&& safeSubtreeMatch(prefixOrPostfixOperand, infixExpression.getRightOperand());
 				}
 			}
-		} else if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN) && assignmentAssociatedOperator.equals(assignment.getOperator())) {
-			Object assignmentExpression= assignment.resolveConstantExpressionValue();
-
-			if (assignmentExpression instanceof Number && ((Number) assignmentExpression).longValue() == 1) {
-				return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide());
-			}
+		} else if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN) && assignmentAssociatedOperator.equals(assignment.getOperator())
+				&& isOneLiteral(assignment)) {
+			return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide());
 		}
 
 		return false;
 	}
 
 	private boolean isOneLiteral(final Expression operand) {
-		Object rightExpression= operand.resolveConstantExpressionValue();
-
-		return rightExpression instanceof Number && ((Number) rightExpression).longValue() == 1;
+		return Long.valueOf(1).equals(ASTNodes.integerLiteral(operand));
 	}
 
 	@Override
