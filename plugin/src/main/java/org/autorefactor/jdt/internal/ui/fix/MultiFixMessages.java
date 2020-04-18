@@ -1634,6 +1634,18 @@ public final class MultiFixMessages extends NLS {
 	 * Automatically filled.
 	 */
 	public static String CleanUpRefactoringWizard_SimplifyExpressionCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_reason;
 
 	static {
 		// Initialize resource bundle

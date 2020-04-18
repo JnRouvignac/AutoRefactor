@@ -70,6 +70,7 @@ public final class AllCleanUpRules {
 				new RemoveSemiColonCleanUp(), new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
 				new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
 				new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
+				new RemoveParenthesisCleanUp(),
 				// The previous cleanups should run first as they make the code more standard and avoid weird code
 				new LocalVariableRatherThanFieldCleanUp(),
 				new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
