@@ -44,12 +44,11 @@ public class SimplifyExpressionSample {
             boolean b1 = s != null && "".equals(s);
             boolean b2 = s != null && "".equalsIgnoreCase(s);
             boolean b3 = s != null && s instanceof String;
-        }
-        {
+
             // Remove redundant null checks
-            boolean b1 = null != s && "".equals(s);
-            boolean b2 = null != s && "".equalsIgnoreCase(s);
-            boolean b3 = null != s && s instanceof String;
+            boolean b4 = null != s && "".equals(s);
+            boolean b5 = null != s && "".equalsIgnoreCase(s);
+            boolean b6 = null != s && s instanceof String;
         }
         {
             // Remove redundant constant operands
@@ -64,6 +63,48 @@ public class SimplifyExpressionSample {
             boolean b11 = s != null && s.startsWith("") && true;
             boolean b12 = s == null || s.startsWith("") || false;
         }
+    }
+
+    public boolean removeExtendedNullCheck(boolean enabled, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && s != null && "".equals(s);
+        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s);
+        boolean b3 = enabled && s != null && s instanceof String;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && null != s && "".equals(s);
+        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s);
+        boolean b6 = enabled && null != s && s instanceof String;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
+    }
+
+    public boolean removeExtendedNullCheck(boolean enabled, boolean isValid, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && isValid && s != null && "".equals(s);
+        boolean b2 = enabled && isValid && s != null && "".equalsIgnoreCase(s);
+        boolean b3 = enabled && isValid && s != null && s instanceof String;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && isValid && null != s && "".equals(s);
+        boolean b5 = enabled && isValid && null != s && "".equalsIgnoreCase(s);
+        boolean b6 = enabled && isValid && null != s && s instanceof String;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
+    }
+
+    public boolean removeNullCheckInTheMiddle(boolean enabled, boolean isValid, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && s != null && "".equals(s) && isValid;
+        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s) && isValid;
+        boolean b3 = enabled && s != null && s instanceof String && isValid;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && null != s && "".equals(s) && isValid;
+        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s) && isValid;
+        boolean b6 = enabled && null != s && s instanceof String && isValid;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
     public boolean doNotRemoveNullCheck(String s) {

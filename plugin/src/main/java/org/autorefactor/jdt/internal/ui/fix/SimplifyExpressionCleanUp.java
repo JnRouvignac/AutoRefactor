@@ -74,9 +74,6 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final InfixExpression node) {
-		Expression lhs= node.getLeftOperand();
-		Expression rhs= node.getRightOperand();
-
 		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR)) {
 			AtomicBoolean hasUselessOperand= new AtomicBoolean(false);
 			List<Expression> remainingOperands= removeUselessOperands(node, hasUselessOperand, false, true);
@@ -93,18 +90,34 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 				replaceWithNewInfixExpression(node, remainingOperands);
 				return false;
 			}
+			List<Expression> operands= ASTNodes.allOperands(node);
 
-			// FIXME this should actually check anywhere in the infix expression,
-			// not only for left and right operands,
-			// said otherwise: handle extended operands
-			Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(lhs);
+			if (operands.size() > 2) {
+				for (int i= 0; i < operands.size() - 1; i++) {
+					Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(operands.get(i));
 
-			if (!node.hasExtendedOperands() && nullCheckedExpressionLHS != null && isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
-				replaceBy(node, rhs);
-				return false;
+					if (nullCheckedExpression != null && isNullCheckRedundant(operands.get(i + 1), nullCheckedExpression)) {
+						operands.remove(i);
+
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
+						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+						rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), null);
+						return false;
+					}
+				}
+			} else {
+				Expression lhs= node.getLeftOperand();
+				Expression rhs= node.getRightOperand();
+				Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(lhs);
+
+				if (nullCheckedExpressionLHS != null && isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
+					replaceBy(node, rhs);
+					return false;
+				}
 			}
 		} else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR) && !node.hasExtendedOperands()
-				&& !maybeReduceBooleanExpression(node, lhs, rhs)) {
+				&& !maybeReduceBooleanExpression(node)) {
 			return false;
 		}
 
@@ -136,8 +149,10 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		return allOperands;
 	}
 
-	private boolean maybeReduceBooleanExpression(final InfixExpression node, final Expression leftExpression,
-			final Expression rightExpression) {
+	private boolean maybeReduceBooleanExpression(final InfixExpression node) {
+		Expression leftExpression= node.getLeftOperand();
+		Expression rightExpression= node.getRightOperand();
+
 		Boolean leftBoolean= ASTNodes.getBooleanLiteral(leftExpression);
 
 		if (leftBoolean != null) {
