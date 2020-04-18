@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
@@ -255,22 +256,21 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		replaceWithSystemArrayCopy(node, ast.createCopyTarget(params.srcArrayExpression), params.srcPos,
-				ast.createCopyTarget(params.destArrayExpression), params.destPos, params.length);
+		replaceWithSystemArrayCopy(node, params);
 		return false;
 	}
 
-	private void replaceWithSystemArrayCopy(final ForStatement node, final Expression srcArrayExpression, final Expression srcPos,
-			final Expression destArrayExpression, final Expression destPos, final Expression length) {
+	private void replaceWithSystemArrayCopy(final ForStatement node, final SystemArrayCopyParams params) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		TryStatement tryStatement= ast.try0(
 				ast.block(ast
-						.toStatement(ast.newMethodInvocation(System.class.getSimpleName(), "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$
+						.toStatement(ast.newMethodInvocation(System.class.getSimpleName(), "arraycopy", rewrite.createMoveTarget(params.srcArrayExpression), params.srcPos, rewrite.createMoveTarget(params.destArrayExpression), params.destPos, params.length))), //$NON-NLS-1$
 				ast.catch0(IndexOutOfBoundsException.class.getSimpleName(), "e", //$NON-NLS-1$
 						ast.throw0(ast.new0(ArrayIndexOutOfBoundsException.class.getSimpleName(), ast.newMethodInvocation("e", "getMessage"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
-		cuRewrite.getASTRewrite().replace(node, tryStatement, null);
+		rewrite.replace(node, tryStatement, null);
 	}
 
 	private void collectUniqueIndex(final ForStatement node, final SystemArrayCopyParams params) {
@@ -292,12 +292,12 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 				}
 			}
 		} else if (initializer instanceof Assignment) {
-			Assignment as= (Assignment) initializer;
+			Assignment assignment= (Assignment) initializer;
 
-			if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isPrimitive(as.resolveTypeBinding(), int.class.getSimpleName())) {
+			if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isPrimitive(assignment.resolveTypeBinding(), int.class.getSimpleName())) {
 				// This must be the array index
-				params.indexStartPos= as.getRightHandSide();
-				SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+				params.indexStartPos= assignment.getRightHandSide();
+				SimpleName lhs= ASTNodes.as(assignment.getLeftHandSide(), SimpleName.class);
 
 				if (lhs != null) {
 					IBinding binding= lhs.resolveBinding();
@@ -324,9 +324,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 				return getVariableBinding(postfixExpression.getOperand());
 			}
 		} else if (updater instanceof PrefixExpression) {
-			PrefixExpression pe= (PrefixExpression) updater;
-			if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
-				return getVariableBinding(pe.getOperand());
+			PrefixExpression prefixExpression= (PrefixExpression) updater;
+
+			if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.INCREMENT)) {
+				return getVariableBinding(prefixExpression.getOperand());
 			}
 		}
 
