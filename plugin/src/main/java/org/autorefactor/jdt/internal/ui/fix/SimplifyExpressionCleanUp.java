@@ -98,16 +98,9 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			// not only for left and right operands,
 			// said otherwise: handle extended operands
 			Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(lhs);
-			Expression nullCheckedExpressionRHS= ASTNodes.getNullCheckedExpression(rhs);
 
-			if (nullCheckedExpressionLHS != null) {
-				if (isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
-					ASTNodes.checkNoExtendedOperands(node);
-					replaceBy(node, rhs);
-					return false;
-				}
-			} else if (isNullCheckRedundant(lhs, nullCheckedExpressionRHS)) {
-				replaceBy(node, lhs);
+			if (!node.hasExtendedOperands() && nullCheckedExpressionLHS != null && isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
+				replaceBy(node, rhs);
 				return false;
 			}
 		} else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR) && !node.hasExtendedOperands()

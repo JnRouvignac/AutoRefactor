@@ -66,29 +66,26 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public void doNotRemoveNullCheck(String s) {
-        {
-            // Do not remove non redundant null checks
-            boolean b1 = s != null && s.equals(NULL_CONSTANT);
-            boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
-        }
-        {
-            // Do not remove non redundant null checks
-            boolean b1 = null != s && s.equals(NULL_CONSTANT);
-            boolean b2 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
-        }
-        {
-            // Right-hand-side left unchanged because left-hand-side can have
-            // side effects
-            boolean b3 = s != null && false;
-            boolean b4 = s != null || true;
-        }
-        {
-            // Right-hand-side left unchanged because left-hand-side can have
-            // side effects
-            boolean b3 = null != s && false;
-            boolean b4 = null != s || true;
-        }
+    public boolean doNotRemoveNullCheck(String s) {
+        // Do not remove non redundant null checks
+        boolean b1 = s != null && s.equals(NULL_CONSTANT);
+        boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
+
+        // Do not remove non redundant null checks
+        boolean b3 = null != s && s.equals(NULL_CONSTANT);
+        boolean b4 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
+
+        // Right-hand-side left unchanged because left-hand-side can have
+        // side effects
+        boolean b5 = s != null && false;
+        boolean b6 = s != null || true;
+
+        // Right-hand-side left unchanged because left-hand-side can have
+        // side effects
+        boolean b7 = null != s && false;
+        boolean b8 = null != s || true;
+
+        return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8;
     }
 
     public void simplifyPrimitiveBooleanExpression(boolean b) {

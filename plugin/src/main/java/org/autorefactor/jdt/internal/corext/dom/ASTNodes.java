@@ -1972,12 +1972,15 @@ public final class ASTNodes {
 	 */
 	public static Expression getNullCheckedExpression(final Expression expression) {
 		Expression e= getUnparenthesedExpression(expression);
+
 		if (e instanceof InfixExpression) {
 			InfixExpression ie= (InfixExpression) e;
+
 			if (hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && checkNoExtendedOperands(ie)) {
 				if (is(ie.getLeftOperand(), NullLiteral.class)) {
 					return ie.getRightOperand();
 				}
+
 				if (is(ie.getRightOperand(), NullLiteral.class)) {
 					return ie.getLeftOperand();
 				}
