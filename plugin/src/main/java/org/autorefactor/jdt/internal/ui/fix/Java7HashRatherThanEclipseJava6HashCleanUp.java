@@ -524,14 +524,14 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isGreatNumberValid(final CollectedData data, final CastExpression newHash) {
-		OrderedInfixExpression<Expression, InfixExpression> typedBitwise= ASTNodes.orderedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
+		OrderedInfixExpression<Expression, InfixExpression> orderedBitwise= ASTNodes.orderedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
 
 		if (ASTNodes.hasType(newHash, int.class.getSimpleName())
-				&& typedBitwise != null
+				&& orderedBitwise != null
 				&& ASTNodes.hasType(newHash.getExpression(), long.class.getSimpleName(), double.class.getSimpleName())
-				&& InfixExpression.Operator.XOR.equals(typedBitwise.getOperator())) {
-			SimpleName field= getField(typedBitwise.getFirstOperand());
-			InfixExpression moveExpression= typedBitwise.getSecondOperand();
+				&& InfixExpression.Operator.XOR.equals(orderedBitwise.getOperator())) {
+			SimpleName field= getField(orderedBitwise.getFirstOperand());
+			InfixExpression moveExpression= orderedBitwise.getSecondOperand();
 
 			if (field != null && moveExpression != null && !ASTNodes.isSameVariable(field, data.getPrimeId())
 					&& !ASTNodes.isSameVariable(field, data.getResultId()) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
@@ -573,17 +573,17 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isObjectValid(final CollectedData data, final ConditionalExpression condition) {
-		OrderedInfixExpression<Expression, NullLiteral> typedIsFieldNull= ASTNodes.orderedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
+		OrderedInfixExpression<Expression, NullLiteral> orderedIsFieldNull= ASTNodes.orderedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
 
-		if (typedIsFieldNull != null
-				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(typedIsFieldNull.getOperator())) {
-			SimpleName field= getField(typedIsFieldNull.getFirstOperand());
+		if (orderedIsFieldNull != null
+				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedIsFieldNull.getOperator())) {
+			SimpleName field= getField(orderedIsFieldNull.getFirstOperand());
 
 			if (field != null) {
 				Long zero;
 				MethodInvocation hashOnField;
 
-				if (InfixExpression.Operator.EQUALS.equals(typedIsFieldNull.getOperator())) {
+				if (InfixExpression.Operator.EQUALS.equals(orderedIsFieldNull.getOperator())) {
 					zero= ASTNodes.integerLiteral(condition.getThenExpression());
 					hashOnField= ASTNodes.as(condition.getElseExpression(), MethodInvocation.class);
 				} else {

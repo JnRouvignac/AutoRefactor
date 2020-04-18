@@ -118,10 +118,10 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			if (condition != null && !condition.hasExtendedOperands()
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
 					&& thenStatements != null && thenStatements.size() == 1 && elseStatements != null && elseStatements.size() == 1) {
-				OrderedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.orderedInfix(condition, Expression.class, NullLiteral.class);
+				OrderedInfixExpression<Expression, NullLiteral> nullityOrderedCondition= ASTNodes.orderedInfix(condition, Expression.class, NullLiteral.class);
 
-				if (nullityTypedCondition != null && ASTNodes.isPassive(nullityTypedCondition.getFirstOperand())) {
-					return maybeReplaceCode(node, condition, thenStatements, elseStatements, nullityTypedCondition.getFirstOperand(), classesToUseWithImport,
+				if (nullityOrderedCondition != null && ASTNodes.isPassive(nullityOrderedCondition.getFirstOperand())) {
+					return maybeReplaceCode(node, condition, thenStatements, elseStatements, nullityOrderedCondition.getFirstOperand(), classesToUseWithImport,
 							importsToAdd);
 				}
 			}
@@ -169,15 +169,15 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final InfixExpression nullityCondition, final List<Statement> nullityStatements,
 			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		OrderedInfixExpression<Expression, NullLiteral> nullityTypedCondition= ASTNodes.orderedInfix(nullityCondition, Expression.class, NullLiteral.class);
+		OrderedInfixExpression<Expression, NullLiteral> nullityOrderedCondition= ASTNodes.orderedInfix(nullityCondition, Expression.class, NullLiteral.class);
 		ReturnStatement returnStatement1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
 		ReturnStatement returnStatement2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
 		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
-		if (nullityTypedCondition != null && returnStatement1 != null && returnStatement2 != null && equalsMethod != null
+		if (nullityOrderedCondition != null && returnStatement1 != null && returnStatement2 != null && equalsMethod != null
 				&& equalsMethod.getExpression() != null && EQUALS_METHOD.equals(equalsMethod.getName().getIdentifier())
 				&& equalsMethod.arguments() != null && equalsMethod.arguments().size() == 1) {
-			Expression secondField= nullityTypedCondition.getFirstOperand();
+			Expression secondField= nullityOrderedCondition.getFirstOperand();
 
 			if (secondField != null
 					&& (match(firstField, secondField, equalsMethod.getExpression(),

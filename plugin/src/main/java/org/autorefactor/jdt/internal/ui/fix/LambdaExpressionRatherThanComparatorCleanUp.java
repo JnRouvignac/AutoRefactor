@@ -79,11 +79,11 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 			if (condition != null
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
-				OrderedInfixExpression<SimpleName, NullLiteral> typedInfix= ASTNodes.orderedInfix(condition, SimpleName.class, NullLiteral.class);
+				OrderedInfixExpression<SimpleName, NullLiteral> orderedInfix= ASTNodes.orderedInfix(condition, SimpleName.class, NullLiteral.class);
 
-				if (typedInfix != null
-						&& ASTNodes.isPassive(typedInfix.getFirstOperand())
-						&& Utils.equalNotNull(typedInfix.getFirstOperand().getIdentifier(), identifier)) {
+				if (orderedInfix != null
+						&& ASTNodes.isPassive(orderedInfix.getFirstOperand())
+						&& Utils.equalNotNull(orderedInfix.getFirstOperand().getIdentifier(), identifier)) {
 					return ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS);
 				}
 			}
