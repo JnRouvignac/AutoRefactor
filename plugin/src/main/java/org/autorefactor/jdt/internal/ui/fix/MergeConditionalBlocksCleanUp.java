@@ -103,7 +103,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 		if (isPositive) {
 			additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
 		} else {
-			additionalCondition= ast.negate(subNode.getExpression(), Copy.COPY);
+			additionalCondition= ast.negate(subNode.getExpression(), Copy.MOVE);
 		}
 
 		rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
