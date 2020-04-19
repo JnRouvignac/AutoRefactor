@@ -169,6 +169,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				case ASTNode.INSTANCEOF_EXPRESSION:
 				case ASTNode.CLASS_INSTANCE_CREATION:
 				case ASTNode.METHOD_INVOCATION:
+				case ASTNode.SUPER_METHOD_INVOCATION:
 				case ASTNode.CAST_EXPRESSION:
 				case ASTNode.PARENTHESIZED_EXPRESSION:
 				case ASTNode.POSTFIX_EXPRESSION:

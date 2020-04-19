@@ -119,6 +119,11 @@ public class IncrementStatementRatherThanIncrementExpressionSample extends Array
         return isEqual;
     }
 
+    public String moveIncrementOutsideSuperMethod(int i) {
+        // Keep this comment
+        return super.remove(++i);
+    }
+
     public boolean doNotMoveIncrementOutsideConditionalInfix(int i, boolean isEnabled) {
         boolean isEqual= isEnabled && (i++ == 10);
         return isEqual;
