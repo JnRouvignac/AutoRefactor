@@ -191,8 +191,6 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 				// parentheses are sometimes needed to explicit code,
 				// some like it like that
 				child instanceof InfixExpression
-				// TODO JNR add additional code to check if the cast is really required
-				// or if it can be removed.
 				|| child instanceof CastExpression
 				// Infix and prefix or postfix without parenthesis is not readable
 				|| (parent instanceof InfixExpression
