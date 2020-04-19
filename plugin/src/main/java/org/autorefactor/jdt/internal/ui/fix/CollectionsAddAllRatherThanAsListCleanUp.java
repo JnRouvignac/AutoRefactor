@@ -107,7 +107,7 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	}
 
 	private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		if (node.getExpression() != null && ASTNodes.as(node.getExpression(), ThisExpression.class) == null && ASTNodes.usesGivenSignature(node, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
+		if (node.getExpression() != null && !ASTNodes.is(node.getExpression(), ThisExpression.class) && ASTNodes.usesGivenSignature(node, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
 			MethodInvocation asListMethod= ASTNodes.as((Expression) node.arguments().get(0), MethodInvocation.class);
 
 			if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(node.getExpression(), Set.class.getCanonicalName()))) {

@@ -89,7 +89,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
 			if (ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
 					&& method.getExpression() != null
-					&& ASTNodes.as(method.getExpression(), ThisExpression.class) == null) {
+					&& !ASTNodes.is(method.getExpression(), ThisExpression.class)) {
 				return method;
 			}
 		}

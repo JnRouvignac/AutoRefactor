@@ -71,7 +71,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	public boolean visit(final MethodInvocation mi) {
 		MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
 
-		if (miExpression != null && miExpression.getExpression() != null && ASTNodes.as(miExpression.getExpression(), ThisExpression.class) == null
+		if (miExpression != null && miExpression.getExpression() != null && !ASTNodes.is(miExpression.getExpression(), ThisExpression.class)
 				&& ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
 			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
 				return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
