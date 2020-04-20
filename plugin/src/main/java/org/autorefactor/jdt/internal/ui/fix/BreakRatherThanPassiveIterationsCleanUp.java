@@ -57,10 +57,10 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
 	private static final class SideEffectVisitor extends InterruptibleVisitor {
-		private final Set<String> localVariableNames;
+		private final Set<SimpleName> localVariableNames;
 		private boolean hasSideEffect;
 
-		private SideEffectVisitor(final Set<String> localVariableNames) {
+		private SideEffectVisitor(final Set<SimpleName> localVariableNames) {
 			this.localVariableNames= localVariableNames;
 		}
 
@@ -79,8 +79,21 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		}
 
 		private boolean visitVar(final Expression modifiedVar) {
-			if (!(modifiedVar instanceof SimpleName)
-					|| !localVariableNames.contains(((SimpleName) modifiedVar).getIdentifier())) {
+			if (!(modifiedVar instanceof SimpleName)) {
+				hasSideEffect= true;
+				return interruptVisit();
+			}
+
+			boolean isFound= false;
+
+			for (SimpleName localVariableName : localVariableNames) {
+				if (ASTNodes.isSameVariable(localVariableName, (SimpleName) modifiedVar)) {
+					isFound= true;
+					break;
+				}
+			}
+
+			if (!isFound) {
 				hasSideEffect= true;
 				return interruptVisit();
 			}
@@ -192,7 +205,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
 	@Override
 	public boolean visit(final ForStatement node) {
-		Set<String> vars= new HashSet<>();
+		Set<SimpleName> vars= new HashSet<>();
 
 		for (Expression initializer : ASTNodes.initializers(node)) {
 			vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
@@ -211,7 +224,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		return visitLoopBody(node.getBody(), vars);
 	}
 
-	private boolean hasSideEffect(final ASTNode node, final Set<String> allowedVars) {
+	private boolean hasSideEffect(final ASTNode node, final Set<SimpleName> allowedVars) {
 		SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
 		variableUseVisitor.visitNode(node);
 		return variableUseVisitor.hasSideEffect();
@@ -219,10 +232,10 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
 	@Override
 	public boolean visit(final EnhancedForStatement node) {
-		return !ASTNodes.isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<String>());
+		return !ASTNodes.isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<SimpleName>());
 	}
 
-	private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
+	private boolean visitLoopBody(final Statement body, final Set<SimpleName> allowedVars) {
 		List<Statement> statements= ASTNodes.asList(body);
 
 		if (Utils.isEmpty(statements)) {

@@ -40,6 +40,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -61,6 +62,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -661,7 +663,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 	@Override
 	public boolean visit(final Initializer node) {
-		Set<String> localVars= ASTNodes.getLocalVariableIdentifiers(node.getBody(), true);
+		Set<SimpleName> localVars= ASTNodes.getLocalVariableIdentifiers(node.getBody(), true);
 		return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
 	}
 
@@ -680,9 +682,9 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 
 		// Method body
-		Set<String> localIdentifiers= new HashSet<>();
+		Set<SimpleName> localIdentifiers= new HashSet<>();
 		for (SingleVariableDeclaration localParameter : ASTNodes.parameters(node)) {
-			localIdentifiers.add(localParameter.getName().getIdentifier());
+			localIdentifiers.add(localParameter.getName());
 		}
 		localIdentifiers.addAll(ASTNodes.getLocalVariableIdentifiers(node.getBody(), true));
 
@@ -690,10 +692,10 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	}
 
 	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node) {
-		return maybeReplaceFqnsWithSimpleNames(node, Collections.<String>emptySet());
+		return maybeReplaceFqnsWithSimpleNames(node, Collections.<SimpleName>emptySet());
 	}
 
-	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<String> localIdentifiers) {
+	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<SimpleName> localIdentifiers) {
 		if (node != null) {
 			Iterable<QualifiedName> qualifiedNames= new QualifiedNamesCollector().collect(node);
 			for (QualifiedName qualifiedName : qualifiedNames) {
@@ -714,20 +716,32 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 	}
 
-	private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<String> localIdentifiers) {
+	private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<SimpleName> localIdentifiers) {
 		ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
 		QName qname= getFullyQualifiedNameOrNull(node);
+
 		if (ancestor != null || qname == null) {
 			return true;
 		}
+
 		if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
 				|| fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
-						&& !localIdentifiers.contains(qname.simpleName)) {
+						&& !containsLocalName(localIdentifiers, qname)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.replace(node, rewrite.createMoveTarget(node.getName()), null);
 			return false;
 		}
 
 		return true;
+	}
+
+	private boolean containsLocalName(final Set<SimpleName> localIdentifiers, final QName qname) {
+		for (SimpleName varName : localIdentifiers) {
+			if (Utils.equalNotNull(varName.getIdentifier(), qname.simpleName)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

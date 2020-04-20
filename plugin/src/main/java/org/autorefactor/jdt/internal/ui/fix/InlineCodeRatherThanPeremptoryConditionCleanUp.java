@@ -36,10 +36,12 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 
@@ -157,20 +159,24 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 				return false;
 			}
 
-			Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
-			Set<String> followingVariableNames= new HashSet<>();
+			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
+			Set<SimpleName> followingVariableNames= new HashSet<>();
 
 			for (Statement statement : ASTNodes.getNextSiblings(node)) {
 				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 			}
 
-			if (!ifVariableNames.removeAll(followingVariableNames)) {
-				replaceBlockByPlainCode(node, unconditionnalStatement);
-				setResult(false);
-				return false;
+			for (SimpleName ifVariableName : ifVariableNames) {
+				for (SimpleName followingVariableName : followingVariableNames) {
+					if (Utils.equalNotNull(ifVariableName.getIdentifier(), followingVariableName.getIdentifier())) {
+						return true;
+					}
+				}
 			}
 
-			return true;
+			replaceBlockByPlainCode(node, unconditionnalStatement);
+			setResult(false);
+			return false;
 		}
 	}
 

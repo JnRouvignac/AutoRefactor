@@ -46,6 +46,7 @@ import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
@@ -340,7 +341,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean hasVariableConflict(final IfStatement node, final List<List<Statement>> casesStmtsToRemove) {
-		Set<String> ifVariableNames= new HashSet<>();
+		Set<SimpleName> ifVariableNames= new HashSet<>();
 
 		for (List<Statement> caseStmtsToRemove : casesStmtsToRemove) {
 			for (Statement caseStmtToRemove : caseStmtsToRemove) {

@@ -33,7 +33,9 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
@@ -71,22 +73,30 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final Block node) {
 		List<Statement> statements= ASTNodes.statements(node);
+
 		if (statements.size() == 1 && statements.get(0) instanceof Block) {
 			replaceBlock((Block) statements.get(0));
 			return false;
 		}
-		if (node.getParent() instanceof Block) {
-			Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
 
-			Set<String> followingVariableNames= new HashSet<>();
+		if (node.getParent() instanceof Block) {
+			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+			Set<SimpleName> followingVariableNames= new HashSet<>();
+
 			for (Statement statement : ASTNodes.getNextSiblings(node)) {
 				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 			}
 
-			if (!ifVariableNames.removeAll(followingVariableNames)) {
-				replaceBlock(node);
-				return false;
+			for (SimpleName ifVariableName : ifVariableNames) {
+				for (SimpleName followingVariableName : followingVariableNames) {
+					if (Utils.equalNotNull(ifVariableName.getIdentifier(), followingVariableName.getIdentifier())) {
+						return true;
+					}
+				}
 			}
+
+			replaceBlock(node);
+			return false;
 		}
 
 		return true;

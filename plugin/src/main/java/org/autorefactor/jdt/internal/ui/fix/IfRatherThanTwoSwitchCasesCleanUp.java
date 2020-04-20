@@ -88,8 +88,8 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		Set<String> previousVarIds= new HashSet<>();
-		Set<String> caseVarIds= new HashSet<>();
+		Set<SimpleName> previousVarIds= new HashSet<>();
+		Set<SimpleName> caseVarIds= new HashSet<>();
 		List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
 		List<Expression> caseExprs= new ArrayList<>();
 		List<Statement> caseStatements= new ArrayList<>();

@@ -33,6 +33,7 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Dimension;
@@ -105,7 +106,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			}
 
 			if (forStatements != null) {
-				Set<String> varNames= new HashSet<>();
+				Set<SimpleName> varNames= new HashSet<>();
 
 				for (int j= 0; j < i; j++) {
 					if (!(blockStatement.get(j) instanceof Block)) {
@@ -125,11 +126,19 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 							&& decl.fragments() != null && decl.fragments().size() == 1) {
 						VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
 								.get(0);
-						String id= fragment.getName().getIdentifier();
+						SimpleName name= fragment.getName();
+						boolean isFound= false;
 
-						if (!varNames.contains(id)) {
+						for (SimpleName varName : varNames) {
+							if (Utils.equalNotNull(varName.getIdentifier(), name.getIdentifier())) {
+								isFound= true;
+								break;
+							}
+						}
+
+						if (!isFound) {
 							candidates.add(decl);
-							varNames.add(id);
+							varNames.add(name);
 						}
 					}
 				}

@@ -54,6 +54,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -262,7 +263,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			List<SwitchCaseSection> cases= new ArrayList<>();
 			Statement remainingStatement= null;
 
-			Set<String> variableDeclarationIds= new HashSet<>();
+			Set<SimpleName> variableDeclarationIds= new HashSet<>();
 			IfStatement ifStatement= node;
 			boolean isFallingThrough= true;
 
@@ -322,17 +323,19 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		return new HasUnlabeledBreakVisitor().findOrDefault(node, false);
 	}
 
-	private boolean detectDeclarationConflicts(final Statement statement, final Set<String> variableDeclarationIds) {
-		Set<String> varNames= ASTNodes.getLocalVariableIdentifiers(statement, false);
+	private boolean detectDeclarationConflicts(final Statement statement, final Set<SimpleName> variableDeclarationIds) {
+		Set<SimpleName> varNames= ASTNodes.getLocalVariableIdentifiers(statement, false);
 		boolean hasConflict= containsAny(variableDeclarationIds, varNames);
 		variableDeclarationIds.addAll(varNames);
 		return hasConflict;
 	}
 
-	private boolean containsAny(final Set<String> variableDeclarationIds, final Set<String> varNames) {
-		for (String varName : varNames) {
-			if (variableDeclarationIds.contains(varName)) {
-				return true;
+	private boolean containsAny(final Set<SimpleName> variableDeclarations, final Set<SimpleName> varNames) {
+		for (SimpleName varName : varNames) {
+			for (SimpleName variableDeclaration : variableDeclarations) {
+				if (Utils.equalNotNull(varName.getIdentifier(), variableDeclaration.getIdentifier())) {
+					return true;
+				}
 			}
 		}
 

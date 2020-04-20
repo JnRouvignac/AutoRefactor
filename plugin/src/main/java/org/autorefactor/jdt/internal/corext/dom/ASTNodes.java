@@ -2788,7 +2788,7 @@ public final class ASTNodes {
 	 *
 	 * @return The ids of the declared variables.
 	 */
-	public static Set<String> getLocalVariableIdentifiers(final ASTNode node, final boolean includeInnerScopes) {
+	public static Set<SimpleName> getLocalVariableIdentifiers(final ASTNode node, final boolean includeInnerScopes) {
 		if (node == null) {
 			return Collections.emptySet();
 		}
@@ -2929,7 +2929,7 @@ public final class ASTNodes {
 	 * @return true if variables are declared with the same identifier after the given statement.
 	 */
 	public static boolean hasVariableConflict(final Statement node, final Statement statementInBlock) {
-		Set<String> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
+		Set<SimpleName> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
 
 		for (Statement statement : getNextSiblings(node)) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(existingVariableNames, true);
