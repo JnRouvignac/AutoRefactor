@@ -70,36 +70,49 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return output;
     }
 
-    public void replaceAddWithNotEqualOperator(
-            java.util.Date[] dates) {
+    public void replaceAddWithNotEqualOperator(Collection<? super java.util.Date> output, java.util.Date[] dates) {
         // Keep this comment
-        Collections.addAll(this, dates);
+        Collections.addAll(output, dates);
     }
 
-    public void replaceAddWithForLoopByCollectionsAddAll(
-            java.util.Date[] dates) {
+    public void replaceAddWithForLoopByCollectionsAddAll(Collection<? super java.util.Date> output, java.util.Date[] dates) {
         // Keep this comment
-        Collections.addAll(this, dates);
+        Collections.addAll(output, dates);
     }
 
-    public void replaceLoopWithFieldArray() {
+    public void replaceLoopWithFieldArray(Collection<? super java.util.Date> output) {
         // Keep this comment
-        Collections.addAll(this, innerArray);
+        Collections.addAll(output, innerArray);
     }
 
-    public void replaceForeachWithFieldArray() {
+    public void replaceForeachWithFieldArray(Collection<? super java.util.Date> output) {
         // Keep this comment
-        Collections.addAll(this, this.innerArray);
+        Collections.addAll(output, this.innerArray);
     }
 
-    public void replaceLoopWithFieldList() {
-        // Keep this comment
-        addAll(this.innerList);
+    @Override
+    public boolean addAll(Collection<? extends java.util.Date> doNotRefactorWithCyclicCalls) {
+        for (java.util.Date doNotRefactorWithCyclicCall : doNotRefactorWithCyclicCalls) {
+            add(doNotRefactorWithCyclicCall);
+        }
+        return true;
     }
 
-    public void replaceForeachWithFieldList() {
+    public boolean doNotRefactorInsideImplementation(Collection<? extends java.util.Date> dates) {
+        for (java.util.Date date : dates) {
+            this.add(date);
+        }
+        return true;
+    }
+
+    public void replaceLoopWithFieldList(Collection<? super java.util.Date> output) {
         // Keep this comment
-        addAll(innerList);
+        output.addAll(this.innerList);
+    }
+
+    public void replaceForeachWithFieldList(Collection<? super java.util.Date> output) {
+        // Keep this comment
+        output.addAll(innerList);
     }
 
     public Collection replaceAddWithForEachByCollectionsAddAll(
@@ -111,10 +124,9 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return output;
     }
 
-    public void replaceAddWithForEachByCollectionsAddAll(
-            java.util.Date[] dates) {
+    public void replaceAddWithForEachByCollectionsAddAll(Collection<? super java.util.Date> output, java.util.Date[] dates) {
         // Keep this comment
-        Collections.addAll(this, dates);
+        Collections.addAll(output, dates);
     }
 
     public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithArray(
@@ -149,9 +161,9 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return colToFill;
     }
 
-    public void doNotReplaceLoopWithFieldList(List<java.util.Date> input) {
+    public void doNotReplaceLoopWithFieldList(Collection<? super java.util.Date> output, List<java.util.Date> input) {
         for (int i = 0; i < input.size(); i++) {
-            add(innerList.get(i));
+            output.add(innerList.get(i));
         }
     }
 
@@ -283,33 +295,5 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
 
     private String doSomething(String s) {
         return null;
-    }
-
-    public class MySet extends AbstractSet<String> {
-        public MySet(List<String> strings) {
-            // Keep this comment
-            addAll(strings);
-        }
-
-        @Override
-        public Iterator<String> iterator() {
-            return null;
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-    }
-
-    public static Set<String> refactorCollectionWithNoTypeArgument(List<String> strings) {
-        class MyHashSet extends HashSet<String> {
-            private static final long serialVersionUID = 1L;
-        }
-
-        final MyHashSet set = new MyHashSet();
-        // Keep this comment
-        set.addAll(strings);
-        return set;
     }
 }

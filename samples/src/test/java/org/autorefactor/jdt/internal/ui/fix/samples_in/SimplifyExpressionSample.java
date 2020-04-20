@@ -39,30 +39,35 @@ public class SimplifyExpressionSample {
     }
 
     public void removeUselessNullCheck(String s) {
-        {
-            // Remove redundant null checks
-            boolean b1 = s != null && "".equals(s);
-            boolean b2 = s != null && "".equalsIgnoreCase(s);
-            boolean b3 = s != null && s instanceof String;
+        // Remove redundant null checks
+        boolean b1 = s != null && "".equals(s);
+        boolean b2 = s != null && "".equalsIgnoreCase(s);
+        boolean b3 = s != null && s instanceof String;
 
-            // Remove redundant null checks
-            boolean b4 = null != s && "".equals(s);
-            boolean b5 = null != s && "".equalsIgnoreCase(s);
-            boolean b6 = null != s && s instanceof String;
-        }
-        {
-            // Remove redundant constant operands
-            boolean b3 = true && s != null;
-            boolean b4 = false && s != null;
-            boolean b5 = true || s != null;
-            boolean b6 = false || s != null;
-            boolean b7 = true && s != null && s.startsWith("");
-            boolean b8 = false || s == null || s.startsWith("");
-            boolean b9 = s != null && true && s.startsWith("");
-            boolean b10 = s == null || false || s.startsWith("");
-            boolean b11 = s != null && s.startsWith("") && true;
-            boolean b12 = s == null || s.startsWith("") || false;
-        }
+        // Remove redundant null checks
+        boolean b4 = null != s && "".equals(s);
+        boolean b5 = null != s && "".equalsIgnoreCase(s);
+        boolean b6 = null != s && s instanceof String;
+
+        // Remove redundant constant operands
+        boolean b7 = true && s != null;
+        boolean b8 = false && s != null;
+        boolean b9 = true || s != null;
+        boolean b10 = false || s != null;
+        boolean b11 = true && s != null && s.startsWith("");
+        boolean b12 = false || s == null || s.startsWith("");
+        boolean b13 = s != null && true && s.startsWith("");
+        boolean b14 = s == null || false || s.startsWith("");
+        boolean b15 = s != null && s.startsWith("") && true;
+        boolean b16 = s == null || s.startsWith("") || false;
+    }
+
+    public boolean doNotRemoveUselessNullCheckOnInstance(Object o) {
+        return o != null && equals(o);
+    }
+
+    public boolean doNotRemoveUselessNullCheckOnThis(Object o) {
+        return o != null && this.equals(o);
     }
 
     public boolean removeExtendedNullCheck(boolean enabled, String s) {

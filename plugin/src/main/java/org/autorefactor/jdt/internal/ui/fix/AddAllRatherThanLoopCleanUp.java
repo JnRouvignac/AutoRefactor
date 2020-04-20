@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
@@ -119,18 +120,18 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			return true;
 		}
 
-		MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+		MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 		IVariableBinding foreachVariable= node.getParameter().resolveBinding();
 		// We should remove all the loop variable occurrences
 		// As we replace only one, there should be no more than one occurrence
 		if (getVariableUseCount(foreachVariable, node.getBody()) == 1
-				&& mi != null && mi.arguments().size() == 1) {
+				&& methodInvocation != null && methodInvocation.arguments().size() == 1) {
 			if (ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
-				if (ASTNodes.isSameLocalVariable(node.getParameter(), ASTNodes.arguments(mi).get(0))) {
-					return maybeReplaceForCollection(node, mi, iterable);
+				if (ASTNodes.isSameLocalVariable(node.getParameter(), ASTNodes.arguments(methodInvocation).get(0))) {
+					return maybeReplaceForCollection(node, methodInvocation, iterable);
 				}
-			} else if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, ASTNodes.arguments(mi).get(0))) {
-				return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, mi);
+			} else if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, ASTNodes.arguments(methodInvocation).get(0))) {
+				return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, methodInvocation);
 			}
 		}
 
@@ -150,28 +151,28 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		if (loopContent != null && loopContent.getLoopVariable() != null && statements.size() == 1) {
 			Name loopVariable= loopContent.getLoopVariable();
 			IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
-			MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
 			// We should remove all the loop variable occurrences
 			// As we replace only one, there should be no more than one occurrence
-			if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
-					&& (loopContent.isLoopingForward() || mi.resolveMethodBinding() != null && ASTNodes.hasType(mi.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
-				Expression addArg0= ASTNodes.arguments(mi).get(0);
+			if (methodInvocation != null && methodInvocation.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
+					&& (loopContent.isLoopingForward() || methodInvocation.resolveMethodBinding() != null && ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
+				Expression addArg0= ASTNodes.arguments(methodInvocation).get(0);
 
 				switch (loopContent.getContainerType()) {
 				case COLLECTION:
 					MethodInvocation getMI= ASTNodes.as(addArg0, MethodInvocation.class);
 
 					if (getMI != null && getMI.arguments().size() == 1 && isSameVariable(loopContent, getMI)) {
-						return maybeReplaceForCollection(node, mi, getMI.getExpression());
+						return maybeReplaceForCollection(node, methodInvocation, getMI.getExpression());
 					}
 					break;
 
 				case ARRAY:
-					ArrayAccess aa= ASTNodes.as(addArg0, ArrayAccess.class);
+					ArrayAccess arrayAccess= ASTNodes.as(addArg0, ArrayAccess.class);
 
-					if (isSameVariable(loopContent, aa)) {
-						return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, loopContent.getContainerVariable(), mi);
+					if (isSameVariable(loopContent, arrayAccess)) {
+						return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, loopContent.getContainerVariable(), methodInvocation);
 					}
 					break;
 				}
@@ -182,10 +183,12 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	}
 
 	private boolean maybeReplaceForArray(final Statement node, final Set<String> classesToUseWithImport,
-			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
-		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-				&& areTypeCompatible(ASTNodes.getCalledType(mi), iterable.resolveTypeBinding())) {
-			replaceWithCollectionsAddAll(node, classesToUseWithImport, importsToAdd, iterable, mi);
+			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation addMethod) {
+		if (addMethod.getExpression() != null
+				&& !ASTNodes.is(addMethod.getExpression(), ThisExpression.class)
+				&& ASTNodes.usesGivenSignature(addMethod, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+				&& areTypeCompatible(ASTNodes.getCalledType(addMethod), iterable.resolveTypeBinding())) {
+			replaceWithCollectionsAddAll(node, classesToUseWithImport, importsToAdd, iterable, addMethod);
 			return false;
 		}
 
@@ -193,14 +196,14 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	}
 
 	private void replaceWithCollectionsAddAll(final Statement node, final Set<String> classesToUseWithImport,
-			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
+			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation addMethod) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
-						"addAll", mi.getExpression() != null ? rewrite.createMoveTarget(mi.getExpression()) : ast.this0(), //$NON-NLS-1$
+						"addAll", addMethod.getExpression() != null ? rewrite.createMoveTarget(addMethod.getExpression()) : ast.this0(), //$NON-NLS-1$
 						rewrite.createMoveTarget(iterable))), null);
 	}
 
@@ -214,9 +217,9 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		return 0;
 	}
 
-	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess aa) {
-		return aa != null && ASTNodes.isSameVariable(aa.getArray(), loopContent.getContainerVariable())
-				&& ASTNodes.isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
+	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
+		return arrayAccess != null && ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
+				&& ASTNodes.isSameLocalVariable(arrayAccess.getIndex(), loopContent.getLoopVariable());
 	}
 
 	private boolean areTypeCompatible(final ITypeBinding colTypeBinding, final ITypeBinding arrayTypeBinding) {
@@ -235,14 +238,19 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		return false;
 	}
 
-	private boolean maybeReplaceForCollection(final ASTNode node, final MethodInvocation colMI,
+	private boolean maybeReplaceForCollection(final ASTNode node, final MethodInvocation addOrRemoveMethod,
 			final Expression data) {
-		if (ASTNodes.usesGivenSignature(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data); //$NON-NLS-1$
+		if (addOrRemoveMethod.getExpression() == null
+				|| ASTNodes.is(addOrRemoveMethod.getExpression(), ThisExpression.class)) {
+			return true;
+		}
+
+		if (ASTNodes.usesGivenSignature(addOrRemoveMethod, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWithCollectionMethod(node, "addAll", addOrRemoveMethod.getExpression(), data); //$NON-NLS-1$
 			return false;
 		}
-		if (ASTNodes.usesGivenSignature(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data); //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(addOrRemoveMethod, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWithCollectionMethod(node, "removeAll", addOrRemoveMethod.getExpression(), data); //$NON-NLS-1$
 			return false;
 		}
 

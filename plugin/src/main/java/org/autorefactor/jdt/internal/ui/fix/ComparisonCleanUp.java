@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class ComparisonCleanUp extends AbstractCleanUpRule {
@@ -78,6 +79,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 			Long literalValue= ASTNodes.integerLiteral(orderedCondition.getSecondOperand());
 
 			if (literalValue != null
+					&& comparisonMI.getExpression() != null
+					&& !ASTNodes.is(comparisonMI.getExpression(), ThisExpression.class)
 					&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 					|| getJavaMinorVersion() >= 2

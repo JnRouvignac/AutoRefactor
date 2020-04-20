@@ -83,33 +83,31 @@ public class ComparisonSample implements Comparator<Double> {
         return b;
     }
 
-    public boolean refactorLocalComparingToZero() {
+    public boolean doNotRefactorLocalComparingToZero() {
         boolean b = true;
         final Double s = 123d;
 
-        // Valid, do no change these ones
-        b &= compare(s, 100d) < 0;
-        b &= compare(s, 100d) <= 0;
-        b &= compare(s, 123d) == 0;
-        b &= compare(s, 321d) != 0;
-        b &= compare(s, 200d) >= 0;
-        b &= compare(s, 200d) > 0;
+        b &= compare(s, 100d) < 100;
+        b &= compare(s, 100d) <= 100;
+        b &= compare(s, 123d) == 100;
+        b &= compare(s, 321d) != 100;
+        b &= compare(s, 200d) >= 100;
+        b &= compare(s, 200d) > 100;
 
-        // Invalid, refactor them
-        b &= compare(s, 100d) < 0;
-        b &= compare(s, 200d) >= 0;
-        b &= compare(s, 100d) <= 0;
-        b &= compare(s, 200d) > 0;
-        b &= compare(s, 100d) < 0;
-        b &= compare(s, 200d) >= 0;
-        b &= compare(s, 100d) <= 0;
-        b &= compare(s, 200d) > 0;
+        b &= compare(s, 100d) == 99;
+        b &= compare(s, 200d) != 99;
+        b &= compare(s, 100d) != 101;
+        b &= (compare(s, 200d)) == 101;
+        b &= 99 == (compare(s, 100d));
+        b &= 99 != compare(s, 200d);
+        b &= 101 != compare(s, 100d);
+        b &= 101 == compare(s, 200d);
 
         return b;
     }
 
     @Override
     public int compare(Double o1, Double o2) {
-        return Doubles.compare(o1, o2);
+        return Doubles.compare(o1, o2) + 100;
     }
 }

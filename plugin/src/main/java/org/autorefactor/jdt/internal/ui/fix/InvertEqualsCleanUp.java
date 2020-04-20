@@ -30,6 +30,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /**
  * See {@link #getDescription()} method.
@@ -71,7 +72,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		if (node.getExpression() == null) {
+		if (node.getExpression() == null || ASTNodes.is(node.getExpression(), ThisExpression.class)) {
 			return true;
 		}
 
