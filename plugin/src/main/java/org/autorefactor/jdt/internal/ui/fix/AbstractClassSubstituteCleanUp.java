@@ -27,6 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,7 +69,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
 	@Override
 	public Set<String> getClassesToImport() {
-		return new HashSet<>(0);
+		return Collections.emptySet();
 	}
 
 	/**

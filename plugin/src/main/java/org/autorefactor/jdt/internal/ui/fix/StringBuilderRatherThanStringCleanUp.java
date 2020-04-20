@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -421,7 +422,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 		private Set<SimpleName> findVariables(final ASTNode currentNode, final Set<SimpleName> remainingReads,
 				final Set<SimpleName> remainingWrites, final SimpleName finalRead, final boolean hasToVisitLoops) {
 			if (currentNode == null) {
-				return new HashSet<>(0);
+				return Collections.emptySet();
 			}
 
 			Set<SimpleName> searchedVariables= new HashSet<>(remainingReads);

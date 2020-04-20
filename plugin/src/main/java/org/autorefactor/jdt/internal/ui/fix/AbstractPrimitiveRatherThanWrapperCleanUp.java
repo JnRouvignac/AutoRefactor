@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -91,7 +92,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the Infix In Safe Operators.
 	 */
 	public List<InfixExpression.Operator> getInfixInSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -100,7 +101,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the postfix in safe operators.
 	 */
 	public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -109,7 +110,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the prefix out safe operators.
 	 */
 	public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -118,7 +119,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the infix out safe operators.
 	 */
 	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -127,7 +128,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the postfix out safe operators.
 	 */
 	public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**
@@ -136,7 +137,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the assignment out safe operators.
 	 */
 	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-		return new ArrayList<>(0);
+		return Collections.emptyList();
 	}
 
 	/**

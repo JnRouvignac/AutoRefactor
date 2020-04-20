@@ -27,6 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -108,7 +109,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 	@Override
 	public Set<String> getClassesToImport() {
-		return new HashSet<>(0);
+		return Collections.emptySet();
 	}
 
 	@Override
