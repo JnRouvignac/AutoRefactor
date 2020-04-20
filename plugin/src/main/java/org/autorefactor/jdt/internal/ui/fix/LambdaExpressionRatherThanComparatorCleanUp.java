@@ -40,9 +40,9 @@ import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcher;
 import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcherRunnable;
 import org.autorefactor.jdt.internal.corext.dom.NodeMatcher;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
-import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
@@ -67,10 +67,10 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 /** See {@link #getDescription()} method. */
 public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportCleanUp {
 	private static final class ObjectNotNullMatcher extends NodeMatcher<Expression> {
-		private final String identifier;
+		private final SimpleName name;
 
-		private ObjectNotNullMatcher(final String identifier) {
-			this.identifier= identifier;
+		private ObjectNotNullMatcher(final SimpleName name) {
+			this.name= name;
 		}
 
 		@Override
@@ -83,7 +83,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 				if (orderedInfix != null
 						&& ASTNodes.isPassive(orderedInfix.getFirstOperand())
-						&& Utils.equalNotNull(orderedInfix.getFirstOperand().getIdentifier(), identifier)) {
+						&& ASTNodes.isSameVariable(orderedInfix.getFirstOperand(), name)) {
 					return ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS);
 				}
 			}
@@ -169,10 +169,10 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			if (node.getBody() instanceof Statement) {
 				return maybeRefactorBody(node, targetType.getTypeArguments()[0], classesToUseWithImport, object1, object2, ASTNodes.asList((Statement) node.getBody()));
 			} else if (node.getBody() instanceof Expression) {
-				String identifier1= object1.getName().getIdentifier();
-				String identifier2= object2.getName().getIdentifier();
+				SimpleName name1= object1.getName();
+				SimpleName name2= object2.getName();
 
-				return maybeRefactorExpression(node, targetType.getTypeArguments()[0], classesToUseWithImport, identifier1, identifier2,
+				return maybeRefactorExpression(node, targetType.getTypeArguments()[0], classesToUseWithImport, name1, name2,
 						(Expression) node.getBody());
 			}
 		}
@@ -235,10 +235,10 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	private boolean maybeRefactorBody(final Expression node, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final VariableDeclaration object1, final VariableDeclaration object2,
 			final List<Statement> statements) {
-		String identifier1= object1.getName().getIdentifier();
-		String identifier2= object2.getName().getIdentifier();
+		SimpleName name1= object1.getName();
+		SimpleName name2= object2.getName();
 
-		if (!maybeRefactorCompareToMethod(node, typeArgument, classesToUseWithImport, statements, identifier1, identifier2)) {
+		if (!maybeRefactorCompareToMethod(node, typeArgument, classesToUseWithImport, statements, name1, name2)) {
 			return false;
 		}
 
@@ -248,7 +248,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		NodeMatcher<Expression> compareToMatcher= new NodeMatcher<Expression>() {
 			@Override
 			public Boolean isMatching(final Expression node) {
-				if (isReturnedExpressionToRefactor(node, criteria, isForward, identifier1, identifier2)) {
+				if (isReturnedExpressionToRefactor(node, criteria, isForward, name1, name2)) {
 					return true;
 				}
 
@@ -259,7 +259,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		NodeMatcher<Expression> zeroMatcher= new NodeMatcher<Expression>() {
 			@Override
 			public Boolean isMatching(final Expression node) {
-				if (Utils.equalNotNull(Long.valueOf(0), ASTNodes.integerLiteral(node))) {
+				if (Long.valueOf(0).equals(ASTNodes.integerLiteral(node))) {
 					return true;
 				}
 
@@ -293,24 +293,24 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			}
 		};
 
-		ControlWorkflowMatcherRunnable runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(identifier1)).condition(new ObjectNotNullMatcher(identifier2)).returnedValue(compareToMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1).negate()).condition(new ObjectNotNullMatcher(identifier2).negate()).returnedValue(zeroMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1).negate()).condition(new ObjectNotNullMatcher(identifier2)).returnedValue(negativeMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1)).condition(new ObjectNotNullMatcher(identifier2).negate()).returnedValue(positiveMatcher);
+		ControlWorkflowMatcherRunnable runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2)).returnedValue(compareToMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(zeroMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2)).returnedValue(negativeMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(positiveMatcher);
 
 		if (runnableMatcher.isMatching(statements)) {
-			refactor(node, typeArgument, classesToUseWithImport, identifier1, criteria, isForward, Boolean.TRUE);
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.TRUE);
 
 			return false;
 		}
 
-		runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(identifier1)).condition(new ObjectNotNullMatcher(identifier2)).returnedValue(compareToMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1).negate()).condition(new ObjectNotNullMatcher(identifier2).negate()).returnedValue(zeroMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1)).condition(new ObjectNotNullMatcher(identifier2).negate()).returnedValue(negativeMatcher)
-				.addWorkflow(new ObjectNotNullMatcher(identifier1).negate()).condition(new ObjectNotNullMatcher(identifier2)).returnedValue(positiveMatcher);
+		runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2)).returnedValue(compareToMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(zeroMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(negativeMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2)).returnedValue(positiveMatcher);
 
 		if (runnableMatcher.isMatching(statements)) {
-			refactor(node, typeArgument, classesToUseWithImport, identifier1, criteria, isForward, Boolean.FALSE);
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.FALSE);
 
 			return false;
 		}
@@ -320,12 +320,12 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 	private boolean maybeRefactorCompareToMethod(final Expression node, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final List<Statement> statements,
-			final String identifier1, final String identifier2) {
+			final SimpleName name1, final SimpleName name2) {
 		if (statements != null && statements.size() == 1) {
 			ReturnStatement returnStatement= ASTNodes.as(statements.get(0), ReturnStatement.class);
 
 			if (returnStatement != null) {
-				return maybeRefactorExpression(node, typeArgument, classesToUseWithImport, identifier1, identifier2,
+				return maybeRefactorExpression(node, typeArgument, classesToUseWithImport, name1, name2,
 						returnStatement.getExpression());
 			}
 		}
@@ -334,13 +334,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	private boolean maybeRefactorExpression(final Expression node, final ITypeBinding typeArgument,
-			final Set<String> classesToUseWithImport, final String identifier1, final String identifier2,
+			final Set<String> classesToUseWithImport, final SimpleName name1, final SimpleName name2,
 			final Expression expression) {
 		AtomicReference<Expression> criteria= new AtomicReference<>();
 		AtomicBoolean isForward= new AtomicBoolean(true);
 
-		if (isReturnedExpressionToRefactor(expression, criteria, isForward, identifier1, identifier2)) {
-			refactor(node, typeArgument, classesToUseWithImport, identifier1, criteria, isForward, null);
+		if (isReturnedExpressionToRefactor(expression, criteria, isForward, name1, name2)) {
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, null);
 
 			return false;
 		}
@@ -349,13 +349,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	private boolean isReturnedExpressionToRefactor(final Expression returnExpression, final AtomicReference<Expression> criteria,
-			final AtomicBoolean isForward, final String identifier1,
-			final String identifier2) {
+			final AtomicBoolean isForward, final SimpleName name1,
+			final SimpleName name2) {
 		PrefixExpression negativeExpression= ASTNodes.as(returnExpression, PrefixExpression.class);
 
 		if (negativeExpression != null && ASTNodes.hasOperator(negativeExpression, PrefixExpression.Operator.MINUS)) {
 			isForward.set(!isForward.get());
-			return isReturnedExpressionToRefactor(negativeExpression.getOperand(), criteria, isForward, identifier1, identifier2);
+			return isReturnedExpressionToRefactor(negativeExpression.getOperand(), criteria, isForward, name1, name2);
 		}
 
 		MethodInvocation compareToMethod= ASTNodes.as(returnExpression, MethodInvocation.class);
@@ -366,14 +366,14 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			if (comparisonType != null) {
 				if (compareToMethod.getExpression() != null
 						&& ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compareTo", comparisonType.getQualifiedName())) { //$NON-NLS-1$
-					return isRefactorComparisonToRefactor(criteria, isForward, identifier1, identifier2, compareToMethod.getExpression(), (Expression) compareToMethod.arguments().get(0));
+					return isRefactorComparisonToRefactor(criteria, isForward, name1, name2, compareToMethod.getExpression(), (Expression) compareToMethod.arguments().get(0));
 				}
 
 				String primitiveType= Bindings.getUnboxedTypeName(comparisonType.getQualifiedName());
 
 				if (primitiveType != null
 						&& ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compare", primitiveType, primitiveType)) { //$NON-NLS-1$
-					return isRefactorComparisonToRefactor(criteria, isForward, identifier1, identifier2, (Expression) compareToMethod.arguments().get(0), (Expression) compareToMethod.arguments().get(1));
+					return isRefactorComparisonToRefactor(criteria, isForward, name1, name2, (Expression) compareToMethod.arguments().get(0), (Expression) compareToMethod.arguments().get(1));
 				}
 			}
 		}
@@ -382,7 +382,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	private boolean isRefactorComparisonToRefactor(final AtomicReference<Expression> criteria,
-			final AtomicBoolean isForward, final String identifier1, final String identifier2, final Expression expr1,
+			final AtomicBoolean isForward, final SimpleName name1, final SimpleName name2, final Expression expr1,
 			final Expression expr2) {
 		MethodInvocation method1= ASTNodes.as(expr1, MethodInvocation.class);
 		MethodInvocation method2= ASTNodes.as(expr2, MethodInvocation.class);
@@ -399,35 +399,35 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			SimpleName objectExpr2= ASTNodes.as(method2.getExpression(), SimpleName.class);
 
 			if (Utils.equalNotNull(methodName1, methodName2) && objectExpr1 != null && objectExpr2 != null) {
-				if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
-						&& Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
+				if (ASTNodes.isSameVariable(objectExpr1, name1)
+						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
 					criteria.set(method1);
 					return true;
 				}
 
-				if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
-						&& Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
+				if (ASTNodes.isSameVariable(objectExpr1, name2)
+						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
 					criteria.set(method1);
 					isForward.set(!isForward.get());
 					return true;
 				}
 			}
 		} else if (field1 != null && field2 != null) {
-			String fieldName1= field1.getName().getIdentifier();
-			String fieldName2= field2.getName().getIdentifier();
+			SimpleName fieldName1= field1.getName();
+			SimpleName fieldName2= field2.getName();
 
 			SimpleName objectExpr1= ASTNodes.as(field1.getQualifier(), SimpleName.class);
 			SimpleName objectExpr2= ASTNodes.as(field2.getQualifier(), SimpleName.class);
 
-			if (Utils.equalNotNull(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
-				if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
-						&& Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
+			if (ASTNodes.isSameVariable(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
+				if (ASTNodes.isSameVariable(objectExpr1, name1)
+						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
 					criteria.set(field1);
 					return true;
 				}
 
-				if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
-						&& Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
+				if (ASTNodes.isSameVariable(objectExpr1, name2)
+						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
 					criteria.set(field1);
 					isForward.set(!isForward.get());
 					return true;
@@ -439,7 +439,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	private void refactor(final Expression node, final ITypeBinding typeArgument,
-			final Set<String> classesToUseWithImport, final String identifier1, final AtomicReference<Expression> criteria,
+			final Set<String> classesToUseWithImport, final SimpleName name1, final AtomicReference<Expression> criteria,
 			final AtomicBoolean isForward, final Boolean isNullFirst) {
 		String comparatorClassName= addImport(Comparator.class, classesToUseWithImport, new HashSet<>(0));
 
@@ -447,7 +447,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		if (criteria.get() instanceof MethodInvocation) {
 			lambda= buildMethod(typeArgument, (MethodInvocation) criteria.get());
 		} else {
-			lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), identifier1);
+			lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), name1);
 		}
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -484,7 +484,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 	@SuppressWarnings("unchecked")
 	private LambdaExpression buildField(final Expression node, final ITypeBinding type, final boolean straightOrder,
-			final Boolean isNullFirst, final QualifiedName field, final String identifier1) {
+			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -497,12 +497,12 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				&& destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
 		if (isTypeKnown && straightOrder && isNullFirst == null) {
-			lambdaExpression.parameters().add(ast.declareFragment(ast.simpleName(identifier1)));
+			lambdaExpression.parameters().add(ast.declareFragment(ast.createCopyTarget(name1)));
 		} else {
-			lambdaExpression.parameters().add(ast.declareSingleVariable(identifier1, ast.toType(type, typeNameDecider)));
+			lambdaExpression.parameters().add(ast.declareSingleVariable(name1.getIdentifier(), ast.toType(type, typeNameDecider)));
 		}
 
-		lambdaExpression.setBody(ast.fieldAccess(ast.simpleName(identifier1), rewrite.createMoveTarget(field.getName())));
+		lambdaExpression.setBody(ast.fieldAccess(ast.createCopyTarget(name1), rewrite.createMoveTarget(field.getName())));
 		lambdaExpression.setParentheses(false);
 		return lambdaExpression;
 	}

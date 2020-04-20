@@ -40,7 +40,7 @@ public class LocalVariableRatherThanFieldSample {
     protected int doNotRefactorProtectedField;
     int doNotRefactorPackageField;
     private int doNotRefactorFieldsInSeveralMethods;
-    private int doNotRefactorFieldConflictingLocalVariable;
+    private int refactorFieldWithSameNameAsLocalVariable;
     private int doNotRefactorFieldInOtherField;
     private int oneField = doNotRefactorFieldInOtherField;
     private int doNotRefactorReadFieldBeforeAssignment;
@@ -132,14 +132,14 @@ public class LocalVariableRatherThanFieldSample {
         System.out.println(doNotRefactorFieldsInSeveralMethods);
     }
 
-    public void doNotRefactorFieldConflictingLocalVariable() {
-        doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
+    public void refactorFieldWithSameNameAsLocalVariable() {
+        refactorFieldWithSameNameAsLocalVariable = 123;
+        System.out.println(refactorFieldWithSameNameAsLocalVariable);
     }
 
     public void methodWithLocalVariable() {
-        long doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
+        long refactorFieldWithSameNameAsLocalVariable = 123;
+        System.out.println(refactorFieldWithSameNameAsLocalVariable);
     }
 
     public void doNotRefactorReadFieldBeforeAssignment() {
@@ -153,7 +153,7 @@ public class LocalVariableRatherThanFieldSample {
         System.out.println(doNotRefactorFieldInOtherField);
     }
 
-    public void doNotRefactorFieldWithConflictingName() {
+    public void refactorFieldWithSameNameAsAttribute() {
         out = 123;
         System.out.println(out);
     }

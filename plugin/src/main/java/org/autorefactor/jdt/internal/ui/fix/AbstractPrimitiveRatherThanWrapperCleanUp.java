@@ -265,7 +265,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 		@Override
 		public boolean visit(final SimpleName aVar) {
-			if (isPrimitiveAllowed && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
+			if (isPrimitiveAllowed && ASTNodes.isSameVariable(aVar, varDecl.getName())
 					&& !aVar.getParent().equals(varDecl)) {
 				isPrimitiveAllowed= isPrimitiveAllowed(aVar);
 

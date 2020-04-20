@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -65,9 +64,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		@Override
 		public boolean visit(final SimpleName aVariable) {
 			if (field != aVariable
-					&& field.getIdentifier().equals(aVariable.getIdentifier())
-					&& !(aVariable.getParent() instanceof MethodDeclaration)
-					&& (!(aVariable.getParent() instanceof MethodInvocation) || aVariable.getLocationInParent() != MethodInvocation.NAME_PROPERTY)) {
+					&& ASTNodes.isSameVariable(field, aVariable)) {
 				occurrences.add(aVariable);
 			}
 
@@ -152,7 +149,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			if (isVariableDeclaration(occurrence)
 					|| isExternalField(occurrence)
 					|| currentMethodDeclaration == null
-					|| (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
+					|| oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration) {
 				return true;
 			}
 

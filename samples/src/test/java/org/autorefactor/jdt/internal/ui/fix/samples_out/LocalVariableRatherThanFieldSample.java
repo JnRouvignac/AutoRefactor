@@ -35,12 +35,10 @@ public class LocalVariableRatherThanFieldSample {
     protected int doNotRefactorProtectedField;
     int doNotRefactorPackageField;
     private int doNotRefactorFieldsInSeveralMethods;
-    private int doNotRefactorFieldConflictingLocalVariable;
     private int doNotRefactorFieldInOtherField;
     private int oneField = doNotRefactorFieldInOtherField;
     private int doNotRefactorReadFieldBeforeAssignment;
     private int doNotRefactorUnusedField;
-    private int out;
     private List<String> dynamicList= new ArrayList<>(Arrays.asList("foo", "bar"));
     private boolean doNotRefactorFieldWithActiveInitializer = dynamicList.remove("foo");
     private Runnable doNotRefactorObject;
@@ -49,19 +47,19 @@ public class LocalVariableRatherThanFieldSample {
 
     public void refactorField() {
         // Keep this comment
-        long refactorField = 123;
+        long refactorField= 123;
         System.out.println(refactorField);
     }
 
     public void refactorInitializedField() {
         // Keep this comment
-        long refactorInitializedField = 123;
+        long refactorInitializedField= 123;
         System.out.println(refactorInitializedField);
     }
 
     public void refactorFieldWithComplexUse(boolean b, List<String> texts) {
         // Keep this comment
-        short refactorFieldWithComplexUse = 123;
+        short refactorFieldWithComplexUse= 123;
         if (b) {
             System.out.println(refactorFieldWithComplexUse);
         } else {
@@ -76,13 +74,13 @@ public class LocalVariableRatherThanFieldSample {
 
     public void refactorArray() {
         // Keep this comment
-        int refactorArray[] = new int[]{123};
+        int refactorArray[]= new int[]{123};
         System.out.println(refactorArray);
     }
 
     public void refactorOneFragment() {
         // Keep this comment
-        int refactorOneFragment = 123;
+        int refactorOneFragment= 123;
         System.out.println(refactorOneFragment);
     }
 
@@ -98,7 +96,7 @@ public class LocalVariableRatherThanFieldSample {
 
     public void refactorStaticField() {
         // Keep this comment
-        long refactorStaticField = 123;
+        long refactorStaticField= 123;
         System.out.println(refactorStaticField);
     }
 
@@ -127,14 +125,14 @@ public class LocalVariableRatherThanFieldSample {
         System.out.println(doNotRefactorFieldsInSeveralMethods);
     }
 
-    public void doNotRefactorFieldConflictingLocalVariable() {
-        doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
+    public void refactorFieldWithSameNameAsLocalVariable() {
+        int refactorFieldWithSameNameAsLocalVariable= 123;
+        System.out.println(refactorFieldWithSameNameAsLocalVariable);
     }
 
     public void methodWithLocalVariable() {
-        long doNotRefactorFieldConflictingLocalVariable = 123;
-        System.out.println(doNotRefactorFieldConflictingLocalVariable);
+        long refactorFieldWithSameNameAsLocalVariable = 123;
+        System.out.println(refactorFieldWithSameNameAsLocalVariable);
     }
 
     public void doNotRefactorReadFieldBeforeAssignment() {
@@ -148,8 +146,8 @@ public class LocalVariableRatherThanFieldSample {
         System.out.println(doNotRefactorFieldInOtherField);
     }
 
-    public void doNotRefactorFieldWithConflictingName() {
-        out = 123;
+    public void refactorFieldWithSameNameAsAttribute() {
+        int out= 123;
         System.out.println(out);
     }
 
