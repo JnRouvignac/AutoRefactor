@@ -177,17 +177,13 @@ public class MergeConditionalBlocksSample {
     }
 
     /** Different if and else if code, leave it */
-    public void doNotMergeSameCode(int i) {
-        // Keep this comment
+    public void doNotMergeAdditionalCode(int i) {
         if (i == 0) {
-            // Keep this comment too
             System.out.println("Duplicate");
         } else if (i == 1) {
-            // Keep this comment too
             System.out.println("Duplicate");
             System.out.println("but not only");
         } else {
-            // Keep this comment also
             System.out.println("Different");
         }
     }

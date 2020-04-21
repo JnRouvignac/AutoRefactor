@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -103,7 +102,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 		if (isPositive) {
 			additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
 		} else {
-			additionalCondition= ast.negate(subNode.getExpression(), Copy.MOVE);
+			additionalCondition= ast.negate(subNode.getExpression());
 		}
 
 		rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
