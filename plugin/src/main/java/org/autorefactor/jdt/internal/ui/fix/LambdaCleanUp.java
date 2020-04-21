@@ -173,14 +173,17 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 					replaceByMethodReference(node, mi);
 					return false;
 				}
+
 				if (calledExpression instanceof FieldAccess) {
 					FieldAccess fieldAccess= (FieldAccess) calledExpression;
+
 					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
 						replaceByMethodReference(node, mi);
 						return false;
 					}
 				} else if (calledExpression instanceof SuperFieldAccess) {
 					SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
+
 					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
 						replaceByMethodReference(node, mi);
 						return false;
@@ -188,10 +191,12 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 				}
 			} else if (calledExpression instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
 				SimpleName calledObject= (SimpleName) calledExpression;
+
 				if (isSameIdentifier(node, 0, calledObject)) {
 					for (int i= 0; i < arguments.size(); i++) {
-						ASTNode expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
-						if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expression)) {
+						SimpleName expression= ASTNodes.as(arguments.get(i), SimpleName.class);
+
+						if (expression == null || !isSameIdentifier(node, i + 1, expression)) {
 							return true;
 						}
 					}
@@ -204,6 +209,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
 					String[] remainingParams= new String[arguments.size() + 1];
 					remainingParams[0]= clazz.getQualifiedName();
+
 					for (int i= 0; i < arguments.size(); i++) {
 						ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
 
