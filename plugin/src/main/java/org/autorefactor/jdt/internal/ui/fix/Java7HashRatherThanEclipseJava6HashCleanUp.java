@@ -223,7 +223,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 	@Override
 	public boolean visit(final MethodDeclaration node) {
-		return maybeRefactorMethodDeclaration(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorMethodDeclaration(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorMethodDeclaration(final MethodDeclaration node,

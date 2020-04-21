@@ -105,7 +105,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
 	@Override
 	public boolean visit(final IfStatement node) {
-		return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,

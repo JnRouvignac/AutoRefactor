@@ -108,7 +108,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final EnhancedForStatement node) {
-		return maybeRefactorEnhancedForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorEnhancedForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorEnhancedForStatement(final EnhancedForStatement node,
@@ -140,7 +140,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final ForStatement node) {
-		return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,

@@ -98,7 +98,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,

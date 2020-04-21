@@ -118,7 +118,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorMethodInvocation(final MethodInvocation node,
@@ -147,7 +147,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public boolean visit(final Block node) {
-		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>(0));
+		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
 	}
 
 	private boolean maybeRefactorBlock(final Block node,
