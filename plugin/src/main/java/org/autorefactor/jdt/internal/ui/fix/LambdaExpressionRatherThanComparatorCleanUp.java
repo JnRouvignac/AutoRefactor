@@ -259,7 +259,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		NodeMatcher<Expression> zeroMatcher= new NodeMatcher<Expression>() {
 			@Override
 			public Boolean isMatching(final Expression node) {
-				if (Long.valueOf(0).equals(ASTNodes.integerLiteral(node))) {
+				if (Long.valueOf(0).equals(ASTNodes.getIntegerLiteral(node))) {
 					return true;
 				}
 
@@ -270,7 +270,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		NodeMatcher<Expression> positiveMatcher= new NodeMatcher<Expression>() {
 			@Override
 			public Boolean isMatching(final Expression node) {
-				Long value= ASTNodes.integerLiteral(node);
+				Long value= ASTNodes.getIntegerLiteral(node);
 
 				if (value != null && value > 0) {
 					return true;
@@ -283,7 +283,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		NodeMatcher<Expression> negativeMatcher= new NodeMatcher<Expression>() {
 			@Override
 			public Boolean isMatching(final Expression node) {
-				Long value= ASTNodes.integerLiteral(node);
+				Long value= ASTNodes.getIntegerLiteral(node);
 
 				if (value != null && value < 0) {
 					return true;

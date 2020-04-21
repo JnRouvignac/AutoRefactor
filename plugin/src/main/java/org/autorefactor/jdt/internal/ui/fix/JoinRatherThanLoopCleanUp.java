@@ -291,7 +291,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 				if (emptyLength != null
 						&& ASTNodes.usesGivenSignature(emptyLength.getFirstOperand(), CharSequence.class.getCanonicalName(), "length") //$NON-NLS-1$
 						&& ASTNodes.as(emptyLength.getFirstOperand().getExpression(), SimpleName.class) != null) {
-					Long literal= ASTNodes.integerLiteral(emptyLength.getSecondOperand());
+					Long literal= ASTNodes.getIntegerLiteral(emptyLength.getSecondOperand());
 
 					if (literal != null) {
 						if (literal.equals(0L)
@@ -313,7 +313,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 						OrderedInfixExpression<SimpleName, Expression> orderedConditionForDelimiter= ASTNodes.orderedInfix(conditionForDelimiter, SimpleName.class, Expression.class);
 
 						if (orderedConditionForDelimiter != null) {
-							Long literal= ASTNodes.integerLiteral(orderedConditionForDelimiter.getSecondOperand());
+							Long literal= ASTNodes.getIntegerLiteral(orderedConditionForDelimiter.getSecondOperand());
 
 							if (ASTNodes.isSameVariable(loopVariable, orderedConditionForDelimiter.getFirstOperand())
 									&& literal != null) {
@@ -340,7 +340,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 									&& limit != null
 									&& "length".equals(limit.getName().getIdentifier()) //$NON-NLS-1$
 									&& ASTNodes.isSameVariable(containerVariable, limit.getQualifier())) {
-								Long literal= ASTNodes.integerLiteral(beyondScope.getRightOperand());
+								Long literal= ASTNodes.getIntegerLiteral(beyondScope.getRightOperand());
 
 								if (Arrays.asList(
 										InfixExpression.Operator.NOT_EQUALS,

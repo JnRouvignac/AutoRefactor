@@ -214,13 +214,13 @@ public final class ForLoopHelper {
 				Pair<Expression, Expression> initPair= ASTNodes.decomposeInitializer(firstInit);
 				Expression init= initPair.getFirst();
 				Expression startValue= initPair.getSecond();
-				Long zero= ASTNodes.integerLiteral(startValue);
+				Long zero= ASTNodes.getIntegerLiteral(startValue);
 				InfixExpression startValueMinusOne= ASTNodes.as(startValue, InfixExpression.class);
 				Expression collectionOnSize= null;
 				Expression arrayOnLength= null;
 
 				if (startValueMinusOne != null && !startValueMinusOne.hasExtendedOperands() && ASTNodes.hasOperator(startValueMinusOne, InfixExpression.Operator.MINUS)) {
-					Long one= ASTNodes.integerLiteral(startValueMinusOne.getRightOperand());
+					Long one= ASTNodes.getIntegerLiteral(startValueMinusOne.getRightOperand());
 
 					if (one != null && one == 1) {
 						collectionOnSize= getCollectionOnSize(startValueMinusOne.getLeftOperand());
@@ -305,7 +305,7 @@ public final class ForLoopHelper {
 	}
 
 	private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar, final Long zero, final Expression collectionOnSize, final Expression arrayOnLength) {
-		Long zero2= ASTNodes.integerLiteral(containerVar);
+		Long zero2= ASTNodes.getIntegerLiteral(containerVar);
 		Expression collectionOnSize2= getCollectionOnSize(containerVar);
 		Expression arrayOnLength2= getArrayOnLength(containerVar);
 

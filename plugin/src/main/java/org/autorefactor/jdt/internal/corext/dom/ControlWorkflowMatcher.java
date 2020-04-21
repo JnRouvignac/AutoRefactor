@@ -348,7 +348,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 			expandActualNode(actualNode);
 			return;
 		} else if (infixExpression != null && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-			List<Expression> allOperands= ASTNodes.allOperands(infixExpression);
+			List<Expression> allOperands= ASTNodes.getAllOperands(infixExpression);
 			Expression firstOperand= allOperands.remove(0);
 			ControlWorkflowNode currentNode= actualNode;
 

@@ -166,8 +166,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
 	private Expression plus(final Expression expression1, final Expression expression2) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		Long expr1Value= ASTNodes.integerLiteral(expression1);
-		Long expr2Value= ASTNodes.integerLiteral(expression2);
+		Long expr1Value= ASTNodes.getIntegerLiteral(expression1);
+		Long expr2Value= ASTNodes.getIntegerLiteral(expression2);
 
 		if (expr1Value != null && expr2Value != null) {
 			return ast.int0((int) (expr1Value + expr2Value));
@@ -186,8 +186,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
 	private Expression minus(final Expression expression1, final Expression expression2) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		Long expr1Value= ASTNodes.integerLiteral(expression1);
-		Long expr2Value= ASTNodes.integerLiteral(expression2);
+		Long expr1Value= ASTNodes.getIntegerLiteral(expression1);
+		Long expr2Value= ASTNodes.getIntegerLiteral(expression2);
 
 		if (expr1Value != null && expr2Value != null) {
 			return ast.int0((int) (expr1Value - expr2Value));
@@ -206,8 +206,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
 	private Expression minusPlusOne(final Expression expression1, final Expression expression2) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		Long expr1Value= ASTNodes.integerLiteral(expression1);
-		Long expr2Value= ASTNodes.integerLiteral(expression2);
+		Long expr1Value= ASTNodes.getIntegerLiteral(expression1);
+		Long expr2Value= ASTNodes.getIntegerLiteral(expression2);
 
 		if (expr1Value != null && expr2Value != null) {
 			return ast.int0((int) (expr1Value - expr2Value + 1));

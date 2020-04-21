@@ -217,7 +217,7 @@ public final class ASTNodes {
 			if (hasOperator(node, InfixExpression.Operator.DIVIDE)) {
 				setActivityLevel(ExprActivity.PASSIVE);
 			} else {
-				for (Expression operand : allOperands(node)) {
+				for (Expression operand : getAllOperands(node)) {
 					if (hasType(operand, Object.class.getCanonicalName())) {
 						setActivityLevel(ExprActivity.PASSIVE);
 						break;
@@ -676,7 +676,7 @@ public final class ASTNodes {
 	 * @param node the infix expression
 	 * @return a List of expressions
 	 */
-	public static List<Expression> allOperands(final InfixExpression node) {
+	public static List<Expression> getAllOperands(final InfixExpression node) {
 		List<Expression> extOps= extendedOperands(node);
 		List<Expression> operands= new ArrayList<>(2 + extOps.size());
 		operands.add(node.getLeftOperand());
@@ -687,7 +687,7 @@ public final class ASTNodes {
 
 		for (Expression expression : operands) {
 			if (expression instanceof InfixExpression && hasOperator((InfixExpression) expression, node.getOperator())) {
-				optimizedOperands.addAll(allOperands((InfixExpression) expression));
+				optimizedOperands.addAll(getAllOperands((InfixExpression) expression));
 			} else {
 				optimizedOperands.add(expression);
 			}
@@ -1653,7 +1653,7 @@ public final class ASTNodes {
 			return true;
 
 		case ASTNode.INFIX_EXPRESSION:
-			for (Expression operand : allOperands((InfixExpression) expression)) {
+			for (Expression operand : getAllOperands((InfixExpression) expression)) {
 				if (!isHardCoded(operand)) {
 					return false;
 				}
@@ -1686,7 +1686,7 @@ public final class ASTNodes {
 	 * @param input The input
 	 * @return Integer literal.
 	 */
-	public static Long integerLiteral(final Expression input) {
+	public static Long getIntegerLiteral(final Expression input) {
 		NumberLiteral contant= as(input, NumberLiteral.class);
 
 		if (contant != null) {
@@ -1708,8 +1708,8 @@ public final class ASTNodes {
 						InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
 						InfixExpression.Operator.TIMES,
 						InfixExpression.Operator.XOR)) {
-			List<Expression> operands= allOperands(operation);
-			Long leftValue= integerLiteral(operands.remove(0));
+			List<Expression> operands= getAllOperands(operation);
+			Long leftValue= getIntegerLiteral(operands.remove(0));
 
 			if (leftValue == null) {
 				return null;
@@ -1718,7 +1718,7 @@ public final class ASTNodes {
 			long result= leftValue;
 
 			for (Expression operand : operands) {
-				Long newValue= integerLiteral(operand);
+				Long newValue= getIntegerLiteral(operand);
 
 				if (newValue == null) {
 					return null;
@@ -1775,7 +1775,7 @@ public final class ASTNodes {
 		PrefixExpression negativeContant= as(input, PrefixExpression.class);
 
 		if (negativeContant != null && hasOperator(negativeContant, PrefixExpression.Operator.MINUS)) {
-			Long value= integerLiteral(negativeContant.getOperand());
+			Long value= getIntegerLiteral(negativeContant.getOperand());
 
 			if (value != null) {
 				return -value;
@@ -2994,7 +2994,7 @@ public final class ASTNodes {
 
 		int nbOperands= 0;
 
-		for (Expression operand : allOperands(infixExpression)) {
+		for (Expression operand : getAllOperands(infixExpression)) {
 			nbOperands+= getNbOperands(operand);
 		}
 

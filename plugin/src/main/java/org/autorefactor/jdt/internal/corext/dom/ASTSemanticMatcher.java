@@ -326,7 +326,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 	}
 
 	private boolean isOneLiteral(final Expression operand) {
-		return Long.valueOf(1).equals(ASTNodes.integerLiteral(operand));
+		return Long.valueOf(1).equals(ASTNodes.getIntegerLiteral(operand));
 	}
 
 	@Override
@@ -781,12 +781,12 @@ public class ASTSemanticMatcher extends ASTMatcher {
 	}
 
 	private List<Expression> getConsistentOperands(final InfixExpression ie) {
-		List<Expression> operands= ASTNodes.allOperands(ie);
+		List<Expression> operands= ASTNodes.getAllOperands(ie);
 
 		for (Iterator<Expression> iterator= operands.iterator(); iterator.hasNext() && operands.size() > 1;) {
 			Expression operand= iterator.next();
 
-			Long numberLiteral= ASTNodes.integerLiteral(operand);
+			Long numberLiteral= ASTNodes.getIntegerLiteral(operand);
 			Boolean booleanValue= ASTNodes.booleanConstant(operand);
 
 			if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND)) {

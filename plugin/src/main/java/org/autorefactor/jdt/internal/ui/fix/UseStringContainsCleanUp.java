@@ -73,7 +73,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
 		if (orderedExpression != null) {
 			MethodInvocation indexOf= orderedExpression.getFirstOperand();
-			Long value= ASTNodes.integerLiteral(orderedExpression.getSecondOperand());
+			Long value= ASTNodes.getIntegerLiteral(orderedExpression.getSecondOperand());
 
 			if (value != null
 					&& (ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$

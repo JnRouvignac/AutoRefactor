@@ -172,7 +172,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private ITypeBinding getLeftOperandType(final InfixExpression ie, final CastExpression node) {
-		List<Expression> operands= ASTNodes.allOperands(ie);
+		List<Expression> operands= ASTNodes.getAllOperands(ie);
 		List<Expression> previousOperands= operands.subList(0, operands.indexOf(node));
 		if (isAnyRefactored(previousOperands)) {
 			return null;

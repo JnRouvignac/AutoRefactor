@@ -272,7 +272,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				List<Expression> operands;
 				if (concatenation != null
 						&& ASTNodes.hasOperator(concatenation, InfixExpression.Operator.PLUS)) {
-					operands= ASTNodes.allOperands(concatenation);
+					operands= ASTNodes.getAllOperands(concatenation);
 				} else {
 					operands= Arrays.asList(assignment.getRightHandSide());
 				}

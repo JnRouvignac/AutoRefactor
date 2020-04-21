@@ -266,7 +266,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		if (varDecl != null && ASTNodes.hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName()) && varDecl.fragments().size() == 1) {
 			VariableDeclarationFragment varFragment= (VariableDeclarationFragment) varDecl.fragments().get(0);
 
-			if (Long.valueOf(initValue).equals(ASTNodes.integerLiteral(varFragment.getInitializer()))) {
+			if (Long.valueOf(initValue).equals(ASTNodes.getIntegerLiteral(varFragment.getInitializer()))) {
 				return varFragment.getName();
 			}
 		}
@@ -536,7 +536,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (field != null && moveExpression != null && !ASTNodes.isSameVariable(field, data.getPrimeId())
 					&& !ASTNodes.isSameVariable(field, data.getResultId()) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
 				SimpleName againFieldName= getField(moveExpression.getLeftOperand());
-				Long hash= ASTNodes.integerLiteral(moveExpression.getRightOperand());
+				Long hash= ASTNodes.getIntegerLiteral(moveExpression.getRightOperand());
 
 				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32).equals(hash)) {
 					if (data.isTempValueUsed()) {
@@ -557,8 +557,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 	private boolean isBooleanValid(final CollectedData data, final ConditionalExpression newHash) {
 		SimpleName booleanField= getField(newHash.getExpression());
-		Long hashForTrue= ASTNodes.integerLiteral(newHash.getThenExpression());
-		Long hashForFalse= ASTNodes.integerLiteral(newHash.getElseExpression());
+		Long hashForTrue= ASTNodes.getIntegerLiteral(newHash.getThenExpression());
+		Long hashForFalse= ASTNodes.getIntegerLiteral(newHash.getElseExpression());
 
 		if (booleanField != null && hashForTrue != null
 				&& hashForFalse != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
@@ -584,11 +584,11 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 				MethodInvocation hashOnField;
 
 				if (InfixExpression.Operator.EQUALS.equals(orderedIsFieldNull.getOperator())) {
-					zero= ASTNodes.integerLiteral(condition.getThenExpression());
+					zero= ASTNodes.getIntegerLiteral(condition.getThenExpression());
 					hashOnField= ASTNodes.as(condition.getElseExpression(), MethodInvocation.class);
 				} else {
 					hashOnField= ASTNodes.as(condition.getThenExpression(), MethodInvocation.class);
-					zero= ASTNodes.integerLiteral(condition.getElseExpression());
+					zero= ASTNodes.getIntegerLiteral(condition.getElseExpression());
 				}
 
 				if (zero != null && zero.longValue() == 0 && hashOnField != null && hashOnField.getExpression() != null

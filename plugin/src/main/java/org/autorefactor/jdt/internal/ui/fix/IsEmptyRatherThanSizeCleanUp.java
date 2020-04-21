@@ -81,7 +81,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
 		if (orderedCondition != null) {
 			MethodInvocation miToReplace= orderedCondition.getFirstOperand();
-			Long literalSize= ASTNodes.integerLiteral(orderedCondition.getSecondOperand());
+			Long literalSize= ASTNodes.getIntegerLiteral(orderedCondition.getSecondOperand());
 
 			if (literalSize != null
 					&& miToReplace.getExpression() != null

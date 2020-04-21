@@ -123,7 +123,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
 
 			if (ie != null) {
-				List<Expression> operands= ASTNodes.allOperands(ie);
+				List<Expression> operands= ASTNodes.getAllOperands(ie);
 				boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
 						InfixExpression.Operator.EQUALS,
 						InfixExpression.Operator.NOT_EQUALS,

@@ -70,7 +70,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 	@Override
 	public boolean visit(final InfixExpression node) {
 		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-			List<Expression> operands= ASTNodes.allOperands(node);
+			List<Expression> operands= ASTNodes.getAllOperands(node);
 
 			for (int i= 1; i < operands.size(); i++) {
 				Expression leftOperand= operands.get(i - 1);
@@ -92,7 +92,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 				&& ASTNodes.isPassive(redundantOperand)
 				&& complexCondition != null
 				&& ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-			List<Expression> operands= ASTNodes.allOperands(complexCondition);
+			List<Expression> operands= ASTNodes.getAllOperands(complexCondition);
 
 			for (int i= 0; i < operands.size(); i++) {
 				List<Expression> previousOperands= operands.subList(0, i);

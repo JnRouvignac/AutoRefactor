@@ -442,7 +442,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private Variable extractVariableAndValuesFromInfixExpression(final InfixExpression infixExpression) {
 		if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
-			List<Expression> operands= ASTNodes.allOperands(infixExpression);
+			List<Expression> operands= ASTNodes.getAllOperands(infixExpression);
 			Variable mergedVariable= null;
 
 			for (Expression operand : operands) {

@@ -90,7 +90,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 				replaceWithNewInfixExpression(node, remainingOperands);
 				return false;
 			}
-			List<Expression> operands= ASTNodes.allOperands(node);
+			List<Expression> operands= ASTNodes.getAllOperands(node);
 
 			if (operands.size() > 2) {
 				for (int i= 0; i < operands.size() - 1; i++) {
@@ -125,7 +125,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	}
 
 	private List<Expression> removeUselessOperands(final InfixExpression node, final AtomicBoolean hasUselessOperand, final Boolean neutralElement, final Boolean shortCircuitValue) {
-		List<Expression> allOperands= ASTNodes.allOperands(node);
+		List<Expression> allOperands= ASTNodes.getAllOperands(node);
 
 		for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
 			Expression operand= it.next();

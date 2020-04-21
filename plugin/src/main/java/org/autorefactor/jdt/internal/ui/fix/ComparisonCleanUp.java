@@ -76,7 +76,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 		if (orderedCondition != null
 				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
 			MethodInvocation comparisonMI= orderedCondition.getFirstOperand();
-			Long literalValue= ASTNodes.integerLiteral(orderedCondition.getSecondOperand());
+			Long literalValue= ASTNodes.getIntegerLiteral(orderedCondition.getSecondOperand());
 
 			if (literalValue != null
 					&& comparisonMI.getExpression() != null
