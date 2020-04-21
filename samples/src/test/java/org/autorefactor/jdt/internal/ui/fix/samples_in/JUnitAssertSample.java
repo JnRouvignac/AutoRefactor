@@ -427,6 +427,23 @@ public class JUnitAssertSample {
         }
     }
 
+    public void refactorIfOnExpression(boolean b1, boolean b2) {
+        // Keep this comment
+        if (b1 && b2) {
+            Assert.fail();
+        }
+        if (b1 || b2) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (!b1 && !b2) {
+            fail();
+        }
+        if (!b1 || !b2) {
+            fail("Failure message to keep");
+        }
+    }
+
     public void refactorIfPrimitiveThenFail(int i1, int i2) {
         // Keep this comment
         if (i1 != i2) {

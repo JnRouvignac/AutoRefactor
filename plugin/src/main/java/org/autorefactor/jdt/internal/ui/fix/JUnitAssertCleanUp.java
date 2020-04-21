@@ -180,13 +180,17 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		return true;
 	}
 
-	private boolean maybeRefactorIf(Set<String> classesToUseWithImport, Set<String> importsToAdd,
+	private boolean maybeRefactorIf(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final IfStatement node, final MethodInvocation mi, final String unitTestPackagePath) {
 		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
 		}
 
-		return !ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName()) || maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true); //$NON-NLS-1$ //$NON-NLS-2$
+		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
+		}
+
+		return true;
 	}
 
 	@Override

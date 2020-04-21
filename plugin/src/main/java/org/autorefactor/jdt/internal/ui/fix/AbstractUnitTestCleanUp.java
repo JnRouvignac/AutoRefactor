@@ -234,6 +234,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.EQUALS)) {
 				return maybeRefactorComparison(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, conditionIe, isAssertTrue, failureMessage);
 			}
+
 			if (ASTNodes.hasOperator(conditionIe, InfixExpression.Operator.NOT_EQUALS)) {
 				return maybeRefactorComparison(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod,
 						conditionIe, !isAssertTrue, failureMessage);
@@ -248,7 +249,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		} else if (constantValue instanceof Boolean) {
 			return maybeReplaceOrRemove(classesToUseWithImport, importsToAdd, nodeToReplace,
 					originalMethod, isAssertTrue ^ (Boolean) constantValue, failureMessage);
-		} else if (isRewriteNeeded) {
+		}
+
+		if (isRewriteNeeded) {
 			refactorToAssertTrueOrFalse(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage, condition, isAssertTrue);
 			return false;
 		}

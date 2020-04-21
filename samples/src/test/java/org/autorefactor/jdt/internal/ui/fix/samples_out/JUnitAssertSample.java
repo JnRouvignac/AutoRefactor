@@ -408,6 +408,15 @@ public class JUnitAssertSample {
         assertTrue("Failure message to keep", b);
     }
 
+    public void refactorIfOnExpression(boolean b1, boolean b2) {
+        // Keep this comment
+        Assert.assertFalse(b1 && b2);
+        Assert.assertFalse("Failure message to keep", b1 || b2);
+
+        assertFalse(!b1 && !b2);
+        assertFalse("Failure message to keep", !b1 || !b2);
+    }
+
     public void refactorIfPrimitiveThenFail(int i1, int i2) {
         // Keep this comment
         Assert.assertEquals(i1, i2);
