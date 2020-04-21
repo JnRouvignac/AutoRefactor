@@ -1080,7 +1080,7 @@ public class ASTNodeFactory {
 	 * @return a new prefix expression
 	 */
 	public Expression not(final Expression expression) {
-		return prefixExpression(PrefixExpression.Operator.NOT, expression);
+		return prefixExpression(PrefixExpression.Operator.NOT, parenthesizeIfNeeded(expression));
 	}
 
 	/**
@@ -1103,14 +1103,16 @@ public class ASTNodeFactory {
 	 */
 	public Expression negate(final Expression expression, final Copy copy) {
 		Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
+
 		if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
 			PrefixExpression pe= (PrefixExpression) exprNoParen;
+
 			if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-				return copy.perform(this, ASTNodes.getUnparenthesedExpression(pe.getOperand()));
+				return copy.perform(this, pe.getOperand());
 			}
 		}
 
-		return not(parenthesizeIfNeeded(copy.perform(this, expression)));
+		return not(copy.perform(this, expression));
 	}
 
 	/**
