@@ -62,7 +62,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class SwitchCleanUp extends AbstractCleanUpRule {
-	static final class Variable {
+	private static final class Variable {
 		private final Expression name;
 		private final List<Expression> constantValues;
 
@@ -176,31 +176,31 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 		@Override
 		public boolean visit(final DoStatement node) {
-			return ignoreUnlabledBreaksInInnerBreakableStatement();
+			return ignoreUnlabeledBreaksInInnerBreakableStatement();
 		}
 
 		@Override
 		public boolean visit(final EnhancedForStatement node) {
-			return ignoreUnlabledBreaksInInnerBreakableStatement();
+			return ignoreUnlabeledBreaksInInnerBreakableStatement();
 		}
 
 		@Override
 		public boolean visit(final ForStatement node) {
-			return ignoreUnlabledBreaksInInnerBreakableStatement();
+			return ignoreUnlabeledBreaksInInnerBreakableStatement();
 		}
 
 		@Override
 		public boolean visit(final SwitchStatement node) {
-			return ignoreUnlabledBreaksInInnerBreakableStatement();
+			return ignoreUnlabeledBreaksInInnerBreakableStatement();
 		}
 
 		@Override
 		public boolean visit(final WhileStatement node) {
-			return ignoreUnlabledBreaksInInnerBreakableStatement();
+			return ignoreUnlabeledBreaksInInnerBreakableStatement();
 		}
 
-		private boolean ignoreUnlabledBreaksInInnerBreakableStatement() {
-			// Unlabeled breaks in inner loops/switchs work ok with switch cleanup rule
+		private boolean ignoreUnlabeledBreaksInInnerBreakableStatement() {
+			// Unlabeled breaks in inner loops/switchs work OK with switch cleanup rule
 			return false;
 		}
 	}
@@ -431,10 +431,13 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Variable extractVariableAndValues(final Expression expression) {
-		Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
-		return exprNoParen instanceof InfixExpression
-				? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
-						: null;
+		InfixExpression infix= ASTNodes.as(expression, InfixExpression.class);
+
+		if (infix != null) {
+			return extractVariableAndValuesFromInfixExpression(infix);
+		}
+
+		return null;
 	}
 
 	private Variable extractVariableAndValuesFromInfixExpression(final InfixExpression infixExpression) {
@@ -460,6 +463,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 			return mergedVariable;
 		}
+
 		if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
 			Expression leftOp= infixExpression.getLeftOperand();
 			Expression rightOp= infixExpression.getRightOperand();
@@ -472,8 +476,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Variable extractVariableWithConstantValue(final Expression firstOp, final Expression secondOp) {
-		// TODO JNR handle enums
-		// TODO JNR handle strings
 		if ((firstOp instanceof Name || firstOp instanceof FieldAccess) && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
 				&& (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
 			return new Variable(firstOp, Arrays.asList(secondOp));
