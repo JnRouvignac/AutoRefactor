@@ -104,7 +104,8 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			rewrite.replace(node,
-					ast.if0(rewrite.createMoveTarget(thenInnerIfStatement.getExpression()), ast.block(ast.if0(rewrite.createMoveTarget(node.getExpression()),
+					ast.if0(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression())),
+							ast.block(ast.if0(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getExpression())),
 							rewrite.createMoveTarget(thenInnerIfStatement.getThenStatement()), rewrite.createMoveTarget(elseInnerIfStatement.getThenStatement())))), null);
 			return false;
 		}

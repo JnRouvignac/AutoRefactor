@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
@@ -71,7 +72,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		if (Boolean.TRUE.equals(constantCondition)) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(node.getExpression()), rewrite.createMoveTarget(node.getBody())), null);
+			rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getExpression())), rewrite.createMoveTarget(node.getBody())), null);
 			return false;
 		}
 
