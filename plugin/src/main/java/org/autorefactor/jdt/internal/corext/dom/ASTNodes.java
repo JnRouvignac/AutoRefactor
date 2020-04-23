@@ -2448,12 +2448,24 @@ public final class ASTNodes {
 	 * @return true if the two provided codes structurally match, false otherwise
 	 */
 	public static boolean match(final List<Statement> referenceStatements, final List<Statement> comparedStatements) {
+		return match(ASTSemanticMatcher.INSTANCE, referenceStatements, comparedStatements);
+	}
+
+	/**
+	 * Returns whether the two provided codes structurally match.
+	 *
+	 * @param matcher the AST matcher
+	 * @param referenceStatements the first code to compare
+	 * @param comparedStatements  the second code to compare
+	 * @return true if the two provided codes structurally match, false otherwise
+	 */
+	public static boolean match(final ASTSemanticMatcher matcher, final List<Statement> referenceStatements, final List<Statement> comparedStatements) {
 		if (referenceStatements.size() != comparedStatements.size()) {
 			return false;
 		}
 
 		for (int codeLine= 0; codeLine < referenceStatements.size(); codeLine++) {
-			if (!match(referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
+			if (!match(matcher, referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
 				return false;
 			}
 		}

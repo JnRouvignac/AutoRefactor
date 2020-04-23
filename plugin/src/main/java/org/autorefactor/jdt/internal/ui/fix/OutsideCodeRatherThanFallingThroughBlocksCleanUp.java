@@ -31,6 +31,7 @@ import java.util.List;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
@@ -40,9 +41,11 @@ import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -166,7 +169,18 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 					stmtsToCompare= new ArrayList<>(statements);
 				}
 
-				boolean match= ASTNodes.match(referenceStatements, stmtsToCompare);
+				ASTSemanticMatcher matcher= new ASTSemanticMatcher() {
+					@Override
+					public boolean match(final SimpleName node, final Object other) {
+						return super.match(node, other)
+								&& other instanceof SimpleName
+								&& node.resolveBinding() != null
+								&& ((SimpleName) other).resolveBinding() != null
+								&& other instanceof SimpleName
+								&& (node.resolveBinding().getKind() != IBinding.VARIABLE && ((SimpleName) other).resolveBinding().getKind() != IBinding.VARIABLE || ASTNodes.isSameVariable(node, (SimpleName) other));
+					}
+				};
+				boolean match= ASTNodes.match(matcher, referenceStatements, stmtsToCompare);
 
 				if (!match) {
 					lastStatement= Utils.getLast(statements);
@@ -187,7 +201,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 							stmtsToCompare= statements.subList(0, statements.size() - 1);
 						}
 
-						match= ASTNodes.match(referenceStatements, stmtsToCompare);
+						match= ASTNodes.match(matcher, referenceStatements, stmtsToCompare);
 					}
 				}
 

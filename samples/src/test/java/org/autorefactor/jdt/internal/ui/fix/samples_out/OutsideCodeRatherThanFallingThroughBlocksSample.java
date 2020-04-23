@@ -28,6 +28,8 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class OutsideCodeRatherThanFallingThroughBlocksSample {
+    private boolean b= true;
+
     public void mergeIfBlocksIntoFollowingCode(int i) {
         // Keep this comment
         if (i <= 0) {
@@ -59,6 +61,23 @@ public class OutsideCodeRatherThanFallingThroughBlocksSample {
             System.out.println("Doing another thing");
         }
         System.out.println("Doing something");
+        return;
+    }
+
+    public void doNotMergeDifferentVariable(int i) {
+        if (i <= 0) {
+            boolean b= false;
+            System.out.println("Display a varaible: " + b);
+            return;
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            return;
+        } else if (i == 20) {
+            int b= 123;
+            System.out.println("Display a varaible: " + b);
+            return;
+        }
+        System.out.println("Display a varaible: " + b);
         return;
     }
 
