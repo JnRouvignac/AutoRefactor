@@ -689,15 +689,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
+	public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
+	public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
+	public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

@@ -27,157 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.util.List;
 
-public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
-    public void mergeCatchIntoFollowingCode(String number) {
-        // Keep this comment
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-        } catch (IllegalArgumentException iae) {
-            System.out.println("Doing another thing");
-            return;
-        } catch (NullPointerException npe) {
-        }
-        System.out.println("Doing something");
-        return;
-    }
-
-    public void mergeEndOfCatchIntoFollowingCode(String number) {
-        // Keep this comment
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-            System.out.println("Doing another thing");
-        } catch (IllegalArgumentException iae) {
-            System.out.println("Doing another thing");
-            return;
-        } catch (NullPointerException npe) {
-            System.out.println("Doing another thing");
-        }
-        System.out.println("Doing something");
-        return;
-    }
-
-    public void doNotRefactorWithFinally(String number) {
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-            System.out.println("Doing something");
-            return;
-        } catch (NullPointerException npe) {
-            System.out.println("Doing something");
-            return;
-        } finally {
-            System.out.println("Beware of finally!");
-        }
-        System.out.println("Doing something");
-        return;
-    }
-
-    public void doNotRefactorCodeThatDoesntFallThrough(String number) {
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-            System.out.println("Doing something");
-        } catch (NullPointerException npe) {
-            System.out.println("Doing something");
-        }
-        System.out.println("Doing something");
-    }
-
-    public void mergeCatchThrowingException(String number) throws Exception {
-        // Keep this comment
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-        } catch (IllegalArgumentException iae) {
-            System.out.println("Doing another thing");
-            throw new Exception();
-        } catch (NullPointerException npe) {
-        }
-        System.out.println("Doing something");
-        throw new Exception();
-    }
-
-    public void mergeCatchWithContinue(List<String> numbers) {
-        for (String number : numbers) {
-            // Keep this comment
-            try {
-                Integer.valueOf(number);
-            } catch (NumberFormatException nfe) {
-            } catch (IllegalArgumentException iae) {
-                System.out.println("Doing another thing");
-                continue;
-            } catch (NullPointerException npe) {
-            }
-            System.out.println("Doing something");
-            continue;
-        }
-    }
-
-    public void mergeCatchWithBreak(List<String> numbers) {
-        for (String number : numbers) {
-            // Keep this comment
-            try {
-                Integer.valueOf(number);
-            } catch (NumberFormatException nfe) {
-            } catch (IllegalArgumentException iae) {
-                System.out.println("Doing another thing");
-                break;
-            } catch (NullPointerException npe) {
-            }
-            System.out.println("Doing something");
-            break;
-        }
-    }
-
-    public void mergeCatchThatAlwaysFallThrough(String number, boolean interruptCode) throws Exception {
-        // Keep this comment
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-        } catch (IllegalArgumentException iae) {
-            System.out.println("Doing another thing");
-            if (interruptCode) {
-                throw new Exception("Stop!");
-            } else {
-                return;
-            }
-        } catch (NullPointerException npe) {
-        }
-        System.out.println("Doing something");
-        if (interruptCode) {
-            throw new Exception("Stop!");
-        } else {
-            return;
-        }
-    }
-
-    public void doNotMergeCatchThatNotAlwaysFallThrough(String number, boolean interruptCode) throws Exception {
-        try {
-            Integer.valueOf(number);
-        } catch (NumberFormatException nfe) {
-            System.out.println("Doing something");
-            if (interruptCode) {
-                throw new Exception("Stop!");
-            }
-        } catch (IllegalArgumentException iae) {
-            System.out.println("Doing another thing");
-            if (interruptCode) {
-                throw new Exception("Stop!");
-            }
-        } catch (NullPointerException npe) {
-            System.out.println("Doing something");
-            if (interruptCode) {
-                throw new Exception("Stop!");
-            }
-        }
-        System.out.println("Doing something");
-        if (interruptCode) {
-            throw new Exception("Stop!");
-        }
-    }
-
+public class OutsideCodeRatherThanFallingThroughBlocksSample {
     public void mergeIfBlocksIntoFollowingCode(int i) {
         // Keep this comment
         if (i <= 0) {
@@ -376,6 +226,156 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
                 throw new Exception("Stop!");
             }
         } else if (i == 20) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        }
+        System.out.println("Doing something");
+        if (interruptCode) {
+            throw new Exception("Stop!");
+        }
+    }
+
+    public void mergeCatchIntoFollowingCode(String number) {
+        // Keep this comment
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            return;
+        } catch (NullPointerException npe) {
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void mergeEndOfCatchIntoFollowingCode(String number) {
+        // Keep this comment
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+            System.out.println("Doing another thing");
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            return;
+        } catch (NullPointerException npe) {
+            System.out.println("Doing another thing");
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void doNotRefactorWithFinally(String number) {
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+            System.out.println("Doing something");
+            return;
+        } catch (NullPointerException npe) {
+            System.out.println("Doing something");
+            return;
+        } finally {
+            System.out.println("Beware of finally!");
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void doNotRefactorCodeThatDoesntFallThrough(String number) {
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+            System.out.println("Doing something");
+        } catch (NullPointerException npe) {
+            System.out.println("Doing something");
+        }
+        System.out.println("Doing something");
+    }
+
+    public void mergeCatchThrowingException(String number) throws Exception {
+        // Keep this comment
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            throw new Exception();
+        } catch (NullPointerException npe) {
+        }
+        System.out.println("Doing something");
+        throw new Exception();
+    }
+
+    public void mergeCatchWithContinue(List<String> numbers) {
+        for (String number : numbers) {
+            // Keep this comment
+            try {
+                Integer.valueOf(number);
+            } catch (NumberFormatException nfe) {
+            } catch (IllegalArgumentException iae) {
+                System.out.println("Doing another thing");
+                continue;
+            } catch (NullPointerException npe) {
+            }
+            System.out.println("Doing something");
+            continue;
+        }
+    }
+
+    public void mergeCatchWithBreak(List<String> numbers) {
+        for (String number : numbers) {
+            // Keep this comment
+            try {
+                Integer.valueOf(number);
+            } catch (NumberFormatException nfe) {
+            } catch (IllegalArgumentException iae) {
+                System.out.println("Doing another thing");
+                break;
+            } catch (NullPointerException npe) {
+            }
+            System.out.println("Doing something");
+            break;
+        }
+    }
+
+    public void mergeCatchThatAlwaysFallThrough(String number, boolean interruptCode) throws Exception {
+        // Keep this comment
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            } else {
+                return;
+            }
+        } catch (NullPointerException npe) {
+        }
+        System.out.println("Doing something");
+        if (interruptCode) {
+            throw new Exception("Stop!");
+        } else {
+            return;
+        }
+    }
+
+    public void doNotMergeCatchThatNotAlwaysFallThrough(String number, boolean interruptCode) throws Exception {
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        } catch (NullPointerException npe) {
             System.out.println("Doing something");
             if (interruptCode) {
                 throw new Exception("Stop!");

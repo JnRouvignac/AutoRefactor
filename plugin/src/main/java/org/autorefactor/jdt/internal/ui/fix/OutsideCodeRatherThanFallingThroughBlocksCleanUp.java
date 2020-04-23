@@ -41,7 +41,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
-public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends AbstractCleanUpRule {
+public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
 	/**
 	 * Get the name.
 	 *
@@ -49,7 +49,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 	 */
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
+		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 	 */
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
+		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
 	}
 
 	/**
@@ -69,19 +69,19 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 	 */
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
+		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
 	}
 
 	@Override
 	public boolean visit(final Block node) {
-		CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(cuRewrite,
+		BlocksAndFollowingCodeVisitor blocksAndFollowingCodeVisitor= new BlocksAndFollowingCodeVisitor(cuRewrite,
 				node);
-		node.accept(catchesAndFollowingCodeVisitor);
-		return catchesAndFollowingCodeVisitor.getResult();
+		node.accept(blocksAndFollowingCodeVisitor);
+		return blocksAndFollowingCodeVisitor.getResult();
 	}
 
-	private static final class CatchesAndFollowingCodeVisitor extends BlockSubVisitor {
-		public CatchesAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+	private static final class BlocksAndFollowingCodeVisitor extends BlockSubVisitor {
+		public BlocksAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
 			super(cuRewrite, startNode);
 		}
 
@@ -155,7 +155,6 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
 			if (nextSibling != null) {
 				referenceStatements.add(nextSibling);
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 				for (Statement redundantStatement : redundantStatements) {
 					List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
@@ -166,6 +165,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 					}
 
 					if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 						if (redundantStatement instanceof Block) {

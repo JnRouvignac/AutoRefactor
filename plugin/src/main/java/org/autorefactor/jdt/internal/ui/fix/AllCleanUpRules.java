@@ -106,7 +106,7 @@ public final class AllCleanUpRules {
 				new OppositeConditionRatherThanDuplicateConditionCleanUp(),
 				new OneConditionRatherThanUnreachableBlockCleanUp(), new MergeConditionalBlocksCleanUp(),
 				new OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
-				new OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp(),
+				new OutsideCodeRatherThanFallingThroughBlocksCleanUp(),
 				new ElseRatherThanOppositeConditionCleanUp(), new GenericMapRatherThanRawMapCleanUp(),
 				new GenericListRatherThanRawListCleanUp(), new UseDiamondOperatorCleanUp(),
 				new NIORatherThanIOCleanUp(),
