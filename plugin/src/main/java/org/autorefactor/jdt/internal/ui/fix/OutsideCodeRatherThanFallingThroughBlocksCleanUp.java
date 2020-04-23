@@ -105,39 +105,34 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
 		private void collectStatements(final Statement node, final List<Statement> redundantStatements) {
-			if (node == null) {
-				return;
-			}
+			if (node != null) {
+				TryStatement ts= ASTNodes.as(node, TryStatement.class);
+				IfStatement is= ASTNodes.as(node, IfStatement.class);
 
-			TryStatement ts= ASTNodes.as(node, TryStatement.class);
-			IfStatement is= ASTNodes.as(node, IfStatement.class);
+				if (ts != null && ts.getFinally() == null) {
+					@SuppressWarnings("unchecked")
+					final List<CatchClause> catchClauses= ts.catchClauses();
 
-			if (ts != null && ts.getFinally() == null) {
-				for (CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
-					doCollectStatements(catchClause.getBody(), redundantStatements);
+					for (CatchClause catchClause : catchClauses) {
+						doCollectStatements(catchClause.getBody(), redundantStatements);
+					}
+				} else if (is != null) {
+					doCollectStatements(is.getThenStatement(), redundantStatements);
+					doCollectStatements(is.getElseStatement(), redundantStatements);
 				}
-			} else if (is != null) {
-				doCollectStatements(is.getThenStatement(), redundantStatements);
-				doCollectStatements(is.getElseStatement(), redundantStatements);
 			}
 		}
 
-		private void doCollectStatements(Statement node, final List<Statement> redundantStatements) {
-			if (node == null) {
-				return;
+		private void doCollectStatements(final Statement node, final List<Statement> redundantStatements) {
+			if (node != null) {
+				redundantStatements.add(node);
+				List<Statement> statements= ASTNodes.asList(node);
+
+				if (!Utils.isEmpty(statements)) {
+					collectStatements(Utils.getLast(statements), redundantStatements);
+				}
 			}
-
-			redundantStatements.add(node);
-			List<Statement> statements= ASTNodes.asList(node);
-
-			if (Utils.isEmpty(statements)) {
-				return;
-			}
-
-			node= statements.get(statements.size() - 1);
-			collectStatements(node, redundantStatements);
 		}
 
 		private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
@@ -175,12 +170,11 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 						}
 
 						setResult(false);
-						return false;
 					}
 				}
 			}
 
-			return true;
+			return getResult();
 		}
 	}
 }
