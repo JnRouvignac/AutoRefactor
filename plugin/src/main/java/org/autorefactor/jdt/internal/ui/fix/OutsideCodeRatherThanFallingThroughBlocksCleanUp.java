@@ -36,9 +36,16 @@ import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUni
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
@@ -136,45 +143,84 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 		}
 
 		private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
-			if (redundantStatements.isEmpty()) {
+			List<Statement> referenceStatements= ASTNodes.getNextSiblings(node);
+
+			if (redundantStatements.isEmpty() || Utils.isEmpty(referenceStatements)) {
 				return true;
 			}
 
-			List<Statement> referenceStatements= new ArrayList<>();
+			for (Statement redundantStatement : redundantStatements) {
+				List<Statement> statements= ASTNodes.asList(redundantStatement);
 
-			Statement nextSibling= ASTNodes.getNextSibling(node);
-			while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {
-				referenceStatements.add(nextSibling);
-				nextSibling= ASTNodes.getNextSibling(nextSibling);
-			}
+				if (Utils.isEmpty(statements) || !ASTNodes.fallsThrough(Utils.getLast(statements))) {
+					continue;
+				}
 
-			if (nextSibling != null) {
-				referenceStatements.add(nextSibling);
+				Statement lastStatement= null;
 
-				for (Statement redundantStatement : redundantStatements) {
-					List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
+				List<Statement> stmtsToCompare;
+				if (statements.size() > referenceStatements.size()) {
+					stmtsToCompare= statements.subList(statements.size() - referenceStatements.size(),
+							statements.size());
+				} else {
+					stmtsToCompare= new ArrayList<>(statements);
+				}
 
-					if (stmtsToCompare.size() > referenceStatements.size()) {
-						stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStatements.size(),
-								stmtsToCompare.size());
-					}
+				boolean match= ASTNodes.match(referenceStatements, stmtsToCompare);
 
-					if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
-						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				if (!match) {
+					lastStatement= Utils.getLast(statements);
+					ReturnStatement returnStatement= ASTNodes.as(lastStatement, ReturnStatement.class);
+					ContinueStatement continueStatement= ASTNodes.as(lastStatement, ContinueStatement.class);
 
-						if (redundantStatement instanceof Block) {
-							rewrite.remove(stmtsToCompare, null);
+					if (isIn(node, MethodDeclaration.class)
+							&& returnStatement != null
+							&& returnStatement.getExpression() == null
+							|| isIn(node, EnhancedForStatement.class, ForStatement.class, WhileStatement.class, DoStatement.class)
+									&& continueStatement != null
+									&& continueStatement.getLabel() == null) {
+
+						if (statements.size() > referenceStatements.size() + 1) {
+							stmtsToCompare= statements.subList(statements.size() - referenceStatements.size() - 1,
+									statements.size() - 1);
 						} else {
-							rewrite.replace(redundantStatement, ast.block(), null);
+							stmtsToCompare= statements.subList(0, statements.size() - 1);
 						}
 
-						setResult(false);
+						match= ASTNodes.match(referenceStatements, stmtsToCompare);
 					}
+				}
+
+				if (match) {
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+					ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+					if (redundantStatement instanceof Block) {
+						rewrite.remove(stmtsToCompare, null);
+
+						if (lastStatement != null) {
+							rewrite.remove(lastStatement, null);
+						}
+					} else {
+						rewrite.replace(redundantStatement, ast.block(), null);
+					}
+
+					setResult(false);
 				}
 			}
 
 			return getResult();
+		}
+
+		private boolean isIn(final Statement node, final Class<?>... domClasses) {
+			for (Class<?> domClass : domClasses) {
+				if (node.getParent().getClass().isAssignableFrom(domClass)
+						|| node.getParent() instanceof Block && node.getParent().getParent().getClass().isAssignableFrom(domClass)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 }

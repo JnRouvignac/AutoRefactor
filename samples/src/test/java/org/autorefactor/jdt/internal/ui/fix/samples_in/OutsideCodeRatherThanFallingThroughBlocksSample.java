@@ -70,6 +70,80 @@ public class OutsideCodeRatherThanFallingThroughBlocksSample {
         return;
     }
 
+    public void mergeWithoutContinue(int i, int j) {
+        while (j-- > 0) {
+            // Keep this comment
+            if (i <= 0) {
+                System.out.println("Doing another thing");
+                System.out.println("Doing something");
+                continue;
+            } else if (i == 10) {
+                System.out.println("Doing another thing");
+                continue;
+            } else if (i == 20) {
+                System.out.println("Doing another thing");
+                System.out.println("Doing something");
+                continue;
+            }
+            System.out.println("Doing something");
+        }
+    }
+
+    public void doNotMergeWithoutLabeledContinue(int i, int j, int k) {
+        loop: while (k-- > 0) {
+            while (j-- > 0) {
+                if (i <= 0) {
+                    System.out.println("Doing another thing");
+                    System.out.println("Doing something");
+                    continue loop;
+                } else if (i == 10) {
+                    System.out.println("Doing another thing");
+                    continue loop;
+                } else if (i == 20) {
+                    System.out.println("Doing another thing");
+                    System.out.println("Doing something");
+                    continue loop;
+                }
+                System.out.println("Doing something");
+            }
+        }
+    }
+
+    public void doNotMergeWithoutBreak(int i, int j) {
+        while (j-- > 0) {
+            if (i <= 0) {
+                System.out.println("Doing another thing");
+                System.out.println("Doing something");
+                break;
+            } else if (i == 10) {
+                System.out.println("Doing another thing");
+                break;
+            } else if (i == 20) {
+                System.out.println("Doing another thing");
+                System.out.println("Doing something");
+                break;
+            }
+            System.out.println("Doing something");
+        }
+    }
+
+    public void mergeWithoutReturn(int i) {
+        // Keep this comment
+        if (i <= 0) {
+            System.out.println("Doing another thing");
+            System.out.println("Doing something");
+            return;
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            return;
+        } else if (i == 20) {
+            System.out.println("Doing another thing");
+            System.out.println("Doing something");
+            return;
+        }
+        System.out.println("Doing something");
+    }
+
     public void doNotRefactorCodeThatDoesntFallThrough(int i) {
         if (i <= 0) {
             System.out.println("Doing something");
