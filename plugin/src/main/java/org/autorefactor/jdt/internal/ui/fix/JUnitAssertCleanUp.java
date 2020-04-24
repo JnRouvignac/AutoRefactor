@@ -200,7 +200,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		List<Expression> arguments= new ArrayList<>(4);
 
 		if (failureMessage != null) {
-			arguments.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(failureMessage)));
+			arguments.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
 		if (copyOfExpected != null) {

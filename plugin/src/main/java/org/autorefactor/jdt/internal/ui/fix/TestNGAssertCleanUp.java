@@ -209,7 +209,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (failureMessage != null) {
-			arguments.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(failureMessage)));
+			arguments.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
 		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
