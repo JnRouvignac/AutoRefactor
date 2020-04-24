@@ -36,6 +36,7 @@ import java.util.Objects;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
@@ -503,7 +504,7 @@ public class ASTNodeFactory {
 					"The provided nodes are not valid for doing a range copy: " + nodes); //$NON-NLS-1$
 		}
 
-		return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
+		return refactorings.createCopyTarget(nodes.get(0), Utils.getLast(nodes));
 	}
 
 	/**
@@ -522,7 +523,7 @@ public class ASTNodeFactory {
 					"The provided nodes are not valid for doing a range move: " + nodes); //$NON-NLS-1$
 		}
 
-		return refactorings.createMoveTarget(nodes.get(0), nodes.get(nodes.size() - 1));
+		return refactorings.createMoveTarget(nodes.get(0), Utils.getLast(nodes));
 	}
 
 	private boolean isValidForRangeOperation(final List<? extends ASTNode> nodes) {

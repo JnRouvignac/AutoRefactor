@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -109,7 +110,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 		}
 
 		private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final AtomicInteger operandCount) {
-			IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
+			IfStatement lastBlock= Utils.getLast(duplicateIfBlocks);
 
 			if (lastBlock.getElseStatement() == null) {
 				IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);

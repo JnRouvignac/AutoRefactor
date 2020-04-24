@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -153,7 +154,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-			Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+			Statement lastStatement= Utils.getLast(caseStructure.getSecond());
 
 			if (!ASTNodes.fallsThrough(lastStatement)) {
 				return true;

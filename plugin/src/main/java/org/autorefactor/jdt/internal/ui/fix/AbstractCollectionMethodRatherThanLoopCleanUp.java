@@ -44,6 +44,7 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -172,7 +173,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 							return maybeReplaceLoopAndVariable(forNode, iterable, thenStatement, toFind);
 						}
 
-						BreakStatement bs= ASTNodes.as(thenStatements.get(thenStatements.size() - 1), BreakStatement.class);
+						BreakStatement bs= ASTNodes.as(Utils.getLast(thenStatements), BreakStatement.class);
 
 						if (bs != null && bs.getLabel() == null) {
 							if (thenStatements.size() == 2 && !maybeReplaceLoopAndVariable(forNode, iterable,

@@ -31,6 +31,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -152,7 +153,7 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 		if (modifiers.isEmpty()) {
 			rewrite.insertBefore(static0, node, null);
 		} else {
-			IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
+			IExtendedModifier lastModifier= (IExtendedModifier) Utils.getLast(modifiers);
 
 			if (lastModifier.isModifier()) {
 				if (((Modifier) lastModifier).isFinal()) {
