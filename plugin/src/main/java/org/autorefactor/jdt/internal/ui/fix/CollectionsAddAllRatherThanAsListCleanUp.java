@@ -131,10 +131,10 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 
 		List<Expression> copyOfArguments= new ArrayList<>(asListMethod.arguments().size() + 1);
-		copyOfArguments.add(rewrite.createMoveTarget(node.getExpression()));
+		copyOfArguments.add(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getExpression())));
 
 		for (Object argument : asListMethod.arguments()) {
-			copyOfArguments.add(rewrite.createMoveTarget((Expression) argument));
+			copyOfArguments.add(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) argument)));
 		}
 
 		MethodInvocation newCollectionsAddAllMethod= ast.newMethodInvocation(ast.name(collectionsName), ADD_ALL_METHOD, copyOfArguments);

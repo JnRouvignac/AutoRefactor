@@ -99,6 +99,6 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
 		String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
 		rewrite.replace(node,
-				ast.newMethodInvocation(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(arg0)), methodName, rewrite.createMoveTarget(expression)), null);
+				ast.newMethodInvocation(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(arg0)), methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(expression))), null);
 	}
 }

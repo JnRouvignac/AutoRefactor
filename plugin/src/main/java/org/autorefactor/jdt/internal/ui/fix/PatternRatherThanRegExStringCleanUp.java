@@ -213,25 +213,25 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
 			rewrite.replace(type, ast.type(patternName), null);
-			rewrite.replace(initializer, ast.newMethodInvocation(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(initializer)), null);
+			rewrite.replace(initializer, ast.newMethodInvocation(ast.name(patternName), COMPILE_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(initializer))), null);
 
 			for (SimpleName regExUse : regExUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
 				MethodInvocation newExpression= null;
 
 				if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), SPLIT_METHOD, String.class.getCanonicalName())) {
-					newExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()));
+					newExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression())));
 				} else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), SPLIT_METHOD, String.class.getCanonicalName(), int.class.getCanonicalName())) {
-					newExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()), rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+					newExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), SPLIT_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression())), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) methodInvocation.arguments().get(1))));
 				} else {
-					MethodInvocation matcherExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), MATCHER_METHOD, rewrite.createMoveTarget(methodInvocation.getExpression()));
+					MethodInvocation matcherExpression= ast.newMethodInvocation(rewrite.createMoveTarget(regExUse), MATCHER_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression())));
 
 					if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), MATCHES_METHOD, String.class.getCanonicalName())) {
 						newExpression= ast.newMethodInvocation(matcherExpression, MATCHES_METHOD);
 					} else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_ALL_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
-						newExpression= ast.newMethodInvocation(matcherExpression, REPLACE_ALL_METHOD, rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+						newExpression= ast.newMethodInvocation(matcherExpression, REPLACE_ALL_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) methodInvocation.arguments().get(1))));
 					} else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_FIRST_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
-						newExpression= ast.newMethodInvocation(matcherExpression, REPLACE_FIRST_METHOD, rewrite.createMoveTarget((Expression) methodInvocation.arguments().get(1)));
+						newExpression= ast.newMethodInvocation(matcherExpression, REPLACE_FIRST_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) methodInvocation.arguments().get(1))));
 					}
 				}
 

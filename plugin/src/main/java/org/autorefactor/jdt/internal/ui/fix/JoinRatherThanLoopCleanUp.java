@@ -40,8 +40,8 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
-import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
@@ -638,13 +638,13 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			Expression copyOfDelimiter= rewrite.createMoveTarget(delimiter);
+			Expression copyOfDelimiter= rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(delimiter));
 
 			if (!ASTNodes.hasType(delimiter, String.class.getCanonicalName())) {
 				copyOfDelimiter= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "valueOf", copyOfDelimiter); //$NON-NLS-1$
 			}
 
-			MethodInvocation joinMethod= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "join", copyOfDelimiter, rewrite.createMoveTarget(containerVariable)); //$NON-NLS-1$
+			MethodInvocation joinMethod= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "join", copyOfDelimiter, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(containerVariable))); //$NON-NLS-1$
 			VariableDeclarationStatement joinStatement= ast.declareStatement(ast.type(String.class.getSimpleName()), rewrite.createMoveTarget(builder), joinMethod);
 			@SuppressWarnings("unchecked")
 			List<ASTNode> varModifiers= joinStatement.modifiers();

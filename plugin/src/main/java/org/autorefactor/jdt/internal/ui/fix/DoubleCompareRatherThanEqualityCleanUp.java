@@ -81,7 +81,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 
 		rewrite.replace(node,
 				ast.infixExpression(
-						ast.newMethodInvocation(Double.class.getSimpleName(), "compare", rewrite.createMoveTarget(node.getLeftOperand()), rewrite.createMoveTarget(node.getRightOperand())), //$NON-NLS-1$
+						ast.newMethodInvocation(Double.class.getSimpleName(), "compare", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getLeftOperand())), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getRightOperand()))), //$NON-NLS-1$
 						node.getOperator(), ast.number("0")), null); //$NON-NLS-1$
 	}
 }

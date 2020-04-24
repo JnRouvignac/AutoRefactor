@@ -130,8 +130,8 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
-						"fill", rewrite.createMoveTarget(arrayAccess.getArray()), //$NON-NLS-1$
-						rewrite.createMoveTarget(assignment.getRightHandSide()))), null);
+						"fill", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())), //$NON-NLS-1$
+						rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())))), null);
 	}
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {

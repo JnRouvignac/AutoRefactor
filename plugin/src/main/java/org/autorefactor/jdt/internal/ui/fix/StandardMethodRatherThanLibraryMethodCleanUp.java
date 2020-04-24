@@ -121,7 +121,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "equals", rewrite.createMoveTarget((Expression) node.arguments().get(0)), //$NON-NLS-1$
+			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "equals", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), //$NON-NLS-1$
 					rewrite.createMoveTarget((Expression) node.arguments().get(1))), null);
 			return false;
 		}
@@ -131,7 +131,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			rewrite.replace(node,
-					ast.newMethodInvocation(javaUtilObjects, "toString", rewrite.createMoveTarget((Expression) node.arguments().get(0)), ast.string("")), null); //$NON-NLS-1$ //$NON-NLS-2$
+					ast.newMethodInvocation(javaUtilObjects, "toString", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), ast.string("")), null); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 
@@ -191,7 +191,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 		List<Expression> copyOfArgs= new ArrayList<>(node.arguments().size());
 
 		for (Object expression : node.arguments()) {
-			copyOfArgs.add(rewrite.createMoveTarget((Expression) expression));
+			copyOfArgs.add(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) expression)));
 		}
 
 		return copyOfArgs;

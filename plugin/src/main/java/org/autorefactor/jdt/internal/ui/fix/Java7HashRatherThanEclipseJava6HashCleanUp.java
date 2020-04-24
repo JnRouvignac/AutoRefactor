@@ -36,8 +36,8 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -301,7 +301,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 							boolean assignmentValid= isStmtValid(data);
 
 							if (assignmentValid) {
-								data.getFields().add(fieldToFind);
+								data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldToFind));
 								return true;
 							}
 						}
@@ -338,7 +338,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					boolean assignmentValid= isStmtValid(data);
 
 					if (assignmentValid) {
-						data.getFields().add(fieldToFind);
+						data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldToFind));
 						return true;
 					}
 				}
@@ -397,7 +397,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 			if (!ASTNodes.isSameVariable(data.getPrimeId(), fieldName)
 					&& !ASTNodes.isSameVariable(data.getResultId(), fieldName)) {
-				data.getFields().add(fieldName);
+				data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldName));
 				return true;
 			}
 		} else if (newHash instanceof ConditionalExpression && data.isTempValueUsed()) {
@@ -413,7 +413,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
 						&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
-					data.getFields().add(fieldName);
+					data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldName));
 					return true;
 				}
 			} else if (ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, boolean[].class.getCanonicalName())
@@ -429,7 +429,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
 						&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
-					data.getFields().add(specificMethod);
+					data.getFields().add(ASTNodes.getUnparenthesedExpression(specificMethod));
 					return true;
 				}
 			} else if (innerClass != null
@@ -479,7 +479,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 							if (topLevelClassReference != null
 									&& topLevelClass.getName().getIdentifier().equals(topLevelClassReference.getIdentifier())) {
-								data.getFields().add(specificMethod);
+								data.getFields().add(ASTNodes.getUnparenthesedExpression(specificMethod));
 								return true;
 							}
 						}
@@ -540,7 +540,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32).equals(hash)) {
 					if (data.isTempValueUsed()) {
-						data.getFields().add(againFieldName);
+						data.getFields().add(ASTNodes.getUnparenthesedExpression(againFieldName));
 						return true;
 					}
 
@@ -565,7 +565,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 				&& !ASTNodes.isSameVariable(booleanField, data.getPrimeId())
 				&& !ASTNodes.isSameVariable(booleanField, data.getResultId()) && Long.valueOf(1231).equals(hashForTrue)
 				&& Long.valueOf(1237).equals(hashForFalse)) {
-			data.getFields().add(booleanField);
+			data.getFields().add(ASTNodes.getUnparenthesedExpression(booleanField));
 			return true;
 		}
 
@@ -598,7 +598,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 					if (fieldToHash != null
 							&& ASTNodes.isSameVariable(field, fieldToHash)) {
-						data.getFields().add(fieldToHash);
+						data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldToHash));
 						return true;
 					}
 				}

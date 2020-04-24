@@ -117,10 +117,10 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				List<Expression> newArguments= new ArrayList<>(originalMethod.arguments().size());
 
 				for (Object argument : originalMethod.arguments()) {
-					newArguments.add(rewrite.createCopyTarget((Expression) argument));
+					newArguments.add(rewrite.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) argument)));
 				}
 
-				newArguments.set(parameterIndex, rewrite.createMoveTarget(operand));
+				newArguments.set(parameterIndex, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(operand)));
 				MethodInvocation newMethod;
 
 				if (originalMethod.getExpression() != null) {

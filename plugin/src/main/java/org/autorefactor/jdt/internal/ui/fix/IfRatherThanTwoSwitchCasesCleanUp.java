@@ -77,6 +77,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean visit(final SwitchStatement node) {
 		if (!ASTNodes.isPassive(node.getExpression())) {
@@ -225,7 +226,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
 				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-			equality= ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(discriminant)); //$NON-NLS-1$
+			equality= ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
 		} else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
 			equality= ast.infixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
 					ast.name(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));

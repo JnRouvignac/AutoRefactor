@@ -95,6 +95,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 	private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
 			final InfixExpression message) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		StringBuilder messageBuilder= new StringBuilder();
 		List<Expression> params= new LinkedList<>();
@@ -113,13 +114,12 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 				messageBuilder.append(literal);
 			} else {
 				hasObjects= true;
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				messageBuilder.append("{}"); //$NON-NLS-1$
 
 				if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-					params.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", rewrite.createMoveTarget(string))); //$NON-NLS-1$
+					params.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(string)))); //$NON-NLS-1$
 				} else {
-					params.add(rewrite.createMoveTarget(string));
+					params.add(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(string)));
 				}
 			}
 		}

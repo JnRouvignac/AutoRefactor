@@ -34,8 +34,8 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
@@ -212,6 +212,6 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.if0(ast.not(ast.newMethodInvocation(ast.name(classname),
-						EQUALS_METHOD, rewrite.createMoveTarget(firstField), rewrite.createMoveTarget(secondField))), ast.block(rewrite.createMoveTarget(returnStatement))), null);
+						EQUALS_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(firstField)), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(secondField)))), ast.block(rewrite.createMoveTarget(returnStatement))), null);
 	}
 }

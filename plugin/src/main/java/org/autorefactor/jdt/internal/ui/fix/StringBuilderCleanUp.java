@@ -404,7 +404,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (result == null) {
 				result= finalString;
 			} else {
-				result= ast.newMethodInvocation(result, "append", finalString); //$NON-NLS-1$
+				result= ast.newMethodInvocation(result, "append", ASTNodes.getUnparenthesedExpression(finalString)); //$NON-NLS-1$
 			}
 		}
 
@@ -449,10 +449,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		Expression stringVar= ast.createCopyTarget(embeddedMI.getExpression());
+		Expression stringVar= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(embeddedMI.getExpression()));
 		List<Expression> args= ASTNodes.arguments(embeddedMI);
-		Expression arg0= ast.createCopyTarget(args.get(0));
-		Expression arg1= ast.createCopyTarget(args.get(1));
+		Expression arg0= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(args.get(0)));
+		Expression arg1= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(args.get(1)));
 		Expression lastExpression= ast.createCopyTarget(node.getExpression());
 		MethodInvocation newAppendSubstring= null;
 

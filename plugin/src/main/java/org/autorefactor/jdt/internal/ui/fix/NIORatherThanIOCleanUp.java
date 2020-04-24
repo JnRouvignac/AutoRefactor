@@ -131,7 +131,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 
 			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) node.getExpression();
-			Expression copyOfPathText= rewrite.createMoveTarget((Expression) classInstanceCreation.arguments().get(0));
+			Expression copyOfPathText= rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
 
 			if (ASTNodes.usesGivenSignature(node, File.class.getCanonicalName(), TOPATH_METHOD)) {
 				rewrite.replace(node, ast.newMethodInvocation(ast.name(pathsName), GET_METHOD, copyOfPathText), null);
@@ -234,7 +234,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 			String pathName= addImport(Path.class, classesToUseWithImport, importsToAdd);
 			rewrite.replace(type, ast.type(pathName), null);
-			rewrite.replace(classInstanceCreation, ast.newMethodInvocation(ast.name(pathsName), GET_METHOD, rewrite.createMoveTarget((Expression) classInstanceCreation.arguments().get(0))), null);
+			rewrite.replace(classInstanceCreation, ast.newMethodInvocation(ast.name(pathsName), GET_METHOD, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), null);
 
 			for (SimpleName fileUse : fileUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();

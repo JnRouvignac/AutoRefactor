@@ -395,7 +395,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 		private MethodInvocation collectionGet(final ForLoopContent loopContent) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			return ast.newMethodInvocation(ast.copySubtree(loopContent.getContainerVariable()), "get", //$NON-NLS-1$
-					ast.copySubtree(loopContent.getLoopVariable()));
+					ast.copySubtree(ASTNodes.getUnparenthesedExpression(loopContent.getLoopVariable())));
 		}
 
 		private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(final Statement statement) {
