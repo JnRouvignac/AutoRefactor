@@ -240,8 +240,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 		if (!FAIL_METHOD.equals(methodName) && FAIL_CLASS.equals(qualifiedClassName)) {
 			qualifiedClassName= ASSERTIONS_CLASS;
 			qualifiedClass= null;
+		} else if (originalMethod.getExpression() != null) {
+			qualifiedClass= cuRewrite.getASTRewrite().createMoveTarget(originalMethod.getExpression());
 		} else {
-			qualifiedClass= ast.copyExpression(originalMethod);
+			qualifiedClass= null;
 		}
 
 		if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
@@ -263,7 +265,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
+				copyOfMessages.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
@@ -286,7 +288,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
+				copyOfMessages.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			assertionMethod= ast.newMethodInvocation(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
@@ -295,7 +297,8 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 		if (copyOfExpected != null) {
 			if (delta != null && IS_EQUAL_TO_METHOD.equals(finalMethodName)) {
 				importsToAdd.add(OFFSET_CLASS);
-				return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected, ast.newMethodInvocation(classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS, "offset", ast.createCopyTarget(delta))); //$NON-NLS-1$ //$NON-NLS-2$
+				final String offsetClassname= classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS; //$NON-NLS-1$
+				return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected, ast.newMethodInvocation(offsetClassname, "offset", ast.createCopyTarget(delta))); //$NON-NLS-1$
 			}
 
 			return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected);
