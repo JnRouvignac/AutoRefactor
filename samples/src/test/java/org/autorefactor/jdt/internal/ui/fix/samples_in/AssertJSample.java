@@ -84,6 +84,23 @@ public class AssertJSample {
         assertThat(f1 != f2).describedAs("Failure message to keep").isFalse();
     }
 
+    public void removeParenthesis(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        Assertions.assertThat((i1 + i2) == (i3 + i4)).isTrue();
+        Assertions.assertThat((i1 + i2) == (i3 + i4)).as("Failure message to keep").isTrue();
+        Assertions.assertThat((i1 + i2) == (i3 + i4)).describedAs("Failure message to keep").isTrue();
+        Assertions.assertThat((i1 + i2) != (i3 + i4)).isFalse();
+        Assertions.assertThat((i1 + i2) != (i3 + i4)).as("Failure message to keep").isFalse();
+        Assertions.assertThat((i1 + i2) != (i3 + i4)).describedAs("Failure message to keep").isFalse();
+
+        assertThat((i1 + i2) == (i3 + i4)).isTrue();
+        assertThat((i1 + i2) == (i3 + i4)).as("Failure message to keep").isTrue();
+        assertThat((i1 + i2) == (i3 + i4)).describedAs("Failure message to keep").isTrue();
+        assertThat((i1 + i2) != (i3 + i4)).isFalse();
+        assertThat((i1 + i2) != (i3 + i4)).as("Failure message to keep").isFalse();
+        assertThat((i1 + i2) != (i3 + i4)).describedAs("Failure message to keep").isFalse();
+    }
+
     public void refactorFailures() {
         // Keep this comment
         Assertions.assertThat(false).isTrue();

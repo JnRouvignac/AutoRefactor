@@ -191,7 +191,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 	}
 
 	@Override
-	protected MethodInvocation invokeQualifiedMethod(Set<String> classesToUseWithImport, Set<String> importsToAdd,
+	protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNodeFactory ast, final Expression copyOfExpression, final String methodName,
 			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
 		List<Expression> arguments= new ArrayList<>(4);
@@ -209,7 +209,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (failureMessage != null) {
-			arguments.add(ast.createCopyTarget(failureMessage));
+			arguments.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
 		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));

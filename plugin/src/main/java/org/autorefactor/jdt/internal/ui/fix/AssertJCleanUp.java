@@ -263,7 +263,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(ast.createCopyTarget((Expression) message));
+				copyOfMessages.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
@@ -286,7 +286,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(ast.createCopyTarget((Expression) message));
+				copyOfMessages.add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			assertionMethod= ast.newMethodInvocation(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);

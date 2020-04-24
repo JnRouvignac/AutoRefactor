@@ -71,6 +71,19 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", f1, f2, .0F);
     }
 
+    public void removeParenthesis(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        Assert.assertEquals(i1 + i2, i3 + i4);
+        Assert.assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+        Assert.assertEquals(i1 + i2, i3 + i4);
+        Assert.assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+
+        assertEquals(i1 + i2, i3 + i4);
+        assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+        assertEquals(i1 + i2, i3 + i4);
+        assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+    }
+
     public void refactorFailures() {
         // Keep this comment
         Assert.fail();

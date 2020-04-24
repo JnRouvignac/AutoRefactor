@@ -266,12 +266,13 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-				invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, ast.createCopyTarget(condition), null, null, failureMessage)), null);
+				invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean replace, final Expression failureMessage) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		if (replace) {
 			rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), null);
 			return false;
@@ -310,7 +311,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, ast,
-					originalMethod, getAssertName(isAssertEquals, "Same"), ast.createCopyTarget(actualAndExpected.getFirst()), ast.createCopyTarget(actualAndExpected.getSecond()), null, failureMessage); //$NON-NLS-1$
+					originalMethod, getAssertName(isAssertEquals, "Same"), ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), //$NON-NLS-1$
+					ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), null, failureMessage);
 			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
 			return false;
 		}
@@ -356,15 +358,18 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			return false;
 		}
 
-		Expression copyOfExpected= ast.createCopyTarget(expectedValue);
-		Expression copyOfActual= ast.createCopyTarget(actualValue);
-		boolean localIsRewriteNeeded= isRewriteNeeded;
-
+		Expression copyOfExpected;
+		Expression copyOfActual;
+		boolean localIsRewriteNeeded;
 		if ((ASTNodes.isHardCoded(actualValue) || isVariableNamedExpected(actualValue)) && !ASTNodes.isHardCoded(expectedValue)
 				&& !isVariableNamedExpected(expectedValue)) {
-			copyOfExpected= ast.createCopyTarget(actualValue);
-			copyOfActual= ast.createCopyTarget(expectedValue);
+			copyOfExpected= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(actualValue));
+			copyOfActual= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(expectedValue));
 			localIsRewriteNeeded= true;
+		} else {
+			copyOfExpected= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(expectedValue));
+			copyOfActual= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(actualValue));
+			localIsRewriteNeeded= isRewriteNeeded;
 		}
 
 		if (localIsRewriteNeeded) {
@@ -422,7 +427,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			final MethodInvocation originalMethod, final boolean isPositive, final Expression actual, final Expression failureMessage) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
-		Expression copyOfActual= ast.createCopyTarget(actual);
+		Expression copyOfActual= ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(actual));
 		return invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, copyOfActual, null, null, failureMessage);
 	}
 

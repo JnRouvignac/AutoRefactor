@@ -85,6 +85,23 @@ public class AssertJSample {
         assertThat(f2).describedAs("Failure message to keep").isEqualTo(f1, Offset.offset(.0F));
     }
 
+    public void removeParenthesis(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        Assertions.assertThat(i3 + i4).isEqualTo(i1 + i2);
+        Assertions.assertThat(i3 + i4).as("Failure message to keep").isEqualTo(i1 + i2);
+        Assertions.assertThat(i3 + i4).describedAs("Failure message to keep").isEqualTo(i1 + i2);
+        Assertions.assertThat(i3 + i4).isEqualTo(i1 + i2);
+        Assertions.assertThat(i3 + i4).as("Failure message to keep").isEqualTo(i1 + i2);
+        Assertions.assertThat(i3 + i4).describedAs("Failure message to keep").isEqualTo(i1 + i2);
+
+        assertThat(i3 + i4).isEqualTo(i1 + i2);
+        assertThat(i3 + i4).as("Failure message to keep").isEqualTo(i1 + i2);
+        assertThat(i3 + i4).describedAs("Failure message to keep").isEqualTo(i1 + i2);
+        assertThat(i3 + i4).isEqualTo(i1 + i2);
+        assertThat(i3 + i4).as("Failure message to keep").isEqualTo(i1 + i2);
+        assertThat(i3 + i4).describedAs("Failure message to keep").isEqualTo(i1 + i2);
+    }
+
     public void refactorFailures() {
         // Keep this comment
         Assertions.fail(null);
