@@ -142,6 +142,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public String toString() {
 			StringBuilder sb= new StringBuilder();
@@ -200,7 +201,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		private boolean ignoreUnlabeledBreaksInInnerBreakableStatement() {
-			// Unlabeled breaks in inner loops/switchs work OK with switch cleanup rule
+			// Unlabeled breaks in inner loops/switchs work ok with switch cleanup rule
 			return false;
 		}
 	}
@@ -463,7 +464,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 			return mergedVariable;
 		}
-
 		if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS) && !infixExpression.hasExtendedOperands()) {
 			Expression leftOp= infixExpression.getLeftOperand();
 			Expression rightOp= infixExpression.getRightOperand();
@@ -475,10 +475,10 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
-	private Variable extractVariableWithConstantValue(final Expression firstOp, final Expression secondOp) {
-		if ((firstOp instanceof Name || firstOp instanceof FieldAccess) && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
-				&& (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
-			return new Variable(firstOp, Arrays.asList(secondOp));
+	private Variable extractVariableWithConstantValue(final Expression variable, final Expression constant) {
+		if ((variable instanceof Name || variable instanceof FieldAccess) && ASTNodes.hasType(variable, char.class.getCanonicalName(), byte.class.getCanonicalName(), short.class.getCanonicalName(), int.class.getCanonicalName())
+				&& (constant instanceof NumberLiteral || constant instanceof CharacterLiteral)) {
+			return new Variable(variable, Arrays.asList(constant));
 		}
 
 		return null;
