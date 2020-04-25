@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -98,11 +98,12 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		StringBuilder messageBuilder= new StringBuilder();
-		List<Expression> params= new LinkedList<>();
+		List<Expression> allOperands= ASTNodes.getAllOperands(message);
+		List<Expression> params= new ArrayList<>(allOperands.size());
 		boolean hasLiteral= false;
 		boolean hasObjects= false;
 
-		for (Expression string : ASTNodes.getAllOperands(message)) {
+		for (Expression string : allOperands) {
 			if (string instanceof StringLiteral) {
 				hasLiteral= true;
 				String literal= (String) string.resolveConstantExpressionValue();
