@@ -102,11 +102,9 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 					setResult(false);
 					return false;
 				}
-
-				return true;
 			}
 
-			return false;
+			return true;
 		}
 
 		private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final AtomicInteger operandCount) {
