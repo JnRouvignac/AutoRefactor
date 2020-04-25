@@ -93,19 +93,17 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	 *
 	 * @param classesToUseWithImport The classes to use with import
 	 * @param importsToAdd           The imports to add
-	 * @param ast                      The builder.
 	 * @param copyOfMethod           The copy of the original method.
 	 * @param methodName             The method name.
 	 * @param copyOfActual           The copy of the actual value or null.
 	 * @param copyOfExpected         The copy of the expected value or null.
 	 * @param delta                  The delta or null
 	 * @param failureMessage         The original failure message or null.
-	 *
 	 * @return The method invocation object.
 	 */
 	protected abstract MethodInvocation invokeQualifiedMethod(Set<String> classesToUseWithImport, Set<String> importsToAdd,
-			ASTNodeFactory ast, Expression copyOfMethod, String methodName,
-			Expression copyOfActual, Expression copyOfExpected, Expression delta, Expression failureMessage);
+			Expression copyOfMethod, String methodName, Expression copyOfActual,
+			Expression copyOfExpected, Expression delta, Expression failureMessage);
 
 	/**
 	 * Resolve the type binding.
@@ -263,10 +261,11 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-				invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
+				invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
@@ -293,11 +292,10 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private MethodInvocation invokeFail(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode node, final MethodInvocation originalMethod, final Expression failureMessage) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		List<Expression> args= ASTNodes.arguments(originalMethod);
 
 		if (args.size() == 1 || args.size() == 2) {
-			return invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$
+			return invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$
 		}
 
 		throw new NotImplementedException(node);
@@ -312,9 +310,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, ast,
-					originalMethod, getAssertName(isAssertEquals, "Same"), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), //$NON-NLS-1$
-					rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), null, failureMessage);
+			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
+					getAssertName(isAssertEquals, "Same"), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
+					null, failureMessage);
 			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
 			return false;
 		}
@@ -383,8 +381,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 				delta= ast.number(".0F"); //$NON-NLS-1$
 			}
 
-			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, ast,
-					originalMethod, getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
+			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
+					getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
 			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
 			return false;
 		}
@@ -427,31 +425,31 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private MethodInvocation invokeAssertNull(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final MethodInvocation originalMethod, final boolean isPositive, final Expression actual, final Expression failureMessage) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
 		Expression copyOfActual= rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actual));
-		return invokeMethod(classesToUseWithImport, importsToAdd, ast, originalMethod, methodName, copyOfActual, null, null, failureMessage);
+		return invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, copyOfActual, null, null, failureMessage);
 	}
 
 	/**
 	 * Invoke the method with full qualified name if needed.
+	 *
 	 * @param classesToUseWithImport The classes to use with import
 	 * @param importsToAdd           The imports to add
-	 * @param ast              The builder.
 	 * @param originalMethod The original method.
 	 * @param methodName     methodName.
 	 * @param copyOfActual   The copy of the actual value or null.
 	 * @param copyOfExpected The copy of the expected value or null.
 	 * @param delta          The delta or null
 	 * @param failureMessage The original failure message or null.
-	 *
 	 * @return The method invocation object.
 	 */
 	protected MethodInvocation invokeMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final ASTNodeFactory ast, final MethodInvocation originalMethod, final String methodName,
-			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+			final MethodInvocation originalMethod, final String methodName, final Expression copyOfActual,
+			final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
 		Expression qualifiedClass;
@@ -462,7 +460,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			qualifiedClass= ast.copyExpression(originalMethod);
 		}
 
-		return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, ast, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
+		return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
 	}
 
 	/**

@@ -232,8 +232,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	protected MethodInvocation invokeMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final ASTNodeFactory ast, final MethodInvocation originalMethod, final String methodName,
-			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+			final MethodInvocation originalMethod, final String methodName, final Expression copyOfActual,
+			final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		String qualifiedClassName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
 		Expression qualifiedClass;
@@ -252,14 +254,15 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (FAIL_METHOD.equals(methodName)) {
-			return invokeFail(ast, failureMessage, qualifiedClass);
+			return invokeFail(failureMessage, qualifiedClass);
 		}
 
-		return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, ast, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
+		return invokeQualifiedMethod(classesToUseWithImport, importsToAdd, qualifiedClass, methodName, copyOfActual, copyOfExpected, delta, failureMessage);
 	}
 
-	private MethodInvocation invokeFail(final ASTNodeFactory ast, final Expression failureMessage,
-			final Expression qualifiedClass) {
+	private MethodInvocation invokeFail(final Expression failureMessage, final Expression qualifiedClass) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		if (failureMessage != null) {
 			MethodInvocation failureMethod= (MethodInvocation) failureMessage;
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
@@ -276,8 +279,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final ASTNodeFactory ast, final Expression copyOfClass, final String methodName,
-			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+			final Expression copyOfClass, final String methodName, final Expression copyOfActual,
+			final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		String finalMethodName= getFinalMethodName(methodName);
 
 		Expression assertionMethod= ast.newMethodInvocation(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);

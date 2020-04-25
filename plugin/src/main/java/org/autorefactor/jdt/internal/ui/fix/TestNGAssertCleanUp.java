@@ -192,8 +192,10 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final ASTNodeFactory ast, final Expression copyOfExpression, final String methodName,
-			final Expression copyOfActual, final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+			final Expression copyOfExpression, final String methodName, final Expression copyOfActual,
+			final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		List<Expression> arguments= new ArrayList<>(4);
 
 		if (copyOfActual != null) {
