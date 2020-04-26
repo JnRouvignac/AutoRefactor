@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
@@ -259,7 +260,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
 		return ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) //$NON-NLS-1$
-				&& (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess)
+				&& (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess || getMI.getExpression() instanceof SuperFieldAccess)
 				&& ASTNodes.isSameLocalVariable(ASTNodes.arguments(getMI).get(0), loopContent.getLoopVariable())
 				&& ASTNodes.isSameVariable(loopContent.getContainerVariable(), getMI.getExpression());
 	}

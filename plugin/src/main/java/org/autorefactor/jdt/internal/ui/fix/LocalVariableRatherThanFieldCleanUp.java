@@ -294,7 +294,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	private static boolean isExternalField(final SimpleName occurrence) {
 		FieldAccess fieldAccess= ASTNodes.as(occurrence, FieldAccess.class);
 
-		if (fieldAccess != null && fieldAccess.getExpression() instanceof ThisExpression) {
+		if (fieldAccess != null && ASTNodes.is(fieldAccess.getExpression(), ThisExpression.class)) {
 			return true;
 		}
 

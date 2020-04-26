@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -476,7 +477,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Variable extractVariableWithConstantValue(final Expression variable, final Expression constant) {
-		if ((variable instanceof Name || variable instanceof FieldAccess) && ASTNodes.hasType(variable, char.class.getCanonicalName(), byte.class.getCanonicalName(), short.class.getCanonicalName(), int.class.getCanonicalName())
+		if ((variable instanceof Name || variable instanceof FieldAccess || variable instanceof SuperFieldAccess) && ASTNodes.hasType(variable, char.class.getCanonicalName(), byte.class.getCanonicalName(), short.class.getCanonicalName(), int.class.getCanonicalName())
 				&& (constant instanceof NumberLiteral || constant instanceof CharacterLiteral)) {
 			return new Variable(variable, Arrays.asList(constant));
 		}

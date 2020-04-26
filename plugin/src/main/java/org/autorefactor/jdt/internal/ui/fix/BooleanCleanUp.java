@@ -67,6 +67,7 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -316,7 +317,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		Assignment thenA= ASTNodes.asExpression(node.getThenStatement(), Assignment.class);
 
 		if (ASTNodes.hasOperator(thenA, Assignment.Operator.ASSIGN) && ASTNodes.asList(node.getElseStatement()).isEmpty()
-				&& (thenA.getLeftHandSide() instanceof Name || thenA.getLeftHandSide() instanceof FieldAccess)) {
+				&& (thenA.getLeftHandSide() instanceof Name || thenA.getLeftHandSide() instanceof FieldAccess || thenA.getLeftHandSide() instanceof SuperFieldAccess)) {
 			Statement previousSibling= ASTNodes.getPreviousSibling(node);
 
 			if (previousSibling instanceof VariableDeclarationStatement) {
@@ -533,7 +534,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 			BooleanASTMatcher matcher= new BooleanASTMatcher();
 
 			if (ASTNodes.match(matcher, node.getThenStatement(), node.getElseStatement())
-					&& (matcher.matches.size() <= 1 || ifCondition instanceof Name || ifCondition instanceof FieldAccess)) {
+					&& (matcher.matches.size() <= 1 || ifCondition instanceof Name || ifCondition instanceof FieldAccess || ifCondition instanceof SuperFieldAccess)) {
 				// Then and else statements are matching, bar the boolean values
 				// which are opposite
 				Statement copyStatement= ast.copySubtree(node.getThenStatement());

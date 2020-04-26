@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.text.edits.TextEditGroup;
@@ -167,11 +168,10 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			if (!evaluatedExpression.isEmpty()) {
 				Name mame= ASTNodes.as(lhs, Name.class);
 				FieldAccess fieldAccess= ASTNodes.as(lhs, FieldAccess.class);
+				SuperFieldAccess superFieldAccess= ASTNodes.as(lhs, SuperFieldAccess.class);
 				IVariableBinding variableBinding;
 
-				if (fieldAccess != null) {
-					variableBinding= fieldAccess.resolveFieldBinding();
-				} else if (mame != null) {
+				if (mame != null) {
 					IBinding binding= mame.resolveBinding();
 
 					if (!(binding instanceof IVariableBinding)) {
@@ -179,6 +179,10 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 					}
 
 					variableBinding= (IVariableBinding) binding;
+				} else if (fieldAccess != null) {
+					variableBinding= fieldAccess.resolveFieldBinding();
+				} else if (superFieldAccess != null) {
+					variableBinding= superFieldAccess.resolveFieldBinding();
 				} else {
 					return true;
 				}

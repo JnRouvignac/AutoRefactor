@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -304,8 +305,13 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 					if (assignment.getLeftHandSide() instanceof Name) {
 						return isOfType(((Name) assignment.getLeftHandSide()).resolveTypeBinding());
 					}
+
 					if (assignment.getLeftHandSide() instanceof FieldAccess) {
 						return isOfType(((FieldAccess) assignment.getLeftHandSide()).resolveTypeBinding());
+					}
+
+					if (assignment.getLeftHandSide() instanceof SuperFieldAccess) {
+						return isOfType(((SuperFieldAccess) assignment.getLeftHandSide()).resolveTypeBinding());
 					}
 				}
 

@@ -51,6 +51,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderCleanUp extends AbstractCleanUpRule {
@@ -285,6 +286,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (expression instanceof FieldAccess) {
 				FieldAccess fieldAccess= (FieldAccess) expression;
+				return fieldAccess.resolveConstantExpressionValue() != null;
+			}
+
+			if (expression instanceof SuperFieldAccess) {
+				SuperFieldAccess fieldAccess= (SuperFieldAccess) expression;
 				return fieldAccess.resolveConstantExpressionValue() != null;
 			}
 		}

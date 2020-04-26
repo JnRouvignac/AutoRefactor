@@ -61,6 +61,7 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
@@ -316,7 +317,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 			if (statement instanceof ExpressionStatement) {
 				Assignment as= ASTNodes.asExpression(statement, Assignment.class);
 
-				if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && (as.getLeftHandSide() instanceof Name || as.getLeftHandSide() instanceof FieldAccess)) {
+				if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && (as.getLeftHandSide() instanceof Name || as.getLeftHandSide() instanceof FieldAccess || as.getLeftHandSide() instanceof SuperFieldAccess)) {
 					return Pair.of(as.getLeftHandSide(), as.getRightHandSide());
 				}
 			}

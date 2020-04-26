@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractCleanUpRule {
@@ -86,7 +87,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 	}
 
 	private Expression getVar(final Expression var) {
-		if (var instanceof Name || var instanceof FieldAccess) {
+		if (var instanceof Name || var instanceof FieldAccess || var instanceof SuperFieldAccess) {
 			return var;
 		}
 

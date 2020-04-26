@@ -55,6 +55,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -392,7 +393,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			return isNewHashValid(data, newHashWithoutBrackets.getExpression());
 		}
 
-		if ((newHash instanceof Name || newHash instanceof FieldAccess) && data.isTempValueUsed()) {
+		if ((newHash instanceof Name || newHash instanceof FieldAccess || newHash instanceof SuperFieldAccess) && data.isTempValueUsed()) {
 			SimpleName fieldName= getField(newHash);
 
 			if (!ASTNodes.isSameVariable(data.getPrimeId(), fieldName)
@@ -516,6 +517,24 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 							&& ASTNodes.isSameVariable(visitedClass.getName(), qualifier)) {
 						return fieldName.getName();
 					}
+				}
+			}
+		}
+
+		SuperFieldAccess superFieldAccess= ASTNodes.as(expression, SuperFieldAccess.class);
+
+		if (superFieldAccess != null) {
+			if (superFieldAccess.getQualifier() == null) {
+				return superFieldAccess.getName();
+			}
+
+			if (superFieldAccess.getQualifier().isSimpleName()) {
+				SimpleName qualifier= (SimpleName) superFieldAccess.getQualifier();
+				TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
+
+				if (visitedClass != null
+						&& ASTNodes.isSameVariable(visitedClass.getName(), qualifier)) {
+					return superFieldAccess.getName();
 				}
 			}
 		}
