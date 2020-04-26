@@ -25,11 +25,17 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
+import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -68,50 +74,97 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
-
-		if (elseCode != null && elseCode.size() == 1) {
-			IfStatement subNode= ASTNodes.as(elseCode.get(0), IfStatement.class);
-
-			if (subNode != null && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(subNode.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-				return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
-						&& maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
-			}
-		}
-
-		return true;
+	public boolean visit(final Block node) {
+		SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(cuRewrite, node);
+		node.accept(successiveIfVisitor);
+		return successiveIfVisitor.getResult();
 	}
 
-	private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStatements,
-			final Statement remainingStatements, final boolean isPositive) {
-		if (doubleStatements != null && ASTNodes.match(node.getThenStatement(), doubleStatements)) {
-			refactorBlocks(node.getExpression(), subNode, remainingStatements, isPositive);
+	private static final class SuccessiveIfVisitor extends BlockSubVisitor {
+		public SuccessiveIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
+			super(cuRewrite, startNode);
+		}
+
+		@Override
+		public boolean visit(final IfStatement node) {
+			if (getResult()) {
+				List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
+				List<Boolean> isThenStatement= new ArrayList<>(4);
+				AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
+				duplicateIfBlocks.add(node);
+				isThenStatement.add(Boolean.TRUE);
+
+				while (addOneMoreIf(duplicateIfBlocks, isThenStatement, operandCount)) {
+					// OK continue
+				}
+
+				if (duplicateIfBlocks.size() > 1) {
+					mergeCode(duplicateIfBlocks, isThenStatement);
+					setResult(false);
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final List<Boolean> isThenStatement, final AtomicInteger operandCount) {
+			IfStatement lastBlock= Utils.getLast(duplicateIfBlocks);
+			Statement previousStatement= Utils.getLast(isThenStatement) ? lastBlock.getThenStatement() : lastBlock.getElseStatement();
+			Statement nextStatement= Utils.getLast(isThenStatement) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
+
+			if (nextStatement != null) {
+				IfStatement nextElse= ASTNodes.as(nextStatement, IfStatement.class);
+
+				if (nextElse != null
+						&& !cuRewrite.getASTRewrite().hasBeenRefactored(nextElse)
+						&& operandCount.get() + ASTNodes.getNbOperands(nextElse.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+					if (ASTNodes.match(previousStatement, nextElse.getThenStatement())) {
+						operandCount.addAndGet(ASTNodes.getNbOperands(nextElse.getExpression()));
+						duplicateIfBlocks.add(nextElse);
+						isThenStatement.add(Boolean.TRUE);
+						return true;
+					}
+
+					if (nextElse.getElseStatement() != null
+							&& ASTNodes.match(previousStatement, nextElse.getElseStatement())) {
+						operandCount.addAndGet(ASTNodes.getNbOperands(nextElse.getExpression()));
+						duplicateIfBlocks.add(nextElse);
+						isThenStatement.add(Boolean.FALSE);
+						return true;
+					}
+				}
+			}
+
 			return false;
 		}
 
-		return true;
-	}
+		private void mergeCode(final List<IfStatement> duplicateIfBlocks, final List<Boolean> isThenStatement) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-	private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
-			final Statement remainingStatements, final boolean isPositive) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 
-		Expression additionalCondition;
-		if (isPositive) {
-			additionalCondition= rewrite.createMoveTarget(subNode.getExpression());
-		} else {
-			additionalCondition= ast.negate(subNode.getExpression());
-		}
+			for (int i= 0; i < duplicateIfBlocks.size(); i++) {
+				if (isThenStatement.get(i)) {
+					newConditions.add(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(duplicateIfBlocks.get(i).getExpression())));
+				} else {
+					newConditions.add(ast.parenthesizeIfNeeded(ast.negate(duplicateIfBlocks.get(i).getExpression())));
+				}
+			}
 
-		rewrite.replace(firstCondition, ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(firstCondition)),
-				InfixExpression.Operator.CONDITIONAL_OR, ast.parenthesizeIfNeeded(additionalCondition)), null);
+			IfStatement lastBlock= Utils.getLast(duplicateIfBlocks);
+			Statement remainingStatement= Utils.getLast(isThenStatement) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
+			InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
 
-		if (remainingStatements != null) {
-			rewrite.replace(subNode, rewrite.createMoveTarget(remainingStatements), null);
-		} else {
-			rewrite.remove(subNode, null);
+			IfStatement newIf;
+			if (remainingStatement != null) {
+				newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()), rewrite.createMoveTarget(remainingStatement));
+			} else {
+				newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
+			}
+
+			rewrite.replace(duplicateIfBlocks.get(0), newIf, null);
 		}
 	}
 }

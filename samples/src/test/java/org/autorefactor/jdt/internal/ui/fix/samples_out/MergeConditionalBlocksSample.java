@@ -97,7 +97,7 @@ public class MergeConditionalBlocksSample {
     /** Duplicate if and else if code, merge it */
     public void numerousDuplicateIfAndElseIf(int i) {
         // Keep this comment
-        if ((((i == 0) || (i == 1)) || (i == 2)) || (i == 3)) {
+        if ((i == 0) || (i == 1) || (i == 2) || (i == 3)) {
             // Keep this comment too
             System.out.println("Duplicate" + (i * 10 * 1));
         } else {
@@ -109,7 +109,7 @@ public class MergeConditionalBlocksSample {
     /** Duplicate if and else if code, merge it */
     public void complexIfAndElseIf(int i) {
         // Keep this comment
-        if (((i == 0) || (i == 1 || i == 2)) || (i > 10)) {
+        if ((i == 0) || (i == 1 || i == 2) || (i > 10)) {
             // Keep this comment too
             System.out.println("Duplicate " + (i + 123 + 0));
         } else {
