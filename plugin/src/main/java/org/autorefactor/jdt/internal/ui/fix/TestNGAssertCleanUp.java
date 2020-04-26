@@ -183,7 +183,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 			}
 
 			if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
+				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0));
 			}
 		}
 

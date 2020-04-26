@@ -187,7 +187,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0));
 		}
 
 		return true;

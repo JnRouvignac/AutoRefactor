@@ -27,6 +27,8 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Assert;
 
 public class JUnitAssertSample {
@@ -437,6 +439,27 @@ public class JUnitAssertSample {
         }
         if (!b) {
             fail("Failure message to keep");
+        }
+    }
+
+    public void doNotRefactorUsedObject(Date nullDate) {
+        if (nullDate != null) {
+            Assert.fail("The date should be null: " + nullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null: " + nullDate.getTime());
+        }
+    }
+
+    public void refactorNotUsedObject(Date nullDate, Date notNullDate) {
+        // Keep this comment
+        if (nullDate != null) {
+            Assert.fail("The date should be null, not like: " + notNullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null, not like: " + notNullDate.getTime());
         }
     }
 

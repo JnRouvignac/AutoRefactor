@@ -27,6 +27,8 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Date;
+
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Fail;
 
@@ -604,6 +606,38 @@ public class AssertJSample {
         }
         if (!b) {
             Fail.fail("Failure message to keep");
+        }
+    }
+
+    public void doNotRefactorUsedObject(Date nullDate) {
+        if (nullDate != null) {
+            Fail.fail("The date should be null: " + nullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null: " + nullDate.getTime());
+        }
+    }
+
+    public void refactorNotUsedObject(Date nullDate, Date notNullDate) {
+        // Keep this comment
+        if (nullDate != null) {
+            Fail.fail("The date should be null, not like: " + notNullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null, not like: " + notNullDate.getTime());
+        }
+    }
+
+    public void refactorObjectInParameter(Date nullDate) {
+        // Keep this comment
+        if (nullDate != null) {
+            Fail.fail("The date should be null, not like: {}", nullDate);
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null, not like: {}", nullDate);
         }
     }
 

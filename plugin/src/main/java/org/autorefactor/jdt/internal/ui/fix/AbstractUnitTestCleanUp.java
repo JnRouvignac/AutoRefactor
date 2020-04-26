@@ -34,9 +34,11 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -56,6 +58,23 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
+	private final class VariableVisitor extends ASTVisitor {
+		private final Set<SimpleName> variables= new HashSet<>();
+
+		@Override
+		public boolean visit(final SimpleName node) {
+			if (node.resolveBinding() != null
+					&& node.resolveBinding().getKind() == IBinding.VARIABLE) {
+				variables.add(node);
+			}
+			return true;
+		}
+
+		public Set<SimpleName> getVariables() {
+			return variables;
+		}
+	}
+
 	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
 		@Override
 		public boolean visit(final MethodInvocation node) {
@@ -184,6 +203,37 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		}
 
 		return super.visit(node);
+	}
+
+	/**
+	 * Maybe refactor the statement.
+	 *
+	 * @param classesToUseWithImport The classes to use with import
+	 * @param importsToAdd           The imports to add
+	 * @param nodeToReplace          The node
+	 * @param originalMethod         The method invocation
+	 * @param isAssertTrue           True if assertTrue is used, False if assertFalse is
+	 *                               used.
+	 * @param condition              The condition on which the assert is based.
+	 * @param failureMessage         The failure message or null.
+	 * @return True if refactored
+	 */
+	protected boolean maybeRefactorIfObjectsAreNotUsed(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean isAssertTrue,
+			final Expression condition, final Expression failureMessage) {
+		VariableVisitor visitor= new VariableVisitor();
+		condition.accept(visitor);
+
+		VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(visitor.getVariables(), true);
+		varOccurrenceVisitor.visitNode((Expression) originalMethod.arguments().get(0));
+
+		if (!varOccurrenceVisitor.isVarUsed()) {
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
+					nodeToReplace, originalMethod, isAssertTrue,
+					condition, failureMessage, true);
+		}
+
+		return true;
 	}
 
 	/**

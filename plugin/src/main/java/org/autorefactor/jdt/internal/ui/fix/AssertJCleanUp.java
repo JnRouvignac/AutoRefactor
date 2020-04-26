@@ -223,7 +223,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
 				}
 
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), mi, true);
+				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), mi);
 			}
 		}
 
