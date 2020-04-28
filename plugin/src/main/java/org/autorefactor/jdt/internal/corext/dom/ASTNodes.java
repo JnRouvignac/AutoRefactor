@@ -80,7 +80,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
@@ -1687,10 +1686,22 @@ public final class ASTNodes {
 	 * @return Integer literal.
 	 */
 	public static Long getIntegerLiteral(final Expression input) {
-		NumberLiteral contant= as(input, NumberLiteral.class);
+		if (input == null) {
+			return null;
+		}
 
-		if (contant != null) {
-			return positiveLiteral(contant);
+		Object number= input.resolveConstantExpressionValue();
+
+		if (number instanceof Short) {
+			return (long) ((Short) number).intValue();
+		}
+
+		if (number instanceof Integer) {
+			return (long) ((Integer) number).intValue();
+		}
+
+		if (number instanceof Long) {
+			return (Long) number;
 		}
 
 		InfixExpression operation= as(input, InfixExpression.class);
@@ -1780,30 +1791,6 @@ public final class ASTNodes {
 			if (value != null) {
 				return -value;
 			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Positive literal.
-	 *
-	 * @param input The input
-	 * @return Positive literal.
-	 */
-	public static Long positiveLiteral(final NumberLiteral input) {
-		Object number= input.resolveConstantExpressionValue();
-
-		if (number instanceof Short) {
-			return (long) ((Short) number).intValue();
-		}
-
-		if (number instanceof Integer) {
-			return (long) ((Integer) number).intValue();
-		}
-
-		if (number instanceof Long) {
-			return (Long) number;
 		}
 
 		return null;

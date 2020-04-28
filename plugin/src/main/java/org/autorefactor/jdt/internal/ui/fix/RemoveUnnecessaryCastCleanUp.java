@@ -258,9 +258,10 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 	/** See JLS, section 5.2 Assignment Conversion */
 	private boolean isConstantExpressionAssignmentConversion(final CastExpression node) {
-		Object value= node.getExpression().resolveConstantExpressionValue();
-		if (value instanceof Integer) {
-			int val= (Integer) value;
+		Long value= ASTNodes.getIntegerLiteral(node.getExpression());
+
+		if (value != null) {
+			long val= value;
 			return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
 					|| ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
 					|| ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
