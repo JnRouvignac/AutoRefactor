@@ -728,7 +728,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 				|| fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
 						&& !containsLocalName(localIdentifiers, qname)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, rewrite.createMoveTarget(node.getName()), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getName()), null);
 			return false;
 		}
 

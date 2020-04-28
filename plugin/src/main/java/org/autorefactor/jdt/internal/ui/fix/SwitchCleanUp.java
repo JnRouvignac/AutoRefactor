@@ -377,7 +377,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			final List<SwitchCaseSection> cases, final Statement remainingStatement) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		SwitchStatement switchStatement= ast.switch0(rewrite.createMoveTarget(switchExpression));
+		SwitchStatement switchStatement= ast.switch0(ASTNodes.createMoveTarget(rewrite, switchExpression));
 
 		for (SwitchCaseSection aCase : cases) {
 			addCaseWithStatements(switchStatement, aCase.constantExprs, aCase.statements);
@@ -403,7 +403,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		// Add the case statement(s)
 		if (caseValuesOrNullForDefault != null) {
 			for (Expression caseValue : caseValuesOrNullForDefault) {
-				switchStatements.add(ast.case0(rewrite.createMoveTarget(caseValue)));
+				switchStatements.add(ast.case0(ASTNodes.createMoveTarget(rewrite, caseValue)));
 			}
 		} else {
 			switchStatements.add(ast.default0());
@@ -413,7 +413,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		boolean isBreakNeeded= true;
 		if (!innerStatements.isEmpty()) {
 			for (Statement statement : innerStatements) {
-				switchStatements.add(rewrite.createMoveTarget(statement));
+				switchStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 			isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStatements));
 		}
@@ -563,7 +563,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (SwitchCase caseToMove : sectionToRemove.existingCases) {
-			rewrite.insertBefore(rewrite.createMoveTarget(caseToMove), caseKept, null);
+			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, caseToMove), caseKept, null);
 		}
 		rewrite.remove(sectionToRemove.statements, null);
 	}

@@ -152,7 +152,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 				String classname= addImport(EnumMap.class, classesToUseWithImport, importsToAdd);
 				Type type= ast.getAST().newParameterizedType(
 						ast.type(classname));
-				rewrite.replace(node, ast.new0(type, rewrite.createMoveTarget(arg)), null);
+				rewrite.replace(node, ast.new0(type, ASTNodes.createMoveTarget(rewrite, arg)), null);
 				importsToAdd.add(EnumMap.class.getCanonicalName());
 				return false;
 			}

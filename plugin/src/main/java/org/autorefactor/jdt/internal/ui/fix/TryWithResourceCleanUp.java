@@ -187,7 +187,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-			return fragment != null ? ast.declareExpression(rewrite.createMoveTarget(previousDeclStatement.getType()), fragment) : null;
+			return fragment != null ? ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment) : null;
 		}
 
 		private VariableDeclarationFragment newFragment(final List<Statement> tryStatements,
@@ -206,15 +206,15 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 					nodesToRemove.add(tryStatement);
 
 					if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-						return ast.declareFragment(rewrite.createMoveTarget(existingFragment.getName()),
-								rewrite.createMoveTarget(assignResource.getRightHandSide()));
+						return ast.declareFragment(ASTNodes.createMoveTarget(rewrite, existingFragment.getName()),
+								ASTNodes.createMoveTarget(rewrite, assignResource.getRightHandSide()));
 					}
 
 					return null;
 				}
 			}
 
-			return containsOnly(definitions, existingFragment.getName()) ? rewrite.createMoveTarget(existingFragment) : null;
+			return containsOnly(definitions, existingFragment.getName()) ? ASTNodes.createMoveTarget(rewrite, existingFragment) : null;
 		}
 
 		private boolean containsOnly(final Collection<SimpleName> definitions, final Expression... simpleNames) {
@@ -237,7 +237,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange(ASTNodes.resources(innerTryStatement)), null);
-			rewrite.replace(innerTryStatement, rewrite.createMoveTarget(innerTryStatement.getBody()), null);
+			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), null);
 			setResult(false);
 			return false;
 		}

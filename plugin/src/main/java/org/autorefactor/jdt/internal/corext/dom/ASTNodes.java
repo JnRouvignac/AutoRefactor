@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
@@ -2994,5 +2995,25 @@ public final class ASTNodes {
 		}
 
 		return nbOperands;
+	}
+
+	/**
+	 * Creates and returns a placeholder node where to move the source code of the
+	 * provided node.<br>
+	 * The placeholder node can be used like any new node created via the AST
+	 * class.<br>
+	 * When the document is rewritten, the source code for the provided node is
+	 * inserted into the output document at the position corresponding to the
+	 * placeholder (indentation is adjusted) and it is removed from the old
+	 * location.
+	 *
+	 * @param <T>  the type of the provided node
+	 * @param rewrite the AST rewrite
+	 * @param expression the node for which to create a move placeholder
+	 * @return the new placeholder node
+	 * @see ASTRewrite#createMoveTargetOld(ASTNode)
+	 */
+	public static <T extends ASTNode> T createMoveTarget(final ASTRewrite rewrite, final T expression) {
+		return rewrite.createMoveTarget(expression);
 	}
 }

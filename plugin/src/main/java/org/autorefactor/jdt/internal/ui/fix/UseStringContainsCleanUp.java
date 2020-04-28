@@ -107,9 +107,9 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), null); //$NON-NLS-1$
 
 		if (isPositive) {
-			rewrite.replace(node, rewrite.createMoveTarget(method), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, method), null);
 		} else {
-			rewrite.replace(node, ast.not(rewrite.createMoveTarget(method)), null);
+			rewrite.replace(node, ast.not(ASTNodes.createMoveTarget(rewrite, method)), null);
 		}
 	}
 }

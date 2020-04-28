@@ -161,7 +161,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithTheSingleArgument(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)), null);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0)), null);
 	}
 
 	private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -225,11 +225,11 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.replace(node,
-					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(arg0)))), null); //$NON-NLS-1$
+					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), null); //$NON-NLS-1$
 		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, ast.newMethodInvocation(rewrite.createMoveTarget(arg0), "floatValue"), null); //$NON-NLS-1$
+			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), null); //$NON-NLS-1$
 		} else {
 			replaceWithValueOf(node, typeBinding);
 		}
@@ -243,6 +243,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		return ast.newMethodInvocation(typeName, methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(arg)));
+		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
 	}
 }

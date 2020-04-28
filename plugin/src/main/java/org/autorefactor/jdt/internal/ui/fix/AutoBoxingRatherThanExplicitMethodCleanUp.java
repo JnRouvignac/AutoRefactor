@@ -107,9 +107,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 		if (primitiveType != null && !primitiveType.equals(actualParameterType)
 				&& !primitiveType.equals(actualResultType)
 				&& (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-			cuRewrite.getASTRewrite().replace(node, ast.cast(ast.type(primitiveType.getName()), rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))), null);
+			cuRewrite.getASTRewrite().replace(node, ast.cast(ast.type(primitiveType.getName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0))), null);
 		} else {
-			cuRewrite.getASTRewrite().replace(node, rewrite.createMoveTarget(ASTNodes.arguments(node).get(0)), null);
+			cuRewrite.getASTRewrite().replace(node, ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0)), null);
 		}
 	}
 }

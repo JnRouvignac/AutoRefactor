@@ -262,7 +262,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 			if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
 				rewrite.replace(initializer, ast.new0(builder.getSimpleName()), null);
 			} else {
-				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), rewrite.createMoveTarget(initializer)), null);
+				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), null);
 			}
 
 			for (SimpleName simpleName : assignmentWrites) {
@@ -277,10 +277,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					operands= Arrays.asList(assignment.getRightHandSide());
 				}
 
-				Expression newExpression= rewrite.createMoveTarget(assignment.getLeftHandSide());
+				Expression newExpression= ASTNodes.createMoveTarget(rewrite, assignment.getLeftHandSide());
 
 				for (Object operand : operands) {
-					newExpression= ast.newMethodInvocation(newExpression, "append", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
+					newExpression= ast.newMethodInvocation(newExpression, "append", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
 				}
 
 				rewrite.replace(assignment, newExpression, null);
@@ -290,18 +290,18 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				Assignment assignment= (Assignment) simpleName.getParent();
 				InfixExpression concatenation= (InfixExpression) assignment.getRightHandSide();
 
-				Expression newExpression= ast.newMethodInvocation(rewrite.createMoveTarget(assignment.getLeftHandSide()), "append", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(concatenation.getRightOperand()))); //$NON-NLS-1$
+				Expression newExpression= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, assignment.getLeftHandSide()), "append", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(concatenation.getRightOperand()))); //$NON-NLS-1$
 
 				if (concatenation.hasExtendedOperands()) {
 					for (Object operand : concatenation.extendedOperands()) {
-						newExpression= ast.newMethodInvocation(newExpression, "append", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
+						newExpression= ast.newMethodInvocation(newExpression, "append", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
 					}
 				}
 
 				rewrite.replace(assignment, newExpression, null);
 			}
 
-			rewrite.replace(finalRead, ast.newMethodInvocation(rewrite.createMoveTarget(finalRead), "toString"), null); //$NON-NLS-1$
+			rewrite.replace(finalRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, finalRead), "toString"), null); //$NON-NLS-1$
 		}
 
 		private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

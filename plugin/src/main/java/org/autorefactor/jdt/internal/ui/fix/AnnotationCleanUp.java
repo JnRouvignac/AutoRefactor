@@ -83,13 +83,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
 		List<MemberValuePair> values= ASTNodes.values(node);
 		if (values.isEmpty()) {
-			rewrite.replace(node, ast.markerAnnotation(rewrite.createMoveTarget(node.getTypeName())), null);
+			rewrite.replace(node, ast.markerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), null);
 			return false;
 		}
 		if (values.size() == 1) {
 			MemberValuePair pair= values.get(0);
 			if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-				rewrite.replace(node, ast.singleValueAnnotation(rewrite.createMoveTarget(node.getTypeName()), rewrite.createMoveTarget(pair.getValue())), null);
+				rewrite.replace(node, ast.singleValueAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName()), ASTNodes.createMoveTarget(rewrite, pair.getValue())), null);
 				return false;
 			}
 		}
@@ -105,7 +105,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 				ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
 				List<Expression> exprs= ASTNodes.expressions(arrayInit);
 				if (exprs.size() == 1) {
-					rewrite.replace(arrayInit, rewrite.createMoveTarget(exprs.get(0)), null);
+					rewrite.replace(arrayInit, ASTNodes.createMoveTarget(rewrite, exprs.get(0)), null);
 					result= false;
 				}
 			}

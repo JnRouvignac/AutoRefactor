@@ -638,14 +638,14 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			Expression copyOfDelimiter= rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(delimiter));
+			Expression copyOfDelimiter= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(delimiter));
 
 			if (!ASTNodes.hasType(delimiter, String.class.getCanonicalName())) {
 				copyOfDelimiter= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "valueOf", copyOfDelimiter); //$NON-NLS-1$
 			}
 
-			MethodInvocation joinMethod= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "join", copyOfDelimiter, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(containerVariable))); //$NON-NLS-1$
-			VariableDeclarationStatement joinStatement= ast.declareStatement(ast.type(String.class.getSimpleName()), rewrite.createMoveTarget(builder), joinMethod);
+			MethodInvocation joinMethod= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "join", copyOfDelimiter, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(containerVariable))); //$NON-NLS-1$
+			VariableDeclarationStatement joinStatement= ast.declareStatement(ast.type(String.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, builder), joinMethod);
 			@SuppressWarnings("unchecked")
 			List<ASTNode> varModifiers= joinStatement.modifiers();
 			@SuppressWarnings("unchecked")
@@ -662,7 +662,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			rewrite.replace(node, joinStatement, null);
 
 			for (SimpleName readToRefactor : readsToRefactor) {
-				rewrite.replace(readToRefactor.getParent(), rewrite.createMoveTarget(readToRefactor), null);
+				rewrite.replace(readToRefactor.getParent(), ASTNodes.createMoveTarget(rewrite, readToRefactor), null);
 			}
 		}
 	}

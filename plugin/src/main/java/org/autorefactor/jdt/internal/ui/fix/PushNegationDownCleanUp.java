@@ -94,7 +94,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 			PrefixExpression pe= (PrefixExpression) operand;
 
 			if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-				return rewrite.createMoveTarget(pe.getOperand());
+				return ASTNodes.createMoveTarget(rewrite, pe.getOperand());
 			}
 		} else if (operand instanceof InfixExpression) {
 			InfixExpression ie= (InfixExpression) operand;

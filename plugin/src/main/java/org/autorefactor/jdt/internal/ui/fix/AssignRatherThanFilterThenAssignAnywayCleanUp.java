@@ -178,7 +178,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.replace(node,
-					ast.toStatement(ast.assign(rewrite.createMoveTarget(leftHandSide), Assignment.Operator.ASSIGN, rewrite.createMoveTarget(rightHandSide))), null);
+					ast.toStatement(ast.assign(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), null);
 		}
 
 		private boolean maybeReplaceWithStraightReturn(final IfStatement node, final InfixExpression condition, final ReturnStatement valuedReturn,
@@ -209,7 +209,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			rewrite.remove(toRemove, null);
-			rewrite.replace(node, ast.return0(rewrite.createMoveTarget(returnedExpression)), null);
+			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnedExpression)), null);
 		}
 	}
 }

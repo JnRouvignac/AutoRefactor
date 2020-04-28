@@ -209,7 +209,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
 				for (Statement stmtToRemove : oneCaseToRemove) {
-					orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
+					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
 				rewrite.replace(node, ast.block(orderedStatements), null);
 			}
@@ -222,7 +222,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
 						// Then clause is empty and there is only one else clause
 						// => revert if statement
-						rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), rewrite.createMoveTarget(((IfStatement) parent).getElseStatement())), null);
+						rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), null);
 						break;
 					}
 					if (allRemovable(areCasesRemovable, i)) {
@@ -238,9 +238,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
 				for (Statement stmtToRemove : oneCaseToRemove) {
-					orderedStatements.add(0, rewrite.createMoveTarget(stmtToRemove));
+					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
-				orderedStatements.add(0, rewrite.createMoveTarget(node));
+				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 				rewrite.replace(node, ast.block(orderedStatements), null);
 			}
 		}
@@ -248,7 +248,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTRewrite rewrite) {
 		for (Statement stmtToRemove : stmtsToRemove) {
-			rewrite.insertAfter(rewrite.createMoveTarget(stmtToRemove), node, null);
+			rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, stmtToRemove), node, null);
 		}
 	}
 

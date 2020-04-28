@@ -112,7 +112,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, rewrite.createMoveTarget(elseStatements.get(0)), null);
+				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), null);
 				return false;
 			}
 		}

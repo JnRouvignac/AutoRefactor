@@ -242,27 +242,27 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 			rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), null);
 
 			if (node instanceof PostfixExpression) {
-				Statement newAssignment= ast.toStatement(rewrite.createMoveTarget(node));
+				Statement newAssignment= ast.toStatement(ASTNodes.createMoveTarget(rewrite, node));
 
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertAfter(newAssignment, statement, null);
 				} else {
-					Block newBlock= ast.block(rewrite.createMoveTarget(statement), newAssignment);
+					Block newBlock= ast.block(ASTNodes.createMoveTarget(rewrite, statement), newAssignment);
 
 					rewrite.replace(statement, newBlock, null);
 				}
 			} else {
 				Statement newAssignment;
 				if (ASTNodes.hasOperator((PrefixExpression) node, PrefixExpression.Operator.INCREMENT)) {
-					newAssignment= ast.toStatement(ast.postfixExpression(rewrite.createMoveTarget(variable), PostfixExpression.Operator.INCREMENT));
+					newAssignment= ast.toStatement(ast.postfixExpression(ASTNodes.createMoveTarget(rewrite, variable), PostfixExpression.Operator.INCREMENT));
 				} else {
-					newAssignment= ast.toStatement(ast.postfixExpression(rewrite.createMoveTarget(variable), PostfixExpression.Operator.DECREMENT));
+					newAssignment= ast.toStatement(ast.postfixExpression(ASTNodes.createMoveTarget(rewrite, variable), PostfixExpression.Operator.DECREMENT));
 				}
 
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertBefore(newAssignment, statement, null);
 				} else {
-					Block newBlock= ast.block(newAssignment, rewrite.createMoveTarget(statement));
+					Block newBlock= ast.block(newAssignment, ASTNodes.createMoveTarget(rewrite, statement));
 
 					rewrite.replace(statement, newBlock, null);
 				}

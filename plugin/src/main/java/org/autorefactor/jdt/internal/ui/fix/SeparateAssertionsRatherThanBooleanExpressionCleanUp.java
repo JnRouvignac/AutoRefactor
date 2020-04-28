@@ -110,7 +110,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			List<Expression> allOperands= ASTNodes.getAllOperands(booleanExpression);
-			rewrite.replace(booleanExpression, rewrite.createMoveTarget(allOperands.remove(0)), null);
+			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), null);
 			List<Statement> expressionStatements= new ArrayList<>(allOperands.size());
 
 			for (Expression operand : allOperands) {
@@ -120,7 +120,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 					newArguments.add(rewrite.createCopyTarget(ASTNodes.getUnparenthesedExpression((Expression) argument)));
 				}
 
-				newArguments.set(parameterIndex, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(operand)));
+				newArguments.set(parameterIndex, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(operand)));
 				MethodInvocation newMethod;
 
 				if (originalMethod.getExpression() != null) {
@@ -141,7 +141,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 					rewrite.insertAfter(expressionStatement, node, null);
 				}
 			} else {
-				expressionStatements.add(0, rewrite.createMoveTarget(node));
+				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 				Block newBlock= ast.block(expressionStatements);
 				rewrite.replace(node, newBlock, null);
 			}

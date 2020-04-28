@@ -81,6 +81,6 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 	private void removeCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		rewrite.replace(secondIf, rewrite.createMoveTarget(secondIf.getThenStatement()), null);
+		rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), null);
 	}
 }

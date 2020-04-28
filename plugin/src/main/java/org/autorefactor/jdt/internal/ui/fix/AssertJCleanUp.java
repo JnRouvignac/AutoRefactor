@@ -243,7 +243,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			qualifiedClassName= ASSERTIONS_CLASS;
 			qualifiedClass= null;
 		} else if (originalMethod.getExpression() != null) {
-			qualifiedClass= cuRewrite.getASTRewrite().createMoveTarget(originalMethod.getExpression());
+			qualifiedClass= ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), originalMethod.getExpression());
 		} else {
 			qualifiedClass= null;
 		}
@@ -268,7 +268,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
+				copyOfMessages.add(ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
@@ -293,7 +293,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			List<Expression> copyOfMessages= new ArrayList<>(failureMethod.arguments().size());
 
 			for (Object message : failureMethod.arguments()) {
-				copyOfMessages.add(cuRewrite.getASTRewrite().createMoveTarget(ASTNodes.getUnparenthesedExpression((Expression) message)));
+				copyOfMessages.add(ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
 			assertionMethod= ast.newMethodInvocation(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);

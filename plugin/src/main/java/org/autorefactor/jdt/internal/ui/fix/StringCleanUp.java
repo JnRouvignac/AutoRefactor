@@ -85,7 +85,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 			if (ASTNodes.hasType(stringExpression, String.class.getCanonicalName())) {
 				// If node is already a String, no need to call toString()
-				rewrite.replace(node, rewrite.createMoveTarget(stringExpression), null);
+				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, stringExpression), null);
 				return false;
 			}
 
@@ -119,7 +119,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (isStringValueOf && ASTNodes.hasType(ASTNodes.arguments(node).get(0), String.class.getCanonicalName())) {
 			if (ASTNodes.arguments(node).get(0) instanceof StringLiteral || ASTNodes.arguments(node).get(0) instanceof InfixExpression) {
-				rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ASTNodes.arguments(node).get(0))), null);
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0))), null);
 				return false;
 			}
 		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
@@ -154,7 +154,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 									&& ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
 				Expression leftExpression= leftInvocation.getExpression();
 				Expression rightExpression= rightInvocation.getExpression();
-				rewrite.replace(node, ast.newMethodInvocation(rewrite.createMoveTarget(leftExpression), "equalsIgnoreCase", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
+				rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, leftExpression), "equalsIgnoreCase", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
@@ -164,7 +164,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			Expression rightExpression= getReducedStringExpression(ASTNodes.arguments(node).get(0), isRefactoringNeeded);
 
 			if (isRefactoringNeeded.get()) {
-				rewrite.replace(node, ast.newMethodInvocation(rewrite.createMoveTarget(leftExpression), "equalsIgnoreCase", rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
+				rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, leftExpression), "equalsIgnoreCase", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
@@ -213,9 +213,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 
 		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-			cuRewrite.getASTRewrite().replace(toReplace, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(ASTNodes.arguments(mi).get(0))), null);
+			cuRewrite.getASTRewrite().replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
 		} else {
-			cuRewrite.getASTRewrite().replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), rewrite.createMoveTarget(ASTNodes.arguments(mi).get(0))), null);
+			cuRewrite.getASTRewrite().replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
 		}
 
 		return false;
@@ -226,7 +226,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 		if (expression != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			return rewrite.createMoveTarget(expression);
+			return ASTNodes.createMoveTarget(rewrite, expression);
 		}
 
 		return ast.this0();

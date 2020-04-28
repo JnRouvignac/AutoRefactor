@@ -128,9 +128,9 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-			rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(firstExpression), InfixExpression.Operator.EQUALS, rewrite.createMoveTarget(secondExpression)), null);
+			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), null);
 		} else {
-			rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(firstExpression), InfixExpression.Operator.XOR, rewrite.createMoveTarget(secondExpression)), null);
+			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), null);
 		}
 	}
 }

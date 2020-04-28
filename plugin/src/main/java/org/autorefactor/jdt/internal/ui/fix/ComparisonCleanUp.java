@@ -113,6 +113,6 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		rewrite.replace(node, ast.infixExpression(rewrite.createMoveTarget(comparisonMI), operator, ast.number("0")), null); //$NON-NLS-1$
+		rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, comparisonMI), operator, ast.number("0")), null); //$NON-NLS-1$
 	}
 }

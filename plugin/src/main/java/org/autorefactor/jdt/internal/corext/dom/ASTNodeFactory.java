@@ -980,7 +980,7 @@ public class ASTNodeFactory {
 	}
 
 	private <T extends ASTNode> T createMoveTarget(final T nodeToMove) {
-		return refactorings.createMoveTarget(nodeToMove);
+		return ASTNodes.createMoveTarget(refactorings, nodeToMove);
 	}
 
 	/**

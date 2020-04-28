@@ -212,7 +212,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
 			rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);
 		} else {
-			rewrite.replace(sourceNode, rewrite.createMoveTarget(unconditionnalStatement), null);
+			rewrite.replace(sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), null);
 		}
 	}
 

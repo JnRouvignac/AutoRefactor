@@ -96,6 +96,6 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 		rewrite.remove(previousStatements, null);
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		rewrite.replace(node, ast.doWhile(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getExpression())), rewrite.createMoveTarget(node.getBody())), null);
+		rewrite.replace(node, ast.doWhile(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
 	}
 }

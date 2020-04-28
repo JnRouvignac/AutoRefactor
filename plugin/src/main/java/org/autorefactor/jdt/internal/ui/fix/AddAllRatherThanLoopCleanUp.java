@@ -204,8 +204,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
-						"addAll", addMethod.getExpression() != null ? rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.this0(), //$NON-NLS-1$
-						rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(iterable)))), null);
+						"addAll", addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.this0(), //$NON-NLS-1$
+						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), null);
 	}
 
 	private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
@@ -273,9 +273,9 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 		MethodInvocation newMethod;
 		if (affectedCollection != null) {
-			newMethod= ast.newMethodInvocation(rewrite.createMoveTarget(affectedCollection), methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(data)));
+			newMethod= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, affectedCollection), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
 		} else {
-			newMethod= ast.newMethodInvocation(methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(data)));
+			newMethod= ast.newMethodInvocation(methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
 		}
 
 		rewrite.replace(toReplace, ast.toStatement(newMethod), null);

@@ -478,7 +478,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		TypeMethodReference typeMethodRef= ast.typeMethodRef();
 		typeMethodRef.setType(ast.toType(type, typeNameDecider));
-		typeMethodRef.setName(rewrite.createMoveTarget(method.getName()));
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, method.getName()));
 		return typeMethodRef;
 	}
 
@@ -502,7 +502,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			lambdaExpression.parameters().add(ast.declareSingleVariable(name1.getIdentifier(), ast.toType(type, typeNameDecider)));
 		}
 
-		lambdaExpression.setBody(ast.fieldAccess(ast.createCopyTarget(name1), rewrite.createMoveTarget(field.getName())));
+		lambdaExpression.setBody(ast.fieldAccess(ast.createCopyTarget(name1), ASTNodes.createMoveTarget(rewrite, field.getName())));
 		lambdaExpression.setParentheses(false);
 		return lambdaExpression;
 	}

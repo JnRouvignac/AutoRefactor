@@ -98,7 +98,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		if (canRemoveCast(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, rewrite.createMoveTarget(node.getExpression()), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), null);
 			return false;
 		}
 

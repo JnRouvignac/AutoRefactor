@@ -106,6 +106,6 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		rewrite.replace(node, ast.parenthesizeIfNeeded(rewrite.createMoveTarget(valuedExpression)), null);
+		rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, valuedExpression)), null);
 	}
 }

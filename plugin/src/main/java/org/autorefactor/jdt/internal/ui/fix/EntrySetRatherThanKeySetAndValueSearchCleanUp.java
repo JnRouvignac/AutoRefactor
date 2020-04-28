@@ -258,7 +258,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		if (typeBinding != null && typeBinding.isRawType()) {
 			// for (Object key : map.keySet()) => for (Object key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(rewrite.createMoveTarget(mapExpression), "entrySet"), null); //$NON-NLS-1$
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
 			Type objectType= ast.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
 			Variable objectVar= new Variable(
 					new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), ast); //$NON-NLS-1$
@@ -269,7 +269,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			// Object key = mapEntry.getKey(); // <--- add this statement
 
 			Type mapKeyType= ast.createCopyTarget(parameter.getType());
-			VariableDeclarationStatement newKeyDecl= ast.declareStatement(mapKeyType, rewrite.createMoveTarget(parameter.getName()),
+			VariableDeclarationStatement newKeyDecl= ast.declareStatement(mapKeyType, ASTNodes.createMoveTarget(rewrite, parameter.getName()),
 					ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
 			rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl, null);
@@ -283,7 +283,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			}
 		} else {
 			// for (K key : map.keySet()) => for (K key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(rewrite.createMoveTarget(mapExpression), "entrySet"), null); //$NON-NLS-1$
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
 			// for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
 			// map.entrySet())
 			Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
@@ -295,7 +295,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 				Type mapKeyType= ast.createCopyTarget(parameter.getType());
 
 				VariableDeclarationStatement newKeyDeclaration= ast.declareStatement(mapKeyType,
-						rewrite.createMoveTarget(parameter.getName()), ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
+						ASTNodes.createMoveTarget(rewrite, parameter.getName()), ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
 				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration, null);
 			}
 		}
@@ -326,7 +326,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		} else {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			// Use the type as defined in the code
-			mapKeyType= rewrite.createMoveTarget(paramType);
+			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
 		}
 		Type mapValueType= ast.copyType(getValueMi, typeNameDecider);
 		return ast.genericType(mapEntryType, mapKeyType, mapValueType);

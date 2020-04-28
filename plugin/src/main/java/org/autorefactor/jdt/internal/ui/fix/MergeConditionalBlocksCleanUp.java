@@ -147,7 +147,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
 			for (int i= 0; i < duplicateIfBlocks.size(); i++) {
 				if (isThenStatement.get(i)) {
-					newConditions.add(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(duplicateIfBlocks.get(i).getExpression())));
+					newConditions.add(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(i).getExpression())));
 				} else {
 					newConditions.add(ast.parenthesizeIfNeeded(ast.negate(duplicateIfBlocks.get(i).getExpression())));
 				}
@@ -159,9 +159,9 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
 			IfStatement newIf;
 			if (remainingStatement != null) {
-				newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()), rewrite.createMoveTarget(remainingStatement));
+				newIf= ast.if0(newCondition, ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(0).getThenStatement()), ASTNodes.createMoveTarget(rewrite, remainingStatement));
 			} else {
-				newIf= ast.if0(newCondition, rewrite.createMoveTarget(duplicateIfBlocks.get(0).getThenStatement()));
+				newIf= ast.if0(newCondition, ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(0).getThenStatement()));
 			}
 
 			rewrite.replace(duplicateIfBlocks.get(0), newIf, null);

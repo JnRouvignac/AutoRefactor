@@ -315,7 +315,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-				invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
+				invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
@@ -361,7 +361,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
-					getAssertName(isAssertEquals, "Same"), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
+					getAssertName(isAssertEquals, "Same"), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
 					null, failureMessage);
 			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
 			return false;
@@ -478,7 +478,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
-		Expression copyOfActual= rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(actual));
+		Expression copyOfActual= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actual));
 		return invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, copyOfActual, null, null, failureMessage);
 	}
 

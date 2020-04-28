@@ -265,9 +265,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 			IExtendedModifier extendedModifier= reorderedModifiers.get(i);
 
 			if (extendedModifier.isModifier()) {
-				rewrite.moveToIndex((Modifier) extendedModifier, i, rewrite.createMoveTarget((Modifier) extendedModifier), null);
+				rewrite.moveToIndex((Modifier) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Modifier) extendedModifier), null);
 			} else {
-				rewrite.moveToIndex((Annotation) extendedModifier, i, rewrite.createMoveTarget((Annotation) extendedModifier), null);
+				rewrite.moveToIndex((Annotation) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Annotation) extendedModifier), null);
 			}
 		}
 	}

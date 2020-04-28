@@ -197,22 +197,22 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.canHaveSiblings(node)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node, null);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
 			}
 
 			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
-			rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()), null);
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
 			rewrite.remove(node.getElseStatement(), null);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
 			for (Statement statement : statementsToMove) {
-				copyOfStatements.add(rewrite.createMoveTarget(statement));
+				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
 			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
-			rewrite.replace(node.getThenStatement(), rewrite.createMoveTarget(node.getElseStatement()), null);
-			copyOfStatements.add(0, rewrite.createMoveTarget(node));
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.block(copyOfStatements);
 			rewrite.replace(node, block, null);
@@ -227,7 +227,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.canHaveSiblings(node)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(rewrite.createMoveTarget(statementsToMove.get(i)), node, null);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
 			}
 
 			rewrite.remove(node.getElseStatement(), null);
@@ -235,11 +235,11 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
 			for (Statement statement : statementsToMove) {
-				copyOfStatements.add(rewrite.createMoveTarget(statement));
+				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
 			rewrite.remove(node.getElseStatement(), null);
-			copyOfStatements.add(0, rewrite.createMoveTarget(node));
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.block(copyOfStatements);
 			rewrite.replace(node, block, null);

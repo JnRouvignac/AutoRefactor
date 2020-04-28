@@ -109,7 +109,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 			}
 		}
 
-		rewrite.replace(node, ast.if0(rewrite.createMoveTarget(ASTNodes.getUnparenthesedExpression(node.getExpression())), rewrite.createMoveTarget(node.getBody())), null);
+		rewrite.replace(node, ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
 	}
 
 	private static class BreakVisitor extends InterruptibleVisitor {

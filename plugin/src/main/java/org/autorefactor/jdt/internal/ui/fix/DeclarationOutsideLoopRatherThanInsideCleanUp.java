@@ -190,15 +190,15 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 				Modifier modifier= (Modifier) iExtendedModifier;
 
 				if (!modifier.isPrivate() && !modifier.isStatic()) {
-					newModifiers.add(rewrite.createMoveTarget(modifier));
+					newModifiers.add(ASTNodes.createMoveTarget(rewrite, modifier));
 				}
 			}
 
 			rewrite.insertBefore(newDeclareStatement, statement, null);
 			rewrite.replace(varToMove,
-					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, rewrite.createMoveTarget(fragment.getInitializer()))), null);
+					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), null);
 		} else {
-			rewrite.insertBefore(rewrite.createMoveTarget(varToMove), statement, null);
+			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, null);
 			rewrite.remove(varToMove, null);
 		}
 	}

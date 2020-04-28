@@ -109,7 +109,7 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 
 		if (expressionWithoutParentheses != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, rewrite.createMoveTarget(expressionWithoutParentheses), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), null);
 			return false;
 		}
 
@@ -334,6 +334,6 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	private void addParentheses(final Expression expression) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(expression, ast.parenthesize(rewrite.createMoveTarget(expression)), null);
+		rewrite.replace(expression, ast.parenthesize(ASTNodes.createMoveTarget(rewrite, expression)), null);
 	}
 }

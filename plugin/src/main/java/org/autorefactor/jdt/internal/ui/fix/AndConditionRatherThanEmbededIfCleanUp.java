@@ -85,9 +85,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		InfixExpression ie= ast.infixExpression(ast.parenthesizeIfNeeded(rewrite.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
-				ast.parenthesizeIfNeeded(rewrite.createMoveTarget(innerIf.getExpression())));
+		InfixExpression ie= ast.infixExpression(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+				ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
 		rewrite.replace(innerIf.getExpression(), ie, null);
-		rewrite.replace(outerIf, rewrite.createMoveTarget(innerIf), null);
+		rewrite.replace(outerIf, ASTNodes.createMoveTarget(rewrite, innerIf), null);
 	}
 }

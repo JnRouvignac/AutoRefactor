@@ -160,13 +160,13 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				}
 				// Java style array "Type[] var"
 				ReturnStatement newReturnStatement= ast
-						.return0(ast.newArray(ast.createCopyTarget(arrayType), rewrite.createMoveTarget(returnExpression)));
+						.return0(ast.newArray(ast.createCopyTarget(arrayType), ASTNodes.createMoveTarget(rewrite, returnExpression)));
 				replaceReturnStatementForArray(node, vds, newReturnStatement);
 			} else {
 				// C style array "Type var[]"
 				ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
 				ReturnStatement newReturnStatement= ast
-						.return0(ast.newArray(arrayType, rewrite.createMoveTarget(returnExpression)));
+						.return0(ast.newArray(arrayType, ASTNodes.createMoveTarget(rewrite, returnExpression)));
 				replaceReturnStatementForArray(node, vds, newReturnStatement);
 			}
 
@@ -185,7 +185,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.remove(previousSibling, null);
-			rewrite.replace(node, ast.return0(rewrite.createMoveTarget(returnExpression)), null);
+			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnExpression)), null);
 		}
 	}
 }

@@ -87,7 +87,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 		Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
 		if (expression != null) {
-			fa.setExpression(rewrite.createMoveTarget(expression));
+			fa.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
 		}
 
 		fa.setName(ast.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$

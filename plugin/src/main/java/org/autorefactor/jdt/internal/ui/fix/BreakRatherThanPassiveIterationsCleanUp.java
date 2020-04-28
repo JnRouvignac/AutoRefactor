@@ -301,7 +301,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		if (ifStatement.getThenStatement() instanceof Block) {
 			rewrite.insertAfter(ast.break0(), Utils.getLast(assignments), null);
 		} else {
-			rewrite.replace(ifStatement.getThenStatement(), ast.block(rewrite.createMoveTarget(ifStatement.getThenStatement()), ast.break0()), null);
+			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), null);
 		}
 	}
 }

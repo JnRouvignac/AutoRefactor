@@ -38,6 +38,7 @@ import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
 import org.autorefactor.jdt.internal.corext.dom.ASTCommentRewriter;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.jdt.internal.corext.dom.SourceRewriter;
 import org.autorefactor.util.Pair;
@@ -222,7 +223,8 @@ public class ASTRewrite {
 		List<T> movedNodes= new ArrayList<>(nodes.size());
 
 		for (T astNode : nodes) {
-			movedNodes.add(createMoveTarget(astNode));
+			final T node= astNode;
+			movedNodes.add(ASTNodes.createMoveTarget(this, node));
 		}
 
 		return movedNodes;
