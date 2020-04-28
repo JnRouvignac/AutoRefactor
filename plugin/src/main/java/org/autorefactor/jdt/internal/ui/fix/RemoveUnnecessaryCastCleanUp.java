@@ -35,15 +35,11 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /**
  * See {@link #getDescription()} method.
@@ -123,21 +119,18 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 			return false;
 		}
 
+		ITypeBinding targetType= ASTNodes.getTargetType(node);
+
+		if (isAssignmentCompatible(node.getExpression(), targetType)) {
+			return true;
+		}
+
 		ASTNode parent= node.getParent();
 		switch (parent.getNodeType()) {
 		case ASTNode.RETURN_STATEMENT:
-			MethodDeclaration md= ASTNodes.getAncestor(parent, MethodDeclaration.class);
-			return isAssignmentCompatible(node.getExpression(), md.getReturnType2())
-					|| isConstantExpressionAssignmentConversion(node);
-
 		case ASTNode.ASSIGNMENT:
-			Assignment as= (Assignment) parent;
-			return isAssignmentCompatible(as, node.getExpression()) || isConstantExpressionAssignmentConversion(node);
-
 		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-			VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
-			return isAssignmentCompatible(node.getExpression(), ASTNodes.resolveTypeBinding(vdf))
-					|| isConstantExpressionAssignmentConversion(node);
+			return isConstantExpressionAssignmentConversion(node);
 
 		case ASTNode.INFIX_EXPRESSION:
 			if (!isPrimitiveTypeNarrowing(node)) {
@@ -285,10 +278,6 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		ITypeBinding exprTypeBinding= node.getExpression().resolveTypeBinding();
 		return ASTNodes.isPrimitive(castTypeBinding) && ASTNodes.isPrimitive(exprTypeBinding)
 				&& isAssignmentCompatible(exprTypeBinding, castTypeBinding);
-	}
-
-	private boolean isAssignmentCompatible(final Expression expression, final Type type) {
-		return expression != null && type != null && isAssignmentCompatible(type.resolveBinding(), expression.resolveTypeBinding());
 	}
 
 	private boolean isAssignmentCompatible(final Expression expression, final ITypeBinding typeBinding) {
