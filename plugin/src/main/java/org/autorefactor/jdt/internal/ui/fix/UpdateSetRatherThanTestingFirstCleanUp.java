@@ -111,7 +111,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 					// There are other statements, replace the if condition with col.add() (or
 					// col.remove())
 					rewrite.replace(ifStmtToReplace.getExpression(),
-							negate ? ast.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : ASTNodes.createMoveTarget(rewrite, miAddOrRemove), null);
+							negate ? ast.negate(miAddOrRemove) : ASTNodes.createMoveTarget(rewrite, miAddOrRemove), null);
 					rewrite.remove(firstStatement, null);
 				}
 
