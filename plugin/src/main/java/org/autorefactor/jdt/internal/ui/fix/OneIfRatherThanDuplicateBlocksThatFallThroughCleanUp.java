@@ -137,10 +137,9 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 			}
 
 			InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
-			IfStatement newIf= ast.if0(newCondition, ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(0).getThenStatement()));
-
 			Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-			rewrite.replace(iterator.next(), newIf, null);
+			IfStatement oldIf= iterator.next();
+			rewrite.replace(oldIf.getExpression(), newCondition, null);
 
 			while (iterator.hasNext()) {
 				rewrite.remove(iterator.next(), null);

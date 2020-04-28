@@ -87,7 +87,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (getResult()) {
+			if (getResult() && node.getElseStatement() != null) {
 				List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
 				List<Boolean> isThenStatement= new ArrayList<>(4);
 				AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
@@ -157,14 +157,13 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 			Statement remainingStatement= Utils.getLast(isThenStatement) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
 			InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
 
-			IfStatement newIf;
-			if (remainingStatement != null) {
-				newIf= ast.if0(newCondition, ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(0).getThenStatement()), ASTNodes.createMoveTarget(rewrite, remainingStatement));
-			} else {
-				newIf= ast.if0(newCondition, ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(0).getThenStatement()));
-			}
+			rewrite.replace(duplicateIfBlocks.get(0).getExpression(), newCondition, null);
 
-			rewrite.replace(duplicateIfBlocks.get(0), newIf, null);
+			if (remainingStatement != null) {
+				rewrite.replace(duplicateIfBlocks.get(0).getElseStatement(), ASTNodes.createMoveTarget(rewrite, remainingStatement), null);
+			} else if (duplicateIfBlocks.get(0).getElseStatement() != null) {
+				rewrite.remove(duplicateIfBlocks.get(0).getElseStatement(), null);
+			}
 		}
 	}
 }
