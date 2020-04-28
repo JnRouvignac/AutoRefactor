@@ -82,6 +82,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final CastExpression node) {
 		NumberLiteral literal= ASTNodes.as(node.getExpression(), NumberLiteral.class);
+
 		if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (ASTNodes.hasType(node.getType().resolveBinding(), long.class.getSimpleName())) {
 				createPrimitive(node, literal, 'L');
@@ -117,6 +118,11 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean canRemoveCast(final CastExpression node) {
+		if (ASTNodes.hasType(node.getExpression(), char.class.getCanonicalName()) && ASTNodes.hasType(node, int.class.getCanonicalName())
+				|| ASTNodes.hasType(node.getExpression(), byte.class.getCanonicalName()) && ASTNodes.hasType(node, char.class.getCanonicalName())) {
+			return false;
+		}
+
 		ASTNode parent= node.getParent();
 		switch (parent.getNodeType()) {
 		case ASTNode.RETURN_STATEMENT:
@@ -126,7 +132,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		case ASTNode.ASSIGNMENT:
 			Assignment as= (Assignment) parent;
-			return isAssignmentCompatible(node.getExpression(), as) || isConstantExpressionAssignmentConversion(node);
+			return isAssignmentCompatible(as, node.getExpression()) || isConstantExpressionAssignmentConversion(node);
 
 		case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
 			VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
@@ -140,7 +146,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 				Expression ro= ie.getRightOperand();
 
 				if (node.equals(lo)) {
-					return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
+					return (isStringConcat(ie) || isAssignmentCompatible(ro, node.getExpression()))
 							&& !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
 				}
 
@@ -157,7 +163,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	private boolean canRemoveCastInIntegralDivision(final CastExpression node, final InfixExpression ie) {
 		ITypeBinding leftOperandType= getLeftOperandType(ie, node);
 		return isIntegralDivision(ie) // safety check
-				&& isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOperandType)
+				&& isAssignmentCompatible(leftOperandType, node.getExpression().resolveTypeBinding())
 				&& compareTo(node.resolveTypeBinding(), leftOperandType) >= 0;
 	}
 
@@ -167,8 +173,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 	private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression ie) {
 		ITypeBinding leftOpType= getLeftOperandType(ie, node);
-		return isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOpType)
-				&& isAssignmentCompatible(node.resolveTypeBinding(), leftOpType);
+		return isAssignmentCompatible(leftOpType, node.getExpression().resolveTypeBinding())
+				&& isAssignmentCompatible(leftOpType, node.resolveTypeBinding());
 	}
 
 	private ITypeBinding getLeftOperandType(final InfixExpression ie, final CastExpression node) {
@@ -278,23 +284,25 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		ITypeBinding castTypeBinding= node.getType().resolveBinding();
 		ITypeBinding exprTypeBinding= node.getExpression().resolveTypeBinding();
 		return ASTNodes.isPrimitive(castTypeBinding) && ASTNodes.isPrimitive(exprTypeBinding)
-				&& isAssignmentCompatible(castTypeBinding, exprTypeBinding);
+				&& isAssignmentCompatible(exprTypeBinding, castTypeBinding);
 	}
 
 	private boolean isAssignmentCompatible(final Expression expression, final Type type) {
-		return expression != null && type != null && isAssignmentCompatible(expression.resolveTypeBinding(), type.resolveBinding());
+		return expression != null && type != null && isAssignmentCompatible(type.resolveBinding(), expression.resolveTypeBinding());
 	}
 
 	private boolean isAssignmentCompatible(final Expression expression, final ITypeBinding typeBinding) {
-		return expression != null && typeBinding != null && isAssignmentCompatible(expression.resolveTypeBinding(), typeBinding);
+		return expression != null && typeBinding != null && isAssignmentCompatible(typeBinding, expression.resolveTypeBinding());
 	}
 
-	private boolean isAssignmentCompatible(final Expression expr1, final Expression expr2) {
-		return expr1 != null && expr2 != null
-				&& isAssignmentCompatible(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
+	private boolean isAssignmentCompatible(final Expression expression1, final Expression expression2) {
+		return expression1 != null && expression2 != null
+				&& isAssignmentCompatible(expression1.resolveTypeBinding(), expression2.resolveTypeBinding());
 	}
 
-	private boolean isAssignmentCompatible(final ITypeBinding targetBinding, final ITypeBinding sourceBinding) {
-		return targetBinding != null && sourceBinding != null && targetBinding.isAssignmentCompatible(sourceBinding);
+	private boolean isAssignmentCompatible(final ITypeBinding sourceBinding, final ITypeBinding targetBinding) {
+		return sourceBinding != null
+				&& targetBinding != null
+				&& targetBinding.isAssignmentCompatible(sourceBinding);
 	}
 }
