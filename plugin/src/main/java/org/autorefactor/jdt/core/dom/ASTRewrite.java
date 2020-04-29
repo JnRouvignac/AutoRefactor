@@ -85,7 +85,7 @@ public class ASTRewrite {
 	 *
 	 * @param astRoot   the compilation unit, root of the AST
 	 * @param eventLoop the event loop
-	 * @param monitor   TODO
+	 * @param monitor   The monitor
 	 */
 	public ASTRewrite(final CompilationUnit astRoot, final EventLoop eventLoop, final SubMonitor monitor) {
 		this.eventLoop= eventLoop;
