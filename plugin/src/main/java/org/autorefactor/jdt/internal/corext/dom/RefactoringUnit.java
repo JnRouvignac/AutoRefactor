@@ -30,7 +30,7 @@ import java.util.Objects;
 import org.eclipse.jdt.core.ICompilationUnit;
 
 /** Work item for the {@link ApplyRefactoringsJob}. */
-public class RefactoringUnit implements Comparable {
+public class RefactoringUnit implements Comparable<Object> {
 	private final ICompilationUnit compilationUnit;
 	private final JavaProjectOptions options;
 
