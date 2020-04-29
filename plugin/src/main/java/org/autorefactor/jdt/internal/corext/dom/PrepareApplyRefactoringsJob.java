@@ -118,6 +118,7 @@ public class PrepareApplyRefactoringsJob extends Job {
 	 * Clones all the cleanups to apply. In fairness, this method is only useful
 	 * for stateful cleanups.
 	 */
+	@SuppressWarnings("deprecation")
 	private List<RefactoringRule> clone(final List<RefactoringRule> refactorings) throws Exception {
 		List<RefactoringRule> res= new ArrayList<>(refactorings.size());
 		for (RefactoringRule refactoring : refactorings) {

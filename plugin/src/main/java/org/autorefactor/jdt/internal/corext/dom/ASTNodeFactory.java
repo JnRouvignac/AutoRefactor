@@ -251,6 +251,7 @@ public class ASTNodeFactory {
 	 * @param expression the case expression
 	 * @return a new switch case statement
 	 */
+	@SuppressWarnings("deprecation")
 	public SwitchCase case0(final Expression expression) {
 		SwitchCase sc= ast.newSwitchCase();
 		sc.setExpression(expression);

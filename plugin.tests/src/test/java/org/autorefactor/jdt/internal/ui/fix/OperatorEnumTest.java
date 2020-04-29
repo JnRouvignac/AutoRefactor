@@ -97,6 +97,7 @@ public class OperatorEnumTest {
 
 	@Test
 	public void simpleTestCompareExpressions() {
+		@SuppressWarnings("deprecation")
 		final AST ast= AST.newAST(AST.JLS8);
 		final Assignment op1= ast.newAssignment();
 		op1.setOperator(Assignment.Operator.ASSIGN);

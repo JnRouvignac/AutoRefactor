@@ -925,6 +925,7 @@ public class CFGBuilder {
 	 * @param throwers                  the thrower blocks information
 	 * @return the blocks liveness state after current node
 	 */
+	@SuppressWarnings("deprecation")
 	public LivenessState buildCFG(final SwitchCase node, final CFGBasicBlock switchConditionBasicBlock, final LivenessState state,
 			final ThrowerBlocks throwers) {
 		// The current live blocks will be empty if there was a break,

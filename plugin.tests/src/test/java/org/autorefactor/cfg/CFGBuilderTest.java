@@ -93,6 +93,7 @@ public class CFGBuilderTest {
 		cu.save(null, true);
 
 		final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4); //$NON-NLS-1$
+		@SuppressWarnings("deprecation")
 		final ASTParser parser= ASTParser.newParser(AST.JLS8);
 		autoRefactorHandlerResetParser(cu, parser, options);
 
