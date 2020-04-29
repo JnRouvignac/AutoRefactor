@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class DoWhileRatherThanWhileSample {
-
     private void replaceWhileByDoWhile(int i) {
         // Keep this comment
         do {
@@ -36,6 +35,150 @@ public class DoWhileRatherThanWhileSample {
             }
             i *= 2;
         } while (true);
+    }
+
+    private void replaceWithInitedBoolean(int i) {
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+        } while (isInitedToTrue);
+    }
+
+    private void replaceWithInitedInteger(int i) {
+        int j= 1_000;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                return;
+            }
+            i *= 2;
+            j--;
+        } while (j > 0);
+    }
+
+    private void replaceWithInitedBooleanAndInteger(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void replaceWithORExpression(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue || j > 0);
+    }
+
+    private void replaceWithFalseOperand(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue || j > 0 || false);
+    }
+
+    private void doNotReplaceWithUnnkownOperand(int i, boolean isValid) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        while (isInitedToTrue && j > 0 && isValid) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void doNotReplaceWithUnnkownInitialization(int i, boolean isValid) {
+        int j= 1_000;
+        boolean isInitedToTrue= isValid;
+
+        while (isInitedToTrue && j > 0) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void doNotReplaceWithIncrement(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        while (isInitedToTrue && j++ > 0) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void replaceRecursiveInitialization(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void replaceWithReassignment(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= false;
+        isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
     }
 
     private void doNotReplaceWhileWithCondition(int i) {

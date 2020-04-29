@@ -25,13 +25,28 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
- * TODO Use variable values analysis for determining where code is dead.
+ * DoWhileRatherThanWhileCleanUp.
  *
  * @see #getDescription()
  */
@@ -68,8 +83,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final WhileStatement node) {
-		Object constantCondition= node.getExpression().resolveConstantExpressionValue();
-		if (Boolean.TRUE.equals(constantCondition)) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression()) && Boolean.TRUE.equals(hasAlwaysValue(node, node.getExpression()))) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.replace(node, ast.doWhile(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
@@ -77,5 +91,149 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		}
 
 		return true;
+	}
+
+	private Object hasAlwaysValue(final Statement node, final Expression condition) {
+		Object constantCondition= condition.resolveConstantExpressionValue();
+
+		if (constantCondition != null) {
+			return constantCondition;
+		}
+
+		Long integerLiteral= ASTNodes.getIntegerLiteral(condition);
+
+		if (integerLiteral != null) {
+			return integerLiteral;
+		}
+
+		SimpleName variable= ASTNodes.as(condition, SimpleName.class);
+
+		if (variable != null && variable.resolveBinding() != null && variable.resolveBinding().getKind() == IBinding.VARIABLE) {
+			List<Statement> previousSiblings= new ArrayList<>(ASTNodes.getPreviousSiblings(node));
+
+			Collections.reverse(previousSiblings);
+
+			for (Statement previousSibling : previousSiblings) {
+				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), previousSibling, true).find();
+
+				if (!visitor.getReads().isEmpty() || visitor.getWrites().size() > 1) {
+					return null;
+				}
+
+				if (!visitor.getWrites().isEmpty()) {
+					SimpleName write= visitor.getWrites().get(0);
+
+					switch (write.getParent().getNodeType()) {
+					case ASTNode.ASSIGNMENT:
+						Assignment assignment= (Assignment) write.getParent();
+
+						if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+							return hasAlwaysValue(previousSibling, assignment.getRightHandSide());
+						}
+
+						break;
+
+					case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+						VariableDeclarationFragment fragment= (VariableDeclarationFragment) write.getParent();
+
+						if (fragment.getInitializer() != null) {
+							return hasAlwaysValue(previousSibling, fragment.getInitializer());
+						}
+
+						break;
+
+					case ASTNode.SINGLE_VARIABLE_DECLARATION:
+						SingleVariableDeclaration singleVariableDeclaration= (SingleVariableDeclaration) write.getParent();
+
+						if (singleVariableDeclaration.getInitializer() != null) {
+							return hasAlwaysValue(previousSibling, singleVariableDeclaration.getInitializer());
+						}
+
+						break;
+
+					default:
+						break;
+					}
+
+					return null;
+				}
+			}
+
+			return null;
+		}
+
+		InfixExpression infixExpression= ASTNodes.as(condition, InfixExpression.class);
+
+		if (infixExpression != null) {
+			if (!infixExpression.hasExtendedOperands()
+					&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS,
+							InfixExpression.Operator.NOT_EQUALS,
+							InfixExpression.Operator.GREATER,
+							InfixExpression.Operator.GREATER_EQUALS,
+							InfixExpression.Operator.LESS,
+							InfixExpression.Operator.LESS_EQUALS)) {
+				Object leftOperand= hasAlwaysValue(node, infixExpression.getLeftOperand());
+				Object rightOperand= hasAlwaysValue(node, infixExpression.getRightOperand());
+
+				if (leftOperand instanceof Number && rightOperand instanceof Number) {
+					Number leftNumber= (Number) leftOperand;
+					Number rightNumber= (Number) rightOperand;
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS)) {
+						return leftNumber.longValue() == rightNumber.longValue();
+					}
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS)) {
+						return leftNumber.longValue() != rightNumber.longValue();
+					}
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.GREATER)) {
+						return leftNumber.longValue() > rightNumber.longValue();
+					}
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.GREATER_EQUALS)) {
+						return leftNumber.longValue() >= rightNumber.longValue();
+					}
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.LESS)) {
+						return leftNumber.longValue() < rightNumber.longValue();
+					}
+
+					if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.LESS_EQUALS)) {
+						return leftNumber.longValue() <= rightNumber.longValue();
+					}
+				}
+
+				return null;
+			}
+
+			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND,
+							InfixExpression.Operator.AND)) {
+				for (Expression operand : ASTNodes.getAllOperands(infixExpression)) {
+					final Object hasAlwaysValue= hasAlwaysValue(node, operand);
+
+					if (!Boolean.TRUE.equals(hasAlwaysValue)) {
+						return hasAlwaysValue;
+					}
+				}
+
+				return Boolean.TRUE;
+			}
+
+			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR,
+							InfixExpression.Operator.OR)) {
+				for (Expression operand : ASTNodes.getAllOperands(infixExpression)) {
+					final Object hasAlwaysValue= hasAlwaysValue(node, operand);
+
+					if (!Boolean.FALSE.equals(hasAlwaysValue)) {
+						return hasAlwaysValue;
+					}
+				}
+
+				return Boolean.FALSE;
+			}
+		}
+
+		return false;
 	}
 }

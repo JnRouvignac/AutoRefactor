@@ -73,6 +73,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MemberValuePair;
@@ -446,28 +447,7 @@ public final class ASTNodes {
 				return new OrderedInfixExpression<>(leftFirst, expression.getOperator(), rightSecond);
 			}
 
-			InfixExpression.Operator mirroredOperator= null;
-
-			if (Arrays.asList(
-					InfixExpression.Operator.AND,
-					InfixExpression.Operator.CONDITIONAL_AND,
-					InfixExpression.Operator.CONDITIONAL_OR,
-					InfixExpression.Operator.EQUALS,
-					InfixExpression.Operator.NOT_EQUALS,
-					InfixExpression.Operator.OR,
-					InfixExpression.Operator.PLUS,
-					InfixExpression.Operator.TIMES,
-					InfixExpression.Operator.XOR).contains(expression.getOperator())) {
-				mirroredOperator= expression.getOperator();
-			} else if (InfixExpression.Operator.GREATER.equals(expression.getOperator())) {
-				mirroredOperator= InfixExpression.Operator.LESS;
-			} else if (InfixExpression.Operator.GREATER_EQUALS.equals(expression.getOperator())) {
-				mirroredOperator= InfixExpression.Operator.LESS_EQUALS;
-			} else if (InfixExpression.Operator.LESS.equals(expression.getOperator())) {
-				mirroredOperator= InfixExpression.Operator.GREATER;
-			} else if (InfixExpression.Operator.LESS_EQUALS.equals(expression.getOperator())) {
-				mirroredOperator= InfixExpression.Operator.GREATER_EQUALS;
-			}
+			InfixExpression.Operator mirroredOperator= mirrorOperator(expression.getOperator());
 
 			if (mirroredOperator != null) {
 				F rightFirst= as(expression.getRightOperand(), firstClass);
@@ -477,6 +457,37 @@ public final class ASTNodes {
 					return new OrderedInfixExpression<>(rightFirst, mirroredOperator, leftSecond);
 				}
 			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Return the mirrored operator.
+	 *
+	 * @param operator An operator
+	 * @return The mirrored operator
+	 */
+	public static InfixExpression.Operator mirrorOperator(final Operator operator) {
+		if (Arrays.asList(
+				InfixExpression.Operator.AND,
+				InfixExpression.Operator.CONDITIONAL_AND,
+				InfixExpression.Operator.CONDITIONAL_OR,
+				InfixExpression.Operator.EQUALS,
+				InfixExpression.Operator.NOT_EQUALS,
+				InfixExpression.Operator.OR,
+				InfixExpression.Operator.PLUS,
+				InfixExpression.Operator.TIMES,
+				InfixExpression.Operator.XOR).contains(operator)) {
+			return operator;
+		} else if (InfixExpression.Operator.GREATER.equals(operator)) {
+			return InfixExpression.Operator.LESS;
+		} else if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
+			return InfixExpression.Operator.LESS_EQUALS;
+		} else if (InfixExpression.Operator.LESS.equals(operator)) {
+			return InfixExpression.Operator.GREATER;
+		} else if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
+			return InfixExpression.Operator.GREATER_EQUALS;
 		}
 
 		return null;
