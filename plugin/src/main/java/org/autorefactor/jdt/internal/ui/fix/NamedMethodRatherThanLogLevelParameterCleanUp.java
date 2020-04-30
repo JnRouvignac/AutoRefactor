@@ -75,7 +75,6 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
 			if (args != null && args.size() == 2) {
 				QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
-				Expression message= args.get(1);
 
 				if (levelType != null) {
 					String methodName;
@@ -96,7 +95,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 						return true;
 					}
 
-					replaceLevelByMethodName(node, methodName, message);
+					replaceLevelByMethodName(node, methodName);
 					return false;
 				}
 			}
@@ -105,11 +104,11 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 		return true;
 	}
 
-	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,
-			final Expression message) {
+	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(message))), null);
+		rewrite.replace(node.getName(), ast.simpleName(methodName), null);
+		rewrite.remove(ASTNodes.arguments(node).get(0), null);
 	}
 }
