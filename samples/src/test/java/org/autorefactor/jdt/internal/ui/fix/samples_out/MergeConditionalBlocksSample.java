@@ -153,4 +153,22 @@ public class MergeConditionalBlocksSample {
             System.out.println("Different");
         }
     }
+
+    /** Duplicate if and else if code, merge it */
+    public void doNotMergeIntruderCode(int i) {
+        // Keep this comment
+        if (i == 0) {
+            // Keep this comment too
+            System.out.println("Duplicate");
+        } else if (i == 1) {
+            // Keep this comment too
+            System.out.println("Intruder");
+        } else if (i == 2) {
+            // Keep this comment too
+            System.out.println("Duplicate");
+        } else {
+            // Keep this comment also
+            System.out.println("Different");
+        }
+    }
 }
