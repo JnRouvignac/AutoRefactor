@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
@@ -303,20 +304,21 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 	private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
 			final List<VariableDeclaration> variableDecls, final List<MethodInvocation> methodCallsToRefactor,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Type substituteType= substituteType(ast, originalInstanceCreation.getType(), originalInstanceCreation,
 				classesToUseWithImport, importsToAdd);
 
 		if (substituteType != null) {
-			cuRewrite.getASTRewrite().replace(originalInstanceCreation.getType(), substituteType, null);
+			rewrite.replace(originalInstanceCreation.getType(), substituteType, null);
 			originalInstanceCreation.setType(substituteType);
 		}
 
 		for (MethodInvocation methodCall : methodCallsToRefactor) {
 			MethodInvocation copyOfMethodCall= ast.copySubtree(methodCall);
 			refactorMethod(ast, methodCall, copyOfMethodCall);
-			cuRewrite.getASTRewrite().replace(methodCall, copyOfMethodCall, null);
+			rewrite.replace(methodCall, copyOfMethodCall, null);
 		}
 
 		for (VariableDeclaration variableDecl : variableDecls) {
@@ -325,7 +327,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 					(ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);
 
 			if (substituteVarType != null) {
-				cuRewrite.getASTRewrite().replace(oldDeclareStatement.getType(), substituteVarType, null);
+				rewrite.replace(oldDeclareStatement.getType(), substituteVarType, null);
 			}
 		}
 	}

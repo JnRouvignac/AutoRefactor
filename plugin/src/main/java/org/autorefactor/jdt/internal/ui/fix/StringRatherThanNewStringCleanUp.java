@@ -75,7 +75,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-				cuRewrite.getASTRewrite().replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
 				return false;
 			}
 		}

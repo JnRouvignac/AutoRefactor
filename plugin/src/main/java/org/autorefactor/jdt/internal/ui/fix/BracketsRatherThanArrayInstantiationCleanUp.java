@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Utils;
@@ -83,12 +84,14 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 	}
 
 	private void refactorWithInitializer(final ArrayCreation node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		if (node.getInitializer() != null) {
-			cuRewrite.getASTRewrite().replace(node, node.getInitializer(), null);
+			rewrite.replace(node, node.getInitializer(), null);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			cuRewrite.getASTRewrite().replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
+			rewrite.replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
 		}
 	}
 

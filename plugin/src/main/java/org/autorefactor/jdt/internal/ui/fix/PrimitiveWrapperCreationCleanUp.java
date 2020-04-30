@@ -219,18 +219,15 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding,
 			final List<Expression> args) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression arg0= args.get(0);
 
 		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
 			rewrite.replace(node,
 					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), null); //$NON-NLS-1$
 		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
 			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), null); //$NON-NLS-1$
 		} else {
 			replaceWithValueOf(node, typeBinding);

@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
@@ -137,34 +138,45 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final BlockComment node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		String comment= getComment(node);
+
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
-			cuRewrite.getASTRewrite().remove(node, null);
+			rewrite.remove(node, null);
 			return false;
 		}
+
 		ASTNode nextNode= getNextNode(node);
+
 		if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
 			if (ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
-				cuRewrite.getASTRewrite().remove(node, null);
+				rewrite.remove(node, null);
 			} else {
-				cuRewrite.getASTRewrite().toJavadoc(node);
+				rewrite.toJavadoc(node);
 			}
 
 			return false;
 		}
+
 		Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
+
 		if (emptyLineAtStartMatcher.find()) {
 			replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
 			return false;
 		}
+
 		Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+
 		if (emptyLineAtEndMatcher.find()) {
 			replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
 			return false;
 		}
+
 		String replacement= getReplacement(comment, false);
+
 		if (replacement != null && !replacement.equals(comment)) {
-			cuRewrite.getASTRewrite().replace(node, replacement);
+			rewrite.replace(node, replacement);
 			return false;
 		}
 
@@ -213,35 +225,42 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Javadoc node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		String comment= getComment(node);
 		boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
 		Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
 		Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
 		if (EMPTY_JAVADOC.matcher(comment).matches()) {
-			cuRewrite.getASTRewrite().remove(node, null);
+			rewrite.remove(node, null);
 			return false;
 		}
+
 		if (emptyLineAtStartMatcher.find()) {
 			replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
 			return false;
 		}
+
 		if (emptyLineAtEndMatcher.find()) {
 			replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
 			return false;
 		}
+
 		if (allTagsEmpty(ASTNodes.tags(node))) {
-			cuRewrite.getASTRewrite().remove(node, null);
+			rewrite.remove(node, null);
 			return false;
 		}
+
 		if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
-			cuRewrite.getASTRewrite().replace(node, comment.replace("/**", "/*")); //$NON-NLS-1$ //$NON-NLS-2$
+			rewrite.replace(node, comment.replace("/**", "/*")); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
+
 		if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
 			ASTNode nextNode= getNextNode(node);
 			if (hasOverrideAnnotation(nextNode)) {
 				// {@inheritDoc} tag is redundant with @Override annotation
-				cuRewrite.getASTRewrite().remove(node, null);
+				rewrite.remove(node, null);
 				return false;
 			}
 
@@ -250,14 +269,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 				int startLine= this.astRoot.getLineNumber(node.getStartPosition());
 				int endLine= this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
 				if (startLine != endLine) {
-					cuRewrite.getASTRewrite().replace(node, "/** {@inheritDoc} */"); //$NON-NLS-1$
+					rewrite.replace(node, "/** {@inheritDoc} */"); //$NON-NLS-1$
 					return false;
 				}
 			}
 		} else if (!isWellFormattedInheritDoc && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
 			String newComment= addPeriodAtEndOfFirstLine(node, comment);
 			if (newComment != null) {
-				cuRewrite.getASTRewrite().replace(node, newComment);
+				rewrite.replace(node, newComment);
 				return false;
 			}
 		} else {
@@ -265,15 +284,16 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 			if (m.matches() && Character.isLowerCase(m.group(2).charAt(0))) {
 				String newComment= m.group(1) + m.group(2).toUpperCase() + m.group(3);
 				if (!newComment.equals(comment)) {
-					cuRewrite.getASTRewrite().replace(node, newComment);
+					rewrite.replace(node, newComment);
 					return false;
 				}
 			}
 		}
+
 		if (hasNoTags(node)) {
 			String replacement= getReplacement(comment, true);
 			if (replacement != null && !replacement.equals(comment)) {
-				cuRewrite.getASTRewrite().replace(node, replacement);
+				rewrite.replace(node, replacement);
 				return false;
 			}
 		}
@@ -441,21 +461,27 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final LineComment node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		String comment= getComment(node);
+
 		if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
-			cuRewrite.getASTRewrite().remove(node, null);
+			rewrite.remove(node, null);
 			return false;
 		}
+
 		if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
 				&& !ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
 			ASTNode nextNode= getNextNode(node);
 			ASTNode previousNode= getPreviousSibling(nextNode);
+
 			if (previousNode != null && isSameLineNumber(node, previousNode)) {
-				cuRewrite.getASTRewrite().toJavadoc(node, previousNode);
+				rewrite.toJavadoc(node, previousNode);
 				return false;
 			}
+
 			if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-				cuRewrite.getASTRewrite().toJavadoc(node, nextNode);
+				rewrite.toJavadoc(node, nextNode);
 				return false;
 			}
 		}
@@ -547,7 +573,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		// PackageDeclaration node accept javadoc in package-info.java files,
 		// but they are useless everywhere else.
 		return node instanceof BodyDeclaration
-				|| (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
+				|| node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
 	}
 
 	@Override

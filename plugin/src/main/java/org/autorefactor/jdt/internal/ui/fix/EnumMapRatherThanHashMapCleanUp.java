@@ -148,11 +148,13 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 	 * @return correct parameter for EnumMap constructor
 	 */
 	private Expression resolveParameter(final Type keyType, final List<Expression> originalArgs) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
-			return cuRewrite.getASTBuilder().createCopyTarget(originalArgs.get(0));
+			return ast.createCopyTarget(originalArgs.get(0));
 		}
 		TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();
-		keyTypeLiteral.setType(cuRewrite.getASTBuilder().createCopyTarget(keyType));
+		keyTypeLiteral.setType(ast.createCopyTarget(keyType));
 		return keyTypeLiteral;
 	}
 }

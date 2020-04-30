@@ -84,6 +84,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			MethodDeclaration enclosingMethod= ASTNodes.getAncestor(node, MethodDeclaration.class);
 			if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 				TypeDeclaration typeDeclaration= ASTNodes.getAncestor(enclosingMethod, TypeDeclaration.class);
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
@@ -98,6 +99,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 			TypeDeclaration typeDeclaration= ASTNodes.getAncestor(node, TypeDeclaration.class);
 			ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
 			if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {

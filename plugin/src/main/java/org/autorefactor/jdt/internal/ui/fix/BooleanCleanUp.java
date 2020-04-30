@@ -353,8 +353,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 					rightHandSide);
 
 			if (newE != null) {
-				cuRewrite.getASTRewrite().replace(rightHandSide, newE, null);
-				cuRewrite.getASTRewrite().remove(node, null);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.replace(rightHandSide, newE, null);
+				rewrite.remove(node, null);
 				return false;
 			}
 		}

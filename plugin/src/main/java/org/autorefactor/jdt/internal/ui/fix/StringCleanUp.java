@@ -216,9 +216,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 
 		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-			cuRewrite.getASTRewrite().replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
+			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
 		} else {
-			cuRewrite.getASTRewrite().replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
+			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(mi).get(0))), null);
 		}
 
 		return false;

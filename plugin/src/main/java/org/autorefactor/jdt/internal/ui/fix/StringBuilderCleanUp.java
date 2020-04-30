@@ -415,7 +415,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		cuRewrite.getASTRewrite().replace(node, result, null);
+		rewrite.replace(node, result, null);
 		return false;
 	}
 
