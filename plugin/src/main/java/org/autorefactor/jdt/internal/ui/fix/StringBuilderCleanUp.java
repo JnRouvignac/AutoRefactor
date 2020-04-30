@@ -365,6 +365,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			final List<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
 			final boolean isInstanceCreationToRewrite) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		Expression result= null;
 		List<Expression> tempStringLiterals= new ArrayList<>();
@@ -377,7 +378,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			}
 
 			if (isValuedStringLiteralOrConstant(appendedString.getSecond())) {
-				tempStringLiterals.add(ast.createCopyTarget(appendedString.getSecond()));
+				tempStringLiterals.add(ASTNodes.createMoveTarget(rewrite, appendedString.getSecond()));
 			} else {
 				result= handleTempStringLiterals(lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals, finalStrings,
 						isFirst);
@@ -386,15 +387,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					isFirst.set(false);
 
 					if (!isInstanceCreationToRewrite) {
-						result= ast.createCopyTarget(lastExpression);
+						result= ASTNodes.createMoveTarget(rewrite, lastExpression);
 						finalStrings.add(getTypedExpression(appendedString));
 					} else if (appendedString.getFirst() != null
 							? ASTNodes.hasType(appendedString.getFirst(), String.class.getCanonicalName())
 							: ASTNodes.hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
-						result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()),
+						result= ast.new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()),
 								getTypedExpression(appendedString));
 					} else {
-						result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()));
+						result= ast.new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()));
 						finalStrings.add(getTypedExpression(appendedString));
 					}
 				} else {
@@ -425,13 +426,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			Expression newExpression= getString(tempStringLiterals);
 
 			if (isFirst.get()) {
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
-					result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()), newExpression);
+					result= cuRewrite.getASTBuilder().new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()), newExpression);
 				} else {
-					result= ast.createCopyTarget(lastExpression);
+					result= ASTNodes.createMoveTarget(rewrite, lastExpression);
 					finalStrings.add(newExpression);
 				}
 			} else {
@@ -572,6 +573,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 	private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		switch (appendedStrings.size()) {
 		case 0:
@@ -580,7 +582,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		case 1:
 			Pair<ITypeBinding, Expression> expression= appendedStrings.get(0);
 			if (ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName())) {
-				return ast.createCopyTarget(expression.getSecond());
+				return ASTNodes.createMoveTarget(rewrite, expression.getSecond());
 			}
 
 			return ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(expression)); //$NON-NLS-1$
