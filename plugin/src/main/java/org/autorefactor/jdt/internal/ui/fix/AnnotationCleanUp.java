@@ -78,8 +78,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final NormalAnnotation node) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		List<MemberValuePair> values= ASTNodes.values(node);
 		if (values.isEmpty()) {

@@ -91,8 +91,8 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		InfixExpression.Operator lazyOperator;
 

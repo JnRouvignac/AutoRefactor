@@ -103,8 +103,8 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 	}
 
 	private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, valuedExpression)), null);
 	}

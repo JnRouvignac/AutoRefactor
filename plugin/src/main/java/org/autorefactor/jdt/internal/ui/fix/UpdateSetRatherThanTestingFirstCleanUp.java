@@ -101,8 +101,8 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 			if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
 					&& ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
 					&& ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 				if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
 					// Only one statement: replace if statement with col.add() (or col.remove())

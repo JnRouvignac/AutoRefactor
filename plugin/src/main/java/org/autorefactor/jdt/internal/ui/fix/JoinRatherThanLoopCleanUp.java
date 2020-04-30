@@ -635,8 +635,8 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 		private void replaceWithStringJoin(final Statement node, final Expression containerVariable,
 				final Statement booleanStatement, final Statement builderStatement, final SimpleName builder,
 				final Expression delimiter, final List<SimpleName> readsToRefactor, final Set<SimpleName> booleanUses) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			Expression copyOfDelimiter= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(delimiter));
 

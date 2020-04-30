@@ -634,8 +634,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 	private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd, final CollectedData data) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		@SuppressWarnings("unchecked")
 		List<Statement> statements= node.getBody().statements();

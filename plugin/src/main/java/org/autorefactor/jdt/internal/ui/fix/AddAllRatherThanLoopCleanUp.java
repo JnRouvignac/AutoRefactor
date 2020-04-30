@@ -198,8 +198,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	private void replaceWithCollectionsAddAll(final Statement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation addMethod) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
@@ -268,8 +268,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	private void replaceWithCollectionMethod(final ASTNode toReplace, final String methodName,
 			final Expression affectedCollection,
 			final Expression data) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		MethodInvocation newMethod;
 		if (affectedCollection != null) {

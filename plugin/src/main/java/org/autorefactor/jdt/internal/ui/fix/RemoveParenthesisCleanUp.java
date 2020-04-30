@@ -332,8 +332,9 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void addParentheses(final Expression expression) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		rewrite.replace(expression, ast.parenthesize(ASTNodes.createMoveTarget(rewrite, expression)), null);
 	}
 }

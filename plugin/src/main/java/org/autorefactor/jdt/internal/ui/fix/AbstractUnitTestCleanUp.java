@@ -309,8 +309,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private void refactorToAssertTrueOrFalse(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -357,8 +357,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 				ie.getRightOperand());
 
 		if (isComparingObjects(ie) && !ASTNodes.is(ie.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(ie.getRightOperand(), NullLiteral.class)) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Same"), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
@@ -393,8 +393,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private boolean maybeRefactorToEquality(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean isAssertEquals,
 			final Expression actualValue, final Expression expectedValue, final Expression failureMessage, final boolean isRewriteNeeded) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (ASTNodes.is(actualValue, NullLiteral.class)) {
 			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,

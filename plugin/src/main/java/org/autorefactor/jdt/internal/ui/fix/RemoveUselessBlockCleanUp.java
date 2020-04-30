@@ -103,8 +103,9 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceBlock(final Block node) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		rewrite.replace(node, ast.copyRange(ASTNodes.statements(node)), null);
 	}
 }

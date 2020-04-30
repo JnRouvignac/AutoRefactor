@@ -364,8 +364,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	private boolean maybeReplaceWithNewStringAppends(final Expression node,
 			final List<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
 			final boolean isInstanceCreationToRewrite) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Expression result= null;
 		List<Expression> tempStringLiterals= new ArrayList<>();
@@ -457,8 +457,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Expression lastExpression= ASTNodes.createMoveTarget(rewrite, node.getExpression());
 		Expression stringVar= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(embeddedMI.getExpression()));
@@ -572,8 +572,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		switch (appendedStrings.size()) {
 		case 0:

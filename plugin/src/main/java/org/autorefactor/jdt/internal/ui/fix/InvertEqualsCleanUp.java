@@ -91,8 +91,8 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void invertEqualsInvocation(final MethodInvocation node, final Expression expression, final Expression arg0) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		rewrite.replace(node.getExpression(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
 		rewrite.replace(arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), null);

@@ -75,6 +75,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 		}
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression replacement= getOppositeExpression(ast, node.getOperand());
 
 		if (replacement != null) {

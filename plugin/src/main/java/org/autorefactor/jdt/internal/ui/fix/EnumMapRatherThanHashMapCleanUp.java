@@ -125,6 +125,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 	private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
 			final Type valueType, final List<Expression> arguments) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression newParam= resolveParameter(keyType, arguments);
 		Type newType= ast.genericType(
 				alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), ast.createCopyTarget(keyType),

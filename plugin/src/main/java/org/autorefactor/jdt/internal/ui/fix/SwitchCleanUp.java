@@ -375,8 +375,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithSwitchStatement(final List<IfStatement> ifStatements, final Expression switchExpression,
 			final List<SwitchCaseSection> cases, final Statement remainingStatement) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		SwitchStatement switchStatement= ast.switch0(ASTNodes.createMoveTarget(rewrite, switchExpression));
 
 		for (SwitchCaseSection aCase : cases) {
@@ -396,8 +397,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
 			final List<Statement> innerStatements) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		List<Statement> switchStatements= ASTNodes.statements(switchStatement);
 
 		// Add the case statement(s)

@@ -124,8 +124,8 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void mergeCode(final List<IfStatement> duplicateIfBlocks, final List<Boolean> isThenStatement) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 

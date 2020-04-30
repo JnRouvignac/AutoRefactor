@@ -245,8 +245,8 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
 		private void replaceString(final Type type, final Expression initializer, final Set<SimpleName> assignmentWrites,
 				final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			Class<?> builder;
 			if (getJavaMinorVersion() >= 5) {

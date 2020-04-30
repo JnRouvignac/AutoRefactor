@@ -208,8 +208,8 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 		}
 
 		private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
 			rewrite.replace(type, ast.type(patternName), null);

@@ -184,8 +184,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 		private VariableDeclarationExpression newResource(final List<Statement> tryStatements,
 				final VariableDeclarationStatement previousDeclStatement, final VariableDeclarationFragment previousDeclFragment,
 				final List<ASTNode> nodesToRemove) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
 			return fragment != null ? ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment) : null;
 		}
@@ -195,8 +196,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
 			List<SimpleName> definitions= visitor.getWrites();
 
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			if (!tryStatements.isEmpty()) {
 				Statement tryStatement= tryStatements.get(0);

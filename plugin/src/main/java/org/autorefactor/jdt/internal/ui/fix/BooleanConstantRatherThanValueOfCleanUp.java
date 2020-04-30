@@ -81,8 +81,9 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 	}
 
 	private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		FieldAccess fa= ast.getAST().newFieldAccess();
 		Name expression= ASTNodes.as(node.getExpression(), Name.class);
 

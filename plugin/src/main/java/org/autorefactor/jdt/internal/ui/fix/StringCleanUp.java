@@ -77,8 +77,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTNode parent= node.getParent();
 		boolean isStringValueOf= isStringValueOf(node);
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
 			Expression stringExpression= node.getExpression();
@@ -210,8 +210,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		ITypeBinding actualType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
 

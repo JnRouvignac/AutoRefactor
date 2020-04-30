@@ -143,8 +143,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 					}
 				}
 
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 				for (VariableDeclarationStatement candidate : candidates) {
 					moveDeclaration(ast, rewrite, statement, candidate);

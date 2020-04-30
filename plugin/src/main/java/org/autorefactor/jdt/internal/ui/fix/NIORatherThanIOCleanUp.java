@@ -125,8 +125,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		if (isFileCreation(node.getExpression())
 				&& isFileUse(node.getExpression())) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 
@@ -226,8 +226,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		}
 
 		private void refactorFile(final Type type, final Expression initializer, final List<SimpleName> fileUses) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			ClassInstanceCreation classInstanceCreation= ASTNodes.as(initializer, ClassInstanceCreation.class);
 

@@ -127,8 +127,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 		}
 
 		private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 

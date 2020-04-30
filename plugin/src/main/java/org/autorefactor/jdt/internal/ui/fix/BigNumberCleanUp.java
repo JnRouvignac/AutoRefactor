@@ -153,6 +153,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 	private ASTNode getValueOf(final String name, final String numberLiteral) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		return ast.newMethodInvocation(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
 	}
 
@@ -212,6 +213,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
 				if (isInStringAppend(mi.getParent())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 					cuRewrite.getASTRewrite().replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)), null);
 				} else {
 					cuRewrite.getASTRewrite().replace(node, getCompareToNode(isPositive, mi), null);
@@ -253,8 +255,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	}
 
 	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		MethodInvocation mi= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
 
 		return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));

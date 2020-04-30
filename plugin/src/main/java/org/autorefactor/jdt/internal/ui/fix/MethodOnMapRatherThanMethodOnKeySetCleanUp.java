@@ -99,8 +99,8 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	}
 
 	private void replaceContains(final MethodInvocation node, MethodInvocation miExpression) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
 		rewrite.replace(node.getName(), ast.simpleName("containsKey"), null); //$NON-NLS-1$

@@ -192,8 +192,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 	private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
 			final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		// Remove the nodes common to all cases
 		boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];

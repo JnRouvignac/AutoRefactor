@@ -206,8 +206,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 	private void replaceEquals(final IfStatement node, final Expression firstField,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd, final Expression secondField,
 			final ReturnStatement returnStatement) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,

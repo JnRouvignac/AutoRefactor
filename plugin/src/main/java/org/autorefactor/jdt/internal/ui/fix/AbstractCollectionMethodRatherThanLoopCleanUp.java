@@ -235,6 +235,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 			thenStatements.remove(thenStatements.size() - 1);
 
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			Statement replacement= ast.if0(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.block(ast.copyRange(thenStatements)));
 			cuRewrite.getASTRewrite().replace(forNode, replacement, null);
 
@@ -244,6 +245,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 		private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
 				final Statement forNextStatement, final boolean negate) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			cuRewrite.getASTRewrite().replace(forNode, ast.return0(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), null);
 
 			if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
@@ -281,8 +283,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 		private void replaceLoopAndVariable(final Statement forNode, final Expression iterable, final Expression toFind,
 				final Statement previousStatement, final boolean previousStmtIsPreviousSibling, final Expression initName, final boolean isPositive) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			Statement replacement;
 			if (previousStmtIsPreviousSibling && previousStatement instanceof VariableDeclarationStatement) {
@@ -390,11 +392,13 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 		private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			return ast.newMethodInvocation(ast.copySubtree(loopContent.getIteratorVariable()), "next"); //$NON-NLS-1$
 		}
 
 		private MethodInvocation collectionGet(final ForLoopContent loopContent) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			return ast.newMethodInvocation(ast.copySubtree(loopContent.getContainerVariable()), "get", //$NON-NLS-1$
 					ast.copySubtree(ASTNodes.getUnparenthesedExpression(loopContent.getLoopVariable())));
 		}

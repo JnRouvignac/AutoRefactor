@@ -146,8 +146,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 			if (ASTNodes.usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ //$NON-NLS-2$
 					|| ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ //$NON-NLS-2$
 							Class.class.getCanonicalName() + generic)) {
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 				String classname= addImport(EnumMap.class, classesToUseWithImport, importsToAdd);
 				Type type= ast.getAST().newParameterizedType(
@@ -165,8 +165,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 			final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
 		if (ASTNodes.usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
 				"com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ //$NON-NLS-2$
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			String classname= classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass; //$NON-NLS-1$ //$NON-NLS-2$
 			importsToAdd.add("java.util." + implClass); //$NON-NLS-1$

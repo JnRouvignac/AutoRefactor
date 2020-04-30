@@ -101,16 +101,18 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
 	private void replaceWith(final MethodInvocation node, final String newMethodName) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
 	}
 
 	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		List<Expression> args= ASTNodes.arguments(node);
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
 		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
 			rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), null);
@@ -118,12 +120,13 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		List<Expression> args= ASTNodes.arguments(node);
 		assertSize(args, 2);
 		Expression arg1= args.get(1);
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
 		rewrite.moveToIndex(arg1, 0, ASTNodes.createMoveTarget(rewrite, arg1), null);
 	}

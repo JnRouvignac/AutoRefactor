@@ -104,8 +104,8 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Block block= ast.block(ASTNodes.createMoveTarget(rewrite, statement));
 		rewrite.replace(statement, block, null);

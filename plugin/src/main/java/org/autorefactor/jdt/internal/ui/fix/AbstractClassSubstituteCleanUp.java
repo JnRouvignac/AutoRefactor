@@ -304,6 +304,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 			final List<VariableDeclaration> variableDecls, final List<MethodInvocation> methodCallsToRefactor,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Type substituteType= substituteType(ast, originalInstanceCreation.getType(), originalInstanceCreation,
 				classesToUseWithImport, importsToAdd);
 

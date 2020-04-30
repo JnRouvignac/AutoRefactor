@@ -125,8 +125,9 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	private void replaceWithArraysFill(final ForStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd, final Assignment assignment, final ArrayAccess arrayAccess) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.toStatement(ast.newMethodInvocation(ast.name(classname),

@@ -300,6 +300,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
 	private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		ASTNode scope= varAccess.getScope();
 		Name varName= varAccess.getVariableName();
 		Type varType= getType(varDecl.getVariableName().getParent());
@@ -409,6 +410,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				SimpleName sn= (SimpleName) a.getLeftHandSide();
 				if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 					VariableDeclarationFragment vdf= ast.getAST().newVariableDeclarationFragment();
 					vdf.setInitializer(ast.createCopyTarget(a.getRightHandSide()));
 					vdf.setName(ast.createCopyTarget(sn));

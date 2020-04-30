@@ -206,8 +206,8 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				}
 
 				if (match) {
-					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 					if (redundantStatement instanceof Block) {
 						rewrite.remove(stmtsToCompare, null);

@@ -206,8 +206,8 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 	}
 
 	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
 			rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);

@@ -132,8 +132,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
 	private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
 			final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Statement negativeStmtCopy;
 		if (negativeStatement instanceof IfStatement) {

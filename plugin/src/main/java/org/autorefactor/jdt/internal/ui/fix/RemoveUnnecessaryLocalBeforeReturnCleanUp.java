@@ -147,8 +147,9 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		}
 
 		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			Type varType= vds.getType();
 			VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
 
@@ -182,8 +183,9 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
 		private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
 				final Expression returnExpression) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			rewrite.remove(previousSibling, null);
 			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnExpression)), null);
 		}

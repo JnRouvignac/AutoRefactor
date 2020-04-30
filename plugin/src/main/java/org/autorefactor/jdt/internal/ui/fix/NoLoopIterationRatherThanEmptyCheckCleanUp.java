@@ -182,8 +182,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 	}
 
 	private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (operands.size() == 2) {
 			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), null);

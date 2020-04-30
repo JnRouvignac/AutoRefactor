@@ -94,8 +94,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
 	private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
 			final InfixExpression message) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		StringBuilder messageBuilder= new StringBuilder();
 		List<Expression> allOperands= ASTNodes.getAllOperands(message);
@@ -135,8 +135,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
 	private void replaceConcatenation(final MethodInvocation node, final String methodName, final StringBuilder messageBuilder,
 			final List<Expression> params) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		params.add(0, ast.string(messageBuilder.toString()));
 		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), null);

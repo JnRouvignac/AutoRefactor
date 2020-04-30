@@ -125,8 +125,8 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	}
 
 	private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 

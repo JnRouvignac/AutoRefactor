@@ -118,12 +118,14 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
 	private Statement createWakelockReleaseStatement(final MethodInvocation methodInvocation) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		return ast.if0(ast.not(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
 				ast.block(ast.toStatement(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
 	}
 
 	private MethodDeclaration createOnPauseMethodDeclaration() {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		return ast.method(ast.extendedModifiers(ast.annotation("Override"), ast.protected0()), "onPause", ast.parameters(), //$NON-NLS-1$ //$NON-NLS-2$
 				ast.block(ast.toStatement(ast.superInvoke("onPause")))); //$NON-NLS-1$
 	}

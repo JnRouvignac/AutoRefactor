@@ -84,8 +84,9 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final WhileStatement node) {
 		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression()) && Boolean.TRUE.equals(hasAlwaysValue(node, node.getExpression()))) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			rewrite.replace(node, ast.doWhile(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
 			return false;
 		}

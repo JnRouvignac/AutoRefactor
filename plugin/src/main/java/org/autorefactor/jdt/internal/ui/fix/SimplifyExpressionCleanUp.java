@@ -99,8 +99,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 					if (nullCheckedExpression != null && isNullCheckRedundant(operands.get(i + 1), nullCheckedExpression)) {
 						operands.remove(i);
 
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 						rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), null);
 						return false;
@@ -177,8 +177,9 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			rightOppositeExpression= rightPrefix.getOperand();
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		if (leftOppositeExpression != null) {
 			if (rightOppositeExpression != null) {
 				rewrite.replace(node,
@@ -228,8 +229,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		// - One boolean primitive and one Boolean object, this code already run
 		// the risk of an NPE, so we can replace the infix expression without
 		// fearing we would introduce a previously non existing NPE.
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Expression operand;
 		if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
@@ -249,6 +250,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), null);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), null);
 		}
 	}

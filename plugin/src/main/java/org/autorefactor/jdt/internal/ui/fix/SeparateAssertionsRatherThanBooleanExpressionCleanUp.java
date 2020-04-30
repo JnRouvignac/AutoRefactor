@@ -106,8 +106,8 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 		InfixExpression booleanExpression= ASTNodes.as((Expression) originalMethod.arguments().get(parameterIndex), InfixExpression.class);
 
 		if (booleanExpression != null && ASTNodes.hasOperator(booleanExpression, operator)) {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			List<Expression> allOperands= ASTNodes.getAllOperands(booleanExpression);
 			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), null);

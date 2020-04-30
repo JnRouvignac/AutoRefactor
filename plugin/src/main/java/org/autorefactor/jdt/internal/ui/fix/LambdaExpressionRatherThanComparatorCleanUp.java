@@ -450,8 +450,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), name1);
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Expression comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
@@ -471,8 +471,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(method);
 
@@ -485,8 +485,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	@SuppressWarnings("unchecked")
 	private LambdaExpression buildField(final Expression node, final ITypeBinding type, final boolean straightOrder,
 			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 

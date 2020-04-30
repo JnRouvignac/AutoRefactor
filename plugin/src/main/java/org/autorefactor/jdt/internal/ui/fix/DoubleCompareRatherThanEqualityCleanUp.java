@@ -76,8 +76,8 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 	}
 
 	private void replace(final InfixExpression node) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		rewrite.replace(node,
 				ast.infixExpression(
