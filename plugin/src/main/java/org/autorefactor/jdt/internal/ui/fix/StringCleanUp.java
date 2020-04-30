@@ -154,7 +154,10 @@ public class StringCleanUp extends AbstractCleanUpRule {
 									&& ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
 				Expression leftExpression= leftInvocation.getExpression();
 				Expression rightExpression= rightInvocation.getExpression();
-				rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, leftExpression), "equalsIgnoreCase", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
+
+				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, leftExpression), null);
+				rewrite.replace(node.getName(), ast.simpleName("equalsIgnoreCase"), null); //$NON-NLS-1$
+				rewrite.replace(ASTNodes.arguments(node).get(0), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)), null);
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$

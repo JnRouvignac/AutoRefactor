@@ -126,18 +126,19 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		}
 
 		if (hasLiteral && hasObjects) {
-			replaceConcatenation(node, methodName, ast, messageBuilder, params);
+			replaceConcatenation(node, methodName, messageBuilder, params);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void replaceConcatenation(final MethodInvocation node, final String methodName, final ASTNodeFactory ast,
-			final StringBuilder messageBuilder, final List<Expression> params) {
-		params.add(0, ast.string(messageBuilder.toString()));
-
+	private void replaceConcatenation(final MethodInvocation node, final String methodName, final StringBuilder messageBuilder,
+			final List<Expression> params) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		params.add(0, ast.string(messageBuilder.toString()));
 		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), null);
 	}
 }

@@ -76,15 +76,13 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
-		boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
-
-		if (isEquals || isStringEqualsIgnoreCase) {
+		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
 			Expression expression= node.getExpression();
 			Expression arg0= ASTNodes.arguments(node).get(0);
 
 			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
-				invertEqualsInvocation(node, isEquals, expression, arg0);
+				invertEqualsInvocation(node, expression, arg0);
 				return false;
 			}
 		}
@@ -92,13 +90,11 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
-			final Expression arg0) {
+	private void invertEqualsInvocation(final MethodInvocation node, final Expression expression, final Expression arg0) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
-		rewrite.replace(node,
-				ast.newMethodInvocation(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression))), null);
+		rewrite.replace(node.getExpression(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
+		rewrite.replace(arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), null);
 	}
 }

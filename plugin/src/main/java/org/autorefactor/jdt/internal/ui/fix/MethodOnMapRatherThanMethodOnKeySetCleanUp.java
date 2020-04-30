@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -68,45 +69,40 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation mi) {
-		MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
+	public boolean visit(final MethodInvocation node) {
+		MethodInvocation miExpression= ASTNodes.as(node.getExpression(), MethodInvocation.class);
 
 		if (miExpression != null && miExpression.getExpression() != null && !ASTNodes.is(miExpression.getExpression(), ThisExpression.class)
 				&& ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
-			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
-				return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "clear") //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "size") //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+							// If parent is not an expression statement, the MethodInvocation must return a
+							// boolean.
+							// In that case, we cannot replace because `Map.removeKey(key) != null`
+							// is not strictly equivalent to `Map.keySet().remove(key)`
+							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
+				return false;
 			}
 
-			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
-				return removeInvocationOfMapKeySet(miExpression, mi, "size"); //$NON-NLS-1$
-			}
-
-			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
-				return removeInvocationOfMapKeySet(miExpression, mi, "isEmpty"); //$NON-NLS-1$
-			}
-
-			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-					// If parent is not an expression statement, the MethodInvocation must return a
-					// boolean.
-					// In that case, we cannot replace because `Map.removeKey(key) != null`
-					// is not strictly equivalent to `Map.keySet().remove(key)`
-					&& mi.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-				return removeInvocationOfMapKeySet(miExpression, mi, "remove"); //$NON-NLS-1$
-			}
-
-			if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-				return removeInvocationOfMapKeySet(miExpression, mi, "containsKey"); //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+				replaceContains(node, miExpression);
+				return false;
 			}
 		}
 
 		return true;
 	}
 
-	private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
-			final String methodName) {
+	private void replaceContains(final MethodInvocation node, MethodInvocation miExpression) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		cuRewrite.getASTRewrite().replace(actualMi,
-				ast.newMethodInvocation(ast.copyExpression(mapKeySetMi), methodName, ast.copyRange(ASTNodes.arguments(actualMi))), null);
-		return false;
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
+		rewrite.replace(node.getName(), ast.simpleName("containsKey"), null); //$NON-NLS-1$
 	}
 }
