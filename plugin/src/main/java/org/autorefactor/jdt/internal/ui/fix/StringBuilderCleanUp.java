@@ -113,7 +113,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
-			LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
+			List<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
 			Expression lastExpression= readAppendMethod(node.getExpression(), allAppendedStrings,
 					new AtomicBoolean(false), new AtomicBoolean(false));
 
@@ -144,7 +144,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean maybeRefactorAppending(final Expression node) {
-		LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
+		List<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
 		AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 		AtomicBoolean isInstanceCreationToRewrite= new AtomicBoolean(false);
 		Expression lastExpression= readAppendMethod(node, allAppendedStrings, isRefactoringNeeded,
@@ -174,7 +174,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Expression readAppendMethod(final Expression expression,
-			final LinkedList<Pair<ITypeBinding, Expression>> allOperands, final AtomicBoolean isRefactoringNeeded,
+			final List<Pair<ITypeBinding, Expression>> allOperands, final AtomicBoolean isRefactoringNeeded,
 			final AtomicBoolean isInstanceCreationToRewrite) {
 		Expression exp= ASTNodes.getUnparenthesedExpression(expression);
 		if (isStringBuilderOrBuffer(exp)) {
@@ -198,9 +198,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					}
 				} else if (ASTNodes.arguments(cic).isEmpty() && !allOperands.isEmpty()
-						&& (allOperands.getFirst().getFirst() != null
-								? ASTNodes.hasType(allOperands.getFirst().getFirst(), String.class.getCanonicalName())
-								: ASTNodes.hasType(allOperands.getFirst().getSecond(), String.class.getCanonicalName()))) {
+						&& (allOperands.get(0).getFirst() != null
+								? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
+								: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
 					isInstanceCreationToRewrite.set(true);
 					isRefactoringNeeded.set(true);
 				}
@@ -214,7 +214,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
-	private void readSubExpressions(final Expression arg, final LinkedList<Pair<ITypeBinding, Expression>> results,
+	private void readSubExpressions(final Expression arg, final List<Pair<ITypeBinding, Expression>> results,
 			final AtomicBoolean isRefactoringNeeded) {
 		InfixExpression ie= ASTNodes.as(arg, InfixExpression.class);
 
@@ -251,7 +251,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			isRefactoringNeeded.set(true);
 		}
 
-		results.addFirst(Pair.<ITypeBinding, Expression>of(null, arg));
+		results.add(0, Pair.<ITypeBinding, Expression>of(null, arg));
 	}
 
 	private boolean isStringConcat(final InfixExpression node) {
@@ -362,7 +362,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	 * @return
 	 */
 	private boolean maybeReplaceWithNewStringAppends(final Expression node,
-			final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
+			final List<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpression,
 			final boolean isInstanceCreationToRewrite) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
@@ -379,32 +379,32 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (isValuedStringLiteralOrConstant(appendedString.getSecond())) {
 				tempStringLiterals.add(ast.createCopyTarget(appendedString.getSecond()));
 			} else {
-				result= handleTempStringLiterals(ast, lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals,
-						finalStrings, isFirst);
+				result= handleTempStringLiterals(lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals, finalStrings,
+						isFirst);
 
 				if (isFirst.get()) {
 					isFirst.set(false);
 
 					if (!isInstanceCreationToRewrite) {
 						result= ast.createCopyTarget(lastExpression);
-						finalStrings.add(getTypedExpression(ast, appendedString));
+						finalStrings.add(getTypedExpression(appendedString));
 					} else if (appendedString.getFirst() != null
 							? ASTNodes.hasType(appendedString.getFirst(), String.class.getCanonicalName())
 							: ASTNodes.hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
 						result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()),
-								getTypedExpression(ast, appendedString));
+								getTypedExpression(appendedString));
 					} else {
 						result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()));
-						finalStrings.add(getTypedExpression(ast, appendedString));
+						finalStrings.add(getTypedExpression(appendedString));
 					}
 				} else {
-					finalStrings.add(getTypedExpression(ast, appendedString));
+					finalStrings.add(getTypedExpression(appendedString));
 				}
 			}
 		}
 
-		result= handleTempStringLiterals(ast, lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals,
-				finalStrings, isFirst);
+		result= handleTempStringLiterals(lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals, finalStrings,
+				isFirst);
 
 		for (Expression finalString : finalStrings) {
 			if (result == null) {
@@ -418,13 +418,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private Expression handleTempStringLiterals(final ASTNodeFactory ast, final Expression lastExpression,
-			final boolean isInstanceCreationToRewrite, Expression result, final List<Expression> tempStringLiterals,
-			final List<Expression> finalStrings, final AtomicBoolean isFirst) {
+	private Expression handleTempStringLiterals(final Expression lastExpression, final boolean isInstanceCreationToRewrite,
+			Expression result, final List<Expression> tempStringLiterals, final List<Expression> finalStrings,
+			final AtomicBoolean isFirst) {
 		if (!tempStringLiterals.isEmpty()) {
-			Expression newExpression= getString(ast, tempStringLiterals);
+			Expression newExpression= getString(tempStringLiterals);
 
 			if (isFirst.get()) {
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
 					result= ast.new0(ast.createCopyTarget(((ClassInstanceCreation) lastExpression).getType()), newExpression);
@@ -442,12 +444,12 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		return result;
 	}
 
-	private Expression getString(final ASTNodeFactory ast, final List<Expression> tempStringLiterals) {
+	private Expression getString(final List<Expression> tempStringLiterals) {
 		Expression newExpression;
 		if (tempStringLiterals.size() == 1) {
 			newExpression= tempStringLiterals.get(0);
 		} else {
-			newExpression= ast.infixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
+			newExpression= cuRewrite.getASTBuilder().infixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
 		}
 
 		return newExpression;
@@ -516,7 +518,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				|| ASTNodes.usesGivenSignature(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
 	}
 
-	private Expression getTypedExpression(final ASTNodeFactory ast, final Pair<ITypeBinding, Expression> typeAndValue) {
+	private Expression getTypedExpression(final Pair<ITypeBinding, Expression> typeAndValue) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression expression= null;
 		if (typeAndValue.getFirst() != null) {
 			expression= ast.cast(ast.type(typeAndValue.getFirst().getQualifiedName()), ast.createCopyTarget(typeAndValue.getSecond()));
@@ -530,7 +534,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final InfixExpression node) {
 		if (isStringConcat(node)) {
-			LinkedList<Pair<ITypeBinding, Expression>> allOperands= new LinkedList<>();
+			List<Pair<ITypeBinding, Expression>> allOperands= new LinkedList<>();
 			readSubExpressions(node, allOperands, new AtomicBoolean(false));
 			boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
 
@@ -568,6 +572,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 	private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		switch (appendedStrings.size()) {
 		case 0:
 			return ast.string(""); //$NON-NLS-1$
@@ -578,7 +583,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				return ast.createCopyTarget(expression.getSecond());
 			}
 
-			return ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, expression)); //$NON-NLS-1$
+			return ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(expression)); //$NON-NLS-1$
 
 		default: // >= 2
 			boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
@@ -586,10 +591,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			List<Expression> concatenateStrings= new ArrayList<>(appendedStrings.size());
 			for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
 				if (isFirstAndNotAString) {
-					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(ast, typeAndValue))); //$NON-NLS-1$
+					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(typeAndValue))); //$NON-NLS-1$
 					isFirstAndNotAString= false;
 				} else {
-					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(ast, typeAndValue)));
+					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(typeAndValue)));
 				}
 			}
 
