@@ -71,16 +71,20 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
 		Statement thenStatement= node.getThenStatement();
 		Statement elseStatement= node.getElseStatement();
+
 		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
 			rewrite.remove(elseStatement, null);
 			return false;
 		}
+
 		if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			Expression condition= node.getExpression();
+
 			if (elseStatement != null) {
-				rewrite.replace(node, ast.if0(ast.negate(condition), ASTNodes.createMoveTarget(rewrite, elseStatement)), null);
+				rewrite.replace(condition, ast.negate(condition), null);
+				rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), null);
 			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
 				removeBlock(node, rewrite, ast);
 				return false;

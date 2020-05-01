@@ -210,8 +210,13 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
-		rewrite.replace(node,
-				ast.if0(ast.not(ast.newMethodInvocation(ast.name(classname),
-						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), ast.block(ASTNodes.createMoveTarget(rewrite, returnStatement))), null);
+		rewrite.replace(node.getExpression(),
+				ast.not(ast.newMethodInvocation(ast.name(classname),
+						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), null);
+		rewrite.replace(node.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, returnStatement)), null);
+
+		if (node.getElseStatement() != null) {
+			rewrite.remove(node.getElseStatement(), null);
+		}
 	}
 }

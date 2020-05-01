@@ -99,11 +99,11 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
 		if (firstCondition != null
+				&& secondIf != null
+				&& secondIf.getElseStatement() != null
 				&& !firstCondition.hasExtendedOperands()
 				&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
-				&& ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
-				&& secondIf != null
-				&& secondIf.getElseStatement() != null) {
+				&& ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())) {
 			return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
 					firstCondition.getRightOperand())
 					&& maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
@@ -157,8 +157,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 			thirdStmtCopy= ASTNodes.createMoveTarget(rewrite, positiveStatement);
 		}
 
-		rewrite.replace(node,
-				ast.if0(ast.negate(duplicateExpression), negativeStmtCopy,
-						ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)), null);
+		rewrite.replace(node.getExpression(), ast.negate(duplicateExpression), null);
+		rewrite.replace(node.getThenStatement(), negativeStmtCopy, null);
+		rewrite.replace(node.getElseStatement(), ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), null);
 	}
 }

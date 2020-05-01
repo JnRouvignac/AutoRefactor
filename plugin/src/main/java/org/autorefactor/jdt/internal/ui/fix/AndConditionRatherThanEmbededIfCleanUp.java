@@ -68,12 +68,12 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 	@Override
 	public boolean visit(final IfStatement node) {
 		if (node.getElseStatement() == null) {
-			IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
+			IfStatement innerIf= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
-			if (is != null
-					&& is.getElseStatement() == null
-					&& ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(is.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-				replaceIfNoElseStatement(node, is);
+			if (innerIf != null
+					&& innerIf.getElseStatement() == null
+					&& ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+				replaceIfNoElseStatement(node, innerIf);
 				return false;
 			}
 		}
@@ -85,9 +85,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		InfixExpression ie= ast.infixExpression(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+		InfixExpression infixExpression= ast.infixExpression(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
 				ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
-		rewrite.replace(innerIf.getExpression(), ie, null);
+		rewrite.replace(innerIf.getExpression(), infixExpression, null);
 		rewrite.replace(outerIf, ASTNodes.createMoveTarget(rewrite, innerIf), null);
 	}
 }
