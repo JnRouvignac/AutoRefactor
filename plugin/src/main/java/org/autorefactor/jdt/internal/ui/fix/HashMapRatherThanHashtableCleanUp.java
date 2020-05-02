@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -123,9 +122,8 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
 	}
 
 	@Override
-	protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
-			final MethodInvocation refactoredMi) {
-		refactoredMi.setName(ast.simpleName("containsValue")); //$NON-NLS-1$
+	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
+		refactoredMi.setName(cuRewrite.getASTBuilder().simpleName("containsValue")); //$NON-NLS-1$
 	}
 
 	@Override

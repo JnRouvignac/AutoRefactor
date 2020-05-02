@@ -203,7 +203,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 		if (allRemovable(areCasesRemovable, 0)) {
 			if (ASTNodes.canHaveSiblings(node)) {
-				insertIdenticalCode(node, oneCaseToRemove, rewrite);
+				insertIdenticalCode(node, oneCaseToRemove);
 
 				rewrite.removeButKeepComment(node, null);
 			} else {
@@ -234,7 +234,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			}
 
 			if (ASTNodes.canHaveSiblings(node)) {
-				insertIdenticalCode(node, oneCaseToRemove, rewrite);
+				insertIdenticalCode(node, oneCaseToRemove);
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
 				for (Statement stmtToRemove : oneCaseToRemove) {
@@ -246,7 +246,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove, final ASTRewrite rewrite) {
+	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		for (Statement stmtToRemove : stmtsToRemove) {
 			rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, stmtToRemove), node, null);
 		}

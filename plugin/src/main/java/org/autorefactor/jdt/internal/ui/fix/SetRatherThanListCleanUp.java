@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -170,8 +169,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 	}
 
 	@Override
-	protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
-			final MethodInvocation refactoredMi) {
+	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
 		if (ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
 			List<Expression> args= ASTNodes.arguments(refactoredMi);

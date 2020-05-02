@@ -74,21 +74,20 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-		Expression replacement= getOppositeExpression(ast, node.getOperand());
+		Expression replacement= getOppositeExpression(node.getOperand());
 
 		if (replacement != null) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, replacement, null);
+			cuRewrite.getASTRewrite().replace(node, replacement, null);
 			return false;
 		}
 
 		return true;
 	}
 
-	private Expression getOppositeExpression(final ASTNodeFactory ast, final Expression negativeExpression) {
+	private Expression getOppositeExpression(final Expression negativeExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 
 		if (operand instanceof PrefixExpression) {
@@ -107,7 +106,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 				if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
 					for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
 						Expression anOperand= it.next();
-						Expression oppositeOperand= getOppositeExpression(ast, anOperand);
+						Expression oppositeOperand= getOppositeExpression(anOperand);
 
 						it.set(oppositeOperand != null ? oppositeOperand : ast.negate(anOperand));
 					}

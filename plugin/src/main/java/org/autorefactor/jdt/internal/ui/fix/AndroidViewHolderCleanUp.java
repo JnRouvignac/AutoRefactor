@@ -279,7 +279,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				Expression inflateExpression= getInflateExpression();
 				return ASTNodes.getFirstAncestorOrNull(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
 						// Check whether inflate is inside a conditional assignment
-						|| (inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION);
+						|| inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION;
 			}
 
 			return false;

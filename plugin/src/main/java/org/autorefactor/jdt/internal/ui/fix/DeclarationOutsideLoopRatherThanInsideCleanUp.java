@@ -143,11 +143,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 					}
 				}
 
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
 				for (VariableDeclarationStatement candidate : candidates) {
-					moveDeclaration(ast, rewrite, statement, candidate);
+					moveDeclaration(statement, candidate);
 					result= false;
 				}
 			}
@@ -167,8 +164,10 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		return false;
 	}
 
-	private void moveDeclaration(final ASTNodeFactory ast, final ASTRewrite rewrite, final Statement statement,
-			final VariableDeclarationStatement varToMove) {
+	private void moveDeclaration(final Statement statement, final VariableDeclarationStatement varToMove) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
 		if (fragment.getInitializer() != null) {

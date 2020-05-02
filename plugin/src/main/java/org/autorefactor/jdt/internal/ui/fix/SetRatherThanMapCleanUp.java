@@ -137,21 +137,11 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 		return parameterTypes.length == 0 || ASTNodes.hasType(parameterTypes[0], int.class.getSimpleName());
 	}
 
-	/**
-	 * Returns the substitute type.
-	 *
-	 * @param ast                      The builder.
-	 * @param origType               The original type
-	 * @param originalExpression           The original expression
-	 * @param classesToUseWithImport The classes that should be used with simple
-	 *                               name.
-	 * @param importsToAdd           The imports that need to be added during this
-	 *                               cleanup.
-	 * @return the substitute type.
-	 */
 	@Override
-	protected Type substituteType(final ASTNodeFactory ast, final Type origType, final ASTNode originalExpression,
-			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+	protected Type substituteType(final Type origType, final ASTNode originalExpression, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		ITypeBinding origTypeBinding= origType.resolveBinding();
 
 		if (origTypeBinding == null) {
@@ -225,12 +215,13 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 		ASTNode parentNode= node.getParent();
 
 		return parentNode instanceof ExpressionStatement
-				|| (parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode));
+				|| parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode);
 	}
 
 	@Override
-	protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
-			final MethodInvocation refactoredMi) {
+	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			refactoredMi.setName(ast.simpleName("contains")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$

@@ -310,12 +310,10 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private void refactorToAssertTrueOrFalse(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-				invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
+		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
@@ -358,12 +356,11 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 		if (isComparingObjects(ie) && !ASTNodes.is(ie.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(ie.getRightOperand(), NullLiteral.class)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Same"), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
 					null, failureMessage);
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), null);
 			return false;
 		}
 
@@ -397,14 +394,12 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (ASTNodes.is(actualValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-					invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), null);
 			return false;
 		}
 
 		if (ASTNodes.is(expectedValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast,
-					invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), null);
 			return false;
 		}
 
@@ -433,7 +428,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, ast, newAssert), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), null);
 			return false;
 		}
 
@@ -463,11 +458,10 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		return !ASTNodes.isPrimitive(ie.getLeftOperand()) || !ASTNodes.isPrimitive(ie.getRightOperand());
 	}
 
-	private ASTNode invokeMethodOrStatement(final ASTNode nodeToReplace, final ASTNodeFactory ast,
-			final MethodInvocation newMethod) {
+	private ASTNode invokeMethodOrStatement(final ASTNode nodeToReplace, final MethodInvocation newMethod) {
 		if (nodeToReplace instanceof Statement) {
 			// The new node should be also a statement
-			return ast.toStatement(newMethod);
+			return cuRewrite.getASTBuilder().toStatement(newMethod);
 		}
 
 		return newMethod;

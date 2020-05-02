@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
@@ -79,9 +80,8 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), null);
 	}
 
-	@SuppressWarnings("rawtypes")
-	private boolean visitMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
-			final List fragments, final Javadoc docComment) {
+	private boolean visitMultiDeclaration(final ASTNode node, final List<?> modifiers, final Type type,
+			final List<?> fragments, final Javadoc docComment) {
 		if (fragments != null && fragments.size() > 1) {
 			refactorMultiDeclaration(node, modifiers, type, fragments, docComment);
 
@@ -91,9 +91,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
-			final List fragments, final Javadoc docComment) {
+	private void refactorMultiDeclaration(final ASTNode node, final List<?> modifiers, final Type type,
+			final List<?> fragments, final Javadoc docComment) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		for (int i= fragments.size() - 1; 0 <= i; i--) {
@@ -112,27 +112,29 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			ASTNode newNode;
 			if (node instanceof VariableDeclarationStatement) {
 				VariableDeclarationStatement newStatement= ast.declareStatement(copyOfType, newFragment);
-				updateModifiers(ast, modifiers, newStatement.modifiers());
+				updateModifiers(modifiers, newStatement.modifiers());
 				newNode= newStatement;
 			} else {
 				FieldDeclaration newField= ast.declareField(copyOfType, newFragment);
 				if (docComment != null) {
 					newField.setJavadoc(ast.createCopyTarget(docComment));
 				}
-				updateModifiers(ast, modifiers, newField.modifiers());
+				updateModifiers(modifiers, newField.modifiers());
 				newNode= newField;
 			}
 
 			if (i > 0) {
-				cuRewrite.getASTRewrite().insertAfter(newNode, node, null);
+				rewrite.insertAfter(newNode, node, null);
 			} else {
-				cuRewrite.getASTRewrite().replace(node, newNode, null);
+				rewrite.replace(node, newNode, null);
 			}
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-	private void updateModifiers(final ASTNodeFactory ast, final List modifiers, final List newModifiers) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void updateModifiers(final List<?> modifiers, final List newModifiers) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		newModifiers.clear();
 		for (Object modifier : modifiers) {
 			newModifiers.add(ast.createCopyTarget((ASTNode) modifier));

@@ -155,8 +155,9 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 	}
 
 	@Override
-	protected void refactorMethod(final ASTNodeFactory ast, final MethodInvocation originalMi,
-			final MethodInvocation refactoredMi) {
+	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$

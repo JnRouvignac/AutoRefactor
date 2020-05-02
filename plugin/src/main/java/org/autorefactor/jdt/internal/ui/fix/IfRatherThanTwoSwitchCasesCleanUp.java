@@ -99,7 +99,6 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 		boolean isPreviousStmtACase= true;
 		int caseNb= 0;
 		int caseIndexWithDefault= -1;
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		for (Object object : statements) {
 			Statement statement= (Statement) object;
@@ -168,17 +167,17 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		replaceSwitch(node, switchStructure, caseIndexWithDefault, ast);
+		replaceSwitch(node, switchStructure, caseIndexWithDefault);
 
 		return false;
 	}
 
 	private void replaceSwitch(final SwitchStatement node,
-			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
-			final ASTNodeFactory ast) {
-		int localCaseIndexWithDefault= caseIndexWithDefault;
+			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
+		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= node.getExpression();
 		Statement currentBlock= null;
 
@@ -189,12 +188,12 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			if (caseStructure.getFirst().isEmpty()) {
 				newCondition= null;
 			} else if (caseStructure.getFirst().size() == 1) {
-				newCondition= buildEquality(ast, discriminant, caseStructure.getFirst().get(0));
+				newCondition= buildEquality(discriminant, caseStructure.getFirst().get(0));
 			} else {
 				List<Expression> equalities= new ArrayList<>();
 
 				for (Expression value : caseStructure.getFirst()) {
-					equalities.add(ast.parenthesizeIfNeeded(buildEquality(ast, discriminant, value)));
+					equalities.add(ast.parenthesizeIfNeeded(buildEquality(discriminant, value)));
 				}
 				newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
 			}
@@ -221,7 +220,9 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 		rewrite.replace(node, currentBlock, null);
 	}
 
-	private Expression buildEquality(final ASTNodeFactory ast, final Expression discriminant, final Expression value) {
+	private Expression buildEquality(final Expression discriminant, final Expression value) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Expression equality;
 
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
