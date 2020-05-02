@@ -189,10 +189,10 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 						}
 					}
 
-					Statement booleanShiftStatement= null;
-
 					if (statements.size() == 3) {
-						if (booleanUses.isEmpty() || !isDelimiterFirst) {
+						Statement booleanShiftStatement= null;
+
+                        if (booleanUses.isEmpty() || !isDelimiterFirst) {
 							return true;
 						}
 
@@ -357,37 +357,35 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 			if (writes.size() == 1 && !reads.isEmpty()) {
 				for (SimpleName read : reads) {
-					if (ASTNodes.isParent(read, node)) {
-						return false;
-					} else if (read.getParent() instanceof MethodInvocation) {
-						MethodInvocation methodInvocation= (MethodInvocation) read.getParent();
+					if (!ASTNodes.isParent(read, node) && read.getParent() instanceof MethodInvocation) {
+                    	MethodInvocation methodInvocation= (MethodInvocation) read.getParent();
 
-						if (read.getLocationInParent() == MethodInvocation.EXPRESSION_PROPERTY) {
-							if (ASTNodes.usesGivenSignature(methodInvocation, builderClass, "toString")) { //$NON-NLS-1$
-								readsToRefactor.add(read);
-								continue;
-							}
+                    	if (read.getLocationInParent() == MethodInvocation.EXPRESSION_PROPERTY) {
+                    		if (ASTNodes.usesGivenSignature(methodInvocation, builderClass, "toString")) { //$NON-NLS-1$
+                    			readsToRefactor.add(read);
+                    			continue;
+                    		}
 
-							if (ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "charAt", int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "chars") //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "length") //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "codePoints") //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "subSequence", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointAt", int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointBefore", int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointCount", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "getChars", int.class.getCanonicalName(), int.class.getCanonicalName(), char[].class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "indexOf", String.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "lastIndexOf", String.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "offsetByCodePoints", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "substring", int.class.getCanonicalName()) //$NON-NLS-1$
-									|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "substring", int.class.getCanonicalName(), int.class.getCanonicalName())) { //$NON-NLS-1$
-								continue;
-							}
-						}
-					}
+                    		if (ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "charAt", int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "chars") //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "length") //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "codePoints") //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, CharSequence.class.getCanonicalName(), "subSequence", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointAt", int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointBefore", int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "codePointCount", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "getChars", int.class.getCanonicalName(), int.class.getCanonicalName(), char[].class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "indexOf", String.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "lastIndexOf", String.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "offsetByCodePoints", int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "substring", int.class.getCanonicalName()) //$NON-NLS-1$
+                    				|| ASTNodes.usesGivenSignature(methodInvocation, builderClass, "substring", int.class.getCanonicalName(), int.class.getCanonicalName())) { //$NON-NLS-1$
+                    			continue;
+                    		}
+                    	}
+                    }
 
 					return false;
 				}
@@ -412,8 +410,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			VarDefinitionsUsesVisitor booleanOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) booleanForInterval.resolveBinding(),
 					blockNode, true).find();
 
-			Set<SimpleName> actualBooleanOccurences= new HashSet<>();
-			actualBooleanOccurences.addAll(booleanOccurrencesVisitor.getReads());
+			Set<SimpleName> actualBooleanOccurences= new HashSet<>(booleanOccurrencesVisitor.getReads());
 			actualBooleanOccurences.addAll(booleanOccurrencesVisitor.getWrites());
 
 			if (!actualBooleanOccurences.remove(booleanForInterval)) {
@@ -543,29 +540,29 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 		private MethodInvocation getAppendInvocation(final ExpressionStatement appending, final String builderClass, final Set<SimpleName> builderUses) {
 			if (appending != null) {
-				MethodInvocation appendDelimiter= ASTNodes.as(appending.getExpression(), MethodInvocation.class);
-
-				if (appendDelimiter != null
-						&& ASTNodes.as(appendDelimiter.getExpression(), SimpleName.class) != null) {
-					builderUses.add(ASTNodes.as(appendDelimiter.getExpression(), SimpleName.class));
-					return appendDelimiter;
-				}
-
 				Assignment assignDelimiter= ASTNodes.as(appending.getExpression(), Assignment.class);
 
+				MethodInvocation appendDelimiter;
 				if (assignDelimiter != null) {
+					appendDelimiter= ASTNodes.as(assignDelimiter.getRightHandSide(), MethodInvocation.class);
 					SimpleName targetVar= ASTNodes.as(assignDelimiter.getLeftHandSide(), SimpleName.class);
-					MethodInvocation appendMethod= ASTNodes.as(assignDelimiter.getRightHandSide(), MethodInvocation.class);
 
-					if (appendMethod != null
-							&& ASTNodes.hasOperator(assignDelimiter, Assignment.Operator.ASSIGN)
-							&& ASTNodes.hasType(targetVar, builderClass)
-							&& ASTNodes.as(appendMethod.getExpression(), SimpleName.class) != null
-							&& ASTNodes.isSameVariable(appendMethod.getExpression(), targetVar)) {
-						builderUses.add(targetVar);
-						builderUses.add(ASTNodes.as(appendMethod.getExpression(), SimpleName.class));
-						return appendMethod;
+					if (appendDelimiter == null
+							|| !ASTNodes.hasOperator(assignDelimiter, Assignment.Operator.ASSIGN)
+							|| !ASTNodes.hasType(targetVar, builderClass)
+							|| !ASTNodes.isSameVariable(appendDelimiter.getExpression(), targetVar)) {
+						return null;
 					}
+
+					builderUses.add(targetVar);
+				} else {
+					appendDelimiter= ASTNodes.as(appending.getExpression(), MethodInvocation.class);
+				}
+
+				if (appendDelimiter != null
+						&& ASTNodes.is(appendDelimiter.getExpression(), SimpleName.class)) {
+					builderUses.add(ASTNodes.as(appendDelimiter.getExpression(), SimpleName.class));
+					return appendDelimiter;
 				}
 			}
 
