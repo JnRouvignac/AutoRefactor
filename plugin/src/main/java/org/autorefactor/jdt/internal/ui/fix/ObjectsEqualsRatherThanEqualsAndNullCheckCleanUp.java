@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -210,10 +211,18 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
+
+		ReturnStatement copyOfReturnStatement= ASTNodes.createMoveTarget(rewrite, returnStatement);
+
 		rewrite.replace(node.getExpression(),
 				ast.not(ast.newMethodInvocation(ast.name(classname),
 						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), null);
-		rewrite.replace(node.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, returnStatement)), null);
+
+		if (node.getThenStatement() instanceof Block) {
+			rewrite.replace((ASTNode) ((Block) node.getThenStatement()).statements().get(0), copyOfReturnStatement, null);
+		} else {
+			rewrite.replace(node.getThenStatement(), copyOfReturnStatement, null);
+		}
 
 		if (node.getElseStatement() != null) {
 			rewrite.remove(node.getElseStatement(), null);
