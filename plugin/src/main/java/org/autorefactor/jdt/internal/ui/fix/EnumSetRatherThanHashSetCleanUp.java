@@ -45,31 +45,16 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
  * Replaces HashSet for enum type creation to EnumSet factory static methods.
  */
 public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectionReplacementCleanUp {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;

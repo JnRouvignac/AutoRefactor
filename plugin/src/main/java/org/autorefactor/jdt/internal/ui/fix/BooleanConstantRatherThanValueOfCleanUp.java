@@ -35,31 +35,16 @@ import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;

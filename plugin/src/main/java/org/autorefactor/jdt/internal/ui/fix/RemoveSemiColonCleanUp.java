@@ -63,31 +63,16 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
  * TODO remove superfluous semi-colons in try-with-resources
  */
 public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;

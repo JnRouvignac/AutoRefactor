@@ -55,31 +55,16 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderCleanUp extends AbstractCleanUpRule {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_reason;

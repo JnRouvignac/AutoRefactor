@@ -58,31 +58,16 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
 		CAN_BE_CASTED_TO.put(LinkedList.class.getCanonicalName(), new String[] { LinkedList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
 	}
 
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_reason;

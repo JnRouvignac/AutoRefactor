@@ -551,11 +551,6 @@ public class ASTRewrite {
 		// because it changes or adds something to the GUI.
 		// Otherwise it would throw an Invalid thread access Exception.
 		eventLoop.syncExec(new Callable<BadLocationException>() {
-			/**
-			 * Call.
-			 *
-			 * @return the bad location exception.
-			 */
 			@Override
 			public BadLocationException call() throws Exception {
 				try {

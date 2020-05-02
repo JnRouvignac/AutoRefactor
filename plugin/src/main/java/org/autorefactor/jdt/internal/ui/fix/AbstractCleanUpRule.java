@@ -65,35 +65,16 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
 	/** The refactoring context of the current visitor. */
 	protected CompilationUnitRewrite cuRewrite;
 
-	/**
-	 * True if it is the visitor by default.
-	 *
-	 * @return true if it is the visitor by default.
-	 */
 	@Override
 	public boolean isByDefault() {
 		return true;
 	}
 
-	/**
-	 * True if the visitor is enabled.
-	 *
-	 * @param preferences The preferences
-	 *
-	 * @return true if the visitor is enabled.
-	 */
 	@Override
 	public boolean isEnabled(final Preferences preferences) {
 		return preferences.isEnabled(getClass());
 	}
 
-	/**
-	 * True if this Java version is supported.
-	 *
-	 * @param javaSeRelease The javaSe release
-	 *
-	 * @return true if this Java version is supported.
-	 */
 	@Override
 	public boolean isJavaVersionSupported(final Release javaSeRelease) {
 		return true;
@@ -108,11 +89,6 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
 		return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
 	}
 
-	/**
-	 * Set the cleanup context.
-	 *
-	 * @param cuRewrite the cleanup context.
-	 */
 	@Override
 	public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
 		this.cuRewrite= cuRewrite;
@@ -133,13 +109,6 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
 		return !cuRewrite.getASTRewrite().hasBeenRefactored(node);
 	}
 
-	/**
-	 * Get the cleanups.
-	 *
-	 * @param astRoot The AST toot
-	 *
-	 * @return the cleanups.
-	 */
 	@Override
 	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
 		astRoot.accept(this);

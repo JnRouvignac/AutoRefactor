@@ -73,31 +73,16 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * @see {@link #getDescription()}
  */
 public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return "Reduce scope of variable"; //$NON-NLS-1$
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return "Reduces the scope of local variables."; //$NON-NLS-1$
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return "It reduces the reading and debugging cost."; //$NON-NLS-1$

@@ -54,45 +54,22 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 /** See {@link #getDescription()} method. */
 public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
 	}
 
 	private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
-		/**
-		 * Compare objects.
-		 *
-		 * @param o1 First item
-		 * @param o2 Second item
-		 *
-		 * @return -1, 0 or 1
-		 */
 		@Override
 		public int compare(final IExtendedModifier o1, final IExtendedModifier o2) {
 			if (o1.isAnnotation()) {

@@ -170,43 +170,21 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 		analyzeVisitors();
 	}
 
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * True if the visitor is enabled.
-	 *
-	 * @param preferences The preferences
-	 *
-	 * @return true if the visitor is enabled.
-	 */
 	@Override
 	public boolean isEnabled(final Preferences preferences) {
 		return true;
@@ -273,13 +251,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 		return Collections.emptyList();
 	}
 
-	/**
-	 * True if this Java version is supported.
-	 *
-	 * @param javaSeRelease The javaSe release
-	 *
-	 * @return true if this Java version is supported.
-	 */
 	@Override
 	public boolean isJavaVersionSupported(final Release javaSeRelease) {
 		return true;
@@ -291,11 +262,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 				&& ((JavaRefactoringRule) visitor).isJavaVersionSupported(javaSERelease);
 	}
 
-	/**
-	 * Set the cleanup context.
-	 *
-	 * @param cuRewrite the cleanup context.
-	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
 	public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
@@ -308,13 +274,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 		this.visitorsContributingRefactoring.clear();
 	}
 
-	/**
-	 * Get the cleanups.
-	 *
-	 * @param astRoot The AST toot
-	 *
-	 * @return the cleanups.
-	 */
 	@Override
 	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
 		astRoot.accept(this);
@@ -390,14 +349,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 	public static void main(final String[] args) {
 		Method[] mm= ASTVisitor.class.getDeclaredMethods();
 		Arrays.sort(mm, new Comparator<Method>() {
-			/**
-			 * Compare objects.
-			 *
-			 * @param o1 First item
-			 * @param o2 Second item
-			 *
-			 * @return -1, 0 or 1
-			 */
 			@Override
 			public int compare(final Method o1, final Method o2) {
 				return o1.getName().compareTo(o2.getName());
@@ -3285,11 +3236,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 		return true;
 	}
 
-	/**
-	 * True if it is the visitor by default.
-	 *
-	 * @return true if it is the visitor by default.
-	 */
 	@Override
 	public boolean isByDefault() {
 		return false;

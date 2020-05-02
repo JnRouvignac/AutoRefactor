@@ -52,31 +52,16 @@ import org.eclipse.jdt.core.dom.Statement;
 public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 	private static final String TESTNG_CLASS= "org.testng.Assert"; //$NON-NLS-1$
 
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_reason;

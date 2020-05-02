@@ -221,13 +221,6 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 				&& Objects.equals(isEntryBlock, other.isEntryBlock);
 	}
 
-	/**
-	 * Compare objects.
-	 *
-	 * @param o Second item
-	 *
-	 * @return -1, 0 or 1
-	 */
 	@Override
 	public int compareTo(final CFGBasicBlock o) {
 		Integer startPosition= lineAndColumn.getStartPosition();

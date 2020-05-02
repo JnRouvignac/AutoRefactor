@@ -177,31 +177,16 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		}
 	}
 
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	@Override
 	public String getName() {
 		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return the description.
-	 */
 	@Override
 	public String getDescription() {
 		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_description;
 	}
 
-	/**
-	 * Get the reason.
-	 *
-	 * @return the reason.
-	 */
 	@Override
 	public String getReason() {
 		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_reason;

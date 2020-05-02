@@ -118,11 +118,6 @@ class PackageBindingStub implements IPackageBinding {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Get the name.
-	 *
-	 * @return the name.
-	 */
 	public String getName() {
 		return packageName;
 	}

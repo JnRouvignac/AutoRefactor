@@ -71,13 +71,6 @@ public class TypeNameDecider {
 			this.anyTypeBinding= anyTypeBinding;
 		}
 
-		/**
-		 * Resolve the type binding.
-		 *
-		 * @param fullyQualifiedName The fully qualified name
-		 *
-		 * @return the type binding.
-		 */
 		@Override
 		public ITypeBinding resolveTypeBinding(final String fullyQualifiedName) {
 			try {
