@@ -204,10 +204,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final SimpleName declaration, final Expression initializer) {
-			if (getResult() && ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
-					&& extraDimensions == 0
+			if (getResult() && extraDimensions == 0
 					&& initializer != null
-					&& ASTNodes.as(initializer, NullLiteral.class) == null) {
+					&& ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
+					&& !ASTNodes.is(initializer, NullLiteral.class)) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
 						blockNode, true).find();
 
