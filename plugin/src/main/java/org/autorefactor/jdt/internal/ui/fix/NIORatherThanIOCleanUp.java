@@ -39,7 +39,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -152,9 +151,9 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	private boolean maybeRefactorBlock(final Block node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
-		node.accept(fileAndUsesVisitor);
-		return fileAndUsesVisitor.getResult();
+		FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(node, classesToUseWithImport, importsToAdd);
+		fileAndUsesVisitor.visitNode(node);
+		return fileAndUsesVisitor.result;
 	}
 
 	private final class FileAndUsesVisitor extends BlockSubVisitor {
@@ -162,10 +161,8 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		private final Set<String> classesToUseWithImport;
 		private final Set<String> importsToAdd;
 
-		public FileAndUsesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
+		public FileAndUsesVisitor(final Block startNode,
 				final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-			super(cuRewrite, startNode);
-
 			this.blockNode= startNode;
 			this.classesToUseWithImport= classesToUseWithImport;
 			this.importsToAdd= importsToAdd;
@@ -197,7 +194,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final Expression initializer) {
-			if (getResult() && ASTNodes.hasType(type.resolveBinding(), File.class.getCanonicalName())
+			if (result && ASTNodes.hasType(type.resolveBinding(), File.class.getCanonicalName())
 					&& extraDimensions == 0
 					&& initializer != null) {
 				if (isFileCreation(initializer)) {
@@ -216,7 +213,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 						refactorFile(type, initializer, reads);
 
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				}

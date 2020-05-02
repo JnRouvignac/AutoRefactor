@@ -51,7 +51,6 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -97,21 +96,17 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(cuRewrite, node);
-		node.accept(newAndAddAllMethodVisitor);
-		return newAndAddAllMethodVisitor.getResult();
+		NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor();
+		newAndAddAllMethodVisitor.visitNode(node);
+		return newAndAddAllMethodVisitor.result;
 	}
 
-	private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
-		public NewAndAddAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ExpressionStatement node) {
 			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
-			if (getResult() && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
+			if (result && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
 				Expression arg0= ASTNodes.arguments(mi).get(0);
 				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
@@ -144,7 +139,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
 				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), null);
 				rewrite.remove(nodeToRemove, null);
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 

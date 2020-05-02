@@ -41,7 +41,6 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -87,21 +86,17 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(cuRewrite, node);
-		node.accept(newAndPutAllMethodVisitor);
-		return newAndPutAllMethodVisitor.getResult();
+		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor();
+		newAndPutAllMethodVisitor.visitNode(node);
+		return newAndPutAllMethodVisitor.result;
 	}
 
-	private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-		public NewAndPutAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ExpressionStatement node) {
 			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
-			if (getResult() && ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
+			if (result && ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
 				Expression arg0= ASTNodes.arguments(mi).get(0);
 				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
@@ -133,7 +128,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
 				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), null);
 				rewrite.remove(nodeToRemove, null);
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 

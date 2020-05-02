@@ -41,7 +41,6 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
@@ -121,19 +120,16 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 	private boolean maybeRefactorBlock(final Block node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
-		node.accept(assignmentForAndReturnVisitor);
-		return assignmentForAndReturnVisitor.getResult();
+		AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(classesToUseWithImport, importsToAdd);
+		assignmentForAndReturnVisitor.visitNode(node);
+		return assignmentForAndReturnVisitor.result;
 	}
 
 	private final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
 		private final Set<String> classesToUseWithImport;
 		private final Set<String> importsToAdd;
 
-		public AssignmentForAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
-				final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-			super(cuRewrite, startNode);
-
+		public AssignmentForAndReturnVisitor(final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 			this.classesToUseWithImport= classesToUseWithImport;
 			this.importsToAdd= importsToAdd;
 		}
@@ -147,7 +143,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 		private boolean maybeReplaceWithCollectionContains(final Statement forNode, final Expression iterable,
 				final Expression loopElement, final IfStatement is) {
-			if (getResult() && is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
+			if (result && is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
 				MethodInvocation condition= getMethodToReplace(is.getExpression());
 				List<Statement> thenStatements= ASTNodes.asList(is.getThenStatement());
 
@@ -167,7 +163,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 							if (isPositive != null) {
 								replaceLoopAndReturn(forNode, iterable, toFind, forNextStatement, isPositive);
-								setResult(false);
+								this.result= false;
 								return false;
 							}
 
@@ -188,7 +184,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 							}
 
 							replaceLoopByIf(forNode, iterable, thenStatements, toFind, bs);
-							setResult(false);
+							this.result= false;
 							return false;
 						}
 					}
@@ -272,7 +268,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 					if (isPositive != null) {
 						replaceLoopAndVariable(forNode, iterable, toFind, previousStatement, previousStmtIsPreviousSibling,
 								initName, isPositive);
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				}
@@ -349,7 +345,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 		public boolean visit(final ForStatement node) {
 			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
 
-			if (getResult() && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
+			if (result && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
 				if (IterationType.INDEX.equals(loopContent.getIterationType())) {
 					return maybeReplace(node, loopContent, collectionGet(loopContent), loopContent.getContainerVariable());
 				}

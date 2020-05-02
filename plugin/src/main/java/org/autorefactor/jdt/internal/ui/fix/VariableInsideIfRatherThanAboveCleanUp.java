@@ -32,7 +32,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -74,19 +73,15 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 
 	@Override
 	public boolean visit(final Block node) {
-		VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor(cuRewrite, node);
-		node.accept(newAndPutAllMethodVisitor);
-		return newAndPutAllMethodVisitor.getResult();
+		VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor();
+		newAndPutAllMethodVisitor.visitNode(node);
+		return newAndPutAllMethodVisitor.result;
 	}
 
-	private static final class VariableAndIfVisitor extends BlockSubVisitor {
-		public VariableAndIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class VariableAndIfVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (getResult()) {
+			if (result) {
 				Statement variableAssignment= ASTNodes.getPreviousSibling(node);
 				VariableDeclarationFragment variable= getVariable(variableAssignment);
 
@@ -143,7 +138,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 			}
 
 			moveAssignmentInsideIf(variableAssignment, statement, statements);
-			setResult(false);
+			this.result= false;
 			return false;
 		}
 

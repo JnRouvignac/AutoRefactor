@@ -35,7 +35,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -79,19 +78,15 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 	@Override
 	public boolean visit(final Block node) {
-		IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(cuRewrite, node);
-		node.accept(ifAndFollowingCodeVisitor);
-		return ifAndFollowingCodeVisitor.getResult();
+		IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor();
+		ifAndFollowingCodeVisitor.visitNode(node);
+		return ifAndFollowingCodeVisitor.result;
 	}
 
 	private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
-		public IfAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
 		@Override
 		public boolean visit(final TryStatement node) {
-			if (getResult() && node.resources().isEmpty()) {
+			if (result && node.resources().isEmpty()) {
 				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
 				if (tryStatements.isEmpty()) {
@@ -109,7 +104,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
 					}
 
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}
@@ -119,7 +114,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (getResult()) {
+			if (result) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 				Statement thenStatement= node.getThenStatement();
@@ -143,7 +138,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
 					}
 
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}
@@ -155,7 +150,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			if (ASTNodes.fallsThrough(unconditionnalStatement)) {
 				replaceBlockByPlainCode(node, unconditionnalStatement);
 				removeForwardCode(node, unconditionnalStatement);
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 
@@ -175,7 +170,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			}
 
 			replaceBlockByPlainCode(node, unconditionnalStatement);
-			setResult(false);
+			this.result= false;
 			return false;
 		}
 	}

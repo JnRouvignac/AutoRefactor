@@ -32,7 +32,6 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -75,23 +74,19 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
 	@Override
 	public boolean visit(final Block node) {
-		IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(cuRewrite, node);
-		node.accept(ifAndReturnVisitor);
-		return ifAndReturnVisitor.getResult();
+		IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor();
+		ifAndReturnVisitor.visitNode(node);
+		return ifAndReturnVisitor.result;
 	}
 
-	private static final class IfAndReturnVisitor extends BlockSubVisitor {
-		public IfAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class IfAndReturnVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final IfStatement node) {
 			InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
 			Statement thenStatement= getThenStatement(node);
 			Statement elseStatement= getElseStatement(node, thenStatement);
 
-			if (getResult() && condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
+			if (result && condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
 				Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
 				Assignment elseAssignment= ASTNodes.asExpression(elseStatement, Assignment.class);
 				boolean isEqual= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
@@ -134,7 +129,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
 					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 
@@ -142,7 +137,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
 					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}
@@ -189,7 +184,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getLeftOperand(), valuedReturn.getExpression())) {
 					replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 
@@ -197,7 +192,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getRightOperand(), valuedReturn.getExpression())) {
 					replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}

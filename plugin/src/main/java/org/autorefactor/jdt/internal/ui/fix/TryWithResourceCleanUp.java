@@ -36,7 +36,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -90,19 +89,15 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor(cuRewrite, node);
-		node.accept(returnStatementVisitor);
-		return returnStatementVisitor.getResult();
+		DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor();
+		returnStatementVisitor.visitNode(node);
+		return returnStatementVisitor.result;
 	}
 
-	private static final class DeclarationAndTryVisitor extends BlockSubVisitor {
-		public DeclarationAndTryVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class DeclarationAndTryVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final TryStatement node) {
-			if (getResult()) {
+			if (result) {
 				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
 				if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
@@ -173,7 +168,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, null);
 			rewrite.remove(nodesToRemove, null);
-			setResult(false);
+			this.result= false;
 			return false;
 		}
 
@@ -239,7 +234,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange(ASTNodes.resources(innerTryStatement)), null);
 			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), null);
-			setResult(false);
+			this.result= false;
 			return false;
 		}
 	}

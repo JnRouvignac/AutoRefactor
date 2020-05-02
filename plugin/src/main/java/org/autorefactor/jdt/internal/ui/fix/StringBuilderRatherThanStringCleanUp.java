@@ -37,7 +37,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -164,17 +163,15 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(cuRewrite, node);
-		node.accept(stringOccurrencesVisitor);
-		return stringOccurrencesVisitor.getResult();
+		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(node);
+		stringOccurrencesVisitor.visitNode(node);
+		return stringOccurrencesVisitor.result;
 	}
 
 	private final class StringOccurrencesVisitor extends BlockSubVisitor {
 		private Block blockNode;
 
-		public StringOccurrencesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-
+		public StringOccurrencesVisitor(final Block startNode) {
 			blockNode= startNode;
 		}
 
@@ -204,7 +201,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final SimpleName declaration, final Expression initializer) {
-			if (getResult() && extraDimensions == 0
+			if (result && extraDimensions == 0
 					&& initializer != null
 					&& ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
 					&& !ASTNodes.is(initializer, NullLiteral.class)) {
@@ -234,7 +231,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {
 						replaceString(type, initializer, assignmentWrites, concatenationWrites, finalRead);
 
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				}

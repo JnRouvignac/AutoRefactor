@@ -31,7 +31,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
@@ -81,19 +80,15 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
 	@Override
 	public boolean visit(final Block node) {
-		ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(cuRewrite, node);
-		node.accept(returnStatementVisitor);
-		return returnStatementVisitor.getResult();
+		ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor();
+		returnStatementVisitor.visitNode(node);
+		return returnStatementVisitor.result;
 	}
 
-	private static final class ReturnStatementVisitor extends BlockSubVisitor {
-		public ReturnStatementVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class ReturnStatementVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ReturnStatement node) {
-			if (getResult()) {
+			if (result) {
 				Statement previousSibling= ASTNodes.getPreviousSibling(node);
 				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
@@ -109,7 +104,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 						} else {
 							replaceReturnStatement(node, vds, returnExpression);
 						}
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				} else {
@@ -119,7 +114,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 							&& !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
 									node)) {
 						replaceReturnStatement(node, previousSibling, as.getRightHandSide());
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				}

@@ -35,7 +35,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -89,19 +88,15 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor(cuRewrite, node);
-		node.accept(ifWithAssignmentVisitor);
-		return ifWithAssignmentVisitor.getResult();
+		IfWithAssignmentVisitor ifWithAssignmentVisitor= new IfWithAssignmentVisitor();
+		ifWithAssignmentVisitor.visitNode(node);
+		return ifWithAssignmentVisitor.result;
 	}
 
-	private static final class IfWithAssignmentVisitor extends BlockSubVisitor {
-		public IfWithAssignmentVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class IfWithAssignmentVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final IfStatement node) {
-			return !getResult() || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
+			return !result || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
 		}
 
 		private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
@@ -208,7 +203,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
 				rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
 				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 
@@ -223,7 +218,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 					rewrite.replace(node, newBlock, editGroup);
 				}
 
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 

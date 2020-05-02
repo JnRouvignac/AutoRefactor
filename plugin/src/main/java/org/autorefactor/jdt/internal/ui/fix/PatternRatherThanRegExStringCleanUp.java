@@ -37,7 +37,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -117,20 +116,18 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 	private boolean maybeRefactorBlock(final Block node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(cuRewrite, node, classesToUseWithImport, importsToAdd);
-		node.accept(regExAndUsesVisitor);
-		return regExAndUsesVisitor.getResult();
+		RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(node, classesToUseWithImport, importsToAdd);
+		regExAndUsesVisitor.visitNode(node);
+		return regExAndUsesVisitor.result;
 	}
 
-	private static final class RegExAndUsesVisitor extends BlockSubVisitor {
+	private final class RegExAndUsesVisitor extends BlockSubVisitor {
 		private final Block blockNode;
 		private final Set<String> classesToUseWithImport;
 		private final Set<String> importsToAdd;
 
-		public RegExAndUsesVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode,
+		public RegExAndUsesVisitor(final Block startNode,
 				final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-			super(cuRewrite, startNode);
-
 			this.blockNode= startNode;
 			this.classesToUseWithImport= classesToUseWithImport;
 			this.importsToAdd= importsToAdd;
@@ -162,7 +159,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final Expression initializer) {
-			if (getResult() && ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
+			if (result && ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
 					&& extraDimensions == 0
 					&& initializer != null) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
@@ -179,7 +176,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					}
 					refactorRegEx(type, initializer, reads);
 
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}

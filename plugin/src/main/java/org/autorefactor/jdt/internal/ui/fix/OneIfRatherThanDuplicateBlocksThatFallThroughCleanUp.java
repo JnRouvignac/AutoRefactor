@@ -34,7 +34,6 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -75,19 +74,15 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
 	@Override
 	public boolean visit(final Block node) {
-		SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(cuRewrite, node);
-		node.accept(successiveIfVisitor);
-		return successiveIfVisitor.getResult();
+		SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor();
+		successiveIfVisitor.visitNode(node);
+		return successiveIfVisitor.result;
 	}
 
-	private static final class SuccessiveIfVisitor extends BlockSubVisitor {
-		public SuccessiveIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class SuccessiveIfVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (getResult()
+			if (result
 					&& ASTNodes.fallsThrough(node.getThenStatement())) {
 				List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
 				AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(node.getExpression()));
@@ -99,7 +94,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
 				if (duplicateIfBlocks.size() > 1) {
 					mergeCode(duplicateIfBlocks);
-					setResult(false);
+					this.result= false;
 					return false;
 				}
 			}

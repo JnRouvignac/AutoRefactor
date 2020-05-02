@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 
@@ -34,42 +33,21 @@ import org.eclipse.jdt.core.dom.Block;
  * visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
-	/**
-	 * The cleanup context.
-	 */
-	protected CompilationUnitRewrite cuRewrite;
-
 	private Block startNode;
 
-	private boolean result= true;
+	/**
+	 * The result.
+	 */
+	public boolean result= true;
 
 	/**
-	 * Constructor.
+	 * Should be used to visit a node.
 	 *
-	 * @param cuRewrite       The cleanup context
-	 * @param startNode The start node block
+	 * @param node The node to visit
 	 */
-	public BlockSubVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-		this.cuRewrite= cuRewrite;
-		this.startNode= startNode;
-	}
-
-	/**
-	 * Get the result.
-	 *
-	 * @return The result
-	 */
-	public boolean getResult() {
-		return result;
-	}
-
-	/**
-	 * Set the result.
-	 *
-	 * @param result The result
-	 */
-	public void setResult(final boolean result) {
-		this.result= result;
+	public void visitNode(final Block node) {
+		this.startNode= node;
+		node.accept(this);
 	}
 
 	@Override

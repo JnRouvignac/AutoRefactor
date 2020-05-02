@@ -151,29 +151,25 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 	}
 
 	private final class AssignmentIfAndReturnVisitor extends BlockSubVisitor {
-		public AssignmentIfAndReturnVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (getResult()) {
+			if (result) {
 				boolean result= visitIfStatement(node);
 
 				if (!result) {
-					setResult(false);
+					this.result= false;
 				}
 			}
 
-			return getResult();
+			return result;
 		}
 	}
 
 	@Override
 	public boolean visit(final Block node) {
-		AssignmentIfAndReturnVisitor assignmentIfAndReturnVisitor= new AssignmentIfAndReturnVisitor(cuRewrite, node);
-		node.accept(assignmentIfAndReturnVisitor);
-		return assignmentIfAndReturnVisitor.getResult();
+		AssignmentIfAndReturnVisitor assignmentIfAndReturnVisitor= new AssignmentIfAndReturnVisitor();
+		assignmentIfAndReturnVisitor.visitNode(node);
+		return assignmentIfAndReturnVisitor.result;
 	}
 
 	/**

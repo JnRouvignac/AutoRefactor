@@ -30,7 +30,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -80,16 +79,12 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
 	@Override
 	public boolean visit(final Block node) {
-		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(cuRewrite, node);
-		node.accept(newAndPutAllMethodVisitor);
-		return newAndPutAllMethodVisitor.getResult();
+		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor();
+		newAndPutAllMethodVisitor.visitNode(node);
+		return newAndPutAllMethodVisitor.result;
 	}
 
-	private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-		public NewAndPutAllMethodVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final PrefixExpression node) {
 			if (ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
@@ -111,7 +106,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 		public boolean visitExpression(final Expression node, final Expression variable) {
 			SimpleName variableName= ASTNodes.as(variable, SimpleName.class);
 
-			if (getResult()
+			if (result
 					&& !(node.getParent() instanceof ExpressionStatement)
 					&& variableName != null
 					&& variableName.resolveBinding() != null
@@ -227,7 +222,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 					&& (node instanceof PrefixExpression || !ASTNodes.fallsThrough(statement))) {
 				extractIncrement(node, variable, statement);
 
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 

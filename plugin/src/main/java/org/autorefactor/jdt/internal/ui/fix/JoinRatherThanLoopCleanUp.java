@@ -43,7 +43,6 @@ import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -105,17 +104,15 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		BuilderForAndUseVisitor builderForAndUseVisitor= new BuilderForAndUseVisitor(cuRewrite, node);
-		node.accept(builderForAndUseVisitor);
-		return builderForAndUseVisitor.getResult();
+		BuilderForAndUseVisitor builderForAndUseVisitor= new BuilderForAndUseVisitor(node);
+		builderForAndUseVisitor.visitNode(node);
+		return builderForAndUseVisitor.result;
 	}
 
 	private final class BuilderForAndUseVisitor extends BlockSubVisitor {
 		private final Block blockNode;
 
-		public BuilderForAndUseVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-
+		public BuilderForAndUseVisitor(final Block startNode) {
 			this.blockNode= startNode;
 		}
 
@@ -142,7 +139,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			List<Statement> statements= ASTNodes.asList(body);
 			Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-			if (getResult()
+			if (result
 					&& previousStatement != null
 					&& containerVariable != null
 					&& ASTNodes.hasType(containerVariable, String[].class.getCanonicalName())
@@ -239,7 +236,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 							&& isConcatenationUseValid(node, builder, builderClass, readsToRefactor, builderUses)) {
 						replaceWithStringJoin(node, containerVariable, booleanStatement, builderStatement, builder, delimiter,
 								readsToRefactor, booleanUses);
-						setResult(false);
+						this.result= false;
 						return false;
 					}
 				}

@@ -39,7 +39,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
@@ -239,19 +238,15 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		SeveralIfVisitor severalIfVisitor= new SeveralIfVisitor(cuRewrite, node);
-		node.accept(severalIfVisitor);
-		return severalIfVisitor.getResult();
+		SeveralIfVisitor severalIfVisitor= new SeveralIfVisitor();
+		severalIfVisitor.visitNode(node);
+		return severalIfVisitor.result;
 	}
 
 	private final class SeveralIfVisitor extends BlockSubVisitor {
-		public SeveralIfVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
 		@Override
 		public boolean visit(final IfStatement node) {
-			if (!getResult() || hasUnlabeledBreak(node)) {
+			if (!result || hasUnlabeledBreak(node)) {
 				return true;
 			}
 
@@ -313,7 +308,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 				final List<SwitchCaseSection> cases, final Statement remainingStatement) {
 			if (switchExpression != null && cases.size() > 2) {
 				replaceWithSwitchStatement(ifStatements, switchExpression, cases, remainingStatement);
-				setResult(false);
+				this.result= false;
 				return false;
 			}
 

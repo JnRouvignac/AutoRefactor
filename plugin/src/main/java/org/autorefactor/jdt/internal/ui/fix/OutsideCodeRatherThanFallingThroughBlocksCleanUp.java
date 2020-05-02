@@ -33,7 +33,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -84,17 +83,12 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 
 	@Override
 	public boolean visit(final Block node) {
-		BlocksAndFollowingCodeVisitor blocksAndFollowingCodeVisitor= new BlocksAndFollowingCodeVisitor(cuRewrite,
-				node);
-		node.accept(blocksAndFollowingCodeVisitor);
-		return blocksAndFollowingCodeVisitor.getResult();
+		BlocksAndFollowingCodeVisitor blocksAndFollowingCodeVisitor= new BlocksAndFollowingCodeVisitor();
+		blocksAndFollowingCodeVisitor.visitNode(node);
+		return blocksAndFollowingCodeVisitor.result;
 	}
 
-	private static final class BlocksAndFollowingCodeVisitor extends BlockSubVisitor {
-		public BlocksAndFollowingCodeVisitor(final CompilationUnitRewrite cuRewrite, final Block startNode) {
-			super(cuRewrite, startNode);
-		}
-
+	private final class BlocksAndFollowingCodeVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final TryStatement node) {
 			return visitStatement(node);
@@ -106,7 +100,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 		}
 
 		private boolean visitStatement(final Statement node) {
-			if (getResult()) {
+			if (result) {
 				List<Statement> redundantStatements= new ArrayList<>();
 				collectStatements(node, redundantStatements);
 				return maybeRemoveRedundantCode(node, redundantStatements);
@@ -218,11 +212,11 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 						rewrite.replace(redundantStatement, ast.block(), null);
 					}
 
-					setResult(false);
+					this.result= false;
 				}
 			}
 
-			return getResult();
+			return result;
 		}
 
 		private boolean isIn(final Statement node, final Class<?>... domClasses) {
