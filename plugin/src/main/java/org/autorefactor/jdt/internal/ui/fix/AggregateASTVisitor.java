@@ -164,7 +164,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 	 * @param visitors the visitors that will be executed by this
 	 *                 {@link AggregateASTVisitor}
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public AggregateASTVisitor(final List<RefactoringRule> visitors) {
 		this.visitors= (List) visitors;
 		analyzeVisitors();
@@ -263,12 +263,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
 	public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
 		this.cuRewrite= cuRewrite;
 
-		for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
-			v.setRefactoringContext(cuRewrite);
+		for (ASTVisitor v : visitors) {
+			((RefactoringRule) v).setRefactoringContext(cuRewrite);
 		}
 
 		this.visitorsContributingRefactoring.clear();
