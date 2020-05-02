@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -84,11 +85,11 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		for (int i= fragments.size() - 1; 0 <= i; i--) {
 			VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
 
-			SimpleName copyOfFragment= ast.createCopyTarget(fragment.getName());
+			SimpleName copyOfFragment= ASTNodes.createMoveTarget(rewrite, fragment.getName());
 			Type copyOfType= ast.createCopyTarget(type);
 			Expression copyOfInitializer;
 			if (fragment.getInitializer() != null) {
-				copyOfInitializer= ast.createCopyTarget(fragment.getInitializer());
+				copyOfInitializer= ASTNodes.createMoveTarget(rewrite, fragment.getInitializer());
 			} else {
 				copyOfInitializer= null;
 			}
