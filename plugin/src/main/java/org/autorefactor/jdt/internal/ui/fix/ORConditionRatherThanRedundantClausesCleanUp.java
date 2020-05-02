@@ -88,10 +88,10 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 	private boolean maybeRefactorCondition(final Expression operandWithRedundance, final Expression redundantOperand) {
 		InfixExpression complexCondition= ASTNodes.as(operandWithRedundance, InfixExpression.class);
 
-		if (ASTNodes.isPrimitive(redundantOperand)
-				&& ASTNodes.isPassive(redundantOperand)
-				&& complexCondition != null
-				&& ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
+		if (complexCondition != null
+				&& ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
+				&& ASTNodes.isPrimitive(redundantOperand)
+				&& ASTNodes.isPassive(redundantOperand)) {
 			List<Expression> operands= ASTNodes.getAllOperands(complexCondition);
 
 			for (int i= 0; i < operands.size(); i++) {

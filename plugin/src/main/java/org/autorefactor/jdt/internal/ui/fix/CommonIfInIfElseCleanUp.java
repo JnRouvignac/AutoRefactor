@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
@@ -96,20 +97,24 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 		IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-		if (ASTNodes.isPassive(node.getExpression()) && thenInnerIfStatement != null && elseInnerIfStatement != null
+		if (thenInnerIfStatement != null && elseInnerIfStatement != null
 				&& thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
-				&& ASTNodes.isPassive(thenInnerIfStatement.getExpression())
+				&& ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
 				&& ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-			rewrite.replace(node,
-					ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression())),
-							ast.block(ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
-							ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement())))), null);
+			refactorIf(node, thenInnerIfStatement, elseInnerIfStatement);
 			return false;
 		}
 
 		return true;
+	}
+
+	private void refactorIf(final IfStatement node, final IfStatement thenInnerIfStatement, final IfStatement elseInnerIfStatement) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
+		IfStatement newInnerIf= ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
+				ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
+		rewrite.replace(node, ast.if0(newCondition, ast.block(newInnerIf)), null);
 	}
 }

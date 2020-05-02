@@ -64,10 +64,13 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 	@Override
 	public boolean visit(final IfStatement node) {
 		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
-		if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
-				&& ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(node.getExpression(), secondIf.getExpression())
-				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
-						|| ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
+
+		if (secondIf != null
+				&& !ASTNodes.isExceptionExpected(node)
+				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement()) || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))
+				&& ASTNodes.isPassive(node.getExpression())
+				&& ASTNodes.isPassive(secondIf.getExpression())
+				&& ASTNodes.match(node.getExpression(), secondIf.getExpression())) {
 			refactorCondition(secondIf);
 
 			return false;

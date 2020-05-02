@@ -172,12 +172,11 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				ASTSemanticMatcher matcher= new ASTSemanticMatcher() {
 					@Override
 					public boolean match(final SimpleName node, final Object other) {
-						return super.match(node, other)
-								&& other instanceof SimpleName
+						return other instanceof SimpleName
 								&& node.resolveBinding() != null
 								&& ((SimpleName) other).resolveBinding() != null
-								&& other instanceof SimpleName
-								&& (node.resolveBinding().getKind() != IBinding.VARIABLE && ((SimpleName) other).resolveBinding().getKind() != IBinding.VARIABLE || ASTNodes.isSameVariable(node, (SimpleName) other));
+								&& (node.resolveBinding().getKind() != IBinding.VARIABLE && ((SimpleName) other).resolveBinding().getKind() != IBinding.VARIABLE || ASTNodes.isSameVariable(node, (SimpleName) other))
+								&& super.match(node, other);
 					}
 				};
 				boolean match= ASTNodes.match(matcher, referenceStatements, stmtsToCompare);

@@ -259,8 +259,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	}
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
-		return ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) //$NON-NLS-1$
-				&& (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess || getMI.getExpression() instanceof SuperFieldAccess)
+		return (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess || getMI.getExpression() instanceof SuperFieldAccess)
+				&& ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) //$NON-NLS-1$
 				&& ASTNodes.isSameLocalVariable(ASTNodes.arguments(getMI).get(0), loopContent.getLoopVariable())
 				&& ASTNodes.isSameVariable(loopContent.getContainerVariable(), getMI.getExpression());
 	}

@@ -213,11 +213,12 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 			Set<Integer> actualLastNodes= new HashSet<>();
 			collectActualLastNodes(actualNode, actualLastNodes);
-			boolean isPassive= isPassive(actualNode);
 
 			if (actualLastNodes.size() != nbWorkflow) {
 				return false;
 			}
+
+			boolean isPassive= isPassive(actualNode);
 
 			for (int i= 0; i < nbWorkflow; i++) {
 				if (!doMatching(actualNode, i, actualLastNodes, isPassive)) {
@@ -292,7 +293,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 	private void collectActualLastNodes(final ControlWorkflowNode actualNode, final Set<Integer> actualLastNodes) {
 		if (actualNode.getCondition() == null) {
-			if (actualNode.getThenNode() != null || actualNode.getElseNode() != null || (actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null)) {
+			if (actualNode.getThenNode() != null || actualNode.getElseNode() != null || actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null) {
 				throw new AbortSearchException();
 			}
 
@@ -308,7 +309,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 	}
 
 	private boolean isPassive(final ControlWorkflowNode actualNode) {
-		return actualNode.getCondition() == null || (ASTNodes.isPassive(actualNode.getCondition()) && isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode()));
+		return actualNode.getCondition() == null || ASTNodes.isPassive(actualNode.getCondition()) && isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode());
 	}
 
 	private void expandActualNode(final ControlWorkflowNode actualNode) {
