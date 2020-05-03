@@ -148,18 +148,12 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor(node);
+		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor();
 		stringOccurrencesVisitor.visitNode(node);
 		return stringOccurrencesVisitor.result;
 	}
 
 	private final class StringOccurrencesVisitor extends BlockSubVisitor {
-		private Block blockNode;
-
-		public StringOccurrencesVisitor(final Block startNode) {
-			blockNode= startNode;
-		}
-
 		@Override
 		public boolean visit(final VariableDeclarationStatement node) {
 			if (node.fragments().size() != 1) {
@@ -191,7 +185,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					&& ASTNodes.hasType(type.resolveBinding(), String.class.getCanonicalName())
 					&& !ASTNodes.is(initializer, NullLiteral.class)) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-						blockNode, true).find();
+						startNode, true).find();
 
 				List<SimpleName> reads= varOccurrencesVisitor.getReads();
 				List<SimpleName> writes= varOccurrencesVisitor.getWrites();

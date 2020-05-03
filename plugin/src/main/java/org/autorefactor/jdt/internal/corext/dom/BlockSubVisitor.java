@@ -33,7 +33,10 @@ import org.eclipse.jdt.core.dom.Block;
  * visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
-	private Block startNode;
+	/**
+	 * The first node to visit.
+	 */
+	protected Block startNode;
 
 	/**
 	 * The result.

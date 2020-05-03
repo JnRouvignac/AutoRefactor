@@ -101,19 +101,16 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 	private boolean maybeRefactorBlock(final Block node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(node, classesToUseWithImport, importsToAdd);
+		RegExAndUsesVisitor regExAndUsesVisitor= new RegExAndUsesVisitor(classesToUseWithImport, importsToAdd);
 		regExAndUsesVisitor.visitNode(node);
 		return regExAndUsesVisitor.result;
 	}
 
 	private final class RegExAndUsesVisitor extends BlockSubVisitor {
-		private final Block blockNode;
 		private final Set<String> classesToUseWithImport;
 		private final Set<String> importsToAdd;
 
-		public RegExAndUsesVisitor(final Block startNode,
-				final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-			this.blockNode= startNode;
+		public RegExAndUsesVisitor(final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 			this.classesToUseWithImport= classesToUseWithImport;
 			this.importsToAdd= importsToAdd;
 		}
@@ -148,7 +145,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					&& extraDimensions == 0
 					&& initializer != null) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-						blockNode, true).find();
+						startNode, true).find();
 
 				List<SimpleName> reads= varOccurrencesVisitor.getReads();
 				List<SimpleName> writes= varOccurrencesVisitor.getWrites();

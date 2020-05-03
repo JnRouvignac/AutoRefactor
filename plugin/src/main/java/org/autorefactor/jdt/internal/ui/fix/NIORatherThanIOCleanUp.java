@@ -136,19 +136,16 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	private boolean maybeRefactorBlock(final Block node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(node, classesToUseWithImport, importsToAdd);
+		FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(classesToUseWithImport, importsToAdd);
 		fileAndUsesVisitor.visitNode(node);
 		return fileAndUsesVisitor.result;
 	}
 
 	private final class FileAndUsesVisitor extends BlockSubVisitor {
-		private final Block blockNode;
 		private final Set<String> classesToUseWithImport;
 		private final Set<String> importsToAdd;
 
-		public FileAndUsesVisitor(final Block startNode,
-				final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-			this.blockNode= startNode;
+		public FileAndUsesVisitor(final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 			this.classesToUseWithImport= classesToUseWithImport;
 			this.importsToAdd= importsToAdd;
 		}
@@ -184,7 +181,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 					&& initializer != null) {
 				if (isFileCreation(initializer)) {
 					VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-							blockNode, true).find();
+							startNode, true).find();
 
 					List<SimpleName> reads= varOccurrencesVisitor.getReads();
 					List<SimpleName> writes= varOccurrencesVisitor.getWrites();

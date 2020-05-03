@@ -89,18 +89,12 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		BuilderForAndUseVisitor builderForAndUseVisitor= new BuilderForAndUseVisitor(node);
+		BuilderForAndUseVisitor builderForAndUseVisitor= new BuilderForAndUseVisitor();
 		builderForAndUseVisitor.visitNode(node);
 		return builderForAndUseVisitor.result;
 	}
 
 	private final class BuilderForAndUseVisitor extends BlockSubVisitor {
-		private final Block blockNode;
-
-		public BuilderForAndUseVisitor(final Block startNode) {
-			this.blockNode= startNode;
-		}
-
 		@Override
 		public boolean visit(final ForStatement node) {
 			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
@@ -348,7 +342,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			}
 
 			VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) builder.resolveBinding(),
-					blockNode, true).find();
+					startNode, true).find();
 
 			List<SimpleName> reads= varOccurrencesVisitor.getReads();
 			List<SimpleName> writes= varOccurrencesVisitor.getWrites();
@@ -408,7 +402,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			}
 
 			VarDefinitionsUsesVisitor booleanOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) booleanForInterval.resolveBinding(),
-					blockNode, true).find();
+					startNode, true).find();
 
 			Set<SimpleName> actualBooleanOccurences= new HashSet<>(booleanOccurrencesVisitor.getReads());
 			actualBooleanOccurences.addAll(booleanOccurrencesVisitor.getWrites());
