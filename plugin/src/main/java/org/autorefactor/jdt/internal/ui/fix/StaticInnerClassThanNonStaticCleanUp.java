@@ -44,12 +44,10 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /** See {@link #getDescription()} method. */
 public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 	private static class TopLevelClassMemberVisitor extends InterruptibleVisitor {
-		private final TypeDeclaration topLevelClass;
 		private final TypeDeclaration innerClass;
 		private boolean isTopLevelClassMemberUsed;
 
-		public TopLevelClassMemberVisitor(final TypeDeclaration topLevelClass, final TypeDeclaration innerClass) {
-			this.topLevelClass= topLevelClass;
+		public TopLevelClassMemberVisitor(final TypeDeclaration innerClass) {
 			this.innerClass= innerClass;
 		}
 
@@ -71,10 +69,10 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 				return interruptVisit();
 			}
 
-			if (!Modifier.isStatic(binding.getModifiers())) {
+			if (!Modifier.isStatic(binding.getModifiers()) && (binding.getKind() == IBinding.VARIABLE || binding.getKind() == IBinding.METHOD)) {
 				ASTNode declaration= ((CompilationUnit) root).findDeclaringNode(binding);
 
-				if (!ASTNodes.isParent(declaration, innerClass) && ASTNodes.isParent(declaration, topLevelClass)) {
+				if (!ASTNodes.isParent(declaration, innerClass)) {
 					isTopLevelClassMemberUsed= true;
 					return interruptVisit();
 				}
@@ -115,7 +113,7 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 			}
 
 			if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
-				TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(topLevelClass, node);
+				TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(node);
 				topLevelClassMemberVisitor.visitNode(node);
 
 				if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
