@@ -25,6 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+
 public class DoWhileRatherThanWhileSample {
     private void replaceWhileByDoWhile(int i) {
         // Keep this comment
@@ -181,9 +186,176 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWhileWithCondition(int i) {
+    private void doNotReplaceWhileWithUnknownValue(int i) {
         while (i <= 100) {
             i *= 2;
+        }
+    }
+
+    private void replaceWithControlWorkflow(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        if (isValid) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void replaceWithTryWithResource(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replaceInCatch(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println("Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithActiveCondition(int m) {
+        int o= 1_000;
+        int p= -1_000;
+
+        if (p++ > -1_000) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            while (isInitedToTrue && o > 0) {
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithActiveResource(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader(p++ + "file.txt")) {
+            System.out.println("Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithActiveBody(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println(p++ + "Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceInFinally(int m, boolean isValid) throws IOException {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println("Hi!");
+        } finally {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithLoop(int q, List<String> texts) {
+        int r= 1_000;
+        int s= -1_000;
+        for (String string : texts) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= s < 0;
+
+            while (isInitedToTrue && r > 0) {
+                if (q > 100) {
+                    isInitedToTrue= false;
+                }
+                q *= 2;
+                r--;
+            }
         }
     }
 }

@@ -35,18 +35,22 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
- * DoWhileRatherThanWhileCleanUp.
+ * Replace while by do/while when the first evaluation is always true.
  *
  * @see #getDescription()
  */
@@ -79,7 +83,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private Object hasAlwaysValue(final Statement node, final Expression condition) {
+	private Object hasAlwaysValue(final ASTNode node, final Expression condition) {
 		Object constantCondition= condition.resolveConstantExpressionValue();
 
 		if (constantCondition != null) {
@@ -95,12 +99,12 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		SimpleName variable= ASTNodes.as(condition, SimpleName.class);
 
 		if (variable != null && variable.resolveBinding() != null && variable.resolveBinding().getKind() == IBinding.VARIABLE) {
-			List<Statement> previousSiblings= new ArrayList<>(ASTNodes.getPreviousSiblings(node));
+			List<ASTNode> precedingStatements= getPrecedingCode(node);
 
-			Collections.reverse(previousSiblings);
+			Collections.reverse(precedingStatements);
 
-			for (Statement previousSibling : previousSiblings) {
-				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), previousSibling, true).find();
+			for (ASTNode precedingStatement : precedingStatements) {
+				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), precedingStatement, true).find();
 
 				if (!visitor.getReads().isEmpty() || visitor.getWrites().size() > 1) {
 					return null;
@@ -114,7 +118,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 						Assignment assignment= (Assignment) write.getParent();
 
 						if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
-							return hasAlwaysValue(previousSibling, assignment.getRightHandSide());
+							return hasAlwaysValue(precedingStatement, assignment.getRightHandSide());
 						}
 
 						break;
@@ -123,7 +127,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 						VariableDeclarationFragment fragment= (VariableDeclarationFragment) write.getParent();
 
 						if (fragment.getInitializer() != null) {
-							return hasAlwaysValue(previousSibling, fragment.getInitializer());
+							return hasAlwaysValue(precedingStatement, fragment.getInitializer());
 						}
 
 						break;
@@ -132,7 +136,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 						SingleVariableDeclaration singleVariableDeclaration= (SingleVariableDeclaration) write.getParent();
 
 						if (singleVariableDeclaration.getInitializer() != null) {
-							return hasAlwaysValue(previousSibling, singleVariableDeclaration.getInitializer());
+							return hasAlwaysValue(precedingStatement, singleVariableDeclaration.getInitializer());
 						}
 
 						break;
@@ -221,5 +225,58 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		}
 
 		return false;
+	}
+
+	@SuppressWarnings({ "unchecked", "deprecation" })
+	private List<ASTNode> getPrecedingCode(final ASTNode node) {
+		Statement statement= null;
+
+		if (node instanceof Statement) {
+			statement= (Statement) node;
+		} else {
+			statement= ASTNodes.getAncestorOrNull(node, Statement.class);
+		}
+
+		if (statement == null) {
+			return new ArrayList<>();
+		}
+
+		List<ASTNode> precedingStatements= new ArrayList<>(ASTNodes.getPreviousSiblings(statement));
+		ASTNode parent= statement.getParent();
+
+		if (parent instanceof Block) {
+			statement= (Statement) parent;
+			parent= parent.getParent();
+		}
+
+		if (parent instanceof IfStatement) {
+			precedingStatements.add(0, ((IfStatement) parent).getExpression());
+			precedingStatements.addAll(0, getPrecedingCode(parent));
+		}
+
+		if (parent instanceof CatchClause) {
+			TryStatement tryStatement= (TryStatement) parent.getParent();
+			precedingStatements.addAll(0, ASTNodes.asList(tryStatement.getBody()));
+
+			if (statement.getParent().getLocationInParent() != TryStatement.RESOURCES_PROPERTY) {
+				precedingStatements.addAll(0, tryStatement.resources());
+			}
+
+			precedingStatements.addAll(0, getPrecedingCode(tryStatement));
+		}
+
+		if (parent instanceof TryStatement) {
+			if (statement.getLocationInParent() == TryStatement.FINALLY_PROPERTY) {
+				return precedingStatements;
+			}
+
+			if (statement.getLocationInParent() != TryStatement.RESOURCES_PROPERTY) {
+				precedingStatements.addAll(0, ((TryStatement) parent).resources());
+			}
+
+			precedingStatements.addAll(0, getPrecedingCode(parent));
+		}
+
+		return precedingStatements;
 	}
 }
