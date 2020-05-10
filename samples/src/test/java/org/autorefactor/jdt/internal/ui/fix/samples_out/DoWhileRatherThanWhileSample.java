@@ -212,7 +212,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithTryWithResource(int m, boolean isValid) {
+    private void replaceWithTryWithResource(int m) {
         int o= 1_000;
         int p= -1_000;
 
@@ -229,6 +229,32 @@ public class DoWhileRatherThanWhileSample {
                 m *= 2;
                 o--;
             } while (isInitedToTrue && o > 0);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replaceWithBlock(int m) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            boolean isInitedToTrue= false;
+            {
+                isInitedToTrue= p < 0;
+
+                // Keep this comment
+                do {
+                    // Keep this comment too
+                    if (m > 100) {
+                        isInitedToTrue= false;
+                    }
+                    m *= 2;
+                    o--;
+                } while (isInitedToTrue && o > 0);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

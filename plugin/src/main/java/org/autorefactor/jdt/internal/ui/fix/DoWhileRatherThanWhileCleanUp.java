@@ -245,8 +245,8 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		ASTNode parent= statement.getParent();
 
 		if (parent instanceof Block) {
-			statement= (Statement) parent;
-			parent= parent.getParent();
+			precedingStatements.addAll(0, getPrecedingCode(parent));
+			return precedingStatements;
 		}
 
 		if (parent instanceof IfStatement) {
