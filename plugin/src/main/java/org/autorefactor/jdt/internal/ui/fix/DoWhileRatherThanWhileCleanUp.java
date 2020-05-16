@@ -117,6 +117,10 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 			Collections.reverse(precedingStatements);
 
 			for (ASTNode precedingStatement : precedingStatements) {
+				if (isConditionalCode(precedingStatement)) {
+					return null;
+				}
+
 				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), precedingStatement, true).find();
 
 				if (visitor.getWrites().size() > 1) {
@@ -141,20 +145,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 					ASTNode parent= write;
 
 					while (parent != precedingStatement) {
-						if (parent == null
-								|| parent instanceof IfStatement
-								|| parent instanceof ConditionalExpression
-								|| parent instanceof EnhancedForStatement
-								|| parent instanceof WhileStatement
-								|| parent instanceof ForStatement
-								|| parent instanceof DoStatement
-								|| parent instanceof AbstractTypeDeclaration
-								|| parent instanceof LambdaExpression
-								|| parent instanceof MethodReference
-								|| parent instanceof SuperMethodReference
-								|| parent instanceof CreationReference
-								|| parent instanceof TypeMethodReference
-								|| parent instanceof SuperMethodReference) {
+						if (isConditionalCode(parent)) {
 							return null;
 						}
 
@@ -273,6 +264,23 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		}
 
 		return false;
+	}
+
+	private boolean isConditionalCode(ASTNode expression) {
+		return expression == null
+				|| expression instanceof IfStatement
+				|| expression instanceof ConditionalExpression
+				|| expression instanceof EnhancedForStatement
+				|| expression instanceof WhileStatement
+				|| expression instanceof ForStatement
+				|| expression instanceof DoStatement
+				|| expression instanceof AbstractTypeDeclaration
+				|| expression instanceof LambdaExpression
+				|| expression instanceof MethodReference
+				|| expression instanceof SuperMethodReference
+				|| expression instanceof CreationReference
+				|| expression instanceof TypeMethodReference
+				|| expression instanceof SuperMethodReference;
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })

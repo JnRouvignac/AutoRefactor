@@ -69,16 +69,31 @@ public class DoWhileRatherThanWhileSample {
         } while (j > 0);
     }
 
-    private void doNotReplaceWithConditionalInitialization(int i, boolean isValid) {
-        int j = -1;
-        int anotherVariable= isValid ? j = 1_000 : 0;
+    private void doNotReplaceWithConditionalInitialization(int aNumber, boolean isValid) {
+        int isNotAlwaysPositive = -1;
+        int anotherVariable= isValid ? isNotAlwaysPositive = 1_000 : 0;
 
-        while (j > 0) {
-            if (i > 100) {
+        while (isNotAlwaysPositive > 0) {
+            if (aNumber > 100) {
                 return;
             }
-            i *= 2;
-            j--;
+            aNumber *= 2;
+            isNotAlwaysPositive--;
+        }
+    }
+
+    private void doNotReplaceWithIfStatement(int aNumber, boolean isValid) {
+        int isNotAlwaysPositive = -2;
+        if (isValid) {
+            isNotAlwaysPositive = 2_000;
+        }
+
+        while (isNotAlwaysPositive > 0) {
+            if (aNumber > 200) {
+                return;
+            }
+            aNumber *= 4;
+            isNotAlwaysPositive--;
         }
     }
 
