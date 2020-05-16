@@ -186,6 +186,23 @@ public class DoWhileRatherThanWhileSample {
         } while (isInitedToTrue && j > 0);
     }
 
+    private void replaceWithAllowedUse(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= k == -1_000;
+        isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
     private void doNotReplaceWhileWithUnknownValue(int i) {
         while (i <= 100) {
             i *= 2;
