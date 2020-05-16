@@ -34,21 +34,31 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.CreationReference;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.LambdaExpression;
+import org.eclipse.jdt.core.dom.MethodReference;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -128,6 +138,28 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 
 				if (!visitor.getWrites().isEmpty()) {
 					SimpleName write= visitor.getWrites().get(0);
+					ASTNode parent= write;
+
+					while (parent != precedingStatement) {
+						if (parent == null
+								|| parent instanceof IfStatement
+								|| parent instanceof ConditionalExpression
+								|| parent instanceof EnhancedForStatement
+								|| parent instanceof WhileStatement
+								|| parent instanceof ForStatement
+								|| parent instanceof DoStatement
+								|| parent instanceof AbstractTypeDeclaration
+								|| parent instanceof LambdaExpression
+								|| parent instanceof MethodReference
+								|| parent instanceof SuperMethodReference
+								|| parent instanceof CreationReference
+								|| parent instanceof TypeMethodReference
+								|| parent instanceof SuperMethodReference) {
+							return null;
+						}
+
+						parent= parent.getParent();
+					}
 
 					switch (write.getParent().getNodeType()) {
 					case ASTNode.ASSIGNMENT:

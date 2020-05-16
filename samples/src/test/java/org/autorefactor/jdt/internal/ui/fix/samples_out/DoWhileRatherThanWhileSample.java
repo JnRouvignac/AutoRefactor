@@ -69,6 +69,19 @@ public class DoWhileRatherThanWhileSample {
         } while (j > 0);
     }
 
+    private void doNotReplaceWithConditionalInitialization(int i, boolean isValid) {
+        int j = -1;
+        int anotherVariable= isValid ? j = 1_000 : 0;
+
+        while (j > 0) {
+            if (i > 100) {
+                return;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
     private void replaceWithInitedBooleanAndInteger(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;
