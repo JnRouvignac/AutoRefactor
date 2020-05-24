@@ -83,7 +83,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 		return true;
 	}
 
-	private void replaceContains(final MethodInvocation node, MethodInvocation miExpression) {
+	private void replaceContains(final MethodInvocation node, final MethodInvocation miExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 

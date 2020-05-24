@@ -266,7 +266,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private boolean isConditionalCode(ASTNode expression) {
+	private boolean isConditionalCode(final ASTNode expression) {
 		return expression == null
 				|| expression instanceof IfStatement
 				|| expression instanceof ConditionalExpression
