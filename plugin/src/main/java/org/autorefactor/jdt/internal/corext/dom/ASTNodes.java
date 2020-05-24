@@ -1568,15 +1568,15 @@ public final class ASTNodes {
 	 *         {@code null} otherwise.
 	 */
 	public static Expression getNullCheckedExpression(final Expression expression) {
-		InfixExpression ie= as(expression, InfixExpression.class);
+		InfixExpression infixExpression= as(expression, InfixExpression.class);
 
-		if (ie != null && hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && checkNoExtendedOperands(ie)) {
-			if (is(ie.getLeftOperand(), NullLiteral.class)) {
-				return ie.getRightOperand();
+		if (infixExpression != null && hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS) && checkNoExtendedOperands(infixExpression)) {
+			if (is(infixExpression.getLeftOperand(), NullLiteral.class)) {
+				return infixExpression.getRightOperand();
 			}
 
-			if (is(ie.getRightOperand(), NullLiteral.class)) {
-				return ie.getLeftOperand();
+			if (is(infixExpression.getRightOperand(), NullLiteral.class)) {
+				return infixExpression.getLeftOperand();
 			}
 		}
 
@@ -2478,8 +2478,8 @@ public final class ASTNodes {
 	 */
 	public static Pair<Expression, Expression> decomposeInitializer(final Expression init) {
 		if (init instanceof VariableDeclarationExpression) {
-			VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
-			final VariableDeclarationExpression node= vde;
+			VariableDeclarationExpression variableDeclarationExpression= (VariableDeclarationExpression) init;
+			final VariableDeclarationExpression node= variableDeclarationExpression;
 			@SuppressWarnings("unchecked")
 			List<VariableDeclarationFragment> fragments= node.fragments();
 

@@ -91,21 +91,21 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				return moveAssignmentBeforeIfStatement(node, assignment, evaluatedExpression);
 			}
 
-			PrefixExpression pe= ASTNodes.as(expression, PrefixExpression.class);
+			PrefixExpression prefixExpression= ASTNodes.as(expression, PrefixExpression.class);
 
-			if (pe != null && ASTNodes.hasOperator(pe,
+			if (prefixExpression != null && ASTNodes.hasOperator(prefixExpression,
 					PrefixExpression.Operator.NOT,
 					PrefixExpression.Operator.COMPLEMENT,
 					PrefixExpression.Operator.MINUS,
 					PrefixExpression.Operator.PLUS)) {
-				return moveAssignmentBeforeIfStatementIfPossible(node, pe.getOperand(), evaluatedExpression);
+				return moveAssignmentBeforeIfStatementIfPossible(node, prefixExpression.getOperand(), evaluatedExpression);
 			}
 
-			InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
+			InfixExpression infixExpression= ASTNodes.as(expression, InfixExpression.class);
 
-			if (ie != null) {
-				List<Expression> operands= ASTNodes.allOperands(ie);
-				boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
+			if (infixExpression != null) {
+				List<Expression> operands= ASTNodes.allOperands(infixExpression);
+				boolean isAllOperandsEvaluated= ASTNodes.hasOperator(infixExpression,
 						InfixExpression.Operator.EQUALS,
 						InfixExpression.Operator.NOT_EQUALS,
 						InfixExpression.Operator.PLUS,

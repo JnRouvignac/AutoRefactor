@@ -603,11 +603,11 @@ public class ASTNodeFactory {
 	 */
 	public VariableDeclarationExpression declareExpression(final Type type, final SimpleName varName, final Expression initializer) {
 		VariableDeclarationFragment fragment= declareFragment(varName, initializer);
-		VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
-		final VariableDeclarationExpression node= vde;
+		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
+		final VariableDeclarationExpression node= variableDeclarationExpression;
 		((List<IExtendedModifier>) node.modifiers()).add(final0());
-		vde.setType(type);
-		return vde;
+		variableDeclarationExpression.setType(type);
+		return variableDeclarationExpression;
 	}
 
 	/**
@@ -618,9 +618,9 @@ public class ASTNodeFactory {
 	 * @return a new variable declaration expression
 	 */
 	public VariableDeclarationExpression declareExpression(final Type type, final VariableDeclarationFragment fragment) {
-		VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
-		vde.setType(type);
-		return vde;
+		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
+		variableDeclarationExpression.setType(type);
+		return variableDeclarationExpression;
 	}
 
 	/**
@@ -792,16 +792,16 @@ public class ASTNodeFactory {
 					+ "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
 		}
 		Iterator<? extends Expression> it= allOperands.iterator();
-		InfixExpression ie= ast.newInfixExpression();
-		ie.setLeftOperand(it.next());
-		ie.setOperator(operator);
-		ie.setRightOperand(it.next());
+		InfixExpression infixExpression= ast.newInfixExpression();
+		infixExpression.setLeftOperand(it.next());
+		infixExpression.setOperator(operator);
+		infixExpression.setRightOperand(it.next());
 		while (it.hasNext()) {
-			final InfixExpression node= ie;
+			final InfixExpression node= infixExpression;
 			((List<Expression>) node.extendedOperands()).add(it.next());
 		}
 
-		return ie;
+		return infixExpression;
 	}
 
 	/**
@@ -833,13 +833,13 @@ public class ASTNodeFactory {
 	 */
 	public InfixExpression infixExpression(final Expression leftOperand, final InfixExpression.Operator operator, final Expression rightOperand,
 			final Expression... extendedOperands) {
-		InfixExpression ie= ast.newInfixExpression();
-		ie.setLeftOperand(leftOperand);
-		ie.setOperator(operator);
-		ie.setRightOperand(rightOperand);
-		final InfixExpression node= ie;
+		InfixExpression infixExpression= ast.newInfixExpression();
+		infixExpression.setLeftOperand(leftOperand);
+		infixExpression.setOperator(operator);
+		infixExpression.setRightOperand(rightOperand);
+		final InfixExpression node= infixExpression;
 		Collections.addAll(node.extendedOperands(), extendedOperands);
-		return ie;
+		return infixExpression;
 	}
 
 	/**

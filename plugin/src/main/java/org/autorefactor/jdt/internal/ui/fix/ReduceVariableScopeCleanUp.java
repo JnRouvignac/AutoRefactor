@@ -323,9 +323,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			}
 			Expression init= initializers.remove(0);
 			VariableDeclarationFragment vdf= getVariableDeclarationFragment(init, varName);
-			VariableDeclarationExpression vde= ast.getAST().newVariableDeclarationExpression(vdf);
-			vde.setType(varType);
-			initializers.add(vde);
+			VariableDeclarationExpression variableDeclarationExpression= ast.getAST().newVariableDeclarationExpression(vdf);
+			variableDeclarationExpression.setType(varType);
+			initializers.add(variableDeclarationExpression);
 			rewrite.replace(fs, newFs, null);
 			// TODO JNR
 			// if (equalNotNull(fs.getBody(), parentStatement)) {

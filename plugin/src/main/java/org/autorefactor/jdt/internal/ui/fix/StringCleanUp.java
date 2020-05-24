@@ -77,9 +77,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 			if (parent instanceof InfixExpression) {
 				// If node is in a String context, no need to call toString()
-				InfixExpression ie= (InfixExpression) parent;
-				Expression leftOp= ie.getLeftOperand();
-				Expression rightOp= ie.getRightOperand();
+				InfixExpression infixExpression= (InfixExpression) parent;
+				Expression leftOp= infixExpression.getLeftOperand();
+				Expression rightOp= infixExpression.getRightOperand();
 				boolean leftOpIsString= ASTNodes.hasType(leftOp, String.class.getCanonicalName());
 				boolean rightOpIsString= ASTNodes.hasType(rightOp, String.class.getCanonicalName());
 				MethodInvocation lmi= ASTNodes.as(leftOp, MethodInvocation.class);
@@ -110,9 +110,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
 			// If node is in a String context, no need to call toString()
-			InfixExpression ie= (InfixExpression) parent;
-			Expression lo= ie.getLeftOperand();
-			Expression ro= ie.getRightOperand();
+			InfixExpression infixExpression= (InfixExpression) parent;
+			Expression lo= infixExpression.getLeftOperand();
+			Expression ro= infixExpression.getRightOperand();
 
 			if (node.equals(lo)) {
 				if (ASTNodes.hasType(ro, String.class.getCanonicalName())) {

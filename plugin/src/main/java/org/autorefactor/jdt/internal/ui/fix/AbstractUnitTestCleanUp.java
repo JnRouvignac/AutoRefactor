@@ -350,11 +350,11 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	}
 
 	private boolean maybeRefactorComparison(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final InfixExpression ie, final boolean isAssertEquals, final Expression failureMessage) {
-		Pair<Expression, Expression> actualAndExpected= getActualAndExpected(ie.getLeftOperand(),
-				ie.getRightOperand());
+			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final InfixExpression infixExpression, final boolean isAssertEquals, final Expression failureMessage) {
+		Pair<Expression, Expression> actualAndExpected= getActualAndExpected(infixExpression.getLeftOperand(),
+				infixExpression.getRightOperand());
 
-		if (isComparingObjects(ie) && !ASTNodes.is(ie.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(ie.getRightOperand(), NullLiteral.class)) {
+		if (isComparingObjects(infixExpression) && !ASTNodes.is(infixExpression.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(infixExpression.getRightOperand(), NullLiteral.class)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
@@ -454,8 +454,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		return "assert" + (isPositive ? "" : "Not") + assertType; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
-	private boolean isComparingObjects(final InfixExpression ie) {
-		return !ASTNodes.isPrimitive(ie.getLeftOperand()) || !ASTNodes.isPrimitive(ie.getRightOperand());
+	private boolean isComparingObjects(final InfixExpression infixExpression) {
+		return !ASTNodes.isPrimitive(infixExpression.getLeftOperand()) || !ASTNodes.isPrimitive(infixExpression.getRightOperand());
 	}
 
 	private ASTNode invokeMethodOrStatement(final ASTNode nodeToReplace, final MethodInvocation newMethod) {

@@ -331,9 +331,9 @@ public class CFGBuilder {
 			return mightThrow;
 
 		case ASTNode.INFIX_EXPRESSION:
-			InfixExpression ie= (InfixExpression) node;
-			boolean ieMightThrow1= addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
-			boolean ieMightThrow2= addVariableAccess(basicBlock, ie.getRightOperand(), flags, throwers);
+			InfixExpression infixExpression= (InfixExpression) node;
+			boolean ieMightThrow1= addVariableAccess(basicBlock, infixExpression.getLeftOperand(), flags, throwers);
+			boolean ieMightThrow2= addVariableAccess(basicBlock, infixExpression.getRightOperand(), flags, throwers);
 			return ieMightThrow1 || ieMightThrow2;
 
 		case ASTNode.INSTANCEOF_EXPRESSION:
@@ -464,9 +464,9 @@ public class CFGBuilder {
 		return addVariableAccess(basicBlock, vdf.getInitializer(), VariableAccess.READ, throwers);
 	}
 
-	private boolean addDeclarations(final CFGBasicBlock basicBlock, final VariableDeclarationExpression vde,
+	private boolean addDeclarations(final CFGBasicBlock basicBlock, final VariableDeclarationExpression variableDeclarationExpression,
 			final ThrowerBlocks throwers) {
-		return addDeclarations(basicBlock, vde.fragments(), vde.getType(), throwers);
+		return addDeclarations(basicBlock, variableDeclarationExpression.fragments(), variableDeclarationExpression.getType(), throwers);
 	}
 
 	private void addDeclarations(final CFGBasicBlock basicBlock, final List<SingleVariableDeclaration> varDecls) {

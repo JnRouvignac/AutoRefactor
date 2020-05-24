@@ -306,8 +306,8 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 		InfixExpression.Operator childOp= node.getOperator();
 
 		if (node.getParent() instanceof InfixExpression) {
-			InfixExpression ie= (InfixExpression) node.getParent();
-			return shouldHaveParentheses(childOp, ie.getOperator());
+			InfixExpression infixExpression= (InfixExpression) node.getParent();
+			return shouldHaveParentheses(childOp, infixExpression.getOperator());
 		}
 
 		return false;

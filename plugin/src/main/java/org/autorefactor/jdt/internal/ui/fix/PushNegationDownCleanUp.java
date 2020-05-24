@@ -82,13 +82,13 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 				return ASTNodes.createMoveTarget(rewrite, pe.getOperand());
 			}
 		} else if (operand instanceof InfixExpression) {
-			InfixExpression ie= (InfixExpression) operand;
-			InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+			InfixExpression infixExpression= (InfixExpression) operand;
+			InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(infixExpression).getReverseBooleanOperator();
 
 			if (reverseOp != null) {
-				List<Expression> allOperands= new ArrayList<>(ASTNodes.allOperands(ie));
+				List<Expression> allOperands= new ArrayList<>(ASTNodes.allOperands(infixExpression));
 
-				if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+				if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
 					for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
 						Expression anOperand= it.next();
 						Expression oppositeOperand= getOppositeExpression(anOperand);

@@ -366,12 +366,12 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		return isOrOperator ? InfixExpression.Operator.CONDITIONAL_OR : InfixExpression.Operator.CONDITIONAL_AND;
 	}
 
-	private Expression signExpression(final Expression ie, final boolean isPositive) {
+	private Expression signExpression(final Expression infixExpression, final boolean isPositive) {
 		if (isPositive) {
-			return ie;
+			return infixExpression;
 		}
 
-		return ast.negate(ie, Copy.NONE);
+		return ast.negate(infixExpression, Copy.NONE);
 	}
 
 	@SuppressWarnings("unchecked")

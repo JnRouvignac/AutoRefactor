@@ -119,44 +119,44 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		case ASTNode.INFIX_EXPRESSION:
 			if (!isPrimitiveTypeNarrowing(node)) {
-				InfixExpression ie= (InfixExpression) parent;
-				Expression lo= ie.getLeftOperand();
-				Expression ro= ie.getRightOperand();
+				InfixExpression infixExpression= (InfixExpression) parent;
+				Expression lo= infixExpression.getLeftOperand();
+				Expression ro= infixExpression.getRightOperand();
 
 				if (node.equals(lo)) {
-					return (isStringConcat(ie) || isAssignmentCompatible(ro, node.getExpression()))
-							&& !ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
+					return (isStringConcat(infixExpression) || isAssignmentCompatible(ro, node.getExpression()))
+							&& !ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
 				}
 
-				return (isNotRefactored(lo) && isStringConcat(ie)
-						|| (isIntegralDivision(ie) ? canRemoveCastInIntegralDivision(node, ie)
-								: isAssignmentCompatibleInInfixExpression(node, ie)))
-						&& !isIntegralDividedByFloatingPoint(node, ie);
+				return (isNotRefactored(lo) && isStringConcat(infixExpression)
+						|| (isIntegralDivision(infixExpression) ? canRemoveCastInIntegralDivision(node, infixExpression)
+								: isAssignmentCompatibleInInfixExpression(node, infixExpression)))
+						&& !isIntegralDividedByFloatingPoint(node, infixExpression);
 			}
 		}
 
 		return false;
 	}
 
-	private boolean canRemoveCastInIntegralDivision(final CastExpression node, final InfixExpression ie) {
-		ITypeBinding leftOperandType= getLeftOperandType(ie, node);
-		return isIntegralDivision(ie) // safety check
+	private boolean canRemoveCastInIntegralDivision(final CastExpression node, final InfixExpression infixExpression) {
+		ITypeBinding leftOperandType= getLeftOperandType(infixExpression, node);
+		return isIntegralDivision(infixExpression) // safety check
 				&& isAssignmentCompatible(leftOperandType, node.getExpression().resolveTypeBinding())
 				&& compareTo(node.resolveTypeBinding(), leftOperandType) >= 0;
 	}
 
-	private boolean isIntegralDivision(final InfixExpression ie) {
-		return isIntegralType(ie) && ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE);
+	private boolean isIntegralDivision(final InfixExpression infixExpression) {
+		return isIntegralType(infixExpression) && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE);
 	}
 
-	private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression ie) {
-		ITypeBinding leftOpType= getLeftOperandType(ie, node);
+	private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression infixExpression) {
+		ITypeBinding leftOpType= getLeftOperandType(infixExpression, node);
 		return isAssignmentCompatible(leftOpType, node.getExpression().resolveTypeBinding())
 				&& isAssignmentCompatible(leftOpType, node.resolveTypeBinding());
 	}
 
-	private ITypeBinding getLeftOperandType(final InfixExpression ie, final CastExpression node) {
-		List<Expression> operands= ASTNodes.allOperands(ie);
+	private ITypeBinding getLeftOperandType(final InfixExpression infixExpression, final CastExpression node) {
+		List<Expression> operands= ASTNodes.allOperands(infixExpression);
 		List<Expression> previousOperands= operands.subList(0, operands.indexOf(node));
 		if (isAnyRefactored(previousOperands)) {
 			return null;
@@ -227,9 +227,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		return preVisit2(leftOperand);
 	}
 
-	private boolean isIntegralDividedByFloatingPoint(final CastExpression node, final InfixExpression ie) {
-		Expression rightOp= ie.getRightOperand();
-		return isIntegralType(ie.getLeftOperand()) && ASTNodes.hasOperator(ie, InfixExpression.Operator.DIVIDE) && isFloatingPointType(rightOp)
+	private boolean isIntegralDividedByFloatingPoint(final CastExpression node, final InfixExpression infixExpression) {
+		Expression rightOp= infixExpression.getRightOperand();
+		return isIntegralType(infixExpression.getLeftOperand()) && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE) && isFloatingPointType(rightOp)
 				&& node.equals(rightOp);
 	}
 
@@ -255,8 +255,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private boolean isStringConcat(final InfixExpression ie) {
-		return ASTNodes.hasType(ie, String.class.getCanonicalName());
+	private boolean isStringConcat(final InfixExpression infixExpression) {
+		return ASTNodes.hasType(infixExpression, String.class.getCanonicalName());
 	}
 
 	private boolean isPrimitiveTypeNarrowing(final CastExpression node) {
