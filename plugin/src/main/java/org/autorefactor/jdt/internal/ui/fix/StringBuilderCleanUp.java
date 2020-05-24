@@ -120,10 +120,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					List<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
 					ClassInstanceCreation classCreation= ASTNodes.as(readAppendMethod(initializer, allAppendedStrings,
 							new AtomicBoolean(false), new AtomicBoolean(false)), ClassInstanceCreation.class);
+					final ClassInstanceCreation node1= classCreation;
+					final ClassInstanceCreation node2= classCreation;
+					final ClassInstanceCreation node3= classCreation;
 
 					if (classCreation != null
 							&& (classCreation.arguments().isEmpty()
-									|| ASTNodes.arguments(classCreation).size() == 1 && (ASTNodes.hasType(ASTNodes.arguments(classCreation).get(0), String.class.getCanonicalName()) || ASTNodes.instanceOf(ASTNodes.arguments(classCreation).get(0), CharSequence.class.getCanonicalName())))) {
+									|| ((List<Expression>) node1.arguments()).size() == 1 && (ASTNodes.hasType(((List<Expression>) node2.arguments()).get(0), String.class.getCanonicalName()) || ASTNodes.instanceOf(((List<Expression>) node3.arguments()).get(0), CharSequence.class.getCanonicalName())))) {
 						return maybeReplaceWithString(node, type, builderClass, fragment, initializer,
 								allAppendedStrings);
 					}
@@ -286,10 +289,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final MethodInvocation node) {
 		if (node.getExpression() != null && "append".equals(node.getName().getIdentifier()) //$NON-NLS-1$
-				&& ASTNodes.arguments(node).size() == 1
+				&& ((List<Expression>) node.arguments()).size() == 1
 				// Most expensive check comes last
 				&& ASTNodes.hasType(node.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())) {
-			MethodInvocation embeddedMI= ASTNodes.as(ASTNodes.arguments(node).get(0), MethodInvocation.class);
+			MethodInvocation embeddedMI= ASTNodes.as(((List<Expression>) node.arguments()).get(0), MethodInvocation.class);
 
 			if (ASTNodes.usesGivenSignature(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
@@ -318,9 +321,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final ClassInstanceCreation node) {
-		if (ASTNodes.arguments(node).size() == 1
+		if (((List<Expression>) node.arguments()).size() == 1
 				&& ASTNodes.hasType(node, StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())) {
-			Expression arg0= ASTNodes.arguments(node).get(0);
+			Expression arg0= ((List<Expression>) node.arguments()).get(0);
 
 			if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
 					&& (arg0 instanceof InfixExpression || arg0 instanceof MethodInvocation
@@ -370,30 +373,37 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		if (ASTNodes.hasType(exp, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())) {
 			if (exp instanceof MethodInvocation) {
 				MethodInvocation mi= (MethodInvocation) exp;
+				final MethodInvocation node= mi;
 
-				if ("append".equals(mi.getName().getIdentifier()) && ASTNodes.arguments(mi).size() == 1) { //$NON-NLS-1$
-					Expression arg0= ASTNodes.arguments(mi).get(0);
+				if ("append".equals(mi.getName().getIdentifier()) && ((List<Expression>) node.arguments()).size() == 1) { //$NON-NLS-1$
+					final MethodInvocation node1= mi;
+					Expression arg0= ((List<Expression>) node1.arguments()).get(0);
 					readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
 							isInstanceCreationToRewrite);
 				}
 			} else if (exp instanceof ClassInstanceCreation) {
 				ClassInstanceCreation cic= (ClassInstanceCreation) exp;
+				final ClassInstanceCreation node= cic;
 
-				if (ASTNodes.arguments(cic).size() == 1) {
-					Expression arg0= ASTNodes.arguments(cic).get(0);
+				if (((List<Expression>) node.arguments()).size() == 1) {
+					final ClassInstanceCreation node1= cic;
+					Expression arg0= ((List<Expression>) node1.arguments()).get(0);
 
 					if (ASTNodes.hasType(cic, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 							&& (ASTNodes.hasType(arg0, String.class.getCanonicalName()) || ASTNodes.instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
 						isInstanceCreationToRewrite.set(true);
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					}
-				} else if (ASTNodes.arguments(cic).isEmpty() && !allOperands.isEmpty()
-						&& (allOperands.get(0).getFirst() != null
-								? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
-								: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
-					isInstanceCreationToRewrite.set(true);
-					isRefactoringNeeded.set(true);
+				} else {
+					final ClassInstanceCreation node1= cic;
+					if (((List<Expression>) node1.arguments()).isEmpty() && !allOperands.isEmpty()
+							&& (allOperands.get(0).getFirst() != null
+									? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
+									: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
+						isInstanceCreationToRewrite.set(true);
+						isRefactoringNeeded.set(true);
+					}
 				}
 
 				return cic;
@@ -411,7 +421,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		if (infixExpression != null && isStringConcat(infixExpression)) {
 			if (infixExpression.hasExtendedOperands()) {
-				List<Expression> reversed= new ArrayList<>(ASTNodes.extendedOperands(infixExpression));
+				final InfixExpression node= infixExpression;
+				List<Expression> reversed= new ArrayList<>((List<Expression>) node.extendedOperands());
 				Collections.reverse(reversed);
 
 				if (isValuedStringLiteralOrConstant(reversed.get(0)) && !results.isEmpty()
@@ -455,7 +466,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		for (Expression expression : ASTNodes.extendedOperands(node)) {
+		for (Expression expression : (List<Expression>) node.extendedOperands()) {
 			if (!isValuedStringLiteralOrConstant(expression)) {
 				return true;
 			}
@@ -532,7 +543,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			return null;
 		}
 
-		Expression argument= ASTNodes.arguments(mi).get(0);
+		Expression argument= ((List<Expression>) mi.arguments()).get(0);
 
 		if (ASTNodes.hasType(argument, expectedType.getParameterTypes()[0].getQualifiedName(),
 				Bindings.getBoxedTypeBinding(expectedType.getParameterTypes()[0], mi.getAST()).getQualifiedName())) {
@@ -653,7 +664,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		Expression lastExpression= ASTNodes.createMoveTarget(rewrite, node.getExpression());
 		Expression stringVar= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(embeddedMI.getExpression()));
-		List<Expression> args= ASTNodes.arguments(embeddedMI);
+		List<Expression> args= (List<Expression>) embeddedMI.arguments();
 		Expression arg0= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(args.get(0)));
 		Expression arg1= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(args.get(1)));
 		MethodInvocation newAppendSubstring= null;

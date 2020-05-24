@@ -291,7 +291,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		Name varName= varAccess.getVariableName();
 		Type varType= getType(varDecl.getVariableName().getParent());
 		if (scope instanceof Block) {
-			List<Statement> statements= ASTNodes.statements((Block) scope);
+			List<Statement> statements= (List<Statement>) ((Block) scope).statements();
 			for (Statement statement : statements) {
 				Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
 				Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
@@ -316,7 +316,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		} else if (scope instanceof ForStatement) {
 			ForStatement fs= (ForStatement) scope;
 			ForStatement newFs= ast.createCopyTarget(fs);
-			List<Expression> initializers= ASTNodes.initializers(newFs);
+			final ForStatement node= newFs;
+			List<Expression> initializers= (List<Expression>) node.initializers();
 			if (initializers.size() != 1) {
 				throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
 			}
@@ -372,7 +373,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				throw new NotImplementedException(stmtToCopy);
 			}
 			VariableDeclarationFragment vdf= getVariableDeclarationFragment(a, varName);
-			ASTNodes.statements(block).add(cuRewrite.getAST().newVariableDeclarationStatement(vdf));
+			final Block node= block;
+			((List<Statement>) node.statements()).add(cuRewrite.getAST().newVariableDeclarationStatement(vdf));
 			return block;
 		}
 		// We should never come here if we had a Block statement, see the replace()

@@ -50,6 +50,7 @@ import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -123,8 +124,10 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
 		ParameterizedType parameterizedType= ast.getAST().newParameterizedType(ast.createCopyTarget(origType));
-		ASTNodes.typeArguments(parameterizedType).clear();
-		ASTNodes.typeArguments(parameterizedType).add(ast.toType(elementType, typeNameDecider));
+		final ParameterizedType node= parameterizedType;
+		((List<Type>) node.typeArguments()).clear();
+		final ParameterizedType node1= parameterizedType;
+		((List<Type>) node1.typeArguments()).add(ast.toType(elementType, typeNameDecider));
 		return parameterizedType;
 	}
 
@@ -139,7 +142,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
 		if (parameterTypes.length > 0 && ASTNodes.hasType(parameterTypes[0], Collection.class.getCanonicalName())) {
-			ITypeBinding actualParameter= ASTNodes.arguments(instanceCreation).get(0).resolveTypeBinding();
+			ITypeBinding actualParameter= ((List<Expression>) instanceCreation.arguments()).get(0).resolveTypeBinding();
 
 			if (isParameterizedTypeWithOneArgument(actualParameter)) {
 				return resolveTypeCompatible(actualParameter.getTypeArguments()[0]);
@@ -197,24 +200,24 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "search", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			ITypeBinding newElementType= ASTNodes.arguments(mi).get(0).resolveTypeBinding();
+			ITypeBinding newElementType= ((List<Expression>) mi.arguments()).get(0).resolveTypeBinding();
 			return resolveTypeCompatible(newElementType);
 		}
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "set", int.class.getSimpleName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatible(ASTNodes.arguments(mi).get(1).resolveTypeBinding());
+			return resolveTypeCompatible(((List<Expression>) mi.arguments()).get(1).resolveTypeBinding());
 		}
 		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", Object[].class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-			ITypeBinding newElementType= ASTNodes.arguments(mi).get(0).resolveTypeBinding().getElementType();
+			ITypeBinding newElementType= ((List<Expression>) mi.arguments()).get(0).resolveTypeBinding().getElementType();
 			return resolveTypeCompatible(newElementType);
 		}
 		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatibleIfPossible(ASTNodes.arguments(mi).get(0).resolveTypeBinding());
+			return resolveTypeCompatibleIfPossible(((List<Expression>) mi.arguments()).get(0).resolveTypeBinding());
 		}
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatibleIfPossible(ASTNodes.arguments(mi).get(1).resolveTypeBinding());
+			return resolveTypeCompatibleIfPossible(((List<Expression>) mi.arguments()).get(1).resolveTypeBinding());
 		}
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "element") //$NON-NLS-1$ //$NON-NLS-2$

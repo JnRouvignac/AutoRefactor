@@ -58,7 +58,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 	@Override
 	public boolean visit(final InfixExpression node) {
 		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-			List<Expression> operands= ASTNodes.getAllOperands(node);
+			List<Expression> operands= ASTNodes.allOperands(node);
 
 			for (int i= 1; i < operands.size(); i++) {
 				List<Expression> previousOperands= operands.subList(0, i - 1);

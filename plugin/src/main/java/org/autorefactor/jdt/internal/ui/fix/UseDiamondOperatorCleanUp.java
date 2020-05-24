@@ -68,7 +68,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 				&& node.getAnonymousClassDeclaration() == null
 				&& ASTNodes.getTargetType(node) != null
 				&& canUseDiamondOperator(node, type)) {
-			List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
+			List<Type> typeArguments= (List<Type>) ((ParameterizedType) type).typeArguments();
 
 			if (!typeArguments.isEmpty()) {
 				cuRewrite.getASTRewrite().remove(typeArguments, null);
@@ -84,7 +84,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 	 * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
 	 */
 	private boolean canUseDiamondOperator(final ClassInstanceCreation node, final Type type) {
-		List<Expression> args= ASTNodes.arguments(node);
+		List<Expression> args= (List<Expression>) node.arguments();
 		if (args.isEmpty()) {
 			return true;
 		}

@@ -238,7 +238,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 
 			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND,
 							InfixExpression.Operator.AND)) {
-				for (Expression operand : ASTNodes.getAllOperands(infixExpression)) {
+				for (Expression operand : ASTNodes.allOperands(infixExpression)) {
 					final Object hasAlwaysValue= peremptoryValue(node, operand);
 
 					if (!Boolean.TRUE.equals(hasAlwaysValue)) {
@@ -251,7 +251,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 
 			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR,
 							InfixExpression.Operator.OR)) {
-				for (Expression operand : ASTNodes.getAllOperands(infixExpression)) {
+				for (Expression operand : ASTNodes.allOperands(infixExpression)) {
 					final Object hasAlwaysValue= peremptoryValue(node, operand);
 
 					if (!Boolean.FALSE.equals(hasAlwaysValue)) {

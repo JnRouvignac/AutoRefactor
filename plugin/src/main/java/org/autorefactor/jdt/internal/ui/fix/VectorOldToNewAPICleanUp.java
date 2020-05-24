@@ -94,7 +94,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		List<Expression> args= ASTNodes.arguments(node);
+		List<Expression> args= (List<Expression>) node.arguments();
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
 
@@ -108,7 +108,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		List<Expression> args= ASTNodes.arguments(node);
+		List<Expression> args= (List<Expression>) node.arguments();
 		assertSize(args, 2);
 		Expression arg1= args.get(1);
 

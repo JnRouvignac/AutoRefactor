@@ -53,7 +53,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final InfixExpression node) {
 		if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
-			List<Expression> allOperands= ASTNodes.getAllOperands(node);
+			List<Expression> allOperands= ASTNodes.allOperands(node);
 			boolean isFirst= true;
 
 			for (Expression expression : allOperands) {

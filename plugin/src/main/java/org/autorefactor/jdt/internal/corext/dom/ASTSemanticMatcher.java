@@ -785,7 +785,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 	}
 
 	private List<Expression> getConsistentOperands(final InfixExpression ie) {
-		List<Expression> operands= ASTNodes.getAllOperands(ie);
+		List<Expression> operands= ASTNodes.allOperands(ie);
 
 		for (Iterator<Expression> iterator= operands.iterator(); iterator.hasNext() && operands.size() > 1;) {
 			Expression operand= iterator.next();

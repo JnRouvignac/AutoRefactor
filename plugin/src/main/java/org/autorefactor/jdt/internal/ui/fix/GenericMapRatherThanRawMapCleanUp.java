@@ -142,7 +142,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 		TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
 		ParameterizedType parameterizedType= ast.getAST().newParameterizedType(ast.createCopyTarget(origType));
-		List<Type> typeArgs= ASTNodes.typeArguments(parameterizedType);
+		final ParameterizedType node= parameterizedType;
+		List<Type> typeArgs= (List<Type>) node.typeArguments();
 		typeArgs.clear();
 		typeArgs.add(ast.toType(keyType, typeNameDecider));
 		typeArgs.add(ast.toType(valueType, typeNameDecider));
@@ -162,7 +163,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 		ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
 		if (parameterTypes.length > 0 && ASTNodes.hasType(parameterTypes[0], Map.class.getCanonicalName())) {
-			ITypeBinding actualParameter= ASTNodes.arguments(instanceCreation).get(0).resolveTypeBinding();
+			ITypeBinding actualParameter= ((List<Expression>) instanceCreation.arguments()).get(0).resolveTypeBinding();
 
 			if (isParameterizedTypeWithNbArguments(actualParameter, 2)) {
 				ITypeBinding newKeyType= actualParameter.getTypeArguments()[0];
@@ -181,7 +182,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 			return false;
 		}
 
-		List<Expression> arguments= ASTNodes.arguments(mi);
+		List<Expression> arguments= (List<Expression>) mi.arguments();
 		if (ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$

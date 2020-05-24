@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -65,7 +67,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		}
 
 		boolean visitSubtree= true;
-		for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
+		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
 			Expression initializer= vdf.getInitializer();
 			if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
 					|| (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)

@@ -25,10 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -70,7 +73,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 			ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 
 			ITypeBinding actualResultType= ASTNodes.getTargetType(node);
-			ITypeBinding actualParameterType= ASTNodes.arguments(node).get(0).resolveTypeBinding();
+			ITypeBinding actualParameterType= ((List<Expression>) node.arguments()).get(0).resolveTypeBinding();
 
 			if (actualResultType != null
 					&& (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass))
@@ -92,9 +95,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 		if (primitiveType != null && !primitiveType.equals(actualParameterType)
 				&& !primitiveType.equals(actualResultType)
 				&& (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-			rewrite.replace(node, ast.cast(ast.type(primitiveType.getName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0))), null);
+			rewrite.replace(node, ast.cast(ast.type(primitiveType.getName()), ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0))), null);
 		} else {
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, ASTNodes.arguments(node).get(0)), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0)), null);
 		}
 	}
 }

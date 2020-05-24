@@ -64,7 +64,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 			boolean isPackageClass= true;
 			boolean isPrivateClass= false;
 
-			for (IExtendedModifier extendedModifier : ASTNodes.modifiers(node)) {
+			for (IExtendedModifier extendedModifier : (List<IExtendedModifier>) node.modifiers()) {
 				if (extendedModifier.isModifier()) {
 					Modifier modifier= (Modifier) extendedModifier;
 					if (modifier.isPublic()) {
@@ -122,7 +122,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 	}
 
 	private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
-		List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
+		List<Statement> statements= (List<Statement>) uniqueConstructor.getBody().statements();
 
 		if (Utils.isEmpty(statements)) {
 			return true;

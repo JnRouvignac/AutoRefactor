@@ -95,7 +95,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		Type keyType= types[0];
 		Type valueType= types[1];
-		List<Expression> arguments= ASTNodes.arguments(cic);
+		List<Expression> arguments= (List<Expression>) cic.arguments();
 
 		if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
 				&& !ASTNodes.hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {

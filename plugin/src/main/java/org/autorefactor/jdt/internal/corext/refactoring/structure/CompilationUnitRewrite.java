@@ -29,7 +29,6 @@ import org.autorefactor.environment.Environment;
 import org.autorefactor.environment.Logger;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.UnhandledException;
@@ -148,10 +147,13 @@ public class CompilationUnitRewrite {
 	 * @return True if it is in comment
 	 */
 	public boolean isInComment(final int position) {
-		for (Comment comment : ASTNodes.getCommentList(astRoot)) {
+		for (Object object : astRoot.getCommentList()) {
+			Comment comment= (Comment) object;
+
 			if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
 				return true;
 			}
+
 			if (position < comment.getStartPosition()) {
 				// Since comment list is "arranged in order of increasing source position"
 				// it is impossible for this position to be surrounded by a comment

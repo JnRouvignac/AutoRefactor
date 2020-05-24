@@ -100,7 +100,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (node.getBody() instanceof ClassInstanceCreation) {
 			ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
-			List<Expression> arguments= ASTNodes.arguments(ci);
+			final ClassInstanceCreation node1= ci;
+			List<Expression> arguments= (List<Expression>) node1.arguments();
 
 			if (ci.resolveTypeBinding() != null
 					&& ci.getAnonymousClassDeclaration() == null
@@ -111,7 +112,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (node.getBody() instanceof SuperMethodInvocation) {
 			SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
-			List<Expression> arguments= ASTNodes.arguments(smi);
+			final SuperMethodInvocation node1= smi;
+			List<Expression> arguments= (List<Expression>) node1.arguments();
 
 			if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
 				replaceBySuperMethodReference(node, smi);
@@ -121,7 +123,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			MethodInvocation mi= (MethodInvocation) node.getBody();
 			Expression calledExpression= mi.getExpression();
 			ITypeBinding calledType= ASTNodes.getCalledType(mi);
-			List<Expression> arguments= ASTNodes.arguments(mi);
+			final MethodInvocation node1= mi;
+			List<Expression> arguments= (List<Expression>) node1.arguments();
 
 			if (node.parameters().size() == arguments.size()) {
 				if (!areSameIdentifiers(node, arguments)) {

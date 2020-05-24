@@ -171,8 +171,8 @@ public final class ForLoops {
 	 *         container, null otherwise
 	 */
 	public static ForLoopContent iterateOverContainer(final ForStatement node) {
-		List<Expression> initializers= ASTNodes.initializers(node);
-		List<Expression> updaters= ASTNodes.updaters(node);
+		List<Expression> initializers= (List<Expression>) node.initializers();
+		List<Expression> updaters= (List<Expression>) node.updaters();
 
 		if (initializers.size() == 1 && updaters.size() <= 1) {
 			Expression firstInit= initializers.get(0);

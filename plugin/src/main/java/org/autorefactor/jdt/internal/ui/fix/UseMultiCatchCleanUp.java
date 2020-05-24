@@ -202,8 +202,9 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			}
 
 			VariableDeclarationStatement node2= (VariableDeclarationStatement) other;
-			List<VariableDeclarationFragment> fragments1= ASTNodes.fragments(node);
-			List<VariableDeclarationFragment> fragments2= ASTNodes.fragments(node2);
+			List<VariableDeclarationFragment> fragments1= (List<VariableDeclarationFragment>) node.fragments();
+			final VariableDeclarationStatement node1= node2;
+			List<VariableDeclarationFragment> fragments2= (List<VariableDeclarationFragment>) node1.fragments();
 			if (fragments1.size() == fragments2.size()) {
 				Iterator<VariableDeclarationFragment> it1= fragments1.iterator();
 				Iterator<VariableDeclarationFragment> it2= fragments2.iterator();
@@ -296,7 +297,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		List<CatchClause> catchClauses= ASTNodes.catchClauses(node);
+		List<CatchClause> catchClauses= (List<CatchClause>) node.catchClauses();
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
 		for (int i= 0; i < catchClauses.size(); i++) {
 			CatchClause catchClause1= catchClauses.get(i);
@@ -342,7 +343,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			return new SingleBinding(type.resolveBinding());
 
 		case ASTNode.UNION_TYPE:
-			List<Type> types= ASTNodes.types((UnionType) type);
+			List<Type> types= (List<Type>) ((UnionType) type).types();
 			ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
 			for (int j= 0; j < types.size(); j++) {
 				typeBindings[j]= types.get(j).resolveBinding();
@@ -403,7 +404,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		UnionType result= cuRewrite.getAST().newUnionType();
-		List<Type> unionedTypes= ASTNodes.types(result);
+		final UnionType node= result;
+		List<Type> unionedTypes= (List<Type>) node.types();
 		unionedTypes.addAll(rewrite.createMoveTarget(allTypes));
 		return result;
 	}
@@ -412,7 +414,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		for (Type type : types) {
 			if (type instanceof UnionType) {
 				UnionType ut= (UnionType) type;
-				collectAllUnionedTypes(results, ASTNodes.types(ut));
+				final UnionType node= ut;
+				collectAllUnionedTypes(results, node.types());
 			} else {
 				results.add(type);
 			}

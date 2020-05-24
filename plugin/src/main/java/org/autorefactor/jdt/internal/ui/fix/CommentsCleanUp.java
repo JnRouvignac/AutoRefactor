@@ -231,7 +231,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 			return false;
 		}
 
-		if (allTagsEmpty(ASTNodes.tags(node))) {
+		if (allTagsEmpty(node.tags())) {
 			rewrite.remove(node, null);
 			return false;
 		}
@@ -288,7 +288,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private boolean hasOverrideAnnotation(final ASTNode node) {
 		if (node instanceof BodyDeclaration) {
-			for (IExtendedModifier modifier : ASTNodes.modifiers((BodyDeclaration) node)) {
+			for (IExtendedModifier modifier : (List<IExtendedModifier>) ((BodyDeclaration) node).modifiers()) {
 				return ASTNodes.hasType(getTypeName(modifier), Override.class.getCanonicalName());
 			}
 		}
@@ -308,7 +308,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean hasNoTags(final Javadoc node) {
-		for (TagElement tag : ASTNodes.tags(node)) {
+		for (TagElement tag : (List<TagElement>) node.tags()) {
 			if (tag.getTagName() != null) {
 				return false;
 			}
@@ -340,7 +340,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		}
 		Matcher matcher= JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
 		if (matcher.matches()) {
-			List<TagElement> tagElements= ASTNodes.tags(node);
+			List<TagElement> tagElements= (List<TagElement>) node.tags();
 			if (tagElements.size() >= 2) {
 				TagElement firstLine= tagElements.get(0);
 				int relativeStart= firstLine.getStartPosition() - node.getStartPosition();
@@ -566,11 +566,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		comments.clear();
 
 		this.astRoot= node;
-		for (Comment comment : ASTNodes.getCommentList(astRoot)) {
+		final CompilationUnit node1= astRoot;
+		for (Comment comment : (List<Comment>) node1.getCommentList()) {
 			comments.add(Pair.of(new SourceLocation(comment), comment));
 		}
+		final CompilationUnit node2= astRoot;
 
-		for (Comment comment : ASTNodes.getCommentList(astRoot)) {
+		for (Comment comment : (List<Comment>) node2.getCommentList()) {
 			if (comment.isBlockComment()) {
 				BlockComment bc= (BlockComment) comment;
 				bc.accept(this);

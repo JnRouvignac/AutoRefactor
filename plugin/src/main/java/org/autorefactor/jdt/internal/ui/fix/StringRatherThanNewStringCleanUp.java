@@ -26,6 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -53,8 +55,8 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final ClassInstanceCreation node) {
-		if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
-			Expression arg0= ASTNodes.arguments(node).get(0);
+		if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ((List<Expression>) node.arguments()).size() == 1) {
+			Expression arg0= ((List<Expression>) node.arguments()).get(0);
 			if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
 					&& (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();

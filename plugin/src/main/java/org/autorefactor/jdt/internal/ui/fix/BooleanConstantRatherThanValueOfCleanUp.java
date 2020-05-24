@@ -54,7 +54,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 	public boolean visit(final MethodInvocation node) {
 		if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-			BooleanLiteral literal= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
+			BooleanLiteral literal= ASTNodes.as(node.arguments(), BooleanLiteral.class);
 
 			if (literal != null) {
 				useConstant(node, literal);

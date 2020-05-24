@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.corext.dom;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -152,7 +153,7 @@ public class TypeNameDecider {
 
 	private static TreeSet<String> getImportedTypes(final CompilationUnit cu) {
 		TreeSet<String> results= new TreeSet<>();
-		for (ImportDeclaration importDecl : ASTNodes.imports(cu)) {
+		for (ImportDeclaration importDecl : (List<ImportDeclaration>) cu.imports()) {
 			Name importName= importDecl.getName();
 			results.add(importName.getFullyQualifiedName());
 		}

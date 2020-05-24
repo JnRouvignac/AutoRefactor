@@ -190,7 +190,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-			rewrite.replace(sourceNode, ast.copyRange(ASTNodes.statements((Block) unconditionnalStatement)), null);
+			rewrite.replace(sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), null);
 		} else {
 			rewrite.replace(sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), null);
 		}

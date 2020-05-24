@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -64,7 +66,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
 			Expression expression= node.getExpression();
-			Expression arg0= ASTNodes.arguments(node).get(0);
+			Expression arg0= ((List<Expression>) node.arguments()).get(0);
 
 			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
 				invertEqualsInvocation(node, expression, arg0);

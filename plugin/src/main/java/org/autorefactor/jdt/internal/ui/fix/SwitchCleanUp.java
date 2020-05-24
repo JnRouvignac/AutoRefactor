@@ -380,7 +380,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		List<Statement> switchStatements= ASTNodes.statements(switchStatement);
+		List<Statement> switchStatements= (List<Statement>) switchStatement.statements();
 
 		// Add the case statement(s)
 		if (caseValuesOrNullForDefault != null) {
@@ -426,7 +426,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private Variable extractVariableAndValuesFromInfixExpression(final InfixExpression infixExpression) {
 		if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
-			List<Expression> operands= ASTNodes.getAllOperands(infixExpression);
+			List<Expression> operands= ASTNodes.allOperands(infixExpression);
 			Variable mergedVariable= null;
 
 			for (Expression operand : operands) {
@@ -506,7 +506,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		List<SwitchCaseSection> switchStructure= new ArrayList<>();
 
 		SwitchCaseSection currentCase= new SwitchCaseSection();
-		for (Statement statement : ASTNodes.statements(node)) {
+		for (Statement statement : (List<Statement>) node.statements()) {
 			if (statement instanceof SwitchCase) {
 				if (!currentCase.statements.isEmpty()) {
 					switchStructure.add(currentCase);

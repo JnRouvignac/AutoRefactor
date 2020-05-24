@@ -63,7 +63,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 	private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
 		if (ASTNodes.usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
-			List<Expression> args= ASTNodes.arguments(node);
+			List<Expression> args= (List<Expression>) node.arguments();
 
 			if (args != null && args.size() == 1) {
 				InfixExpression message= ASTNodes.as(args.get(0), InfixExpression.class);
@@ -83,7 +83,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		StringBuilder messageBuilder= new StringBuilder();
-		List<Expression> allOperands= ASTNodes.getAllOperands(message);
+		List<Expression> allOperands= ASTNodes.allOperands(message);
 		List<Expression> params= new ArrayList<>(allOperands.size());
 		boolean hasLiteral= false;
 		boolean hasObjects= false;

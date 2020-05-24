@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -37,6 +39,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
@@ -60,7 +63,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 		ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
 
 		if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
-				&& ASTNodes.typeArguments(node).isEmpty()) {
+				&& ((List<Type>) node.typeArguments()).isEmpty()) {
 			// Remove useless thisExpressions
 			cuRewrite.getASTRewrite().remove(node.getExpression(), null);
 			return false;

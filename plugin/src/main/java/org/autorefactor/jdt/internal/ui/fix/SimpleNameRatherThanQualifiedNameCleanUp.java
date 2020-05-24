@@ -523,7 +523,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		ITypeBinding typeBinding= node.resolveBinding();
 		if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
 			CompilationUnit compilationUnit= (CompilationUnit) node.getParent();
-			for (ImportDeclaration importDecl : ASTNodes.imports(compilationUnit)) {
+			final CompilationUnit node1= compilationUnit;
+			for (ImportDeclaration importDecl : (List<ImportDeclaration>) node1.imports()) {
 				readImport(importDecl);
 			}
 			importTypesFromPackage("java.lang", compilationUnit); //$NON-NLS-1$
@@ -582,7 +583,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 		@Override
 		public boolean visit(final FieldDeclaration node) {
-			for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
+			for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
 				String simpleName= vdf.getName().getIdentifier();
 				IVariableBinding variableBinding= vdf.resolveBinding();
 				if (variableBinding != null) {
@@ -655,7 +656,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	@Override
 	public boolean visit(final MethodDeclaration node) {
 		// Method parameters
-		for (SingleVariableDeclaration parameter : ASTNodes.parameters(node)) {
+		for (SingleVariableDeclaration parameter : (List<SingleVariableDeclaration>) node.parameters()) {
 			if (!maybeReplaceFqnsWithSimpleNames(parameter)) {
 				return false;
 			}
@@ -668,7 +669,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 		// Method body
 		Set<SimpleName> localIdentifiers= new HashSet<>();
-		for (SingleVariableDeclaration localParameter : ASTNodes.parameters(node)) {
+		for (SingleVariableDeclaration localParameter : (List<SingleVariableDeclaration>) node.parameters()) {
 			localIdentifiers.add(localParameter.getName());
 		}
 		localIdentifiers.addAll(ASTNodes.getLocalVariableIdentifiers(node.getBody(), true));

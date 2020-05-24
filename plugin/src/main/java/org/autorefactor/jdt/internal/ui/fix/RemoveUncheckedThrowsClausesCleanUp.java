@@ -77,7 +77,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 	 */
 	private Collection<ASTNode> getUncheckedExceptions(final MethodDeclaration node) {
 		List<ASTNode> result= new ArrayList<>();
-		for (Type n : ASTNodes.thrownExceptionTypes(node)) {
+		for (Type n : (List<Type>) node.thrownExceptionTypes()) {
 			if (isUnchecked(n)) {
 				result.add(n);
 			}

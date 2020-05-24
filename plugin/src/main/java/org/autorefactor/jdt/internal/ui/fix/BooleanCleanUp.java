@@ -375,13 +375,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		return ast.negate(ie, Copy.NONE);
 	}
 
+	@SuppressWarnings("unchecked")
 	private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement vds,
 			final Expression expression) {
 		if (vds == null) {
 			return null;
 		}
 
-		for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
+		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds.fragments()) {
 			if (ASTNodes.isSameVariable(expression, vdf)) {
 				return vdf;
 			}
@@ -494,8 +495,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		return ast.name(Boolean.class.getCanonicalName());
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean isSimpleNameAlreadyUsed(final String simpleName, final CompilationUnit cu) {
-		for (ImportDeclaration id : ASTNodes.imports(cu)) {
+		for (ImportDeclaration id : (List<ImportDeclaration>) cu.imports()) {
 			if (!(id.getName() instanceof QualifiedName)) {
 				throw new NotImplementedException(id.getName());
 			}

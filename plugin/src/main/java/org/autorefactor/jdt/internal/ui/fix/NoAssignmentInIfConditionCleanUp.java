@@ -104,7 +104,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			InfixExpression ie= ASTNodes.as(expression, InfixExpression.class);
 
 			if (ie != null) {
-				List<Expression> operands= ASTNodes.getAllOperands(ie);
+				List<Expression> operands= ASTNodes.allOperands(ie);
 				boolean isAllOperandsEvaluated= ASTNodes.hasOperator(ie,
 						InfixExpression.Operator.EQUALS,
 						InfixExpression.Operator.NOT_EQUALS,
@@ -213,7 +213,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
 				final Expression expression) {
 			if (vds != null && expression instanceof SimpleName) {
-				for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
+				for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds.fragments()) {
 					if (ASTNodes.isSameVariable(expression, vdf)) {
 						return vdf;
 					}

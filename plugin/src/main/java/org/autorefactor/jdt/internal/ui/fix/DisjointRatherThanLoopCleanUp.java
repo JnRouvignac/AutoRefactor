@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -69,7 +70,7 @@ public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 	@Override
 	protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
 		Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-		Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arguments(condition).get(0));
+		Expression arg0= ASTNodes.getUnparenthesedExpression(((List<Expression>) condition.arguments()).get(0));
 
 		if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
 			return expression;

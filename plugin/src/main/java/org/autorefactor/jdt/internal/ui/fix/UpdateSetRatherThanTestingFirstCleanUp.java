@@ -82,10 +82,12 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 		if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			Statement firstStatement= Utils.getFirst(statements);
 			MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
+			final MethodInvocation node= miContains;
+			final MethodInvocation node1= miAddOrRemove;
 
 			if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
 					&& ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
-					&& ASTNodes.match(ASTNodes.arguments(miContains).get(0), ASTNodes.arguments(miAddOrRemove).get(0))) {
+					&& ASTNodes.match(((List<Expression>) node.arguments()).get(0), ((List<Expression>) node1.arguments()).get(0))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 

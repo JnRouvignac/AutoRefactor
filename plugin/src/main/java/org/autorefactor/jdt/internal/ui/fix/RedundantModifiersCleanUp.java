@@ -117,8 +117,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 	private boolean maybeRemovePublicStaticFinalModifiers(final FieldDeclaration node) {
 		// Remove modifiers implied by the context
 		boolean result= true;
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> modifiers= node.modifiers();
 
-		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
 				cuRewrite.getASTRewrite().remove(modifier, null);
 				result= false;
@@ -136,6 +138,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		return node instanceof TypeDeclaration && Modifier.isFinal(((TypeDeclaration) node).getModifiers());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final MethodDeclaration node) {
 		if (isInterface(node.getParent())) {
@@ -146,7 +149,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		int modifiers= node.getModifiers();
 
 		if (Modifier.isFinal(modifiers) && (isFinalClass(node.getParent()) || Modifier.isPrivate(modifiers))) {
-			return removeFinalModifier(ASTNodes.modifiers(node));
+			return removeFinalModifier(node.modifiers());
 		}
 
 		if (Modifier.isProtected(node.getModifiers()) && (node.isConstructor() ? isFinalClass(node.getParent())
@@ -168,7 +171,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean removeProtectedModifier(final BodyDeclaration node) {
-		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> modifiers= node.modifiers();
+
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isProtected()) {
 				cuRewrite.getASTRewrite().remove(modifier, null);
 				return false;
@@ -179,9 +185,11 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean removePublicAbstractModifiers(final BodyDeclaration node) {
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> modifiers= node.modifiers();
 		boolean result= true;
 
-		for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isAbstract()) {
 				cuRewrite.getASTRewrite().remove(modifier, null);
 				result= false;
@@ -201,29 +209,34 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		return removePublicAbstractModifiers(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final EnumDeclaration node) {
-		return removeStaticAbstractModifier(ASTNodes.modifiers(node)) && ensureModifiersOrder(node);
+		return removeStaticAbstractModifier(node.modifiers()) && ensureModifiersOrder(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TryStatement node) {
 		boolean result= true;
 
-		for (VariableDeclarationExpression resource : ASTNodes.resources(node)) {
-			result&= removeFinalModifier(ASTNodes.modifiers(resource));
+		for (VariableDeclarationExpression resource : (List<VariableDeclarationExpression>) node.resources()) {
+			final VariableDeclarationExpression node1= resource;
+			result&= removeFinalModifier(node1.modifiers());
 		}
 
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TypeDeclaration node) {
-		return (!isInterface(node) || removeStaticAbstractModifier(ASTNodes.modifiers(node))) && ensureModifiersOrder(node);
+		return (!isInterface(node) || removeStaticAbstractModifier(node.modifiers())) && ensureModifiersOrder(node);
 	}
 
 	private boolean ensureModifiersOrder(final BodyDeclaration node) {
-		List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
+		@SuppressWarnings("unchecked")
+		List<IExtendedModifier> extendedModifiers= node.modifiers();
 		List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
 		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
@@ -262,6 +275,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final SingleVariableDeclaration node) {
 		ASTNode parent= node.getParent();
@@ -271,7 +285,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 			TypeDeclaration type= ASTNodes.getAncestorOrNull(method, TypeDeclaration.class);
 
 			if (Modifier.isAbstract(method.getModifiers()) || isInterface(type)) {
-				return removeFinalModifier(ASTNodes.modifiers(node));
+				return removeFinalModifier(node.modifiers());
 			}
 		}
 

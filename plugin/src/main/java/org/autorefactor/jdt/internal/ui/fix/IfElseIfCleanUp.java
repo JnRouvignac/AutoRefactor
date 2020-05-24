@@ -93,7 +93,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 		Statement elseStatement= node.getElseStatement();
 
 		if (elseStatement instanceof Block) {
-			List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);
+			List<Statement> elseStatements= (List<Statement>) ((Block) elseStatement).statements();
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();

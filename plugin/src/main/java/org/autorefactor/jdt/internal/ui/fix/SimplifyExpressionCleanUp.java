@@ -75,7 +75,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 				replaceWithNewInfixExpression(node, remainingOperands);
 				return false;
 			}
-			List<Expression> operands= ASTNodes.getAllOperands(node);
+			List<Expression> operands= ASTNodes.allOperands(node);
 
 			if (operands.size() > 2) {
 				for (int i= 0; i < operands.size() - 1; i++) {
@@ -110,7 +110,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	}
 
 	private List<Expression> removeUselessOperands(final InfixExpression node, final AtomicBoolean hasUselessOperand, final Boolean neutralElement, final Boolean shortCircuitValue) {
-		List<Expression> allOperands= ASTNodes.getAllOperands(node);
+		List<Expression> allOperands= ASTNodes.allOperands(node);
 
 		for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
 			Expression operand= it.next();
@@ -263,10 +263,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 			if (e instanceof MethodInvocation) {
 				MethodInvocation expression= (MethodInvocation) e;
+				final MethodInvocation node= expression;
+				final MethodInvocation node1= expression;
 
 				if (expression.getExpression() != null && expression.getExpression().resolveConstantExpressionValue() != null
-						&& ASTNodes.arguments(expression).size() == 1
-						&& ASTNodes.arguments(expression).get(0).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
+						&& ((List<Expression>) node.arguments()).size() == 1
+						&& ((List<Expression>) node1.arguments()).get(0).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
 					// Did we invoke java.lang.Object.equals() or
 					// java.lang.String.equalsIgnoreCase()?
 					return ASTNodes.usesGivenSignature(expression, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$

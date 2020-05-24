@@ -245,11 +245,13 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 
 		case ASTNode.METHOD_INVOCATION:
 			MethodInvocation methodInvocation= (MethodInvocation) parent;
-			return ASTNodes.arguments(methodInvocation).contains(node) || canRemoveParenthesesAroundExpression(methodInvocation, node);
+			final MethodInvocation node1= methodInvocation;
+			return ((List<Expression>) node1.arguments()).contains(node) || canRemoveParenthesesAroundExpression(methodInvocation, node);
 
 		case ASTNode.SUPER_METHOD_INVOCATION:
 			SuperMethodInvocation superMethodInvocation= (SuperMethodInvocation) parent;
-			return ASTNodes.arguments(superMethodInvocation).contains(node);
+			final SuperMethodInvocation node2= superMethodInvocation;
+			return ((List<Expression>) node2.arguments()).contains(node);
 
 		case ASTNode.IF_STATEMENT:
 			IfStatement ifStatement= (IfStatement) parent;

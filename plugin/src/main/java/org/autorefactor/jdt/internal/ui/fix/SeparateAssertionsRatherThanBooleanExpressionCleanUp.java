@@ -94,7 +94,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			List<Expression> allOperands= ASTNodes.getAllOperands(booleanExpression);
+			List<Expression> allOperands= ASTNodes.allOperands(booleanExpression);
 			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), null);
 			List<Statement> expressionStatements= new ArrayList<>(allOperands.size());
 

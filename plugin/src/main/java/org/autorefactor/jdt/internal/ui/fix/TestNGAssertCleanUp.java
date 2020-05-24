@@ -98,7 +98,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		List<Expression> args= ASTNodes.arguments(node);
+		List<Expression> args= (List<Expression>) node.arguments();
 
 		if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), null, false);
@@ -168,7 +168,8 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 			}
 
 			if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0));
+				final MethodInvocation node1= mi;
+				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ((List<Expression>) node1.arguments()).get(0));
 			}
 		}
 

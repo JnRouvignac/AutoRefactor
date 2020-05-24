@@ -192,7 +192,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 	public boolean visit(final ForStatement node) {
 		Set<SimpleName> vars= new HashSet<>();
 
-		for (Expression initializer : ASTNodes.initializers(node)) {
+		for (Expression initializer : (List<Expression>) node.initializers()) {
 			vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
 		}
 
@@ -200,7 +200,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 			return true;
 		}
 
-		for (Expression updater : ASTNodes.updaters(node)) {
+		for (Expression updater : (List<Expression>) node.updaters()) {
 			if (hasSideEffect(updater, vars)) {
 				return true;
 			}

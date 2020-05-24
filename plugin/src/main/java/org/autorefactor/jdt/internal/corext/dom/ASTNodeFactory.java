@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -210,7 +211,8 @@ public class ASTNodeFactory {
 	 */
 	public Block block(final Statement... statements) {
 		Block block= ast.newBlock();
-		addAll(ASTNodes.statements(block), statements);
+		final Block node= block;
+		addAll(node.statements(), statements);
 		return block;
 	}
 
@@ -222,7 +224,8 @@ public class ASTNodeFactory {
 	 */
 	public Block block(final Collection<Statement> statements) {
 		Block block= ast.newBlock();
-		ASTNodes.statements(block).addAll(statements);
+		final Block node= block;
+		((List<Statement>) node.statements()).addAll(statements);
 		return block;
 	}
 
@@ -340,7 +343,8 @@ public class ASTNodeFactory {
 	public Type genericType(final String typeName, final Type... typeArguments) {
 		Type type= type(typeName);
 		ParameterizedType parameterizedType= ast.newParameterizedType(type);
-		Collections.addAll(ASTNodes.typeArguments(parameterizedType), typeArguments);
+		final ParameterizedType node= parameterizedType;
+		Collections.addAll(node.typeArguments(), typeArguments);
 		return parameterizedType;
 	}
 
@@ -360,7 +364,8 @@ public class ASTNodeFactory {
 		cc.setException(svd);
 
 		Block block= ast.newBlock();
-		addAll(ASTNodes.statements(block), statements);
+		final Block node= block;
+		addAll(node.statements(), statements);
 		cc.setBody(block);
 		return cc;
 	}
@@ -396,7 +401,8 @@ public class ASTNodeFactory {
 
 		if (typeBinding.isParameterizedType()) {
 			ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-			List<Type> typeArgs= ASTNodes.typeArguments(type);
+			final ParameterizedType node= type;
+			List<Type> typeArgs= (List<Type>) node.typeArguments();
 			for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
 				typeArgs.add(toType(typeArg, typeNameDecider));
 			}
@@ -463,7 +469,8 @@ public class ASTNodeFactory {
 		case ASTNode.PARAMETERIZED_TYPE:
 			ParameterizedType pType= (ParameterizedType) type;
 			ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
-			List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
+			final ParameterizedType node= copyOfType;
+			List<Type> newTypeArgs= (List<Type>) node.typeArguments();
 			for (Object typeArg : pType.typeArguments()) {
 				if (((Type) typeArg).isWildcardType()) {
 					newTypeArgs.add(ast.newWildcardType());
@@ -597,7 +604,8 @@ public class ASTNodeFactory {
 	public VariableDeclarationExpression declareExpression(final Type type, final SimpleName varName, final Expression initializer) {
 		VariableDeclarationFragment fragment= declareFragment(varName, initializer);
 		VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
-		ASTNodes.modifiers(vde).add(final0());
+		final VariableDeclarationExpression node= vde;
+		((List<IExtendedModifier>) node.modifiers()).add(final0());
 		vde.setType(type);
 		return vde;
 	}
@@ -789,7 +797,8 @@ public class ASTNodeFactory {
 		ie.setOperator(operator);
 		ie.setRightOperand(it.next());
 		while (it.hasNext()) {
-			ASTNodes.extendedOperands(ie).add(it.next());
+			final InfixExpression node= ie;
+			((List<Expression>) node.extendedOperands()).add(it.next());
 		}
 
 		return ie;
@@ -828,7 +837,8 @@ public class ASTNodeFactory {
 		ie.setLeftOperand(leftOperand);
 		ie.setOperator(operator);
 		ie.setRightOperand(rightOperand);
-		Collections.addAll(ASTNodes.extendedOperands(ie), extendedOperands);
+		final InfixExpression node= ie;
+		Collections.addAll(node.extendedOperands(), extendedOperands);
 		return ie;
 	}
 
@@ -878,7 +888,8 @@ public class ASTNodeFactory {
 	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
 		MethodInvocation mi= ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(methodName));
-		addAll(ASTNodes.arguments(mi), arguments);
+		final MethodInvocation node= mi;
+		addAll(node.arguments(), arguments);
 		return mi;
 	}
 
@@ -1030,7 +1041,8 @@ public class ASTNodeFactory {
 	public ClassInstanceCreation new0(final String typeName, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(simpleType(typeName));
-		addAll(ASTNodes.arguments(cic), arguments);
+		final ClassInstanceCreation node= cic;
+		addAll(node.arguments(), arguments);
 		return cic;
 	}
 
@@ -1044,7 +1056,8 @@ public class ASTNodeFactory {
 	public ClassInstanceCreation new0(final Type type, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(type);
-		addAll(ASTNodes.arguments(cic), arguments);
+		final ClassInstanceCreation node= cic;
+		addAll(node.arguments(), arguments);
 		return cic;
 	}
 
@@ -1057,7 +1070,7 @@ public class ASTNodeFactory {
 
 	private <E extends Expression> void addAll(final MethodInvocation mi, final List<E> arguments) {
 		if (!isEmptyRangeCopy(arguments)) {
-			ASTNodes.arguments(mi).addAll(arguments);
+			((List<Expression>) mi.arguments()).addAll(arguments);
 		}
 	}
 
@@ -1249,7 +1262,8 @@ public class ASTNodeFactory {
 	public TryStatement try0(final Block body, final CatchClause... catchClauses) {
 		TryStatement tryS= ast.newTryStatement();
 		tryS.setBody(body);
-		addAll(ASTNodes.catchClauses(tryS), catchClauses);
+		final TryStatement node= tryS;
+		addAll(node.catchClauses(), catchClauses);
 		return tryS;
 	}
 
@@ -1369,7 +1383,8 @@ public class ASTNodeFactory {
 	public MethodDeclaration method(final List<IExtendedModifier> modifiers, final String methodName,
 			final List<SingleVariableDeclaration> parameters, final Block block) {
 		MethodDeclaration md= ast.newMethodDeclaration();
-		ASTNodes.modifiers(md).addAll(modifiers);
+		final BodyDeclaration node= md;
+		((List<IExtendedModifier>) node.modifiers()).addAll(modifiers);
 		md.setName(simpleName(methodName));
 		md.parameters().addAll(parameters);
 		md.setBody(block);

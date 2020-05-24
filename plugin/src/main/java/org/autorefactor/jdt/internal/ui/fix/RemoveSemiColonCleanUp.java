@@ -191,7 +191,8 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 	private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
 		if (root instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) root;
-			return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
+			final CompilationUnit node= cu;
+			return filterCommentsInRange(start, end, node.getCommentList());
 		}
 
 		return Collections.emptyList();
@@ -217,7 +218,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		List<VariableDeclarationExpression> resources= ASTNodes.resources(node);
+		List<VariableDeclarationExpression> resources= (List<VariableDeclarationExpression>) node.resources();
 		if (resources.isEmpty()) {
 			return true;
 		}

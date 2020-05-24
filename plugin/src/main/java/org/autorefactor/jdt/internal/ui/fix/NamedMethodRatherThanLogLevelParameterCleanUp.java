@@ -56,7 +56,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 	@Override
 	public boolean visit(final MethodInvocation node) {
 		if (ASTNodes.usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-			List<Expression> args= ASTNodes.arguments(node);
+			List<Expression> args= (List<Expression>) node.arguments();
 
 			if (args != null && args.size() == 2) {
 				QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
@@ -94,6 +94,6 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		rewrite.replace(node.getName(), ast.simpleName(methodName), null);
-		rewrite.remove(ASTNodes.arguments(node).get(0), null);
+		rewrite.remove(((List<Expression>) node.arguments()).get(0), null);
 	}
 }

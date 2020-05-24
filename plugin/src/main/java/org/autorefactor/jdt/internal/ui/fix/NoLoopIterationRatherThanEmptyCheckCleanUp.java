@@ -78,7 +78,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 					}
 
 					if (ASTNodes.hasOperator(condition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
-						List<Expression> operands= ASTNodes.getAllOperands(condition);
+						List<Expression> operands= ASTNodes.allOperands(condition);
 						Expression operand= ASTNodes.as(Utils.getLast(operands), InfixExpression.class);
 
 						if (isConditionValid(operand, container)) {

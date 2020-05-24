@@ -57,7 +57,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		List<Statement> statements= ASTNodes.statements(node);
+		List<Statement> statements= (List<Statement>) node.statements();
 
 		if (statements.size() == 1 && statements.get(0) instanceof Block) {
 			replaceBlock((Block) statements.get(0));
@@ -91,6 +91,6 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		rewrite.replace(node, ast.copyRange(ASTNodes.statements(node)), null);
+		rewrite.replace(node, ast.copyRange((List<Statement>) node.statements()), null);
 	}
 }

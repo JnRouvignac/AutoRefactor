@@ -46,7 +46,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -54,53 +53,38 @@ import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LabeledStatement;
-import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -210,7 +194,7 @@ public final class ASTNodes {
 			if (hasOperator(node, InfixExpression.Operator.DIVIDE)) {
 				setActivityLevel(ExprActivity.PASSIVE);
 			} else {
-				for (Expression operand : getAllOperands(node)) {
+				for (Expression operand : allOperands(node)) {
 					if (hasType(operand, Object.class.getCanonicalName())) {
 						setActivityLevel(ExprActivity.PASSIVE);
 						break;
@@ -332,13 +316,14 @@ public final class ASTNodes {
 	 * @param statement the statement to analyze
 	 * @return the provided statement as a non null list of statements
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<Statement> asList(final Statement statement) {
 		if (statement == null) {
 			return Collections.emptyList();
 		}
 
 		if (statement instanceof Block) {
-			return statements((Block) statement);
+			return ((Block) statement).statements();
 		}
 
 		return Arrays.asList(statement);
@@ -551,126 +536,6 @@ public final class ASTNodes {
 	}
 
 	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ClassInstanceCreation#arguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> arguments(final ClassInstanceCreation node) {
-		return node.arguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ConstructorInvocation#arguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> arguments(final ConstructorInvocation node) {
-		return node.arguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see MethodInvocation#arguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> arguments(final MethodInvocation node) {
-		return node.arguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see SuperConstructorInvocation#arguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> arguments(final SuperConstructorInvocation node) {
-		return node.arguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see SuperMethodInvocation#arguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> arguments(final SuperMethodInvocation node) {
-		return node.arguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of body declarations
-	 * @see AnonymousClassDeclaration#bodyDeclarations()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<BodyDeclaration> bodyDeclarations(final AnonymousClassDeclaration node) {
-		return node.bodyDeclarations();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of body declarations
-	 * @see TypeDeclaration#bodyDeclarations()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<BodyDeclaration> bodyDeclarations(final AbstractTypeDeclaration node) {
-		return node.bodyDeclarations();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see TryStatement#catchClauses()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<CatchClause> catchClauses(final TryStatement node) {
-		return node.catchClauses();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ArrayInitializer#expressions()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> expressions(final ArrayInitializer node) {
-		return node.expressions();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see InfixExpression#extendedOperands()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> extendedOperands(final InfixExpression node) {
-		return node.extendedOperands();
-	}
-
-	/**
 	 * Returns a copy of all the operands from the provided infix expressions.
 	 * It takes a bug into account.
 	 * In some cases, ASTConverter.java creates several infix expressions instead of one extended infix expression.
@@ -679,8 +544,9 @@ public final class ASTNodes {
 	 * @param node the infix expression
 	 * @return a List of expressions
 	 */
-	public static List<Expression> getAllOperands(final InfixExpression node) {
-		List<Expression> extOps= extendedOperands(node);
+	public static List<Expression> allOperands(final InfixExpression node) {
+		@SuppressWarnings("unchecked")
+		List<Expression> extOps= node.extendedOperands();
 		List<Expression> operands= new ArrayList<>(2 + extOps.size());
 		operands.add(node.getLeftOperand());
 		operands.add(node.getRightOperand());
@@ -690,277 +556,13 @@ public final class ASTNodes {
 
 		for (Expression expression : operands) {
 			if (expression instanceof InfixExpression && hasOperator((InfixExpression) expression, node.getOperator())) {
-				optimizedOperands.addAll(getAllOperands((InfixExpression) expression));
+				optimizedOperands.addAll(allOperands((InfixExpression) expression));
 			} else {
 				optimizedOperands.add(expression);
 			}
 		}
 
 		return optimizedOperands;
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ForStatement#initializers()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> initializers(final ForStatement node) {
-		return node.initializers();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ForStatement#updaters()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Expression> updaters(final ForStatement node) {
-		return node.updaters();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see FieldDeclaration#fragments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<VariableDeclarationFragment> fragments(final FieldDeclaration node) {
-		return node.fragments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see VariableDeclarationExpression#fragments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<VariableDeclarationFragment> fragments(final VariableDeclarationExpression node) {
-		return node.fragments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see VariableDeclarationStatement#fragments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<VariableDeclarationFragment> fragments(final VariableDeclarationStatement node) {
-		return node.fragments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see CompilationUnit#getCommentList()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Comment> getCommentList(final CompilationUnit node) {
-		return node.getCommentList();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see CompilationUnit#imports()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<ImportDeclaration> imports(final CompilationUnit node) {
-		return node.imports();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see BodyDeclaration#modifiers()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<IExtendedModifier> modifiers(final BodyDeclaration node) {
-		return node.modifiers();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see BodyDeclaration#modifiers()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<IExtendedModifier> modifiers(final SingleVariableDeclaration node) {
-		return node.modifiers();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see VariableDeclarationExpression#modifiers()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<IExtendedModifier> modifiers(final VariableDeclarationExpression node) {
-		return node.modifiers();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see VariableDeclarationStatement#modifiers()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<IExtendedModifier> modifiers(final VariableDeclarationStatement node) {
-		return node.modifiers();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see MethodDeclaration#parameters()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<SingleVariableDeclaration> parameters(final MethodDeclaration node) {
-		return node.parameters();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of variable declaration expressions
-	 * @see TryStatement#resources()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<VariableDeclarationExpression> resources(final TryStatement node) {
-		return node.resources();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see Block#statements()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Statement> statements(final Block node) {
-		return node.statements();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see SwitchStatement#statements()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Statement> statements(final SwitchStatement node) {
-		return node.statements();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see Javadoc#tags()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<TagElement> tags(final Javadoc node) {
-		return node.tags();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of types
-	 * @see MethodDeclaration#thrownExceptionTypes()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Type> thrownExceptionTypes(final MethodDeclaration node) {
-		return node.thrownExceptionTypes();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ParameterizedType#typeArguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Type> typeArguments(final MethodInvocation node) {
-		return node.typeArguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see ParameterizedType#typeArguments()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Type> typeArguments(final ParameterizedType node) {
-		return node.typeArguments();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of abstract type declarations
-	 * @see CompilationUnit#types()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<AbstractTypeDeclaration> types(final CompilationUnit node) {
-		return node.types();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of abstract type declarations
-	 * @see UnionType#types()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<Type> types(final UnionType node) {
-		return node.types();
-	}
-
-	/**
-	 * Generecized version of the equivalent JDT method.
-	 *
-	 * @param node the node on which to call the equivalent JDT method
-	 * @return a List of expressions
-	 * @see NormalAnnotation#values()
-	 */
-	@SuppressWarnings("unchecked")
-	public static List<MemberValuePair> values(final NormalAnnotation node) {
-		return node.values();
 	}
 
 	/**
@@ -1405,7 +1007,9 @@ public final class ASTNodes {
 		}
 		if (parent instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) parent;
-			List<AbstractTypeDeclaration> types= types(cu);
+			final CompilationUnit node1= cu;
+			@SuppressWarnings("unchecked")
+			List<AbstractTypeDeclaration> types= node1.types();
 			int index= types.indexOf(node);
 			if (index != -1 && index + 1 < types.size()) {
 				return types.get(index + 1);
@@ -1415,14 +1019,16 @@ public final class ASTNodes {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final AbstractTypeDeclaration parent,
 			final boolean lookForPrevious) {
-		return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+		return getSibling(node, parent.bodyDeclarations(), lookForPrevious);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final AnonymousClassDeclaration parent,
 			final boolean lookForPrevious) {
-		return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+		return getSibling(node, parent.bodyDeclarations(), lookForPrevious);
 	}
 
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final List<BodyDeclaration> bodyDeclarations,
@@ -1656,7 +1262,7 @@ public final class ASTNodes {
 			return true;
 
 		case ASTNode.INFIX_EXPRESSION:
-			for (Expression operand : getAllOperands((InfixExpression) expression)) {
+			for (Expression operand : allOperands((InfixExpression) expression)) {
 				if (!isHardCoded(operand)) {
 					return false;
 				}
@@ -1723,7 +1329,7 @@ public final class ASTNodes {
 						InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
 						InfixExpression.Operator.TIMES,
 						InfixExpression.Operator.XOR)) {
-			List<Expression> operands= getAllOperands(operation);
+			List<Expression> operands= allOperands(operation);
 			Long leftValue= getIntegerLiteral(operands.remove(0));
 
 			if (leftValue == null) {
@@ -2010,8 +1616,8 @@ public final class ASTNodes {
 		if (statement == null) {
 			return null;
 		}
-
-		List<VariableDeclarationFragment> fragments= fragments(statement);
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationFragment> fragments= statement.fragments();
 		return fragments.size() == 1 ? fragments.get(0) : null;
 	}
 
@@ -2873,7 +2479,9 @@ public final class ASTNodes {
 	public static Pair<Expression, Expression> decomposeInitializer(final Expression init) {
 		if (init instanceof VariableDeclarationExpression) {
 			VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
-			List<VariableDeclarationFragment> fragments= fragments(vde);
+			final VariableDeclarationExpression node= vde;
+			@SuppressWarnings("unchecked")
+			List<VariableDeclarationFragment> fragments= node.fragments();
 
 			if (fragments.size() == 1) {
 				VariableDeclarationFragment fragment= fragments.get(0);
@@ -2993,7 +2601,7 @@ public final class ASTNodes {
 
 		int nbOperands= 0;
 
-		for (Expression operand : getAllOperands(infixExpression)) {
+		for (Expression operand : allOperands(infixExpression)) {
 			nbOperands+= getNbOperands(operand);
 		}
 
