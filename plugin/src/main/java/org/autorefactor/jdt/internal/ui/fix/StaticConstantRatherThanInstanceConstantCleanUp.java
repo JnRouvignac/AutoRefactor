@@ -61,7 +61,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 				Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
 			Modifier finalModifier= null;
 			@SuppressWarnings("unchecked")
-			final Collection<IExtendedModifier> modifiers= node.modifiers();
+			Collection<IExtendedModifier> modifiers= node.modifiers();
 
 			for (Modifier modifier : getModifiersOnly(modifiers)) {
 				if (modifier.isStatic()) {

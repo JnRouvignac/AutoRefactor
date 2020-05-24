@@ -92,8 +92,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
 			if (result && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-				final MethodInvocation node1= mi;
-				Expression arg0= ((List<Expression>) node1.arguments()).get(0);
+				Expression arg0= (Expression) mi.arguments().get(0);
 				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
 				Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
@@ -137,7 +136,8 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			List<Expression> args= (List<Expression>) cic.arguments();
+			@SuppressWarnings("unchecked")
+			List<Expression> args= cic.arguments();
 			boolean noArgsCtor= args.isEmpty();
 
 			if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),

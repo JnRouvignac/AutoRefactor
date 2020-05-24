@@ -223,8 +223,7 @@ public class ASTRewrite {
 		List<T> movedNodes= new ArrayList<>(nodes.size());
 
 		for (T astNode : nodes) {
-			final T node= astNode;
-			movedNodes.add(ASTNodes.createMoveTarget(this, node));
+			movedNodes.add(ASTNodes.createMoveTarget(this, astNode));
 		}
 
 		return movedNodes;

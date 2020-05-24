@@ -111,13 +111,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		ClassInstanceCreation classInstanceCreation= ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
 
 		if (typeBinding != null && classInstanceCreation != null) {
-			final ClassInstanceCreation node1= classInstanceCreation;
-			List<Expression> cicArgs= (List<Expression>) node1.arguments();
+			List<?> cicArgs= classInstanceCreation.arguments();
 
 			if (cicArgs.size() == 1) {
-				Expression arg0= cicArgs.get(0);
+				Expression arg0= (Expression) cicArgs.get(0);
 
-				if (((List<Expression>) node.arguments()).isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
+				if (node.arguments().isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
 					String methodName= getMethodName(typeBinding.getQualifiedName(),
 							node.getName().getIdentifier());
 
@@ -136,7 +135,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
 		return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-						&& Objects.equals(10, ((List<Expression>) node.arguments()).get(1).resolveConstantExpressionValue());
+						&& Objects.equals(10, ((Expression) node.arguments().get(1)).resolveConstantExpressionValue());
 	}
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
@@ -147,7 +146,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithTheSingleArgument(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0)), null);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), null);
 	}
 
 	private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -185,7 +184,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final ClassInstanceCreation node) {
 		ITypeBinding typeBinding= node.getType().resolveBinding();
-		List<Expression> args= (List<Expression>) node.arguments();
+		@SuppressWarnings("unchecked")
+		List<Expression> args= node.arguments();
 
 		if (getJavaMinorVersion() >= 5 && args.size() == 1) {
 			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
@@ -222,7 +222,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
 		cuRewrite.getASTRewrite().replace(node,
-				newMethodInvocation(typeBinding.getName(), "valueOf", ((List<Expression>) node.arguments()).get(0)), null); //$NON-NLS-1$
+				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), null); //$NON-NLS-1$
 	}
 
 	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {

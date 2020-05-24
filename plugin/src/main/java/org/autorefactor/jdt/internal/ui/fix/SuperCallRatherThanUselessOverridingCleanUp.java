@@ -77,7 +77,8 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 			return true;
 		}
 
-		List<Statement> bodyStatements= (List<Statement>) node.getBody().statements();
+		@SuppressWarnings("unchecked")
+		List<Statement> bodyStatements= node.getBody().statements();
 
 		if (bodyStatements.size() == 1) {
 			SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);

@@ -113,15 +113,11 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		if (getVariableUseCount(foreachVariable, node.getBody()) == 1
 				&& methodInvocation != null && methodInvocation.arguments().size() == 1) {
 			if (ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
-				final MethodInvocation node1= methodInvocation;
-				if (ASTNodes.isSameLocalVariable(node.getParameter(), ((List<Expression>) node1.arguments()).get(0))) {
+				if (ASTNodes.isSameLocalVariable(node.getParameter(), (Expression) methodInvocation.arguments().get(0))) {
 					return maybeReplaceForCollection(node, methodInvocation, iterable);
 				}
-			} else {
-				final MethodInvocation node1= methodInvocation;
-				if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, ((List<Expression>) node1.arguments()).get(0))) {
-					return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, methodInvocation);
-				}
+			} else if (ASTNodes.isArray(iterable) && ASTNodes.isSameLocalVariable(foreachVariable, (Expression) methodInvocation.arguments().get(0))) {
+				return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, methodInvocation);
 			}
 		}
 
@@ -147,8 +143,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			// As we replace only one, there should be no more than one occurrence
 			if (methodInvocation != null && methodInvocation.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
 					&& (loopContent.isLoopingForward() || methodInvocation.resolveMethodBinding() != null && ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
-				final MethodInvocation node1= methodInvocation;
-				Expression addArg0= ((List<Expression>) node1.arguments()).get(0);
+				Expression addArg0= (Expression) methodInvocation.arguments().get(0);
 
 				switch (loopContent.getContainerType()) {
 				case COLLECTION:
@@ -251,7 +246,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
 		return (getMI.getExpression() instanceof Name || getMI.getExpression() instanceof FieldAccess || getMI.getExpression() instanceof SuperFieldAccess)
 				&& ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) //$NON-NLS-1$
-				&& ASTNodes.isSameLocalVariable(((List<Expression>) getMI.arguments()).get(0), loopContent.getLoopVariable())
+				&& ASTNodes.isSameLocalVariable((Expression) getMI.arguments().get(0), loopContent.getLoopVariable())
 				&& ASTNodes.isSameVariable(loopContent.getContainerVariable(), getMI.getExpression());
 	}
 

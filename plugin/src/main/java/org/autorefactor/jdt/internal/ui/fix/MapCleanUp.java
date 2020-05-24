@@ -82,8 +82,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
 			if (result && ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
-				final MethodInvocation node1= mi;
-				Expression arg0= ((List<Expression>) node1.arguments()).get(0);
+				Expression arg0= (Expression) mi.arguments().get(0);
 				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
 				Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
@@ -125,7 +124,8 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			if (cic == null || cic.getAnonymousClassDeclaration() != null) {
 				return false;
 			}
-			List<Expression> args= (List<Expression>) cic.arguments();
+			@SuppressWarnings("unchecked")
+			List<Expression> args= cic.arguments();
 			boolean noArgsCtor= args.isEmpty();
 			boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
 			return noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),

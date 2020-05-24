@@ -101,6 +101,7 @@ public class CFGDotPrinter {
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, final Set<CFGEdge> edges,
 			final StringBuilder sb) {
 		boolean needDigraph= sb.length() == 0;

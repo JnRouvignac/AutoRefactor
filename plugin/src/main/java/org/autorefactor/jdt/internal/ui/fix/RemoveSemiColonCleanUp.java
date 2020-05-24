@@ -188,11 +188,11 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 		results.put(s, sourceLoc);
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
 		if (root instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) root;
-			final CompilationUnit node= cu;
-			return filterCommentsInRange(start, end, node.getCommentList());
+			return filterCommentsInRange(start, end, cu.getCommentList());
 		}
 
 		return Collections.emptyList();
@@ -218,7 +218,8 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		List<VariableDeclarationExpression> resources= (List<VariableDeclarationExpression>) node.resources();
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationExpression> resources= node.resources();
 		if (resources.isEmpty()) {
 			return true;
 		}

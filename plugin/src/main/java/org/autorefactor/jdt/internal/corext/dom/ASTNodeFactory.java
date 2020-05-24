@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -209,10 +208,10 @@ public class ASTNodeFactory {
 	 * @param statements the statements to add to the block
 	 * @return a new Block
 	 */
+	@SuppressWarnings("unchecked")
 	public Block block(final Statement... statements) {
 		Block block= ast.newBlock();
-		final Block node= block;
-		addAll(node.statements(), statements);
+		addAll(block.statements(), statements);
 		return block;
 	}
 
@@ -222,10 +221,10 @@ public class ASTNodeFactory {
 	 * @param statements the statements to add to the block
 	 * @return a new Block
 	 */
+	@SuppressWarnings("unchecked")
 	public Block block(final Collection<Statement> statements) {
 		Block block= ast.newBlock();
-		final Block node= block;
-		((List<Statement>) node.statements()).addAll(statements);
+		block.statements().addAll(statements);
 		return block;
 	}
 
@@ -340,11 +339,11 @@ public class ASTNodeFactory {
 	 * @param typeArguments the type arguments
 	 * @return a new parameterized type
 	 */
+	@SuppressWarnings("unchecked")
 	public Type genericType(final String typeName, final Type... typeArguments) {
 		Type type= type(typeName);
 		ParameterizedType parameterizedType= ast.newParameterizedType(type);
-		final ParameterizedType node= parameterizedType;
-		Collections.addAll(node.typeArguments(), typeArguments);
+		Collections.addAll(parameterizedType.typeArguments(), typeArguments);
 		return parameterizedType;
 	}
 
@@ -356,6 +355,7 @@ public class ASTNodeFactory {
 	 * @param statements          the statements to add to the catch clause
 	 * @return a new catch clause
 	 */
+	@SuppressWarnings("unchecked")
 	public CatchClause catch0(final String exceptionTypeName, final String caughtExceptionName, final Statement... statements) {
 		CatchClause cc= ast.newCatchClause();
 		SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
@@ -364,8 +364,7 @@ public class ASTNodeFactory {
 		cc.setException(svd);
 
 		Block block= ast.newBlock();
-		final Block node= block;
-		addAll(node.statements(), statements);
+		addAll(block.statements(), statements);
 		cc.setBody(block);
 		return cc;
 	}
@@ -401,8 +400,8 @@ public class ASTNodeFactory {
 
 		if (typeBinding.isParameterizedType()) {
 			ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-			final ParameterizedType node= type;
-			List<Type> typeArgs= (List<Type>) node.typeArguments();
+			@SuppressWarnings("unchecked")
+			List<Type> typeArgs= type.typeArguments();
 			for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
 				typeArgs.add(toType(typeArg, typeNameDecider));
 			}
@@ -469,8 +468,8 @@ public class ASTNodeFactory {
 		case ASTNode.PARAMETERIZED_TYPE:
 			ParameterizedType pType= (ParameterizedType) type;
 			ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
-			final ParameterizedType node= copyOfType;
-			List<Type> newTypeArgs= (List<Type>) node.typeArguments();
+			@SuppressWarnings("unchecked")
+			List<Type> newTypeArgs= copyOfType.typeArguments();
 			for (Object typeArg : pType.typeArguments()) {
 				if (((Type) typeArg).isWildcardType()) {
 					newTypeArgs.add(ast.newWildcardType());
@@ -601,11 +600,11 @@ public class ASTNodeFactory {
 	 * @param initializer the variable initializer, can be null
 	 * @return a new variable declaration expression
 	 */
+	@SuppressWarnings("unchecked")
 	public VariableDeclarationExpression declareExpression(final Type type, final SimpleName varName, final Expression initializer) {
 		VariableDeclarationFragment fragment= declareFragment(varName, initializer);
 		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
-		final VariableDeclarationExpression node= variableDeclarationExpression;
-		((List<IExtendedModifier>) node.modifiers()).add(final0());
+		variableDeclarationExpression.modifiers().add(final0());
 		variableDeclarationExpression.setType(type);
 		return variableDeclarationExpression;
 	}
@@ -786,6 +785,7 @@ public class ASTNodeFactory {
 	 * @param allOperands the operands
 	 * @return a new infix expression
 	 */
+	@SuppressWarnings("unchecked")
 	public InfixExpression infixExpression(final InfixExpression.Operator operator, final Collection<? extends Expression> allOperands) {
 		if (allOperands.size() < 2) {
 			throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
@@ -797,8 +797,7 @@ public class ASTNodeFactory {
 		infixExpression.setOperator(operator);
 		infixExpression.setRightOperand(it.next());
 		while (it.hasNext()) {
-			final InfixExpression node= infixExpression;
-			((List<Expression>) node.extendedOperands()).add(it.next());
+			infixExpression.extendedOperands().add(it.next());
 		}
 
 		return infixExpression;
@@ -831,14 +830,14 @@ public class ASTNodeFactory {
 	 * @param extendedOperands the extended operands
 	 * @return a new infix expression
 	 */
+	@SuppressWarnings("unchecked")
 	public InfixExpression infixExpression(final Expression leftOperand, final InfixExpression.Operator operator, final Expression rightOperand,
 			final Expression... extendedOperands) {
 		InfixExpression infixExpression= ast.newInfixExpression();
 		infixExpression.setLeftOperand(leftOperand);
 		infixExpression.setOperator(operator);
 		infixExpression.setRightOperand(rightOperand);
-		final InfixExpression node= infixExpression;
-		Collections.addAll(node.extendedOperands(), extendedOperands);
+		Collections.addAll(infixExpression.extendedOperands(), extendedOperands);
 		return infixExpression;
 	}
 
@@ -885,11 +884,11 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
+	@SuppressWarnings("unchecked")
 	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
 		MethodInvocation mi= ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(methodName));
-		final MethodInvocation node= mi;
-		addAll(node.arguments(), arguments);
+		addAll(mi.arguments(), arguments);
 		return mi;
 	}
 
@@ -1038,11 +1037,11 @@ public class ASTNodeFactory {
 	 * @param arguments the constructor invocation arguments
 	 * @return a new class instance creation
 	 */
+	@SuppressWarnings("unchecked")
 	public ClassInstanceCreation new0(final String typeName, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(simpleType(typeName));
-		final ClassInstanceCreation node= cic;
-		addAll(node.arguments(), arguments);
+		addAll(cic.arguments(), arguments);
 		return cic;
 	}
 
@@ -1053,11 +1052,11 @@ public class ASTNodeFactory {
 	 * @param arguments the constructor invocation arguments
 	 * @return a new class instance creation
 	 */
+	@SuppressWarnings("unchecked")
 	public ClassInstanceCreation new0(final Type type, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(type);
-		final ClassInstanceCreation node= cic;
-		addAll(node.arguments(), arguments);
+		addAll(cic.arguments(), arguments);
 		return cic;
 	}
 
@@ -1068,9 +1067,10 @@ public class ASTNodeFactory {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private <E extends Expression> void addAll(final MethodInvocation mi, final List<E> arguments) {
 		if (!isEmptyRangeCopy(arguments)) {
-			((List<Expression>) mi.arguments()).addAll(arguments);
+			mi.arguments().addAll(arguments);
 		}
 	}
 
@@ -1259,11 +1259,11 @@ public class ASTNodeFactory {
 	 * @param catchClauses the catch clauses for the try
 	 * @return a new try statement
 	 */
+	@SuppressWarnings("unchecked")
 	public TryStatement try0(final Block body, final CatchClause... catchClauses) {
 		TryStatement tryS= ast.newTryStatement();
 		tryS.setBody(body);
-		final TryStatement node= tryS;
-		addAll(node.catchClauses(), catchClauses);
+		addAll(tryS.catchClauses(), catchClauses);
 		return tryS;
 	}
 
@@ -1383,8 +1383,7 @@ public class ASTNodeFactory {
 	public MethodDeclaration method(final List<IExtendedModifier> modifiers, final String methodName,
 			final List<SingleVariableDeclaration> parameters, final Block block) {
 		MethodDeclaration md= ast.newMethodDeclaration();
-		final BodyDeclaration node= md;
-		((List<IExtendedModifier>) node.modifiers()).addAll(modifiers);
+		md.modifiers().addAll(modifiers);
 		md.setName(simpleName(methodName));
 		md.parameters().addAll(parameters);
 		md.setBody(block);

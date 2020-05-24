@@ -154,13 +154,14 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
 		if (type.isParameterizedType() && isTargetType(type)) {
 			ParameterizedType ptype= (ParameterizedType) type;
-			final ParameterizedType node1= ptype;
-			List<Type> typeArguments= (List<Type>) node1.typeArguments();
+			@SuppressWarnings("unchecked")
+			List<Type> typeArguments= ptype.typeArguments();
 
 			if (!typeArguments.isEmpty()
 					&& typeArguments.get(0).resolveBinding() != null
 					&& typeArguments.get(0).resolveBinding().isEnum()) {
-				List<VariableDeclarationFragment> fragments= (List<VariableDeclarationFragment>) node.fragments();
+				@SuppressWarnings("unchecked")
+				List<VariableDeclarationFragment> fragments= node.fragments();
 
 				for (VariableDeclarationFragment fragment : fragments) {
 					Expression initExpression= fragment.getInitializer();
@@ -184,6 +185,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 	 * Just one more wrapper to extract type arguments, <br>
 	 * to avoid boilerplate casting and shorten method name.
 	 */
+	@SuppressWarnings("unchecked")
 	List<Type> typeArgs(final Type parameterizedType) {
 		return ((ParameterizedType) parameterizedType).typeArguments();
 	}

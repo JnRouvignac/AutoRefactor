@@ -74,6 +74,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 				&& maybeReplaceSetContains(ifStmtToReplace, ifExpression, oppositeStatement, statement, !negate, "remove"); //$NON-NLS-1$
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
 			final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
 		List<Statement> statements= ASTNodes.asList(statement);
@@ -82,12 +83,10 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 		if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			Statement firstStatement= Utils.getFirst(statements);
 			MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
-			final MethodInvocation node= miContains;
-			final MethodInvocation node1= miAddOrRemove;
 
 			if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
 					&& ASTNodes.match(miContains.getExpression(), miAddOrRemove.getExpression())
-					&& ASTNodes.match(((List<Expression>) node.arguments()).get(0), ((List<Expression>) node1.arguments()).get(0))) {
+					&& ASTNodes.match(((List<Expression>) miContains.arguments()).get(0), ((List<Expression>) miAddOrRemove.arguments()).get(0))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 

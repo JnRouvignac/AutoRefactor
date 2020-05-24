@@ -221,8 +221,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		boolean result= true;
 
 		for (VariableDeclarationExpression resource : (List<VariableDeclarationExpression>) node.resources()) {
-			final VariableDeclarationExpression node1= resource;
-			result&= removeFinalModifier(node1.modifiers());
+			result&= removeFinalModifier(resource.modifiers());
 		}
 
 		return result;

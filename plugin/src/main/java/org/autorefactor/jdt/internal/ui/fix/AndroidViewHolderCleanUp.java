@@ -38,7 +38,6 @@ import org.autorefactor.jdt.internal.corext.dom.Variable;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -46,7 +45,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -110,14 +108,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				// Transform tree
 
 				// Create If statement
-				SingleVariableDeclaration viewArg= ((List<SingleVariableDeclaration>) node.parameters()).get(1);
+				SingleVariableDeclaration viewArg= (SingleVariableDeclaration) node.parameters().get(1);
 				Variable convertViewVar= new Variable(viewArg.getName().getIdentifier(), ast);
 				InfixExpression condition= ast.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.null0());
 				Block thenBlock= ast.block();
 				IfStatement ifStatement= ast.if0(condition, thenBlock);
 				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, null);
-				final Block node1= thenBlock;
-				List<Statement> thenStatements= (List<Statement>) node1.statements();
+				@SuppressWarnings("unchecked")
+				List<Statement> thenStatements= thenBlock.statements();
 
 				thenStatements.add(ast.toStatement(ast.assign(convertViewVar.varName(), Assignment.Operator.ASSIGN, ast.createCopyTarget(visitor.getInflateExpression()))));
 
@@ -188,16 +186,16 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
 			final TypeNameDecider typeNameDecider) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		TypeDeclaration result= ast.getAST().newTypeDeclaration();
-		final BodyDeclaration node1= result;
-		((List<IExtendedModifier>) node1.modifiers()).addAll(Arrays.asList(ast.private0(), ast.static0()));
+		result.modifiers().addAll(Arrays.asList(ast.private0(), ast.static0()));
 		result.setName(typeName);
-		final AbstractTypeDeclaration node= result;
-		List<BodyDeclaration> viewItemsFieldDecls= (List<BodyDeclaration>) node.bodyDeclarations();
+		List<BodyDeclaration> viewItemsFieldDecls= result.bodyDeclarations();
+
 		for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
 			viewItemsFieldDecls.add(item.toFieldDecl(ast, typeNameDecider));
 		}
@@ -330,11 +328,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				return true;
 			}
 
+			@SuppressWarnings("unchecked")
 			private FieldDeclaration toFieldDecl(final ASTNodeFactory ast, final TypeNameDecider typeNameDecider) {
 				FieldDeclaration field= ast.declareField(ast.copyType(variable, typeNameDecider),
 						ast.declareFragment(ast.createCopyTarget(variable)));
-				final BodyDeclaration node= field;
-				((List<IExtendedModifier>) node.modifiers()).add(ast.private0());
+				field.modifiers().add(ast.private0());
 				return field;
 			}
 		}

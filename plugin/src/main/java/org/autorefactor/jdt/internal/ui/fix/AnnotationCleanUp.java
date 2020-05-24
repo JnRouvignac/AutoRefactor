@@ -66,7 +66,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		List<MemberValuePair> values= (List<MemberValuePair>) node.values();
+		@SuppressWarnings("unchecked")
+		List<MemberValuePair> values= node.values();
 		if (values.isEmpty()) {
 			rewrite.replace(node, ast.markerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), null);
 			return false;
@@ -88,10 +89,9 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 				result= false;
 			} else if (pair.getValue().getNodeType() == ASTNode.ARRAY_INITIALIZER) {
 				ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
-				final ArrayInitializer node1= arrayInit;
-				List<Expression> exprs= (List<Expression>) node1.expressions();
+				List<?> exprs= arrayInit.expressions();
 				if (exprs.size() == 1) {
-					rewrite.replace(arrayInit, ASTNodes.createMoveTarget(rewrite, exprs.get(0)), null);
+					rewrite.replace(arrayInit, ASTNodes.createMoveTarget(rewrite, (Expression) exprs.get(0)), null);
 					result= false;
 				}
 			}
@@ -166,7 +166,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 	private boolean arraysEqual(final ITypeBinding typeBinding, final ArrayInitializer arrayInit, final Object javaObj) {
 		if (javaObj instanceof Object[]) {
 			Object[] javaObjArray= (Object[]) javaObj;
-			List<Expression> exprs= (List<Expression>) arrayInit.expressions();
+			@SuppressWarnings("unchecked")
+			List<Expression> exprs= arrayInit.expressions();
 
 			if (exprs.size() == javaObjArray.length) {
 				for (int i= 0; i < javaObjArray.length; i++) {

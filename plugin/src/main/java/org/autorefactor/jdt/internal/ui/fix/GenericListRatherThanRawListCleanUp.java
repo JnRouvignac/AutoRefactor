@@ -112,6 +112,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		return origRawType;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Type substituteType(final Type origType, final ASTNode originalExpression, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
@@ -124,10 +125,8 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
 		ParameterizedType parameterizedType= ast.getAST().newParameterizedType(ast.createCopyTarget(origType));
-		final ParameterizedType node= parameterizedType;
-		((List<Type>) node.typeArguments()).clear();
-		final ParameterizedType node1= parameterizedType;
-		((List<Type>) node1.typeArguments()).add(ast.toType(elementType, typeNameDecider));
+		parameterizedType.typeArguments().clear();
+		parameterizedType.typeArguments().add(ast.toType(elementType, typeNameDecider));
 		return parameterizedType;
 	}
 
@@ -142,7 +141,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
 		if (parameterTypes.length > 0 && ASTNodes.hasType(parameterTypes[0], Collection.class.getCanonicalName())) {
-			ITypeBinding actualParameter= ((List<Expression>) instanceCreation.arguments()).get(0).resolveTypeBinding();
+			ITypeBinding actualParameter= ((Expression) instanceCreation.arguments().get(0)).resolveTypeBinding();
 
 			if (isParameterizedTypeWithOneArgument(actualParameter)) {
 				return resolveTypeCompatible(actualParameter.getTypeArguments()[0]);
@@ -179,6 +178,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeAllElements") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
@@ -200,25 +200,30 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "search", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			ITypeBinding newElementType= ((List<Expression>) mi.arguments()).get(0).resolveTypeBinding();
+			ITypeBinding newElementType= ((Expression) mi.arguments().get(0)).resolveTypeBinding();
 			return resolveTypeCompatible(newElementType);
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "set", int.class.getSimpleName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatible(((List<Expression>) mi.arguments()).get(1).resolveTypeBinding());
+			return resolveTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding());
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", Object[].class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-			ITypeBinding newElementType= ((List<Expression>) mi.arguments()).get(0).resolveTypeBinding().getElementType();
+			ITypeBinding newElementType= ((Expression) mi.arguments().get(0)).resolveTypeBinding().getElementType();
 			return resolveTypeCompatible(newElementType);
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatibleIfPossible(((List<Expression>) mi.arguments()).get(0).resolveTypeBinding());
+			return resolveTypeCompatibleIfPossible(((Expression) mi.arguments().get(0)).resolveTypeBinding());
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
-			return resolveTypeCompatibleIfPossible(((List<Expression>) mi.arguments()).get(1).resolveTypeBinding());
+			return resolveTypeCompatibleIfPossible(((Expression) mi.arguments().get(1)).resolveTypeBinding());
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "remove", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "element") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getFirst") || ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "getLast") //$NON-NLS-1$ //$NON-NLS-2$
@@ -237,6 +242,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
 			return true;
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, LinkedList.class.getCanonicalName(), "descendingIterator") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "iterator") || ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "listIterator") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "listIterator", int.class.getSimpleName()) //$NON-NLS-1$
@@ -248,6 +254,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
 			return true;
 		}
+
 		if (ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray")) { //$NON-NLS-1$
 			if (!isExprReceived(mi)) {

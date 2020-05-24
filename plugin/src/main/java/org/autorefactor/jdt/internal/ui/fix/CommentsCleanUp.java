@@ -208,6 +208,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return finder.getCoveringNode();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final Javadoc node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -286,6 +287,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean hasOverrideAnnotation(final ASTNode node) {
 		if (node instanceof BodyDeclaration) {
 			for (IExtendedModifier modifier : (List<IExtendedModifier>) ((BodyDeclaration) node).modifiers()) {
@@ -307,6 +309,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private boolean hasNoTags(final Javadoc node) {
 		for (TagElement tag : (List<TagElement>) node.tags()) {
 			if (tag.getTagName() != null) {
@@ -340,7 +343,8 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		}
 		Matcher matcher= JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
 		if (matcher.matches()) {
-			List<TagElement> tagElements= (List<TagElement>) node.tags();
+			@SuppressWarnings("unchecked")
+			List<TagElement> tagElements= node.tags();
 			if (tagElements.size() >= 2) {
 				TagElement firstLine= tagElements.get(0);
 				int relativeStart= firstLine.getStartPosition() - node.getStartPosition();
@@ -561,18 +565,17 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 				|| node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final CompilationUnit node) {
 		comments.clear();
-
 		this.astRoot= node;
-		final CompilationUnit node1= astRoot;
-		for (Comment comment : (List<Comment>) node1.getCommentList()) {
+
+		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
 			comments.add(Pair.of(new SourceLocation(comment), comment));
 		}
-		final CompilationUnit node2= astRoot;
 
-		for (Comment comment : (List<Comment>) node2.getCommentList()) {
+		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
 			if (comment.isBlockComment()) {
 				BlockComment bc= (BlockComment) comment;
 				bc.accept(this);

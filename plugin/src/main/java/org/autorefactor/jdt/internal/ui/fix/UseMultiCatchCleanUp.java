@@ -201,10 +201,10 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			VariableDeclarationStatement node2= (VariableDeclarationStatement) other;
-			List<VariableDeclarationFragment> fragments1= (List<VariableDeclarationFragment>) node.fragments();
-			final VariableDeclarationStatement node1= node2;
-			List<VariableDeclarationFragment> fragments2= (List<VariableDeclarationFragment>) node1.fragments();
+			@SuppressWarnings("unchecked")
+			List<VariableDeclarationFragment> fragments1= node.fragments();
+			@SuppressWarnings("unchecked")
+			List<VariableDeclarationFragment> fragments2= ((VariableDeclarationStatement) other).fragments();
 			if (fragments1.size() == fragments2.size()) {
 				Iterator<VariableDeclarationFragment> it1= fragments1.iterator();
 				Iterator<VariableDeclarationFragment> it2= fragments2.iterator();
@@ -297,7 +297,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		List<CatchClause> catchClauses= (List<CatchClause>) node.catchClauses();
+		@SuppressWarnings("unchecked")
+		List<CatchClause> catchClauses= node.catchClauses();
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
 		for (int i= 0; i < catchClauses.size(); i++) {
 			CatchClause catchClause1= catchClauses.get(i);
@@ -343,7 +344,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			return new SingleBinding(type.resolveBinding());
 
 		case ASTNode.UNION_TYPE:
-			List<Type> types= (List<Type>) ((UnionType) type).types();
+			@SuppressWarnings("unchecked") List<Type> types= ((UnionType) type).types();
 			ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
 			for (int j= 0; j < types.size(); j++) {
 				typeBindings[j]= types.get(j).resolveBinding();
@@ -404,18 +405,18 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		UnionType result= cuRewrite.getAST().newUnionType();
-		final UnionType node= result;
-		List<Type> unionedTypes= (List<Type>) node.types();
+		@SuppressWarnings("unchecked")
+		List<Type> unionedTypes= result.types();
 		unionedTypes.addAll(rewrite.createMoveTarget(allTypes));
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void collectAllUnionedTypes(final List<Type> results, final Collection<Type> types) {
 		for (Type type : types) {
 			if (type instanceof UnionType) {
 				UnionType ut= (UnionType) type;
-				final UnionType node= ut;
-				collectAllUnionedTypes(results, node.types());
+				collectAllUnionedTypes(results, ut.types());
 			} else {
 				results.add(type);
 			}

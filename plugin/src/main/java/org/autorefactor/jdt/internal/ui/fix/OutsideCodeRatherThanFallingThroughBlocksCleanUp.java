@@ -101,7 +101,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 
 				if (ts != null && ts.getFinally() == null) {
 					@SuppressWarnings("unchecked")
-					final List<CatchClause> catchClauses= ts.catchClauses();
+					List<CatchClause> catchClauses= ts.catchClauses();
 
 					for (CatchClause catchClause : catchClauses) {
 						doCollectStatements(catchClause.getBody(), redundantStatements);

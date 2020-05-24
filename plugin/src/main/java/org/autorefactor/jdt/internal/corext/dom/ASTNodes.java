@@ -1007,9 +1007,8 @@ public final class ASTNodes {
 		}
 		if (parent instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) parent;
-			final CompilationUnit node1= cu;
 			@SuppressWarnings("unchecked")
-			List<AbstractTypeDeclaration> types= node1.types();
+			List<AbstractTypeDeclaration> types= cu.types();
 			int index= types.indexOf(node);
 			if (index != -1 && index + 1 < types.size()) {
 				return types.get(index + 1);
@@ -2479,9 +2478,8 @@ public final class ASTNodes {
 	public static Pair<Expression, Expression> decomposeInitializer(final Expression init) {
 		if (init instanceof VariableDeclarationExpression) {
 			VariableDeclarationExpression variableDeclarationExpression= (VariableDeclarationExpression) init;
-			final VariableDeclarationExpression node= variableDeclarationExpression;
 			@SuppressWarnings("unchecked")
-			List<VariableDeclarationFragment> fragments= node.fragments();
+			List<VariableDeclarationFragment> fragments= variableDeclarationExpression.fragments();
 
 			if (fragments.size() == 1) {
 				VariableDeclarationFragment fragment= fragments.get(0);

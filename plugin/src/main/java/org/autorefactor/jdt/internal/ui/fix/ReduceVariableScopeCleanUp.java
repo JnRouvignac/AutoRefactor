@@ -291,7 +291,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		Name varName= varAccess.getVariableName();
 		Type varType= getType(varDecl.getVariableName().getParent());
 		if (scope instanceof Block) {
-			List<Statement> statements= (List<Statement>) ((Block) scope).statements();
+			@SuppressWarnings("unchecked")
+			List<Statement> statements= ((Block) scope).statements();
 			for (Statement statement : statements) {
 				Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
 				Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
@@ -316,8 +317,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		} else if (scope instanceof ForStatement) {
 			ForStatement fs= (ForStatement) scope;
 			ForStatement newFs= ast.createCopyTarget(fs);
-			final ForStatement node= newFs;
-			List<Expression> initializers= (List<Expression>) node.initializers();
+			@SuppressWarnings("unchecked")
+			List<Expression> initializers= newFs.initializers();
 			if (initializers.size() != 1) {
 				throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
 			}
@@ -365,6 +366,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Block copy(final Statement stmtToCopy, final Name varName) {
 		if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
 			Block block= cuRewrite.getAST().newBlock();
@@ -373,8 +375,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				throw new NotImplementedException(stmtToCopy);
 			}
 			VariableDeclarationFragment fragment= getVariableDeclarationFragment(a, varName);
-			final Block node= block;
-			((List<Statement>) node.statements()).add(cuRewrite.getAST().newVariableDeclarationStatement(fragment));
+			((List<Statement>) block.statements()).add(cuRewrite.getAST().newVariableDeclarationStatement(fragment));
 			return block;
 		}
 		// We should never come here if we had a Block statement, see the replace()
