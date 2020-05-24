@@ -36,10 +36,10 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.ContainerType;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.ForLoopContent;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.IterationType;
 import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
@@ -97,7 +97,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 	private final class BuilderForAndUseVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ForStatement node) {
-			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+			ForLoopContent loopContent= ForLoops.iterateOverContainer(node);
 
 			if (loopContent != null
 					&& loopContent.isLoopingForward()

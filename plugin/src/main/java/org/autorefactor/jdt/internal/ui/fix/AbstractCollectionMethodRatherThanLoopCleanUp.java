@@ -37,10 +37,10 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.ContainerType;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.ForLoopContent;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.IterationType;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
@@ -343,7 +343,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
 		@Override
 		public boolean visit(final ForStatement node) {
-			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
+			ForLoopContent loopContent= ForLoops.iterateOverContainer(node);
 
 			if (result && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
 				if (IterationType.INDEX.equals(loopContent.getIterationType())) {

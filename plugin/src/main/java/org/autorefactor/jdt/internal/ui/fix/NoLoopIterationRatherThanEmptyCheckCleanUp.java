@@ -30,8 +30,8 @@ import java.util.List;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper;
-import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops;
+import org.autorefactor.jdt.internal.corext.dom.ForLoops.ForLoopContent;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -154,7 +154,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 		EnhancedForStatement enhancedForStatement= ASTNodes.as(statements.get(0), EnhancedForStatement.class);
 
 		if (forStatement != null) {
-			ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(forStatement);
+			ForLoopContent loopContent= ForLoops.iterateOverContainer(forStatement);
 
 			if (loopContent != null) {
 				return loopContent.getContainerVariable();
