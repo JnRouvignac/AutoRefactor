@@ -93,7 +93,8 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 		Statement elseStatement= node.getElseStatement();
 
 		if (elseStatement instanceof Block) {
-			List<Statement> elseStatements= (List<Statement>) ((Block) elseStatement).statements();
+			@SuppressWarnings("unchecked")
+			List<Statement> elseStatements= ((Block) elseStatement).statements();
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();

@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -70,7 +69,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 	}
 
 	private boolean maybeRefactorAssertion(final ExpressionStatement node, final MethodInvocation originalMethod,
-			final String methodName, final Operator operator) {
+			final String methodName, final InfixExpression.Operator operator) {
 		if (ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "org.junit.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
@@ -87,7 +86,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 	}
 
 	private boolean maybeRefactorMethod(final ExpressionStatement node, final MethodInvocation originalMethod,
-			final Operator operator, final int parameterIndex) {
+			final InfixExpression.Operator operator, final int parameterIndex) {
 		InfixExpression booleanExpression= ASTNodes.as((Expression) originalMethod.arguments().get(parameterIndex), InfixExpression.class);
 
 		if (booleanExpression != null && ASTNodes.hasOperator(booleanExpression, operator)) {

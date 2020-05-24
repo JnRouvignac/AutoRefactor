@@ -67,7 +67,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -445,7 +444,7 @@ public final class ASTNodes {
 	 * @param operator An operator
 	 * @return The mirrored operator
 	 */
-	public static InfixExpression.Operator mirrorOperator(final Operator operator) {
+	public static InfixExpression.Operator mirrorOperator(final InfixExpression.Operator operator) {
 		if (Arrays.asList(
 				InfixExpression.Operator.AND,
 				InfixExpression.Operator.CONDITIONAL_AND,

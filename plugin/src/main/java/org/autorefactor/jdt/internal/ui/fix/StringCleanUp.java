@@ -26,7 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -103,9 +102,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 					return false;
 				}
 			}
-		} else if (isStringValueOf && ASTNodes.hasType(((List<Expression>) node.arguments()).get(0), String.class.getCanonicalName())) {
-			if (((List<Expression>) node.arguments()).get(0) instanceof StringLiteral || ((List<Expression>) node.arguments()).get(0) instanceof InfixExpression) {
-				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0))), null);
+		} else if (isStringValueOf && ASTNodes.hasType((Expression) node.arguments().get(0), String.class.getCanonicalName())) {
+			if ((Expression) node.arguments().get(0) instanceof StringLiteral || (Expression) node.arguments().get(0) instanceof InfixExpression) {
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))), null);
 				return false;
 			}
 		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
@@ -131,7 +130,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			MethodInvocation leftInvocation= ASTNodes.as(node.getExpression(), MethodInvocation.class);
-			MethodInvocation rightInvocation= ASTNodes.as(((List<Expression>) node.arguments()).get(0), MethodInvocation.class);
+			MethodInvocation rightInvocation= ASTNodes.as((Expression) node.arguments().get(0), MethodInvocation.class);
 
 			if (leftInvocation != null && rightInvocation != null
 					&& (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
@@ -143,14 +142,14 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, leftExpression), null);
 				rewrite.replace(node.getName(), ast.simpleName("equalsIgnoreCase"), null); //$NON-NLS-1$
-				rewrite.replace(((List<Expression>) node.arguments()).get(0), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)), null);
+				rewrite.replace((Expression) node.arguments().get(0), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)), null);
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
 			AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 
 			Expression leftExpression= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
-			Expression rightExpression= getReducedStringExpression(((List<Expression>) node.arguments()).get(0), isRefactoringNeeded);
+			Expression rightExpression= getReducedStringExpression((Expression) node.arguments().get(0), isRefactoringNeeded);
 
 			if (isRefactoringNeeded.get()) {
 				rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, leftExpression), "equalsIgnoreCase", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression))), null); //$NON-NLS-1$
@@ -160,7 +159,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
-			StringLiteral stringLiteral= ASTNodes.as(((List<Expression>) node.arguments()).get(0), StringLiteral.class);
+			StringLiteral stringLiteral= ASTNodes.as((Expression) node.arguments().get(0), StringLiteral.class);
 
 			if (stringLiteral != null) {
 				String value= stringLiteral.getLiteralValue();
@@ -199,12 +198,12 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		ITypeBinding actualType= ((List<Expression>) mi.arguments()).get(0).resolveTypeBinding();
+		ITypeBinding actualType= ((Expression) mi.arguments().get(0)).resolveTypeBinding();
 
 		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, ((List<Expression>) mi.arguments()).get(0))), null);
+			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), null);
 		} else {
-			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, ((List<Expression>) mi.arguments()).get(0))), null);
+			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), null);
 		}
 
 		return false;

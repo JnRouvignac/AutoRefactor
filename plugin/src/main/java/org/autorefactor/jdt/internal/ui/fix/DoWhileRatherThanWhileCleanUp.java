@@ -134,8 +134,8 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 						parent= astNode.getParent();
 					}
 
-					if (parent instanceof PrefixExpression && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)
-							|| parent instanceof PostfixExpression && ASTNodes.hasOperator((PostfixExpression) parent, PostfixExpression.Operator.INCREMENT, PostfixExpression.Operator.DECREMENT)) {
+					if ((parent instanceof PrefixExpression && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT))
+							|| (parent instanceof PostfixExpression && ASTNodes.hasOperator((PostfixExpression) parent, PostfixExpression.Operator.INCREMENT, PostfixExpression.Operator.DECREMENT))) {
 						return null;
 					}
 				}

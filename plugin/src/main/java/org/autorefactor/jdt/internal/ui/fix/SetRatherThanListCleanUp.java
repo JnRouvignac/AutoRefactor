@@ -157,7 +157,8 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
 		if (ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
-			List<Expression> args= (List<Expression>) refactoredMi.arguments();
+			@SuppressWarnings("unchecked")
+			List<Expression> args= refactoredMi.arguments();
 			Expression item= args.get(1);
 			args.clear();
 			args.add(item);

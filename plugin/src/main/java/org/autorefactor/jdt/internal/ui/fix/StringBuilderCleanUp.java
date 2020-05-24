@@ -86,7 +86,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		return "".equals(expression.resolveConstantExpressionValue()) //$NON-NLS-1$
 				// Due to a bug with ASTNode.resolveConstantExpressionValue()
 				// in Eclipse 3.7.2 and 3.8.0, this second check is necessary
-				|| stringLiteral != null && "".equals(stringLiteral.getLiteralValue()); //$NON-NLS-1$
+				|| (stringLiteral != null && "".equals(stringLiteral.getLiteralValue())); //$NON-NLS-1$
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 					if (classCreation != null
 							&& (classCreation.arguments().isEmpty()
-									|| classCreation.arguments().size() == 1 && (ASTNodes.hasType((Expression) classCreation.arguments().get(0), String.class.getCanonicalName()) || ASTNodes.instanceOf((Expression) classCreation.arguments().get(0), CharSequence.class.getCanonicalName())))) {
+									|| (classCreation.arguments().size() == 1 && (ASTNodes.hasType((Expression) classCreation.arguments().get(0), String.class.getCanonicalName()) || ASTNodes.instanceOf((Expression) classCreation.arguments().get(0), CharSequence.class.getCanonicalName()))))) {
 						return maybeReplaceWithString(node, type, builderClass, fragment, initializer,
 								allAppendedStrings);
 					}
@@ -147,9 +147,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					if (isValidAppending(fragment, allAppendedStrings, builderClass, statement)) {
 						statementsToRemove.add(statement);
 						continue;
-					} else {
-						isAppendingFinished= true;
 					}
+                    isAppendingFinished= true;
 				}
 
 				if (isAppendingFinished) {
@@ -161,11 +160,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					}
 
 					for (SimpleName read : varOccurrencesVisitor.getReads()) {
-						if (isReadValid(node, builderClass, toStringToRefactor, read)) {
-							isUsed= true;
-						} else {
+						if (!isReadValid(node, builderClass, toStringToRefactor, read)) {
 							return true;
 						}
+                        isUsed= true;
 					}
 				}
 			}
@@ -323,8 +321,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			Expression arg0= (Expression) node.arguments().get(0);
 
 			if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
-					&& (arg0 instanceof InfixExpression || arg0 instanceof MethodInvocation
-							&& (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0)))) {
+					&& (arg0 instanceof InfixExpression || (arg0 instanceof MethodInvocation
+							&& (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0))))) {
 				return maybeRefactorAppending(node);
 			}
 		}
@@ -388,15 +386,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 						isInstanceCreationToRewrite.set(true);
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					}
-				} else {
-					if (cic.arguments().isEmpty() && !allOperands.isEmpty()
-							&& (allOperands.get(0).getFirst() != null
-									? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
-									: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
-						isInstanceCreationToRewrite.set(true);
-						isRefactoringNeeded.set(true);
-					}
-				}
+				} else if (cic.arguments().isEmpty() && !allOperands.isEmpty()
+                		&& (allOperands.get(0).getFirst() != null
+                				? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
+                				: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
+                	isInstanceCreationToRewrite.set(true);
+                	isRefactoringNeeded.set(true);
+                }
 
 				return cic;
 			} else {
@@ -747,8 +743,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName());
 
 			if (isEmptyString(expression.getSecond())) {
-				boolean removeExpression= canRemoveEmptyStrings || canNowRemoveEmptyStrings && i + 1 < allOperands.size()
-						&& ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName());
+				boolean removeExpression= canRemoveEmptyStrings || (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
+						&& ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName()));
 				if (removeExpression) {
 					allOperands.remove(i);
 					replaceNeeded= true;

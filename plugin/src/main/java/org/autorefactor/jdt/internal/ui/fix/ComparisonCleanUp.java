@@ -68,8 +68,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 					&& !ASTNodes.is(comparisonMI.getExpression(), ThisExpression.class)
 					&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-					|| getJavaMinorVersion() >= 2
-					&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
+					|| (getJavaMinorVersion() >= 2
+					&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName())))) { //$NON-NLS-1$
 				if (literalValue.compareTo(Long.valueOf(0)) == 0) {
 					return true;
 				}

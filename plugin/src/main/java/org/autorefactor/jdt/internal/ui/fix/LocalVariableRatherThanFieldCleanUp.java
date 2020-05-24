@@ -134,7 +134,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			if (isVariableDeclaration(occurrence)
 					|| isExternalField(occurrence)
 					|| currentMethodDeclaration == null
-					|| oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration) {
+					|| (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
 				return true;
 			}
 

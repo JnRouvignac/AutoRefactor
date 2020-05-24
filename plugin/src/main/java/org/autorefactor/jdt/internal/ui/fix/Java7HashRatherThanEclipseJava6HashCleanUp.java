@@ -360,10 +360,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
 					&& primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
 					&& ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
-					&& (isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
-							&& isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId())
-							|| isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
-									&& isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId()))) {
+					&& ((isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
+							&& isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId()))
+							|| (isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
+									&& isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId())))) {
 				return isNewHashValid(data, newHash);
 			}
 		}

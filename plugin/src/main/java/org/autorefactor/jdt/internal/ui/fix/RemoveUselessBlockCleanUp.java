@@ -57,7 +57,8 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		List<Statement> statements= (List<Statement>) node.statements();
+		@SuppressWarnings("unchecked")
+		List<Statement> statements= node.statements();
 
 		if (statements.size() == 1 && statements.get(0) instanceof Block) {
 			replaceBlock((Block) statements.get(0));
@@ -87,6 +88,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void replaceBlock(final Block node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();

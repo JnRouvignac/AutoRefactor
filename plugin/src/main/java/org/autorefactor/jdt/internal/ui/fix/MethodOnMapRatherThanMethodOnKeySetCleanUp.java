@@ -62,12 +62,12 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "clear") //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "size") //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
 							// If parent is not an expression statement, the MethodInvocation must return a
 							// boolean.
 							// In that case, we cannot replace because `Map.removeKey(key) != null`
 							// is not strictly equivalent to `Map.keySet().remove(key)`
-							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);

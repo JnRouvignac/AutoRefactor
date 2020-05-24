@@ -93,7 +93,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		List<Expression> args= (List<Expression>) node.arguments();
+		@SuppressWarnings("unchecked")
+		List<Expression> args= node.arguments();
 		int i= 0;
 		boolean shouldVisit= true;
 		while (shouldVisit && i < PACKAGE_PATHES.length) {
@@ -172,7 +173,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ((List<Expression>) mi.arguments()).get(0));
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), (Expression) mi.arguments().get(0));
 		}
 
 		return true;

@@ -213,7 +213,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 		int openingCurlyIndex= body.getStartPosition();
-		return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || !maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body);
+		return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || (!maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body));
 	}
 
 	@Override

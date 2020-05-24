@@ -153,7 +153,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 			if (node.getBody() instanceof Statement) {
 				return maybeRefactorBody(node, targetType.getTypeArguments()[0], classesToUseWithImport, object1, object2, ASTNodes.asList((Statement) node.getBody()));
-			} else if (node.getBody() instanceof Expression) {
+			}
+            if (node.getBody() instanceof Expression) {
 				SimpleName name1= object1.getName();
 				SimpleName name2= object2.getName();
 

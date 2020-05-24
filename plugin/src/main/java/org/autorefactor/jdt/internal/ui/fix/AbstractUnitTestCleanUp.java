@@ -229,9 +229,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 		if (!varOccurrenceVisitor.isVarUsed()) {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-					nodeToReplace, originalMethod, isAssertTrue,
-					condition, failureMessage, true);
-		}
+        		nodeToReplace, originalMethod, isAssertTrue,
+        		condition, failureMessage, true);
+	}
 
 		return true;
 	}
@@ -290,7 +290,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		} else if (ASTNodes.usesGivenSignature(conditionMi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
 			if (canUseAssertNotEquals || isAssertTrue) {
 				Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
-						((List<Expression>) conditionMi.arguments()).get(0));
+						(Expression) conditionMi.arguments().get(0));
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, nodeToReplace,
 						originalMethod, isAssertTrue, actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
 			}
@@ -340,7 +340,8 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private MethodInvocation invokeFail(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode node, final MethodInvocation originalMethod, final Expression failureMessage) {
-		List<Expression> args= (List<Expression>) originalMethod.arguments();
+		@SuppressWarnings("unchecked")
+		List<Expression> args= originalMethod.arguments();
 
 		if (args.size() == 1 || args.size() == 2) {
 			return invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, "fail", null, null, null, failureMessage); //$NON-NLS-1$

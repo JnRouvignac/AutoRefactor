@@ -270,14 +270,8 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 					Long literal= ASTNodes.getIntegerLiteral(emptyLength.getSecondOperand());
 
 					if (literal != null) {
-						if (literal.equals(0L)
-								&& Arrays.asList(
-										InfixExpression.Operator.NOT_EQUALS,
-										InfixExpression.Operator.GREATER).contains(emptyLength.getOperator())) {
-							builderUses.add(ASTNodes.as(emptyLength.getFirstOperand().getExpression(), SimpleName.class));
-							return true;
-						} else if (literal.equals(1L)
-								&& InfixExpression.Operator.GREATER_EQUALS.equals(emptyLength.getOperator())) {
+						if ((literal.equals(0L) && Arrays.asList(InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.GREATER).contains(emptyLength.getOperator()))
+								|| (literal.equals(1L) && InfixExpression.Operator.GREATER_EQUALS.equals(emptyLength.getOperator()))) {
 							builderUses.add(ASTNodes.as(emptyLength.getFirstOperand().getExpression(), SimpleName.class));
 							return true;
 						}
@@ -293,13 +287,8 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 							if (ASTNodes.isSameVariable(loopVariable, orderedConditionForDelimiter.getFirstOperand())
 									&& literal != null) {
-								if (literal.equals(0L)
-										&& Arrays.asList(
-												InfixExpression.Operator.NOT_EQUALS,
-												InfixExpression.Operator.GREATER).contains(orderedConditionForDelimiter.getOperator())) {
-									return true;
-								} else if (literal.equals(1L)
-										&& InfixExpression.Operator.GREATER_EQUALS.equals(orderedConditionForDelimiter.getOperator())) {
+								if ((literal.equals(0L) && Arrays.asList(InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.GREATER).contains(orderedConditionForDelimiter.getOperator()))
+										|| (literal.equals(1L) && InfixExpression.Operator.GREATER_EQUALS.equals(orderedConditionForDelimiter.getOperator()))) {
 									return true;
 								}
 							}
@@ -318,10 +307,10 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 									&& ASTNodes.isSameVariable(containerVariable, limit.getQualifier())) {
 								Long literal= ASTNodes.getIntegerLiteral(beyondScope.getRightOperand());
 
-								if (Arrays.asList(
+								if ((Arrays.asList(
 										InfixExpression.Operator.NOT_EQUALS,
-										InfixExpression.Operator.LESS).contains(orderedConditionForDelimiter.getOperator()) && literal.equals(1L)
-										|| InfixExpression.Operator.LESS_EQUALS.equals(orderedConditionForDelimiter.getOperator()) && literal.equals(2L)) {
+										InfixExpression.Operator.LESS).contains(orderedConditionForDelimiter.getOperator()) && literal.equals(1L))
+										|| (InfixExpression.Operator.LESS_EQUALS.equals(orderedConditionForDelimiter.getOperator()) && literal.equals(2L))) {
 									return true;
 								}
 							}

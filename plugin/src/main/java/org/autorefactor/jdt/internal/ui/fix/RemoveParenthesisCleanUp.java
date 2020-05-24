@@ -141,17 +141,13 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 			return null;
 		}
 
-		if (parent instanceof InfixExpression
-				&& ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS)
-				|| parent instanceof PrefixExpression
-						&& ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) {
-			if (child instanceof PrefixExpression
-					&& ASTNodes.hasOperator((PrefixExpression) child, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) {
-				return null;
-			}
-
-			if (child instanceof PostfixExpression
-					&& ASTNodes.hasOperator((PostfixExpression) child, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) {
+		if ((parent instanceof InfixExpression
+				&& ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS))
+				|| (parent instanceof PrefixExpression
+						&& ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) {
+			if ((child instanceof PrefixExpression
+					&& ASTNodes.hasOperator((PrefixExpression) child, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) || (child instanceof PostfixExpression
+					&& ASTNodes.hasOperator((PostfixExpression) child, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT))) {
 				return null;
 			}
 
@@ -178,11 +174,11 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 				child instanceof InfixExpression
 				|| child instanceof CastExpression
 				// Infix and prefix or postfix without parenthesis is not readable
-				|| (parent instanceof InfixExpression
+				|| ((parent instanceof InfixExpression
 						|| parent instanceof PrefixExpression
 						|| parent instanceof PostfixExpression)
 						&& (child instanceof PrefixExpression
-								|| child instanceof PostfixExpression)) {
+								|| child instanceof PostfixExpression))) {
 			return null;
 		}
 

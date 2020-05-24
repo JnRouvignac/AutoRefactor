@@ -128,13 +128,13 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			List<Expression> args= cic.arguments();
 			boolean noArgsCtor= args.isEmpty();
 			boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-			return noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+			return (noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
 					ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
 					IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
-					WeakHashMap.class.getCanonicalName())
-					|| mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+					WeakHashMap.class.getCanonicalName()))
+					|| (mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
 							HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
-							WeakHashMap.class.getCanonicalName());
+							WeakHashMap.class.getCanonicalName()));
 		}
 
 		private boolean isValidCapacityParameter(final Expression sourceMap, final List<Expression> args) {

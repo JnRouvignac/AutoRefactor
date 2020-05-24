@@ -99,8 +99,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean canRemoveCast(final CastExpression node) {
-		if (ASTNodes.hasType(node.getExpression(), char.class.getCanonicalName()) && ASTNodes.hasType(node, int.class.getCanonicalName())
-				|| ASTNodes.hasType(node.getExpression(), byte.class.getCanonicalName()) && ASTNodes.hasType(node, char.class.getCanonicalName())) {
+		if ((ASTNodes.hasType(node.getExpression(), char.class.getCanonicalName()) && ASTNodes.hasType(node, int.class.getCanonicalName()))
+				|| (ASTNodes.hasType(node.getExpression(), byte.class.getCanonicalName()) && ASTNodes.hasType(node, char.class.getCanonicalName()))) {
 			return false;
 		}
 
@@ -128,7 +128,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 							&& !ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
 				}
 
-				return (isNotRefactored(lo) && isStringConcat(infixExpression)
+				return ((isNotRefactored(lo) && isStringConcat(infixExpression))
 						|| (isIntegralDivision(infixExpression) ? canRemoveCastInIntegralDivision(node, infixExpression)
 								: isAssignmentCompatibleInInfixExpression(node, infixExpression)))
 						&& !isIntegralDividedByFloatingPoint(node, infixExpression);
@@ -248,9 +248,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		if (value != null) {
 			long val= value;
-			return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
-					|| ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
-					|| ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
+			return (ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
+					|| (ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
+					|| (ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
 		}
 
 		return false;

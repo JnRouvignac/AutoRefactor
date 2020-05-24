@@ -27,7 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -192,7 +192,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		TypeDeclaration result= ast.getAST().newTypeDeclaration();
-		result.modifiers().addAll(Arrays.asList(ast.private0(), ast.static0()));
+		Collections.addAll(result.modifiers(), ast.private0(), ast.static0());
 		result.setName(typeName);
 		List<BodyDeclaration> viewItemsFieldDecls= result.bodyDeclarations();
 

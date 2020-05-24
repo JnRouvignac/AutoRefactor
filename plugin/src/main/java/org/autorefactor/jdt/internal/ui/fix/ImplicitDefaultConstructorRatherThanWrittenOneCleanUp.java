@@ -55,6 +55,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 		return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TypeDeclaration node) {
 		if (!node.isInterface()) {
@@ -104,8 +105,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 					IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
 					if (extendedModifier.isModifier()) {
 						Modifier modifier= (Modifier) extendedModifier;
-						if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
-								|| (modifier.isPrivate() && isPrivateClass)) {
+						if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
+								|| modifier.isPrivate() && isPrivateClass) {
 							cuRewrite.getASTRewrite().remove(uniqueConstructor, null);
 							return false;
 						}
@@ -122,7 +123,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 	}
 
 	private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
-		List<Statement> statements= (List<Statement>) uniqueConstructor.getBody().statements();
+		@SuppressWarnings("unchecked")
+		List<Statement> statements= uniqueConstructor.getBody().statements();
 
 		if (Utils.isEmpty(statements)) {
 			return true;

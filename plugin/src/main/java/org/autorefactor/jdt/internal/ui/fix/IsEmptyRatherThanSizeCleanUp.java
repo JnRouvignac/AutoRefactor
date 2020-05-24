@@ -72,7 +72,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 					&& miToReplace.getExpression() != null
 					&& !ASTNodes.is(miToReplace.getExpression(), ThisExpression.class)
 					&& (ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), SIZE_METHOD) || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), SIZE_METHOD)
-							|| ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), LENGTH_METHOD) && getJavaMinorVersion() >= 6)) {
+							|| (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), LENGTH_METHOD) && getJavaMinorVersion() >= 6))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
