@@ -67,8 +67,8 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		}
 
 		boolean visitSubtree= true;
-		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
-			Expression initializer= vdf.getInitializer();
+		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
+			Expression initializer= fragment.getInitializer();
 			if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
 					|| (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {

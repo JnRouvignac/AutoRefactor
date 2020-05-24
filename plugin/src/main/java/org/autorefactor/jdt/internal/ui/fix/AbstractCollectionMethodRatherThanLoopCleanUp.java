@@ -400,10 +400,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 		}
 
 		private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(final Statement statement) {
-			VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(statement);
+			VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(statement);
 
-			if (vdf != null) {
-				return Pair.of(vdf.getName(), vdf.getInitializer());
+			if (fragment != null) {
+				return Pair.of(fragment.getName(), fragment.getInitializer());
 			}
 
 			return Pair.empty();

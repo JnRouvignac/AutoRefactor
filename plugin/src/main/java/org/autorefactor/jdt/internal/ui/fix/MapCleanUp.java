@@ -94,10 +94,10 @@ public class MapCleanUp extends AbstractCleanUpRule {
 						return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
 					}
 				} else if (previousStatement instanceof VariableDeclarationStatement) {
-					VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
+					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(
 							previousStatement);
-					if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
-						return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
+					if (fragment != null && ASTNodes.isSameLocalVariable(fragment, mi.getExpression())) {
+						return maybeReplaceInitializer(fragment.getInitializer(), arg0, node);
 					}
 				}
 			}

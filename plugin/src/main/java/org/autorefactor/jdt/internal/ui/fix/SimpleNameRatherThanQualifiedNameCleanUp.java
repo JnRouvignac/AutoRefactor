@@ -518,13 +518,13 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TypeDeclaration node) {
 		ITypeBinding typeBinding= node.resolveBinding();
 		if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
 			CompilationUnit compilationUnit= (CompilationUnit) node.getParent();
-			final CompilationUnit node1= compilationUnit;
-			for (ImportDeclaration importDecl : (List<ImportDeclaration>) node1.imports()) {
+			for (ImportDeclaration importDecl : (List<ImportDeclaration>) compilationUnit.imports()) {
 				readImport(importDecl);
 			}
 			importTypesFromPackage("java.lang", compilationUnit); //$NON-NLS-1$
@@ -581,11 +581,12 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			return true;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean visit(final FieldDeclaration node) {
-			for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) node.fragments()) {
-				String simpleName= vdf.getName().getIdentifier();
-				IVariableBinding variableBinding= vdf.resolveBinding();
+			for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
+				String simpleName= fragment.getName().getIdentifier();
+				IVariableBinding variableBinding= fragment.resolveBinding();
 				if (variableBinding != null) {
 					fields.addName(FQN.fromMember(
 							QName.valueOf(variableBinding.getDeclaringClass().getQualifiedName(), simpleName)));
@@ -653,6 +654,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final MethodDeclaration node) {
 		// Method parameters

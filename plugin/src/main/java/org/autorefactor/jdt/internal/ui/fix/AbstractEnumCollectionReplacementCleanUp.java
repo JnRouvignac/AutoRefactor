@@ -162,8 +162,8 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 					&& typeArguments.get(0).resolveBinding().isEnum()) {
 				List<VariableDeclarationFragment> fragments= (List<VariableDeclarationFragment>) node.fragments();
 
-				for (VariableDeclarationFragment vdf : fragments) {
-					Expression initExpression= vdf.getInitializer();
+				for (VariableDeclarationFragment fragment : fragments) {
+					Expression initExpression= fragment.getInitializer();
 
 					if (initExpression != null) {
 						initExpression= ASTNodes.getUnparenthesedExpression(initExpression);

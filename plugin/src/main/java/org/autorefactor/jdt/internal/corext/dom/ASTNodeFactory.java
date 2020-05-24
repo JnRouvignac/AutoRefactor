@@ -643,9 +643,9 @@ public class ASTNodeFactory {
 	 * @return a new variable declaration fragment
 	 */
 	public VariableDeclarationFragment declareFragment(final SimpleName varName) {
-		VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
-		vdf.setName(varName);
-		return vdf;
+		VariableDeclarationFragment fragment= ast.newVariableDeclarationFragment();
+		fragment.setName(varName);
+		return fragment;
 	}
 
 	/**
@@ -656,10 +656,10 @@ public class ASTNodeFactory {
 	 * @return a new variable declaration fragment
 	 */
 	public VariableDeclarationFragment declareFragment(final SimpleName varName, final Expression initializer) {
-		VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
-		vdf.setName(varName);
-		vdf.setInitializer(initializer);
-		return vdf;
+		VariableDeclarationFragment fragment= ast.newVariableDeclarationFragment();
+		fragment.setName(varName);
+		fragment.setInitializer(initializer);
+		return fragment;
 	}
 
 	/**

@@ -178,15 +178,15 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			}
 
 			VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-			VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
+			VariableDeclarationFragment fragment= findVariableDeclarationFragment(vds, lhs);
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
 
-			if (vdf != null && (vdf.getInitializer() == null || ASTNodes.isPassive(vdf.getInitializer()))) {
-				rewrite.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
+			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
+				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
 				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
 				this.result= false;
 				return false;
@@ -213,9 +213,9 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
 				final Expression expression) {
 			if (vds != null && expression instanceof SimpleName) {
-				for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds.fragments()) {
-					if (ASTNodes.isSameVariable(expression, vdf)) {
-						return vdf;
+				for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) vds.fragments()) {
+					if (ASTNodes.isSameVariable(expression, fragment)) {
+						return fragment;
 					}
 				}
 			}

@@ -78,10 +78,10 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
 					VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-					VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
+					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(vds);
 
-					if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
-						Expression returnExpression= vdf.getInitializer();
+					if (fragment != null && ASTNodes.isSameLocalVariable(node.getExpression(), fragment.getName())) {
+						Expression returnExpression= fragment.getInitializer();
 						if (returnExpression instanceof ArrayInitializer) {
 							if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
 								return true;

@@ -448,8 +448,8 @@ public class CFGBuilder {
 	private boolean addDeclarations(final CFGBasicBlock basicBlock, final List<VariableDeclarationFragment> fragments, final Type type,
 			final ThrowerBlocks throwers) {
 		boolean mightThrow= false;
-		for (VariableDeclarationFragment vdf : fragments) {
-			if (addDeclaration(basicBlock, vdf, type, throwers)) {
+		for (VariableDeclarationFragment fragment : fragments) {
+			if (addDeclaration(basicBlock, fragment, type, throwers)) {
 				mightThrow= true;
 			}
 		}
@@ -457,11 +457,11 @@ public class CFGBuilder {
 		return mightThrow;
 	}
 
-	private boolean addDeclaration(final CFGBasicBlock basicBlock, final VariableDeclarationFragment vdf, final Type type,
+	private boolean addDeclaration(final CFGBasicBlock basicBlock, final VariableDeclarationFragment fragment, final Type type,
 			final ThrowerBlocks throwers) {
-		int accessType= vdf.getInitializer() == null ? VariableAccess.DECL_UNINIT : VariableAccess.DECL_INIT | VariableAccess.WRITE;
-		basicBlock.addVariableAccess(new VariableAccess(vdf, vdf.getName(), type, accessType));
-		return addVariableAccess(basicBlock, vdf.getInitializer(), VariableAccess.READ, throwers);
+		int accessType= fragment.getInitializer() == null ? VariableAccess.DECL_UNINIT : VariableAccess.DECL_INIT | VariableAccess.WRITE;
+		basicBlock.addVariableAccess(new VariableAccess(fragment, fragment.getName(), type, accessType));
+		return addVariableAccess(basicBlock, fragment.getInitializer(), VariableAccess.READ, throwers);
 	}
 
 	private boolean addDeclarations(final CFGBasicBlock basicBlock, final VariableDeclarationExpression variableDeclarationExpression,

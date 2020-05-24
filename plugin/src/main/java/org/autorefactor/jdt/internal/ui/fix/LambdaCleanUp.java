@@ -251,8 +251,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 	private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
 		Object param0= node.parameters().get(i);
 		if (param0 instanceof VariableDeclarationFragment) {
-			VariableDeclarationFragment vdf= (VariableDeclarationFragment) param0;
-			return ASTNodes.isSameVariable(vdf.getName(), argument);
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) param0;
+			return ASTNodes.isSameVariable(fragment.getName(), argument);
 			// } else if (param0 instanceof SingleVariableDeclaration) {
 			// TODO it should also be possible to deal with a SingleVariableDeclaration
 			// when the type matches the expected inferred type

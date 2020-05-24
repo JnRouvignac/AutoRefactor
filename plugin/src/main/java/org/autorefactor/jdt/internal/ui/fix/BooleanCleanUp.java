@@ -303,15 +303,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
 			if (previousSibling instanceof VariableDeclarationStatement) {
 				VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-				VariableDeclarationFragment vdf= getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
+				VariableDeclarationFragment fragment= getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
 
-				if (vdf != null) {
+				if (fragment != null) {
 					VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
-							vdf.resolveBinding(), node.getExpression(), true).find();
+							fragment.resolveBinding(), node.getExpression(), true).find();
 
 					if (variableUseVisitor.getReads().isEmpty()) {
 						ITypeBinding typeBinding= vds.getType().resolveBinding();
-						return maybeReplace(node, thenA, typeBinding, vdf.getInitializer());
+						return maybeReplace(node, thenA, typeBinding, fragment.getInitializer());
 					}
 				}
 			} else if (previousSibling instanceof ExpressionStatement) {
@@ -381,9 +381,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 			return null;
 		}
 
-		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds.fragments()) {
-			if (ASTNodes.isSameVariable(expression, vdf)) {
-				return vdf;
+		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) vds.fragments()) {
+			if (ASTNodes.isSameVariable(expression, fragment)) {
+				return fragment;
 			}
 		}
 
