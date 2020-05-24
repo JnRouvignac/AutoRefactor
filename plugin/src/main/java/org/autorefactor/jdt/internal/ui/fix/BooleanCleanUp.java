@@ -251,7 +251,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 		ITypeBinding typeBinding= node.resolveTypeBinding();
 
 		if (typeBinding != null) {
-			Expression newE= newExpressionOrNull(typeBinding.getQualifiedName(), node.getExpression(),
+			Expression newE= newExpressionOrNull(typeBinding, node.getExpression(),
 					node.getThenExpression(), node.getElseExpression());
 
 			if (newE != null) {
@@ -329,8 +329,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
 	private boolean maybeReplace(final IfStatement node, final Assignment assignment, final ITypeBinding typeBinding, final Expression rightHandSide) {
 		if (typeBinding != null) {
-			String expressionTypeName= typeBinding.getQualifiedName();
-			Expression newE= newExpressionOrNull(expressionTypeName, node.getExpression(), assignment.getRightHandSide(),
+			Expression newE= newExpressionOrNull(typeBinding, node.getExpression(), assignment.getRightHandSide(),
 					rightHandSide);
 
 			if (newE != null) {
@@ -432,7 +431,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 						+ md.getName().getIdentifier() + ", but found " + qualifiedName); //$NON-NLS-1$
 	}
 
-	private Expression newExpressionOrNull(final String expressionTypeName, final Expression condition, final Expression thenExpression,
+	private Expression newExpressionOrNull(final ITypeBinding typeBinding, final Expression condition, final Expression thenExpression,
 			final Expression elseExpression) {
 		Boolean thenLiteral= ASTNodes.getBooleanLiteral(thenExpression);
 		Boolean elseLiteral= ASTNodes.getBooleanLiteral(elseExpression);
@@ -446,12 +445,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 				orientedCondition= ast.negate(condition, Copy.COPY);
 			}
 
-			return getExpression(orientedCondition, expressionTypeName, booleanName);
+			return getExpression(orientedCondition, typeBinding.getQualifiedName(), booleanName);
 		}
 
 		if ((ASTNodes.isPrimitive(thenExpression) || ASTNodes.isPrimitive(elseExpression))
-				&& ("boolean".equals(expressionTypeName) //$NON-NLS-1$
-						|| Boolean.class.getCanonicalName().equals(expressionTypeName))) {
+				&& ASTNodes.hasType(typeBinding, boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())) {
 			// If both expressions are primitive, there cannot be any NPE
 			// If only one expression is primitive, a NPE is already possible so we do not
 			// care
