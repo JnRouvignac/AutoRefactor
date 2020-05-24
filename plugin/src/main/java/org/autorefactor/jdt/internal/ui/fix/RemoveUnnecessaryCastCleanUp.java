@@ -228,9 +228,10 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean isIntegralDividedByFloatingPoint(final CastExpression node, final InfixExpression infixExpression) {
-		Expression rightOp= infixExpression.getRightOperand();
-		return isIntegralType(infixExpression.getLeftOperand()) && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE) && isFloatingPointType(rightOp)
-				&& node.equals(rightOp);
+		return node.equals(infixExpression.getRightOperand())
+				&& isIntegralType(infixExpression.getLeftOperand())
+				&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE)
+				&& isFloatingPointType(node);
 	}
 
 	private boolean isIntegralType(final Expression expression) {
