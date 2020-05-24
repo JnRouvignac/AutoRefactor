@@ -188,6 +188,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final ForStatement node) {
 		Set<SimpleName> vars= new HashSet<>();
@@ -241,39 +242,41 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
 			List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
-			for (Statement statement : assignments) {
-				VariableDeclarationStatement variableDeclaration= ASTNodes.as(statement, VariableDeclarationStatement.class);
-				Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
+			if (areAssignmentsValid(allowedVars, assignments)) {
+				addBreak(ifStatement, assignments);
+				return false;
+			}
+		}
 
-				if (variableDeclaration != null) {
-					for (Object obj : variableDeclaration.fragments()) {
-						VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
+		return true;
+	}
 
-						if (ASTNodes.isHardCoded(fragment.getInitializer())) {
-							continue;
-						}
+	private boolean areAssignmentsValid(final Set<SimpleName> allowedVars, final List<Statement> assignments) {
+		for (Statement statement : assignments) {
+			VariableDeclarationStatement variableDeclaration= ASTNodes.as(statement, VariableDeclarationStatement.class);
+			Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
 
-						return true;
-					}
+			if (variableDeclaration != null) {
+				for (Object obj : variableDeclaration.fragments()) {
+					VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
-					continue;
-				} else if (assignment != null
-						&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
-						&& ASTNodes.isHardCoded(assignment.getRightHandSide())
-						&& ASTNodes.isPassive(assignment.getLeftHandSide())) {
-					VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
-					varOccurrenceVisitor.visitNode(assignment.getLeftHandSide());
-
-					if (!varOccurrenceVisitor.isVarUsed()) {
-						continue;
+					if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
+						return false;
 					}
 				}
+			} else if (assignment != null
+					&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+					&& ASTNodes.isHardCoded(assignment.getRightHandSide())
+					&& ASTNodes.isPassive(assignment.getLeftHandSide())) {
+				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
+				varOccurrenceVisitor.visitNode(assignment.getLeftHandSide());
 
-				return true;
+				if (varOccurrenceVisitor.isVarUsed()) {
+					return false;
+				}
+			} else {
+				return false;
 			}
-
-			addBreak(ifStatement, assignments);
-			return false;
 		}
 
 		return true;
