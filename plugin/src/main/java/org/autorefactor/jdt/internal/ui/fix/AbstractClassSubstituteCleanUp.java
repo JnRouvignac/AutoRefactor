@@ -459,7 +459,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 		@Override
 		public boolean visit(final SimpleName aVariable) {
 			SimpleName varDeclName= varDecl.getName();
-			if (ASTNodes.isSameVariable(aVariable, varDeclName) && !aVariable.equals(varDeclName)) {
+			if (ASTNodes.isSameLocalVariable(aVariable, varDeclName) && !aVariable.equals(varDeclName)) {
 				varOccurrences.add(aVariable);
 			}
 
