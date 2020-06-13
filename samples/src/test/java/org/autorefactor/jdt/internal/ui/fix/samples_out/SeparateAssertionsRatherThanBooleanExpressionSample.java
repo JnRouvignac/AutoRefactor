@@ -88,6 +88,18 @@ public class SeparateAssertionsRatherThanBooleanExpressionSample {
         org.testng.Assert.assertFalse(b2, "Either b1 or b2 is wrong, I don't know");
     }
 
+    public void refactorJupiter(boolean b1, boolean b2) {
+        // Keep this comment
+        org.junit.jupiter.api.Assertions.assertTrue(b1);
+        org.junit.jupiter.api.Assertions.assertTrue(b2);
+        org.junit.jupiter.api.Assertions.assertTrue(b1, "Either b1 or b2 is wrong, I don't know");
+        org.junit.jupiter.api.Assertions.assertTrue(b2, "Either b1 or b2 is wrong, I don't know");
+        org.junit.jupiter.api.Assertions.assertFalse(b1);
+        org.junit.jupiter.api.Assertions.assertFalse(b2);
+        org.junit.jupiter.api.Assertions.assertFalse(b1, "Either b1 or b2 is wrong, I don't know");
+        org.junit.jupiter.api.Assertions.assertFalse(b2, "Either b1 or b2 is wrong, I don't know");
+    }
+
     public void doNotRefactorOppositeInfixExpression(boolean b1, boolean b2) {
         Assert.assertTrue(b1 || b2);
         Assert.assertTrue("Either b1 or b2 is wrong, I don't know", b1 || b2);

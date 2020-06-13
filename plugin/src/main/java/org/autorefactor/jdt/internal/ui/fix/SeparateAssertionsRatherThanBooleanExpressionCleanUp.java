@@ -70,10 +70,12 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 
 	private boolean maybeRefactorAssertion(final ExpressionStatement node, final MethodInvocation originalMethod,
 			final String methodName, final InfixExpression.Operator operator) {
-		if (ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(originalMethod, "org.junit.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(originalMethod, "junit.framework.Assert", methodName, boolean.class.getSimpleName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(originalMethod, "org.junit.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(originalMethod, "junit.framework.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(originalMethod, "org.junit.jupiter.api.Assertions", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(originalMethod, "org.junit.jupiter.api.Assertions", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
 			return maybeRefactorMethod(node, originalMethod, operator, 0);
 		}
 
