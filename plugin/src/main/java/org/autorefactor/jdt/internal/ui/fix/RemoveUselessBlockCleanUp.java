@@ -26,15 +26,21 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
+import org.autorefactor.jdt.internal.corext.dom.ASTComments;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -93,6 +99,50 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		rewrite.replace(node, ast.copyRange((List<Statement>) node.statements()), null);
+		List<Statement> statements= node.statements();
+		List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
+
+		for (String comment : extraLeadingComments) {
+			rewrite.insertBefore(ast.rawComment(comment), node, null);
+		}
+
+		rewrite.replace(node, ast.copyRange(statements), null);
+	}
+
+	/**
+	 * If statements starts on different line than block and comment starts on same line then block
+	 * the comment has to be copied manually (see #396)
+	 */
+	private List<String> collectExtraLeadingComments(Block node, List<Statement> statements) {
+		List<String> comments = new ArrayList<>();
+		CompilationUnit cu = node.getRoot() instanceof CompilationUnit ? (CompilationUnit) node.getRoot() : null;
+
+		if (cu != null) {
+			int stmtStartPosition = statements.isEmpty()
+					? SourceLocation.getEndPosition(node) - 1
+					: statements.get(0).getStartPosition();
+			List<Comment> leadingComments = ASTComments.filterCommentsInRange(
+					node.getStartPosition() + 1,
+					stmtStartPosition, cu);
+
+			try {
+				if (!leadingComments.isEmpty()) {
+					int lineNumberBlockStart = cu.getLineNumber(node.getStartPosition());
+					String source = cu.getTypeRoot().getSource();
+
+					for (Comment comment : leadingComments) {
+						String s = source.substring(comment.getStartPosition(), SourceLocation.getEndPosition(comment));
+						if (lineNumberBlockStart == cu.getLineNumber(comment.getStartPosition())
+								&& lineNumberBlockStart != cu.getLineNumber(stmtStartPosition)) {
+							comments.add(s);
+						}
+					}
+				}
+			} catch (JavaModelException e) {
+				// Should we abort?
+			}
+		}
+
+		return comments;
 	}
 }

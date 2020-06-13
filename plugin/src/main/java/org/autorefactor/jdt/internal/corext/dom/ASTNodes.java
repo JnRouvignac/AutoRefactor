@@ -117,12 +117,15 @@ public final class ASTNodes {
 	}
 
 	/** Compares {@link ASTNode}s according to their start position. */
-	public static final class NodeStartPositionComparator implements Comparator<ASTNode> {
+	private static final class NodeStartPositionComparator implements Comparator<ASTNode> {
 		@Override
 		public int compare(final ASTNode o1, final ASTNode o2) {
 			return o1.getStartPosition() - o2.getStartPosition();
 		}
 	}
+
+	/** Compares {@link ASTNode}s according to their start position. */
+	public static final Comparator<ASTNode> ORDER_NODES_BY_START_POSITION = new NodeStartPositionComparator();
 
 	private static final class ExprActivityVisitor extends InterruptibleVisitor {
 		private ExprActivity activityLevel= ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH;
@@ -1031,7 +1034,7 @@ public final class ASTNodes {
 
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final List<BodyDeclaration> bodyDeclarations,
 			final boolean lookForPrevious) {
-		TreeSet<BodyDeclaration> children= new TreeSet<>(new NodeStartPositionComparator());
+		TreeSet<BodyDeclaration> children= new TreeSet<>(ORDER_NODES_BY_START_POSITION);
 		children.addAll(bodyDeclarations);
 
 		BodyDeclaration previous= null;

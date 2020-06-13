@@ -1323,6 +1323,17 @@ public class ASTNodeFactory {
 	}
 
 	/**
+	 * Builds a new {@link ASTNode} instance containing raw comment source code.
+	 *
+	 * @param text the raw source code of comment
+	 *
+	 * @return a newline statement
+	 */
+	public ASTNode rawComment(String text) {
+		return refactorings.getRewrite().createStringPlaceholder(text, ASTNode.EMPTY_STATEMENT);
+	}
+
+	/**
 	 * Builds a new {@link Modifier} with keyword {@code public}.
 	 *
 	 * @return a {@code public} modifier
