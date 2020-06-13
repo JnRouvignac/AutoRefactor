@@ -104,9 +104,9 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
         List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
 
         for (String comment : extraLeadingComments) {
-            r.insertBefore(b.rawComment(comment), node);
+            rewrite.insertBefore(ast.rawComment(comment), node);
         }
-        r.replace(node, b.copyRange(statements));
+        rewrite.replace(node, ast.copyRange(statements));
     }
 
     /**
