@@ -24,7 +24,7 @@ public final class ASTComments {
      * @return comments
      */
     public static List<Comment> filterCommentsInRange(int start, int end, final CompilationUnit cu) {
-        return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
+        return filterCommentsInRange(start, end, (List<Comment>) cu.getCommentList());
     }
 
     /**
