@@ -27,6 +27,8 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Assert;
 
 public class JUnitAssertSample {
@@ -69,6 +71,19 @@ public class JUnitAssertSample {
         assertTrue("Failure message to keep", f1 == f2);
         assertFalse(f1 != f2);
         assertFalse("Failure message to keep", f1 != f2);
+    }
+
+    public void removeParenthesis(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        Assert.assertTrue((i1 + i2) == (i3 + i4));
+        Assert.assertTrue("Failure message to keep", (i1 + i2) == (i3 + i4));
+        Assert.assertFalse((i1 + i2) != (i3 + i4));
+        Assert.assertFalse("Failure message to keep", (i1 + i2) != (i3 + i4));
+
+        assertTrue((i1 + i2) == (i3 + i4));
+        assertTrue("Failure message to keep", (i1 + i2) == (i3 + i4));
+        assertFalse((i1 + i2) != (i3 + i4));
+        assertFalse("Failure message to keep", (i1 + i2) != (i3 + i4));
     }
 
     public void refactorFailures() {
@@ -114,6 +129,13 @@ public class JUnitAssertSample {
             assertFalse(false);
         if (b)
             assertFalse("Useless message", false);
+    }
+
+    public void removeElse(boolean b) {
+        if (b)
+            System.out.println("foo");
+        else
+            Assert.assertTrue(true);
     }
 
     public void refactorNegatedConditions(boolean b) {
@@ -416,6 +438,44 @@ public class JUnitAssertSample {
             fail();
         }
         if (!b) {
+            fail("Failure message to keep");
+        }
+    }
+
+    public void doNotRefactorUsedObject(Date nullDate) {
+        if (nullDate != null) {
+            Assert.fail("The date should be null: " + nullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null: " + nullDate.getTime());
+        }
+    }
+
+    public void refactorNotUsedObject(Date nullDate, Date notNullDate) {
+        // Keep this comment
+        if (nullDate != null) {
+            Assert.fail("The date should be null, not like: " + notNullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null, not like: " + notNullDate.getTime());
+        }
+    }
+
+    public void refactorIfOnExpression(boolean b1, boolean b2) {
+        // Keep this comment
+        if (b1 && b2) {
+            Assert.fail();
+        }
+        if (b1 || b2) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (!b1 && !b2) {
+            fail();
+        }
+        if (!b1 || !b2) {
             fail("Failure message to keep");
         }
     }

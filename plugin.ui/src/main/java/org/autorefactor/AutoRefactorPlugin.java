@@ -44,154 +44,154 @@ import org.osgi.framework.BundleContext;
 
 /** The activator class controls the plug-in life cycle. */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
-    /** The plug-in ID. */
-    public static final String PLUGIN_ID= "org.autorefactor.plugin.ui"; //$NON-NLS-1$
+	/** The plug-in ID. */
+	public static final String PLUGIN_ID= "org.autorefactor.plugin.ui"; //$NON-NLS-1$
 
-    /** The shared instance. */
-    private static AutoRefactorPlugin plugin;
-    private static Environment environment;
+	/** The shared instance. */
+	private static AutoRefactorPlugin plugin;
+	private static Environment environment;
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        super.start(context);
-        plugin= this;
-        environment= new Environment(new DisplayEventLoop(), new JobManagerImpl(), new LoggerImpl(),
-                new EclipsePreferences(plugin.getPreferenceStore()));
-    }
+	@Override
+	public void start(final BundleContext context) throws Exception {
+		super.start(context);
+		plugin= this;
+		environment= new Environment(new DisplayEventLoop(), new JobManagerImpl(), new LoggerImpl(),
+				new EclipsePreferences(plugin.getPreferenceStore()));
+	}
 
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        plugin= null;
-        ((JobManagerImpl) environment.getJobManager()).cancelJobs();
-        environment= null;
-        super.stop(context);
-    }
+	@Override
+	public void stop(final BundleContext context) throws Exception {
+		plugin= null;
+		((JobManagerImpl) environment.getJobManager()).cancelJobs();
+		environment= null;
+		super.stop(context);
+	}
 
-    private static class LoggerImpl implements Logger {
-        private static void log(int severity, String message, Exception e) {
-            if (getEnvironment().getPreferences().debugModeOn()) {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                }
-                throw new UnhandledException(null, message, e);
-            }
+	private static class LoggerImpl implements Logger {
+		private static void log(int severity, String message, Exception e) {
+			if (getEnvironment().getPreferences().debugModeOn()) {
+				if (e instanceof RuntimeException) {
+					throw (RuntimeException) e;
+				}
+				throw new UnhandledException(null, message, e);
+			}
 
-            final ILog log= getDefault().getLog();
-            log.log(new Status(severity, PLUGIN_ID, message, e));
-        }
+			final ILog log= getDefault().getLog();
+			log.log(new Status(severity, PLUGIN_ID, message, e));
+		}
 
-        /**
-         * Log a warning message.
-         *
-         * @param message the message
-         */
-        @Override
-        public void warn(String message) {
-            log(IStatus.WARNING, message, null);
-        }
+		/**
+		 * Log a warning message.
+		 *
+		 * @param message the message
+		 */
+		@Override
+		public void warn(String message) {
+			log(IStatus.WARNING, message, null);
+		}
 
-        /**
-         * Log a error message.
-         *
-         * @param message the message
-         */
-        @Override
-        public void error(String message) {
-            log(IStatus.ERROR, message, null);
-        }
+		/**
+		 * Log a error message.
+		 *
+		 * @param message the message
+		 */
+		@Override
+		public void error(String message) {
+			log(IStatus.ERROR, message, null);
+		}
 
-        /**
-         * Log a error message with exception.
-         *
-         * @param message the message
-         * @param e       the exception
-         */
-        @Override
-        public void error(String message, Exception e) {
-            log(IStatus.ERROR, message, e);
-        }
-    }
+		/**
+		 * Log a error message with exception.
+		 *
+		 * @param message the message
+		 * @param e       the exception
+		 */
+		@Override
+		public void error(String message, Exception e) {
+			log(IStatus.ERROR, message, e);
+		}
+	}
 
-    /**
-     * Returns the shared instance.
-     *
-     * @return the shared instance
-     */
-    public static AutoRefactorPlugin getDefault() {
-        // Deprecated. Replaced by IEclipsePreferences.
-        // Preferences are now stored according to scopes in the IPreferencesService.
-        // The return value of this method corresponds to a combination of the
-        // InstanceScope and the DefaultScope.
-        // To set preferences for your plug-in, use new
-        // InstanceScope().getNode(<&yourPluginId>).
-        // To set default preferences for your plug-in, use new
-        // DefaultScope().getNode(<yourPluginId>).
-        // To lookup an integer preference value for your plug-in, use
-        // Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>,
-        // <defaultValue>, null).
-        // Similar methods exist on IPreferencesService for obtaining other kinds of
-        // preference values
-        // (strings, booleans, etc).
-        return plugin;
-    }
+	/**
+	 * Returns the shared instance.
+	 *
+	 * @return the shared instance
+	 */
+	public static AutoRefactorPlugin getDefault() {
+		// Deprecated. Replaced by IEclipsePreferences.
+		// Preferences are now stored according to scopes in the IPreferencesService.
+		// The return value of this method corresponds to a combination of the
+		// InstanceScope and the DefaultScope.
+		// To set preferences for your plug-in, use new
+		// InstanceScope().getNode(<&yourPluginId>).
+		// To set default preferences for your plug-in, use new
+		// DefaultScope().getNode(<yourPluginId>).
+		// To lookup an integer preference value for your plug-in, use
+		// Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>,
+		// <defaultValue>, null).
+		// Similar methods exist on IPreferencesService for obtaining other kinds of
+		// preference values
+		// (strings, booleans, etc).
+		return plugin;
+	}
 
-    /**
-     * Returns the environment.
-     *
-     * @return the environment
-     */
-    public static Environment getEnvironment() {
-        return environment;
-    }
+	/**
+	 * Returns the environment.
+	 *
+	 * @return the environment
+	 */
+	public static Environment getEnvironment() {
+		return environment;
+	}
 
-    /**
-     * Turns on the debug mode.
-     * <p>
-     * This method is only for internal use.
-     */
-    public static void turnDebugModeOn() {
-        getDefault().getPreferenceStore().setValue(PreferenceConstants.DEBUG_MODE_ON.getName(), true);
-    }
+	/**
+	 * Turns on the debug mode.
+	 * <p>
+	 * This method is only for internal use.
+	 */
+	public static void turnDebugModeOn() {
+		getDefault().getPreferenceStore().setValue(PreferenceConstants.DEBUG_MODE_ON.getName(), true);
+	}
 
-    /**
-     * Returns an image descriptor for the image file at the given plug-in relative
-     * path.
-     *
-     * @param path the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(final String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in relative
+	 * path.
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(final String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
-    private static class JobManagerImpl implements JobManager {
-        private final Vector<Job> jobs= new Vector<>();
+	private static class JobManagerImpl implements JobManager {
+		private final Vector<Job> jobs= new Vector<>();
 
-        /**
-         * Register a job.
-         *
-         * @param job the job
-         */
-        @Override
-        public void register(Job job) {
-            jobs.add(job);
-        }
+		/**
+		 * Register a job.
+		 *
+		 * @param job the job
+		 */
+		@Override
+		public void register(Job job) {
+			jobs.add(job);
+		}
 
-        /**
-         * Unregister a job.
-         *
-         * @param job the job
-         */
-        @Override
-        public void unregister(Job job) {
-            jobs.remove(job);
-        }
+		/**
+		 * Unregister a job.
+		 *
+		 * @param job the job
+		 */
+		@Override
+		public void unregister(Job job) {
+			jobs.remove(job);
+		}
 
-        private void cancelJobs() {
-            for (Job job : jobs) {
-                job.cancel();
-            }
-            jobs.clear();
-        }
-    }
+		private void cancelJobs() {
+			for (Job job : jobs) {
+				job.cancel();
+			}
+			jobs.clear();
+		}
+	}
 }

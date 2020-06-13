@@ -47,6 +47,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -63,129 +64,114 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class CollectionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        final NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor(ctx, node);
-        node.accept(newAndAddAllMethodVisitor);
-        return newAndAddAllMethodVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		NewAndAddAllMethodVisitor newAndAddAllMethodVisitor= new NewAndAddAllMethodVisitor();
+		newAndAddAllMethodVisitor.visitNode(node);
+		return newAndAddAllMethodVisitor.result;
+	}
 
-    private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
-        public NewAndAddAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
-        }
+	private final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
+		@Override
+		public boolean visit(final ExpressionStatement node) {
+			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
 
-        @Override
-        public boolean visit(final ExpressionStatement node) {
-            final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
-            if (ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
-                final Expression arg0= ASTNodes.arguments(mi).get(0);
-                final Statement previousStatement= ASTNodes.getPreviousSibling(node);
+			if (result && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
+				Expression arg0= (Expression) mi.arguments().get(0);
+				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-                final Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
-                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                    final SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+				Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
+				if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
+					SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
 
-                    if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
-                        return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
-                    }
-                } else if (previousStatement instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
-                            (VariableDeclarationStatement) previousStatement);
-                    if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
-                        return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
-                    }
-                }
-            }
+					if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
+						return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
+					}
+				} else if (previousStatement instanceof VariableDeclarationStatement) {
+					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(
+							previousStatement);
+					if (fragment != null && ASTNodes.isSameLocalVariable(fragment, mi.getExpression())) {
+						return maybeReplaceInitializer(fragment.getInitializer(), arg0, node);
+					}
+				}
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
-                final ExpressionStatement nodeToRemove) {
-            final ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+		private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
+				final ExpressionStatement nodeToRemove) {
+			ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
 
-            if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
-                ctx.getRefactorings().replace(nodeToReplace, b.new0(b.createMoveTarget(cic.getType()), b.createMoveTarget(arg0)));
-                ctx.getRefactorings().remove(nodeToRemove);
-                setResult(false);
-                return false;
-            }
+			if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            return true;
-        }
+				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), null);
+				rewrite.remove(nodeToRemove, null);
+				this.result= false;
+				return false;
+			}
 
-        private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceCollection) {
-            if (cic == null) {
-                return false;
-            }
+			return true;
+		}
 
-            final List<Expression> args= ASTNodes.arguments(cic);
-            final boolean noArgsCtor= args.isEmpty();
+		private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceCollection) {
+			if (cic == null || cic.getAnonymousClassDeclaration() != null) {
+				return false;
+			}
 
-            if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
-                    ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
-                    CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
-                    DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), LinkedTransferQueue.class.getCanonicalName(),
-                    PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
-                    HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
-                    TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName())) {
-                return true;
-            }
+			@SuppressWarnings("unchecked")
+			List<Expression> args= cic.arguments();
+			boolean noArgsCtor= args.isEmpty();
 
-            final boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
+			if (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
+					ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
+					CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
+					DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
+					LinkedBlockingQueue.class.getCanonicalName(), LinkedTransferQueue.class.getCanonicalName(),
+					PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
+					HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
+					TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName())) {
+				return true;
+			}
 
-            return colCapacityCtor && ASTNodes.hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
-                    ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(), HashSet.class.getCanonicalName(),
-                    LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName());
-        }
+			boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
 
-        private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
-            if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
-                final Object constant= args.get(0).resolveConstantExpressionValue();
-                final MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
+			return colCapacityCtor && ASTNodes.hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
+					LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
+					ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(), HashSet.class.getCanonicalName(),
+					LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName());
+		}
 
-                if (constant != null) {
-                    return constant.equals(0);
-                }
+		private boolean isValidCapacityParameter(final Expression sourceCollection, final List<Expression> args) {
+			if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
+				Object constant= args.get(0).resolveConstantExpressionValue();
+				MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
 
-                return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
-            }
+				if (constant != null) {
+					return constant.equals(0);
+				}
 
-            return false;
-        }
-    }
+				return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
 }

@@ -27,57 +27,57 @@ package org.autorefactor.preferences;
 
 /** Interface holding preference constants. */
 public enum PreferenceConstants {
-    /** Preference that turns debug mode on or off. */
-    DEBUG_MODE_ON("debug_mode_on", "Enable debug mode (for developers)", Boolean.FALSE); //$NON-NLS-1$ //$NON-NLS-2$
+	/** Preference that turns debug mode on or off. */
+	DEBUG_MODE_ON("debug_mode_on", "Enable debug mode (for developers)", Boolean.FALSE); //$NON-NLS-1$ //$NON-NLS-2$
 
-    /** TODO use this for preferences initialization. */
-    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS= "cleanup.always_use_this_for_non_static_method_access"; //$NON-NLS-1$
+	/** TODO use this for preferences initialization. */
+	private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS= "cleanup.always_use_this_for_non_static_method_access"; //$NON-NLS-1$
 
-    /** The preference name (not shown to the user). */
-    private final String name;
-    /** The preference description (shown to the user). */
-    private final String description;
-    /** The default value of the preference. */
-    private final Object defaultValue;
+	/** The preference name (not shown to the user). */
+	private final String name;
+	/** The preference description (shown to the user). */
+	private final String description;
+	/** The default value of the preference. */
+	private final Object defaultValue;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param name        the preference name
-     * @param description the preference description
-     */
-    PreferenceConstants(final String name, final String description, final Object defaultValue) {
-        this.name= name;
-        this.description= description;
-        this.defaultValue= defaultValue;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param name        the preference name
+	 * @param description the preference description
+	 */
+	PreferenceConstants(final String name, final String description, final Object defaultValue) {
+		this.name= name;
+		this.description= description;
+		this.defaultValue= defaultValue;
+	}
 
-    /**
-     * Returns the preference default value. This default value is used during
-     * preference initialization.
-     *
-     * @return the preference default value
-     */
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
+	/**
+	 * Returns the preference default value. This default value is used during
+	 * preference initialization.
+	 *
+	 * @return the preference default value
+	 */
+	public Object getDefaultValue() {
+		return defaultValue;
+	}
 
-    /**
-     * Returns the preference description. This description is displayed on the UI.
-     *
-     * @return the preference description
-     */
-    public String getDescription() {
-        return description;
-    }
+	/**
+	 * Returns the preference description. This description is displayed on the UI.
+	 *
+	 * @return the preference description
+	 */
+	public String getDescription() {
+		return description;
+	}
 
-    /**
-     * Returns the preference name. The preference name must uniquely identify the
-     * preference in the AutoRefactor project.
-     *
-     * @return the preference name
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Returns the preference name. The preference name must uniquely identify the
+	 * preference in the AutoRefactor project.
+	 *
+	 * @return the preference name
+	 */
+	public String getName() {
+		return name;
+	}
 }

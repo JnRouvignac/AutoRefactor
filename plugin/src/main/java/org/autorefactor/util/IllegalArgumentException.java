@@ -32,13 +32,13 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * argument.
  */
 public class IllegalArgumentException extends AutoRefactorException {
-    /**
-     * Constructor.
-     *
-     * @param node    the node from which to retrieve the source location
-     * @param message the exception message
-     */
-    public IllegalArgumentException(final ASTNode node, final String message) {
-        super(node, message);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param node    the node from which to retrieve the source location
+	 * @param message the exception message
+	 */
+	public IllegalArgumentException(final ASTNode node, final String message) {
+		super(node, message);
+	}
 }

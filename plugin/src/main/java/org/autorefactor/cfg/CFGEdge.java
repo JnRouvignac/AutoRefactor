@@ -31,89 +31,89 @@ import org.eclipse.jdt.core.dom.Expression;
 
 /** This class represents an edge of the control flow graph. */
 public class CFGEdge {
-    private final Expression condition;
-    /** TODO JNR rename. */
-    private final boolean evaluationResult;
-    private final CFGBasicBlock sourceBlock;
-    private final CFGBasicBlock targetBlock;
+	private final Expression condition;
+	/** TODO JNR rename. */
+	private final boolean evaluationResult;
+	private final CFGBasicBlock sourceBlock;
+	private final CFGBasicBlock targetBlock;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param condition        the decision condition that led to the creation of
-     *                         this edge.
-     * @param evaluationResult the condition evaluation result
-     * @param sourceBlock      the source block
-     * @param targetBlock      the target block
-     */
-    public CFGEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
-            final CFGBasicBlock targetBlock) {
-        this.condition= condition;
-        this.evaluationResult= evaluationResult;
-        this.sourceBlock= sourceBlock;
-        this.targetBlock= targetBlock;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param condition        the decision condition that led to the creation of
+	 *                         this edge.
+	 * @param evaluationResult the condition evaluation result
+	 * @param sourceBlock      the source block
+	 * @param targetBlock      the target block
+	 */
+	public CFGEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
+			final CFGBasicBlock targetBlock) {
+		this.condition= condition;
+		this.evaluationResult= evaluationResult;
+		this.sourceBlock= sourceBlock;
+		this.targetBlock= targetBlock;
+	}
 
-    /**
-     * Returns the decision condition that led to the creation of this edge.
-     *
-     * @return the decision condition that led to the creation of this edge
-     */
-    public Expression getCondition() {
-        return this.condition;
-    }
+	/**
+	 * Returns the decision condition that led to the creation of this edge.
+	 *
+	 * @return the decision condition that led to the creation of this edge
+	 */
+	public Expression getCondition() {
+		return this.condition;
+	}
 
-    /**
-     * Returns the source block of the edge.
-     *
-     * @return the source block of the edge
-     */
-    public CFGBasicBlock getSourceBlock() {
-        return this.sourceBlock;
-    }
+	/**
+	 * Returns the source block of the edge.
+	 *
+	 * @return the source block of the edge
+	 */
+	public CFGBasicBlock getSourceBlock() {
+		return this.sourceBlock;
+	}
 
-    /**
-     * Returns the target block of the edge.
-     *
-     * @return the target block of the edge
-     */
-    public CFGBasicBlock getTargetBlock() {
-        return this.targetBlock;
-    }
+	/**
+	 * Returns the target block of the edge.
+	 *
+	 * @return the target block of the edge
+	 */
+	public CFGBasicBlock getTargetBlock() {
+		return this.targetBlock;
+	}
 
-    /**
-     * Returns the condition evaluation result.
-     *
-     * @return the condition evaluation result
-     */
-    public boolean getEvaluationResult() {
-        return evaluationResult;
-    }
+	/**
+	 * Returns the condition evaluation result.
+	 *
+	 * @return the condition evaluation result
+	 */
+	public boolean getEvaluationResult() {
+		return evaluationResult;
+	}
 
-    @Override
-    public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE["); //$NON-NLS-1$
-        this.sourceBlock.appendDotNodeLabel(sb);
-        sb.append(" -> "); //$NON-NLS-1$
-        this.targetBlock.appendDotNodeLabel(sb);
-        return sb.append("]").toString(); //$NON-NLS-1$
-    }
+	@Override
+	public String toString() {
+		StringBuilder sb= new StringBuilder("EDGE["); //$NON-NLS-1$
+		this.sourceBlock.appendDotNodeLabel(sb);
+		sb.append(" -> "); //$NON-NLS-1$
+		this.targetBlock.appendDotNodeLabel(sb);
+		return sb.append("]").toString(); //$NON-NLS-1$
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        final CFGEdge other= (CFGEdge) obj;
-        return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
-                && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		CFGEdge other= (CFGEdge) obj;
+		return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
+				&& Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
+	}
 }

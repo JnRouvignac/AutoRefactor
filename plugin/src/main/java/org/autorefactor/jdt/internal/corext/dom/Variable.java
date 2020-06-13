@@ -36,101 +36,101 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  * It helps generate various declarations and accesses to this variable.
  */
 public class Variable {
-    private final String typeName;
-    private final String variableName;
-    private final ASTNodeFactory b;
+	private final String typeName;
+	private final String variableName;
+	private final ASTNodeFactory ast;
 
-    /**
-     * Builds a variable with its name and its type.
-     *
-     * @param typeName     the variable's type name
-     * @param variableName the variable's name
-     * @param astBuilder   the builder to build new AST nodes
-     */
-    public Variable(final String typeName, final String variableName, final ASTNodeFactory astBuilder) {
-        this.typeName= typeName;
-        this.variableName= variableName;
-        this.b= astBuilder;
-    }
+	/**
+	 * Builds a variable with its name and its type.
+	 *
+	 * @param typeName     the variable's type name
+	 * @param variableName the variable's name
+	 * @param astBuilder   the builder to build new AST nodes
+	 */
+	public Variable(final String typeName, final String variableName, final ASTNodeFactory astBuilder) {
+		this.typeName= typeName;
+		this.variableName= variableName;
+		this.ast= astBuilder;
+	}
 
-    /**
-     * Builds a variable with its name and no type information. Calling any method
-     * dealing with the type will throw an exception.
-     *
-     * @param variableName the variable's name
-     * @param astBuilder   the builder to build new AST nodes
-     */
-    public Variable(final String variableName, final ASTNodeFactory astBuilder) {
-        this(null, variableName, astBuilder);
-    }
+	/**
+	 * Builds a variable with its name and no type information. Calling any method
+	 * dealing with the type will throw an exception.
+	 *
+	 * @param variableName the variable's name
+	 * @param astBuilder   the builder to build new AST nodes
+	 */
+	public Variable(final String variableName, final ASTNodeFactory astBuilder) {
+		this(null, variableName, astBuilder);
+	}
 
-    /**
-     * Builds a {@link SimpleName} holding the name of this variable.
-     *
-     * @return a new {@link SimpleName}
-     */
-    public SimpleName varName() {
-        return b.simpleName(variableName);
-    }
+	/**
+	 * Builds a {@link SimpleName} holding the name of this variable.
+	 *
+	 * @return a new {@link SimpleName}
+	 */
+	public SimpleName varName() {
+		return ast.simpleName(variableName);
+	}
 
-    /**
-     * Returns the name of this variable as a string.
-     *
-     * @return the variable's name
-     */
-    public String varNameRaw() {
-        return variableName;
-    }
+	/**
+	 * Returns the name of this variable as a string.
+	 *
+	 * @return the variable's name
+	 */
+	public String varNameRaw() {
+		return variableName;
+	}
 
-    /**
-     * Builds a {@link Type} holding the type of this variable.
-     *
-     * @return a new {@link SimpleType}
-     */
-    public Type type() {
-        checkTypeDefined();
-        return b.type(typeName);
-    }
+	/**
+	 * Builds a {@link Type} holding the type of this variable.
+	 *
+	 * @return a new {@link SimpleType}
+	 */
+	public Type type() {
+		checkTypeDefined();
+		return ast.type(typeName);
+	}
 
-    /**
-     * Builds a {@link SimpleName} holding the type name of this variable.
-     *
-     * @return a new {@link SimpleName}
-     */
-    public SimpleName typeName() {
-        checkTypeDefined();
-        return b.simpleName(typeName);
-    }
+	/**
+	 * Builds a {@link SimpleName} holding the type name of this variable.
+	 *
+	 * @return a new {@link SimpleName}
+	 */
+	public SimpleName typeName() {
+		checkTypeDefined();
+		return ast.simpleName(typeName);
+	}
 
-    /**
-     * Returns the type of this variable as a string.
-     *
-     * @return the variable's type name
-     */
-    public String typeNameRaw() {
-        checkTypeDefined();
-        return typeName;
-    }
+	/**
+	 * Returns the type of this variable as a string.
+	 *
+	 * @return the variable's type name
+	 */
+	public String typeNameRaw() {
+		checkTypeDefined();
+		return typeName;
+	}
 
-    private void checkTypeDefined() {
-        if (typeName == null) {
-            throw new IllegalStateException("This method cannot be called on variable '" + variableName //$NON-NLS-1$
-                    + "', because no type has been defined for it."); //$NON-NLS-1$
-        }
-    }
+	private void checkTypeDefined() {
+		if (typeName == null) {
+			throw new IllegalStateException("This method cannot be called on variable '" + variableName //$NON-NLS-1$
+					+ "', because no type has been defined for it."); //$NON-NLS-1$
+		}
+	}
 
-    /**
-     * Builds a {@link VariableDeclarationStatement} with the name and type this
-     * variable.
-     *
-     * @return a new {@link VariableDeclarationStatement}
-     */
-    public VariableDeclarationStatement declareStatement() {
-        return b.declareStatement(type(), varName(), null);
-    }
+	/**
+	 * Builds a {@link VariableDeclarationStatement} with the name and type this
+	 * variable.
+	 *
+	 * @return a new {@link VariableDeclarationStatement}
+	 */
+	public VariableDeclarationStatement declareStatement() {
+		return ast.declareStatement(type(), varName(), null);
+	}
 
-    @Override
-    public String toString() {
-        return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    }
+	@Override
+	public String toString() {
+		return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
 }

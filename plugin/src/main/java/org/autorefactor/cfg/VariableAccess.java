@@ -31,75 +31,75 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** Represents an access to a variable. */
 public class VariableAccess {
-    /** A declaration which value is already initialized. */
-    public static final int DECL_INIT= 1 << 0;
-    /** A declaration which value may or may not be initialized. */
-    public static final int DECL_UNINIT= 1 << 1;
-    /** A variable read. */
-    public static final int READ= 1 << 2;
-    /** A variable write. */
-    public static final int WRITE= 1 << 4;
+	/** A declaration which value is already initialized. */
+	public static final int DECL_INIT= 1 << 0;
+	/** A declaration which value may or may not be initialized. */
+	public static final int DECL_UNINIT= 1 << 1;
+	/** A variable read. */
+	public static final int READ= 1 << 2;
+	/** A variable write. */
+	public static final int WRITE= 1 << 4;
 
-    private final ASTNode astNode;
-    private final Name name;
-    private final Type type;
-    private final int accessType;
+	private final ASTNode astNode;
+	private final Name name;
+	private final Type type;
+	private final int accessType;
 
-    /**
-     * Class constructor.
-     *
-     * @param astNode    the AST node of the variable
-     * @param name       the name of the variable
-     * @param type       the type of the variable
-     * @param accessType the access type to the variable
-     */
-    public VariableAccess(final ASTNode astNode, final Name name, final Type type, final int accessType) {
-        this.astNode= astNode;
-        this.name= name;
-        this.type= type;
-        this.accessType= accessType;
-    }
+	/**
+	 * Class constructor.
+	 *
+	 * @param astNode    the AST node of the variable
+	 * @param name       the name of the variable
+	 * @param type       the type of the variable
+	 * @param accessType the access type to the variable
+	 */
+	public VariableAccess(final ASTNode astNode, final Name name, final Type type, final int accessType) {
+		this.astNode= astNode;
+		this.name= name;
+		this.type= type;
+		this.accessType= accessType;
+	}
 
-    /**
-     * Class constructor.
-     *
-     * @param astNode    the AST node of the variable
-     * @param accessType the access type to the variable
-     */
-    public VariableAccess(final ASTNode astNode, final int accessType) {
-        this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
-    }
+	/**
+	 * Class constructor.
+	 *
+	 * @param astNode    the AST node of the variable
+	 * @param accessType the access type to the variable
+	 */
+	public VariableAccess(final ASTNode astNode, final int accessType) {
+		this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
+	}
 
-    @Override
-    public String toString() {
-        final StringBuilder sb= new StringBuilder("VAR_ACCESS["); //$NON-NLS-1$
-        toString(sb);
-        return sb.append("]").toString(); //$NON-NLS-1$
-    }
+	@Override
+	public String toString() {
+		StringBuilder sb= new StringBuilder("VAR_ACCESS["); //$NON-NLS-1$
+		toString(sb);
+		return sb.append("]").toString(); //$NON-NLS-1$
+	}
 
-    private void toString(final StringBuilder sb) {
-        sb.append(this.type);
-        sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ //$NON-NLS-2$
-        if ((this.accessType & DECL_INIT) != 0) {
-            sb.append("DECL_INIT"); //$NON-NLS-1$
-        }
-        if ((this.accessType & DECL_UNINIT) != 0) {
-            if (sb.length() > 0) {
-                sb.append("|"); //$NON-NLS-1$
-            }
-            sb.append("DECL_UNINIT"); //$NON-NLS-1$
-        }
-        if ((this.accessType & READ) != 0) {
-            if (sb.length() > 0) {
-                sb.append("|"); //$NON-NLS-1$
-            }
-            sb.append("READ"); //$NON-NLS-1$
-        }
-        if ((this.accessType & WRITE) != 0) {
-            if (sb.length() > 0) {
-                sb.append("|"); //$NON-NLS-1$
-            }
-            sb.append("WRITE"); //$NON-NLS-1$
-        }
-    }
+	private void toString(final StringBuilder sb) {
+		sb.append(this.type);
+		sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ //$NON-NLS-2$
+		if ((this.accessType & DECL_INIT) != 0) {
+			sb.append("DECL_INIT"); //$NON-NLS-1$
+		}
+		if ((this.accessType & DECL_UNINIT) != 0) {
+			if (sb.length() > 0) {
+				sb.append("|"); //$NON-NLS-1$
+			}
+			sb.append("DECL_UNINIT"); //$NON-NLS-1$
+		}
+		if ((this.accessType & READ) != 0) {
+			if (sb.length() > 0) {
+				sb.append("|"); //$NON-NLS-1$
+			}
+			sb.append("READ"); //$NON-NLS-1$
+		}
+		if ((this.accessType & WRITE) != 0) {
+			if (sb.length() > 0) {
+				sb.append("|"); //$NON-NLS-1$
+			}
+			sb.append("WRITE"); //$NON-NLS-1$
+		}
+	}
 }

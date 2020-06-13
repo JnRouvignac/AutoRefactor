@@ -27,6 +27,8 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Assert;
 
 public class JUnitAssertSample {
@@ -71,6 +73,19 @@ public class JUnitAssertSample {
         assertEquals("Failure message to keep", f1, f2, .0F);
     }
 
+    public void removeParenthesis(int i1, int i2, int i3, int i4) {
+        // Keep this comment
+        Assert.assertEquals(i1 + i2, i3 + i4);
+        Assert.assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+        Assert.assertEquals(i1 + i2, i3 + i4);
+        Assert.assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+
+        assertEquals(i1 + i2, i3 + i4);
+        assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+        assertEquals(i1 + i2, i3 + i4);
+        assertEquals("Failure message to keep", i1 + i2, i3 + i4);
+    }
+
     public void refactorFailures() {
         // Keep this comment
         Assert.fail();
@@ -105,6 +120,11 @@ public class JUnitAssertSample {
         }
         if (b) {
         }
+    }
+
+    public void removeElse(boolean b) {
+        if (b)
+            System.out.println("foo");
     }
 
     public void refactorNegatedConditions(boolean b) {
@@ -401,6 +421,32 @@ public class JUnitAssertSample {
 
         assertTrue(b);
         assertTrue("Failure message to keep", b);
+    }
+
+    public void doNotRefactorUsedObject(Date nullDate) {
+        if (nullDate != null) {
+            Assert.fail("The date should be null: " + nullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null: " + nullDate.getTime());
+        }
+    }
+
+    public void refactorNotUsedObject(Date nullDate, Date notNullDate) {
+        // Keep this comment
+        Assert.assertNull("The date should be null, not like: " + notNullDate.getTime(), nullDate);
+
+        assertNull("The date should be null, not like: " + notNullDate.getTime(), nullDate);
+    }
+
+    public void refactorIfOnExpression(boolean b1, boolean b2) {
+        // Keep this comment
+        Assert.assertFalse(b1 && b2);
+        Assert.assertFalse("Failure message to keep", b1 || b2);
+
+        assertFalse(!b1 && !b2);
+        assertFalse("Failure message to keep", !b1 || !b2);
     }
 
     public void refactorIfPrimitiveThenFail(int i1, int i2) {

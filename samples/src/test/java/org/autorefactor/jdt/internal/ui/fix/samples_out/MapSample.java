@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MapSample {
-
     public void replaceNewNoArgsAssignmentThenPutAll(Map<String, String> map, Map<String, String> output) {
         // Keep this comment
         output = new HashMap<String, String>(map);
@@ -80,6 +79,19 @@ public class MapSample {
 
     public Map<Object, Object> doNotReplaceNewThenAddAllIncompatibleTypes(Map<String, String> map) {
         final Map<Object, Object> output = new HashMap<>();
+        output.putAll(map);
+        return output;
+    }
+
+    public Map<String, String> doNotReplaceAnonymousMap(Map<String, String> map) {
+        final Map<String, String> output = new HashMap<String, String>() {
+            private static final long serialVersionUID= 1L;
+
+            @Override
+            public void putAll(Map<? extends String, ? extends String> map) {
+                // Drop the map
+            }
+        };
         output.putAll(map);
         return output;
     }

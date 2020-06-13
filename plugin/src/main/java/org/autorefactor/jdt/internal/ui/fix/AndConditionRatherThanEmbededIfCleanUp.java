@@ -27,67 +27,52 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        if (node.getElseStatement() == null) {
-            final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
+	@Override
+	public boolean visit(final IfStatement node) {
+		if (node.getElseStatement() == null) {
+			IfStatement innerIf= ASTNodes.as(node.getThenStatement(), IfStatement.class);
 
-            if (is != null
-                    && is.getElseStatement() == null
-                    && ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(is.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-                replaceIfNoElseStatement(node, is);
-                return false;
-            }
-        }
+			if (innerIf != null
+					&& innerIf.getElseStatement() == null
+					&& ASTNodes.getNbOperands(node.getExpression()) + ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+				replaceIfNoElseStatement(node, innerIf);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+	private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.createMoveTarget(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
-                b.parenthesizeIfNeeded(b.createMoveTarget(innerIf.getExpression())));
-        r.replace(innerIf.getExpression(), ie);
-        r.replace(outerIf, b.createMoveTarget(innerIf));
-    }
+		InfixExpression infixExpression= ast.infixExpression(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+				ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
+		rewrite.replace(innerIf.getExpression(), infixExpression, null);
+		rewrite.replace(outerIf, ASTNodes.createMoveTarget(rewrite, innerIf), null);
+	}
 }

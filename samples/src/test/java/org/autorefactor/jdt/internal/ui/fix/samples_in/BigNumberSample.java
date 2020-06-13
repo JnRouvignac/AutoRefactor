@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class BigNumberSample {
-
     public static String useConstructorWithStringArg() {
         // Keep this comment
         BigDecimal bd1 = new BigDecimal(123.345);
@@ -144,5 +143,16 @@ public class BigNumberSample {
 
     public static BigDecimal removeUnderscoreFromLiterals() {
         return BigDecimal.valueOf(1_000.0);
+    }
+
+    public static BigDecimal doNotReplaceAnonymousBigDecimal() {
+        return new BigDecimal(123.345) {
+            private static final long serialVersionUID= 6820790651383493851L;
+
+            @Override
+            public String toString() {
+                return "foo";
+            }
+        };
     }
 }

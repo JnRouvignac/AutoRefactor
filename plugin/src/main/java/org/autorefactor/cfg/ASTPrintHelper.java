@@ -33,33 +33,33 @@ import org.eclipse.jdt.core.dom.Expression;
 
 /** Helper class for printing AST information. */
 public final class ASTPrintHelper {
-    private ASTPrintHelper() {
-        // Hide utility class ctor
-    }
+	private ASTPrintHelper() {
+		// Hide utility class ctor
+	}
 
-    static String codeExcerpt(final List<Expression> expressions) {
-        final StringBuilder sb= new StringBuilder();
-        for (final Iterator<Expression> iter= expressions.iterator(); iter.hasNext();) {
-            final Expression expression= iter.next();
-            sb.append(expression);
-            if (iter.hasNext()) {
-                sb.append(", "); //$NON-NLS-1$
-            }
-        }
+	static String codeExcerpt(final List<Expression> expressions) {
+		StringBuilder sb= new StringBuilder();
+		for (final Iterator<Expression> iter= expressions.iterator(); iter.hasNext();) {
+			Expression expression= iter.next();
+			sb.append(expression);
+			if (iter.hasNext()) {
+				sb.append(", "); //$NON-NLS-1$
+			}
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    static String codeExcerpt(final ASTNode node) {
-        final String nodeString= node.toString();
-        final String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
-        final String codeExcerpt;
-        if (nodeLines[0].matches("\\s*\\{\\s*")) { //$NON-NLS-1$
-            codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ //$NON-NLS-2$
-        } else {
-            codeExcerpt= nodeLines[0];
-        }
+	static String codeExcerpt(final ASTNode node) {
+		String nodeString= node.toString();
+		String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
+		String codeExcerpt;
+		if (nodeLines[0].matches("\\s*\\{\\s*")) { //$NON-NLS-1$
+			codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			codeExcerpt= nodeLines[0];
+		}
 
-        return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+		return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

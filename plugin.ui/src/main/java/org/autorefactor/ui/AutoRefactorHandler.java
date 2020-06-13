@@ -25,15 +25,13 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.environment.Environment;
 import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
@@ -50,6 +48,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -66,115 +65,117 @@ import org.eclipse.ui.handlers.HandlerUtil;
  *      >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
-    /**
-     * Execute.
-     *
-     * @param event The event
-     *
-     * @return An object
-     *
-     * @throws ExecutionException ExecutionException
-     */
-    public Object execute(final ExecutionEvent event) throws ExecutionException {
-        try {
-            Environment environment= getEnvironment();
-            new PrepareApplyRefactoringsJob(getSelectedJavaElements(event),
-                    AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()), environment)
-                            .schedule();
-        } catch (Exception e) {
-            final Shell shell= HandlerUtil.getActiveShell(event);
+	/**
+	 * Execute.
+	 *
+	 * @param event The event
+	 *
+	 * @return An object
+	 *
+	 * @throws ExecutionException ExecutionException
+	 */
+	@Override
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+		try {
+			Environment environment= AutoRefactorPlugin.getEnvironment();
+			new PrepareApplyRefactoringsJob(getSelectedJavaElements(event),
+					AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()), environment)
+							.schedule();
+		} catch (Exception e) {
+			final Shell shell= HandlerUtil.getActiveShell(event);
 
-            StringWriter sw= new StringWriter();
-            PrintWriter pw= new PrintWriter(sw);
-            e.printStackTrace(pw);
+			StringWriter sw= new StringWriter();
+			PrintWriter pw= new PrintWriter(sw);
+			e.printStackTrace(pw);
 
-            showMessage(shell, "An error has occurred:\n\n" + sw); //$NON-NLS-1$
-        }
+			showMessage(shell, "An error has occurred:\n\n" + sw); //$NON-NLS-1$
+		}
 
-        // TODO JNR provide a maven plugin
-        // TODO JNR provide a gradle plugin
-        // TODO JNR provide an ant task
-        // @see http://stackoverflow.com/questions/2113865/jdt-without-eclipse
+		// TODO JNR provide a maven plugin
+		// TODO JNR provide a gradle plugin
+		// TODO JNR provide an ant task
+		// @see http://stackoverflow.com/questions/2113865/jdt-without-eclipse
 
-        // TODO JNR provide from the UI the ability to execute groovy (other
-        // scripts? rhino?) scripts for cleanup.
+		// TODO JNR provide from the UI the ability to execute groovy (other
+		// scripts? rhino?) scripts for cleanup.
 
-        // <p> Extract method: Live variable analysis - READ WRITE variable analysis
-        // (including method params).
-        // If variable used in extracted method and WRITE first in selected text
-        // => do not pass it down as parameter
-        // Use ASTMatcher and do not compare content of expressions, compare just
-        // resolvedTypeBinding().
-        return null;
-    }
+		// <p> Extract method: Live variable analysis - READ WRITE variable analysis
+		// (including method params).
+		// If variable used in extracted method and WRITE first in selected text
+		// => do not pass it down as parameter
+		// Use ASTMatcher and do not compare content of expressions, compare just
+		// resolvedTypeBinding().
+		return null;
+	}
 
-    static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
-        final Shell shell= HandlerUtil.getActiveShell(event);
-        final String activePartId= HandlerUtil.getActivePartId(event);
-        if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId) //$NON-NLS-1$
-                || "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId) //$NON-NLS-1$
-                || "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) { //$NON-NLS-1$
-            return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
-        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId) //$NON-NLS-1$
-                || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) { //$NON-NLS-1$
-            return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
-        } else {
-            getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'."); //$NON-NLS-1$ //$NON-NLS-2$
-            return Collections.emptyList();
-        }
-    }
+	static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
+		final Shell shell= HandlerUtil.getActiveShell(event);
+		final String activePartId= HandlerUtil.getActivePartId(event);
+		if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId) //$NON-NLS-1$
+				|| "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId) //$NON-NLS-1$
+				|| "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) { //$NON-NLS-1$
+			return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
+		} else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId) //$NON-NLS-1$
+				|| "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) { //$NON-NLS-1$
+			return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
+		} else {
+			AutoRefactorPlugin.getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'."); //$NON-NLS-1$ //$NON-NLS-2$
+			return Collections.emptyList();
+		}
+	}
 
-    private static List<IJavaElement> getSelectedJavaElements(Shell shell, IStructuredSelection selection) {
-        boolean goodSelection= true;
-        final List<IJavaElement> results= new ArrayList<>();
+	private static List<IJavaElement> getSelectedJavaElements(Shell shell, IStructuredSelection selection) {
+		boolean goodSelection= true;
+		final List<IJavaElement> results= new ArrayList<>();
 
-        for (Object el : selection.toArray()) {
-            if (el instanceof ICompilationUnit || el instanceof IPackageFragment || el instanceof IPackageFragmentRoot
-                    || el instanceof IJavaProject) {
-                results.add((IJavaElement) el);
-            } else if (el instanceof IProject) {
-                final IProject project= (IProject) el;
-                if (project.isOpen() && hasNature(project, JavaCore.NATURE_ID)) {
-                    results.add(JavaCore.create(project));
-                }
-            } else {
-                goodSelection= false;
-            }
-        }
+		for (Object el : selection.toArray()) {
+			if (el instanceof ICompilationUnit || el instanceof IPackageFragment || el instanceof IPackageFragmentRoot
+					|| el instanceof IJavaProject) {
+				results.add((IJavaElement) el);
+			} else if (el instanceof IProject) {
+				final IProject project= (IProject) el;
+				if (project.isOpen() && hasNature(project, JavaCore.NATURE_ID)) {
+					results.add(JavaCore.create(project));
+				}
+			} else {
+				goodSelection= false;
+			}
+		}
 
-        if (!goodSelection) {
-            showMessage(shell, "Please select a Java source file, Java package or Java project"); //$NON-NLS-1$
-        }
+		if (!goodSelection) {
+			showMessage(shell, "Please select a Java source file, Java package or Java project"); //$NON-NLS-1$
+		}
 
-        return results;
-    }
+		return results;
+	}
 
-    private static boolean hasNature(final IProject project, String natureId) {
-        try {
-            return project.hasNature(natureId);
-        } catch (CoreException e) {
-            throw new UnhandledException(null, e);
-        }
-    }
+	private static boolean hasNature(final IProject project, String natureId) {
+		try {
+			return project.hasNature(natureId);
+		} catch (CoreException e) {
+			throw new UnhandledException(null, e);
+		}
+	}
 
-    private static List<IJavaElement> getSelectedJavaElements(Shell shell, IEditorPart activeEditor) {
-        final IEditorInput editorInput= activeEditor.getEditorInput();
-        final IJavaElement javaElement= JavaUI.getEditorInputJavaElement(editorInput);
-        if (javaElement instanceof ICompilationUnit) {
-            return Collections.singletonList(javaElement);
-        }
-        showMessage(shell, "This action only works on Java source files"); //$NON-NLS-1$
-        return Collections.emptyList();
-    }
+	private static List<IJavaElement> getSelectedJavaElements(Shell shell, IEditorPart activeEditor) {
+		final IEditorInput editorInput= activeEditor.getEditorInput();
+		final IJavaElement javaElement= JavaUI.getEditorInputJavaElement(editorInput);
+		if (javaElement instanceof ICompilationUnit) {
+			return Collections.singletonList(javaElement);
+		}
+		showMessage(shell, "This action only works on Java source files"); //$NON-NLS-1$
+		return Collections.emptyList();
+	}
 
-    private static void showMessage(final Shell shell, final String message) {
-        Display.getDefault().asyncExec(new Runnable() {
-            /**
-             * Run.
-             */
-            public void run() {
-                openInformation(shell, "Info", message); //$NON-NLS-1$
-            }
-        });
-    }
+	private static void showMessage(final Shell shell, final String message) {
+		Display.getDefault().asyncExec(new Runnable() {
+			/**
+			 * Run.
+			 */
+			@Override
+			public void run() {
+				MessageDialog.openInformation(shell, "Info", message); //$NON-NLS-1$
+			}
+		});
+	}
 }

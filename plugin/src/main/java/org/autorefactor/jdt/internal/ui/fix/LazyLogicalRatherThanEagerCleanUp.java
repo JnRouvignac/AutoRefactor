@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -34,72 +35,58 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
-            List<Expression> allOperands= ASTNodes.allOperands(node);
-            boolean isFirst= true;
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+			List<Expression> allOperands= ASTNodes.allOperands(node);
+			boolean isFirst= true;
 
-            for (Expression expression : allOperands) {
-                if (!ASTNodes.hasType(expression, boolean.class.getSimpleName(), Boolean.class.getCanonicalName())) {
-                    return true;
-                }
+			for (Expression expression : allOperands) {
+				if (!ASTNodes.hasType(expression, boolean.class.getSimpleName(), Boolean.class.getCanonicalName())) {
+					return true;
+				}
 
-                if (isFirst) {
-                    isFirst= false;
-                } else if (!ASTNodes.isPassiveWithoutFallingThrough(expression)) {
-                    return true;
-                }
-            }
+				if (isFirst) {
+					isFirst= false;
+				} else if (!ASTNodes.isPassiveWithoutFallingThrough(expression)) {
+					return true;
+				}
+			}
 
-            replaceWithLazyOperator(node, allOperands);
-            return false;
-        }
+			replaceWithLazyOperator(node, allOperands);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+	private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final InfixExpression.Operator lazyOperator;
+		InfixExpression.Operator lazyOperator;
 
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
-            lazyOperator= InfixExpression.Operator.CONDITIONAL_AND;
-        } else {
-            lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
-        }
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
+			lazyOperator= InfixExpression.Operator.CONDITIONAL_AND;
+		} else {
+			lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
+		}
 
-        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, b.createMoveTarget(allOperands)));
-    }
+		rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)), null);
+	}
 }

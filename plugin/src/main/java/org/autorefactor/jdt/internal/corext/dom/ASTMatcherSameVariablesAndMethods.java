@@ -35,29 +35,29 @@ import org.eclipse.jdt.core.dom.SimpleName;
  * Matches two piece of code only if the variables/methods in use are the same.
  */
 public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher {
-    @Override
-    public boolean match(final SimpleName node, final Object other) {
-        return super.match(node, other) && sameReference(node, (SimpleName) other);
-    }
+	@Override
+	public boolean match(final SimpleName node, final Object other) {
+		return super.match(node, other) && sameReference(node, (SimpleName) other);
+	}
 
-    private boolean sameReference(final SimpleName node1, final SimpleName node2) {
-        return Utils.equalNotNull(getDeclaration(node1), getDeclaration(node2));
-    }
+	private boolean sameReference(final SimpleName node1, final SimpleName node2) {
+		return Utils.equalNotNull(getDeclaration(node1), getDeclaration(node2));
+	}
 
-    private IBinding getDeclaration(final SimpleName node) {
-        final IBinding b= node.resolveBinding();
-        if (b != null) {
-            switch (b.getKind()) {
-            case IBinding.VARIABLE:
-                return ((IVariableBinding) b).getVariableDeclaration();
+	private IBinding getDeclaration(final SimpleName node) {
+		IBinding ast= node.resolveBinding();
+		if (ast != null) {
+			switch (ast.getKind()) {
+			case IBinding.VARIABLE:
+				return ((IVariableBinding) ast).getVariableDeclaration();
 
-            case IBinding.METHOD:
-                return ((IMethodBinding) b).getMethodDeclaration();
-            }
+			case IBinding.METHOD:
+				return ((IMethodBinding) ast).getMethodDeclaration();
+			}
 
-            return b;
-        }
+			return ast;
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

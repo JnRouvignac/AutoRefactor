@@ -438,4 +438,21 @@ public class CommonCodeInIfElseStatementSample {
         // Keep this comment
         return "Do completely other things";
     }
+
+    /** Common code: i++, Remove if statement */
+    public void ifElseRemoveIfInSwitch(boolean b, int i, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            // Keep this!
+            if (b) {
+                i= i * 2;
+            } else {
+                i= i * 3;
+            }
+            // Keep this comment
+            i++;
+        case 1:
+            i--;
+        }
+    }
 }

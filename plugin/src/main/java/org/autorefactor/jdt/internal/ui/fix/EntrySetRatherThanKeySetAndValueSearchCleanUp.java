@@ -26,11 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,10 +35,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Variable;
@@ -65,370 +60,357 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
+	}
 
-    /**
-     * This class helps decide which name to give to a new variable.
-     * <p>
-     * When creating a new variable, its name may shadow another variable or field
-     * used in the local scope.
-     * <p>
-     * Does JDT provide a public API for naming local variables? I could not find
-     * any.
-     */
-    private static final class VariableNameDecider {
-        private final ASTNode scope;
-        private final int insertionPoint;
-        private final ASTNode namingScope;
+	/**
+	 * This class helps decide which name to give to a new variable.
+	 * <p>
+	 * When creating a new variable, its name may shadow another variable or field
+	 * used in the local scope.
+	 * <p>
+	 * Does JDT provide a public API for naming local variables? I could not find
+	 * any.
+	 */
+	private static final class VariableNameDecider {
+		private final ASTNode scope;
+		private final int insertionPoint;
+		private final ASTNode namingScope;
 
-        private VariableNameDecider(final ASTNode scope, final int insertionPoint) {
-            this.scope= scope;
-            this.insertionPoint= insertionPoint;
-            this.namingScope= getNamingScope(scope);
-        }
+		private VariableNameDecider(final ASTNode scope, final int insertionPoint) {
+			this.scope= scope;
+			this.insertionPoint= insertionPoint;
+			this.namingScope= getNamingScope(scope);
+		}
 
-        private ASTNode getNamingScope(final ASTNode scope) {
-            Class<?>[] ancestorClasses= { MethodDeclaration.class, Initializer.class };
-            ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
-            if (ancestor == null) {
-                throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
-                        + Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
-            }
+		private ASTNode getNamingScope(final ASTNode scope) {
+			Class<?>[] ancestorClasses= { MethodDeclaration.class, Initializer.class };
+			ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
+			if (ancestor == null) {
+				throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
+						+ Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
+			}
 
-            return ancestor;
-        }
+			return ancestor;
+		}
 
-        /**
-         * Returns a name suggestion suitable for use when inserting a new variable
-         * declaration. This name:
-         * <ul>
-         * <li>will not shadow any variable name in use after the insertion point</li>
-         * <li>and will not conflict with local variables declared before the insertion
-         * point.</li>
-         * </ul>
-         *
-         * @param candidateNames the suggestion will be one of the candidate names,
-         *                       maybe suffixed by a number
-         * @return the suggestion for a variable name
-         */
-        public String suggest(final String... candidateNames) {
-            final Set<String> declaredLocalVarNames= new HashSet<>(collectDeclaredLocalVariableNames());
-            final Set<String> varNamesUsedAfter= new HashSet<>(collectVariableNamesUsedAfter());
-            // Can we use one of the candidate names?
-            for (String candidate : candidateNames) {
-                if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
-                    return candidate;
-                }
-            }
+		/**
+		 * Returns a name suggestion suitable for use when inserting a new variable
+		 * declaration. This name:
+		 * <ul>
+		 * <li>will not shadow any variable name in use after the insertion point</li>
+		 * <li>and will not conflict with local variables declared before the insertion
+		 * point.</li>
+		 * </ul>
+		 *
+		 * @param candidateNames the suggestion will be one of the candidate names,
+		 *                       maybe suffixed by a number
+		 * @return the suggestion for a variable name
+		 */
+		public String suggest(final String... candidateNames) {
+			Set<String> declaredLocalVarNames= new HashSet<>(collectDeclaredLocalVariableNames());
+			Set<String> varNamesUsedAfter= new HashSet<>(collectVariableNamesUsedAfter());
+			// Can we use one of the candidate names?
+			for (String candidate : candidateNames) {
+				if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
+					return candidate;
+				}
+			}
 
-            // Iterate on the first candidate name and suffix it with an integer
-            int i= 1;
-            do {
-                final String candidate= candidateNames[0] + i;
-                if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
-                    return candidate;
-                }
-                i++;
-            } while (true);
-        }
+			// Iterate on the first candidate name and suffix it with an integer
+			int i= 1;
+			do {
+				String candidate= candidateNames[0] + i;
+				if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
+					return candidate;
+				}
+				i++;
+			} while (true);
+		}
 
-        private boolean isSuitable(final String candidateName, final Set<String> declaredLocalVarNames,
-                final Set<String> varNamesUsedAfter) {
-            // No variable declaration conflict
-            return !declaredLocalVarNames.contains(candidateName)
-                    // New variable does not shadow use of other variables/fields with the same name
-                    && !varNamesUsedAfter.contains(candidateName);
-        }
+		private boolean isSuitable(final String candidateName, final Set<String> declaredLocalVarNames,
+				final Set<String> varNamesUsedAfter) {
+			// No variable declaration conflict
+			return !declaredLocalVarNames.contains(candidateName)
+					// New variable does not shadow use of other variables/fields with the same name
+					&& !varNamesUsedAfter.contains(candidateName);
+		}
 
-        private Collection<String> collectDeclaredLocalVariableNames() {
-            return new CollectorVisitor<String>() {
-                @Override
-                public boolean preVisit2(final ASTNode node) {
-                    return !isTypeDeclaration(node);
-                }
+		private Collection<String> collectDeclaredLocalVariableNames() {
+			return new CollectorVisitor<String>() {
+				@Override
+				public boolean preVisit2(final ASTNode node) {
+					return !isTypeDeclaration(node);
+				}
 
-                @Override
-                public boolean visit(final SimpleName node) {
-                    final IBinding binding= node.resolveBinding();
-                    if (binding != null && binding.getKind() == IBinding.VARIABLE) {
-                        addResult(binding.getName());
-                    }
+				@Override
+				public boolean visit(final SimpleName node) {
+					IBinding binding= node.resolveBinding();
+					if (binding != null && binding.getKind() == IBinding.VARIABLE) {
+						addResult(binding.getName());
+					}
 
-                    return true;
-                }
-            }.collect(namingScope);
-        }
+					return true;
+				}
+			}.collect(namingScope);
+		}
 
-        private List<String> collectVariableNamesUsedAfter() {
-            return new CollectorVisitor<String>() {
-                @Override
-                public boolean preVisit2(final ASTNode node) {
-                    return node.getStartPosition() > insertionPoint && !isTypeDeclaration(node);
-                }
+		private List<String> collectVariableNamesUsedAfter() {
+			return new CollectorVisitor<String>() {
+				@Override
+				public boolean preVisit2(final ASTNode node) {
+					return node.getStartPosition() > insertionPoint && !isTypeDeclaration(node);
+				}
 
-                @Override
-                public boolean visit(final SimpleName node) {
-                    final IBinding binding= node.resolveBinding();
-                    if (binding != null && binding.getKind() == IBinding.VARIABLE) {
-                        addResult(binding.getName());
-                    }
+				@Override
+				public boolean visit(final SimpleName node) {
+					IBinding binding= node.resolveBinding();
+					if (binding != null && binding.getKind() == IBinding.VARIABLE) {
+						addResult(binding.getName());
+					}
 
-                    return true;
-                }
-            }.collect(scope);
-        }
+					return true;
+				}
+			}.collect(scope);
+		}
 
-        private boolean isTypeDeclaration(final ASTNode node) {
-            switch (node.getNodeType()) {
-            case ANNOTATION_TYPE_DECLARATION:
-            case ANONYMOUS_CLASS_DECLARATION:
-            case ENUM_DECLARATION:
-            case TYPE_DECLARATION:
-                return true;
+		private boolean isTypeDeclaration(final ASTNode node) {
+			switch (node.getNodeType()) {
+			case ASTNode.ANNOTATION_TYPE_DECLARATION:
+			case ASTNode.ANONYMOUS_CLASS_DECLARATION:
+			case ASTNode.ENUM_DECLARATION:
+			case ASTNode.TYPE_DECLARATION:
+				return true;
 
-            default:
-                return false;
-            }
-        }
-    }
+			default:
+				return false;
+			}
+		}
+	}
 
-    @Override
-    public boolean visit(final EnhancedForStatement enhancedFor) {
-        final MethodInvocation foreachExpression= ASTNodes.as(enhancedFor.getExpression(), MethodInvocation.class);
+	@Override
+	public boolean visit(final EnhancedForStatement enhancedFor) {
+		MethodInvocation foreachExpression= ASTNodes.as(enhancedFor.getExpression(), MethodInvocation.class);
 
-        if (isKeySetMethod(foreachExpression)) {
-            // From 'for (K key : map.keySet()) { }'
-            // -> mapExpression become 'map', parameter become 'K key'
-            final Expression mapExpression= foreachExpression.getExpression();
-            if (mapExpression == null) {
-                // Not implemented
-                return true;
-            }
-            final SingleVariableDeclaration parameter= enhancedFor.getParameter();
-            final List<MethodInvocation> getValueMis= collectMapGetValueCalls(mapExpression, parameter,
-                    enhancedFor.getBody());
-            if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
-                replaceEntryIterationByKeyIteration(enhancedFor, mapExpression, parameter, getValueMis);
-                return false;
-            }
-        }
+		if (isKeySetMethod(foreachExpression)) {
+			// From 'for (K key : map.keySet()) { }'
+			// -> mapExpression become 'map', parameter become 'K key'
+			Expression mapExpression= foreachExpression.getExpression();
+			if (mapExpression == null) {
+				// Not implemented
+				return true;
+			}
+			SingleVariableDeclaration parameter= enhancedFor.getParameter();
+			List<MethodInvocation> getValueMis= collectMapGetValueCalls(mapExpression, parameter,
+					enhancedFor.getBody());
+			if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
+				replaceEntryIterationByKeyIteration(enhancedFor, mapExpression, parameter, getValueMis);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceEntryIterationByKeyIteration(final EnhancedForStatement enhancedFor, final Expression mapExpression,
-            final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+	private void replaceEntryIterationByKeyIteration(final EnhancedForStatement enhancedFor, final Expression mapExpression,
+			final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
-        enhancedFor.getBody().accept(keyUseVisitor);
-        int keyUses= keyUseVisitor.getReads().size();
+		VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
+		enhancedFor.getBody().accept(keyUseVisitor);
+		int keyUses= keyUseVisitor.getReads().size();
 
-        final int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
-        final Variable entryVar= new Variable(
-                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b); //$NON-NLS-1$ //$NON-NLS-2$
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
+		int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
+		Variable entryVar= new Variable(
+				new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), ast); //$NON-NLS-1$ //$NON-NLS-2$
+		TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
 
-        final MethodInvocation getValueMi0= getValueMis.get(0);
-        final ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
+		MethodInvocation getValueMi0= getValueMis.get(0);
+		ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
 
-        if (typeBinding != null && typeBinding.isRawType()) {
-            // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
-            final Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
-            final Variable objectVar= new Variable(
-                    new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b); //$NON-NLS-1$
-            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
+		if (typeBinding != null && typeBinding.isRawType()) {
+			// for (Object key : map.keySet()) => for (Object key : map.entrySet())
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
+			Type objectType= ast.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
+			Variable objectVar= new Variable(
+					new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), ast); //$NON-NLS-1$
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(objectVar.varNameRaw(), objectType), null);
 
-            // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-            // Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
-            // Object key = mapEntry.getKey(); // <--- add this statement
+			// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+			// Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
+			// Object key = mapEntry.getKey(); // <--- add this statement
 
-            final Type mapKeyType= b.createCopyTarget(parameter.getType());
-            final VariableDeclarationStatement newKeyDecl= b.declareStatement(mapKeyType, b.createMoveTarget(parameter.getName()),
-                    b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
+			Type mapKeyType= ast.createCopyTarget(parameter.getType());
+			VariableDeclarationStatement newKeyDecl= ast.declareStatement(mapKeyType, ASTNodes.createMoveTarget(rewrite, parameter.getName()),
+					ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
-            r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
+			rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl, null);
 
-            if (keyUses > getValueMis.size()) {
-                String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
+			if (keyUses > getValueMis.size()) {
+				String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-                final VariableDeclarationStatement newEntryDecl= b.declareStatement(b.type(mapEntryTypeName),
-                        entryVar.varName(), b.cast(b.type(mapEntryTypeName), objectVar.varName()));
-                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
-            }
-        } else {
-            // for (K key : map.keySet()) => for (K key : map.entrySet())
-            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.createMoveTarget(mapExpression), "entrySet")); //$NON-NLS-1$
-            // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
-            // map.entrySet())
-            final Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
-            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
+				VariableDeclarationStatement newEntryDecl= ast.declareStatement(ast.type(mapEntryTypeName),
+						entryVar.varName(), ast.cast(ast.type(mapEntryTypeName), objectVar.varName()));
+				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl, null);
+			}
+		} else {
+			// for (K key : map.keySet()) => for (K key : map.entrySet())
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
+			// for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
+			// map.entrySet())
+			Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(entryVar.varNameRaw(), mapEntryType), null);
 
-            if (keyUses > getValueMis.size()) {
-                // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-                // K key = mapEntry.getKey(); // <--- add this statement
-                final Type mapKeyType= b.createCopyTarget(parameter.getType());
+			if (keyUses > getValueMis.size()) {
+				// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+				// K key = mapEntry.getKey(); // <--- add this statement
+				Type mapKeyType= ast.createCopyTarget(parameter.getType());
 
-                final VariableDeclarationStatement newKeyDeclaration= b.declareStatement(mapKeyType,
-                        b.createMoveTarget(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
-                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
-            }
-        }
+				VariableDeclarationStatement newKeyDeclaration= ast.declareStatement(mapKeyType,
+						ASTNodes.createMoveTarget(rewrite, parameter.getName()), ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
+				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration, null);
+			}
+		}
 
-        // Replace all occurrences of map.get(key) => mapEntry.getValue()
-        for (MethodInvocation getValueMi : getValueMis) {
-            r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue")); //$NON-NLS-1$
-        }
-    }
+		// Replace all occurrences of map.get(key) => mapEntry.getValue()
+		for (MethodInvocation getValueMi : getValueMis) {
+			rewrite.replace(getValueMi, ast.newMethodInvocation(entryVar.varName(), "getValue"), null); //$NON-NLS-1$
+		}
+	}
 
-    /**
-     * If possible, use the type declaration, so we can return the type as it was
-     * declared. Otherwise, let's use the type binding and output verbose fully
-     * qualified types.
-     */
-    private Type createMapEntryType(final SingleVariableDeclaration parameter, final MethodInvocation getValueMi,
-            final TypeNameDecider typeNameDecider) {
-        final String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
+	/**
+	 * If possible, use the type declaration, so we can return the type as it was
+	 * declared. Otherwise, let's use the type binding and output verbose fully
+	 * qualified types.
+	 */
+	private Type createMapEntryType(final SingleVariableDeclaration parameter, final MethodInvocation getValueMi,
+			final TypeNameDecider typeNameDecider) {
+		String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Type paramType= parameter.getType();
-        final Type mapKeyType;
-        if (paramType.isPrimitiveType()) {
-            // Use the type binding (not as precise as what is in the code)
-            final ITypeBinding mapTypeBinding= getValueMi.getExpression().resolveTypeBinding();
-            final ITypeBinding keyTypeBinding= mapTypeBinding.getTypeArguments()[0];
-            mapKeyType= b.toType(keyTypeBinding, typeNameDecider);
-        } else {
-            // Use the type as defined in the code
-            mapKeyType= b.createMoveTarget(paramType);
-        }
-        final Type mapValueType= b.copyType(getValueMi, typeNameDecider);
-        return b.genericType(mapEntryType, mapKeyType, mapValueType);
-    }
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private boolean isKeySetMethod(final MethodInvocation foreachExpression) {
-        return foreachExpression != null && ASTNodes.usesGivenSignature(foreachExpression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
-    }
+		Type paramType= parameter.getType();
+		Type mapKeyType;
+		if (paramType.isPrimitiveType()) {
+			// Use the type binding (not as precise as what is in the code)
+			ITypeBinding mapTypeBinding= getValueMi.getExpression().resolveTypeBinding();
+			ITypeBinding keyTypeBinding= mapTypeBinding.getTypeArguments()[0];
+			mapKeyType= ast.toType(keyTypeBinding, typeNameDecider);
+		} else {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			// Use the type as defined in the code
+			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
+		}
+		Type mapValueType= ast.copyType(getValueMi, typeNameDecider);
+		return ast.genericType(mapEntryType, mapKeyType, mapValueType);
+	}
 
-    private List<MethodInvocation> collectMapGetValueCalls(final Expression mapExpression,
-            final SingleVariableDeclaration parameter, final Statement body) {
-        return new CollectMapGetCalls(mapExpression, parameter).collect(body);
-    }
+	private boolean isKeySetMethod(final MethodInvocation foreachExpression) {
+		return foreachExpression != null && ASTNodes.usesGivenSignature(foreachExpression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+	}
 
-    /** Sanity check. */
-    private boolean haveSameTypeBindings(final Collection<? extends Expression> exprs) {
-        Iterator<? extends Expression> it= exprs.iterator();
+	private List<MethodInvocation> collectMapGetValueCalls(final Expression mapExpression,
+			final SingleVariableDeclaration parameter, final Statement body) {
+		return new CollectMapGetCalls(mapExpression, parameter).collect(body);
+	}
 
-        if (!it.hasNext()) {
-            // Not really expected
-            return false;
-        }
+	/** Sanity check. */
+	private boolean haveSameTypeBindings(final Collection<? extends Expression> exprs) {
+		Iterator<? extends Expression> it= exprs.iterator();
 
-        final ITypeBinding type0= it.next().resolveTypeBinding();
+		if (!it.hasNext()) {
+			// Not really expected
+			return false;
+		}
 
-        if (type0 == null) {
-            return false;
-        }
+		ITypeBinding type0= it.next().resolveTypeBinding();
 
-        while (it.hasNext()) {
-            final ITypeBinding typeN= it.next().resolveTypeBinding();
-            if (!areSameTypeBindings(type0, typeN)) {
-                return false;
-            }
-        }
+		if (type0 == null) {
+			return false;
+		}
 
-        return true;
-    }
+		while (it.hasNext()) {
+			ITypeBinding typeN= it.next().resolveTypeBinding();
+			if (!areSameTypeBindings(type0, typeN)) {
+				return false;
+			}
+		}
 
-    private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        return type1 == null || type2 == null || (type1.isParameterizedType() == type2.isParameterizedType()
-                && areSameParameterizedTypeBindings(type1, type2));
-    }
+		return true;
+	}
 
-    /** Special handling because of captures. */
-    private boolean areSameParameterizedTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        return type1.getErasure().equals(type2.getErasure())
-                && areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
-    }
+	private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
+		return type1 == null || type2 == null || type1.isParameterizedType() == type2.isParameterizedType()
+				&& areSameParameterizedTypeBindings(type1, type2);
+	}
 
-    private boolean areSameTypeBindings(final ITypeBinding[] types1, final ITypeBinding[] types2) {
-        if (types1.length != types2.length) {
-            return false;
-        }
-        for (int i= 0; i < types1.length; i++) {
-            if (!areSameTypeBindings(types1[i], types2[i])) {
-                return false;
-            }
-        }
+	/** Special handling because of captures. */
+	private boolean areSameParameterizedTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
+		return type1.getErasure().equals(type2.getErasure())
+				&& areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
+	}
 
-        return true;
-    }
+	private boolean areSameTypeBindings(final ITypeBinding[] types1, final ITypeBinding[] types2) {
+		if (types1.length != types2.length) {
+			return false;
+		}
+		for (int i= 0; i < types1.length; i++) {
+			if (!areSameTypeBindings(types1[i], types2[i])) {
+				return false;
+			}
+		}
 
-    /**
-     * Class to find {@code map.get(loopVariable)} constructs in the AST tree, and
-     * collect the type of the value, which is unknown until one is located.
-     */
-    static class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
-        private final Expression mapExpression;
-        private final SingleVariableDeclaration forEachParameter;
+		return true;
+	}
 
-        public CollectMapGetCalls(final Expression mapExpression, final SingleVariableDeclaration forEachParameter) {
-            this.mapExpression= mapExpression;
-            this.forEachParameter= forEachParameter;
-        }
+	/**
+	 * Class to find {@code map.get(loopVariable)} constructs in the AST tree, and
+	 * collect the type of the value, which is unknown until one is located.
+	 */
+	static class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
+		private final Expression mapExpression;
+		private final SingleVariableDeclaration forEachParameter;
 
-        @Override
-        public boolean visit(final MethodInvocation node) {
-            if (isSameReference(node.getExpression(), mapExpression)
-                    && ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    && ASTNodes.isSameVariable(ASTNodes.arguments(node).get(0), forEachParameter.getName())) {
-                addResult(node);
-            }
+		public CollectMapGetCalls(final Expression mapExpression, final SingleVariableDeclaration forEachParameter) {
+			this.mapExpression= mapExpression;
+			this.forEachParameter= forEachParameter;
+		}
 
-            return true;
-        }
+		@Override
+		public boolean visit(final MethodInvocation node) {
+			if (isSameReference(node.getExpression(), mapExpression)
+					&& ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+					&& ASTNodes.isSameVariable((Expression) node.arguments().get(0), forEachParameter.getName())) {
+				addResult(node);
+			}
 
-        private boolean isSameReference(final Expression expr1, final Expression expr2) {
-            if (expr1 == null || expr2 == null) {
-                return false;
-            }
-            if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
-                return ASTNodes.isSameVariable(expr1, expr2);
-            }
-            final MethodInvocation mi1= (MethodInvocation) expr1;
-            final MethodInvocation mi2= (MethodInvocation) expr2;
-            return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
-                    && isSameReference(mi1.getExpression(), mi2.getExpression());
-        }
-    }
+			return true;
+		}
+
+		private boolean isSameReference(final Expression expr1, final Expression expr2) {
+			if (expr1 == null || expr2 == null) {
+				return false;
+			}
+			if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
+				return ASTNodes.isSameVariable(expr1, expr2);
+			}
+			MethodInvocation mi1= (MethodInvocation) expr1;
+			MethodInvocation mi2= (MethodInvocation) expr2;
+			return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
+					&& isSameReference(mi1.getExpression(), mi2.getExpression());
+		}
+	}
 }

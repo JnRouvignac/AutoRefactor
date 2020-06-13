@@ -29,17 +29,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -55,223 +56,240 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
-    private static final class SideEffectVisitor extends InterruptibleVisitor {
-        private final Set<String> localVariableNames;
-        private boolean hasSideEffect;
+	private static final class SideEffectVisitor extends InterruptibleVisitor {
+		private final Set<SimpleName> localVariableNames;
+		private boolean hasSideEffect;
 
-        private SideEffectVisitor(final Set<String> localVariableNames) {
-            this.localVariableNames= localVariableNames;
-        }
+		private SideEffectVisitor(final Set<SimpleName> localVariableNames) {
+			this.localVariableNames= localVariableNames;
+		}
 
-        private boolean hasSideEffect() {
-            return hasSideEffect;
-        }
+		private boolean hasSideEffect() {
+			return hasSideEffect;
+		}
 
-        @Override
-        public boolean visit(final Assignment node) {
-            if (!ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN)) {
-                hasSideEffect= true;
-                return interruptVisit();
-            }
+		@Override
+		public boolean visit(final Assignment node) {
+			if (!ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN)) {
+				hasSideEffect= true;
+				return interruptVisit();
+			}
 
-            return visitVar(node.getLeftHandSide());
-        }
+			return visitVar(node.getLeftHandSide());
+		}
 
-        private boolean visitVar(final Expression modifiedVar) {
-            if (!(modifiedVar instanceof SimpleName)
-                    || !localVariableNames.contains(((SimpleName) modifiedVar).getIdentifier())) {
-                hasSideEffect= true;
-                return interruptVisit();
-            }
+		private boolean visitVar(final Expression modifiedVar) {
+			if (!(modifiedVar instanceof SimpleName)) {
+				hasSideEffect= true;
+				return interruptVisit();
+			}
 
-            return true;
-        }
+			boolean isFound= false;
 
-        @Override
-        public boolean visit(final PrefixExpression node) {
-            return !ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT) || visitVar(node.getOperand());
-        }
+			for (SimpleName localVariableName : localVariableNames) {
+				if (ASTNodes.isSameVariable(localVariableName, (SimpleName) modifiedVar)) {
+					isFound= true;
+					break;
+				}
+			}
 
-        @Override
-        public boolean visit(final PostfixExpression node) {
-            return visitVar(node.getOperand());
-        }
+			if (!isFound) {
+				hasSideEffect= true;
+				return interruptVisit();
+			}
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public boolean visit(final InfixExpression node) {
-            if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.hasType(node, String.class.getCanonicalName())
-                    && (mayCallImplicitToString(node.getLeftOperand())
-                            || mayCallImplicitToString(node.getRightOperand())
-                            || mayCallImplicitToString(node.extendedOperands()))) {
-                hasSideEffect= true;
-                return interruptVisit();
-            }
+			return true;
+		}
 
-            return true;
-        }
+		@Override
+		public boolean visit(final PrefixExpression node) {
+			if (ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
+				return visitVar(node.getOperand());
+			}
 
-        private boolean mayCallImplicitToString(final List<Expression> extendedOperands) {
-            if (extendedOperands != null) {
-                for (Expression expression : extendedOperands) {
-                    if (mayCallImplicitToString(expression)) {
-                        return true;
-                    }
-                }
-            }
+			return true;
+		}
 
-            return false;
-        }
+		@Override
+		public boolean visit(final PostfixExpression node) {
+			return visitVar(node.getOperand());
+		}
 
-        private boolean mayCallImplicitToString(final Expression expression) {
-            return !ASTNodes.hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
-                    Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
-                    Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
-                    && !(expression instanceof PostfixExpression);
-        }
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean visit(final InfixExpression node) {
+			if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.hasType(node, String.class.getCanonicalName())
+					&& (mayCallImplicitToString(node.getLeftOperand())
+							|| mayCallImplicitToString(node.getRightOperand())
+							|| mayCallImplicitToString(node.extendedOperands()))) {
+				hasSideEffect= true;
+				return interruptVisit();
+			}
 
-        @Override
-        public boolean visit(final SuperMethodInvocation node) {
-            hasSideEffect= true;
-            return interruptVisit();
-        }
+			return true;
+		}
 
-        @Override
-        public boolean visit(final MethodInvocation node) {
-            hasSideEffect= true;
-            return interruptVisit();
-        }
+		private boolean mayCallImplicitToString(final List<Expression> extendedOperands) {
+			if (extendedOperands != null) {
+				for (Expression expression : extendedOperands) {
+					if (mayCallImplicitToString(expression)) {
+						return true;
+					}
+				}
+			}
 
-        @Override
-        public boolean visit(final ClassInstanceCreation node) {
-            hasSideEffect= true;
-            return interruptVisit();
-        }
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ThrowStatement node) {
-            hasSideEffect= true;
-            return interruptVisit();
-        }
-    }
+		private boolean mayCallImplicitToString(final Expression expression) {
+			return !ASTNodes.hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+					Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
+					Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
+					&& !(expression instanceof PostfixExpression);
+		}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
-    }
+		@Override
+		public boolean visit(final SuperMethodInvocation node) {
+			hasSideEffect= true;
+			return interruptVisit();
+		}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
-    }
+		@Override
+		public boolean visit(final MethodInvocation node) {
+			hasSideEffect= true;
+			return interruptVisit();
+		}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
-    }
+		@Override
+		public boolean visit(final ClassInstanceCreation node) {
+			hasSideEffect= true;
+			return interruptVisit();
+		}
 
-    @Override
-    public boolean visit(final ForStatement node) {
-        final Set<String> vars= new HashSet<>();
+		@Override
+		public boolean visit(final ThrowStatement node) {
+			hasSideEffect= true;
+			return interruptVisit();
+		}
+	}
 
-        for (Expression initializer : ASTNodes.initializers(node)) {
-            vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
-        }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
+	}
 
-        if (hasSideEffect(node.getExpression(), vars)) {
-            return true;
-        }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
+	}
 
-        for (Expression updater : ASTNodes.updaters(node)) {
-            if (hasSideEffect(updater, vars)) {
-                return true;
-            }
-        }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
+	}
 
-        return visitLoopBody(node.getBody(), vars);
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(final ForStatement node) {
+		Set<SimpleName> vars= new HashSet<>();
 
-    private boolean hasSideEffect(final ASTNode node, final Set<String> allowedVars) {
-        final SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
-        variableUseVisitor.visitNode(node);
-        return variableUseVisitor.hasSideEffect();
-    }
+		for (Expression initializer : (List<Expression>) node.initializers()) {
+			vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
+		}
 
-    @Override
-    public boolean visit(final EnhancedForStatement node) {
-        return !ASTNodes.isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<String>());
-    }
+		if (hasSideEffect(node.getExpression(), vars)) {
+			return true;
+		}
 
-    private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
-        final List<Statement> statements= ASTNodes.asList(body);
+		for (Expression updater : (List<Expression>) node.updaters()) {
+			if (hasSideEffect(updater, vars)) {
+				return true;
+			}
+		}
 
-        if (statements == null || statements.isEmpty()) {
-            return true;
-        }
+		return visitLoopBody(node.getBody(), vars);
+	}
 
-        for (int i= 0; i < statements.size() - 1; i++) {
-            final Statement statement= statements.get(i);
-            allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+	private boolean hasSideEffect(final ASTNode node, final Set<SimpleName> allowedVars) {
+		SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
+		variableUseVisitor.visitNode(node);
+		return variableUseVisitor.hasSideEffect();
+	}
 
-            if (hasSideEffect(statement, allowedVars)) {
-                return true;
-            }
-        }
+	@Override
+	public boolean visit(final EnhancedForStatement node) {
+		return !ASTNodes.isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<SimpleName>());
+	}
 
-        final IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
+	private boolean visitLoopBody(final Statement body, final Set<SimpleName> allowedVars) {
+		List<Statement> statements= ASTNodes.asList(body);
 
-        if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
-            final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
+		if (Utils.isEmpty(statements)) {
+			return true;
+		}
 
-            for (Statement statement : assignments) {
-                if (statement instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
+		for (int i= 0; i < statements.size() - 1; i++) {
+			Statement statement= statements.get(i);
+			allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 
-                    for (Object obj : decl.fragments()) {
-                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
+			if (hasSideEffect(statement, allowedVars)) {
+				return true;
+			}
+		}
 
-                        if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
-                            return true;
-                        }
-                    }
-                } else if (statement instanceof ExpressionStatement) {
-                    final Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
+		IfStatement ifStatement= ASTNodes.as(Utils.getLast(statements), IfStatement.class);
 
-                    if (assignment == null || !ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
+		if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
+			List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
-            addBreak(ifStatement, assignments);
-            return false;
-        }
+			if (areAssignmentsValid(allowedVars, assignments)) {
+				addBreak(ifStatement, assignments);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+	private boolean areAssignmentsValid(final Set<SimpleName> allowedVars, final List<Statement> assignments) {
+		for (Statement statement : assignments) {
+			VariableDeclarationStatement variableDeclaration= ASTNodes.as(statement, VariableDeclarationStatement.class);
+			Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
 
-        if (ifStatement.getThenStatement() instanceof Block) {
-            r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));
-        } else {
-            r.replace(ifStatement.getThenStatement(), b.block(b.createMoveTarget(ifStatement.getThenStatement()), b.break0()));
-        }
-    }
+			if (variableDeclaration != null) {
+				for (Object obj : variableDeclaration.fragments()) {
+					VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
+
+					if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
+						return false;
+					}
+				}
+			} else if (assignment != null
+					&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+					&& ASTNodes.isHardCoded(assignment.getRightHandSide())
+					&& ASTNodes.isPassive(assignment.getLeftHandSide())) {
+				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
+				varOccurrenceVisitor.visitNode(assignment.getLeftHandSide());
+
+				if (varOccurrenceVisitor.isVarUsed()) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		if (ifStatement.getThenStatement() instanceof Block) {
+			rewrite.insertAfter(ast.break0(), Utils.getLast(assignments), null);
+		} else {
+			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), null);
+		}
+	}
 }

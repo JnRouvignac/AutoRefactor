@@ -26,75 +26,66 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        final Refactorings r= this.ctx.getRefactorings();
+	@Override
+	public boolean visit(final IfStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        final Statement thenStatement= node.getThenStatement();
-        final Statement elseStatement= node.getElseStatement();
-        if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-            r.remove(elseStatement);
-            return false;
-        }
-        if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
+		Statement thenStatement= node.getThenStatement();
+		Statement elseStatement= node.getElseStatement();
 
-            final Expression condition= node.getExpression();
-            if (elseStatement != null) {
-                r.replace(node, b.if0(b.negate(condition), b.createMoveTarget(elseStatement)));
-            } else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
-                removeBlock(node, r, b);
-                return false;
-            }
-        }
+		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
+			rewrite.remove(elseStatement, null);
+			return false;
+		}
 
-        return true;
-    }
+		if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
+			Expression condition= node.getExpression();
 
-    private void removeBlock(final IfStatement node, final Refactorings r, final ASTNodeFactory b) {
-        if (ASTNodes.canHaveSiblings(node)) {
-            r.remove(node);
-        } else {
-            r.replace(node, b.block());
-        }
-    }
+			if (elseStatement != null) {
+				rewrite.replace(condition, cuRewrite.getASTBuilder().negate(condition), null);
+				rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), null);
+			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
+				removeBlock(node);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private void removeBlock(final IfStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+			rewrite.remove(node, null);
+		} else {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			rewrite.replace(node, ast.block(), null);
+		}
+	}
 }

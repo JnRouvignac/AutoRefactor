@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 public class UseCollectionsWhileNestedClassConflictsSample {
-    public class Collections {
+    public static class Collections {
     }
 
     public void replaceAddWithForLoopByCollectionsAddAll(

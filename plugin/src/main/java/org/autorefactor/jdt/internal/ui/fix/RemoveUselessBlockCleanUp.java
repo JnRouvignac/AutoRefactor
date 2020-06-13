@@ -40,67 +40,69 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
+import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        final List<Statement> statements= ASTNodes.statements(node);
-        if (statements.size() == 1 && statements.get(0) instanceof Block) {
-            replaceBlock((Block) statements.get(0));
-            return false;
-        }
-        if (node.getParent() instanceof Block) {
-            final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+	@Override
+	public boolean visit(final Block node) {
+		@SuppressWarnings("unchecked")
+		List<Statement> statements= node.statements();
 
-            final Set<String> followingVariableNames= new HashSet<>();
-            for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
-            }
+		if (statements.size() == 1 && statements.get(0) instanceof Block) {
+			replaceBlock((Block) statements.get(0));
+			return false;
+		}
 
-            if (!ifVariableNames.removeAll(followingVariableNames)) {
-                replaceBlock(node);
-                return false;
-            }
-        }
+		if (node.getParent() instanceof Block) {
+			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+			Set<SimpleName> followingVariableNames= new HashSet<>();
 
-        return true;
-    }
+			for (Statement statement : ASTNodes.getNextSiblings(node)) {
+				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+			}
 
-    private void replaceBlock(final Block node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
-        final List<Statement> statements= ASTNodes.statements(node);
+			for (SimpleName ifVariableName : ifVariableNames) {
+				for (SimpleName followingVariableName : followingVariableNames) {
+					if (Utils.equalNotNull(ifVariableName.getIdentifier(), followingVariableName.getIdentifier())) {
+						return true;
+					}
+				}
+			}
 
-        final List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
+			replaceBlock(node);
+			return false;
+		}
+
+		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void replaceBlock(final Block node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+        List<Statement> statements= (List<Statement>) node.statements();
+
+        List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
 
         for (String comment : extraLeadingComments) {
             r.insertBefore(b.rawComment(comment), node);
@@ -113,24 +115,24 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      * the comment has to be copied manually (see #396)
      */
     private List<String> collectExtraLeadingComments(Block node, List<Statement> statements) {
-        final List<String> comments = new ArrayList<>();
+        List<String> comments = new ArrayList<>();
 
-        final CompilationUnit cu = node.getRoot() instanceof CompilationUnit ? (CompilationUnit) node.getRoot() : null;
+        CompilationUnit cu = node.getRoot() instanceof CompilationUnit ? (CompilationUnit) node.getRoot() : null;
         if (cu != null) {
-            final int stmtStartPosition = !statements.isEmpty()
+            int stmtStartPosition = !statements.isEmpty()
                     ? statements.get(0).getStartPosition()
                     : SourceLocation.getEndPosition(node) - 1;
-            final List<Comment> leadingComments = ASTComments.filterCommentsInRange(
+            List<Comment> leadingComments = ASTComments.filterCommentsInRange(
                     node.getStartPosition() + 1,
                     stmtStartPosition, cu);
 
             try {
                 if (!leadingComments.isEmpty()) {
-                    final int lineNumberBlockStart = cu.getLineNumber(node.getStartPosition());
-                    final String source = cu.getTypeRoot().getSource();
+                    int lineNumberBlockStart = cu.getLineNumber(node.getStartPosition());
+                    String source = cu.getTypeRoot().getSource();
 
                     for (Comment comment : leadingComments) {
-                        final String s = source.substring(comment.getStartPosition(), SourceLocation.getEndPosition(comment));
+                        String s = source.substring(comment.getStartPosition(), SourceLocation.getEndPosition(comment));
                         if (lineNumberBlockStart == cu.getLineNumber(comment.getStartPosition())
                                 && lineNumberBlockStart != cu.getLineNumber(stmtStartPosition)) {
                             comments.add(s);
@@ -142,5 +144,5 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
             }
         }
         return comments;
-    }
+	}
 }

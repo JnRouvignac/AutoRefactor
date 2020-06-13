@@ -29,43 +29,28 @@ import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final SuperConstructorInvocation node) {
-        if (node.arguments().isEmpty()) {
-            ctx.getRefactorings().removeButKeepComment(node);
-            return false;
-        }
+	@Override
+	public boolean visit(final SuperConstructorInvocation node) {
+		if (node.arguments().isEmpty()) {
+			cuRewrite.getASTRewrite().removeButKeepComment(node, null);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

@@ -39,8 +39,8 @@ public class AndConditionRatherThanEmbededIfSample {
         // Keep this comment
         // Keep this comment too
         if ((0 < i1 && i1 < 10) && (0 < i2 && i2 < 10)) {
-        	// Keep this comment also
-        	int i = 0;
+            // Keep this comment also
+            int i = 0;
         }
     }
 

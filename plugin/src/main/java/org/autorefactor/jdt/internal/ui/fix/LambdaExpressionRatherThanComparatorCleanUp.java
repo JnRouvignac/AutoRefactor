@@ -30,10 +30,17 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Bindings;
+import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcher;
+import org.autorefactor.jdt.internal.corext.dom.ControlWorkflowMatcherRunnable;
+import org.autorefactor.jdt.internal.corext.dom.NodeMatcher;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.util.Utils;
@@ -43,249 +50,446 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportCleanUp {
-    private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-        @Override
-        public boolean visit(final ClassInstanceCreation node) {
-            return LambdaExpressionRatherThanComparatorCleanUp.this
-                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
-        }
-    }
+	private static final class ObjectNotNullMatcher extends NodeMatcher<Expression> {
+		private final SimpleName name;
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name;
-    }
+		private ObjectNotNullMatcher(final SimpleName name) {
+			this.name= name;
+		}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_description;
-    }
+		@Override
+		public Boolean isMatching(final Expression node) {
+			InfixExpression condition= ASTNodes.as(node, InfixExpression.class);
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_reason;
-    }
+			if (condition != null
+					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
+				OrderedInfixExpression<SimpleName, NullLiteral> orderedInfix= ASTNodes.orderedInfix(condition, SimpleName.class, NullLiteral.class);
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 8;
-    }
+				if (orderedInfix != null
+						&& ASTNodes.isSameVariable(orderedInfix.getFirstOperand(), name)
+						&& ASTNodes.isPassive(orderedInfix.getFirstOperand())) {
+					return ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS);
+				}
+			}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(Comparator.class.getCanonicalName()));
-    }
+			return null;
+		}
+	}
 
-    @Override
-    public CleanUpWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass();
-    }
+	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
+		@Override
+		public boolean visit(final ClassInstanceCreation node) {
+			return maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
+		}
 
-    @Override
-    public boolean visit(final ClassInstanceCreation node) {
-        return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node));
-    }
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return maybeRefactorLambdaExpression(node, getClassesToUseWithImport());
+		}
+	}
 
-    private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
-            final Set<String> classesToUseWithImport) {
-        final AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
-        final Type type= node.getType();
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name;
+	}
 
-        if (type != null && type.resolveBinding() != null
-                && type.resolveBinding().getTypeArguments() != null
-                && type.resolveBinding().getTypeArguments().length == 1
-                && ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName())
-                && node.arguments().isEmpty()
-                && anonymousClassDecl != null
-                && anonymousClassDecl.bodyDeclarations() != null
-                && anonymousClassDecl.bodyDeclarations().size() == 1) {
-            @SuppressWarnings("unchecked")
-            final List<BodyDeclaration> bodies= anonymousClassDecl.bodyDeclarations();
-            final ITypeBinding typeArgument= type.resolveBinding().getTypeArguments()[0];
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_description;
+	}
 
-            if (bodies != null && bodies.size() == 1 && typeArgument != null) {
-                final BodyDeclaration body= bodies.get(0);
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_reason;
+	}
 
-                if (body instanceof MethodDeclaration) {
-                    return maybeRefactorMethod(node, typeArgument, body, classesToUseWithImport);
-                }
-            }
-        }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 8;
+	}
 
-        return true;
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Comparator.class.getCanonicalName()));
+	}
 
-    private boolean maybeRefactorMethod(final ClassInstanceCreation node, final ITypeBinding typeArgument,
-            final BodyDeclaration body, final Set<String> classesToUseWithImport) {
-        final MethodDeclaration methodDecl= (MethodDeclaration) body;
-        final Block methodBody= methodDecl.getBody();
+	@Override
+	public CleanUpWithNewClassImport getRefactoringClassInstance() {
+		return new RefactoringWithObjectsClass();
+	}
 
-        if (ASTNodes.usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
-                typeArgument.getQualifiedName())) {
-            @SuppressWarnings("unchecked")
-            final List<Statement> statements= methodBody.statements();
+	@Override
+	public boolean visit(final LambdaExpression node) {
+		return maybeRefactorLambdaExpression(node, getAlreadyImportedClasses(node));
+	}
 
-            if (statements != null && statements.size() == 1) {
-                final ReturnStatement returnStatement= ASTNodes.as(statements.get(0), ReturnStatement.class);
+	private boolean maybeRefactorLambdaExpression(final LambdaExpression node,
+			final Set<String> classesToUseWithImport) {
+		ITypeBinding targetType= ASTNodes.getTargetType(node);
 
-                if (returnStatement != null) {
-                    final MethodInvocation compareToMethod= ASTNodes.as(returnStatement.getExpression(), MethodInvocation.class);
+		if (ASTNodes.hasType(targetType, Comparator.class.getCanonicalName())
+				&& targetType.getTypeArguments() != null
+				&& targetType.getTypeArguments().length == 1
+				&& node.parameters() != null
+				&& node.parameters().size() == 2) {
+			VariableDeclaration object1= (VariableDeclaration) node.parameters().get(0);
+			VariableDeclaration object2= (VariableDeclaration) node.parameters().get(1);
 
-                    if (compareToMethod != null && compareToMethod.getExpression() != null) {
-                        final ITypeBinding comparisonType= compareToMethod.getExpression().resolveTypeBinding();
+			if (node.getBody() instanceof Statement) {
+				return maybeRefactorBody(node, targetType.getTypeArguments()[0], classesToUseWithImport, object1, object2, ASTNodes.asList((Statement) node.getBody()));
+			}
+            if (node.getBody() instanceof Expression) {
+				SimpleName name1= object1.getName();
+				SimpleName name2= object2.getName();
 
-                        if (compareToMethod != null && compareToMethod.getExpression() != null && comparisonType != null
-                                && ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compareTo", comparisonType.getQualifiedName())) { //$NON-NLS-1$
-                            return maybeRefactorComparison(node, methodDecl, compareToMethod, typeArgument,
-                                    classesToUseWithImport);
-                        }
-                    }
-                }
-            }
-        }
+				return maybeRefactorExpression(node, targetType.getTypeArguments()[0], classesToUseWithImport, name1, name2,
+						(Expression) node.getBody());
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeRefactorComparison(final ClassInstanceCreation node, final MethodDeclaration methodDecl,
-            final MethodInvocation compareToMethod, final ITypeBinding typeArgument,
-            final Set<String> classesToUseWithImport) {
-        final SingleVariableDeclaration object1= (SingleVariableDeclaration) methodDecl.parameters().get(0);
-        final String identifier1= object1.getName().getIdentifier();
+	@Override
+	public boolean visit(final ClassInstanceCreation node) {
+		return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node));
+	}
 
-        final SingleVariableDeclaration object2= (SingleVariableDeclaration) methodDecl.parameters().get(1);
-        final String identifier2= object2.getName().getIdentifier();
+	private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
+			final Set<String> classesToUseWithImport) {
+		AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
+		Type type= node.getType();
 
-        final Expression expr1= compareToMethod.getExpression();
-        final Expression expr2= (Expression) compareToMethod.arguments().get(0);
+		if (type != null && type.resolveBinding() != null
+				&& type.resolveBinding().getTypeArguments() != null
+				&& type.resolveBinding().getTypeArguments().length == 1
+				&& ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName())
+				&& node.arguments().isEmpty()
+				&& anonymousClassDecl != null
+				&& anonymousClassDecl.bodyDeclarations() != null
+				&& anonymousClassDecl.bodyDeclarations().size() == 1) {
+			@SuppressWarnings("unchecked")
+			List<BodyDeclaration> bodies= anonymousClassDecl.bodyDeclarations();
+			ITypeBinding typeArgument= type.resolveBinding().getTypeArguments()[0];
 
-        final MethodInvocation method1= ASTNodes.as(expr1, MethodInvocation.class);
-        final MethodInvocation method2= ASTNodes.as(expr2, MethodInvocation.class);
+			if (bodies != null && bodies.size() == 1 && typeArgument != null) {
+				BodyDeclaration body= bodies.get(0);
 
-        final QualifiedName field1= ASTNodes.as(expr1, QualifiedName.class);
-        final QualifiedName field2= ASTNodes.as(expr2, QualifiedName.class);
+				if (body instanceof MethodDeclaration) {
+					return maybeRefactorMethod(node, typeArgument, (MethodDeclaration) body, classesToUseWithImport);
+				}
+			}
+		}
 
-        if (method1 != null && (method1.arguments() != null || method1.arguments().isEmpty()) && method2 != null
-                && (method2.arguments() != null || method2.arguments().isEmpty())) {
-            final String methodName1= method1.getName().getIdentifier();
-            final String methodName2= method2.getName().getIdentifier();
+		return true;
+	}
 
-            final SimpleName objectExpr1= ASTNodes.as(method1.getExpression(), SimpleName.class);
-            final SimpleName objectExpr2= ASTNodes.as(method2.getExpression(), SimpleName.class);
+	private boolean maybeRefactorMethod(final ClassInstanceCreation node, final ITypeBinding typeArgument,
+			final MethodDeclaration methodDecl, final Set<String> classesToUseWithImport) {
+		Block methodBody= methodDecl.getBody();
 
-            if (Utils.equalNotNull(methodName1, methodName2) && objectExpr1 != null && objectExpr2 != null) {
-                if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
-                        && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
-                    refactorMethod(node, typeArgument, method1, classesToUseWithImport, true);
-                    return false;
-                }
+		if (ASTNodes.usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
+				typeArgument.getQualifiedName())) {
+			VariableDeclaration object1= (VariableDeclaration) methodDecl.parameters().get(0);
+			VariableDeclaration object2= (VariableDeclaration) methodDecl.parameters().get(1);
 
-                if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
-                        && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
-                    refactorMethod(node, typeArgument, method1, classesToUseWithImport, false);
-                    return false;
-                }
-            }
-        } else if (field1 != null && field2 != null) {
-            final String fieldName1= field1.getName().getIdentifier();
-            final String fieldName2= field2.getName().getIdentifier();
+			@SuppressWarnings("unchecked")
+			List<Statement> statements= methodBody.statements();
 
-            final SimpleName objectExpr1= ASTNodes.as(field1.getQualifier(), SimpleName.class);
-            final SimpleName objectExpr2= ASTNodes.as(field2.getQualifier(), SimpleName.class);
+			return maybeRefactorBody(node, typeArgument, classesToUseWithImport, object1, object2, statements);
+		}
 
-            if (Utils.equalNotNull(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
-                if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
-                        && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
-                    refactorField(node, typeArgument, field1, identifier1, classesToUseWithImport, true);
-                    return false;
-                }
+		return true;
+	}
 
-                if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
-                        && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
-                    refactorField(node, typeArgument, field1, identifier1, classesToUseWithImport, false);
-                    return false;
-                }
-            }
-        }
+	private boolean maybeRefactorBody(final Expression node, final ITypeBinding typeArgument,
+			final Set<String> classesToUseWithImport, final VariableDeclaration object1, final VariableDeclaration object2,
+			final List<Statement> statements) {
+		SimpleName name1= object1.getName();
+		SimpleName name2= object2.getName();
 
-        return true;
-    }
+		if (!maybeRefactorCompareToMethod(node, typeArgument, classesToUseWithImport, statements, name1, name2)) {
+			return false;
+		}
 
-    private void refactorMethod(final ClassInstanceCreation node, final ITypeBinding type,
-            final MethodInvocation method, final Set<String> classesToUseWithImport, final boolean straightOrder) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+		AtomicReference<Expression> criteria= new AtomicReference<>();
+		AtomicBoolean isForward= new AtomicBoolean(true);
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(method);
+		NodeMatcher<Expression> compareToMatcher= new NodeMatcher<Expression>() {
+			@Override
+			public Boolean isMatching(final Expression node) {
+				if (isReturnedExpressionToRefactor(node, criteria, isForward, name1, name2)) {
+					return true;
+				}
 
-        final TypeMethodReference typeMethodRef= b.typeMethodRef();
-        typeMethodRef.setType(b.toType(type, typeNameDecider));
-        typeMethodRef.setName(b.createMoveTarget(method.getName()));
-        final MethodInvocation comparingMethod= b
-                .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", typeMethodRef); //$NON-NLS-1$
-        if (straightOrder) {
-            r.replace(node, comparingMethod);
-        } else {
-            r.replace(node, b.invoke(comparingMethod, "reversed")); //$NON-NLS-1$
-        }
-    }
+				return null;
+			}
+		};
 
-    @SuppressWarnings("unchecked")
-    private void refactorField(final ClassInstanceCreation node, final ITypeBinding type, final QualifiedName field,
-            final String identifier1, final Set<String> classesToUseWithImport, final boolean straightOrder) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+		NodeMatcher<Expression> zeroMatcher= new NodeMatcher<Expression>() {
+			@Override
+			public Boolean isMatching(final Expression node) {
+				if (Long.valueOf(0).equals(ASTNodes.getIntegerLiteral(node))) {
+					return true;
+				}
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(field);
+				return null;
+			}
+		};
 
-        final LambdaExpression lambdaExpression= b.lambda();
-        final ITypeBinding destinationType= ASTNodes.getTargetType(node);
+		NodeMatcher<Expression> positiveMatcher= new NodeMatcher<Expression>() {
+			@Override
+			public Boolean isMatching(final Expression node) {
+				Long value= ASTNodes.getIntegerLiteral(node);
 
-        boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
-                && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
+				if (value != null && value > 0) {
+					return true;
+				}
 
-        if (isTypeKnown && straightOrder) {
-            lambdaExpression.parameters().add(b.declareFragment(b.simpleName(identifier1)));
-        } else {
-            lambdaExpression.parameters().add(b.declareSingleVariable(identifier1, b.toType(type, typeNameDecider)));
-        }
+				return null;
+			}
+		};
 
-        lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.createMoveTarget(field.getName())));
-        lambdaExpression.setParentheses(false);
-        final MethodInvocation comparingMethod= b
-                .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", lambdaExpression); //$NON-NLS-1$
-        if (straightOrder) {
-            r.replace(node, comparingMethod);
-        } else {
-            r.replace(node, b.invoke(comparingMethod, "reversed")); //$NON-NLS-1$
-        }
-    }
+		NodeMatcher<Expression> negativeMatcher= new NodeMatcher<Expression>() {
+			@Override
+			public Boolean isMatching(final Expression node) {
+				Long value= ASTNodes.getIntegerLiteral(node);
+
+				if (value != null && value < 0) {
+					return true;
+				}
+
+				return null;
+			}
+		};
+
+		ControlWorkflowMatcherRunnable runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2)).returnedValue(compareToMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(zeroMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2)).returnedValue(negativeMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(positiveMatcher);
+
+		if (runnableMatcher.isMatching(statements)) {
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.TRUE);
+
+			return false;
+		}
+
+		runnableMatcher= ControlWorkflowMatcher.createControlWorkflowMatcher().addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2)).returnedValue(compareToMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(zeroMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(negativeMatcher)
+				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2)).returnedValue(positiveMatcher);
+
+		if (runnableMatcher.isMatching(statements)) {
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.FALSE);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean maybeRefactorCompareToMethod(final Expression node, final ITypeBinding typeArgument,
+			final Set<String> classesToUseWithImport, final List<Statement> statements,
+			final SimpleName name1, final SimpleName name2) {
+		if (statements != null && statements.size() == 1) {
+			ReturnStatement returnStatement= ASTNodes.as(statements.get(0), ReturnStatement.class);
+
+			if (returnStatement != null) {
+				return maybeRefactorExpression(node, typeArgument, classesToUseWithImport, name1, name2,
+						returnStatement.getExpression());
+			}
+		}
+
+		return true;
+	}
+
+	private boolean maybeRefactorExpression(final Expression node, final ITypeBinding typeArgument,
+			final Set<String> classesToUseWithImport, final SimpleName name1, final SimpleName name2,
+			final Expression expression) {
+		AtomicReference<Expression> criteria= new AtomicReference<>();
+		AtomicBoolean isForward= new AtomicBoolean(true);
+
+		if (isReturnedExpressionToRefactor(expression, criteria, isForward, name1, name2)) {
+			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, null);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean isReturnedExpressionToRefactor(final Expression returnExpression, final AtomicReference<Expression> criteria,
+			final AtomicBoolean isForward, final SimpleName name1,
+			final SimpleName name2) {
+		PrefixExpression negativeExpression= ASTNodes.as(returnExpression, PrefixExpression.class);
+
+		if (negativeExpression != null && ASTNodes.hasOperator(negativeExpression, PrefixExpression.Operator.MINUS)) {
+			isForward.set(!isForward.get());
+			return isReturnedExpressionToRefactor(negativeExpression.getOperand(), criteria, isForward, name1, name2);
+		}
+
+		MethodInvocation compareToMethod= ASTNodes.as(returnExpression, MethodInvocation.class);
+
+		if (compareToMethod != null && compareToMethod.getExpression() != null) {
+			ITypeBinding comparisonType= compareToMethod.getExpression().resolveTypeBinding();
+
+			if (comparisonType != null) {
+				if (compareToMethod.getExpression() != null
+						&& ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compareTo", comparisonType.getQualifiedName())) { //$NON-NLS-1$
+					return isRefactorComparisonToRefactor(criteria, isForward, name1, name2, compareToMethod.getExpression(), (Expression) compareToMethod.arguments().get(0));
+				}
+
+				String primitiveType= Bindings.getUnboxedTypeName(comparisonType.getQualifiedName());
+
+				if (primitiveType != null
+						&& ASTNodes.usesGivenSignature(compareToMethod, comparisonType.getQualifiedName(), "compare", primitiveType, primitiveType)) { //$NON-NLS-1$
+					return isRefactorComparisonToRefactor(criteria, isForward, name1, name2, (Expression) compareToMethod.arguments().get(0), (Expression) compareToMethod.arguments().get(1));
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isRefactorComparisonToRefactor(final AtomicReference<Expression> criteria,
+			final AtomicBoolean isForward, final SimpleName name1, final SimpleName name2, final Expression expr1,
+			final Expression expr2) {
+		MethodInvocation method1= ASTNodes.as(expr1, MethodInvocation.class);
+		MethodInvocation method2= ASTNodes.as(expr2, MethodInvocation.class);
+
+		QualifiedName field1= ASTNodes.as(expr1, QualifiedName.class);
+		QualifiedName field2= ASTNodes.as(expr2, QualifiedName.class);
+
+		if (method1 != null && Utils.isEmpty(method1.arguments()) && method2 != null
+				&& Utils.isEmpty(method2.arguments())) {
+			String methodName1= method1.getName().getIdentifier();
+			String methodName2= method2.getName().getIdentifier();
+
+			SimpleName objectExpr1= ASTNodes.as(method1.getExpression(), SimpleName.class);
+			SimpleName objectExpr2= ASTNodes.as(method2.getExpression(), SimpleName.class);
+
+			if (Utils.equalNotNull(methodName1, methodName2) && objectExpr1 != null && objectExpr2 != null) {
+				if (ASTNodes.isSameVariable(objectExpr1, name1)
+						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
+					criteria.set(method1);
+					return true;
+				}
+
+				if (ASTNodes.isSameVariable(objectExpr1, name2)
+						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
+					criteria.set(method1);
+					isForward.set(!isForward.get());
+					return true;
+				}
+			}
+		} else if (field1 != null && field2 != null) {
+			SimpleName fieldName1= field1.getName();
+			SimpleName fieldName2= field2.getName();
+
+			SimpleName objectExpr1= ASTNodes.as(field1.getQualifier(), SimpleName.class);
+			SimpleName objectExpr2= ASTNodes.as(field2.getQualifier(), SimpleName.class);
+
+			if (ASTNodes.isSameVariable(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
+				if (ASTNodes.isSameVariable(objectExpr1, name1)
+						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
+					criteria.set(field1);
+					return true;
+				}
+
+				if (ASTNodes.isSameVariable(objectExpr1, name2)
+						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
+					criteria.set(field1);
+					isForward.set(!isForward.get());
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private void refactor(final Expression node, final ITypeBinding typeArgument,
+			final Set<String> classesToUseWithImport, final SimpleName name1, final AtomicReference<Expression> criteria,
+			final AtomicBoolean isForward, final Boolean isNullFirst) {
+		String comparatorClassName= addImport(Comparator.class, classesToUseWithImport, new HashSet<>());
+
+		Expression lambda;
+		if (criteria.get() instanceof MethodInvocation) {
+			lambda= buildMethod(typeArgument, (MethodInvocation) criteria.get());
+		} else {
+			lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), name1);
+		}
+
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		Expression comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
+
+		if (!isForward.get()) {
+			comparingMethod= ast.newMethodInvocation(comparingMethod, "reversed"); //$NON-NLS-1$
+		}
+
+		if (isNullFirst != null) {
+			if (isNullFirst) {
+				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
+			} else {
+				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
+			}
+		}
+
+		rewrite.replace(node, comparingMethod, null);
+	}
+
+	private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		TypeNameDecider typeNameDecider= new TypeNameDecider(method);
+
+		TypeMethodReference typeMethodRef= ast.typeMethodRef();
+		typeMethodRef.setType(ast.toType(type, typeNameDecider));
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, method.getName()));
+		return typeMethodRef;
+	}
+
+	@SuppressWarnings("unchecked")
+	private LambdaExpression buildField(final Expression node, final ITypeBinding type, final boolean straightOrder,
+			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
+
+		LambdaExpression lambdaExpression= ast.lambda();
+		ITypeBinding destinationType= ASTNodes.getTargetType(node);
+
+		boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
+				&& destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
+
+		if (isTypeKnown && straightOrder && isNullFirst == null) {
+			lambdaExpression.parameters().add(ast.declareFragment(ast.createCopyTarget(name1)));
+		} else {
+			lambdaExpression.parameters().add(ast.declareSingleVariable(name1.getIdentifier(), ast.toType(type, typeNameDecider)));
+		}
+
+		lambdaExpression.setBody(ast.fieldAccess(ast.createCopyTarget(name1), ASTNodes.createMoveTarget(rewrite, field.getName())));
+		lambdaExpression.setParentheses(false);
+		return lambdaExpression;
+	}
 }

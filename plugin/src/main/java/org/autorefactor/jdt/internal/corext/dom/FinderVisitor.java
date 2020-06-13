@@ -35,40 +35,40 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
  * @param <R> type of the results returned by this finder visitor
  */
 public class FinderVisitor<R> extends ASTVisitor {
-    /** Whether the result has been found. */
-    private boolean resultFound;
-    /** The actual boolean result. */
-    private R result;
+	/** Whether the result has been found. */
+	private boolean resultFound;
+	/** The actual boolean result. */
+	private R result;
 
-    /**
-     * Sets the result.
-     *
-     * @param result the result
-     */
-    protected void setResult(final R result) {
-        this.resultFound= true;
-        this.result= result;
-    }
+	/**
+	 * Sets the result.
+	 *
+	 * @param result the result
+	 */
+	protected void setResult(final R result) {
+		this.resultFound= true;
+		this.result= result;
+	}
 
-    /**
-     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
-     * found result if one exists, or the default value.
-     *
-     * @param nodeToVisit   the node to visit
-     * @param defaultResult the default result if no result could be found
-     * @return the result found, or the default result when none exist
-     */
-    public R findOrDefault(final ASTNode nodeToVisit, final R defaultResult) {
-        if (nodeToVisit != null) {
-            nodeToVisit.accept(this);
-        }
+	/**
+	 * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
+	 * found result if one exists, or the default value.
+	 *
+	 * @param nodeToVisit   the node to visit
+	 * @param defaultResult the default result if no result could be found
+	 * @return the result found, or the default result when none exist
+	 */
+	public R findOrDefault(final ASTNode nodeToVisit, final R defaultResult) {
+		if (nodeToVisit != null) {
+			nodeToVisit.accept(this);
+		}
 
-        return resultFound ? result : defaultResult;
-    }
+		return resultFound ? result : defaultResult;
+	}
 
-    @Override
-    public boolean preVisit2(final ASTNode node) {
-        // Exit has fast as possible when the result is found
-        return !resultFound;
-    }
+	@Override
+	public boolean preVisit2(final ASTNode node) {
+		// Exit has fast as possible when the result is found
+		return !resultFound;
+	}
 }

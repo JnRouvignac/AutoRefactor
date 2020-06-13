@@ -30,9 +30,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Dimension;
@@ -50,147 +51,139 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        final List<Statement> blockStatement= ASTNodes.asList(node);
-        boolean result= true;
+	@Override
+	public boolean visit(final Block node) {
+		List<Statement> blockStatement= ASTNodes.asList(node);
+		boolean result= true;
 
-        List<Statement> forStatements;
-        for (int i= 0; i < blockStatement.size(); i++) {
-            final Statement statement= blockStatement.get(i);
-            final ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
-            final EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
-            final WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
-            final DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
-            forStatements= null;
+		List<Statement> forStatements;
+		for (int i= 0; i < blockStatement.size(); i++) {
+			Statement statement= blockStatement.get(i);
+			ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
+			EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
+			WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
+			DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
+			forStatements= null;
 
-            if (forStatement != null) {
-                forStatements= ASTNodes.asList(forStatement.getBody());
-            } else if (enhancedForStatement != null) {
-                forStatements= ASTNodes.asList(enhancedForStatement.getBody());
-            } else if (whileStatement != null) {
-                forStatements= ASTNodes.asList(whileStatement.getBody());
-            } else if (doStatement != null) {
-                forStatements= ASTNodes.asList(doStatement.getBody());
-            }
+			if (forStatement != null) {
+				forStatements= ASTNodes.asList(forStatement.getBody());
+			} else if (enhancedForStatement != null) {
+				forStatements= ASTNodes.asList(enhancedForStatement.getBody());
+			} else if (whileStatement != null) {
+				forStatements= ASTNodes.asList(whileStatement.getBody());
+			} else if (doStatement != null) {
+				forStatements= ASTNodes.asList(doStatement.getBody());
+			}
 
-            if (forStatements != null) {
-                final Set<String> varNames= new HashSet<>();
+			if (forStatements != null) {
+				Set<SimpleName> varNames= new HashSet<>();
 
-                for (int j= 0; j < i; j++) {
-                    if (!(blockStatement.get(j) instanceof Block)) {
-                        varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
-                    }
-                }
-                for (int j= i + 1; j < blockStatement.size(); j++) {
-                    varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
-                }
+				for (int j= 0; j < i; j++) {
+					if (!(blockStatement.get(j) instanceof Block)) {
+						varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
+					}
+				}
+				for (int j= i + 1; j < blockStatement.size(); j++) {
+					varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
+				}
 
-                final List<VariableDeclarationStatement> candidates= new ArrayList<>();
+				List<VariableDeclarationStatement> candidates= new ArrayList<>();
 
-                for (Statement declarationStatement : forStatements) {
-                    final VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
+				for (Statement declarationStatement : forStatements) {
+					VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
 
-                    if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
-                            && decl.fragments() != null && decl.fragments().size() == 1) {
-                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
-                                .get(0);
-                        final String id= fragment.getName().getIdentifier();
+					if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
+							&& decl.fragments() != null && decl.fragments().size() == 1) {
+						VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
+								.get(0);
+						SimpleName name= fragment.getName();
+						boolean isFound= false;
 
-                        if (!varNames.contains(id)) {
-                            candidates.add(decl);
-                            varNames.add(id);
-                        }
-                    }
-                }
+						for (SimpleName varName : varNames) {
+							if (Utils.equalNotNull(varName.getIdentifier(), name.getIdentifier())) {
+								isFound= true;
+								break;
+							}
+						}
 
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                final Refactorings r= this.ctx.getRefactorings();
+						if (!isFound) {
+							candidates.add(decl);
+							varNames.add(name);
+						}
+					}
+				}
 
-                for (VariableDeclarationStatement candidate : candidates) {
-                    moveDeclaration(b, r, statement, candidate);
-                    result= false;
-                }
-            }
-        }
+				for (VariableDeclarationStatement candidate : candidates) {
+					moveDeclaration(statement, candidate);
+					result= false;
+				}
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @SuppressWarnings("unchecked")
-    private boolean hasAnnotation(final List<?> modifiers) {
-        for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
-            if (em.isAnnotation()) {
-                return true;
-            }
-        }
+	@SuppressWarnings("unchecked")
+	private boolean hasAnnotation(final List<?> modifiers) {
+		for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
+			if (em.isAnnotation()) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    private void moveDeclaration(final ASTNodeFactory b, final Refactorings r, final Statement statement,
-            final VariableDeclarationStatement varToMove) {
-        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
+	private void moveDeclaration(final Statement statement, final VariableDeclarationStatement varToMove) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        if (fragment.getInitializer() != null) {
-            final Type copyOfType= b.createCopyTarget(varToMove.getType());
-            final SimpleName name= fragment.getName();
-            VariableDeclarationFragment newFragment= b.declareFragment(b.createCopyTarget(name));
-            @SuppressWarnings("unchecked")
-            List<Dimension> extraDimensions= fragment.extraDimensions();
-            @SuppressWarnings("unchecked")
-            List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-            newExtraDimensions.addAll(b.createMoveTarget(extraDimensions));
-            VariableDeclarationStatement newDeclareStatement= b.declareStatement(copyOfType, newFragment);
-            @SuppressWarnings("unchecked")
-            List<IExtendedModifier> modifiers= varToMove.modifiers();
-            @SuppressWarnings("unchecked")
-            List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
+		VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
-            for (IExtendedModifier iExtendedModifier : modifiers) {
-                Modifier modifier= (Modifier) iExtendedModifier;
+		if (fragment.getInitializer() != null) {
+			Type copyOfType= ast.createCopyTarget(varToMove.getType());
+			SimpleName name= fragment.getName();
+			VariableDeclarationFragment newFragment= ast.declareFragment(ast.createCopyTarget(name));
+			@SuppressWarnings("unchecked")
+			List<Dimension> extraDimensions= fragment.extraDimensions();
+			@SuppressWarnings("unchecked")
+			List<Dimension> newExtraDimensions= newFragment.extraDimensions();
+			newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+			VariableDeclarationStatement newDeclareStatement= ast.declareStatement(copyOfType, newFragment);
+			@SuppressWarnings("unchecked")
+			List<IExtendedModifier> modifiers= varToMove.modifiers();
+			@SuppressWarnings("unchecked")
+			List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
 
-                if (!modifier.isPrivate() && !modifier.isStatic()) {
-                    newModifiers.add(b.createMoveTarget(modifier));
-                }
-            }
+			for (IExtendedModifier iExtendedModifier : modifiers) {
+				Modifier modifier= (Modifier) iExtendedModifier;
 
-            r.insertBefore(newDeclareStatement, statement);
-            r.replace(varToMove,
-                    b.toStatement(b.assign(b.createCopyTarget(name), Assignment.Operator.ASSIGN, b.createMoveTarget(fragment.getInitializer()))));
-        } else {
-            r.insertBefore(b.createMoveTarget(varToMove), statement);
-            r.remove(varToMove);
-        }
-    }
+				if (!modifier.isPrivate() && !modifier.isStatic()) {
+					newModifiers.add(ASTNodes.createMoveTarget(rewrite, modifier));
+				}
+			}
+
+			rewrite.insertBefore(newDeclareStatement, statement, null);
+			rewrite.replace(varToMove,
+					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), null);
+		} else {
+			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, null);
+			rewrite.remove(varToMove, null);
+		}
+	}
 }

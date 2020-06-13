@@ -25,10 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.refactoring.structure.CompilationUnitRewrite;
 import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -40,94 +41,77 @@ import org.eclipse.jdt.core.dom.QualifiedName;
  * {@link ASTVisitor}s. It centralizes useful features for cleanup rules.
  */
 public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefactoringRule {
-    private static final class LombokVisitor extends InterruptibleVisitor {
-        private boolean useLombok;
+	private static final class LombokVisitor extends InterruptibleVisitor {
+		private boolean useLombok;
 
-        @Override
-        public boolean visit(final QualifiedName node) {
-            if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
-                useLombok= true;
-                return interruptVisit();
-            }
+		@Override
+		public boolean visit(final QualifiedName node) {
+			if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
+				useLombok= true;
+				return interruptVisit();
+			}
 
-            return true;
-        }
+			return true;
+		}
 
-        /**
-         * @return the useLombok
-         */
-        public boolean isUseLombok() {
-            return useLombok;
-        }
-    }
+		/**
+		 * @return the useLombok
+		 */
+		public boolean isUseLombok() {
+			return useLombok;
+		}
+	}
 
-    /** The refactoring context of the current visitor. */
-    protected RefactoringContext ctx;
+	/** The refactoring context of the current visitor. */
+	protected CompilationUnitRewrite cuRewrite;
 
-    /**
-     * True if it is the visitor by default.
-     *
-     * @return true if it is the visitor by default.
-     */
-    public boolean isByDefault() {
-        return true;
-    }
+	@Override
+	public boolean isByDefault() {
+		return true;
+	}
 
-    /**
-     * True if the visitor is enabled.
-     *
-     * @param preferences The preferences
-     *
-     * @return true if the visitor is enabled.
-     */
-    public boolean isEnabled(final Preferences preferences) {
-        return preferences.isEnabled(getClass());
-    }
+	@Override
+	public boolean isEnabled(final Preferences preferences) {
+		return preferences.isEnabled(getClass());
+	}
 
-    /**
-     * True if this Java version is supported.
-     *
-     * @param javaSeRelease The javaSe release
-     *
-     * @return true if this Java version is supported.
-     */
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return true;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return true;
+	}
 
-    /**
-     * Set the cleanup context.
-     *
-     * @param ctx the cleanup context.
-     */
-    public void setRefactoringContext(final RefactoringContext ctx) {
-        this.ctx= ctx;
-    }
+	/**
+	 * Get the java minor version.
+	 *
+	 * @return the java minor version.
+	 */
+	public int getJavaMinorVersion() {
+		return cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+	}
 
-    @Override
-    public boolean preVisit2(final ASTNode node) {
-        if (node instanceof CompilationUnit) {
-            LombokVisitor lombokVisitor= new LombokVisitor();
-            lombokVisitor.visitNode(node);
+	@Override
+	public void setRefactoringContext(final CompilationUnitRewrite cuRewrite) {
+		this.cuRewrite= cuRewrite;
+	}
 
-            if (lombokVisitor.isUseLombok()) {
-                return false;
-            }
-        }
-        // Only visit nodes that have not been refactored
-        // to avoid trying to refactor twice the same node (or sub nodes)
-        return !ctx.getRefactorings().hasBeenRefactored(node);
-    }
+	@Override
+	public boolean preVisit2(final ASTNode node) {
+		if (node instanceof CompilationUnit) {
+			LombokVisitor lombokVisitor= new LombokVisitor();
+			lombokVisitor.visitNode(node);
 
-    /**
-     * Get the cleanups.
-     *
-     * @param astRoot The AST toot
-     *
-     * @return the cleanups.
-     */
-    public Refactorings getRefactorings(final CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return ctx.getRefactorings();
-    }
+			if (lombokVisitor.isUseLombok()) {
+				return false;
+			}
+		}
+		// Only visit nodes that have not been refactored
+		// to avoid trying to refactor twice the same node (or sub nodes)
+		return !cuRewrite.getASTRewrite().hasBeenRefactored(node);
+	}
+
+	@Override
+	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
+		astRoot.accept(this);
+		return cuRewrite.getASTRewrite();
+	}
 }

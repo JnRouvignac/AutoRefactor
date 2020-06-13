@@ -97,7 +97,7 @@ public class MergeConditionalBlocksSample {
     /** Duplicate if and else if code, merge it */
     public void numerousDuplicateIfAndElseIf(int i) {
         // Keep this comment
-        if ((((i == 0) || (i == 1)) || (i == 2)) || (i == 3)) {
+        if ((i == 0) || (i == 1) || (i == 2) || (i == 3)) {
             // Keep this comment too
             System.out.println("Duplicate" + (i * 10 * 1));
         } else {
@@ -109,7 +109,7 @@ public class MergeConditionalBlocksSample {
     /** Duplicate if and else if code, merge it */
     public void complexIfAndElseIf(int i) {
         // Keep this comment
-        if (((i == 0) || (i == 1 || i == 2)) || (i > 10)) {
+        if ((i == 0) || (i == 1 || i == 2) || (i > 10)) {
             // Keep this comment too
             System.out.println("Duplicate " + (i + 123 + 0));
         } else {
@@ -143,15 +143,29 @@ public class MergeConditionalBlocksSample {
     }
 
     /** Different if and else if code, leave it */
-    public void doNotMergeSameCode(int i) {
+    public void doNotMergeAdditionalCode(int i) {
+        if (i == 0) {
+            System.out.println("Duplicate");
+        } else if (i == 1) {
+            System.out.println("Duplicate");
+            System.out.println("but not only");
+        } else {
+            System.out.println("Different");
+        }
+    }
+
+    /** Duplicate if and else if code, merge it */
+    public void doNotMergeIntruderCode(int i) {
         // Keep this comment
         if (i == 0) {
             // Keep this comment too
             System.out.println("Duplicate");
         } else if (i == 1) {
             // Keep this comment too
+            System.out.println("Intruder");
+        } else if (i == 2) {
+            // Keep this comment too
             System.out.println("Duplicate");
-            System.out.println("but not only");
         } else {
             // Keep this comment also
             System.out.println("Different");

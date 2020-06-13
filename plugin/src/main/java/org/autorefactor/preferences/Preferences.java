@@ -29,18 +29,18 @@ import org.autorefactor.jdt.internal.ui.fix.AbstractCleanUpRule;
 
 /** Helper interface for preferences. */
 public interface Preferences {
-    /**
-     * Returns whether debug mode is on.
-     *
-     * @return true if debug mode is on, false otherwise.
-     */
-    boolean debugModeOn();
+	/**
+	 * Returns whether debug mode is on.
+	 *
+	 * @return true if debug mode is on, false otherwise.
+	 */
+	boolean debugModeOn();
 
-    /**
-     * Returns whether this cleanup rule is on.
-     *
-     * @param clazz The class.
-     * @return true if this cleanup rule is on, false otherwise.
-     */
-    boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz);
+	/**
+	 * Returns whether this cleanup rule is on.
+	 *
+	 * @param clazz The class.
+	 * @return true if this cleanup rule is on, false otherwise.
+	 */
+	boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz);
 }

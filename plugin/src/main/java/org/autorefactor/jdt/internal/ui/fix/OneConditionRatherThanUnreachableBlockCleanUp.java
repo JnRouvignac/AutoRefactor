@@ -25,66 +25,52 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /** See {@link #getDescription()} method. */
 public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
-        if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
-                && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(node.getExpression(), secondIf.getExpression())
-                && (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
-                        || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
-            refactorCondition(secondIf);
+	@Override
+	public boolean visit(final IfStatement node) {
+		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-            return false;
-        }
+		if (secondIf != null
+				&& !ASTNodes.isExceptionExpected(node)
+				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement()) || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))
+				&& ASTNodes.isPassive(node.getExpression())
+				&& ASTNodes.isPassive(secondIf.getExpression())
+				&& ASTNodes.match(node.getExpression(), secondIf.getExpression())) {
+			refactorCondition(secondIf);
 
-        return true;
-    }
+			return false;
+		}
 
-    private void refactorCondition(final IfStatement secondIf) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+		return true;
+	}
 
-        if (secondIf.getElseStatement() == null) {
-            r.remove(secondIf);
-        } else {
-            r.replace(secondIf, b.createMoveTarget(secondIf.getElseStatement()));
-        }
-    }
+	private void refactorCondition(final IfStatement secondIf) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		if (secondIf.getElseStatement() == null) {
+			rewrite.remove(secondIf, null);
+		} else {
+			rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getElseStatement()), null);
+		}
+	}
 }

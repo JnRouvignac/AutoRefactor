@@ -25,152 +25,122 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Block node) {
-        VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor(ctx, node);
-        node.accept(newAndPutAllMethodVisitor);
-        return newAndPutAllMethodVisitor.getResult();
-    }
+	@Override
+	public boolean visit(final Block node) {
+		VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor();
+		newAndPutAllMethodVisitor.visitNode(node);
+		return newAndPutAllMethodVisitor.result;
+	}
 
-    private static final class VariableAndIfVisitor extends BlockSubVisitor {
-        public VariableAndIfVisitor(final RefactoringContext ctx, final Block startNode) {
-            super(ctx, startNode);
-        }
+	private final class VariableAndIfVisitor extends BlockSubVisitor {
+		@Override
+		public boolean visit(final IfStatement node) {
+			if (result) {
+				Statement variableAssignment= ASTNodes.getPreviousSibling(node);
+				VariableDeclarationFragment variable= getVariable(variableAssignment);
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            Statement variableAssignment= ASTNodes.getPreviousSibling(node);
-            SimpleName variable= getVariable(variableAssignment);
+				if (variable == null || isVarUsed(variable, node.getExpression())) {
+					return true;
+				}
 
-            if (variable == null) {
-                return true;
-            }
+				for (Statement statement : ASTNodes.getNextSiblings(node)) {
+					if (isVarUsed(variable, statement)) {
+						return true;
+					}
+				}
 
-            final HashSet<String> variableToFind= new HashSet<>(Arrays.asList(variable.getIdentifier()));
-            VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-            varOccurrenceVisitor.visitNode(node.getExpression());
+				if (isVarUsed(variable, node.getThenStatement())) {
+					if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+						return true;
+					}
 
-            for (Statement statement : ASTNodes.getNextSiblings(node)) {
-                varOccurrenceVisitor.visitNode(statement);
-            }
+					return maybeMoveAssignment(variableAssignment, node.getThenStatement());
+				}
 
-            if (varOccurrenceVisitor.isVarUsed()) {
-                return true;
-            }
+				if (node.getElseStatement() != null) {
+					return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+				}
+			}
 
-            varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-            varOccurrenceVisitor.visitNode(node.getThenStatement());
+			return true;
+		}
 
-            if (varOccurrenceVisitor.isVarUsed()) {
-                if (node.getElseStatement() != null) {
-                    varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-                    varOccurrenceVisitor.visitNode(node.getElseStatement());
+		private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
+			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true).find();
+			return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
+		}
 
-                    if (varOccurrenceVisitor.isVarUsed()) {
-                        return true;
-                    }
-                }
+		private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
+			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
 
-                return maybeMoveAssignment(variableAssignment, node.getThenStatement());
-            }
+			if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
+				VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
 
-            if (node.getElseStatement() != null) {
-                varOccurrenceVisitor= new VarOccurrenceVisitor(variableToFind, true);
-                varOccurrenceVisitor.visitNode(node.getElseStatement());
+				if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+					return fragment;
+				}
+			}
 
-                return !varOccurrenceVisitor.isVarUsed() || maybeMoveAssignment(variableAssignment, node.getElseStatement());
-            }
+			return null;
+		}
 
-            return true;
-        }
+		private boolean maybeMoveAssignment(final Statement variableAssignment, final Statement statement) {
+			List<Statement> statements= ASTNodes.asList(statement);
 
-        private SimpleName getVariable(final Statement variableAssignment) {
-            VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
+			if (statements.isEmpty()) {
+				return true;
+			}
 
-            if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
-                VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
+			moveAssignmentInsideIf(variableAssignment, statement, statements);
+			this.result= false;
+			return false;
+		}
 
-                if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-                    return fragment.getName();
-                }
-            }
+		private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
+				final List<Statement> statements) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            return null;
-        }
-
-        private boolean maybeMoveAssignment(final Statement variableAssignment, final Statement statement) {
-            List<Statement> statements= ASTNodes.asList(statement);
-
-            if (statements.isEmpty()) {
-                return true;
-            }
-
-            moveAssignmentInsideIf(variableAssignment, statement, statements);
-            return false;
-        }
-
-        private void moveAssignmentInsideIf(final Statement variableAssignment, final Statement statement,
-                final List<Statement> statements) {
-            final Refactorings r= this.ctx.getRefactorings();
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
-
-            if (statement instanceof Block) {
-                r.insertBefore(b.createMoveTarget(variableAssignment), statements.get(0));
-                r.remove(variableAssignment);
-            } else {
-                List<Statement> copyOfThenStatements= b.createMoveTarget(statements);
-                copyOfThenStatements.add(0, b.createMoveTarget(variableAssignment));
-                Block block= b.block(copyOfThenStatements);
-                r.replace(statement, block);
-            }
-        }
-    }
+			if (statement instanceof Block) {
+				rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, variableAssignment), statements.get(0), null);
+				rewrite.remove(variableAssignment, null);
+			} else {
+				List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
+				copyOfThenStatements.add(0, ASTNodes.createMoveTarget(rewrite, variableAssignment));
+				Block block= ast.block(copyOfThenStatements);
+				rewrite.replace(statement, block, null);
+			}
+		}
+	}
 }

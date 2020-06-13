@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Random;
 
 public class SimplifyExpressionSample {
-
     private static final String NULL_CONSTANT = null;
 
     private boolean addedToMakeCodeFail(boolean b1, boolean b2, Object o) {
@@ -40,170 +39,99 @@ public class SimplifyExpressionSample {
     }
 
     public void removeUselessNullCheck(String s) {
-        {
-            // Remove redundant null checks
-            boolean b1 = s != null && "".equals(s);
-            boolean b2 = s != null && "".equalsIgnoreCase(s);
-            boolean b3 = s != null && s instanceof String;
-        }
-        {
-            // Remove redundant null checks
-            boolean b1 = null != s && "".equals(s);
-            boolean b2 = null != s && "".equalsIgnoreCase(s);
-            boolean b3 = null != s && s instanceof String;
-        }
-        {
-            // Remove redundant constant operands
-            boolean b3 = true && s != null;
-            boolean b4 = false && s != null;
-            boolean b5 = true || s != null;
-            boolean b6 = false || s != null;
-            boolean b7 = true && s != null && s.startsWith("");
-            boolean b8 = false || s == null || s.startsWith("");
-            boolean b9 = s != null && true && s.startsWith("");
-            boolean b10 = s == null || false || s.startsWith("");
-            boolean b11 = s != null && s.startsWith("") && true;
-            boolean b12 = s == null  || s.startsWith("") || false;
-        }
+        // Remove redundant null checks
+        boolean b1 = s != null && "".equals(s);
+        boolean b2 = s != null && "".equalsIgnoreCase(s);
+        boolean b3 = s != null && s instanceof String;
+
+        // Remove redundant null checks
+        boolean b4 = null != s && "".equals(s);
+        boolean b5 = null != s && "".equalsIgnoreCase(s);
+        boolean b6 = null != s && s instanceof String;
+
+        // Remove redundant constant operands
+        boolean b7 = true && s != null;
+        boolean b8 = false && s != null;
+        boolean b9 = true || s != null;
+        boolean b10 = false || s != null;
+        boolean b11 = true && s != null && s.startsWith("");
+        boolean b12 = false || s == null || s.startsWith("");
+        boolean b13 = s != null && true && s.startsWith("");
+        boolean b14 = s == null || false || s.startsWith("");
+        boolean b15 = s != null && s.startsWith("") && true;
+        boolean b16 = s == null || s.startsWith("") || false;
     }
 
-    public void doNotRemoveNullCheck(String s) {
-        {
-            // Do not remove non redundant null checks
-            boolean b1 = s != null && s.equals(NULL_CONSTANT);
-            boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
-        }
-        {
-            // Do not remove non redundant null checks
-            boolean b1 = null != s && s.equals(NULL_CONSTANT);
-            boolean b2 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
-        }
-        {
-            // Right-hand-side left unchanged because left-hand-side can have
-            // side effects
-            boolean b3 = s != null && false;
-            boolean b4 = s != null || true;
-        }
-        {
-            // Right-hand-side left unchanged because left-hand-side can have
-            // side effects
-            boolean b3 = null != s && false;
-            boolean b4 = null != s || true;
-        }
+    public boolean doNotRemoveUselessNullCheckOnInstance(Object o) {
+        return o != null && equals(o);
     }
 
-    public void borderLineParenthezisedExpressions(Integer i) throws Exception {
-        // Do not replace any because they are in a String concatenation
-        String s1 = ((Number) i).doubleValue() + " ";
-        String s2 = (i instanceof Number) + " ";
-        String s3 = (i + 0) + " ";
-        String s4 = (i == null ? null : "i") + " ";
-        // Do not replace
-        long l1   = 2 + (i == null ? 0 : i);
-        long l2   = (i != null && i == 0) ? 0 : i;
-
-        // Replace
-        boolean b1 = ((Number) i).doubleValue() == 0;
-        // Replace
-        boolean b2 = (i instanceof Number);
-        // Do not replace
-        boolean b3 = (i + 0) == 0;
-        // Do not replace
-        Collection<?> c = null;
-        Object obj = ((List<?>) c).get(0);
-        // Do not replace
-        boolean b4 = !(i instanceof Number);
-        boolean b5 = !(b4 = false);
-        // Replace
-        boolean b6 = (i != null);
-        // Replace
-        boolean b7 = b5 && (i != null);
-        // Do not replace
-        boolean b8 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
-        boolean b9 = (i != null ? i : Integer.valueOf(2)).byteValue() == 0;
-        boolean b10 = b1 ? (b2 = true) : (b3 = true);
-        boolean b11 = b1 ? (i instanceof Number) : (i instanceof Object);
-        final Random rand = new Random();
-        boolean b12 =  (i = rand.nextInt()) != i + 1;
-        boolean b13 = ((i = rand.nextInt()) != i + 1) && ((i = rand.nextInt()) != i + 1);
+    public boolean doNotRemoveUselessNullCheckOnThis(Object o) {
+        return o != null && this.equals(o);
     }
 
-    public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
-        // Such expressions are used a lot in while conditions
-        return -1 != (c = reader.read(cbuf));
+    public boolean removeExtendedNullCheck(boolean enabled, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && s != null && "".equals(s);
+        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s);
+        boolean b3 = enabled && s != null && s instanceof String;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && null != s && "".equals(s);
+        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s);
+        boolean b6 = enabled && null != s && s instanceof String;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
-    public boolean removeUselessParentheses() throws Exception {
-        boolean b = (true);
-        int i;
-        Collection<?> col = (null);
-        i = (0);
-        int[] ar = new int[(i)];
-        ar = new int[] { (i) };
-        ar[(i)] = (i);
-        if ((b)) {
-            throw (new Exception());
-        }
-        do {
-        } while ((b));
-        while ((b)) {
-        }
-        for (Object obj : (col)) {
-        }
-        for (i = 0; (b); i++) {
-        }
-        synchronized ((col)) {
-        }
-        switch ((i)) {
-        case (0):
-        }
-        if ((col) instanceof Collection) {
-        }
-        return ((b));
+    public boolean removeExtendedNullCheck(boolean enabled, boolean isValid, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && isValid && s != null && "".equals(s);
+        boolean b2 = enabled && isValid && s != null && "".equalsIgnoreCase(s);
+        boolean b3 = enabled && isValid && s != null && s instanceof String;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && isValid && null != s && "".equals(s);
+        boolean b5 = enabled && isValid && null != s && "".equalsIgnoreCase(s);
+        boolean b6 = enabled && isValid && null != s && s instanceof String;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
-    public int removeUselessParenthesesInStatements(int i) {
-        int j = (i);
-        j = (i);
-        if ((j == 0)) {
-            removeUselessParenthesesInStatements((i));
-            (this).removeUselessParenthesesInStatements(i);
-            ("" + 5 + 6).toString();
-            Object o;
-            (o = i).toString();
-        }
-        do {
-            i++;
-        } while ((i == 0));
-        while ((i == 0)) {
-            i++;
-        }
-        return (i);
+    public boolean removeNullCheckInTheMiddle(boolean enabled, boolean isValid, String s) {
+        // Remove redundant null checks
+        boolean b1 = enabled && s != null && "".equals(s) && isValid;
+        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s) && isValid;
+        boolean b3 = enabled && s != null && s instanceof String && isValid;
+
+        // Remove redundant null checks
+        boolean b4 = enabled && null != s && "".equals(s) && isValid;
+        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s) && isValid;
+        boolean b6 = enabled && null != s && s instanceof String && isValid;
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
-    public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
-            boolean b2, boolean b3) {
-        System.out.println(b1 && (b2 && b3));
-        System.out.println(b1 || (b2 || b3));
-        int i1 = 0;
-        int i2 = 0;
-        int i3 = 0;
-        System.out.println(i1 * (i2 * i3));
-        System.out.println(i1 + (i2 + i3));
-        System.out.println(i1 & (i2 & i3));
-        System.out.println(i1 | (i2 | i3));
-        System.out.println(i1 ^ (i2 ^ i3));
-    }
+    public boolean doNotRemoveNullCheck(String s) {
+        // Do not remove non redundant null checks
+        boolean b1 = s != null && s.equals(NULL_CONSTANT);
+        boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
 
-    public void doNotRemoveParenthesesWithNonAssociativeOperators(int i1,
-            int i2, int i3) {
-        System.out.println(i1 - (i2 - i3));
-        System.out.println(i1 / (i2 / i3));
-    }
+        // Do not remove non redundant null checks
+        boolean b3 = null != s && s.equals(NULL_CONSTANT);
+        boolean b4 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
 
-    public void doNotRemoveParenthesesDueToOperatorsPriority(int i1,
-            int i2, int i3) {
-        System.out.println((i1 + i2) / i3);
+        // Right-hand-side left unchanged because left-hand-side can have
+        // side effects
+        boolean b5 = s != null && false;
+        boolean b6 = s != null || true;
+
+        // Right-hand-side left unchanged because left-hand-side can have
+        // side effects
+        boolean b7 = null != s && false;
+        boolean b8 = null != s || true;
+
+        return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8;
     }
 
     public void simplifyPrimitiveBooleanExpression(boolean b) {
@@ -263,25 +191,6 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public boolean addParenthesesToMixedAndOrBooleanOperators(int i, boolean b1, boolean b2, boolean b3) {
-        if (i == 0) {
-            return b1 && b2 || b3;
-        }
-        return b1 || b2 && b3;
-    }
-
-    public int addParenthesesToMixedBitwiseOperators(int b1, int b2, int b3) {
-        int i = b1 & b2 | b3;
-        int j = b1 | b2 & b3;
-        int k = b1 << b2 | b3;
-        int l = b1 | b2 << b3;
-        int m = b1 >> b2 | b3;
-        int n = b1 | b2 >> b3;
-        int o = b1 >>> b2 | b3;
-        int p = b1 | b2 >>> b3;
-        return i + j + k + l + m + n + o + p;
-    }
-
     public boolean reduceBooleanExpression(boolean b1, boolean b2) {
         boolean b3 = !b1 == !b2;
         boolean b4 = !b1 != !b2;
@@ -293,69 +202,5 @@ public class SimplifyExpressionSample {
         boolean b10 = b1 != !b2;
         boolean b11 = b1 ^ !b2;
         return b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11;
-    }
-
-    public int doNotRefactorMinusOnDecrement(int increment) {
-        return -(increment--);
-    }
-
-    public int doNotRefactorPlusOnDecrement(int increment) {
-        return +(increment--);
-    }
-
-    public int doNotRefactorMinusOnIncrement(int increment) {
-        return -(increment++);
-    }
-
-    public int doNotRefactorPlusOnIncrement(int increment) {
-        return +(increment++);
-    }
-
-    public int doNotRefactorMinusOnPreDecrement(int increment) {
-        return -(--increment);
-    }
-
-    public int doNotRefactorPlusOnPreDecrement(int increment) {
-        return +(--increment);
-    }
-
-    public int doNotRefactorMinusOnPreIncrement(int increment) {
-        return -(++increment);
-    }
-
-    public int doNotRefactorPlusOnPreIncrement(int increment) {
-        return +(++increment);
-    }
-
-    public int doNotRefactorInfixOnDecrement(int increment) {
-        return 1 -(increment--);
-    }
-
-    public int doNotRefactorPositiveInfixOnDecrement(int increment) {
-        return 1 +(increment--);
-    }
-
-    public int doNotRefactorInfixOnIncrement(int increment) {
-        return 1 -(increment++);
-    }
-
-    public int doNotRefactorPositiveInfixOnIncrement(int increment) {
-        return 1 +(increment++);
-    }
-
-    public int doNotRefactorInfixOnPreDecrement(int increment) {
-        return 1 -(--increment);
-    }
-
-    public int doNotRefactorPositiveInfixOnPreDecrement(int increment) {
-        return 1 +(--increment);
-    }
-
-    public int doNotRefactorInfixOnPreIncrement(int increment) {
-        return 1 -(++increment);
-    }
-
-    public int doNotRefactorPositiveInfixOnPreIncrement(int increment) {
-        return 1 +(++increment);
     }
 }

@@ -34,47 +34,47 @@ import org.autorefactor.util.IllegalStateException;
 
 /** Collects code paths into the CFG. */
 public class CodePathCollector {
-    private final List<List<CFGBasicBlock>> results= new ArrayList<>();
-    private final LinkedList<CFGBasicBlock> stack= new LinkedList<>();
+	private final List<List<CFGBasicBlock>> results= new ArrayList<>();
+	private final LinkedList<CFGBasicBlock> stack= new LinkedList<>();
 
-    /**
-     * Returns the collected code paths.
-     *
-     * @param entryBlock the entry block of the CFG
-     * @return the collected code paths
-     */
-    public Collection<List<CFGBasicBlock>> getPaths(final CFGBasicBlock entryBlock) {
-        collectPathes(entryBlock);
-        return results;
-    }
+	/**
+	 * Returns the collected code paths.
+	 *
+	 * @param entryBlock the entry block of the CFG
+	 * @return the collected code paths
+	 */
+	public Collection<List<CFGBasicBlock>> getPaths(final CFGBasicBlock entryBlock) {
+		collectPathes(entryBlock);
+		return results;
+	}
 
-    private void collectPathes(final CFGBasicBlock block) {
-        if (block.isExitBlock()) {
-            // This is the end of this path,
-            // let's take a copy of the stack
-            results.add(new ArrayList<>(stack));
-            return;
-        }
-        if (stack.contains(block)) {
-            // Cycle detected, let's stop it here
-            return;
-        }
+	private void collectPathes(final CFGBasicBlock block) {
+		if (block.isExitBlock()) {
+			// This is the end of this path,
+			// let's take a copy of the stack
+			results.add(new ArrayList<>(stack));
+			return;
+		}
+		if (stack.contains(block)) {
+			// Cycle detected, let's stop it here
+			return;
+		}
 
-        stack.addFirst(block);
-        try {
-            boolean foundAtLeastOneEdge= false;
-            for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
-                if (obj instanceof CFGEdge) {
-                    final CFGEdge edge= (CFGEdge) obj;
-                    collectPathes(edge.getTargetBlock());
-                    foundAtLeastOneEdge= true;
-                }
-            }
-            if (!foundAtLeastOneEdge) {
-                throw new IllegalStateException(block.getNode(), "Path should have ended with an exit block: " + stack); //$NON-NLS-1$
-            }
-        } finally {
-            stack.removeLast();
-        }
-    }
+		stack.addFirst(block);
+		try {
+			boolean foundAtLeastOneEdge= false;
+			for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
+				if (obj instanceof CFGEdge) {
+					CFGEdge edge= (CFGEdge) obj;
+					collectPathes(edge.getTargetBlock());
+					foundAtLeastOneEdge= true;
+				}
+			}
+			if (!foundAtLeastOneEdge) {
+				throw new IllegalStateException(block.getNode(), "Path should have ended with an exit block: " + stack); //$NON-NLS-1$
+			}
+		} finally {
+			stack.removeLast();
+		}
+	}
 }

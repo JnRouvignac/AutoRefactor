@@ -28,16 +28,18 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -45,192 +47,177 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        if (ASTNodes.fallsThrough(node.getBody())) {
-            final ContinueVisitor continueVisitor= new ContinueVisitor(node);
-            continueVisitor.visitNode(node);
+	@Override
+	public boolean visit(final WhileStatement node) {
+		if (ASTNodes.fallsThrough(node.getBody())) {
+			ContinueVisitor continueVisitor= new ContinueVisitor(node);
+			continueVisitor.visitNode(node);
 
-            if (continueVisitor.canBeRefactored()) {
-                final BreakVisitor breakVisitor= new BreakVisitor(node);
-                breakVisitor.visitNode(node);
+			if (continueVisitor.canBeRefactored()) {
+				BreakVisitor breakVisitor= new BreakVisitor(node);
+				breakVisitor.visitNode(node);
 
-                if (breakVisitor.canBeRefactored()) {
-                    replaceByIf(node, breakVisitor);
-                    return false;
-                }
-            }
-        }
+				if (breakVisitor.canBeRefactored()) {
+					replaceByIf(node, breakVisitor);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+	private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
-            if (ASTNodes.canHaveSiblings(breakStatement)) {
-                r.remove(breakStatement);
-            } else {
-                r.replace(breakStatement, b.block());
-            }
-        }
+		for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
+			if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(breakStatement, null);
+			} else {
+				rewrite.replace(breakStatement, ast.block(), null);
+			}
+		}
 
-        r.replace(node, b.if0(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
-    }
+		rewrite.replace(node, ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
+	}
 
-    private class BreakVisitor extends InterruptibleVisitor {
-        private final WhileStatement root;
-        private final List<BreakStatement> breaks= new ArrayList<>();
-        private boolean canBeRefactored= true;
+	private static class BreakVisitor extends InterruptibleVisitor {
+		private final WhileStatement root;
+		private final List<BreakStatement> breaks= new ArrayList<>();
+		private boolean canBeRefactored= true;
 
-        public BreakVisitor(final WhileStatement root) {
-            this.root= root;
-        }
+		public BreakVisitor(final WhileStatement root) {
+			this.root= root;
+		}
 
-        public List<BreakStatement> getBreaks() {
-            return breaks;
-        }
+		public List<BreakStatement> getBreaks() {
+			return breaks;
+		}
 
-        public boolean canBeRefactored() {
-            return canBeRefactored;
-        }
+		public boolean canBeRefactored() {
+			return canBeRefactored;
+		}
 
-        @Override
-        public boolean visit(final BreakStatement aBreak) {
-            if (aBreak.getLabel() != null) {
-                canBeRefactored= false;
-                return interruptVisit();
-            }
+		@Override
+		public boolean visit(final BreakStatement aBreak) {
+			if (aBreak.getLabel() != null) {
+				canBeRefactored= false;
+				return interruptVisit();
+			}
 
-            Statement parent= aBreak;
-            do {
-                parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
-            } while (parent != root && (ASTNodes.getNextSiblings(parent) == null || ASTNodes.getNextSiblings(parent).isEmpty()));
+			Statement parent= aBreak;
+			do {
+				parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
+			} while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
 
-            if (parent != root) {
-                canBeRefactored= false;
-                return interruptVisit();
-            }
+			if (parent != root) {
+				canBeRefactored= false;
+				return interruptVisit();
+			}
 
-            breaks.add(aBreak);
+			breaks.add(aBreak);
 
-            return true;
-        }
+			return true;
+		}
 
-        @Override
-        public boolean visit(final WhileStatement node) {
-            return root.equals(node);
-        }
+		@Override
+		public boolean visit(final WhileStatement node) {
+			return root.equals(node);
+		}
 
-        @Override
-        public boolean visit(final DoStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final DoStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final ForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final SwitchStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final SwitchStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final AnonymousClassDeclaration node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final AnonymousClassDeclaration node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final LambdaExpression node) {
-            return false;
-        }
-    }
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return false;
+		}
+	}
 
-    private class ContinueVisitor extends InterruptibleVisitor {
-        private final WhileStatement root;
-        private boolean canBeRefactored= true;
+	private static class ContinueVisitor extends InterruptibleVisitor {
+		private final WhileStatement root;
+		private boolean canBeRefactored= true;
 
-        public ContinueVisitor(final WhileStatement root) {
-            this.root= root;
-        }
+		public ContinueVisitor(final WhileStatement root) {
+			this.root= root;
+		}
 
-        public boolean canBeRefactored() {
-            return canBeRefactored;
-        }
+		public boolean canBeRefactored() {
+			return canBeRefactored;
+		}
 
-        @Override
-        public boolean visit(final ContinueStatement node) {
-            canBeRefactored= false;
-            return interruptVisit();
-        }
+		@Override
+		public boolean visit(final ContinueStatement node) {
+			canBeRefactored= false;
+			return interruptVisit();
+		}
 
-        @Override
-        public boolean visit(final WhileStatement node) {
-            return root.equals(node);
-        }
+		@Override
+		public boolean visit(final WhileStatement node) {
+			return root.equals(node);
+		}
 
-        @Override
-        public boolean visit(final DoStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final DoStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final ForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final AnonymousClassDeclaration node) {
-            return false;
-        }
+		@Override
+		public boolean visit(final AnonymousClassDeclaration node) {
+			return false;
+		}
 
-        @Override
-        public boolean visit(final LambdaExpression node) {
-            return false;
-        }
-    }
+		@Override
+		public boolean visit(final LambdaExpression node) {
+			return false;
+		}
+	}
 }

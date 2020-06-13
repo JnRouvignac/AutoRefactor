@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -37,104 +39,90 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
 
-        if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
-                && ASTNodes.typeArguments(node).isEmpty()) {
-            // Remove useless thisExpressions
-            this.ctx.getRefactorings().remove(node.getExpression());
-            return false;
-        }
+		if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
+				&& ((List<Type>) node.typeArguments()).isEmpty()) {
+			// Remove useless thisExpressions
+			cuRewrite.getASTRewrite().remove(node.getExpression(), null);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private static boolean thisExpressionRefersToEnclosingType(final ThisExpression thisExpression) {
-        return thisExpression != null
-                && thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
-    }
+	private static boolean thisExpressionRefersToEnclosingType(final ThisExpression thisExpression) {
+		return thisExpression != null
+				&& thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
+	}
 
-    private static boolean thisExpressionRefersToEnclosingType(final Name thisQualifierName, final ASTNode node) {
-        if (thisQualifierName == null) {
-            return true;
-        }
+	private static boolean thisExpressionRefersToEnclosingType(final Name thisQualifierName, final ASTNode node) {
+		if (thisQualifierName == null) {
+			return true;
+		}
 
-        final ASTNode enclosingType= ASTNodes.getEnclosingType(node);
+		ASTNode enclosingType= ASTNodes.getEnclosingType(node);
 
-        if (enclosingType instanceof AnonymousClassDeclaration) {
-            return false;
-        }
+		if (enclosingType instanceof AnonymousClassDeclaration) {
+			return false;
+		}
 
-        final AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
+		AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
 
-        if (thisQualifierName instanceof SimpleName) {
-            return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
-        }
+		if (thisQualifierName instanceof SimpleName) {
+			return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
+		}
 
-        if (thisQualifierName instanceof QualifiedName) {
-            final QualifiedName qn= (QualifiedName) thisQualifierName;
-            return ASTNodes.isEqual(qn.getName(), ancestor.getName())
-                    && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
-        }
+		if (thisQualifierName instanceof QualifiedName) {
+			QualifiedName qn= (QualifiedName) thisQualifierName;
+			return ASTNodes.isEqual(qn.getName(), ancestor.getName())
+					&& thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
+		}
 
-        throw new NotImplementedException(thisQualifierName);
-    }
+		throw new NotImplementedException(thisQualifierName);
+	}
 
-    private boolean isCallingMethodDeclaredInEnclosingType(final MethodInvocation node) {
-        final ASTNode currentType= ASTNodes.getEnclosingType(node);
-        final IMethodBinding mb= node.resolveMethodBinding();
+	private boolean isCallingMethodDeclaredInEnclosingType(final MethodInvocation node) {
+		ASTNode currentType= ASTNodes.getEnclosingType(node);
+		IMethodBinding mb= node.resolveMethodBinding();
 
-        if (mb == null) {
-            return false;
-        }
+		if (mb == null) {
+			return false;
+		}
 
-        if (currentType instanceof AnonymousClassDeclaration) {
-            final AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
-            final ITypeBinding enclosingTypeBinding= c.resolveBinding();
-            return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
-        }
+		if (currentType instanceof AnonymousClassDeclaration) {
+			AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;
+			ITypeBinding enclosingTypeBinding= c.resolveBinding();
+			return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
+		}
 
-        if (currentType instanceof AbstractTypeDeclaration) {
-            final AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
-            final ITypeBinding enclosingTypeBinding= ed.resolveBinding();
-            return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
-        }
+		if (currentType instanceof AbstractTypeDeclaration) {
+			AbstractTypeDeclaration ed= (AbstractTypeDeclaration) currentType;
+			ITypeBinding enclosingTypeBinding= ed.resolveBinding();
+			return enclosingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
+		}
 
-        throw new NotImplementedException(node, node);
-    }
+		throw new NotImplementedException(node, node);
+	}
 }

@@ -29,84 +29,72 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.QualifiedName;
 
 /** See {@link #getDescription()} method. */
 public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (ASTNodes.usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-            final List<Expression> args= ASTNodes.arguments(node);
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (ASTNodes.usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+			@SuppressWarnings("unchecked")
+			List<Expression> args= node.arguments();
 
-            if (args != null && args.size() == 2) {
-                QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
-                final Expression message= args.get(1);
+			if (args != null && args.size() == 2) {
+				QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
 
-                if (levelType != null) {
-                    final String methodName;
+				if (levelType != null) {
+					String methodName;
 
-                    if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "SEVERE")) { //$NON-NLS-1$
-                        methodName= "severe"; //$NON-NLS-1$
-                    } else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "WARNING")) { //$NON-NLS-1$
-                        methodName= "warning"; //$NON-NLS-1$
-                    } else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "INFO")) { //$NON-NLS-1$
-                        methodName= "info"; //$NON-NLS-1$
-                    } else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINE")) { //$NON-NLS-1$
-                        methodName= "fine"; //$NON-NLS-1$
-                    } else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINER")) { //$NON-NLS-1$
-                        methodName= "finer"; //$NON-NLS-1$
-                    } else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINEST")) { //$NON-NLS-1$
-                        methodName= "finest"; //$NON-NLS-1$
-                    } else {
-                        return true;
-                    }
+					if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "SEVERE")) { //$NON-NLS-1$
+						methodName= "severe"; //$NON-NLS-1$
+					} else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "WARNING")) { //$NON-NLS-1$
+						methodName= "warning"; //$NON-NLS-1$
+					} else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "INFO")) { //$NON-NLS-1$
+						methodName= "info"; //$NON-NLS-1$
+					} else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINE")) { //$NON-NLS-1$
+						methodName= "fine"; //$NON-NLS-1$
+					} else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINER")) { //$NON-NLS-1$
+						methodName= "finer"; //$NON-NLS-1$
+					} else if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "FINEST")) { //$NON-NLS-1$
+						methodName= "finest"; //$NON-NLS-1$
+					} else {
+						return true;
+					}
 
-                    replaceLevelByMethodName(node, methodName, message);
-                    return false;
-                }
-            }
-        }
+					replaceLevelByMethodName(node, methodName);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,
-            final Expression message) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        r.replace(node, b.invoke(b.createMoveTarget(node.getExpression()), methodName, b.createMoveTarget(message)));
-    }
+		rewrite.replace(node.getName(), ast.simpleName(methodName), null);
+		rewrite.remove((Expression) node.arguments().get(0), null);
+	}
 }

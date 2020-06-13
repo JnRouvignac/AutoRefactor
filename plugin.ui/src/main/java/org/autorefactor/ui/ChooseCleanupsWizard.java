@@ -25,10 +25,9 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-
 import java.util.List;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
@@ -38,35 +37,35 @@ import org.eclipse.jface.wizard.Wizard;
  * Wizard which allows the user to choose which cleanups to apply to the
  * selected java elements.
  */
-public class ChooseRefactoringsWizard extends Wizard {
-    private final ChooseRefactoringWizardPage chooseRefactoringsPage= new ChooseRefactoringWizardPage();
-    private final List<IJavaElement> javaElements;
+public class ChooseCleanupsWizard extends Wizard {
+	private final ChooseRefactoringWizardPage chooseCleanupsPage= new ChooseRefactoringWizardPage();
+	private final List<IJavaElement> javaElements;
 
-    /**
-     * Builds an instance of this class, with the provided java element.
-     *
-     * @param javaElements the java elements from where to extract the project
-     *                     options
-     */
-    public ChooseRefactoringsWizard(List<IJavaElement> javaElements) {
-        setNeedsProgressMonitor(true);
-        this.javaElements= javaElements;
-    }
+	/**
+	 * Builds an instance of this class, with the provided java element.
+	 *
+	 * @param javaElements the java elements from where to extract the project
+	 *                     options
+	 */
+	public ChooseCleanupsWizard(List<IJavaElement> javaElements) {
+		setNeedsProgressMonitor(true);
+		this.javaElements= javaElements;
+	}
 
-    @Override
-    public String getWindowTitle() {
-        return "Choose refactorings..."; //$NON-NLS-1$
-    }
+	@Override
+	public String getWindowTitle() {
+		return "Choose cleanups..."; //$NON-NLS-1$
+	}
 
-    @Override
-    public void addPages() {
-        addPage(chooseRefactoringsPage);
-    }
+	@Override
+	public void addPages() {
+		addPage(chooseCleanupsPage);
+	}
 
-    @Override
-    public boolean performFinish() {
-        final List<RefactoringRule> refactoringRules= chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactoringRules, getEnvironment()).schedule();
-        return !refactoringRules.isEmpty();
-    }
+	@Override
+	public boolean performFinish() {
+		final List<RefactoringRule> refactoringRules= chooseCleanupsPage.getSelectedRefactorings();
+		new PrepareApplyRefactoringsJob(javaElements, refactoringRules, AutoRefactorPlugin.getEnvironment()).schedule();
+		return !refactoringRules.isEmpty();
+	}
 }

@@ -29,9 +29,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -40,75 +40,66 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final FieldDeclaration node) {
-        if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
-                Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
-            Modifier finalModifier= null;
-            for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
-                if (modifier.isStatic()) {
-                    return true;
-                }
-                if (modifier.isFinal()) {
-                    finalModifier= modifier;
-                }
-            }
+	@Override
+	public boolean visit(final FieldDeclaration node) {
+		if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
+				Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
+			Modifier finalModifier= null;
+			@SuppressWarnings("unchecked")
+			Collection<IExtendedModifier> modifiers= node.modifiers();
 
-            if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
-                final Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
+			for (Modifier modifier : getModifiersOnly(modifiers)) {
+				if (modifier.isStatic()) {
+					return true;
+				}
+				if (modifier.isFinal()) {
+					finalModifier= modifier;
+				}
+			}
 
-                if (ASTNodes.isHardCoded(initializer)) {
-                    addStaticModifier(finalModifier);
-                    return false;
-                }
-            }
-        }
+			if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
+				Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
 
-        return true;
-    }
+				if (ASTNodes.isHardCoded(initializer)) {
+					addStaticModifier(finalModifier);
+					return false;
+				}
+			}
+		}
 
-    private void addStaticModifier(final Modifier finalModifier) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+		return true;
+	}
 
-        r.insertBefore(b.static0(), finalModifier);
-    }
+	private void addStaticModifier(final Modifier finalModifier) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results= new LinkedList<>();
-        for (IExtendedModifier em : modifiers) {
-            if (em.isModifier()) {
-                results.add((Modifier) em);
-            }
-        }
+		rewrite.insertBefore(ast.static0(), finalModifier, null);
+	}
 
-        return results;
-    }
+	private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
+		List<Modifier> results= new LinkedList<>();
+		for (IExtendedModifier em : modifiers) {
+			if (em.isModifier()) {
+				results.add((Modifier) em);
+			}
+		}
+
+		return results;
+	}
 }

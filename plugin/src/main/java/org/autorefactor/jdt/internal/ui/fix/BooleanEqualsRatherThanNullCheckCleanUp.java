@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -37,88 +38,77 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
-            final Expression leftOperand= node.getLeftOperand();
-            final Expression rightOperand= node.getRightOperand();
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+			Expression leftOperand= node.getLeftOperand();
+			Expression rightOperand= node.getRightOperand();
 
-            final InfixExpression condition= ASTNodes.as(leftOperand, InfixExpression.class);
-            final boolean isNullCheck= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
-            final boolean isAndExpression= ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND);
+			InfixExpression condition= ASTNodes.as(leftOperand, InfixExpression.class);
+			boolean isNullCheck= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
+			boolean isAndExpression= ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND);
 
-            if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
-                    && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
-                Expression firstExpression= null;
-                if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)) {
-                    firstExpression= condition.getRightOperand();
-                } else if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)) {
-                    firstExpression= condition.getLeftOperand();
-                }
+			if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
+					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
+				Expression firstExpression= null;
+				if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)) {
+					firstExpression= condition.getRightOperand();
+				} else if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)) {
+					firstExpression= condition.getLeftOperand();
+				}
 
-                Expression secondExpression= null;
-                final PrefixExpression negateSecondExpression= ASTNodes.as(rightOperand, PrefixExpression.class);
-                final boolean isPositiveExpression;
-                if (negateSecondExpression != null && ASTNodes.hasOperator(negateSecondExpression, PrefixExpression.Operator.NOT)) {
-                    secondExpression= negateSecondExpression.getOperand();
-                    isPositiveExpression= false;
-                } else {
-                    secondExpression= rightOperand;
-                    isPositiveExpression= true;
-                }
+				Expression secondExpression= null;
+				PrefixExpression negateSecondExpression= ASTNodes.as(rightOperand, PrefixExpression.class);
+				boolean isPositiveExpression;
+				if (negateSecondExpression != null && ASTNodes.hasOperator(negateSecondExpression, PrefixExpression.Operator.NOT)) {
+					secondExpression= negateSecondExpression.getOperand();
+					isPositiveExpression= false;
+				} else {
+					secondExpression= rightOperand;
+					isPositiveExpression= true;
+				}
 
-                if (firstExpression != null && ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpression)
-                        && ASTNodes.match(firstExpression, secondExpression)) {
-                    replaceNullCheck(node, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
-                    return false;
-                }
-            }
-        }
+				if (firstExpression != null && ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpression)
+						&& ASTNodes.match(firstExpression, secondExpression)) {
+					replaceNullCheck(node, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
-            final boolean isAndExpression, final boolean isPositiveExpression) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+	private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
+			final boolean isAndExpression, final boolean isPositiveExpression) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final Name booleanConstant= b.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
-        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.createMoveTarget(firstExpression)); //$NON-NLS-1$
+		Name booleanConstant= ast.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
+		MethodInvocation equalsMethod= ast.newMethodInvocation(booleanConstant, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstExpression))); //$NON-NLS-1$
 
-        Expression newExpression= null;
-        if (!isNullCheck || isAndExpression) {
-            newExpression= equalsMethod;
-        } else {
-            newExpression= b.not(equalsMethod);
-        }
+		Expression newExpression= null;
+		if (!isNullCheck || isAndExpression) {
+			newExpression= equalsMethod;
+		} else {
+			newExpression= ast.not(equalsMethod);
+		}
 
-        ctx.getRefactorings().replace(node, newExpression);
-    }
+		rewrite.replace(node, newExpression, null);
+	}
 }

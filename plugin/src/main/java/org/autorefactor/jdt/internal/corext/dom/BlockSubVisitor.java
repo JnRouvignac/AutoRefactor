@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 
@@ -34,46 +33,28 @@ import org.eclipse.jdt.core.dom.Block;
  * visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
-    /**
-     * The cleanup context.
-     */
-    protected RefactoringContext ctx;
+	/**
+	 * The first node to visit.
+	 */
+	protected Block startNode;
 
-    private Block startNode;
+	/**
+	 * The result.
+	 */
+	public boolean result= true;
 
-    private boolean result= true;
+	/**
+	 * Should be used to visit a node.
+	 *
+	 * @param node The node to visit
+	 */
+	public void visitNode(final Block node) {
+		this.startNode= node;
+		node.accept(this);
+	}
 
-    /**
-     * Constructor.
-     *
-     * @param ctx       The cleanup context
-     * @param startNode The start node block
-     */
-    public BlockSubVisitor(final RefactoringContext ctx, final Block startNode) {
-        this.ctx= ctx;
-        this.startNode= startNode;
-    }
-
-    /**
-     * Get the result.
-     *
-     * @return The result
-     */
-    public boolean getResult() {
-        return result;
-    }
-
-    /**
-     * Set the result.
-     *
-     * @param result The result
-     */
-    public void setResult(final boolean result) {
-        this.result= result;
-    }
-
-    @Override
-    public boolean visit(final Block node) {
-        return startNode == node;
-    }
+	@Override
+	public boolean visit(final Block node) {
+		return startNode == node;
+	}
 }

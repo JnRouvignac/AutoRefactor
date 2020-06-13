@@ -25,57 +25,48 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
 public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (!node.hasExtendedOperands()
-                && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER)
-                && ASTNodes.hasType(node.getLeftOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())
-                && ASTNodes.hasType(node.getRightOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())) {
-            replace(node);
-            return false;
-        }
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (!node.hasExtendedOperands()
+				&& ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER)
+				&& ASTNodes.hasType(node.getLeftOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())
+				&& ASTNodes.hasType(node.getRightOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())) {
+			replace(node);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replace(final InfixExpression node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
-                b.infixExpression(
-                        b.invoke(Double.class.getSimpleName(), "compare", b.createMoveTarget(node.getLeftOperand()), b.createMoveTarget(node.getRightOperand())), //$NON-NLS-1$
-                        node.getOperator(), b.number("0"))); //$NON-NLS-1$
-    }
+	private void replace(final InfixExpression node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		rewrite.replace(node,
+				ast.infixExpression(
+						ast.newMethodInvocation(Double.class.getSimpleName(), "compare", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getLeftOperand())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getRightOperand()))), //$NON-NLS-1$
+						node.getOperator(), ast.number("0")), null); //$NON-NLS-1$
+	}
 }

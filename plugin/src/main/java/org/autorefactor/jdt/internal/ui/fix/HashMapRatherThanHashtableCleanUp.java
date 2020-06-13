@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -43,91 +42,78 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<>();
+	private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<>();
 
-    static {
-        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-    }
+	static {
+		CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 2;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 2;
+	}
 
-    @Override
-    protected boolean canBeSharedInOtherThread() {
-        return false;
-    }
+	@Override
+	protected boolean canBeSharedInOtherThread() {
+		return false;
+	}
 
-    @Override
-    protected String[] getExistingClassCanonicalName() {
-        return new String[] { Hashtable.class.getCanonicalName() };
-    }
+	@Override
+	protected String[] getExistingClassCanonicalName() {
+		return new String[] { Hashtable.class.getCanonicalName() };
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(HashMap.class.getCanonicalName()));
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(HashMap.class.getCanonicalName()));
+	}
 
-    @Override
-    protected String getSubstitutingClassName(final String origRawType) {
-        if (Hashtable.class.getCanonicalName().equals(origRawType)) {
-            return HashMap.class.getCanonicalName();
-        }
+	@Override
+	protected String getSubstitutingClassName(final String origRawType) {
+		if (Hashtable.class.getCanonicalName().equals(origRawType)) {
+			return HashMap.class.getCanonicalName();
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    protected boolean canMethodBeRefactored(final MethodInvocation mi,
-            final List<MethodInvocation> methodCallsToRefactor) {
-        if (ASTNodes.usesGivenSignature(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            methodCallsToRefactor.add(mi);
-        }
+	@Override
+	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+			final List<MethodInvocation> methodCallsToRefactor) {
+		if (ASTNodes.usesGivenSignature(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			methodCallsToRefactor.add(mi);
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
-            final MethodInvocation refactoredMi) {
-        refactoredMi.setName(b.simpleName("containsValue")); //$NON-NLS-1$
-    }
+	@Override
+	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
+		refactoredMi.setName(cuRewrite.getASTBuilder().simpleName("containsValue")); //$NON-NLS-1$
+	}
 
-    @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
-                CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(), new String[0]));
-    }
+	@Override
+	protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+		return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
+				CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(), new String[0]));
+	}
 }

@@ -25,98 +25,79 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class ComparisonCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_reason;
+	}
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
+	@Override
+	public boolean visit(final InfixExpression node) {
+		OrderedInfixExpression<MethodInvocation, Expression> orderedCondition= ASTNodes.orderedInfix(node, MethodInvocation.class, Expression.class);
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        final Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
-        final Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
+		if (orderedCondition != null
+				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
+			MethodInvocation comparisonMI= orderedCondition.getFirstOperand();
+			Long literalValue= ASTNodes.getIntegerLiteral(orderedCondition.getSecondOperand());
 
-        return node.hasExtendedOperands() || (maybeStandardizeComparison(node, leftOperand,
-                rightOperand) && maybeStandardizeComparison(node, rightOperand, leftOperand));
-    }
+			if (literalValue != null
+					&& comparisonMI.getExpression() != null
+					&& !ASTNodes.is(comparisonMI.getExpression(), ThisExpression.class)
+					&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| getJavaMinorVersion() >= 2
+					&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
+				if (literalValue.compareTo(0L) == 0) {
+					return true;
+				}
 
-    private boolean maybeStandardizeComparison(final InfixExpression node, final Expression comparator,
-            final Expression literal) {
-        final MethodInvocation comparisonMI= ASTNodes.as(comparator, MethodInvocation.class);
+				if (literalValue.compareTo(0L) < 0) {
+					if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
+						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS);
+					} else {
+						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER_EQUALS);
+					}
+				} else if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
+					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER);
+				} else {
+					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS_EQUALS);
+				}
 
-        if (comparisonMI != null
-                && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                        && (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                        || (getJavaMinorVersion() >= 2
-                        && ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName())))) { //$NON-NLS-1$
-            final Object literalValue= literal.resolveConstantExpressionValue();
+				return false;
+			}
+		}
 
-            if (literalValue instanceof Number) {
-                final Number numberValue= (Number) literalValue;
-                final double doubleValue= numberValue.doubleValue();
+		return true;
+	}
 
-                if (doubleValue == 0) {
-                    return true;
-                }
+	private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
+			final InfixExpression.Operator operator) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-                if (doubleValue < 0) {
-                    if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-                        refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS);
-                    } else {
-                        refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER_EQUALS);
-                    }
-                } else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-                    refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER);
-                } else {
-                    refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS_EQUALS);
-                }
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
-            final InfixExpression.Operator operator) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.infixExpression(b.createMoveTarget(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
-    }
+		rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, comparisonMI), operator, ast.number("0")), null); //$NON-NLS-1$
+	}
 }

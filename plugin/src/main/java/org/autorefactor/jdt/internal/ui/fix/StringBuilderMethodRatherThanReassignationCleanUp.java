@@ -27,74 +27,63 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Arrays;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final Assignment node) {
-        final Expression targetVar= node.getLeftHandSide();
-        Expression var= node.getRightHandSide();
-        if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
-                && var instanceof MethodInvocation) {
-            var= getVar(var);
+	@Override
+	public boolean visit(final Assignment node) {
+		Expression targetVar= node.getLeftHandSide();
+		Expression var= node.getRightHandSide();
+		if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+				&& var instanceof MethodInvocation) {
+			var= getVar(var);
 
-            if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                ctx.getRefactorings().replace(node, b.createMoveTarget(node.getRightHandSide()));
-                return false;
-            }
-        }
+			if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private Expression getVar(final Expression var) {
-        if (var instanceof Name || var instanceof FieldAccess) {
-            return var;
-        }
+	private Expression getVar(final Expression var) {
+		if (var instanceof Name || var instanceof FieldAccess || var instanceof SuperFieldAccess) {
+			return var;
+		}
 
-        final MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
+		MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
 
-        if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
-                && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                        .contains(mi.getName().getIdentifier())) {
-            return getVar(mi.getExpression());
-        }
+		if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+				&& Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+						.contains(mi.getName().getIdentifier())) {
+			return getVar(mi.getExpression());
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

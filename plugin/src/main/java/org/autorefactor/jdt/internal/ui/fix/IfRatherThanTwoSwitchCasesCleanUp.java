@@ -30,11 +30,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -46,193 +47,180 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final SwitchStatement node) {
-        if (!ASTNodes.isPassive(node.getExpression())) {
-            return true;
-        }
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean visit(final SwitchStatement node) {
+		if (!ASTNodes.isPassive(node.getExpression())) {
+			return true;
+		}
 
-        final List<?> statements= node.statements();
+		List<?> statements= node.statements();
 
-        if (statements.isEmpty()) {
-            return true;
-        }
+		if (statements.isEmpty()) {
+			return true;
+		}
 
-        final Set<String> previousVarIds= new HashSet<>();
-        final Set<String> caseVarIds= new HashSet<>();
-        final List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
-        List<Expression> caseExprs= new ArrayList<>();
-        List<Statement> caseStatements= new ArrayList<>();
+		Set<SimpleName> previousVarIds= new HashSet<>();
+		Set<SimpleName> caseVarIds= new HashSet<>();
+		List<Pair<List<Expression>, List<Statement>>> switchStructure= new ArrayList<>();
+		List<Expression> caseExprs= new ArrayList<>();
+		List<Statement> caseStatements= new ArrayList<>();
 
-        boolean isPreviousStmtACase= true;
-        int caseNb= 0;
-        int caseIndexWithDefault= -1;
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+		boolean isPreviousStmtACase= true;
+		int caseNb= 0;
+		int caseIndexWithDefault= -1;
 
-        for (Object object : statements) {
-            Statement statement= (Statement) object;
+		for (Object object : statements) {
+			Statement statement= (Statement) object;
 
-            if (statement instanceof SwitchCase) {
-                if (!isPreviousStmtACase) {
-                    caseNb++;
+			if (statement instanceof SwitchCase) {
+				if (!isPreviousStmtACase) {
+					caseNb++;
 
-                    if (caseNb > 2) {
-                        return true;
-                    }
+					if (caseNb > 2) {
+						return true;
+					}
 
-                    previousVarIds.addAll(caseVarIds);
-                    caseVarIds.clear();
+					previousVarIds.addAll(caseVarIds);
+					caseVarIds.clear();
 
-                    switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-                    caseExprs= new ArrayList<>();
-                    caseStatements= new ArrayList<>();
-                }
+					switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
+					caseExprs= new ArrayList<>();
+					caseStatements= new ArrayList<>();
+				}
 
-                if (((SwitchCase) statement).isDefault()) {
-                    caseIndexWithDefault= caseNb;
-                } else {
-                    caseExprs.add(((SwitchCase) statement).getExpression());
-                }
+				if (((SwitchCase) statement).isDefault()) {
+					caseIndexWithDefault= caseNb;
+				} else {
+					caseExprs.add(((SwitchCase) statement).getExpression());
+				}
 
-                isPreviousStmtACase= true;
-            } else {
-                final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
-                varOccurrenceVisitor.visitNode(statement);
+				isPreviousStmtACase= true;
+			} else {
+				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
+				varOccurrenceVisitor.visitNode(statement);
 
-                if (varOccurrenceVisitor.isVarUsed()) {
-                    return true;
-                }
+				if (varOccurrenceVisitor.isVarUsed()) {
+					return true;
+				}
 
-                caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(statement, false));
-                caseStatements.add(statement);
+				caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(statement, false));
+				caseStatements.add(statement);
 
-                isPreviousStmtACase= false;
-            }
-        }
+				isPreviousStmtACase= false;
+			}
+		}
 
-        switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-        caseNb++;
+		switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
+		caseNb++;
 
-        if (caseNb > 2) {
-            return true;
-        }
+		if (caseNb > 2) {
+			return true;
+		}
 
-        if (caseIndexWithDefault != -1) {
-            Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
-            switchStructure.add(caseWithDefault);
-        }
+		if (caseIndexWithDefault != -1) {
+			Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
+			switchStructure.add(caseWithDefault);
+		}
 
-        for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-            final Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+			Statement lastStatement= Utils.getLast(caseStructure.getSecond());
 
-            if (!ASTNodes.fallsThrough(lastStatement)) {
-                return true;
-            }
+			if (!ASTNodes.fallsThrough(lastStatement)) {
+				return true;
+			}
 
-            final BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
+			BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
 
-            if (bs != null && bs.getLabel() == null) {
-                caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
-            }
-        }
+			if (bs != null && bs.getLabel() == null) {
+				caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
+			}
+		}
 
-        replaceSwitch(node, switchStructure, caseIndexWithDefault, b);
+		replaceSwitch(node, switchStructure, caseIndexWithDefault);
 
-        return false;
-    }
+		return false;
+	}
 
-    private void replaceSwitch(final SwitchStatement node,
-            final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
-            final ASTNodeFactory b) {
-        int localCaseIndexWithDefault= caseIndexWithDefault;
-        final Refactorings r= this.ctx.getRefactorings();
+	private void replaceSwitch(final SwitchStatement node,
+			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final Expression discriminant= node.getExpression();
-        Statement currentBlock= null;
+		int localCaseIndexWithDefault= caseIndexWithDefault;
+		Expression discriminant= node.getExpression();
+		Statement currentBlock= null;
 
-        for (int i= switchStructure.size() - 1; i >= 0; i--) {
-            final Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
+		for (int i= switchStructure.size() - 1; i >= 0; i--) {
+			Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
-            final Expression newCondition;
-            if (caseStructure.getFirst().isEmpty()) {
-                newCondition= null;
-            } else if (caseStructure.getFirst().size() == 1) {
-                newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
-            } else {
-                final List<Expression> equalities= new ArrayList<>();
+			Expression newCondition;
+			if (caseStructure.getFirst().isEmpty()) {
+				newCondition= null;
+			} else if (caseStructure.getFirst().size() == 1) {
+				newCondition= buildEquality(discriminant, caseStructure.getFirst().get(0));
+			} else {
+				List<Expression> equalities= new ArrayList<>();
 
-                for (Expression value : caseStructure.getFirst()) {
-                    equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
-                }
-                newCondition= b.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
-            }
+				for (Expression value : caseStructure.getFirst()) {
+					equalities.add(ast.parenthesizeIfNeeded(buildEquality(discriminant, value)));
+				}
+				newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
+			}
 
-            final Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
+			Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
 
-            for (int j= 0; j < caseStructure.getSecond().size(); j++) {
-                copyOfStatements[j]= b.createCopyTarget(caseStructure.getSecond().get(j));
-            }
+			for (int j= 0; j < caseStructure.getSecond().size(); j++) {
+				copyOfStatements[j]= ast.createCopyTarget(caseStructure.getSecond().get(j));
+			}
 
-            final Block newBlock= b.block(copyOfStatements);
+			Block newBlock= ast.block(copyOfStatements);
 
-            if (currentBlock != null) {
-                currentBlock= b.if0(newCondition, newBlock, currentBlock);
-            } else if (copyOfStatements.length == 0) {
-                localCaseIndexWithDefault= -1;
-            } else if (localCaseIndexWithDefault == -1) {
-                currentBlock= b.if0(newCondition, newBlock);
-            } else {
-                currentBlock= newBlock;
-            }
-        }
+			if (currentBlock != null) {
+				currentBlock= ast.if0(newCondition, newBlock, currentBlock);
+			} else if (copyOfStatements.length == 0) {
+				localCaseIndexWithDefault= -1;
+			} else if (localCaseIndexWithDefault == -1) {
+				currentBlock= ast.if0(newCondition, newBlock);
+			} else {
+				currentBlock= newBlock;
+			}
+		}
 
-        r.replace(node, currentBlock);
-    }
+		rewrite.replace(node, currentBlock, null);
+	}
 
-    private Expression buildEquality(final ASTNodeFactory b, final Expression discriminant, final Expression value) {
-        final Expression equality;
+	private Expression buildEquality(final Expression discriminant, final Expression value) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
-                Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-            equality= b.invoke(b.createCopyTarget(value), "equals", b.createCopyTarget(discriminant)); //$NON-NLS-1$
-        } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-            equality= b.infixExpression(b.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
-                    b.name(value.resolveTypeBinding().getQualifiedName()), b.createCopyTarget((SimpleName) value)));
-        } else {
-            equality= b.infixExpression(b.parenthesizeIfNeeded(b.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
-                    b.createCopyTarget(value));
-        }
+		Expression equality;
 
-        return equality;
-    }
+		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
+				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
+			equality= ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
+		} else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
+			equality= ast.infixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
+					ast.name(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+		} else {
+			equality= ast.infixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
+					ast.createCopyTarget(value));
+		}
+
+		return equality;
+	}
 }

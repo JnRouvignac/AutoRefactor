@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -60,268 +61,273 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class LambdaCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 8;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 8;
+	}
 
-    @Override
-    public boolean visit(final LambdaExpression node) {
-        if (node.hasParentheses() && node.parameters().size() == 1
-                && node.parameters().get(0) instanceof VariableDeclarationFragment) {
-            // TODO it should also be possible to deal with a SingleVariableDeclaration
-            // when the type matches the expected inferred type
-            // To do this, we should visit the whole block and check the target type
-            removeParamParentheses(node);
-            return false;
-        }
-        if (node.getBody() instanceof Block) {
-            final List<Statement> statements= ASTNodes.asList((Block) node.getBody());
+	@Override
+	public boolean visit(final LambdaExpression node) {
+		if (node.hasParentheses() && node.parameters().size() == 1
+				&& node.parameters().get(0) instanceof VariableDeclarationFragment) {
+			// TODO it should also be possible to deal with a SingleVariableDeclaration
+			// when the type matches the expected inferred type
+			// To do this, we should visit the whole block and check the target type
+			removeParamParentheses(node);
+			return false;
+		}
+		if (node.getBody() instanceof Block) {
+			List<Statement> statements= ASTNodes.asList((Block) node.getBody());
 
-            if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement) {
-                removeReturnAndBrackets(node, statements);
-                return false;
-            }
-        } else if (node.getBody() instanceof ClassInstanceCreation) {
-            final ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
-            final List<Expression> arguments= ASTNodes.arguments(ci);
+			if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement) {
+				removeReturnAndBrackets(node, statements);
+				return false;
+			}
+		} else if (node.getBody() instanceof ClassInstanceCreation) {
+			ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
+			@SuppressWarnings("unchecked")
+			List<Expression> arguments= ci.arguments();
 
-            if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments) && ci.resolveTypeBinding() != null) {
-                replaceByCreationReference(node, ci);
-                return false;
-            }
-        } else if (node.getBody() instanceof SuperMethodInvocation) {
-            final SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
-            final List<Expression> arguments= ASTNodes.arguments(smi);
+			if (ci.resolveTypeBinding() != null
+					&& ci.getAnonymousClassDeclaration() == null
+					&& node.parameters().size() == arguments.size()
+					&& areSameIdentifiers(node, arguments)) {
+				replaceByCreationReference(node, ci);
+				return false;
+			}
+		} else if (node.getBody() instanceof SuperMethodInvocation) {
+			SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
+			@SuppressWarnings("unchecked")
+			List<Expression> arguments= smi.arguments();
 
-            if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
-                replaceBySuperMethodReference(node, smi);
-                return false;
-            }
-        } else if (node.getBody() instanceof MethodInvocation) {
-            final MethodInvocation mi= (MethodInvocation) node.getBody();
-            final Expression calledExpression= mi.getExpression();
-            final ITypeBinding calledType= ASTNodes.getCalledType(mi);
-            final List<Expression> arguments= ASTNodes.arguments(mi);
+			if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
+				replaceBySuperMethodReference(node, smi);
+				return false;
+			}
+		} else if (node.getBody() instanceof MethodInvocation) {
+			MethodInvocation mi= (MethodInvocation) node.getBody();
+			Expression calledExpression= mi.getExpression();
+			ITypeBinding calledType= ASTNodes.getCalledType(mi);
+			@SuppressWarnings("unchecked")
+			List<Expression> arguments= mi.arguments();
 
-            if (node.parameters().size() == arguments.size()) {
-                if (!areSameIdentifiers(node, arguments)) {
-                    return true;
-                }
+			if (node.parameters().size() == arguments.size()) {
+				if (!areSameIdentifiers(node, arguments)) {
+					return true;
+				}
 
-                if (isStaticMethod(mi)) {
-                    if (!arguments.isEmpty()) {
-                        final String[] remainingParams= new String[arguments.size() - 1];
-                        for (int i= 0; i < arguments.size() - 1; i++) {
-                            final ITypeBinding argumentBinding= arguments.get(i + 1).resolveTypeBinding();
+				if (isStaticMethod(mi)) {
+					if (!arguments.isEmpty()) {
+						String[] remainingParams= new String[arguments.size() - 1];
+						for (int i= 0; i < arguments.size() - 1; i++) {
+							ITypeBinding argumentBinding= arguments.get(i + 1).resolveTypeBinding();
 
-                            if (argumentBinding == null) {
-                                return true;
-                            }
+							if (argumentBinding == null) {
+								return true;
+							}
 
-                            remainingParams[i]= argumentBinding.getQualifiedName();
-                        }
+							remainingParams[i]= argumentBinding.getQualifiedName();
+						}
 
-                        for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
-                            if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && ASTNodes.usesGivenSignature(methodBinding,
-                                    calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
-                                return true;
-                            }
-                        }
-                    }
+						for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
+							if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && ASTNodes.usesGivenSignature(methodBinding,
+									calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
+								return true;
+							}
+						}
+					}
 
-                    replaceByTypeReference(node, mi);
-                    return false;
-                }
+					replaceByTypeReference(node, mi);
+					return false;
+				}
 
-                if (calledExpression == null || calledExpression instanceof StringLiteral || calledExpression instanceof NumberLiteral
-                        || calledExpression instanceof ThisExpression) {
-                    replaceByMethodReference(node, mi);
-                    return false;
-                }
-                if (calledExpression instanceof FieldAccess) {
-                    final FieldAccess fieldAccess= (FieldAccess) calledExpression;
-                    if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
-                        replaceByMethodReference(node, mi);
-                        return false;
-                    }
-                } else if (calledExpression instanceof SuperFieldAccess) {
-                    final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
-                    if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
-                        replaceByMethodReference(node, mi);
-                        return false;
-                    }
-                }
-            } else if (calledExpression instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
-                final SimpleName calledObject= (SimpleName) calledExpression;
-                if (isSameIdentifier(node, 0, calledObject)) {
-                    for (int i= 0; i < arguments.size(); i++) {
-                        final ASTNode expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
-                        if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expression)) {
-                            return true;
-                        }
-                    }
+				if (calledExpression == null || calledExpression instanceof StringLiteral || calledExpression instanceof NumberLiteral
+						|| calledExpression instanceof ThisExpression) {
+					replaceByMethodReference(node, mi);
+					return false;
+				}
 
-                    final ITypeBinding clazz= calledExpression.resolveTypeBinding();
+				if (calledExpression instanceof FieldAccess) {
+					FieldAccess fieldAccess= (FieldAccess) calledExpression;
 
-                    if (clazz == null) {
-                        return true;
-                    }
+					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
+						replaceByMethodReference(node, mi);
+						return false;
+					}
+				} else if (calledExpression instanceof SuperFieldAccess) {
+					SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
 
-                    final String[] remainingParams= new String[arguments.size() + 1];
-                    remainingParams[0]= clazz.getQualifiedName();
-                    for (int i= 0; i < arguments.size(); i++) {
-                        final ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
+					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
+						replaceByMethodReference(node, mi);
+						return false;
+					}
+				}
+			} else if (calledExpression instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
+				SimpleName calledObject= (SimpleName) calledExpression;
 
-                        if (argumentBinding == null) {
-                            return true;
-                        }
+				if (isSameIdentifier(node, 0, calledObject)) {
+					for (int i= 0; i < arguments.size(); i++) {
+						SimpleName expression= ASTNodes.as(arguments.get(i), SimpleName.class);
 
-                        remainingParams[i + 1]= argumentBinding.getQualifiedName();
-                    }
+						if (expression == null || !isSameIdentifier(node, i + 1, expression)) {
+							return true;
+						}
+					}
 
-                    for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
-                        if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && ASTNodes.usesGivenSignature(methodBinding,
-                                clazz.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
-                            return true;
-                        }
-                    }
+					ITypeBinding clazz= calledExpression.resolveTypeBinding();
 
-                    replaceByTypeReference(node, mi);
-                    return false;
-                }
-            }
-        }
+					if (clazz == null) {
+						return true;
+					}
 
-        return true;
-    }
+					String[] remainingParams= new String[arguments.size() + 1];
+					remainingParams[0]= clazz.getQualifiedName();
 
-    private boolean isStaticMethod(final MethodInvocation mi) {
-        final Expression calledExpression= mi.getExpression();
+					for (int i= 0; i < arguments.size(); i++) {
+						ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
 
-        if (calledExpression == null) {
-            return mi.resolveMethodBinding() != null && (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
-        }
+						if (argumentBinding == null) {
+							return true;
+						}
 
-        Name typeName= ASTNodes.as(calledExpression, Name.class);
+						remainingParams[i + 1]= argumentBinding.getQualifiedName();
+					}
 
-        return typeName != null && typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
-    }
+					for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
+						if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && ASTNodes.usesGivenSignature(methodBinding,
+								clazz.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
+							return true;
+						}
+					}
 
-    private boolean areSameIdentifiers(final LambdaExpression node, final List<Expression> arguments) {
-        for (int i= 0; i < node.parameters().size(); i++) {
-            final Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+					replaceByTypeReference(node, mi);
+					return false;
+				}
+			}
+		}
 
-            if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expression)) {
-                return false;
-            }
-        }
+		return true;
+	}
 
-        return true;
-    }
+	private boolean isStaticMethod(final MethodInvocation mi) {
+		Expression calledExpression= mi.getExpression();
 
-    private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
-        final Object param0= node.parameters().get(i);
-        if (param0 instanceof VariableDeclarationFragment) {
-            final VariableDeclarationFragment vdf= (VariableDeclarationFragment) param0;
-            return vdf.getName().getIdentifier().equals(argument.getIdentifier());
-            // } else if (param0 instanceof SingleVariableDeclaration) {
-            // TODO it should also be possible to deal with a SingleVariableDeclaration
-            // when the type matches the expected inferred type
-            // To do this, we should visit the whole block and check the target type
-        }
+		if (calledExpression == null) {
+			return mi.resolveMethodBinding() != null && (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
+		}
 
-        return false;
-    }
+		Name typeName= ASTNodes.as(calledExpression, Name.class);
 
-    @SuppressWarnings("unchecked")
-    private void removeParamParentheses(final LambdaExpression node) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+		return typeName != null && typeName.resolveBinding() != null && typeName.resolveBinding().getKind() == IBinding.TYPE;
+	}
 
-        final LambdaExpression copyOfLambdaExpression= b.lambda();
-        final ASTNode copyOfParameter= b.createMoveTarget((ASTNode) node.parameters().get(0));
-        copyOfLambdaExpression.parameters().add(copyOfParameter);
-        copyOfLambdaExpression.setBody(b.createMoveTarget(node.getBody()));
-        copyOfLambdaExpression.setParentheses(false);
-        ctx.getRefactorings().replace(node, copyOfLambdaExpression);
-    }
+	private boolean areSameIdentifiers(final LambdaExpression node, final List<Expression> arguments) {
+		for (int i= 0; i < node.parameters().size(); i++) {
+			Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
 
-    private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+			if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expression)) {
+				return false;
+			}
+		}
 
-        final ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-        ctx.getRefactorings().replace(node.getBody(), b.parenthesizeIfNeeded(b.createMoveTarget(returnStatement.getExpression())));
-    }
+		return true;
+	}
 
-    private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+	private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
+		Object param0= node.parameters().get(i);
+		if (param0 instanceof VariableDeclarationFragment) {
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) param0;
+			return ASTNodes.isSameVariable(fragment.getName(), argument);
+			// } else if (param0 instanceof SingleVariableDeclaration) {
+			// TODO it should also be possible to deal with a SingleVariableDeclaration
+			// when the type matches the expected inferred type
+			// To do this, we should visit the whole block and check the target type
+		}
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
+		return false;
+	}
 
-        final CreationReference creationRef= b.creationRef();
-        creationRef.setType(b.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
-        ctx.getRefactorings().replace(node, creationRef);
-    }
+	@SuppressWarnings("unchecked")
+	private void removeParamParentheses(final LambdaExpression node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+		LambdaExpression copyOfLambdaExpression= ast.lambda();
+		ASTNode copyOfParameter= ASTNodes.createMoveTarget(rewrite, (ASTNode) node.parameters().get(0));
+		copyOfLambdaExpression.parameters().add(copyOfParameter);
+		copyOfLambdaExpression.setBody(ASTNodes.createMoveTarget(rewrite, node.getBody()));
+		copyOfLambdaExpression.setParentheses(false);
+		rewrite.replace(node, copyOfLambdaExpression, null);
+	}
 
-        final SuperMethodReference creationRef= b.superMethodRef();
-        creationRef.setName(b.createMoveTarget(ci.getName()));
-        ctx.getRefactorings().replace(node, creationRef);
-    }
+	private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+		ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
+		rewrite.replace(node.getBody(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), null);
+	}
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
+	private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final TypeMethodReference typeMethodRef= b.typeMethodRef();
-        typeMethodRef.setType(b.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
-        typeMethodRef.setName(b.createMoveTarget(mi.getName()));
-        ctx.getRefactorings().replace(node, typeMethodRef);
-    }
+		TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
 
-    private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
+		CreationReference creationRef= ast.creationRef();
+		creationRef.setType(ast.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
+		rewrite.replace(node, creationRef, null);
+	}
 
-        final ExpressionMethodReference typeMethodRef= b.exprMethodRef();
-        if (mi.getExpression() != null) {
-            typeMethodRef.setExpression(b.createMoveTarget(mi.getExpression()));
-        } else {
-            typeMethodRef.setExpression(b.this0());
-        }
-        typeMethodRef.setName(b.createMoveTarget(mi.getName()));
-        ctx.getRefactorings().replace(node, typeMethodRef);
-    }
+	private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		SuperMethodReference creationRef= ast.superMethodRef();
+		creationRef.setName(ASTNodes.createMoveTarget(rewrite, ci.getName()));
+		rewrite.replace(node, creationRef, null);
+	}
+
+	private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
+
+		TypeMethodReference typeMethodRef= ast.typeMethodRef();
+		typeMethodRef.setType(ast.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, mi.getName()));
+		rewrite.replace(node, typeMethodRef, null);
+	}
+
+	private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		ExpressionMethodReference typeMethodRef= ast.exprMethodRef();
+
+		if (mi.getExpression() != null) {
+			typeMethodRef.setExpression(ASTNodes.createMoveTarget(rewrite, mi.getExpression()));
+		} else {
+			typeMethodRef.setExpression(ast.this0());
+		}
+
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, mi.getName()));
+		rewrite.replace(node, typeMethodRef, null);
+	}
 }

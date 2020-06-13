@@ -34,83 +34,83 @@ import java.util.Objects;
  * @param <S> The type of the second element in the pair
  */
 public final class Pair<F, S> {
-    /** First object. */
-    private final F first;
-    /** Second object. */
-    private final S second;
+	/** First object. */
+	private final F first;
+	/** Second object. */
+	private final S second;
 
-    /**
-     * Returns an immutable empty pair.
-     *
-     * @param <F> the first element type
-     * @param <S> the second element type
-     * @return an immutable empty
-     */
-    public static <F, S> Pair<F, S> empty() {
-        return new Pair<F, S>(null, null);
-    }
+	/**
+	 * Returns an immutable empty pair.
+	 *
+	 * @param <F> the first element type
+	 * @param <S> the second element type
+	 * @return an immutable empty
+	 */
+	public static <F, S> Pair<F, S> empty() {
+		return new Pair<>(null, null);
+	}
 
-    /**
-     * Returns an immutable pair made of the two objects.
-     *
-     * @param <F>    the first element type
-     * @param <S>    the second element type
-     * @param first  the first element, can be null
-     * @param second the second element, can be null
-     * @return an immutable pair made of the two objects.
-     */
-    public static <F, S> Pair<F, S> of(final F first, final S second) {
-        return new Pair<F, S>(first, second);
-    }
+	/**
+	 * Returns an immutable pair made of the two objects.
+	 *
+	 * @param <F>    the first element type
+	 * @param <S>    the second element type
+	 * @param first  the first element, can be null
+	 * @param second the second element, can be null
+	 * @return an immutable pair made of the two objects.
+	 */
+	public static <F, S> Pair<F, S> of(final F first, final S second) {
+		return new Pair<>(first, second);
+	}
 
-    /**
-     * Creates a new pair.
-     *
-     * @param first  the first element, can be null
-     * @param second the second element, can be null
-     */
-    private Pair(final F first, final S second) {
-        this.first= first;
-        this.second= second;
-    }
+	/**
+	 * Creates a new pair.
+	 *
+	 * @param first  the first element, can be null
+	 * @param second the second element, can be null
+	 */
+	private Pair(final F first, final S second) {
+		this.first= first;
+		this.second= second;
+	}
 
-    /**
-     * Gets the first element of this pair.
-     *
-     * @return the first element, can be null
-     */
-    public F getFirst() {
-        return first;
-    }
+	/**
+	 * Gets the first element of this pair.
+	 *
+	 * @return the first element, can be null
+	 */
+	public F getFirst() {
+		return first;
+	}
 
-    /**
-     * Gets the second element of this pair.
-     *
-     * @return the second element, can be null
-     */
-    public S getSecond() {
-        return second;
-    }
+	/**
+	 * Gets the second element of this pair.
+	 *
+	 * @return the second element, can be null
+	 */
+	public S getSecond() {
+		return second;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(first, second);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(first, second);
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        final Pair<?, ?> other= (Pair<?, ?>) obj;
-        return Objects.equals(first, other.first) && Objects.equals(second, other.second);
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		Pair<?, ?> other= (Pair<?, ?>) obj;
+		return Objects.equals(first, other.first) && Objects.equals(second, other.second);
+	}
 
-    @Override
-    public String toString() {
-        return "FIRST: " + first + " SECOND: " + second; //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	@Override
+	public String toString() {
+		return "FIRST: " + first + " SECOND: " + second; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

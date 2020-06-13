@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Utils;
@@ -37,79 +38,66 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /** See {@link #getDescription()} method. */
 public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ArrayCreation node) {
-        if (node.getInitializer() != null || isVoid(node)) {
-            final ITypeBinding arrayType= node.resolveTypeBinding();
-            final ITypeBinding destinationType= ASTNodes.getTargetType(node);
+	@Override
+	public boolean visit(final ArrayCreation node) {
+		if (node.getInitializer() != null || isVoid(node)) {
+			ITypeBinding arrayType= node.resolveTypeBinding();
+			ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
-            if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
-                refactorWithInitializer(node);
-                return false;
-            }
-        }
+			if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
+				refactorWithInitializer(node);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void refactorWithInitializer(final ArrayCreation node) {
-        if (node.getInitializer() != null) {
-            ctx.getRefactorings().replace(node, node.getInitializer());
-        } else {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.createCopyTarget(b.arrayInitializer()));
-        }
-    }
+	private void refactorWithInitializer(final ArrayCreation node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-    private boolean isDestinationAllowed(final ASTNode node) {
-        final int parentType= node.getParent().getNodeType();
+		if (node.getInitializer() != null) {
+			rewrite.replace(node, node.getInitializer(), null);
+		} else {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
-                || parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
-    }
+			rewrite.replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
+		}
+	}
 
-    private boolean isVoid(final ArrayCreation node) {
-        @SuppressWarnings("unchecked")
-        final List<Expression> dimensions= node.dimensions();
+	private boolean isDestinationAllowed(final ASTNode node) {
+		int parentType= node.getParent().getNodeType();
 
-        for (Expression dimension : dimensions) {
-            final Object dimensionLiteral= dimension.resolveConstantExpressionValue();
+		return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
+				|| parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
+	}
 
-            if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
-                return false;
-            }
-        }
+	private boolean isVoid(final ArrayCreation node) {
+		@SuppressWarnings("unchecked") List<Expression> dimensions= node.dimensions();
 
-        return true;
-    }
+		for (Expression dimension : dimensions) {
+			Object dimensionLiteral= dimension.resolveConstantExpressionValue();
+
+			if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

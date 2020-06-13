@@ -74,6 +74,16 @@ public class RemoveUnnecessaryCastSample {
         Double doNotChangeLocalDouble = 101d;
     }
 
+    public IllegalArgumentException doNotRefactorChatToInt() {
+        char c = 'a';
+        return new IllegalArgumentException("" + (int) c);
+    }
+
+    public String doNotRefactorByteToChat() {
+        byte b = 0;
+        return "" + (char) b;
+    }
+
     public Object removeCastToSameType(Integer i) {
         // Keep this comment
         return (Integer) i;

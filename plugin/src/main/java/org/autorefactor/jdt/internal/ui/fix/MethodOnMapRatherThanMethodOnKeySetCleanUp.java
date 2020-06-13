@@ -29,79 +29,65 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
 public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation mi) {
-        MethodInvocation miExpression= ASTNodes.as(mi.getExpression(), MethodInvocation.class);
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		MethodInvocation miExpression= ASTNodes.as(node.getExpression(), MethodInvocation.class);
 
-        if (miExpression != null && ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "clear"); //$NON-NLS-1$
-            }
+		if (miExpression != null && miExpression.getExpression() != null && !ASTNodes.is(miExpression.getExpression(), ThisExpression.class)
+				&& ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "clear") //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "size") //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
+					|| (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+							// If parent is not an expression statement, the MethodInvocation must return a
+							// boolean.
+							// In that case, we cannot replace because `Map.removeKey(key) != null`
+							// is not strictly equivalent to `Map.keySet().remove(key)`
+							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT)) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "size"); //$NON-NLS-1$
-            }
+				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
+				return false;
+			}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "isEmpty"); //$NON-NLS-1$
-            }
+			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+				replaceContains(node, miExpression);
+				return false;
+			}
+		}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    // If parent is not an expression statement, the MethodInvocation must return a
-                    // boolean.
-                    // In that case, we cannot replace because `Map.removeKey(key) != null`
-                    // is not strictly equivalent to `Map.keySet().remove(key)`
-                    && mi.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                return removeInvocationOfMapKeySet(miExpression, mi, "remove"); //$NON-NLS-1$
-            }
+		return true;
+	}
 
-            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-                return removeInvocationOfMapKeySet(miExpression, mi, "containsKey"); //$NON-NLS-1$
-            }
-        }
+	private void replaceContains(final MethodInvocation node, final MethodInvocation miExpression) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        return true;
-    }
-
-    private boolean removeInvocationOfMapKeySet(final MethodInvocation mapKeySetMi, final MethodInvocation actualMi,
-            final String methodName) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        ctx.getRefactorings().replace(actualMi,
-                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(ASTNodes.arguments(actualMi))));
-        return false;
-    }
+		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
+		rewrite.replace(node.getName(), ast.simpleName("containsKey"), null); //$NON-NLS-1$
+	}
 }

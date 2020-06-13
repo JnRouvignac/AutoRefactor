@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
@@ -38,73 +39,61 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
-            final Expression leftOperand= node.getLeftOperand();
-            final Expression rightOperand= node.getRightOperand();
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
+			Expression leftOperand= node.getLeftOperand();
+			Expression rightOperand= node.getRightOperand();
 
-            return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
-                    // If not replaced then try the other way round
-                    && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
-        }
+			return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
+					// If not replaced then try the other way round
+					&& maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expression,
-            final Expression variable) {
-        StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
+	private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expression,
+			final Expression variable) {
+		StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
 
-        if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
-                && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
-            final ASTNodeFactory b= this.ctx.getASTBuilder();
-            final MethodInvocation newInvoke= b.invoke(String.class.getSimpleName(), "valueOf", b.createMoveTarget(variable)); //$NON-NLS-1$
+		if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
+				&& !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            if (node.hasExtendedOperands()) {
-                List<Expression> extendedOperands= ASTNodes.extendedOperands(node);
-                List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
-                newOperands.add(newInvoke);
-                newOperands.addAll(b.createMoveTarget(extendedOperands));
+			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
 
-                ctx.getRefactorings().replace(node, b.infixExpression(InfixExpression.Operator.PLUS, newOperands));
-            } else {
-                ctx.getRefactorings().replace(node, newInvoke);
-            }
+			if (node.hasExtendedOperands()) {
+				@SuppressWarnings("unchecked")
+				List<Expression> extendedOperands= node.extendedOperands();
+				List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
+				newOperands.add(newInvoke);
+				newOperands.addAll(rewrite.createMoveTarget(extendedOperands));
 
-            return false;
-        }
+				rewrite.replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands), null);
+			} else {
+				rewrite.replace(node, newInvoke, null);
+			}
 
-        return true;
-    }
+			return false;
+		}
+
+		return true;
+	}
 }

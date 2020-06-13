@@ -33,59 +33,59 @@ import org.autorefactor.preferences.Preferences;
  * This is poor man's dependency injection.
  */
 public class Environment {
-    private final EventLoop eventLoop;
-    private final JobManager jobManager;
-    private final Logger logger;
-    private final Preferences preferences;
+	private final EventLoop eventLoop;
+	private final JobManager jobManager;
+	private final Logger logger;
+	private final Preferences preferences;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param eventLoop   the event loop
-     * @param jobManager  the job manager
-     * @param logger      the logger
-     * @param preferences the preferences
-     */
-    public Environment(final EventLoop eventLoop, final JobManager jobManager, final Logger logger, final Preferences preferences) {
-        this.eventLoop= eventLoop;
-        this.jobManager= jobManager;
-        this.logger= logger;
-        this.preferences= preferences;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param eventLoop   the event loop
+	 * @param jobManager  the job manager
+	 * @param logger      the logger
+	 * @param preferences the preferences
+	 */
+	public Environment(final EventLoop eventLoop, final JobManager jobManager, final Logger logger, final Preferences preferences) {
+		this.eventLoop= eventLoop;
+		this.jobManager= jobManager;
+		this.logger= logger;
+		this.preferences= preferences;
+	}
 
-    /**
-     * Returns the event loop.
-     *
-     * @return the event loop
-     */
-    public EventLoop getEventLoop() {
-        return eventLoop;
-    }
+	/**
+	 * Returns the event loop.
+	 *
+	 * @return the event loop
+	 */
+	public EventLoop getEventLoop() {
+		return eventLoop;
+	}
 
-    /**
-     * Returns the job manager.
-     *
-     * @return the job manager
-     */
-    public JobManager getJobManager() {
-        return jobManager;
-    }
+	/**
+	 * Returns the job manager.
+	 *
+	 * @return the job manager
+	 */
+	public JobManager getJobManager() {
+		return jobManager;
+	}
 
-    /**
-     * Returns the logger.
-     *
-     * @return the logger
-     */
-    public Logger getLogger() {
-        return logger;
-    }
+	/**
+	 * Returns the logger.
+	 *
+	 * @return the logger
+	 */
+	public Logger getLogger() {
+		return logger;
+	}
 
-    /**
-     * Returns the preferences.
-     *
-     * @return the preferences
-     */
-    public Preferences getPreferences() {
-        return preferences;
-    }
+	/**
+	 * Returns the preferences.
+	 *
+	 * @return the preferences
+	 */
+	public Preferences getPreferences() {
+		return preferences;
+	}
 }

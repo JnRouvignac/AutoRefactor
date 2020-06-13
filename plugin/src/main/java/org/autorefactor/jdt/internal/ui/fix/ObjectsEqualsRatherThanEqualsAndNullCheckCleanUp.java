@@ -31,11 +31,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -48,190 +50,167 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassImportCleanUp {
-    private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-        @Override
-        public boolean visit(final IfStatement node) {
-            return ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this
-                    .maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
-        }
-    }
+	private static final String EQUALS_METHOD= "equals"; //$NON-NLS-1$
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
-    }
+	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
+		@Override
+		public boolean visit(final IfStatement node) {
+			return maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
+		}
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 7;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
+	}
 
-    @Override
-    public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList(Objects.class.getCanonicalName()));
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 7;
+	}
 
-    @Override
-    public CleanUpWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass();
-    }
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Objects.class.getCanonicalName()));
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
-    }
+	@Override
+	public CleanUpWithNewClassImport getRefactoringClassInstance() {
+		return new RefactoringWithObjectsClass();
+	}
 
-    private boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        if (node.getElseStatement() != null) {
-            final InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
-            final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
-            final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	}
 
-            if (condition != null && !condition.hasExtendedOperands()
-                    && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                    && thenStatements != null && thenStatements.size() == 1 && elseStatements != null && elseStatements.size() == 1) {
-                final Expression operand1= condition.getLeftOperand();
-                final Expression operand2= condition.getRightOperand();
+	private boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		if (node.getElseStatement() != null) {
+			InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+			List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+			List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
 
-                final NullLiteral nullLiteral1= ASTNodes.as(operand2, NullLiteral.class);
-                final NullLiteral nullLiteral2= ASTNodes.as(operand1, NullLiteral.class);
-                final Expression firstField;
+			if (condition != null && !condition.hasExtendedOperands()
+					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+					&& thenStatements != null && thenStatements.size() == 1 && elseStatements != null && elseStatements.size() == 1) {
+				OrderedInfixExpression<Expression, NullLiteral> nullityOrderedCondition= ASTNodes.orderedInfix(condition, Expression.class, NullLiteral.class);
 
-                if (ASTNodes.isPassive(operand1) && nullLiteral1 != null) {
-                    firstField= operand1;
-                } else if (ASTNodes.isPassive(operand2) && nullLiteral2 != null) {
-                    firstField= operand2;
-                } else {
-                    firstField= null;
-                }
+				if (nullityOrderedCondition != null && ASTNodes.isPassive(nullityOrderedCondition.getFirstOperand())) {
+					return maybeReplaceCode(node, condition, thenStatements, elseStatements, nullityOrderedCondition.getFirstOperand(), classesToUseWithImport,
+							importsToAdd);
+				}
+			}
+		}
 
-                if (firstField != null) {
-                    return maybeReplaceCode(node, condition, thenStatements, elseStatements, firstField, classesToUseWithImport,
-                            importsToAdd);
-                }
-            }
-        }
+		return true;
+	}
 
-        return true;
-    }
+	private boolean maybeReplaceCode(final IfStatement node, final InfixExpression condition,
+			final List<Statement> thenStatements, final List<Statement> elseStatements, final Expression firstField,
+			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		IfStatement checkNullityStatement;
+		IfStatement checkEqualsStatement;
 
-    private boolean maybeReplaceCode(final IfStatement node, final InfixExpression condition,
-            final List<Statement> thenStatements, final List<Statement> elseStatements, final Expression firstField,
-            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final IfStatement checkNullityStatement;
-        final IfStatement checkEqualsStatement;
+		if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
+			checkNullityStatement= ASTNodes.as(thenStatements.get(0), IfStatement.class);
+			checkEqualsStatement= ASTNodes.as(elseStatements.get(0), IfStatement.class);
+		} else {
+			checkEqualsStatement= ASTNodes.as(thenStatements.get(0), IfStatement.class);
+			checkNullityStatement= ASTNodes.as(elseStatements.get(0), IfStatement.class);
+		}
 
-        if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
-            checkNullityStatement= ASTNodes.as(thenStatements.get(0), IfStatement.class);
-            checkEqualsStatement= ASTNodes.as(elseStatements.get(0), IfStatement.class);
-        } else {
-            checkEqualsStatement= ASTNodes.as(thenStatements.get(0), IfStatement.class);
-            checkNullityStatement= ASTNodes.as(elseStatements.get(0), IfStatement.class);
-        }
+		if (checkNullityStatement != null && checkNullityStatement.getElseStatement() == null && checkEqualsStatement != null
+				&& checkEqualsStatement.getElseStatement() == null) {
+			InfixExpression nullityCondition= ASTNodes.as(checkNullityStatement.getExpression(), InfixExpression.class);
+			List<Statement> nullityStatements= ASTNodes.asList(checkNullityStatement.getThenStatement());
 
-        if (checkNullityStatement != null && checkNullityStatement.getElseStatement() == null && checkEqualsStatement != null
-                && checkEqualsStatement.getElseStatement() == null) {
-            final InfixExpression nullityCondition= ASTNodes.as(checkNullityStatement.getExpression(), InfixExpression.class);
-            final List<Statement> nullityStatements= ASTNodes.asList(checkNullityStatement.getThenStatement());
+			PrefixExpression equalsCondition= ASTNodes.as(checkEqualsStatement.getExpression(), PrefixExpression.class);
+			List<Statement> equalsStatements= ASTNodes.asList(checkEqualsStatement.getThenStatement());
 
-            final PrefixExpression equalsCondition= ASTNodes.as(checkEqualsStatement.getExpression(), PrefixExpression.class);
-            final List<Statement> equalsStatements= ASTNodes.asList(checkEqualsStatement.getThenStatement());
+			if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
+					&& ASTNodes.hasOperator(nullityCondition, InfixExpression.Operator.NOT_EQUALS) && nullityStatements != null
+					&& nullityStatements.size() == 1 && equalsCondition != null
+					&& ASTNodes.hasOperator(equalsCondition, PrefixExpression.Operator.NOT) && equalsStatements != null
+					&& equalsStatements.size() == 1) {
+				return maybeReplaceEquals(node, firstField, nullityCondition, nullityStatements, equalsCondition,
+						equalsStatements, classesToUseWithImport, importsToAdd);
+			}
+		}
 
-            if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
-                    && ASTNodes.hasOperator(nullityCondition, InfixExpression.Operator.NOT_EQUALS) && nullityStatements != null
-                    && nullityStatements.size() == 1 && equalsCondition != null
-                    && ASTNodes.hasOperator(equalsCondition, PrefixExpression.Operator.NOT) && equalsStatements != null
-                    && equalsStatements.size() == 1) {
-                return maybeReplaceEquals(node, firstField, nullityCondition, nullityStatements, equalsCondition,
-                        equalsStatements, classesToUseWithImport, importsToAdd);
-            }
-        }
+		return true;
+	}
 
-        return true;
-    }
+	private boolean maybeReplaceEquals(final IfStatement node, final Expression firstField,
+			final InfixExpression nullityCondition, final List<Statement> nullityStatements,
+			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
+			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		OrderedInfixExpression<Expression, NullLiteral> nullityOrderedCondition= ASTNodes.orderedInfix(nullityCondition, Expression.class, NullLiteral.class);
+		ReturnStatement returnStatement1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
+		ReturnStatement returnStatement2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
+		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
-    private boolean maybeReplaceEquals(final IfStatement node, final Expression firstField,
-            final InfixExpression nullityCondition, final List<Statement> nullityStatements,
-            final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
-            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final Expression nullityOperand1= nullityCondition.getLeftOperand();
-        final Expression nullityOperand2= nullityCondition.getRightOperand();
+		if (nullityOrderedCondition != null && returnStatement1 != null && returnStatement2 != null && equalsMethod != null
+				&& equalsMethod.getExpression() != null && EQUALS_METHOD.equals(equalsMethod.getName().getIdentifier())
+				&& equalsMethod.arguments() != null && equalsMethod.arguments().size() == 1) {
+			Expression secondField= nullityOrderedCondition.getFirstOperand();
 
-        final NullLiteral nullityLiteral1= ASTNodes.as(nullityOperand2, NullLiteral.class);
-        final NullLiteral nullityLiteral2= ASTNodes.as(nullityOperand1, NullLiteral.class);
-        final Expression secondField;
+			if (secondField != null
+					&& (match(firstField, secondField, equalsMethod.getExpression(),
+							(ASTNode) equalsMethod.arguments().get(0))
+							|| match(secondField, firstField, equalsMethod.getExpression(),
+									(ASTNode) equalsMethod.arguments().get(0)))) {
+				BooleanLiteral returnFalse1= ASTNodes.as(returnStatement1.getExpression(), BooleanLiteral.class);
+				BooleanLiteral returnFalse2= ASTNodes.as(returnStatement2.getExpression(), BooleanLiteral.class);
 
-        if (ASTNodes.isPassive(nullityOperand1) && nullityLiteral1 != null) {
-            secondField= nullityOperand1;
-        } else if (ASTNodes.isPassive(nullityOperand2) && nullityLiteral2 != null) {
-            secondField= nullityOperand2;
-        } else {
-            secondField= null;
-        }
+				if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
+						&& !returnFalse2.booleanValue()) {
+					replaceEquals(node, firstField, classesToUseWithImport, importsToAdd, secondField, returnStatement1);
+					return false;
+				}
+			}
+		}
 
-        final ReturnStatement returnStmt1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
-        final ReturnStatement returnStmt2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
-        final MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
+		return true;
+	}
 
-        if (secondField != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
-                && equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier()) //$NON-NLS-1$
-                && (equalsMethod.arguments() == null || equalsMethod.arguments().size() == 1)
-                && (match(firstField, secondField, equalsMethod.getExpression(),
-                        (ASTNode) equalsMethod.arguments().get(0))
-                        || match(secondField, firstField, equalsMethod.getExpression(),
-                                (ASTNode) equalsMethod.arguments().get(0)))) {
-            final BooleanLiteral returnFalse1= ASTNodes.as(returnStmt1.getExpression(), BooleanLiteral.class);
-            final BooleanLiteral returnFalse2= ASTNodes.as(returnStmt2.getExpression(), BooleanLiteral.class);
+	private boolean match(final Expression firstField, final Expression secondField, final Expression thisObject,
+			final ASTNode otherObject) {
+		return ASTNodes.match(thisObject, firstField) && ASTNodes.match(otherObject, secondField);
+	}
 
-            if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
-                    && !returnFalse2.booleanValue()) {
-                replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
-                importsToAdd.add(Objects.class.getCanonicalName());
-                return false;
-            }
-        }
+	private void replaceEquals(final IfStatement node, final Expression firstField,
+			final Set<String> classesToUseWithImport, final Set<String> importsToAdd, final Expression secondField,
+			final ReturnStatement returnStatement) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        return true;
-    }
+		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 
-    private boolean match(final Expression firstField, final Expression secondField, final Expression thisObject,
-            final ASTNode otherObject) {
-        return ASTNodes.match(thisObject, firstField) && ASTNodes.match(otherObject, secondField);
-    }
+		ReturnStatement copyOfReturnStatement= ASTNodes.createMoveTarget(rewrite, returnStatement);
 
-    private void replaceEquals(final IfStatement node, final Expression firstField, final Expression secondField,
-            final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final Refactorings r= this.ctx.getRefactorings();
+		rewrite.replace(node.getExpression(),
+				ast.not(ast.newMethodInvocation(ast.name(classname),
+						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), null);
 
-        r.replace(node,
-                b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
-                        "equals", b.createMoveTarget(firstField), b.createMoveTarget(secondField))), b.block(b.createMoveTarget(returnStmt1)))); //$NON-NLS-1$
-    }
+		if (node.getThenStatement() instanceof Block) {
+			rewrite.replace((ASTNode) ((Block) node.getThenStatement()).statements().get(0), copyOfReturnStatement, null);
+		} else {
+			rewrite.replace(node.getThenStatement(), copyOfReturnStatement, null);
+		}
+
+		if (node.getElseStatement() != null) {
+			rewrite.remove(node.getElseStatement(), null);
+		}
+	}
 }

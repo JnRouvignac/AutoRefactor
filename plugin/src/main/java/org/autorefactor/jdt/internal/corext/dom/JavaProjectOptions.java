@@ -29,31 +29,31 @@ import java.util.Map;
 
 /** The java project options. */
 public interface JavaProjectOptions {
-    /**
-     * Returns the compiler options used to compile a java project.
-     *
-     * @return the compiler options used to compile a java project
-     */
-    Map<String, String> getCompilerOptions();
+	/**
+	 * Returns the compiler options used to compile a java project.
+	 *
+	 * @return the compiler options used to compile a java project
+	 */
+	Map<String, String> getCompilerOptions();
 
-    /**
-     * Returns the java SE release in use for the current project.
-     *
-     * @return the java SE release in use for the current project
-     */
-    Release getJavaSERelease();
+	/**
+	 * Returns the java SE release in use for the current project.
+	 *
+	 * @return the java SE release in use for the current project
+	 */
+	Release getJavaSERelease();
 
-    /**
-     * Returns the tabulation size in use for the current project.
-     *
-     * @return the tabulation size in use for the current project.
-     */
-    Integer getTabSize();
+	/**
+	 * Returns the tabulation size in use for the current project.
+	 *
+	 * @return the tabulation size in use for the current project.
+	 */
+	Integer getTabSize();
 
-    /**
-     * Returns the comment line length in use for the current project.
-     *
-     * @return the comment line length in use for the current project.
-     */
-    int getCommentLineLength();
+	/**
+	 * Returns the comment line length in use for the current project.
+	 *
+	 * @return the comment line length in use for the current project.
+	 */
+	int getCommentLineLength();
 }

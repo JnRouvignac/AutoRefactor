@@ -25,10 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ThisExpression;
 
 /**
  * See {@link #getDescription()} method.
@@ -38,64 +42,46 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  * </p>
  */
 public class InvertEqualsCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (node.getExpression() == null) {
-            return true;
-        }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (node.getExpression() == null || ASTNodes.is(node.getExpression(), ThisExpression.class)) {
+			return true;
+		}
 
-        boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
-        boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
+			Expression expression= node.getExpression();
+			Expression arg0= ((List<Expression>) node.arguments()).get(0);
 
-        if (isEquals || isStringEqualsIgnoreCase) {
-            final Expression expression= node.getExpression();
-            final Expression arg0= ASTNodes.arguments(node).get(0);
+			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
+				invertEqualsInvocation(node, expression, arg0);
+				return false;
+			}
+		}
 
-            if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
-                invertEqualsInvocation(node, isEquals, expression, arg0);
-                return false;
-            }
-        }
+		return true;
+	}
 
-        return true;
-    }
+	private void invertEqualsInvocation(final MethodInvocation node, final Expression expression, final Expression arg0) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
-            final Expression arg0) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-
-        final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ //$NON-NLS-2$
-        this.ctx.getRefactorings().replace(node,
-                b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget(arg0)), methodName, b.createMoveTarget(expression)));
-    }
+		rewrite.replace(node.getExpression(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
+		rewrite.replace(arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), null);
+	}
 }

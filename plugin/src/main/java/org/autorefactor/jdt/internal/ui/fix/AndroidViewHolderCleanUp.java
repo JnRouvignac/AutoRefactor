@@ -27,12 +27,12 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.jdt.internal.corext.dom.Variable;
 import org.autorefactor.preferences.Preferences;
@@ -71,296 +71,290 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  * @see {@link #getDescription()} method.
  */
 public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
+	}
 
-    @Override
-    public boolean isEnabled(final Preferences preferences) {
-        // FIXME enable only when android libraries are detected
-        return super.isEnabled(preferences);
-    }
+	@Override
+	public boolean isEnabled(final Preferences preferences) {
+		// FIXME enable only when android libraries are detected
+		return super.isEnabled(preferences);
+	}
 
-    @Override
-    public boolean visit(final MethodDeclaration node) {
-        Block body= node.getBody();
-        if (body != null && ASTNodes.usesGivenSignature(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                "android.view.ViewGroup")) { //$NON-NLS-1$
-            final GetViewVariableVisitor visitor= new GetViewVariableVisitor();
-            body.accept(visitor);
-            if (visitor.canApplyRefactoring()) {
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                final Refactorings r= this.ctx.getRefactorings();
-                final TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
+	@Override
+	public boolean visit(final MethodDeclaration node) {
+		Block body= node.getBody();
+		if (body != null && ASTNodes.usesGivenSignature(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"android.view.ViewGroup")) { //$NON-NLS-1$
+			GetViewVariableVisitor visitor= new GetViewVariableVisitor();
+			body.accept(visitor);
+			if (visitor.canApplyRefactoring()) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-                // Transform tree
+				TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
 
-                // Create If statement
-                final SingleVariableDeclaration viewArg= ASTNodes.parameters(node).get(1);
-                final Variable convertViewVar= new Variable(viewArg.getName().getIdentifier(), b);
-                final InfixExpression condition= b.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, b.null0());
-                final Block thenBlock= b.block();
-                final IfStatement ifStatement= b.if0(condition, thenBlock);
-                r.insertBefore(ifStatement, visitor.viewAssignmentStatement);
-                final List<Statement> thenStatements= ASTNodes.statements(thenBlock);
+				// Transform tree
 
-                thenStatements.add(b.toStatement(b.assign(convertViewVar.varName(), Assignment.Operator.ASSIGN, b.createCopyTarget(visitor.getInflateExpression()))));
+				// Create If statement
+				SingleVariableDeclaration viewArg= (SingleVariableDeclaration) node.parameters().get(1);
+				Variable convertViewVar= new Variable(viewArg.getName().getIdentifier(), ast);
+				InfixExpression condition= ast.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.null0());
+				Block thenBlock= ast.block();
+				IfStatement ifStatement= ast.if0(condition, thenBlock);
+				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, null);
+				@SuppressWarnings("unchecked")
+				List<Statement> thenStatements= thenBlock.statements();
 
-                // Assign to local view variable when necessary
-                if (!"convertView".equals(visitor.viewVariableName.getIdentifier())) { //$NON-NLS-1$
-                    Statement assignConvertViewToView= null;
-                    if (visitor.viewVariableDeclFragment != null) {
-                        assignConvertViewToView= b.declareStatement(b.copyType(visitor.viewVariableName, typeNameDecider),
-                                b.createCopyTarget(visitor.viewVariableName), convertViewVar.varName());
-                    } else if (visitor.viewVariableAssignment != null) {
-                        assignConvertViewToView= b
-                                .toStatement(b.assign(b.createCopyTarget(visitor.viewVariableName), Assignment.Operator.ASSIGN, convertViewVar.varName()));
-                    }
-                    if (assignConvertViewToView != null) {
-                        r.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement);
-                    }
-                }
+				thenStatements.add(ast.toStatement(ast.assign(convertViewVar.varName(), Assignment.Operator.ASSIGN, ast.createCopyTarget(visitor.getInflateExpression()))));
 
-                // Make sure method returns the view to be reused
-                if (visitor.returnStatement != null) {
-                    r.insertAfter(b.return0(b.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement);
-                    r.remove(visitor.returnStatement);
-                }
+				// Assign to local view variable when necessary
+				if (!"convertView".equals(visitor.viewVariableName.getIdentifier())) { //$NON-NLS-1$
+					Statement assignConvertViewToView= null;
+					if (visitor.viewVariableDeclFragment != null) {
+						assignConvertViewToView= ast.declareStatement(ast.copyType(visitor.viewVariableName, typeNameDecider),
+								ast.createCopyTarget(visitor.viewVariableName), convertViewVar.varName());
+					} else if (visitor.viewVariableAssignment != null) {
+						assignConvertViewToView= ast
+								.toStatement(ast.assign(ast.createCopyTarget(visitor.viewVariableName), Assignment.Operator.ASSIGN, convertViewVar.varName()));
+					}
+					if (assignConvertViewToView != null) {
+						rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement, null);
+					}
+				}
 
-                // Optimize findViewById calls
-                final FindViewByIdVisitor findViewByIdVisitor= new FindViewByIdVisitor(visitor.viewVariableName);
-                body.accept(findViewByIdVisitor);
-                if (!findViewByIdVisitor.items.isEmpty()) {
-                    // TODO JNR name conflict? Use VariableNameDecider
-                    Variable viewHolderItemVar= new Variable("ViewHolderItem", "viewHolderItem", b); //$NON-NLS-1$ //$NON-NLS-2$
+				// Make sure method returns the view to be reused
+				if (visitor.returnStatement != null) {
+					rewrite.insertAfter(ast.return0(ast.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement, null);
+					rewrite.remove(visitor.returnStatement, null);
+				}
 
-                    // Create ViewHolderItem class
-                    r.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
-                            typeNameDecider), node);
+				// Optimize findViewById calls
+				FindViewByIdVisitor findViewByIdVisitor= new FindViewByIdVisitor(visitor.viewVariableName);
+				body.accept(findViewByIdVisitor);
+				if (!findViewByIdVisitor.items.isEmpty()) {
+					// TODO JNR name conflict? Use VariableNameDecider
+					Variable viewHolderItemVar= new Variable("ViewHolderItem", "viewHolderItem", ast); //$NON-NLS-1$ //$NON-NLS-2$
 
-                    // Declare viewhHolderItem object
-                    r.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement());
-                    // Initialize viewHolderItem
-                    thenStatements.add(
-                            b.toStatement(b.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN, b.new0(viewHolderItemVar.type()))));
-                    // Assign findViewById to ViewHolderItem
-                    for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
-                        // Ensure we are accessing convertView object
-                        FieldAccess fieldAccess= b.fieldAccess(viewHolderItemVar.varName(),
-                                b.simpleName(item.variable.getIdentifier()));
-                        // FIXME This does not work: not sure why??
-                        // r.set(item.findViewByIdInvocation,
-                        // MethodInvocation.EXPRESSION_PROPERTY, convertViewVar.varName());
-                        item.findViewByIdInvocation.setExpression(convertViewVar.varName());
-                        // FIXME For some reason b.copy() does not do what we would like
-                        thenStatements.add(b.toStatement(b.assign(fieldAccess, Assignment.Operator.ASSIGN, b.copySubtree(item.findViewByIdExpression))));
+					// Create ViewHolderItem class
+					rewrite.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
+							typeNameDecider), node, null);
 
-                        // Replace previous findViewById with accesses to viewHolderItem
-                        r.replace(item.findViewByIdExpression, b.createCopyTarget(fieldAccess));
-                    }
-                    // Store viewHolderItem in convertView
-                    thenStatements.add(b.toStatement(b.invoke("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
+					// Declare viewhHolderItem object
+					rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement(), null);
+					// Initialize viewHolderItem
+					thenStatements.add(
+							ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN, ast.new0(viewHolderItemVar.type()))));
+					// Assign findViewById to ViewHolderItem
+					for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
+						// Ensure we are accessing convertView object
+						FieldAccess fieldAccess= ast.fieldAccess(viewHolderItemVar.varName(),
+								ast.simpleName(item.variable.getIdentifier()));
+						// FIXME This does not work: not sure why??
+						// rewrite.set(item.findViewByIdInvocation,
+						// MethodInvocation.EXPRESSION_PROPERTY, convertViewVar.varName());
+						item.findViewByIdInvocation.setExpression(convertViewVar.varName());
+						// FIXME For some reason ast.copy() does not do what we would like
+						thenStatements.add(ast.toStatement(ast.assign(fieldAccess, Assignment.Operator.ASSIGN, ast.copySubtree(item.findViewByIdExpression))));
 
-                    // Retrieve viewHolderItem from convertView
-                    ifStatement.setElseStatement(b.block(b.toStatement(b.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
-                            b.cast(viewHolderItemVar.type(), b.invoke("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-                r.remove(visitor.viewAssignmentStatement);
-                return false;
-            }
-        }
+						// Replace previous findViewById with accesses to viewHolderItem
+						rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), null);
+					}
+					// Store viewHolderItem in convertView
+					thenStatements.add(ast.toStatement(ast.newMethodInvocation("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
 
-        return true;
-    }
+					// Retrieve viewHolderItem from convertView
+					ifStatement.setElseStatement(ast.block(ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
+							ast.cast(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				rewrite.remove(visitor.viewAssignmentStatement, null);
+				return false;
+			}
+		}
 
-    private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
-            final TypeNameDecider typeNameDecider) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        TypeDeclaration result= b.getAST().newTypeDeclaration();
-        ASTNodes.modifiers(result).addAll(Arrays.asList(b.private0(), b.static0()));
-        result.setName(typeName);
-        List<BodyDeclaration> viewItemsFieldDecls= ASTNodes.bodyDeclarations(result);
-        for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
-            viewItemsFieldDecls.add(item.toFieldDecl(b, typeNameDecider));
-        }
+		return true;
+	}
 
-        return result;
-    }
+	@SuppressWarnings("unchecked")
+	private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
+			final TypeNameDecider typeNameDecider) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    /** Visitor that returns all the interesting accesses to the view variable. */
-    private static final class GetViewVariableVisitor extends ASTVisitor {
-        private SimpleName viewVariableName;
-        /** {@code null} when {@link #viewVariableAssignment} is not null. */
-        private VariableDeclarationFragment viewVariableDeclFragment;
-        /** {@code null} when {@link #viewVariableDeclFragment} is not null. */
-        private Assignment viewVariableAssignment;
-        /** Statement which is the ancestor node of the assignment node. */
-        private Statement viewAssignmentStatement;
-        private ReturnStatement returnStatement;
+		TypeDeclaration result= ast.getAST().newTypeDeclaration();
+		Collections.addAll(result.modifiers(), ast.private0(), ast.static0());
+		result.setName(typeName);
+		List<BodyDeclaration> viewItemsFieldDecls= result.bodyDeclarations();
 
-        private void resetData() {
-            viewVariableName= null;
-            viewVariableDeclFragment= null;
-            viewVariableAssignment= null;
-            viewAssignmentStatement= null;
-            returnStatement= null;
-        }
+		for (FindViewByIdVisitor.FindViewByIdItem item : findViewByIdVisitor.items) {
+			viewItemsFieldDecls.add(item.toFieldDecl(ast, typeNameDecider));
+		}
 
-        @Override
-        public boolean visit(final MethodInvocation node) {
-            if (isInflateMethod(node)) {
-                ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
-                if (ancestor instanceof VariableDeclarationFragment) {
-                    viewVariableDeclFragment= (VariableDeclarationFragment) ancestor;
-                    viewVariableName= viewVariableDeclFragment.getName();
-                    viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableDeclFragment, VariableDeclarationStatement.class);
-                    if (viewAssignmentStatement == null) {
-                        resetData();
-                        return true;
-                    }
-                } else if (ancestor instanceof Assignment) {
-                    viewVariableAssignment= (Assignment) ancestor;
-                    final Expression lhs= viewVariableAssignment.getLeftHandSide();
-                    if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
-                        resetData();
-                        return true;
-                    }
-                    viewVariableName= (SimpleName) lhs;
-                    viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
-                }
+		return result;
+	}
 
-                return false;
-            }
+	/** Visitor that returns all the interesting accesses to the view variable. */
+	private static final class GetViewVariableVisitor extends ASTVisitor {
+		private SimpleName viewVariableName;
+		/** {@code null} when {@link #viewVariableAssignment} is not null. */
+		private VariableDeclarationFragment viewVariableDeclFragment;
+		/** {@code null} when {@link #viewVariableDeclFragment} is not null. */
+		private Assignment viewVariableAssignment;
+		/** Statement which is the ancestor node of the assignment node. */
+		private Statement viewAssignmentStatement;
+		private ReturnStatement returnStatement;
 
-            return true;
-        }
+		private void resetData() {
+			viewVariableName= null;
+			viewVariableDeclFragment= null;
+			viewVariableAssignment= null;
+			viewAssignmentStatement= null;
+			returnStatement= null;
+		}
 
-        @Override
-        public boolean visit(final ReturnStatement node) {
-            this.returnStatement= node;
-            return true;
-        }
+		@Override
+		public boolean visit(final MethodInvocation node) {
+			if (isInflateMethod(node)) {
+				ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
+				if (ancestor instanceof VariableDeclarationFragment) {
+					viewVariableDeclFragment= (VariableDeclarationFragment) ancestor;
+					viewVariableName= viewVariableDeclFragment.getName();
+					viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableDeclFragment, VariableDeclarationStatement.class);
+					if (viewAssignmentStatement == null) {
+						resetData();
+						return true;
+					}
+				} else if (ancestor instanceof Assignment) {
+					viewVariableAssignment= (Assignment) ancestor;
+					Expression lhs= viewVariableAssignment.getLeftHandSide();
+					if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
+						resetData();
+						return true;
+					}
+					viewVariableName= (SimpleName) lhs;
+					viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
+				}
 
-        private boolean canApplyRefactoring() {
-            // We found a suitable variable to replace
-            return viewVariableName != null && !isInflateInsideIf();
-        }
+				return false;
+			}
 
-        private boolean isInflateInsideIf() {
-            if (this.viewAssignmentStatement != null) {
-                Expression inflateExpression= getInflateExpression();
-                return ASTNodes.getFirstAncestorOrNull(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
-                        // Check whether inflate is inside a conditional assignment
-                        || (inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION);
-            }
+			return true;
+		}
 
-            return false;
-        }
+		@Override
+		public boolean visit(final ReturnStatement node) {
+			this.returnStatement= node;
+			return true;
+		}
 
-        private Expression getInflateExpression() {
-            if (this.viewVariableDeclFragment != null) {
-                return this.viewVariableDeclFragment.getInitializer();
-            }
-            if (this.viewVariableAssignment != null) {
-                return this.viewVariableAssignment.getRightHandSide();
-            }
+		private boolean canApplyRefactoring() {
+			// We found a suitable variable to replace
+			return viewVariableName != null && !isInflateInsideIf();
+		}
 
-            return null;
-        }
+		private boolean isInflateInsideIf() {
+			if (this.viewAssignmentStatement != null) {
+				Expression inflateExpression= getInflateExpression();
+				return ASTNodes.getFirstAncestorOrNull(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
+						// Check whether inflate is inside a conditional assignment
+						|| inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION;
+			}
 
-        private boolean isInflateMethod(final MethodInvocation node) {
-            final String inflaterType= "android.view.LayoutInflater"; //$NON-NLS-1$
-            final String viewGroupType= "android.view.ViewGroup"; //$NON-NLS-1$
-            return ASTNodes.usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType) //$NON-NLS-1$ //$NON-NLS-2$
-                    || ASTNodes.usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType, //$NON-NLS-1$ //$NON-NLS-2$
-                            boolean.class.getSimpleName());
-        }
-    }
+			return false;
+		}
 
-    /** Finds calls to {@code android.view.View#findViewById(int)}. */
-    private static final class FindViewByIdVisitor extends ASTVisitor {
-        static class FindViewByIdItem {
-            private SimpleName variable;
-            private Expression findViewByIdExpression;
-            private MethodInvocation findViewByIdInvocation;
+		private Expression getInflateExpression() {
+			if (this.viewVariableDeclFragment != null) {
+				return this.viewVariableDeclFragment.getInitializer();
+			}
+			if (this.viewVariableAssignment != null) {
+				return this.viewVariableAssignment.getRightHandSide();
+			}
 
-            private boolean setAssignment(final MethodInvocation node) {
-                this.findViewByIdInvocation= node;
-                ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
-                if (ancestor instanceof VariableDeclarationFragment) {
-                    final VariableDeclarationFragment fragment= (VariableDeclarationFragment) ancestor;
-                    variable= fragment.getName();
-                    findViewByIdExpression= fragment.getInitializer();
-                } else if (ancestor instanceof Assignment) {
-                    final Assignment as= (Assignment) ancestor;
-                    final Expression lhs= as.getLeftHandSide();
-                    if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
-                        // Only simple names are handled.
-                        // Using anything else than simple name is unexpected,
-                        // and even so, it is unexpected that simple names
-                        // would not mixed with qualified names, etc.
-                        return false;
-                    }
-                    variable= (SimpleName) lhs;
-                    findViewByIdExpression= as.getRightHandSide();
-                } else {
-                    return false;
-                }
+			return null;
+		}
 
-                return true;
-            }
+		private boolean isInflateMethod(final MethodInvocation node) {
+			String inflaterType= "android.view.LayoutInflater"; //$NON-NLS-1$
+			String viewGroupType= "android.view.ViewGroup"; //$NON-NLS-1$
+			return ASTNodes.usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType) //$NON-NLS-1$ //$NON-NLS-2$
+					|| ASTNodes.usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType, //$NON-NLS-1$ //$NON-NLS-2$
+							boolean.class.getSimpleName());
+		}
+	}
 
-            private FieldDeclaration toFieldDecl(final ASTNodeFactory b, final TypeNameDecider typeNameDecider) {
-                final FieldDeclaration field= b.declareField(b.copyType(variable, typeNameDecider),
-                        b.declareFragment(b.createCopyTarget(variable)));
-                ASTNodes.modifiers(field).add(b.private0());
-                return field;
-            }
-        }
+	/** Finds calls to {@code android.view.View#findViewById(int)}. */
+	private static final class FindViewByIdVisitor extends ASTVisitor {
+		static class FindViewByIdItem {
+			private SimpleName variable;
+			private Expression findViewByIdExpression;
+			private MethodInvocation findViewByIdInvocation;
 
-        private List<FindViewByIdItem> items= new ArrayList<>();
-        private SimpleName viewVariableName;
+			private boolean setAssignment(final MethodInvocation node) {
+				this.findViewByIdInvocation= node;
+				ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
+				if (ancestor instanceof VariableDeclarationFragment) {
+					VariableDeclarationFragment fragment= (VariableDeclarationFragment) ancestor;
+					variable= fragment.getName();
+					findViewByIdExpression= fragment.getInitializer();
+				} else if (ancestor instanceof Assignment) {
+					Assignment as= (Assignment) ancestor;
+					Expression lhs= as.getLeftHandSide();
+					if (lhs.getNodeType() != ASTNode.SIMPLE_NAME) {
+						// Only simple names are handled.
+						// Using anything else than simple name is unexpected,
+						// and even so, it is unexpected that simple names
+						// would not mixed with qualified names, etc.
+						return false;
+					}
+					variable= (SimpleName) lhs;
+					findViewByIdExpression= as.getRightHandSide();
+				} else {
+					return false;
+				}
 
-        private FindViewByIdVisitor(final SimpleName viewVariableName) {
-            this.viewVariableName= viewVariableName;
-        }
+				return true;
+			}
 
-        @Override
-        public boolean visit(final MethodInvocation node) {
-            if (ASTNodes.usesGivenSignature(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-                    && ASTNodes.isSameVariable(viewVariableName, node.getExpression())) {
-                FindViewByIdItem item= new FindViewByIdItem();
-                if (item.setAssignment(node)) {
-                    items.add(item);
-                }
-            }
+			@SuppressWarnings("unchecked")
+			private FieldDeclaration toFieldDecl(final ASTNodeFactory ast, final TypeNameDecider typeNameDecider) {
+				FieldDeclaration field= ast.declareField(ast.copyType(variable, typeNameDecider),
+						ast.declareFragment(ast.createCopyTarget(variable)));
+				field.modifiers().add(ast.private0());
+				return field;
+			}
+		}
 
-            return true;
-        }
-    }
+		private List<FindViewByIdItem> items= new ArrayList<>();
+		private SimpleName viewVariableName;
+
+		private FindViewByIdVisitor(final SimpleName viewVariableName) {
+			this.viewVariableName= viewVariableName;
+		}
+
+		@Override
+		public boolean visit(final MethodInvocation node) {
+			if (ASTNodes.usesGivenSignature(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
+					&& ASTNodes.isSameVariable(viewVariableName, node.getExpression())) {
+				FindViewByIdItem item= new FindViewByIdItem();
+				if (item.setAssignment(node)) {
+					items.add(item);
+				}
+			}
+
+			return true;
+		}
+	}
 }

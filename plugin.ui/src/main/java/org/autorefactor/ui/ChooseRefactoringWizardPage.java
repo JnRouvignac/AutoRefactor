@@ -25,13 +25,6 @@
  */
 package org.autorefactor.ui;
 
-import static org.eclipse.jface.viewers.CheckboxTableViewer.newCheckList;
-import static org.eclipse.swt.SWT.BORDER;
-import static org.eclipse.swt.SWT.CHECK;
-import static org.eclipse.swt.SWT.HIDE_SELECTION;
-import static org.eclipse.swt.SWT.H_SCROLL;
-import static org.eclipse.swt.SWT.NO_FOCUS;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,272 +75,278 @@ import org.eclipse.swt.widgets.Text;
  * the selected java elements.
  */
 public class ChooseRefactoringWizardPage extends WizardPage {
-    private final class CheckStateProvider implements ICheckStateProvider {
-        public CheckStateProvider(List<? extends Object> refactorings) {
-            for (Object refactoring : refactorings) {
-                checkedState.put(refactoring, Boolean.FALSE);
-            }
-        }
+	private final class CheckStateProvider implements ICheckStateProvider {
+		public CheckStateProvider(List<? extends Object> refactorings) {
+			for (Object refactoring : refactorings) {
+				checkedState.put(refactoring, Boolean.FALSE);
+			}
+		}
 
-        /**
-         * True if it is checked.
-         *
-         * @param element The element
-         *
-         * @return True if it is checked.
-         */
-        public boolean isChecked(Object element) {
-            return Boolean.TRUE.equals(checkedState.get(element));
-        }
+		/**
+		 * True if it is checked.
+		 *
+		 * @param element The element
+		 *
+		 * @return True if it is checked.
+		 */
+		@Override
+		public boolean isChecked(Object element) {
+			return Boolean.TRUE.equals(checkedState.get(element));
+		}
 
-        /**
-         * True if it is grayed.
-         *
-         * @param element The element
-         *
-         * @return True if it is grayed.
-         */
-        public boolean isGrayed(Object element) {
-            return false;
-        }
-    }
+		/**
+		 * True if it is grayed.
+		 *
+		 * @param element The element
+		 *
+		 * @return True if it is grayed.
+		 */
+		@Override
+		public boolean isGrayed(Object element) {
+			return false;
+		}
+	}
 
-    private final HashMap<Object, Boolean> checkedState= new HashMap<>();
-    private Text filterText;
-    private CheckboxTableViewer tableViewer;
-    private Button selectAllVisibleCheckbox;
+	private final HashMap<Object, Boolean> checkedState= new HashMap<>();
+	private Text filterText;
+	private CheckboxTableViewer tableViewer;
+	private Button selectAllVisibleCheckbox;
 
-    private final Styler defaultStyler= new Styler() {
-        @Override
-        public void applyStyles(TextStyle textStyle) {
-            // No specific style
-        }
-    };
+	private final Styler defaultStyler= new Styler() {
+		@Override
+		public void applyStyles(TextStyle textStyle) {
+			// No specific style
+		}
+	};
 
-    private final Styler underlineStyler= new Styler() {
-        @Override
-        public void applyStyles(TextStyle style) {
-            style.underline= true;
-        }
-    };
+	private final Styler underlineStyler= new Styler() {
+		@Override
+		public void applyStyles(TextStyle style) {
+			style.underline= true;
+		}
+	};
 
-    ChooseRefactoringWizardPage() {
-        super("Choose refactorings..."); //$NON-NLS-1$
-        setTitle("Choose refactorings..."); //$NON-NLS-1$
-        setDescription("Choose the refactorings to perform automatically"); //$NON-NLS-1$
-    }
+	ChooseRefactoringWizardPage() {
+		super("Choose cleanups..."); //$NON-NLS-1$
+		setTitle("Choose cleanups..."); //$NON-NLS-1$
+		setDescription("Choose the refactorings to perform automatically"); //$NON-NLS-1$
+	}
 
-    /**
-     * Returns the cleanups (selected by the user) to apply to the selected
-     * elements.
-     *
-     * @return the cleanups (selected by the user) to apply to the selected
-     *         elements
-     */
-    public List<RefactoringRule> getSelectedRefactorings() {
-        final List<RefactoringRule> results= new ArrayList<>();
-        for (Object o : tableViewer.getCheckedElements()) {
-            results.add((RefactoringRule) o);
-        }
+	/**
+	 * Returns the cleanups (selected by the user) to apply to the selected
+	 * elements.
+	 *
+	 * @return the cleanups (selected by the user) to apply to the selected
+	 *         elements
+	 */
+	public List<RefactoringRule> getSelectedRefactorings() {
+		final List<RefactoringRule> results= new ArrayList<>();
+		for (Object o : tableViewer.getCheckedElements()) {
+			results.add((RefactoringRule) o);
+		}
 
-        return results;
-    }
+		return results;
+	}
 
-    /**
-     * create the control.
-     *
-     * @param parent The parent
-     */
-    public void createControl(Composite parent) {
-        parent.setLayout(new GridLayout());
+	/**
+	 * create the control.
+	 *
+	 * @param parent The parent
+	 */
+	@Override
+	public void createControl(Composite parent) {
+		parent.setLayout(new GridLayout());
 
-        createFilterText(parent);
-        createSelectAllCheckbox(parent);
-        createRefactoringsTable(parent);
+		createFilterText(parent);
+		createSelectAllCheckbox(parent);
+		createRefactoringsTable(parent);
 
-        // Required to avoid an error in the system
-        setControl(parent);
-        // Allows to click the "Finish" button
-        setPageComplete(true);
-    }
+		// Required to avoid an error in the system
+		setControl(parent);
+		// Allows to click the "Finish" button
+		setPageComplete(true);
+	}
 
-    private void createFilterText(Composite parent) {
-        filterText= new Text(parent, BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
-        filterText.setMessage("Type in to filter refactorings"); //$NON-NLS-1$
-        filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+	private void createFilterText(Composite parent) {
+		filterText= new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
+		filterText.setMessage("Type in to filter refactorings"); //$NON-NLS-1$
+		filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        filterText.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent event) {
-                // Trigger a call to StyledCellLabelProvider.update()
-                tableViewer.refresh(true);
-            }
-        });
-    }
+		filterText.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent event) {
+				// Trigger a call to StyledCellLabelProvider.update()
+				tableViewer.refresh(true);
+			}
+		});
+	}
 
-    private void createSelectAllCheckbox(Composite parent) {
-        selectAllVisibleCheckbox= new Button(parent, CHECK);
-        selectAllVisibleCheckbox.setText("Toggle all the visible refactorings"); //$NON-NLS-1$
-        selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                final Object[] visibleElements= filter(tableViewer, tableViewer.getInput());
-                for (Object element : visibleElements) {
-                    setChecked(element, selectAllVisibleCheckbox.getSelection());
-                }
-            }
+	private void createSelectAllCheckbox(Composite parent) {
+		selectAllVisibleCheckbox= new Button(parent, SWT.CHECK);
+		selectAllVisibleCheckbox.setText("Toggle all the visible refactorings"); //$NON-NLS-1$
+		selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				final Object[] visibleElements= filter(tableViewer, tableViewer.getInput());
+				for (Object element : visibleElements) {
+					setChecked(element, selectAllVisibleCheckbox.getSelection());
+				}
+			}
 
-            private Object[] filter(StructuredViewer viewer, Object input) {
-                try {
-                    final Class<StructuredViewer> clazz= StructuredViewer.class;
-                    Method m= clazz.getDeclaredMethod("filter", Object[].class); //$NON-NLS-1$
-                    m.setAccessible(true);
-                    return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
-                } catch (Exception e) {
-                    throw new UnhandledException(null, e);
-                }
-            }
-        });
-    }
+			private Object[] filter(StructuredViewer viewer, Object input) {
+				try {
+					final Class<StructuredViewer> clazz= StructuredViewer.class;
+					Method m= clazz.getDeclaredMethod("filter", Object[].class); //$NON-NLS-1$
+					m.setAccessible(true);
+					return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
+				} catch (Exception e) {
+					throw new UnhandledException(null, e);
+				}
+			}
+		});
+	}
 
-    private void setChecked(Object element, boolean isChecked) {
-        checkedState.put(element, isChecked);
-        tableViewer.setChecked(element, isChecked);
-    }
+	private void setChecked(Object element, boolean isChecked) {
+		checkedState.put(element, isChecked);
+		tableViewer.setChecked(element, isChecked);
+	}
 
-    private void createRefactoringsTable(Composite parent) {
-        tableViewer= newCheckList(parent, BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
-        createColumns(tableViewer);
-        tableViewer.setContentProvider(new ArrayContentProvider());
-        final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
-        tableViewer.setInput(refactorings);
-        tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
-        tableViewer.setComparator(new ViewerComparator() {
-            @Override
-            public int compare(Viewer viewer, Object o1, Object o2) {
-                return ((RefactoringRule) o1).getName().compareTo(((RefactoringRule) o2).getName());
-            }
-        });
-        tableViewer.addFilter(new ViewerFilter() {
-            @Override
-            public boolean select(Viewer viewer, Object parentElement, Object refactoring) {
-                final String filter= filterText.getText().toLowerCase();
-                final RefactoringRule rule= (RefactoringRule) refactoring;
-                final String description= rule.getDescription().toLowerCase();
-                final String name= rule.getName().toLowerCase();
-                return description.contains(filter) || name.contains(filter);
-            }
-        });
-        ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
-        tableViewer.setLabelProvider(new StyledCellLabelProvider() {
-            @Override
-            public void update(ViewerCell cell) {
-                final String filter= filterText.getText().toLowerCase();
-                final String name= ((RefactoringRule) cell.getElement()).getName();
-                cell.setText(name);
-                cell.setStyleRanges(getStyleRanges(name, filter));
-            }
+	private void createRefactoringsTable(Composite parent) {
+		tableViewer= CheckboxTableViewer.newCheckList(parent, SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
+		createColumns(tableViewer);
+		tableViewer.setContentProvider(new ArrayContentProvider());
+		final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
+		tableViewer.setInput(refactorings);
+		tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
+		tableViewer.setComparator(new ViewerComparator() {
+			@Override
+			public int compare(Viewer viewer, Object o1, Object o2) {
+				return ((RefactoringRule) o1).getName().compareTo(((RefactoringRule) o2).getName());
+			}
+		});
+		tableViewer.addFilter(new ViewerFilter() {
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object refactoring) {
+				final String filter= filterText.getText().toLowerCase();
+				final RefactoringRule rule= (RefactoringRule) refactoring;
+				final String description= rule.getDescription().toLowerCase();
+				final String name= rule.getName().toLowerCase();
+				return description.contains(filter) || name.contains(filter);
+			}
+		});
+		ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
+		tableViewer.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				final String filter= filterText.getText().toLowerCase();
+				final String name= ((RefactoringRule) cell.getElement()).getName();
+				cell.setText(name);
+				cell.setStyleRanges(getStyleRanges(name, filter));
+			}
 
-            private StyleRange[] getStyleRanges(String text, String filter) {
-                final int matchIndex= text.toLowerCase().indexOf(filter);
-                final int matchLength= filter.length();
-                if (matchIndex != -1 && matchLength != 0) {
-                    final StyledString styledString= new StyledString(text, defaultStyler);
-                    styledString.setStyle(matchIndex, matchLength, underlineStyler);
-                    return styledString.getStyleRanges();
-                }
+			private StyleRange[] getStyleRanges(String text, String filter) {
+				final int matchIndex= text.toLowerCase().indexOf(filter);
+				final int matchLength= filter.length();
+				if (matchIndex != -1 && matchLength != 0) {
+					final StyledString styledString= new StyledString(text, defaultStyler);
+					styledString.setStyle(matchIndex, matchLength, underlineStyler);
+					return styledString.getStyleRanges();
+				}
 
-                return null;
-            }
+				return null;
+			}
 
-            @Override
-            public String getToolTipText(Object refactoring) {
-                RefactoringRule refactoringRule= (RefactoringRule) refactoring;
-                return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason(); //$NON-NLS-1$
-            }
+			@Override
+			public String getToolTipText(Object refactoring) {
+				RefactoringRule refactoringRule= (RefactoringRule) refactoring;
+				return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason(); //$NON-NLS-1$
+			}
 
-            @Override
-            public Point getToolTipShift(Object object) {
-                return new Point(10, 20);
-            }
-        });
+			@Override
+			public Point getToolTipShift(Object object) {
+				return new Point(10, 20);
+			}
+		});
 
-        final Table table= tableViewer.getTable();
-        table.setLinesVisible(false);
-        table.addListener(SWT.EraseItem, new Listener() {
-            public void handleEvent(Event event) {
-                if ((event.detail & SWT.SELECTED) != 0) {
-                    event.detail&= ~SWT.SELECTED;
-                }
-            }
-        });
-        table.addListener(SWT.MouseDown, new Listener() {
-            public void handleEvent(Event event) {
-                Point pt= new Point(event.x, event.y);
-                TableItem item= table.getItem(pt);
+		final Table table= tableViewer.getTable();
+		table.setLinesVisible(false);
+		table.addListener(SWT.EraseItem, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if ((event.detail & SWT.SELECTED) != 0) {
+					event.detail&= ~SWT.SELECTED;
+				}
+			}
+		});
+		table.addListener(SWT.MouseDown, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				Point pt= new Point(event.x, event.y);
+				TableItem item= table.getItem(pt);
 
-                if (item == null) {
-                    return;
-                }
+				if (item == null) {
+					return;
+				}
 
-                int index= table.indexOf(item);
-                Object element= tableViewer.getElementAt(index);
-                tableViewer.setChecked(element, !tableViewer.getChecked(element));
-            }
-        });
-        table.addListener(SWT.MouseDoubleClick, new Listener() {
-            public void handleEvent(Event event) {
-                Point pt= new Point(event.x, event.y);
-                TableItem item= table.getItem(pt);
+				int index= table.indexOf(item);
+				Object element= tableViewer.getElementAt(index);
+				tableViewer.setChecked(element, !tableViewer.getChecked(element));
+			}
+		});
+		table.addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				Point pt= new Point(event.x, event.y);
+				TableItem item= table.getItem(pt);
 
-                if (item == null) {
-                    return;
-                }
+				if (item == null) {
+					return;
+				}
 
-                int index= table.indexOf(item);
-                Object element= tableViewer.getElementAt(index);
-                tableViewer.setCheckedElements(new Object[] { element });
+				int index= table.indexOf(item);
+				Object element= tableViewer.getElementAt(index);
+				tableViewer.setCheckedElements(new Object[] { element });
 
-                ChooseRefactoringWizardPage.this.getWizard().performFinish();
-                ((WizardDialog) ChooseRefactoringWizardPage.this.getWizard().getContainer()).close();
-            }
-        });
-        tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
-        packColumns(table);
-        table.setFocus();
-    }
+				ChooseRefactoringWizardPage.this.getWizard().performFinish();
+				((WizardDialog) ChooseRefactoringWizardPage.this.getWizard().getContainer()).close();
+			}
+		});
+		tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
+		packColumns(table);
+		table.setFocus();
+	}
 
-    private void createColumns(final TableViewer tableViewer) {
-        TableViewerColumn refactoringColumn= createTableViewerColumn(tableViewer);
-        refactoringColumn.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return ((RefactoringRule) element).getName();
-            }
-        });
-    }
+	private void createColumns(final TableViewer tableViewer) {
+		TableViewerColumn refactoringColumn= createTableViewerColumn(tableViewer);
+		refactoringColumn.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((RefactoringRule) element).getName();
+			}
+		});
+	}
 
-    private TableViewerColumn createTableViewerColumn(TableViewer tableViewer) {
-        final TableViewerColumn viewerColumn= new TableViewerColumn(tableViewer, SWT.NONE);
-        final TableColumn column= viewerColumn.getColumn();
-        column.setResizable(true);
-        column.setMoveable(true);
-        return viewerColumn;
-    }
+	private TableViewerColumn createTableViewerColumn(TableViewer tableViewer) {
+		final TableViewerColumn viewerColumn= new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn column= viewerColumn.getColumn();
+		column.setResizable(true);
+		column.setMoveable(true);
+		return viewerColumn;
+	}
 
-    private void packColumns(final Table table) {
-        final int length= table.getColumns().length;
-        for (int i= 0; i < length; i++) {
-            table.getColumn(i).pack();
-        }
-    }
+	private void packColumns(final Table table) {
+		final int length= table.getColumns().length;
+		for (int i= 0; i < length; i++) {
+			table.getColumn(i).pack();
+		}
+	}
 
-    @Override
-    public void dispose() {
-        checkedState.clear();
-        filterText.dispose();
-        tableViewer.getTable().dispose();
-        selectAllVisibleCheckbox.dispose();
-        super.dispose();
-    }
+	@Override
+	public void dispose() {
+		checkedState.clear();
+		filterText.dispose();
+		tableViewer.getTable().dispose();
+		selectAllVisibleCheckbox.dispose();
+		super.dispose();
+	}
 }

@@ -32,161 +32,161 @@ import org.eclipse.jdt.core.dom.Expression;
 
 /** Builder for a {@link CFGEdge}. */
 public class CFGEdgeBuilder {
-    private Expression condition;
-    /** TODO JNR rename. */
-    private boolean evaluationResult;
-    private final CFGBasicBlock sourceBlock;
-    private CFGBasicBlock targetBlock;
-    /**
-     * Marks a "jumping" edge: and edge built because of an exception escaping a try
-     * statement.
-     */
-    private boolean jumping;
-    /** Prevents building twice. */
-    private CFGEdge built;
+	private Expression condition;
+	/** TODO JNR rename. */
+	private boolean evaluationResult;
+	private final CFGBasicBlock sourceBlock;
+	private CFGBasicBlock targetBlock;
+	/**
+	 * Marks a "jumping" edge: and edge built because of an exception escaping a try
+	 * statement.
+	 */
+	private boolean jumping;
+	/** Prevents building twice. */
+	private CFGEdge built;
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param sourceBlock the edge source block
-     */
-    public CFGEdgeBuilder(final CFGBasicBlock sourceBlock) {
-        this(null, false, sourceBlock);
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param sourceBlock the edge source block
+	 */
+	public CFGEdgeBuilder(final CFGBasicBlock sourceBlock) {
+		this(null, false, sourceBlock);
+	}
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param condition        the decision condition that led to the creation of
-     *                         this edge.
-     * @param evaluationResult the condition evaluation result
-     * @param sourceBlock      the edge source block
-     */
-    public CFGEdgeBuilder(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock) {
-        this.condition= condition;
-        this.evaluationResult= evaluationResult;
-        this.sourceBlock= sourceBlock;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param condition        the decision condition that led to the creation of
+	 *                         this edge.
+	 * @param evaluationResult the condition evaluation result
+	 * @param sourceBlock      the edge source block
+	 */
+	public CFGEdgeBuilder(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock) {
+		this.condition= condition;
+		this.evaluationResult= evaluationResult;
+		this.sourceBlock= sourceBlock;
+	}
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param throwingBlock a block throwing an exception
-     * @param jumping       marks a "jumping" edge: and edge built because of an
-     *                      exception escaping a try statement
-     */
-    public CFGEdgeBuilder(final CFGBasicBlock throwingBlock, final boolean jumping) {
-        this.sourceBlock= throwingBlock;
-        this.jumping= jumping;
-    }
+	/**
+	 * Builds an instance of this class.
+	 *
+	 * @param throwingBlock a block throwing an exception
+	 * @param jumping       marks a "jumping" edge: and edge built because of an
+	 *                      exception escaping a try statement
+	 */
+	public CFGEdgeBuilder(final CFGBasicBlock throwingBlock, final boolean jumping) {
+		this.sourceBlock= throwingBlock;
+		this.jumping= jumping;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        final CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
-        return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
-                && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
+		return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
+				&& Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
+	}
 
-    /**
-     * Sets the target block of the edge.
-     *
-     * @param targetBlock the target block of the edge
-     * @return the current object
-     */
-    public CFGEdgeBuilder withTarget(final CFGBasicBlock targetBlock) {
-        this.targetBlock= targetBlock;
-        return this;
-    }
+	/**
+	 * Sets the target block of the edge.
+	 *
+	 * @param targetBlock the target block of the edge
+	 * @return the current object
+	 */
+	public CFGEdgeBuilder withTarget(final CFGBasicBlock targetBlock) {
+		this.targetBlock= targetBlock;
+		return this;
+	}
 
-    /**
-     * Validates the content of this builder and then builds a {@link CFGEdge} with
-     * it. This method can only be invoked once.
-     *
-     * @return a new {@link CFGEdge} with the content from this builder.
-     */
-    public CFGEdge build() {
-        if (sourceBlock == null) {
-            throw new IllegalStateException(this.condition, "sourceBlock is mandatory"); //$NON-NLS-1$
-        }
-        if (targetBlock == null) {
-            throw new IllegalStateException(this.condition, "targetBlock is mandatory"); //$NON-NLS-1$
-        }
-        if (built != null) {
-            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        if (condition != null) {
-            built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
-        } else {
-            built= buildEdge(sourceBlock, targetBlock);
-        }
+	/**
+	 * Validates the content of this builder and then builds a {@link CFGEdge} with
+	 * it. This method can only be invoked once.
+	 *
+	 * @return a new {@link CFGEdge} with the content from this builder.
+	 */
+	public CFGEdge build() {
+		if (sourceBlock == null) {
+			throw new IllegalStateException(this.condition, "sourceBlock is mandatory"); //$NON-NLS-1$
+		}
+		if (targetBlock == null) {
+			throw new IllegalStateException(this.condition, "targetBlock is mandatory"); //$NON-NLS-1$
+		}
+		if (built != null) {
+			throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (condition != null) {
+			built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
+		} else {
+			built= buildEdge(sourceBlock, targetBlock);
+		}
 
-        return built;
-    }
+		return built;
+	}
 
-    /**
-     * Factory method building a CFGEdge with the provided arguments.
-     *
-     * @param sourceBlock the source block of the edge
-     * @param targetBlock the target block of the edge
-     * @return a new {@link CFGEdge}
-     */
-    public static CFGEdge buildEdge(final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
-        return buildEdge(null, true, sourceBlock, targetBlock);
-    }
+	/**
+	 * Factory method building a CFGEdge with the provided arguments.
+	 *
+	 * @param sourceBlock the source block of the edge
+	 * @param targetBlock the target block of the edge
+	 * @return a new {@link CFGEdge}
+	 */
+	public static CFGEdge buildEdge(final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
+		return buildEdge(null, true, sourceBlock, targetBlock);
+	}
 
-    /**
-     * Factory method building a CFGEdge with the provided arguments.
-     *
-     * @param condition   the decision condition that led to the creation of this
-     *                    edge.
-     * @param sourceBlock the source block of the edge
-     * @param targetBlock the target block of the edge
-     * @return a new {@link CFGEdge}
-     */
-    public static CFGEdge buildEdge(final Expression condition, final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
-        return buildEdge(condition, true, sourceBlock, targetBlock);
-    }
+	/**
+	 * Factory method building a CFGEdge with the provided arguments.
+	 *
+	 * @param condition   the decision condition that led to the creation of this
+	 *                    edge.
+	 * @param sourceBlock the source block of the edge
+	 * @param targetBlock the target block of the edge
+	 * @return a new {@link CFGEdge}
+	 */
+	public static CFGEdge buildEdge(final Expression condition, final CFGBasicBlock sourceBlock, final CFGBasicBlock targetBlock) {
+		return buildEdge(condition, true, sourceBlock, targetBlock);
+	}
 
-    /**
-     * Factory method building a CFGEdge with the provided arguments.
-     *
-     * @param condition        the decision condition that led to the creation of
-     *                         this edge.
-     * @param evaluationResult the condition evaluation result
-     * @param sourceBlock      the source block of the edge
-     * @param targetBlock      the target block of the edge
-     * @return a new {@link CFGEdge}
-     */
-    public static CFGEdge buildEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
-            final CFGBasicBlock targetBlock) {
-        final CFGEdge edge= new CFGEdge(condition, evaluationResult, sourceBlock, targetBlock);
-        sourceBlock.addOutgoingEdge(edge);
-        targetBlock.addIncomingEdge(edge);
-        return edge;
-    }
+	/**
+	 * Factory method building a CFGEdge with the provided arguments.
+	 *
+	 * @param condition        the decision condition that led to the creation of
+	 *                         this edge.
+	 * @param evaluationResult the condition evaluation result
+	 * @param sourceBlock      the source block of the edge
+	 * @param targetBlock      the target block of the edge
+	 * @return a new {@link CFGEdge}
+	 */
+	public static CFGEdge buildEdge(final Expression condition, final boolean evaluationResult, final CFGBasicBlock sourceBlock,
+			final CFGBasicBlock targetBlock) {
+		CFGEdge edge= new CFGEdge(condition, evaluationResult, sourceBlock, targetBlock);
+		sourceBlock.addOutgoingEdge(edge);
+		targetBlock.addIncomingEdge(edge);
+		return edge;
+	}
 
-    @Override
-    public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE_BUILDER["); //$NON-NLS-1$
-        this.sourceBlock.appendDotNodeLabel(sb);
-        sb.append(" -> "); //$NON-NLS-1$
-        if (this.targetBlock != null) {
-            this.targetBlock.appendDotNodeLabel(sb);
-        } else {
-            sb.append("?"); //$NON-NLS-1$
-        }
+	@Override
+	public String toString() {
+		StringBuilder sb= new StringBuilder("EDGE_BUILDER["); //$NON-NLS-1$
+		this.sourceBlock.appendDotNodeLabel(sb);
+		sb.append(" -> "); //$NON-NLS-1$
+		if (this.targetBlock != null) {
+			this.targetBlock.appendDotNodeLabel(sb);
+		} else {
+			sb.append("?"); //$NON-NLS-1$
+		}
 
-        return sb.append("]").toString(); //$NON-NLS-1$
-    }
+		return sb.append("]").toString(); //$NON-NLS-1$
+	}
 }

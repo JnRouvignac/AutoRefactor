@@ -45,12 +45,14 @@ public class Java7HashRatherThanEclipseJava6HashSample {
         private short innerShort;
         private float innerFloat;
         private double innerOtherDouble;
+        private Boolean innerBooleanWrapper;
 
         @Override
         public int hashCode() {
             // Keep this comment
             final int prime = 31;
             int result = 1;
+            result = prime * result + getEnclosingInstance().hashCode();
             result = prime * result + (RefactoredClass.this.innerBoolean ? 1231 : 1237);
             result = prime * result + this.innerByte;
             result = prime * result + innerChar;
@@ -66,7 +68,29 @@ public class Java7HashRatherThanEclipseJava6HashSample {
             result = prime * result + innerShort;
             result = prime * result + ((innerText == null) ? 0 : innerText.hashCode());
             result = prime * result + ((innerTextById != null) ? this.innerTextById.hashCode() : 0);
+            result = prime * result + ((this.innerBooleanWrapper != null) ? innerBooleanWrapper.hashCode() : 0);
             return prime * result + Arrays.hashCode(innerTexts);
+        }
+
+        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+            return Java7HashRatherThanEclipseJava6HashSample.this;
+        }
+    }
+
+    public class DoNotRefactorNewClass {
+        private boolean innerBoolean;
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getEnclosingInstance().hashCode();
+            result = prime * result + (innerBoolean ? 1231 : 1237);
+            return result;
+        }
+
+        private Java7HashRatherThanEclipseJava6HashSample getEnclosingInstance() {
+            return new Java7HashRatherThanEclipseJava6HashSample();
         }
     }
 

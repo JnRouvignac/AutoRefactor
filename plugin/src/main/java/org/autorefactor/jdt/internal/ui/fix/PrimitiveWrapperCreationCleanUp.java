@@ -30,6 +30,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.Objects;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -40,208 +41,194 @@ import org.eclipse.jdt.core.dom.SimpleName;
 
 /** See {@link #getDescription()} method. */
 public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
+	}
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (node.getExpression() == null) {
+			return true;
+		}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (node.getExpression() == null) {
-            return true;
-        }
+		ITypeBinding destinationTypeBinding= ASTNodes.getTargetType(node);
 
-        ITypeBinding destinationTypeBinding= ASTNodes.getTargetType(node);
+		if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
+				&& "valueOf".equals(node.getName().getIdentifier())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
+				replaceWithTheSingleArgument(node);
+				return false;
+			}
 
-        if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
-                && "valueOf".equals(node.getName().getIdentifier())) { //$NON-NLS-1$
-            if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                    || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
-                replaceWithTheSingleArgument(node);
-                return false;
-            }
+			if (is(node, Byte.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseByte"); //$NON-NLS-1$
+			}
 
-            if (is(node, Byte.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseByte"); //$NON-NLS-1$
-            }
+			if (is(node, Short.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseShort"); //$NON-NLS-1$
+			}
 
-            if (is(node, Short.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseShort"); //$NON-NLS-1$
-            }
+			if (is(node, Integer.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseInt"); //$NON-NLS-1$
+			}
 
-            if (is(node, Integer.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseInt"); //$NON-NLS-1$
-            }
+			if (is(node, Long.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseLong"); //$NON-NLS-1$
+			}
 
-            if (is(node, Long.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseLong"); //$NON-NLS-1$
-            }
+			if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
+				return replaceMethodName(node, "parseBoolean"); //$NON-NLS-1$
+			}
 
-            if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
-                return replaceMethodName(node, "parseBoolean"); //$NON-NLS-1$
-            }
+			if (is(node, Float.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseFloat"); //$NON-NLS-1$
+			}
 
-            if (is(node, Float.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseFloat"); //$NON-NLS-1$
-            }
+			if (is(node, Double.class.getCanonicalName())) {
+				return replaceMethodName(node, "parseDouble"); //$NON-NLS-1$
+			}
+		}
 
-            if (is(node, Double.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseDouble"); //$NON-NLS-1$
-            }
-        }
+		ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
+		ClassInstanceCreation classInstanceCreation= ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
 
-        final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-        ClassInstanceCreation classInstanceCreation= ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
+		if (typeBinding != null && classInstanceCreation != null) {
+			List<?> cicArgs= classInstanceCreation.arguments();
 
-        if (typeBinding != null && classInstanceCreation != null) {
-            final List<Expression> cicArgs= ASTNodes.arguments(classInstanceCreation);
+			if (cicArgs.size() == 1) {
+				Expression arg0= (Expression) cicArgs.get(0);
 
-            if (cicArgs.size() == 1) {
-                final Expression arg0= cicArgs.get(0);
-                if (ASTNodes.arguments(node).isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
-                    final String methodName= getMethodName(typeBinding.getQualifiedName(),
-                            node.getName().getIdentifier());
+				if (node.arguments().isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
+					String methodName= getMethodName(typeBinding.getQualifiedName(),
+							node.getName().getIdentifier());
 
-                    if (methodName != null) {
-                        ctx.getRefactorings().replace(node,
-                                newMethodInvocation(typeBinding.getName(), methodName, arg0));
-                        return false;
-                    }
-                }
-            }
-        }
+					if (methodName != null) {
+						cuRewrite.getASTRewrite().replace(node,
+								newMethodInvocation(typeBinding.getName(), methodName, arg0), null);
+						return false;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
-        return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-                        && Objects.equals(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue());
-    }
+	private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
+		return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+				|| (ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
+						&& Objects.equals(10, ((Expression) node.arguments().get(1)).resolveConstantExpressionValue()));
+	}
 
-    private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
-        final SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
-        this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
-        return false;
-    }
+	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
+		SimpleName name= cuRewrite.getASTBuilder().simpleName(methodName);
+		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, null);
+		return false;
+	}
 
-    private void replaceWithTheSingleArgument(final MethodInvocation node) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.createMoveTarget(ASTNodes.arguments(node).get(0)));
-    }
+	private void replaceWithTheSingleArgument(final MethodInvocation node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), null);
+	}
 
-    private String getMethodName(final String typeName, final String invokedMethodName) {
-        if (Boolean.class.getCanonicalName().equals(typeName) && "booleanValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "valueOf"; //$NON-NLS-1$
-        }
+	private String getMethodName(final String typeName, final String invokedMethodName) {
+		if (Boolean.class.getCanonicalName().equals(typeName) && "booleanValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "valueOf"; //$NON-NLS-1$
+		}
 
-        if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseByte"; //$NON-NLS-1$
-        }
+		if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseByte"; //$NON-NLS-1$
+		}
 
-        if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseDouble"; //$NON-NLS-1$
-        }
+		if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseDouble"; //$NON-NLS-1$
+		}
 
-        if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseFloat"; //$NON-NLS-1$
-        }
+		if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseFloat"; //$NON-NLS-1$
+		}
 
-        if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseLong"; //$NON-NLS-1$
-        }
+		if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseLong"; //$NON-NLS-1$
+		}
 
-        if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseShort"; //$NON-NLS-1$
-        }
+		if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseShort"; //$NON-NLS-1$
+		}
 
-        if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
-            return "parseInt"; //$NON-NLS-1$
-        }
+		if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseInt"; //$NON-NLS-1$
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public boolean visit(final ClassInstanceCreation node) {
-        final ITypeBinding typeBinding= node.getType().resolveBinding();
-        final List<Expression> args= ASTNodes.arguments(node);
+	@Override
+	public boolean visit(final ClassInstanceCreation node) {
+		ITypeBinding typeBinding= node.getType().resolveBinding();
+		@SuppressWarnings("unchecked")
+		List<Expression> args= node.arguments();
 
-        if (getJavaMinorVersion() >= 5 && args.size() == 1) {
-            if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
-                    Long.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName())) {
-                replaceWithValueOf(node, typeBinding);
-                return false;
-            }
+		if (getJavaMinorVersion() >= 5 && args.size() == 1) {
+			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
+					Long.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName())) {
+				replaceWithValueOf(node, typeBinding);
+				return false;
+			}
 
-            if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
-                replaceFloatInstanceWithValueOf(node, typeBinding, args);
-                return false;
-            }
-        }
+			if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
+				replaceFloatInstanceWithValueOf(node, typeBinding, args);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding,
-            final List<Expression> args) {
-        final Expression arg0= args.get(0);
+	private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding,
+			final List<Expression> args) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node,
-                    b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.createMoveTarget(arg0)))); //$NON-NLS-1$
-        } else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-            final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke(b.createMoveTarget(arg0), "floatValue")); //$NON-NLS-1$
-        } else {
-            replaceWithValueOf(node, typeBinding);
-        }
-    }
+		Expression arg0= args.get(0);
 
-    private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
-        this.ctx.getRefactorings().replace(node,
-                newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
-    }
+		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
+			rewrite.replace(node,
+					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), null); //$NON-NLS-1$
+		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
+			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), null); //$NON-NLS-1$
+		} else {
+			replaceWithValueOf(node, typeBinding);
+		}
+	}
 
-    private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        return b.invoke(typeName, methodName, b.createMoveTarget(arg));
-    }
+	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
+		cuRewrite.getASTRewrite().replace(node,
+				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), null); //$NON-NLS-1$
+	}
+
+	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
+	}
 }

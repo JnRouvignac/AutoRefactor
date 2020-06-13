@@ -36,70 +36,55 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final VariableDeclarationStatement node) {
-        if (node.fragments() != null && node.fragments().size() == 1) {
-            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+	@Override
+	public boolean visit(final VariableDeclarationStatement node) {
+		if (node.fragments() != null && node.fragments().size() == 1) {
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
-            if (fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-                final SimpleName varName= fragment.getName();
-                final IVariableBinding variable= fragment.resolveBinding();
-                Statement stmtToInspect= ASTNodes.getNextSibling(node);
-                boolean isOverridden= false;
-                boolean isRead= false;
+			if (fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+				SimpleName varName= fragment.getName();
+				IVariableBinding variable= fragment.resolveBinding();
+				Statement stmtToInspect= ASTNodes.getNextSibling(node);
+				boolean isOverridden= false;
+				boolean isRead= false;
 
-                while (stmtToInspect != null && !isOverridden && !isRead) {
-                    final Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
+				while (stmtToInspect != null && !isOverridden && !isRead) {
+					Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
 
-                    if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
-                        if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
-                            isOverridden= true;
-                        } else {
-                            isRead= true;
-                        }
-                    }
+					if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
+						if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+							isOverridden= true;
+						} else {
+							isRead= true;
+						}
+					}
 
-                    isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty();
-                    stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
-                }
+					isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty();
+					stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
+				}
 
-                if (isOverridden && !isRead) {
-                    ctx.getRefactorings().remove(fragment.getInitializer());
-                    return false;
-                }
-            }
-        }
+				if (isOverridden && !isRead) {
+					cuRewrite.getASTRewrite().remove(fragment.getInitializer(), null);
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

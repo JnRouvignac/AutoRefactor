@@ -56,127 +56,116 @@ import org.eclipse.jdt.core.search.SearchRequestor;
  * @see #getDescription()
  */
 public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodDeclaration node) {
-        if (node.getBody() == null) {
-            return true;
-        }
+	@Override
+	public boolean visit(final MethodDeclaration node) {
+		if (node.getBody() == null) {
+			return true;
+		}
 
-        final List<Statement> bodyStatements= ASTNodes.statements(node.getBody());
+		@SuppressWarnings("unchecked")
+		List<Statement> bodyStatements= node.getBody().statements();
 
-        if (bodyStatements.size() == 1) {
-            final SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
+		if (bodyStatements.size() == 1) {
+			SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
 
-            if (bodyMi != null) {
-                final IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
-                final IMethodBinding declMethodBinding= node.resolveBinding();
+			if (bodyMi != null) {
+				IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
+				IMethodBinding declMethodBinding= node.resolveBinding();
 
-                if (declMethodBinding != null && bodyMethodBinding != null
-                        && declMethodBinding.overrides(bodyMethodBinding)
-                        && !hasSignificantAnnotations(declMethodBinding)
-                        && haveSameModifiers(bodyMethodBinding, declMethodBinding)
-                        && haveSameParameters(node, bodyMi)) {
-                    if (!Modifier.isProtected(declMethodBinding.getModifiers())
-                            || declaredInSamePackage(bodyMethodBinding, declMethodBinding)
-                            // protected also means package visibility, so check if it is required
-                            || !isMethodUsedInItsPackage(declMethodBinding, node)) {
-                        this.ctx.getRefactorings().remove(node);
-                        return false;
-                    }
-                }
-            }
-        }
+				if (declMethodBinding != null && bodyMethodBinding != null
+						&& declMethodBinding.overrides(bodyMethodBinding)
+						&& !hasSignificantAnnotations(declMethodBinding)
+						&& haveSameModifiers(bodyMethodBinding, declMethodBinding)
+						&& haveSameParameters(node, bodyMi)) {
+					if (!Modifier.isProtected(declMethodBinding.getModifiers())
+							|| declaredInSamePackage(bodyMethodBinding, declMethodBinding)
+							// protected also means package visibility, so check if it is required
+							|| !isMethodUsedInItsPackage(declMethodBinding, node)) {
+						cuRewrite.getASTRewrite().remove(node, null);
+						return false;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
-        final List<?> parameters= node.parameters();
+	private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
+		List<?> parameters= node.parameters();
 
-        for (int i= 0; i < node.parameters().size(); i++) {
-            final SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
-            final SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
+		for (int i= 0; i < node.parameters().size(); i++) {
+			SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
+			SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
 
-            if (paramExpression == null
-                    || !paramName.getName().getIdentifier().equals(paramExpression.getIdentifier())) {
-                return false;
-            }
-        }
+			if (paramExpression == null
+					|| !ASTNodes.isSameVariable(paramName.getName(), paramExpression)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /** This method is extremely expensive. */
-    private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration node) {
-        final IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
+	/** This method is extremely expensive. */
+	private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration node) {
+		IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
 
-        final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
-        final SearchRequestor requestor= new SearchRequestor() {
-            @Override
-            public void acceptSearchMatch(final SearchMatch match) {
-                methodIsUsedInPackage.set(true);
-            }
-        };
+		final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
+		SearchRequestor requestor= new SearchRequestor() {
+			@Override
+			public void acceptSearchMatch(final SearchMatch match) {
+				methodIsUsedInPackage.set(true);
+			}
+		};
 
-        try {
-            final SearchEngine searchEngine= new SearchEngine();
-            searchEngine.search(SearchPattern.createPattern(methodBinding.getJavaElement(), IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH),
-                    new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
-                    SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
-                    requestor, ctx.getProgressMonitor());
-            return methodIsUsedInPackage.get();
-        } catch (CoreException e) {
-            throw new UnhandledException(node, e);
-        }
-    }
+		try {
+			SearchEngine searchEngine= new SearchEngine();
+			searchEngine.search(SearchPattern.createPattern(methodBinding.getJavaElement(), IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH),
+					new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
+					SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
+					requestor, cuRewrite.getProgressMonitor());
+			return methodIsUsedInPackage.get();
+		} catch (CoreException e) {
+			throw new UnhandledException(node, e);
+		}
+	}
 
-    private boolean declaredInSamePackage(final IMethodBinding methodBinding1, final IMethodBinding methodBinding2) {
-        final ITypeBinding declaringClass1= methodBinding1.getDeclaringClass();
-        final ITypeBinding declaringClass2= methodBinding2.getDeclaringClass();
-        return declaringClass1.getPackage().equals(declaringClass2.getPackage());
-    }
+	private boolean declaredInSamePackage(final IMethodBinding methodBinding1, final IMethodBinding methodBinding2) {
+		ITypeBinding declaringClass1= methodBinding1.getDeclaringClass();
+		ITypeBinding declaringClass2= methodBinding2.getDeclaringClass();
+		return declaringClass1.getPackage().equals(declaringClass2.getPackage());
+	}
 
-    private boolean haveSameModifiers(final IMethodBinding overriding, final IMethodBinding overridden) {
-        // UCDetector can suggest to reduce visibility where possible
-        return overriding.getModifiers() == overridden.getModifiers();
-    }
+	private boolean haveSameModifiers(final IMethodBinding overriding, final IMethodBinding overridden) {
+		// UCDetector can suggest to reduce visibility where possible
+		return overriding.getModifiers() == overridden.getModifiers();
+	}
 
-    private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
-        for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
-            final ITypeBinding annotationType= annotation.getAnnotationType();
+	private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
+		for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
+			ITypeBinding annotationType= annotation.getAnnotationType();
 
-            if (!ASTNodes.hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
-                return true;
-            }
-        }
+			if (!ASTNodes.hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

@@ -26,6 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -35,45 +38,35 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ClassInstanceCreation node) {
-        if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
-            final Expression arg0= ASTNodes.arguments(node).get(0);
-            if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
-                    && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
-                final ASTNodeFactory b= ctx.getASTBuilder();
-                ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.createMoveTarget(arg0)));
-                return false;
-            }
-        }
+	@Override
+	public boolean visit(final ClassInstanceCreation node) {
+		if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ((List<Expression>) node.arguments()).size() == 1) {
+			Expression arg0= ((List<Expression>) node.arguments()).get(0);
+			if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
+					&& (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        return true;
-    }
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

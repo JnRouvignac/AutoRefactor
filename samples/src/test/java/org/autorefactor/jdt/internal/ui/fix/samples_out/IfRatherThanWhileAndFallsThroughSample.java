@@ -53,7 +53,6 @@ public class IfRatherThanWhileAndFallsThroughSample {
         // Keep this comment
         if (isVisible) {
             if (i > 0) {
-            } else {
             }
         }
     }

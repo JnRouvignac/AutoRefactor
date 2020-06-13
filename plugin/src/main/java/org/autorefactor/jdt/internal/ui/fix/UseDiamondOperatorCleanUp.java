@@ -40,117 +40,107 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_reason;
+	}
 
-    @Override
-    public boolean isJavaVersionSupported(final Release javaSeRelease) {
-        return javaSeRelease.getMinorVersion() >= 7;
-    }
+	@Override
+	public boolean isJavaVersionSupported(final Release javaSeRelease) {
+		return javaSeRelease.getMinorVersion() >= 7;
+	}
 
-    @Override
-    public boolean visit(final ClassInstanceCreation node) {
-        final Type type= node.getType();
+	@Override
+	public boolean visit(final ClassInstanceCreation node) {
+		Type type= node.getType();
 
-        if (type.isParameterizedType()
-                && node.getAnonymousClassDeclaration() == null
-                && ASTNodes.getTargetType(node) != null
-                && canUseDiamondOperator(node, type)) {
-            final List<Type> typeArguments= ASTNodes.typeArguments((ParameterizedType) type);
+		if (type.isParameterizedType()
+				&& node.getAnonymousClassDeclaration() == null
+				&& ASTNodes.getTargetType(node) != null
+				&& canUseDiamondOperator(node, type)) {
+			@SuppressWarnings("unchecked")
+			List<Type> typeArguments= ((ParameterizedType) type).typeArguments();
 
-            if (!typeArguments.isEmpty()) {
-                this.ctx.getRefactorings().remove(typeArguments);
-                return false;
-            }
-        }
+			if (!typeArguments.isEmpty()) {
+				cuRewrite.getASTRewrite().remove(typeArguments, null);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * Tries to rebuild the process that leads to
-     * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
-     */
-    private boolean canUseDiamondOperator(final ClassInstanceCreation node, final Type type) {
-        List<Expression> args= ASTNodes.arguments(node);
-        if (args.isEmpty()) {
-            return true;
-        }
+	/**
+	 * Tries to rebuild the process that leads to
+	 * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
+	 */
+	private boolean canUseDiamondOperator(final ClassInstanceCreation node, final Type type) {
+		@SuppressWarnings("unchecked")
+		List<Expression> args= node.arguments();
+		if (args.isEmpty()) {
+			return true;
+		}
 
-        ITypeBinding typeBinding= type.resolveBinding();
-        IMethodBinding ctorBinding= node.resolveConstructorBinding();
+		ITypeBinding typeBinding= type.resolveBinding();
+		IMethodBinding ctorBinding= node.resolveConstructorBinding();
 
-        if (typeBinding == null || ctorBinding == null) {
-            return false;
-        }
+		if (typeBinding == null || ctorBinding == null) {
+			return false;
+		}
 
-        List<ITypeBinding> typeArguments= new ArrayList<>(Arrays.asList(typeBinding.getTypeArguments()));
-        ITypeBinding typeDecl= typeBinding.getTypeDeclaration();
-        List<ITypeBinding> typeParameters= new ArrayList<>(Arrays.asList(typeDecl.getTypeParameters()));
+		List<ITypeBinding> typeArguments= new ArrayList<>(Arrays.asList(typeBinding.getTypeArguments()));
+		ITypeBinding typeDecl= typeBinding.getTypeDeclaration();
+		List<ITypeBinding> typeParameters= new ArrayList<>(Arrays.asList(typeDecl.getTypeParameters()));
 
-        IMethodBinding methodDecl= ctorBinding.getMethodDeclaration();
-        ITypeBinding[] actualCtorParamTypes= ctorBinding.getParameterTypes();
-        ITypeBinding[] declMethodParamTypes= methodDecl.getParameterTypes();
-        int limit= Math.min(declMethodParamTypes.length, args.size());
+		IMethodBinding methodDecl= ctorBinding.getMethodDeclaration();
+		ITypeBinding[] actualCtorParamTypes= ctorBinding.getParameterTypes();
+		ITypeBinding[] declMethodParamTypes= methodDecl.getParameterTypes();
+		int limit= Math.min(declMethodParamTypes.length, args.size());
 
-        for (int i= 0; i < limit; i++) {
-            ITypeBinding declParamType= declMethodParamTypes[i];
-            ITypeBinding actualParamType= actualCtorParamTypes[i];
-            String actualParamTypeQName= actualParamType.getErasure().getQualifiedName();
-            Expression actualArg= args.get(i);
-            ITypeBinding actualArgType= ASTNodes.findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
+		for (int i= 0; i < limit; i++) {
+			ITypeBinding declParamType= declMethodParamTypes[i];
+			ITypeBinding actualParamType= actualCtorParamTypes[i];
+			String actualParamTypeQName= actualParamType.getErasure().getQualifiedName();
+			Expression actualArg= args.get(i);
+			ITypeBinding actualArgType= ASTNodes.findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
 
-            if (actualArgType != null && declParamType.isParameterizedType()) {
-                ITypeBinding[] declParamTypeArgs= declParamType.getTypeArguments();
-                ITypeBinding[] actualArgTypeArgs= actualArgType.getTypeArguments();
+			if (actualArgType != null && declParamType.isParameterizedType()) {
+				ITypeBinding[] declParamTypeArgs= declParamType.getTypeArguments();
+				ITypeBinding[] actualArgTypeArgs= actualArgType.getTypeArguments();
 
-                for (int j= 0; j < declParamTypeArgs.length; j++) {
-                    ITypeBinding declParamTypeArg= declParamTypeArgs[j];
+				for (int j= 0; j < declParamTypeArgs.length; j++) {
+					ITypeBinding declParamTypeArg= declParamTypeArgs[j];
 
-                    if (declParamTypeArg.isWildcardType() && actualArgTypeArgs.length != 0) {
-                        ITypeBinding declParamTypeArgBound= declParamTypeArg.getBound();
-                        int typeParamIndex= typeParameters.indexOf(declParamTypeArgBound);
+					if (declParamTypeArg.isWildcardType() && actualArgTypeArgs.length != 0) {
+						ITypeBinding declParamTypeArgBound= declParamTypeArg.getBound();
+						int typeParamIndex= typeParameters.indexOf(declParamTypeArgBound);
 
-                        ITypeBinding actualArgTypeArg= actualArgTypeArgs[j];
-                        int typeArgIndex= typeArguments.indexOf(actualArgTypeArg);
+						ITypeBinding actualArgTypeArg= actualArgTypeArgs[j];
+						int typeArgIndex= typeArguments.indexOf(actualArgTypeArg);
 
-                        if (typeParamIndex == -1 || typeArgIndex == -1) {
-                            return false;
-                        }
+						if (typeParamIndex == -1 || typeArgIndex == -1) {
+							return false;
+						}
 
-                        // The type parameter is matching
-                        typeParameters.remove(typeParamIndex);
-                        typeArguments.remove(typeArgIndex);
-                    }
-                }
-            }
-        }
+						// The type parameter is matching
+						typeParameters.remove(typeParamIndex);
+						typeArguments.remove(typeArgIndex);
+					}
+				}
+			}
+		}
 
-        // All the type parameters are matching
-        return typeParameters.isEmpty();
-    }
+		// All the type parameters are matching
+		return typeParameters.isEmpty();
+	}
 }

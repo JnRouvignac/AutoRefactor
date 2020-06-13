@@ -61,162 +61,149 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
  * TODO remove superfluous semi-colons in try-with-resources
  */
 public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final AnnotationTypeDeclaration node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final AnnotationTypeDeclaration node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    @Override
-    public boolean visit(final EnumDeclaration node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final EnumDeclaration node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    @Override
-    public boolean visit(final FieldDeclaration node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final FieldDeclaration node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    @Override
-    public boolean visit(final Initializer node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final Initializer node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    @Override
-    public boolean visit(final MethodDeclaration node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final MethodDeclaration node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    @Override
-    public boolean visit(final TypeDeclaration node) {
-        return visit((BodyDeclaration) node);
-    }
+	@Override
+	public boolean visit(final TypeDeclaration node) {
+		return visit((BodyDeclaration) node);
+	}
 
-    private boolean visit(final BodyDeclaration node) {
-        final BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
-        final ASTNode parent= node.getParent();
+	private boolean visit(final BodyDeclaration node) {
+		BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
+		ASTNode parent= node.getParent();
 
-        if (nextSibling != null) {
-            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
-        }
+		if (nextSibling != null) {
+			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
+		}
 
-        if (parent instanceof AbstractTypeDeclaration) {
-            final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
-            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
-        }
+		if (parent instanceof AbstractTypeDeclaration) {
+			AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
+			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
+		}
 
-        if (parent instanceof AnonymousClassDeclaration) {
-            final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
-            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
-        }
+		if (parent instanceof AnonymousClassDeclaration) {
+			AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
+			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
+		}
 
-        if (parent instanceof CompilationUnit) {
-            final CompilationUnit cu= (CompilationUnit) parent;
-            return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
-        }
+		if (parent instanceof CompilationUnit) {
+			CompilationUnit cu= (CompilationUnit) parent;
+			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
+		}
 
-        if (parent instanceof TypeDeclarationStatement) {
-            return true;
-        }
+		if (parent instanceof TypeDeclarationStatement) {
+			return true;
+		}
 
-        throw new NotImplementedException(node,
-                "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
-    }
+		throw new NotImplementedException(node,
+				"for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
+	}
 
-    private boolean maybeRemoveSuperfluousSemiColons(final ASTNode node, final int start, final int end) {
-        if (end <= start) {
-            return true;
-        }
+	private boolean maybeRemoveSuperfluousSemiColons(final ASTNode node, final int start, final int end) {
+		if (end <= start) {
+			return true;
+		}
 
-        boolean result= true;
-        final Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
+		boolean result= true;
+		Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
 
-        for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
-            final String s= entry.getKey();
-            final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s); //$NON-NLS-1$
+		for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
+			String s= entry.getKey();
+			Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s); //$NON-NLS-1$
 
-            while (m.find()) {
-                int startPos= entry.getValue().getStartPosition();
-                SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-                this.ctx.getRefactorings().remove(toRemove);
-                result= false;
-            }
-        }
+			while (m.find()) {
+				int startPos= entry.getValue().getStartPosition();
+				SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
+				cuRewrite.getASTRewrite().remove(toRemove);
+				result= false;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode node, final int start, final int end) {
-        final List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
+	private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode node, final int start, final int end) {
+		List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
 
-        final String source= ctx.getSource(node);
-        final LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<>();
-        if (comments.isEmpty()) {
-            putResult(source, start, end, results);
-        } else {
-            int nextStart= start;
-            for (Comment comment : comments) {
-                if (nextStart < comment.getStartPosition()) {
-                    putResult(source, nextStart, comment.getStartPosition(), results);
-                }
-                nextStart= SourceLocation.getEndPosition(comment);
-            }
-        }
+		String source= cuRewrite.getSource(node);
+		LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<>();
+		if (comments.isEmpty()) {
+			putResult(source, start, end, results);
+		} else {
+			int nextStart= start;
+			for (Comment comment : comments) {
+				if (nextStart < comment.getStartPosition()) {
+					putResult(source, nextStart, comment.getStartPosition(), results);
+				}
+				nextStart= SourceLocation.getEndPosition(comment);
+			}
+		}
 
-        return results;
-    }
+		return results;
+	}
 
-    private void putResult(final String source, final int start, final int end, final LinkedHashMap<String, SourceLocation> results) {
-        final SourceLocation sourceLoc= SourceLocation.fromPositions(start, end);
-        final String s= sourceLoc.substring(source);
-        results.put(s, sourceLoc);
-    }
+	private void putResult(final String source, final int start, final int end, final LinkedHashMap<String, SourceLocation> results) {
+		SourceLocation sourceLoc= SourceLocation.fromPositions(start, end);
+		String s= sourceLoc.substring(source);
+		results.put(s, sourceLoc);
+	}
 
-    private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
-        if (root instanceof CompilationUnit) {
-            return ASTComments.filterCommentsInRange(start, end, (CompilationUnit) root);
-        }
+	@SuppressWarnings("unchecked")
+	private List<Comment> filterCommentsInRange(final int start, final int end, final ASTNode root) {
+		if (root instanceof CompilationUnit) {
+      return ASTComments.filterCommentsInRange(start, end, (CompilationUnit) root);
+		}
 
-        return Collections.emptyList();
-    }
+		return Collections.emptyList();
+	}
 
-    @Override
-    public boolean visit(final TryStatement node) {
-        final List<VariableDeclarationExpression> resources= ASTNodes.resources(node);
-        if (resources.isEmpty()) {
-            return true;
-        }
-        VariableDeclarationExpression lastResource= Utils.getLast(resources);
-        Block body= node.getBody();
-        return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
-    }
+	@Override
+	public boolean visit(final TryStatement node) {
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationExpression> resources= node.resources();
+		if (resources.isEmpty()) {
+			return true;
+		}
+		VariableDeclarationExpression lastResource= Utils.getLast(resources);
+		Block body= node.getBody();
+		return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
+	}
 }

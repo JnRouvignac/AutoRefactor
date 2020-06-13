@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -59,59 +59,50 @@ import org.eclipse.jdt.core.dom.Statement;
  * @see #getDescription()
  */
 public class IfElseIfCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
+	}
 
-    // TODO JNR
+	// TODO JNR
 
-    // UseIfElseIfRefactoring
-    // if (b) {
-    // return i;
-    // }
-    // if (c) {
-    // return j;
-    // }
-    // if (d) {
-    // return k;
-    // }
-    // return l;
+	// UseIfElseIfRefactoring
+	// if (ast) {
+	// return i;
+	// }
+	// if (c) {
+	// return j;
+	// }
+	// if (d) {
+	// return k;
+	// }
+	// return l;
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        final Statement elseStatement= node.getElseStatement();
-        if (elseStatement instanceof Block) {
-            List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);
-            if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
-                final ASTNodeFactory b= this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.createMoveTarget(elseStatements.get(0)));
-                return false;
-            }
-        }
+	@Override
+	public boolean visit(final IfStatement node) {
+		Statement elseStatement= node.getElseStatement();
 
-        return true;
-    }
+		if (elseStatement instanceof Block) {
+			@SuppressWarnings("unchecked")
+			List<Statement> elseStatements= ((Block) elseStatement).statements();
+
+			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), null);
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

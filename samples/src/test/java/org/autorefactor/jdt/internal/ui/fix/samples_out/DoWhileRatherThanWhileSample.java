@@ -25,8 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-public class DoWhileRatherThanWhileSample {
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
 
+public class DoWhileRatherThanWhileSample {
     private void replaceWhileByDoWhile(int i) {
         // Keep this comment
         do {
@@ -38,9 +42,391 @@ public class DoWhileRatherThanWhileSample {
         } while (true);
     }
 
-    private void doNotReplaceWhileWithCondition(int i) {
+    private void replaceWithInitedBoolean(int i) {
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+        } while (isInitedToTrue);
+    }
+
+    private void replaceWithInitedInteger(int i) {
+        int j= 1_000;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                return;
+            }
+            i *= 2;
+            j--;
+        } while (j > 0);
+    }
+
+    private void doNotReplaceWithConditionalInitialization(int aNumber, boolean isValid) {
+        int isNotAlwaysPositive = -1;
+        int anotherVariable= isValid ? isNotAlwaysPositive = 1_000 : 0;
+
+        while (isNotAlwaysPositive > 0) {
+            if (aNumber > 100) {
+                return;
+            }
+            aNumber *= 2;
+            isNotAlwaysPositive--;
+        }
+    }
+
+    private void doNotReplaceWithIfStatement(int aNumber, boolean isValid) {
+        int isNotAlwaysPositive = -2;
+        if (isValid) {
+            isNotAlwaysPositive = 2_000;
+        }
+
+        while (isNotAlwaysPositive > 0) {
+            if (aNumber > 200) {
+                return;
+            }
+            aNumber *= 4;
+            isNotAlwaysPositive--;
+        }
+    }
+
+    private void replaceWithInitedBooleanAndInteger(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void replaceWithORExpression(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue || j > 0);
+    }
+
+    private void replaceWithFalseOperand(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue || j > 0 || false);
+    }
+
+    private void doNotReplaceWithUnnkownOperand(int i, boolean isValid) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        while (isInitedToTrue && j > 0 && isValid) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void doNotReplaceWithUnnkownInitialization(int i, boolean isValid) {
+        int j= 1_000;
+        boolean isInitedToTrue= isValid;
+
+        while (isInitedToTrue && j > 0) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void doNotReplaceWithIncrement(int i) {
+        int j= 1_000;
+        boolean isInitedToTrue= true;
+
+        while (isInitedToTrue && j++ > 0) {
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        }
+    }
+
+    private void replaceRecursiveInitialization(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void replaceWithReassignment(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= false;
+        isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void replaceWithAllowedUse(int i) {
+        int j= 1_000;
+        int k= -1_000;
+        boolean isInitedToTrue= k == -1_000;
+        isInitedToTrue= k < 0;
+
+        // Keep this comment
+        do {
+            // Keep this comment too
+            if (i > 100) {
+                isInitedToTrue= false;
+            }
+            i *= 2;
+            j--;
+        } while (isInitedToTrue && j > 0);
+    }
+
+    private void doNotReplaceWhileWithUnknownValue(int i) {
         while (i <= 100) {
             i *= 2;
+        }
+    }
+
+    private void replaceWithControlWorkflow(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        if (isValid) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            do {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            } while (isInitedToTrue && o > 0);
+        }
+    }
+
+    private void replaceWithTryWithResource(int m) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            do {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            } while (isInitedToTrue && o > 0);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replaceWithBlock(int m) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            boolean isInitedToTrue= false;
+            {
+                isInitedToTrue= p < 0;
+
+                // Keep this comment
+                do {
+                    // Keep this comment too
+                    if (m > 100) {
+                        isInitedToTrue= false;
+                    }
+                    m *= 2;
+                    o--;
+                } while (isInitedToTrue && o > 0);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replaceInCatch(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println("Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            do {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            } while (isInitedToTrue && o > 0);
+        }
+    }
+
+    private void doNotReplaceWithActiveCondition(int m) {
+        int o= 1_000;
+        int p= -1_000;
+
+        if (p++ > -1_000) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            while (isInitedToTrue && o > 0) {
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithActiveResource(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader(p++ + "file.txt")) {
+            System.out.println("Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithActiveBody(int m, boolean isValid) {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println(p++ + "Hi!");
+        } catch (IOException e) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceInFinally(int m, boolean isValid) throws IOException {
+        int o= 1_000;
+        int p= -1_000;
+
+        try (FileReader reader= new FileReader("file.txt")) {
+            System.out.println("Hi!");
+        } finally {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= p < 0;
+
+            // Keep this comment
+            while (isInitedToTrue && o > 0) {
+                // Keep this comment too
+                if (m > 100) {
+                    isInitedToTrue= false;
+                }
+                m *= 2;
+                o--;
+            }
+        }
+    }
+
+    private void doNotReplaceWithLoop(int q, List<String> texts) {
+        int r= 1_000;
+        int s= -1_000;
+        for (String string : texts) {
+            boolean isInitedToTrue= false;
+            isInitedToTrue= s < 0;
+
+            while (isInitedToTrue && r > 0) {
+                if (q > 100) {
+                    isInitedToTrue= false;
+                }
+                q *= 2;
+                r--;
+            }
         }
     }
 }

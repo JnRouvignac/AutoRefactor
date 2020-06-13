@@ -36,7 +36,6 @@ import java.io.InputStream;
  */
 @Deprecated
 abstract public interface RedundantModifiersSample {
-
     /**
      * Keep the JavaDoc.
      */
@@ -65,14 +64,16 @@ abstract public interface RedundantModifiersSample {
 
     public static final String MY_FIELD = "";
 
-    abstract public void myMethod(final String myArg);
+    abstract public void removeAbstractAndPublicModifier(final String removeFinalModifier);
 
     abstract static public class FixModifierOrderSampleClass implements Closeable {
 
         final public static String MY_FIELD = "";
 
-        final public static void myMethod(final String myArg) {
+        final public static void sortModifiers(final String myArg) {
         }
+
+        public abstract void abstractMethod(final String removeFinalModifier);
 
         void removeFinalModifierInTryWithResource() throws IOException {
             try (final InputStream is = new FileInputStream("out.txt")) {

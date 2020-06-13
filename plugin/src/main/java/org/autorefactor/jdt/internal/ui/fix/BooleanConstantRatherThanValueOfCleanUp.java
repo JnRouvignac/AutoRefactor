@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -34,58 +35,48 @@ import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            final BooleanLiteral literal= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
+	@Override
+	public boolean visit(final MethodInvocation node) {
+		if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
+			BooleanLiteral literal= ASTNodes.as(node.arguments(), BooleanLiteral.class);
 
-            if (literal != null) {
-                useConstant(node, literal);
-                return false;
-            }
-        }
+			if (literal != null) {
+				useConstant(node, literal);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final FieldAccess fa= b.getAST().newFieldAccess();
-        final Name expression= ASTNodes.as(node.getExpression(), Name.class);
+	private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        if (expression != null) {
-            fa.setExpression(b.createMoveTarget(expression));
-        }
+		FieldAccess fa= ast.getAST().newFieldAccess();
+		Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
-        fa.setName(b.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-        ctx.getRefactorings().replace(node, fa);
-    }
+		if (expression != null) {
+			fa.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
+		}
+
+		fa.setName(ast.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
+		rewrite.replace(node, fa, null);
+	}
 }

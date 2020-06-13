@@ -29,7 +29,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.Queue;
 
 public class NoAssignmentInIfConditionSample {
-
     public void moveLeftHandSideAssignmentBeforeIf(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
@@ -116,6 +115,32 @@ public class NoAssignmentInIfConditionSample {
         }
     }
 
+    public void moveAssignmentBeforeIfAtConditionOfTernaryExpression(String s, int i) {
+        final char c;
+        // Keep this comment
+        if ((c = s.charAt(i)) == 'A' ? c == 'B' : c == 'C') {
+            System.out.println("A, B or C");
+        } else {
+            System.out.println("Not A, B or C");
+        }
+    }
+
+    public void doNotMoveAssignmentBeforeIfAtLeftOperandOfTernaryExpression(String s, int i, char c) {
+        if (c == 'A' ? (c = s.charAt(i)) == 'B' : c == 'C') {
+            System.out.println("Found");
+        } else {
+            System.out.println("Not found");
+        }
+    }
+
+    public void doNotMoveAssignmentBeforeIfAtRightOperandOfTernaryExpression(String s, int i, char c) {
+        if (c == 'A' ? c == 'B' : (c = s.charAt(i)) == 'C') {
+            System.out.println("Found");
+        } else {
+            System.out.println("Not found");
+        }
+    }
+
     public void moveAssignmentBeforeIfAtStartOfInfixExpression(String s, int i) {
         final char c;
         // Keep this comment
@@ -175,6 +200,22 @@ public class NoAssignmentInIfConditionSample {
             System.out.println("Value=" + i);
         } else {
             System.out.println("Empty");
+        }
+    }
+
+    public void moveLeftHandSideAssignmentInSwitch(Queue<Integer> q, int discriminant) {
+        Integer i;
+        System.out.println("Before polling");
+        switch (discriminant) {
+        case 0:
+            // Keep this comment
+            if ((i = q.poll()) != null) {
+                System.out.println("Value=" + i);
+            } else {
+                System.out.println("Empty");
+            }
+        case 1:
+            System.out.println("Another case");
         }
     }
 }

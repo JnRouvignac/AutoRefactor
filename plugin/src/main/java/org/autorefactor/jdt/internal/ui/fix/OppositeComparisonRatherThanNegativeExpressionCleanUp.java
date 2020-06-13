@@ -25,67 +25,55 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final PrefixExpression node) {
-        if (ASTNodes.hasOperator(node, PrefixExpression.Operator.MINUS)) {
-            final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+	@Override
+	public boolean visit(final PrefixExpression node) {
+		if (ASTNodes.hasOperator(node, PrefixExpression.Operator.MINUS)) {
+			MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
 
-            if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
-                final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
+			if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
+				String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
-                for (String clazz : classes) {
-                    if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
-                        reverseObjects(node, mi);
-                        return false;
-                    }
-                }
-            }
-        }
+				for (String clazz : classes) {
+					if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
+						reverseObjects(node, mi);
+						return false;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+	private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        r.replace(node, b.invoke(b.parenthesizeIfNeeded(b.createMoveTarget((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
-                b.createMoveTarget(mi.getExpression())));
-    }
+		rewrite.replace(node, ast.newMethodInvocation(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
+				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(mi.getExpression()))), null);
+	}
 }

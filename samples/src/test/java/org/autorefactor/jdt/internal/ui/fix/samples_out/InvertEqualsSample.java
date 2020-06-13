@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class InvertEqualsSample {
-
     public static interface Itf {
         int primitiveConstant = 1;
         String objConstant = "fkjfkjf";
@@ -42,7 +41,7 @@ public class InvertEqualsSample {
     private int primitiveField;
 
     public boolean invertEquals(Object obj) {
-        // Keep this comment 1
+        // Keep this comment
         return "".equals(obj)
                 && Itf.objConstant.equals(obj)
                 && ("" + Itf.objConstant).equals(obj)
@@ -50,6 +49,14 @@ public class InvertEqualsSample {
                 // && obj.equals(Itf.enumConstant);
                 // should become:
                 // && Itf.enumConstant.equals(obj);
+    }
+
+    public boolean doNotInvertEqualsOnInstance() {
+        return equals("");
+    }
+
+    public boolean doNotInvertEqualsOnThis() {
+        return this.equals("");
     }
 
     public boolean doNotInvertEqualsWhenParameterIsNull(Object obj) {
@@ -63,7 +70,7 @@ public class InvertEqualsSample {
     }
 
     public boolean invertEqualsIgnoreCase(String s) {
-        // Keep this comment 1
+        // Keep this comment
         return "".equalsIgnoreCase(s)
                 && Itf.objConstant.equalsIgnoreCase(s)
                 && ("" + Itf.objConstant).equalsIgnoreCase(s);

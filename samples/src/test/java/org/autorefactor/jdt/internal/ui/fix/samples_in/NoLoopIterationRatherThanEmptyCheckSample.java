@@ -42,6 +42,20 @@ public class NoLoopIterationRatherThanEmptyCheckSample {
         return sum;
     }
 
+    public int removeConditionOnExpression(int[] integerArray) {
+        int sum = 0;
+
+        // Keep this comment
+        if (integerArray.length > 1 - 1) {
+            // Keep this comment too
+            for (int i : integerArray) {
+                sum += i;
+            }
+        }
+
+        return sum;
+    }
+
     public int removeReversedCondition(int[] integerArray) {
         int sum = 0;
 

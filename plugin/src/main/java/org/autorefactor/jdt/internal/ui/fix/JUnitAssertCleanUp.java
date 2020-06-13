@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -44,168 +45,164 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
-    private static final String[] PACKAGE_PATHES= { "junit.framework.", "org.junit." }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String[] PACKAGE_PATHES= { "junit.framework.", "org.junit." }; //$NON-NLS-1$ //$NON-NLS-2$
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
+	}
 
-    @Override
-    protected Pair<Expression, Expression> getActualAndExpected(final Expression leftValue,
-            final Expression rightValue) {
-        return Pair.of(rightValue, leftValue);
-    }
+	@Override
+	protected Pair<Expression, Expression> getActualAndExpected(final Expression leftValue,
+			final Expression rightValue) {
+		return Pair.of(rightValue, leftValue);
+	}
 
-    @Override
-    public boolean visit(final CompilationUnit node) {
-        canUseAssertNotEquals= false;
+	@Override
+	public boolean visit(final CompilationUnit node) {
+		canUseAssertNotEquals= false;
 
-        for (Object object : node.imports()) {
-            ImportDeclaration importDeclaration= (ImportDeclaration) object;
-            final ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
+		for (Object object : node.imports()) {
+			ImportDeclaration importDeclaration= (ImportDeclaration) object;
+			ITypeBinding typeBinding= resolveTypeBinding(importDeclaration);
 
-            if (ASTNodes.hasType(typeBinding, "org.junit.Assert")) { //$NON-NLS-1$
-                for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
-                    if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
-                        canUseAssertNotEquals= true;
-                        return super.visit(node);
-                    }
-                }
-            }
-        }
+			if (ASTNodes.hasType(typeBinding, "org.junit.Assert")) { //$NON-NLS-1$
+				for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
+					if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
+						canUseAssertNotEquals= true;
+						return super.visit(node);
+					}
+				}
+			}
+		}
 
-        // New file: reset the value
-        return super.visit(node);
-    }
+		// New file: reset the value
+		return super.visit(node);
+	}
 
-    @Override
-    public boolean visit(final MethodInvocation node) {
-        final List<Expression> args= ASTNodes.arguments(node);
-        int i= 0;
-        boolean shouldVisit= true;
-        while (shouldVisit && i < PACKAGE_PATHES.length) {
-            shouldVisit= maybeRefactorMethod(node, PACKAGE_PATHES[i], args);
-            i++;
-        }
+	@Override
+	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		@SuppressWarnings("unchecked")
+		List<Expression> args= node.arguments();
+		int i= 0;
+		boolean shouldVisit= true;
+		while (shouldVisit && i < PACKAGE_PATHES.length) {
+			shouldVisit= maybeRefactorMethod(classesToUseWithImport, importsToAdd, node, PACKAGE_PATHES[i], args);
+			i++;
+		}
 
-        return shouldVisit;
-    }
+		return shouldVisit;
+	}
 
-    private boolean maybeRefactorMethod(final MethodInvocation node, final String unitTestPackagePath,
-            final List<Expression> args) {
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, node, true, args.get(0), null, false);
-        }
+	private boolean maybeRefactorMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+			final MethodInvocation node, final String unitTestPackagePath, final List<Expression> args) {
+		String jUnitClass= unitTestPackagePath + "Assert"; //$NON-NLS-1$
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, node, true, args.get(1), args.get(0), false);
-        }
+		if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), null, false);
+		}
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, node, false, args.get(0), null, false);
-        }
+		if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(1), args.get(0), false);
+		}
 
-        if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, node, false, args.get(1), args.get(0), false);
-        }
+		if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), null, false);
+		}
 
-        for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(1), args.get(0), null, false);
-            }
+		if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(1), args.get(0), false);
+		}
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, true, args.get(2), args.get(1), args.get(0), false);
-            }
+		for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
+			if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(1), args.get(0), null);
+			}
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(1), args.get(0), null, false);
-            }
+			if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(2), args.get(1), args.get(0));
+			}
 
-            if (ASTNodes.usesGivenSignature(node, unitTestPackagePath + "Assert", "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-                return maybeRefactorToEquality(node, node, false, args.get(2), args.get(1), args.get(0), false);
-            }
-        }
+			if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(1), args.get(0), null);
+			}
 
-        return true;
-    }
+			if (ASTNodes.usesGivenSignature(node, jUnitClass, "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(2), args.get(1), args.get(0));
+			}
+		}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+		return true;
+	}
 
-        if (node.getElseStatement() == null && statements.size() == 1) {
-            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
-            int i= 0;
-            boolean shouldVisit= true;
-            while (shouldVisit && i < PACKAGE_PATHES.length) {
-                shouldVisit= maybeRefactorIf(node, mi, PACKAGE_PATHES[i]);
-                i++;
-            }
+	@Override
+	public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
-            return shouldVisit;
-        }
+		if (node.getElseStatement() == null && statements.size() == 1) {
+			MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+			int i= 0;
+			boolean shouldVisit= true;
+			while (shouldVisit && i < PACKAGE_PATHES.length) {
+				shouldVisit= maybeRefactorIf(classesToUseWithImport, importsToAdd, node, mi, PACKAGE_PATHES[i]);
+				i++;
+			}
 
-        return true;
-    }
+			return shouldVisit;
+		}
 
-    private boolean maybeRefactorIf(final IfStatement node, final MethodInvocation mi,
-            final String unitTestPackagePath) {
-        if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
-        }
+		return true;
+	}
 
-        return !ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName()) || maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	private boolean maybeRefactorIf(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+			final IfStatement node, final MethodInvocation mi, final String unitTestPackagePath) {
+		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
+		}
 
-    @Override
-    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpression,
-            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
-            final Expression delta, final Expression failureMessage) {
-        List<Expression> arguments= new ArrayList<>(4);
+		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), (Expression) mi.arguments().get(0));
+		}
 
-        if (failureMessage != null) {
-            arguments.add(b.createCopyTarget(failureMessage));
-        }
+		return true;
+	}
 
-        if (copyOfExpected != null) {
-            arguments.add(copyOfExpected);
-        }
+	@Override
+	protected MethodInvocation invokeQualifiedMethod(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
+			final Expression copyOfExpression, final String methodName, final Expression copyOfActual,
+			final Expression copyOfExpected, final Expression delta, final Expression failureMessage) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        if (copyOfActual != null) {
-            arguments.add(copyOfActual);
-        }
+		List<Expression> arguments= new ArrayList<>(4);
 
-        if (delta != null) {
-            arguments.add(delta);
-        }
+		if (failureMessage != null) {
+			arguments.add(ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), ASTNodes.getUnparenthesedExpression(failureMessage)));
+		}
 
-        return b.invoke(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
-    }
+		if (copyOfExpected != null) {
+			arguments.add(copyOfExpected);
+		}
+
+		if (copyOfActual != null) {
+			arguments.add(copyOfActual);
+		}
+
+		if (delta != null) {
+			arguments.add(delta);
+		}
+
+		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
+	}
 }

@@ -28,74 +28,60 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final WhileStatement node) {
-        final List<Statement> whileStatements= ASTNodes.asList(node.getBody());
+	@Override
+	public boolean visit(final WhileStatement node) {
+		List<Statement> whileStatements= ASTNodes.asList(node.getBody());
 
-        if (whileStatements.isEmpty()) {
-            return true;
-        }
+		if (whileStatements.isEmpty()) {
+			return true;
+		}
 
-        final List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
+		List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
 
-        Statement previousStatement= ASTNodes.getPreviousSibling(node);
-        int i= whileStatements.size() - 1;
-        while (i >= 0) {
-            if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
-                return true;
-            }
-            i--;
-            previousStatements.add(previousStatement);
-            previousStatement= ASTNodes.getPreviousSibling(previousStatement);
-        }
+		Statement previousStatement= ASTNodes.getPreviousSibling(node);
+		int i= whileStatements.size() - 1;
+		while (i >= 0) {
+			if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
+				return true;
+			}
+			i--;
+			previousStatements.add(previousStatement);
+			previousStatement= ASTNodes.getPreviousSibling(previousStatement);
+		}
 
-        replaceWithDoWhile(node, previousStatements);
-        return false;
-    }
+		replaceWithDoWhile(node, previousStatements);
+		return false;
+	}
 
-    private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
-        final Refactorings r= this.ctx.getRefactorings();
-        r.remove(previousStatements);
+	private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		rewrite.remove(previousStatements, null);
 
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        r.replace(node, b.doWhile(b.createMoveTarget(node.getExpression()), b.createMoveTarget(node.getBody())));
-    }
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		rewrite.replace(node, ast.doWhile(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
+	}
 }

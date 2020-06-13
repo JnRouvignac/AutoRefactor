@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -322,6 +323,20 @@ public class ContainsRatherThanLoopSample {
                 element.toString();
                 break;
             }
+        }
+    }
+
+    public class DoNotRefactorCollectionImplementation<T> extends ArrayList<T> {
+        private static final long serialVersionUID= 8837962990422334107L;
+
+        @Override
+        public boolean contains(Object other) {
+            for (Object item : this) {
+                if (other.equals(item)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -28,9 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -44,205 +44,190 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
-    private static final class IndentationVisitor extends ASTVisitor {
-        private int indentation;
+	private static final class IndentationVisitor extends ASTVisitor {
+		private int indentation;
 
-        public int getIndentation() {
-            return indentation;
-        }
+		public int getIndentation() {
+			return indentation;
+		}
 
-        @Override
-        public boolean visit(final IfStatement node) {
-            computeGreatestIndentation(node.getThenStatement());
+		@Override
+		public boolean visit(final IfStatement node) {
+			computeGreatestIndentation(node.getThenStatement());
 
-            if (node.getElseStatement() != null) {
-                computeGreatestIndentation(node.getElseStatement());
-            }
+			if (node.getElseStatement() != null) {
+				computeGreatestIndentation(node.getElseStatement());
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        @Override
-        public boolean visit(final WhileStatement node) {
-            computeGreatestIndentation(node.getBody());
-            return false;
-        }
+		@Override
+		public boolean visit(final WhileStatement node) {
+			computeGreatestIndentation(node.getBody());
+			return false;
+		}
 
-        @Override
-        public boolean visit(final DoStatement node) {
-            computeGreatestIndentation(node.getBody());
-            return false;
-        }
+		@Override
+		public boolean visit(final DoStatement node) {
+			computeGreatestIndentation(node.getBody());
+			return false;
+		}
 
-        @Override
-        public boolean visit(final ForStatement node) {
-            computeGreatestIndentation(node.getBody());
-            return false;
-        }
+		@Override
+		public boolean visit(final ForStatement node) {
+			computeGreatestIndentation(node.getBody());
+			return false;
+		}
 
-        @Override
-        public boolean visit(final EnhancedForStatement node) {
-            computeGreatestIndentation(node.getBody());
-            return false;
-        }
+		@Override
+		public boolean visit(final EnhancedForStatement node) {
+			computeGreatestIndentation(node.getBody());
+			return false;
+		}
 
-        @Override
-        public boolean visit(final TryStatement node) {
-            computeGreatestIndentation(node.getBody());
+		@Override
+		public boolean visit(final TryStatement node) {
+			computeGreatestIndentation(node.getBody());
 
-            for (Object object : node.catchClauses()) {
-                final CatchClause clause= (CatchClause) object;
-                computeGreatestIndentation(clause.getBody());
-            }
+			for (Object object : node.catchClauses()) {
+				CatchClause clause= (CatchClause) object;
+				computeGreatestIndentation(clause.getBody());
+			}
 
-            if (node.getFinally() != null) {
-                computeGreatestIndentation(node.getFinally());
-            }
+			if (node.getFinally() != null) {
+				computeGreatestIndentation(node.getFinally());
+			}
 
-            if (node.getFinally() != null) {
-                computeGreatestIndentation(node.getFinally());
-            }
+			if (node.getFinally() != null) {
+				computeGreatestIndentation(node.getFinally());
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        @Override
-        public boolean visit(final Block node) {
-            computeGreatestIndentation(node);
-            return false;
-        }
+		@Override
+		public boolean visit(final Block node) {
+			computeGreatestIndentation(node);
+			return false;
+		}
 
-        private void computeGreatestIndentation(final Statement statements) {
-            for (Statement statement : ASTNodes.asList(statements)) {
-                IndentationVisitor visitor= new IndentationVisitor();
+		private void computeGreatestIndentation(final Statement statements) {
+			for (Statement statement : ASTNodes.asList(statements)) {
+				IndentationVisitor visitor= new IndentationVisitor();
 
-                statement.accept(visitor);
+				statement.accept(visitor);
 
-                indentation= Math.max(indentation, visitor.getIndentation() + 1);
-            }
-        }
-    }
+				indentation= Math.max(indentation, visitor.getIndentation() + 1);
+			}
+		}
+	}
 
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement node) {
-        if (node.getElseStatement() != null && !ASTNodes.isInElse(node)) {
-            if (ASTNodes.fallsThrough(node.getThenStatement())) {
-                if (ASTNodes.fallsThrough(node.getElseStatement())) {
-                    if (ASTNodes.getNextSiblings(node).isEmpty()) {
-                        int thenIndentation= getIndentation(node.getThenStatement());
-                        int elseIndentation= getIndentation(node.getElseStatement());
+	@Override
+	public boolean visit(final IfStatement node) {
+		if (node.getElseStatement() != null && !ASTNodes.isInElse(node)) {
+			if (ASTNodes.fallsThrough(node.getThenStatement())) {
+				if (ASTNodes.fallsThrough(node.getElseStatement())) {
+					if (ASTNodes.getNextSiblings(node).isEmpty()) {
+						int thenIndentation= getIndentation(node.getThenStatement());
+						int elseIndentation= getIndentation(node.getElseStatement());
 
-                        if (thenIndentation <= elseIndentation || node.getElseStatement() instanceof IfStatement) {
-                            moveElseStatement(node);
-                        } else {
-                            moveThenStatement(node);
-                        }
+						if (thenIndentation <= elseIndentation || node.getElseStatement() instanceof IfStatement) {
+							moveElseStatement(node);
+						} else {
+							moveThenStatement(node);
+						}
 
-                        return false;
-                    }
-                } else if (!ASTNodes.hasVariableConflict(node, node.getElseStatement())) {
-                    moveElseStatement(node);
-                    return false;
-                }
-            } else if (ASTNodes.fallsThrough(node.getElseStatement()) && !ASTNodes.hasVariableConflict(node, node.getThenStatement()) && !(node.getElseStatement() instanceof IfStatement)) {
-                moveThenStatement(node);
-                return false;
-            }
-        }
+						return false;
+					}
+				} else if (!ASTNodes.hasVariableConflict(node, node.getElseStatement())) {
+					moveElseStatement(node);
+					return false;
+				}
+			} else if (ASTNodes.fallsThrough(node.getElseStatement()) && !ASTNodes.hasVariableConflict(node, node.getThenStatement()) && !(node.getElseStatement() instanceof IfStatement)) {
+				moveThenStatement(node);
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private int getIndentation(final Statement statementInIf) {
-        IndentationVisitor visitor= new IndentationVisitor();
-        statementInIf.accept(visitor);
-        return visitor.getIndentation() + (statementInIf instanceof Block ? -1 : 0);
-    }
+	private int getIndentation(final Statement statementInIf) {
+		IndentationVisitor visitor= new IndentationVisitor();
+		statementInIf.accept(visitor);
+		return visitor.getIndentation() + (statementInIf instanceof Block ? -1 : 0);
+	}
 
-    private void moveThenStatement(final IfStatement node) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+	private void moveThenStatement(final IfStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
+		List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
-        if (ASTNodes.canHaveSiblings(node)) {
-            for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                r.insertAfter(b.createMoveTarget(statementsToMove.get(i)), node);
-            }
+		if (ASTNodes.canHaveSiblings(node)) {
+			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
+			}
 
-            r.replace(node.getExpression(), b.negate(node.getExpression()));
-            r.replace(node.getThenStatement(), b.createMoveTarget(node.getElseStatement()));
-            r.remove(node.getElseStatement());
-        } else {
-            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
+			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
+			rewrite.remove(node.getElseStatement(), null);
+		} else {
+			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
-            for (Statement statement : statementsToMove) {
-                copyOfStatements.add(b.createMoveTarget(statement));
-            }
+			for (Statement statement : statementsToMove) {
+				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
+			}
 
-            r.replace(node.getExpression(), b.negate(node.getExpression()));
-            r.replace(node.getThenStatement(), b.createMoveTarget(node.getElseStatement()));
-            copyOfStatements.add(0, b.createMoveTarget(node));
+			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
-            Block block= b.block(copyOfStatements);
-            r.replace(node, block);
-        }
-    }
+			Block block= ast.block(copyOfStatements);
+			rewrite.replace(node, block, null);
+		}
+	}
 
-    private void moveElseStatement(final IfStatement node) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+	private void moveElseStatement(final IfStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
+		List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 
-        if (ASTNodes.canHaveSiblings(node)) {
-            for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-                r.insertAfter(b.createMoveTarget(statementsToMove.get(i)), node);
-            }
+		if (ASTNodes.canHaveSiblings(node)) {
+			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
+			}
 
-            r.remove(node.getElseStatement());
-        } else {
-            final List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
+			rewrite.remove(node.getElseStatement(), null);
+		} else {
+			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
-            for (Statement statement : statementsToMove) {
-                copyOfStatements.add(b.createMoveTarget(statement));
-            }
+			for (Statement statement : statementsToMove) {
+				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
+			}
 
-            r.remove(node.getElseStatement());
-            copyOfStatements.add(0, b.createMoveTarget(node));
+			rewrite.remove(node.getElseStatement(), null);
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
-            Block block= b.block(copyOfStatements);
-            r.replace(node, block);
-        }
-    }
+			Block block= ast.block(copyOfStatements);
+			rewrite.replace(node, block, null);
+		}
+	}
 }

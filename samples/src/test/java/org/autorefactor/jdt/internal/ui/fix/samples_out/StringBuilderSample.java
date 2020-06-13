@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.management.JMX;
 
@@ -64,6 +65,184 @@ public class StringBuilderSample {
         String s12 = String.valueOf(0);
         String s13 = "foo " + "bar " + "baz";
         String s14 = "foo " + "bar " + "baz";
+    }
+
+    public String useConcatenationOnSeveralStatements() {
+        // Keep this comment
+        String buffer = "baz " + "bar";
+        String s1 = buffer;
+
+        // Keep this comment too
+        String builder = "baz " + "bar";
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public String useConcatenationOnFluentAppending() {
+        // Keep this comment
+        String buffer = "baz " + "bar";
+        String s1 = buffer;
+
+        // Keep this comment too
+        String builder = "baz " + "bar";
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public String useConcatenationWithVariable(String text) {
+        // Keep this comment
+        final String buffer = "baz " + text;
+        String s1 = buffer;
+
+        // Keep this comment too
+        final String builder = "baz " + text;
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public String useConcatenationWithReassignment(String text) {
+        // Keep this comment
+        String buffer = "baz " + text;
+        String s1 = buffer;
+
+        // Keep this comment too
+        String builder = "baz " + text;
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public String useConcatenationWithAppendingOnConstructor(String text) {
+        // Keep this comment
+        String buffer = "baz " + text;
+        String s1 = buffer;
+
+        // Keep this comment too
+        String builder = "baz " + text;
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public String useConcatenationWithOnlyAppendingOnConstructor(String text) {
+        // Keep this comment
+        String buffer = "baz " + text;
+        String s1 = buffer;
+
+        // Keep this comment too
+        String builder = "baz " + text;
+        String s2 = builder;
+
+        return s1 + s2;
+    }
+
+    public int useConcatenationWithSpecialMethod() {
+        // Keep this comment
+        String buffer = "baz " + "bar";
+        int s1 = buffer.length();
+
+        // Keep this comment too
+        String builder = "baz " + "bar";
+        int s2 = builder.length();
+
+        return s1 + s2;
+    }
+
+    public int doNotRefactorWithDangerousMethod() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append("bar");
+        int s1 = buffer.capacity();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append("bar");
+        int s2 = builder.capacity();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithoutAppending() {
+        StringBuffer buffer = new StringBuffer();
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        String s2 = builder.toString();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithoutUse(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+
+        return "s1 + s2";
+    }
+
+    public Object doNotRefactorWithVariableEscape(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+        String s2 = builder.toString();
+
+        return Arrays.<Object>asList(buffer, builder);
+    }
+
+    public String doNotRefactorWithLateAppending(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+        String s1 = buffer.toString();
+        buffer.append("Wait!");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+        String s2 = builder.toString();
+        builder.append("Wait!");
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithSelfAppending(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(buffer);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(builder);
+        String s2 = builder.toString();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithSelfAppending(int i) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(i++);
+        buffer.append(i++);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(i++);
+        builder.append(i++);
+        String s2 = builder.toString();
+
+        return s1 + s2;
     }
 
     public void useConcatenationInsideAppend(StringBuffer sbuf, StringBuilder sbui) {
@@ -220,6 +399,14 @@ public class StringBuilderSample {
 
         if (isValid) {
         }
+    }
+
+    public void removeElse(StringBuilder builder, StringBuffer buffer, boolean isValid) {
+        if (isValid)
+            System.out.println("foo");
+
+        if (isValid)
+            System.out.println("foo");
     }
 
     public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {

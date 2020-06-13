@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -39,90 +41,78 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final FieldDeclaration node) {
-        if (!canRemoveFieldDefaultValue(node)) {
-            return true;
-        }
-        final ITypeBinding fieldType= node.getType().resolveBinding();
-        if (fieldType == null || Modifier.isFinal(node.getModifiers())) {
-            return true;
-        }
+	@Override
+	public boolean visit(final FieldDeclaration node) {
+		if (!canRemoveFieldDefaultValue(node)) {
+			return true;
+		}
+		ITypeBinding fieldType= node.getType().resolveBinding();
+		if (fieldType == null || Modifier.isFinal(node.getModifiers())) {
+			return true;
+		}
 
-        boolean visitSubtree= true;
-        for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
-            final Expression initializer= vdf.getInitializer();
-            if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
-                    || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
-                            && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
-                this.ctx.getRefactorings().remove(initializer);
-                visitSubtree= false;
-            }
-        }
+		boolean visitSubtree= true;
+		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
+			Expression initializer= fragment.getInitializer();
+			if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
+					|| (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
+							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
+				cuRewrite.getASTRewrite().remove(initializer, null);
+				visitSubtree= false;
+			}
+		}
 
-        return visitSubtree;
-    }
+		return visitSubtree;
+	}
 
-    private boolean canRemoveFieldDefaultValue(final FieldDeclaration node) {
-        // Do not remove default values from interface/annotation fields
-        // because they are final by default
-        final ASTNode parent= node.getParent();
-        if (parent instanceof TypeDeclaration) {
-            return !((TypeDeclaration) parent).isInterface();
-        }
+	private boolean canRemoveFieldDefaultValue(final FieldDeclaration node) {
+		// Do not remove default values from interface/annotation fields
+		// because they are final by default
+		ASTNode parent= node.getParent();
+		if (parent instanceof TypeDeclaration) {
+			return !((TypeDeclaration) parent).isInterface();
+		}
 
-        return parent instanceof AnonymousClassDeclaration || parent instanceof EnumDeclaration;
-    }
+		return parent instanceof AnonymousClassDeclaration || parent instanceof EnumDeclaration;
+	}
 
-    private boolean isPrimitiveDefaultValue(final Object val) {
-        if (val instanceof Short || val instanceof Integer || val instanceof Long) {
-            return ((Number) val).longValue() == 0;
-        }
-        if (val instanceof Double || val instanceof Float) {
-            return ((Number) val).doubleValue() == 0;
-        }
-        if (val instanceof Boolean) {
-            return Boolean.FALSE.equals(val);
-        }
-        return val instanceof Character && ((Character) val).charValue() == '\u0000';
-    }
+	private boolean isPrimitiveDefaultValue(final Object val) {
+		if (val instanceof Short || val instanceof Integer || val instanceof Long) {
+			return ((Number) val).longValue() == 0;
+		}
+		if (val instanceof Double || val instanceof Float) {
+			return ((Number) val).doubleValue() == 0;
+		}
+		if (val instanceof Boolean) {
+			return Boolean.FALSE.equals(val);
+		}
+		return val instanceof Character && ((Character) val).charValue() == '\u0000';
+	}
 
-    private boolean isPrimitiveLiteral(final Expression initializer) {
-        switch (initializer.getNodeType()) {
-        case ASTNode.BOOLEAN_LITERAL:
-        case ASTNode.CHARACTER_LITERAL:
-        case ASTNode.NUMBER_LITERAL:
-            return true;
+	private boolean isPrimitiveLiteral(final Expression initializer) {
+		switch (initializer.getNodeType()) {
+		case ASTNode.BOOLEAN_LITERAL:
+		case ASTNode.CHARACTER_LITERAL:
+		case ASTNode.NUMBER_LITERAL:
+			return true;
 
-        default: // including string and null literal
-            return false;
-        }
-    }
+		default: // including string and null literal
+			return false;
+		}
+	}
 }

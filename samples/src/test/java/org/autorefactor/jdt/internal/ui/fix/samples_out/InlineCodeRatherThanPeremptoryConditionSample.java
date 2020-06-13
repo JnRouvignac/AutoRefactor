@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,13 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
     public int replaceIfByBlock(int i) {
         if (i < 0) {
         }
+
+        return i;
+    }
+
+    public int removeElse(int i) {
+        if (i < 0)
+            i--;
 
         return i;
     }
@@ -303,5 +311,18 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
         int i = 0;
         i = i + 10;
         return i;
+    }
+
+    public List<String> inlineBlockAlwaysTrueConditionInStatement(List<String> aList, int discriminant) {
+        switch (discriminant) {
+        case 0:
+            // Keep this comment
+            String forbiddenValue = "foo";
+            aList.remove(forbiddenValue);
+            return new ArrayList<>(0);
+        case 1:
+            aList.add("foo");
+        }
+        return aList;
     }
 }

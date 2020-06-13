@@ -25,11 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -37,69 +38,54 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final ReturnStatement node) {
-        if (node.getExpression() == null && isLastStatement(node)) {
-            final Refactorings r= ctx.getRefactorings();
+	@Override
+	public boolean visit(final ReturnStatement node) {
+		if (node.getExpression() == null && isLastStatement(node)) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-            if (ASTNodes.canHaveSiblings(node)) {
-                r.remove(node);
-            } else {
-                r.replace(node, ctx.getASTBuilder().block());
-            }
+			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(node, null);
+			} else {
+				rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isLastStatement(final Statement node) {
-        final Statement nextStatement= ASTNodes.getNextStatement(node);
+	private boolean isLastStatement(final Statement node) {
+		Statement nextStatement= ASTNodes.getNextStatement(node);
 
-        if (nextStatement == null) {
-            if (node.getParent() instanceof MethodDeclaration) {
-                return true;
-            }
-            if (node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement
-                    || node.getParent() instanceof ForStatement || node.getParent() instanceof EnhancedForStatement) {
-                return false;
-            }
-            if (node.getParent() instanceof Statement) {
-                return isLastStatement((Statement) node.getParent());
-            }
-        }
+		if (nextStatement == null) {
+			if (node.getParent() instanceof MethodDeclaration) {
+				return true;
+			}
+			if (node.getParent() instanceof EnhancedForStatement || node.getParent() instanceof ForStatement
+					|| node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement) {
+				return false;
+			}
+			if (node.getParent() instanceof Statement) {
+				return isLastStatement((Statement) node.getParent());
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

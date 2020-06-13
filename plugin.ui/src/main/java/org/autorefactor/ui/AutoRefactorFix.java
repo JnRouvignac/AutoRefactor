@@ -25,8 +25,6 @@
  */
 package org.autorefactor.ui;
 
-import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -57,97 +55,98 @@ import org.eclipse.text.edits.TextEdit;
 /** AutoRefactorFix. */
 @SuppressWarnings("restriction")
 public class AutoRefactorFix implements ICleanUpFix {
-    private CleanUpChange cleanUpChange;
+	private CleanUpChange cleanUpChange;
 
-    /**
-     * Create the clean up.
-     *
-     * @param compilationUnit compilation unit
-     * @param enabled         enabled
-     * @param fOptions        options
-     * @return Clean up fix
-     */
-    public static ICleanUpFix createCleanUp(final CompilationUnit compilationUnit, final boolean enabled,
-            final CleanUpOptions fOptions) {
-        boolean hasChanges= false;
-        final ICompilationUnit iCompilationUnit= (ICompilationUnit) compilationUnit.getJavaElement();
-        final CleanUpChange cleanUpChange= new CleanUpChange("AutoRefactor", iCompilationUnit); //$NON-NLS-1$
-        TextEdit allEdits= null;
+	/**
+	 * Create the clean up.
+	 *
+	 * @param compilationUnit compilation unit
+	 * @param enabled         enabled
+	 * @param fOptions        options
+	 * @return Clean up fix
+	 */
+	public static ICleanUpFix createCleanUp(final CompilationUnit compilationUnit, final boolean enabled,
+			final CleanUpOptions fOptions) {
+		boolean hasChanges= false;
+		final ICompilationUnit iCompilationUnit= (ICompilationUnit) compilationUnit.getJavaElement();
+		final CleanUpChange cleanUpChange= new CleanUpChange("AutoRefactor", iCompilationUnit); //$NON-NLS-1$
+		TextEdit allEdits= null;
 
-        if (enabled) {
-            final IJavaProject javaProject= PrepareApplyRefactoringsJob.getIJavaProject(iCompilationUnit);
-            final JavaProjectOptions options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
+		if (enabled) {
+			final IJavaProject javaProject= PrepareApplyRefactoringsJob.getIJavaProject(iCompilationUnit);
+			final JavaProjectOptions options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
 
-            final Environment environment= getEnvironment();
-            final List<RefactoringRule> refactoringRules= getConfiguredRefactoringRules(fOptions);
-            final SubMonitor loopMonitor= SubMonitor.convert(null, 1);
-            final Queue<RefactoringUnit> refactoringUnits= new ConcurrentLinkedQueue<>();
-            refactoringUnits.add(new RefactoringUnit(iCompilationUnit, options));
+			final Environment environment= AutoRefactorPlugin.getEnvironment();
+			final List<RefactoringRule> refactoringRules= getConfiguredRefactoringRules(fOptions);
+			final SubMonitor loopMonitor= SubMonitor.convert(null, 1);
+			final Queue<RefactoringUnit> refactoringUnits= new ConcurrentLinkedQueue<>();
+			refactoringUnits.add(new RefactoringUnit(iCompilationUnit, options));
 
-            final ApplyRefactoringsJob applyRefactoringsJob= new ApplyRefactoringsJob(refactoringUnits,
-                    refactoringRules, environment);
-            final AggregateASTVisitor visitor= new AggregateASTVisitor(refactoringRules);
-            try {
-                List<TextEdit> textEdits= applyRefactoringsJob.applyRefactoring(iCompilationUnit, visitor, options,
-                        loopMonitor, false);
+			final ApplyRefactoringsJob applyRefactoringsJob= new ApplyRefactoringsJob(refactoringUnits,
+					refactoringRules, environment);
+			final AggregateASTVisitor visitor= new AggregateASTVisitor(refactoringRules);
+			try {
+				List<TextEdit> textEdits= applyRefactoringsJob.applyRefactoring(iCompilationUnit, visitor, options,
+						loopMonitor, false);
 
-                for (TextEdit textEdit : textEdits) {
-                    if (hasChanges) {
-                        allEdits= TextEditUtil.merge(allEdits, textEdit);
-                    } else {
-                        hasChanges= true;
-                        allEdits= textEdit;
-                    }
-                }
-            } catch (Exception e) {
-                if (!hasChanges) {
-                    return null;
-                }
-            }
-        }
+				for (TextEdit textEdit : textEdits) {
+					if (hasChanges) {
+						allEdits= TextEditUtil.merge(allEdits, textEdit);
+					} else {
+						hasChanges= true;
+						allEdits= textEdit;
+					}
+				}
+			} catch (Exception e) {
+				if (!hasChanges) {
+					return null;
+				}
+			}
+		}
 
-        if (!hasChanges) {
-            return null;
-        }
+		if (!hasChanges) {
+			return null;
+		}
 
-        cleanUpChange.setEdit(allEdits);
-        AutoRefactorFix autoRefactorFix= new AutoRefactorFix();
-        autoRefactorFix.cleanUpChange= cleanUpChange;
-        return autoRefactorFix;
-    }
+		cleanUpChange.setEdit(allEdits);
+		AutoRefactorFix autoRefactorFix= new AutoRefactorFix();
+		autoRefactorFix.cleanUpChange= cleanUpChange;
+		return autoRefactorFix;
+	}
 
-    /**
-     * Returns the cleanup rules which have been enabled from the Eclipse
-     * preferences.
-     *
-     * @param options the options
-     * @return the cleanup rules which have been enabled from the Eclipse
-     *         preferences
-     */
-    public static List<RefactoringRule> getConfiguredRefactoringRules(final CleanUpOptions options) {
-        final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
-        for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
-            final RefactoringRule refactoring= iter.next();
-            final String cleanupPropertyName= AutoRefactorTabPage.getCleanupPropertyName(refactoring);
+	/**
+	 * Returns the cleanup rules which have been enabled from the Eclipse
+	 * preferences.
+	 *
+	 * @param options the options
+	 * @return the cleanup rules which have been enabled from the Eclipse
+	 *         preferences
+	 */
+	public static List<RefactoringRule> getConfiguredRefactoringRules(final CleanUpOptions options) {
+		final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
+		for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
+			final RefactoringRule refactoring= iter.next();
+			final String cleanupPropertyName= AutoRefactorTabPage.getCleanupPropertyName(refactoring);
 
-            if (!AutoRefactorPlugin.getDefault().getPreferenceStore().contains(cleanupPropertyName)
-                    || !CleanUpOptions.TRUE.equals(
-                            AutoRefactorPlugin.getDefault().getPreferenceStore().getString(cleanupPropertyName))) {
-                iter.remove();
-            }
-        }
+			if (!AutoRefactorPlugin.getDefault().getPreferenceStore().contains(cleanupPropertyName)
+					|| !CleanUpOptions.TRUE.equals(
+							AutoRefactorPlugin.getDefault().getPreferenceStore().getString(cleanupPropertyName))) {
+				iter.remove();
+			}
+		}
 
-        return refactorings;
-    }
+		return refactorings;
+	}
 
-    /**
-     * Create the change.
-     *
-     * @param progressMonitor progress monitor
-     * @return Compilation unit change
-     * @throws CoreException Core exception
-     */
-    public CleanUpChange createChange(final IProgressMonitor progressMonitor) throws CoreException {
-        return cleanUpChange;
-    }
+	/**
+	 * Create the change.
+	 *
+	 * @param progressMonitor progress monitor
+	 * @return Compilation unit change
+	 * @throws CoreException Core exception
+	 */
+	@Override
+	public CleanUpChange createChange(final IProgressMonitor progressMonitor) throws CoreException {
+		return cleanUpChange;
+	}
 }

@@ -56,86 +56,87 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(value= Parameterized.class)
 public class CFGBuilderTest {
-    private String testName;
-    private int methodDeclarationNb;
+	private String testName;
+	private int methodDeclarationNb;
 
-    public CFGBuilderTest(String testName, int methodDeclarationNb) {
-        this.testName= testName;
-        this.methodDeclarationNb= methodDeclarationNb;
-    }
+	public CFGBuilderTest(String testName, int methodDeclarationNb) {
+		this.testName= testName;
+		this.methodDeclarationNb= methodDeclarationNb;
+	}
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[" + testName + ", methodNb=" + methodDeclarationNb + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    }
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[" + testName + ", methodNb=" + methodDeclarationNb + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 
-    @Parameters(name= "{index}: {0}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(
-                new Object[][] { { "ForWithIfToEndLoopSample", 0 }, { "IfElseIfSample", 0 }, { "LabelsSample", 0 }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        { "SwitchSample", 0 }, { "WhileLoopsSample", 2 }, { "TryCatchThrowSample", 0 }, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    }
+	@Parameters(name= "{index}: {0}")
+	public static Collection<Object[]> data() {
+		return Arrays.asList(
+				new Object[][] { { "ForWithIfToEndLoopSample", 0 }, { "IfElseIfSample", 0 }, { "LabelsSample", 0 }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						{ "SwitchSample", 0 }, { "WhileLoopsSample", 2 }, { "TryCatchThrowSample", 0 }, }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 
-    @Test
-    public void testCFGBuilder() throws Exception {
-        final String sampleName= testName + ".java"; //$NON-NLS-1$
-        final File javaFile= new File("src/test/java/org/autorefactor/cfg", sampleName); //$NON-NLS-1$
-        assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists()); //$NON-NLS-1$ //$NON-NLS-2$
-        final File dotFile= new File("src/test/resources/org/autorefactor/cfg", testName + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
-        assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+	@Test
+	public void testCFGBuilder() throws Exception {
+		final String sampleName= testName + ".java"; //$NON-NLS-1$
+		final File javaFile= new File("src/test/java/org/autorefactor/cfg", sampleName); //$NON-NLS-1$
+		assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists()); //$NON-NLS-1$ //$NON-NLS-2$
+		final File dotFile= new File("src/test/resources/org/autorefactor/cfg", testName + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
+		assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists()); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final String dotSource= readAll(dotFile).trim();
-        final String javaSource= readAll(javaFile);
+		final String dotSource= readAll(dotFile).trim();
+		final String javaSource= readAll(javaFile);
 
-        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment("org.autorefactor.cfg"); //$NON-NLS-1$
-        final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, javaSource, true, null);
-        cu.getBuffer().setContents(javaSource);
-        cu.save(null, true);
+		final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment("org.autorefactor.cfg"); //$NON-NLS-1$
+		final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, javaSource, true, null);
+		cu.getBuffer().setContents(javaSource);
+		cu.save(null, true);
 
-        final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4); //$NON-NLS-1$
-        final ASTParser parser= ASTParser.newParser(AST.JLS8);
-        autoRefactorHandlerResetParser(cu, parser, options);
+		final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4); //$NON-NLS-1$
+		@SuppressWarnings("deprecation")
+		final ASTParser parser= ASTParser.newParser(AST.JLS8);
+		autoRefactorHandlerResetParser(cu, parser, options);
 
-        final CompilationUnit astRoot= (CompilationUnit) parser.createAST(null);
-        final CFGBuilder builder= new CFGBuilder(javaSource, options);
-        final List<CFGBasicBlock> blocks= builder.buildCFG(astRoot);
+		final CompilationUnit astRoot= (CompilationUnit) parser.createAST(null);
+		final CFGBuilder builder= new CFGBuilder(javaSource, options);
+		final List<CFGBasicBlock> blocks= builder.buildCFG(astRoot);
 
-        final CFGBasicBlock block= blocks.get(methodDeclarationNb);
-        final String actual= new CFGDotPrinter().toDot(block).trim();
-        final File dotFileOut= new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot"); //$NON-NLS-1$ //$NON-NLS-2$
-        writeAll(dotFileOut, actual);
-        assertEquals(testName + ": wrong output;", dotSource, actual); //$NON-NLS-1$
-    }
+		final CFGBasicBlock block= blocks.get(methodDeclarationNb);
+		final String actual= new CFGDotPrinter().toDot(block).trim();
+		final File dotFileOut= new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot"); //$NON-NLS-1$ //$NON-NLS-2$
+		writeAll(dotFileOut, actual);
+		assertEquals(testName + ": wrong output;", dotSource, actual); //$NON-NLS-1$
+	}
 
-    private void writeAll(File file, String fileContent) throws Exception {
-        FileOutputStream os= null;
-        Writer writer= null;
-        try {
-            os= new FileOutputStream(file);
-            writer= new BufferedWriter(new OutputStreamWriter(os));
-            writer.append(fileContent);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-            if (os != null) {
-                os.close();
-            }
-        }
-    }
+	private void writeAll(File file, String fileContent) throws Exception {
+		FileOutputStream os= null;
+		Writer writer= null;
+		try {
+			os= new FileOutputStream(file);
+			writer= new BufferedWriter(new OutputStreamWriter(os));
+			writer.append(fileContent);
+		} finally {
+			if (writer != null) {
+				writer.close();
+			}
+			if (os != null) {
+				os.close();
+			}
+		}
+	}
 
-    private JavaProjectOptions newJavaProjectOptions(Release javaSERelease, int tabSize) {
-        JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
-        options.setJavaSERelease(javaSERelease);
-        options.setTabSize(tabSize);
-        return options;
-    }
+	private JavaProjectOptions newJavaProjectOptions(Release javaSERelease, int tabSize) {
+		JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
+		options.setJavaSERelease(javaSERelease);
+		options.setTabSize(tabSize);
+		return options;
+	}
 
-    private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options)
-            throws Exception {
-        final Method m= ApplyRefactoringsJob.class.getDeclaredMethod("resetParser", ICompilationUnit.class, //$NON-NLS-1$
-                ASTParser.class, JavaProjectOptions.class);
-        m.setAccessible(true);
-        m.invoke(null, cu, parser, options);
-    }
+	private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options)
+			throws Exception {
+		final Method m= ApplyRefactoringsJob.class.getDeclaredMethod("resetParser", ICompilationUnit.class, //$NON-NLS-1$
+				ASTParser.class, JavaProjectOptions.class);
+		m.setAccessible(true);
+		m.invoke(null, cu, parser, options);
+	}
 }

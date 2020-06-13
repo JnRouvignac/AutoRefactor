@@ -58,8 +58,9 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckSample {
         if (this.textById == null) {
             if (other.textById != null)
                 return false;
-        } else if (!this.textById.equals(other.textById))
+        } else if (!this.textById.equals(other.textById)) {
             return false;
+        }
         return true;
     }
 }

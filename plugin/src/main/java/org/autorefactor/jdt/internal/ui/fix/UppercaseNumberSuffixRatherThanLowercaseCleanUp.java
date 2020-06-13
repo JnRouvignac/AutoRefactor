@@ -34,50 +34,38 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
  * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
  */
 public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final NumberLiteral node) {
-        final String token= node.getToken();
+	@Override
+	public boolean visit(final NumberLiteral node) {
+		String token= node.getToken();
 
-        if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$
-            useUppercase(node, token);
-            return false;
-        }
+		if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$
+			useUppercase(node, token);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void useUppercase(final NumberLiteral node, final String token) {
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
+	private void useUppercase(final NumberLiteral node, final String token) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        final String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
-        final NumberLiteral replacement= b.number(newToken);
-        ctx.getRefactorings().replace(node, replacement);
-    }
+		String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
+		NumberLiteral replacement= ast.number(newToken);
+		cuRewrite.getASTRewrite().replace(node, replacement, null);
+	}
 }

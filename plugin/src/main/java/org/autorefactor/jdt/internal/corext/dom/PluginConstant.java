@@ -27,6 +27,6 @@ package org.autorefactor.jdt.internal.corext.dom;
 
 /** Constants to be used in the current plugin. */
 public interface PluginConstant {
-    /** The plug-in ID. */
-    String PLUGIN_ID= "org.autorefactor.plugin"; //$NON-NLS-1$
+	/** The plug-in ID. */
+	String PLUGIN_ID= "org.autorefactor.plugin"; //$NON-NLS-1$
 }

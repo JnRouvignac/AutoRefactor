@@ -37,101 +37,89 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class LongPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_reason;
+	}
 
-    @Override
-    public String getWrapperFullyQualifiedName() {
-        return Long.class.getCanonicalName();
-    }
+	@Override
+	public String getWrapperFullyQualifiedName() {
+		return Long.class.getCanonicalName();
+	}
 
-    @Override
-    public String getPrimitiveTypeName() {
-        return long.class.getSimpleName();
-    }
+	@Override
+	public String getPrimitiveTypeName() {
+		return long.class.getSimpleName();
+	}
 
-    @Override
-    public Class<? extends Expression> getLiteralClass() {
-        return NumberLiteral.class;
-    }
+	@Override
+	public Class<? extends Expression> getLiteralClass() {
+		return NumberLiteral.class;
+	}
 
-    @Override
-    public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
-                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
-    }
+	@Override
+	public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+				PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
+	}
 
-    @Override
-    public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
-                InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
-                InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
-                InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
-                InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
-    }
+	@Override
+	public List<InfixExpression.Operator> getInfixInSafeOperators() {
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
+				InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
+				InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
+				InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+				InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
+	}
 
-    @Override
-    public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
-                PostfixExpression.Operator.DECREMENT);
-    }
+	@Override
+	public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
+		return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
+				PostfixExpression.Operator.DECREMENT);
+	}
 
-    @Override
-    public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
-                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
-    }
+	@Override
+	public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+				PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
+	}
 
-    @Override
-    public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
-                InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
-                InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.LESS,
-                InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
-                InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
-                InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
-                InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
-    }
+	@Override
+	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
+				InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+				InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.LESS,
+				InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
+				InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
+				InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+				InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
+	}
 
-    @Override
-    public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
-                PostfixExpression.Operator.DECREMENT);
-    }
+	@Override
+	public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
+		return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
+				PostfixExpression.Operator.DECREMENT);
+	}
 
-    @Override
-    public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN, Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
-                Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN, Assignment.Operator.LEFT_SHIFT_ASSIGN,
-                Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN);
-    }
+	@Override
+	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
+		return Arrays.<Assignment.Operator>asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN, Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
+				Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN, Assignment.Operator.LEFT_SHIFT_ASSIGN,
+				Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN);
+	}
 
-    @Override
-    public String[] getSafeInConstants() {
-        return new String[] { "MIN_VALUE", "MAX_VALUE" }; //$NON-NLS-1$ //$NON-NLS-2$
-    }
+	@Override
+	public String[] getSafeInConstants() {
+		return new String[] { "MIN_VALUE", "MAX_VALUE" }; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

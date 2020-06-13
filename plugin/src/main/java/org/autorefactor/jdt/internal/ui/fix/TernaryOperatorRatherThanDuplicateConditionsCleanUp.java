@@ -29,10 +29,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -40,141 +40,126 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    @Override
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    @Override
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
-            List<Expression> operands= ASTNodes.allOperands(node);
+	@Override
+	public boolean visit(final InfixExpression node) {
+		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
+			List<Expression> operands= ASTNodes.allOperands(node);
 
-            for (int i= 1; i < operands.size(); i++) {
-                List<Expression> previousOperands= operands.subList(0, i - 1);
-                InfixExpression firstCondition= ASTNodes.as(operands.get(i - 1), InfixExpression.class);
-                InfixExpression secondCondition= ASTNodes.as(operands.get(i), InfixExpression.class);
-                List<Expression> nextOperands= operands.subList(i + 1, operands.size());
+			for (int i= 1; i < operands.size(); i++) {
+				List<Expression> previousOperands= operands.subList(0, i - 1);
+				InfixExpression firstCondition= ASTNodes.as(operands.get(i - 1), InfixExpression.class);
+				InfixExpression secondCondition= ASTNodes.as(operands.get(i), InfixExpression.class);
+				List<Expression> nextOperands= operands.subList(i + 1, operands.size());
 
-                if (firstCondition != null && !firstCondition.hasExtendedOperands()
-                        && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND,
-                                InfixExpression.Operator.AND)
-                        && secondCondition != null && !secondCondition.hasExtendedOperands()
-                        && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND,
-                                InfixExpression.Operator.AND)
-                        && isBooleanAndPassive(firstCondition.getLeftOperand())
-                        && isBooleanAndPassive(firstCondition.getRightOperand())
-                        && isBooleanAndPassive(secondCondition.getLeftOperand())
-                        && isBooleanAndPassive(secondCondition.getRightOperand())) {
-                    if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
-                            firstCondition.getRightOperand(), secondCondition.getRightOperand(),
-                            previousOperands, nextOperands)
-                            || !maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
-                                    firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
-                                    previousOperands, nextOperands)
-                            || !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
-                                    firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
-                                    previousOperands, nextOperands)
-                            || !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getRightOperand(),
-                                    firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
-                                    previousOperands, nextOperands)) {
-                        return false;
-                    }
-                }
-            }
-        }
+				if (firstCondition != null && !firstCondition.hasExtendedOperands()
+						&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND,
+								InfixExpression.Operator.AND)
+						&& secondCondition != null && !secondCondition.hasExtendedOperands()
+						&& ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND,
+								InfixExpression.Operator.AND)
+						&& isBooleanAndPassive(firstCondition.getLeftOperand())
+						&& isBooleanAndPassive(firstCondition.getRightOperand())
+						&& isBooleanAndPassive(secondCondition.getLeftOperand())
+						&& isBooleanAndPassive(secondCondition.getRightOperand())) {
+					if (!maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+							firstCondition.getRightOperand(), secondCondition.getRightOperand(),
+							previousOperands, nextOperands)
+							|| !maybeReplaceDuplicateExpression(node, firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+									firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+									previousOperands, nextOperands)
+							|| !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getLeftOperand(),
+									firstCondition.getLeftOperand(), secondCondition.getRightOperand(),
+									previousOperands, nextOperands)
+							|| !maybeReplaceDuplicateExpression(node, firstCondition.getRightOperand(), secondCondition.getRightOperand(),
+									firstCondition.getLeftOperand(), secondCondition.getLeftOperand(),
+									previousOperands, nextOperands)) {
+						return false;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private boolean isBooleanAndPassive(final Expression expression) {
-        return ASTNodes.isPrimitive(expression, boolean.class.getSimpleName()) && ASTNodes.isPassive(expression);
-    }
+	private boolean isBooleanAndPassive(final Expression expression) {
+		return ASTNodes.isPrimitive(expression, boolean.class.getSimpleName()) && ASTNodes.isPassive(expression);
+	}
 
-    private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
-            final Expression oppositeCondition, final Expression oneExpression, final Expression oppositeExpression,
-            final List<Expression> previousOperands, final List<Expression> nextOperands) {
-        if (ASTSemanticMatcher.INSTANCE.matchOpposite(oneCondition, oppositeCondition)
-                && !ASTNodes.match(oneExpression, oppositeExpression)) {
-            replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression, previousOperands,
-                    nextOperands);
-            return false;
-        }
+	private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
+			final Expression oppositeCondition, final Expression oneExpression, final Expression oppositeExpression,
+			final List<Expression> previousOperands, final List<Expression> nextOperands) {
+		if (ASTSemanticMatcher.INSTANCE.matchOpposite(oneCondition, oppositeCondition)
+				&& !ASTNodes.match(oneExpression, oppositeExpression)) {
+			replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression, previousOperands,
+					nextOperands);
+			return false;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    private void replaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
-            final Expression oneExpression, final Expression oppositeExpression, final List<Expression> previousOperands,
-            final List<Expression> nextOperands) {
-        final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
+	private void replaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
+			final Expression oneExpression, final Expression oppositeExpression, final List<Expression> previousOperands,
+			final List<Expression> nextOperands) {
+		AtomicBoolean isFirstExprPositive= new AtomicBoolean();
 
-        final Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);
+		Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);
 
-        final Expression thenExpression;
-        final Expression elseExpression;
+		Expression thenExpression;
+		Expression elseExpression;
 
-        if (isFirstExprPositive.get()) {
-            thenExpression= oneExpression;
-            elseExpression= oppositeExpression;
-        } else {
-            thenExpression= oppositeExpression;
-            elseExpression= oneExpression;
-        }
+		if (isFirstExprPositive.get()) {
+			thenExpression= oneExpression;
+			elseExpression= oppositeExpression;
+		} else {
+			thenExpression= oppositeExpression;
+			elseExpression= oneExpression;
+		}
 
-        final ASTNodeFactory b= ctx.getASTBuilder();
-        final Refactorings r= ctx.getRefactorings();
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        ParenthesizedExpression newConditionalExpression= b.parenthesize(b.conditionalExpression(b.createMoveTarget(basicExpression),
-                b.createMoveTarget(thenExpression), b.createMoveTarget(elseExpression)));
+		ParenthesizedExpression newConditionalExpression= ast.parenthesize(ast.conditionalExpression(ASTNodes.createMoveTarget(rewrite, basicExpression),
+				ASTNodes.createMoveTarget(rewrite, thenExpression), ASTNodes.createMoveTarget(rewrite, elseExpression)));
 
-        if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
-            r.replace(node, newConditionalExpression);
-        } else {
-            List<Expression> operands= b.createMoveTarget(previousOperands);
-            operands.add(newConditionalExpression);
-            operands.addAll(b.createMoveTarget(nextOperands));
-            r.replace(node, b.infixExpression(node.getOperator(), operands));
-        }
-    }
+		if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
+			rewrite.replace(node, newConditionalExpression, null);
+		} else {
+			List<Expression> operands= rewrite.createMoveTarget(previousOperands);
+			operands.add(newConditionalExpression);
+			operands.addAll(rewrite.createMoveTarget(nextOperands));
+			rewrite.replace(node, ast.infixExpression(node.getOperator(), operands), null);
+		}
+	}
 
-    private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
-        Expression basisExpression;
-        final PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
+	private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
+		Expression basisExpression;
+		PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
 
-        if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
-            basisExpression= negateExpression.getOperand();
-            isExprPositive.set(false);
-        } else {
-            basisExpression= originalExpression;
-            isExprPositive.set(true);
-        }
+		if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
+			basisExpression= negateExpression.getOperand();
+			isExprPositive.set(false);
+		} else {
+			basisExpression= originalExpression;
+			isExprPositive.set(true);
+		}
 
-        return basisExpression;
-    }
+		return basisExpression;
+	}
 }

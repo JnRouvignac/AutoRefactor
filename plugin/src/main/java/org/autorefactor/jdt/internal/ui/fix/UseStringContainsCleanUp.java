@@ -26,94 +26,76 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.OrderedInfixExpression;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class UseStringContainsCleanUp extends AbstractCleanUpRule {
-    /**
-     * Get the name.
-     *
-     * @return the name.
-     */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name;
+	}
 
-    /**
-     * Get the description.
-     *
-     * @return the description.
-     */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_description;
+	}
 
-    /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final InfixExpression node) {
-        if (!node.hasExtendedOperands()) {
-            Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
-            Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
+	@Override
+	public boolean visit(final InfixExpression node) {
+		OrderedInfixExpression<MethodInvocation, Expression> orderedExpression= ASTNodes.orderedInfix(node, MethodInvocation.class, Expression.class);
 
-            return maybeRefactor(node, leftOperand, rightOperand, true)
-                    && maybeRefactor(node, rightOperand, leftOperand, false);
-        }
+		if (orderedExpression != null) {
+			MethodInvocation indexOf= orderedExpression.getFirstOperand();
+			Long value= ASTNodes.getIntegerLiteral(orderedExpression.getSecondOperand());
 
-        return true;
-    }
+			if (value != null
+					&& (ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+							|| ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
 
-    private boolean maybeRefactor(final InfixExpression node, final Expression operand1, final Expression operand2,
-            final boolean isMethodOnTheLeft) {
-        MethodInvocation indexOf= ASTNodes.as(operand1, MethodInvocation.class);
-        Long value= ASTNodes.integerLiteral(operand2);
+				if (is(orderedExpression.getOperator(), InfixExpression.Operator.GREATER_EQUALS, value, 0)
+						|| is(orderedExpression.getOperator(), InfixExpression.Operator.NOT_EQUALS, value, -1)) {
+					replaceWithStringContains(node, indexOf, true);
+					return false;
+				}
 
-        if (indexOf != null
-                && value != null
-                && (ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                        || ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
+				if (is(orderedExpression.getOperator(), InfixExpression.Operator.LESS, value, 0)
+						|| is(orderedExpression.getOperator(), InfixExpression.Operator.EQUALS, value, -1)) {
+					replaceWithStringContains(node, indexOf, false);
+					return false;
+				}
+			}
+		}
 
-            if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.GREATER_EQUALS : InfixExpression.Operator.LESS_EQUALS, value, 0)
-                    || is(node, InfixExpression.Operator.NOT_EQUALS, value, -1)) {
-                replaceWithStringContains(node, indexOf, false);
-                return false;
-            }
-            if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.LESS : InfixExpression.Operator.GREATER, value, 0)
-                    || is(node, InfixExpression.Operator.EQUALS, value, -1)) {
-                replaceWithStringContains(node, indexOf, true);
-                return false;
-            }
-        }
+		return true;
+	}
 
-        return true;
-    }
+	private boolean is(final InfixExpression.Operator actualOperator, final InfixExpression.Operator expectedOperator, final Long actualNumber, final int expectedNumber) {
+		return Utils.equalNotNull(expectedOperator, actualOperator)
+				&& (long) actualNumber == expectedNumber;
+	}
 
-    private boolean is(final InfixExpression ie, final InfixExpression.Operator operator, final Long number, final int constant) {
-        return ASTNodes.hasOperator(ie, operator)
-                && (long) number == constant;
-    }
+	private void replaceWithStringContains(final InfixExpression node, final MethodInvocation method, final boolean isPositive) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-    private void replaceWithStringContains(final InfixExpression ie, final MethodInvocation node, final boolean negate) {
-        final Refactorings r= this.ctx.getRefactorings();
-        final ASTNodeFactory b= this.ctx.getASTBuilder();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
+		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), null); //$NON-NLS-1$
 
-        if (negate) {
-            r.replace(ie, b.not(b.createMoveTarget(node)));
-        } else {
-            r.replace(ie, b.createMoveTarget(node));
-        }
-    }
+		if (isPositive) {
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, method), null);
+		} else {
+			rewrite.replace(node, ast.not(ASTNodes.createMoveTarget(rewrite, method)), null);
+		}
+	}
 }
