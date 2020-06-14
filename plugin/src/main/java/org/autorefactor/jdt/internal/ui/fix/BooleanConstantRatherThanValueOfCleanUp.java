@@ -29,9 +29,11 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
@@ -52,32 +54,44 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-			@SuppressWarnings("unchecked")
-			BooleanLiteral literal= ASTNodes.as(node.arguments(), BooleanLiteral.class);
+		if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
+			BooleanLiteral literal= ASTNodes.as((Expression) node.arguments().get(0), BooleanLiteral.class);
 
 			if (literal != null) {
-				useConstant(node, literal);
+				replaceMethod(node, literal.booleanValue());
 				return false;
+			}
+		} else if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
+			StringLiteral literal= ASTNodes.as((Expression) node.arguments().get(0), StringLiteral.class);
+
+			if (literal != null) {
+				if ("true".equals(literal.getLiteralValue())) { //$NON-NLS-1$
+					replaceMethod(node, true);
+					return false;
+				}
+
+				if ("false".equals(literal.getLiteralValue())) { //$NON-NLS-1$
+					replaceMethod(node, false);
+					return false;
+				}
 			}
 		}
 
 		return true;
 	}
 
-	private void useConstant(final MethodInvocation node, final BooleanLiteral literal) {
+	private void replaceMethod(final MethodInvocation node, final boolean literal) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		FieldAccess fa= ast.getAST().newFieldAccess();
+		FieldAccess fieldAccess= ast.getAST().newFieldAccess();
 		Name expression= ASTNodes.as(node.getExpression(), Name.class);
 
 		if (expression != null) {
-			fa.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
+			fieldAccess.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
 		}
 
-		fa.setName(ast.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-		rewrite.replace(node, fa, null);
+		fieldAccess.setName(ast.simpleName(literal ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
+		rewrite.replace(node, fieldAccess, null);
 	}
 }

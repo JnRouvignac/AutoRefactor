@@ -26,15 +26,23 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class BooleanConstantRatherThanValueOfSample {
-
     public void useBooleanConstants() {
         // Keep this comment
         Boolean b1 = Boolean.valueOf(true);
         Boolean b2 = Boolean.valueOf(false);
     }
 
-    public void doNotUseBooleanConstants(boolean b) {
+    public void replaceBooleanStrings() {
         // Keep this comment
+        Boolean b1 = Boolean.valueOf("true");
+        Boolean b2 = Boolean.valueOf("false");
+    }
+
+    public void doNotUseBooleanConstants(boolean b) {
         Boolean b1 = Boolean.valueOf(b);
+    }
+
+    public void doNotRefactorAmbigousValue(boolean b) {
+        Boolean b1 = Boolean.valueOf("TRUE");
     }
 }
