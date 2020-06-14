@@ -28,6 +28,9 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Date;
+
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 
 public class JupiterAssertSample {
@@ -37,76 +40,104 @@ public class JupiterAssertSample {
         // Keep this comment
         Assertions.assertEquals(i1, i2);
         Assertions.assertEquals(i1, i2, "Failure message to keep");
+        Assertions.assertEquals(i1, i2, () -> "Failure message to keep");
         Assertions.assertNotEquals(i1, i2);
         Assertions.assertNotEquals(i1, i2, "Failure message to keep");
+        Assertions.assertNotEquals(i1, i2, () -> "Failure message to keep");
         Assertions.assertEquals(i1, i2);
         Assertions.assertEquals(i1, i2, "Failure message to keep");
+        Assertions.assertEquals(i1, i2, () -> "Failure message to keep");
         Assertions.assertNotEquals(i1, i2);
         Assertions.assertNotEquals(i1, i2, "Failure message to keep");
+        Assertions.assertNotEquals(i1, i2, () -> "Failure message to keep");
 
         assertEquals(i1, i2);
         assertEquals(i1, i2, "Failure message to keep");
+        assertEquals(i1, i2, () -> "Failure message to keep");
         assertNotEquals(i1, i2);
         assertNotEquals(i1, i2, "Failure message to keep");
+        assertNotEquals(i1, i2, () -> "Failure message to keep");
         assertEquals(i1, i2);
         assertEquals(i1, i2, "Failure message to keep");
+        assertEquals(i1, i2, () -> "Failure message to keep");
         assertNotEquals(i1, i2);
         assertNotEquals(i1, i2, "Failure message to keep");
+        assertNotEquals(i1, i2, () -> "Failure message to keep");
     }
 
     public void refactorWithDoubles(double d1, double d2) {
         // Keep this comment
         Assertions.assertEquals(d1, d2, .0);
         Assertions.assertEquals(d1, d2, .0, "Failure message to keep");
+        Assertions.assertEquals(d1, d2, .0, () -> "Failure message to keep");
         Assertions.assertNotEquals(d1, d2, .0);
         Assertions.assertNotEquals(d1, d2, .0, "Failure message to keep");
+        Assertions.assertNotEquals(d1, d2, .0, () -> "Failure message to keep");
         Assertions.assertEquals(d1, d2, .0);
         Assertions.assertEquals(d1, d2, .0, "Failure message to keep");
+        Assertions.assertEquals(d1, d2, .0, () -> "Failure message to keep");
         Assertions.assertNotEquals(d1, d2, .0);
         Assertions.assertNotEquals(d1, d2, .0, "Failure message to keep");
+        Assertions.assertNotEquals(d1, d2, .0, () -> "Failure message to keep");
 
         assertEquals(d1, d2, .0);
         assertEquals(d1, d2, .0, "Failure message to keep");
+        assertEquals(d1, d2, .0, () -> "Failure message to keep");
         assertNotEquals(d1, d2, .0);
         assertNotEquals(d1, d2, .0, "Failure message to keep");
+        assertNotEquals(d1, d2, .0, () -> "Failure message to keep");
         assertEquals(d1, d2, .0);
         assertEquals(d1, d2, .0, "Failure message to keep");
+        assertEquals(d1, d2, .0, () -> "Failure message to keep");
         assertNotEquals(d1, d2, .0);
         assertNotEquals(d1, d2, .0, "Failure message to keep");
+        assertNotEquals(d1, d2, .0, () -> "Failure message to keep");
     }
 
     public void refactorWithFloats(float f1, float f2) {
         // Keep this comment
         Assertions.assertEquals(f1, f2, .0F);
         Assertions.assertEquals(f1, f2, .0F, "Failure message to keep");
+        Assertions.assertEquals(f1, f2, .0F, () -> "Failure message to keep");
         Assertions.assertNotEquals(f1, f2, .0F);
         Assertions.assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        Assertions.assertNotEquals(f1, f2, .0F, () -> "Failure message to keep");
         Assertions.assertEquals(f1, f2, .0F);
         Assertions.assertEquals(f1, f2, .0F, "Failure message to keep");
+        Assertions.assertEquals(f1, f2, .0F, () -> "Failure message to keep");
         Assertions.assertNotEquals(f1, f2, .0F);
         Assertions.assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        Assertions.assertNotEquals(f1, f2, .0F, () -> "Failure message to keep");
 
         assertEquals(f1, f2, .0F);
         assertEquals(f1, f2, .0F, "Failure message to keep");
+        assertEquals(f1, f2, .0F, () -> "Failure message to keep");
         assertNotEquals(f1, f2, .0F);
         assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        assertNotEquals(f1, f2, .0F, () -> "Failure message to keep");
         assertEquals(f1, f2, .0F);
         assertEquals(f1, f2, .0F, "Failure message to keep");
+        assertEquals(f1, f2, .0F, () -> "Failure message to keep");
         assertNotEquals(f1, f2, .0F);
         assertNotEquals(f1, f2, .0F, "Failure message to keep");
+        assertNotEquals(f1, f2, .0F, () -> "Failure message to keep");
     }
 
     public void refactorFailures() {
         // Keep this comment
         Assertions.fail();
         Assertions.fail("Failure message to keep");
+        Assertions.fail(() -> "Failure message to keep");
         Assertions.fail();
         Assertions.fail("Failure message to keep");
+        Assertions.fail(() -> "Failure message to keep");
 
         fail();
         fail("Failure message to keep");
+        fail(() -> "Failure message to keep");
         fail();
         fail("Failure message to keep");
+        fail(() -> "Failure message to keep");
     }
 
     public void removeDeadChecks() {
@@ -116,386 +147,560 @@ public class JupiterAssertSample {
         // Keep this comment
         Assertions.assertFalse(b);
         Assertions.assertFalse(b, "Failure message to keep");
+        Assertions.assertFalse(b, () -> "Failure message to keep");
         Assertions.assertTrue(b);
         Assertions.assertTrue(b, "Failure message to keep");
+        Assertions.assertTrue(b, () -> "Failure message to keep");
 
         assertFalse(b);
         assertFalse(b, "Failure message to keep");
+        assertFalse(b, () -> "Failure message to keep");
         assertTrue(b);
         assertTrue(b, "Failure message to keep");
+        assertTrue(b, () -> "Failure message to keep");
     }
 
     public void refactorWithObjectReferences(Object o1, Object o2) {
         // Keep this comment
         Assertions.assertSame(o1, o2);
         Assertions.assertSame(o1, o2, "Failure message to keep");
+        Assertions.assertSame(o1, o2, () -> "Failure message to keep");
         Assertions.assertNotSame(o1, o2);
         Assertions.assertNotSame(o1, o2, "Failure message to keep");
+        Assertions.assertNotSame(o1, o2, () -> "Failure message to keep");
         Assertions.assertSame(o1, o2);
         Assertions.assertSame(o1, o2, "Failure message to keep");
+        Assertions.assertSame(o1, o2, () -> "Failure message to keep");
         Assertions.assertNotSame(o1, o2);
         Assertions.assertNotSame(o1, o2, "Failure message to keep");
+        Assertions.assertNotSame(o1, o2, () -> "Failure message to keep");
 
         assertSame(o1, o2);
         assertSame(o1, o2, "Failure message to keep");
+        assertSame(o1, o2, () -> "Failure message to keep");
         assertNotSame(o1, o2);
         assertNotSame(o1, o2, "Failure message to keep");
+        assertNotSame(o1, o2, () -> "Failure message to keep");
         assertSame(o1, o2);
         assertSame(o1, o2, "Failure message to keep");
+        assertSame(o1, o2, () -> "Failure message to keep");
         assertNotSame(o1, o2);
         assertNotSame(o1, o2, "Failure message to keep");
+        assertNotSame(o1, o2, () -> "Failure message to keep");
     }
 
     public void refactorWithObjects(Object o1, Object o2) {
         // Keep this comment
         Assertions.assertEquals(o1, o2);
         Assertions.assertEquals(o1, o2, "Failure message to keep");
+        Assertions.assertEquals(o1, o2, () -> "Failure message to keep");
         Assertions.assertNotEquals(o1, o2);
         Assertions.assertNotEquals(o1, o2, "Failure message to keep");
+        Assertions.assertNotEquals(o1, o2, () -> "Failure message to keep");
         Assertions.assertEquals(o1, o2);
         Assertions.assertEquals(o1, o2, "Failure message to keep");
+        Assertions.assertEquals(o1, o2, () -> "Failure message to keep");
         Assertions.assertNotEquals(o1, o2);
         Assertions.assertNotEquals(o1, o2, "Failure message to keep");
+        Assertions.assertNotEquals(o1, o2, () -> "Failure message to keep");
 
         assertEquals(o1, o2);
         assertEquals(o1, o2, "Failure message to keep");
+        assertEquals(o1, o2, () -> "Failure message to keep");
         assertNotEquals(o1, o2);
         assertNotEquals(o1, o2, "Failure message to keep");
+        assertNotEquals(o1, o2, () -> "Failure message to keep");
         assertEquals(o1, o2);
         assertEquals(o1, o2, "Failure message to keep");
+        assertEquals(o1, o2, () -> "Failure message to keep");
         assertNotEquals(o1, o2);
         assertNotEquals(o1, o2, "Failure message to keep");
+        assertNotEquals(o1, o2, () -> "Failure message to keep");
     }
 
     public void refactorNullCheckFirstArg(Object o) {
         // Keep this comment
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
 
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
     }
 
     public void refactorNullCheckSecondArg(Object o) {
         // Keep this comment
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
 
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
     }
 
     public void refactorNullCheckFirstArgWithEquals(Object o) {
         // Keep this comment
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
 
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
     }
 
     public void refactorNullCheckSecondArgWithEquals(Object o) {
         // Keep this comment
         Assertions.assertNull(o);
         Assertions.assertNull(o, "Failure message to keep");
+        Assertions.assertNull(o, () -> "Failure message to keep");
         Assertions.assertNotNull(o);
         Assertions.assertNotNull(o, "Failure message to keep");
+        Assertions.assertNotNull(o, () -> "Failure message to keep");
 
         assertNull(o);
         assertNull(o, "Failure message to keep");
+        assertNull(o, () -> "Failure message to keep");
         assertNotNull(o);
         assertNotNull(o, "Failure message to keep");
+        assertNotNull(o, () -> "Failure message to keep");
     }
 
     public void moveLiteralAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
-        Assertions.assertEquals(o, 42);
-        Assertions.assertEquals(o, 42, "Failure message to keep");
-        Assertions.assertNotEquals(o, 42);
-        Assertions.assertNotEquals(o, 42, "Failure message to keep");
+        Assertions.assertEquals(42, o);
+        Assertions.assertEquals(42, o, "Failure message to keep");
+        Assertions.assertEquals(42, o, () -> "Failure message to keep");
+        Assertions.assertNotEquals(42, o);
+        Assertions.assertNotEquals(42, o, "Failure message to keep");
+        Assertions.assertNotEquals(42, o, () -> "Failure message to keep");
 
-        assertEquals(o, 42);
-        assertEquals(o, 42, "Failure message to keep");
-        assertNotEquals(o, 42);
-        assertNotEquals(o, 42, "Failure message to keep");
+        assertEquals(42, o);
+        assertEquals(42, o, "Failure message to keep");
+        assertEquals(42, o, () -> "Failure message to keep");
+        assertNotEquals(42, o);
+        assertNotEquals(42, o, "Failure message to keep");
+        assertNotEquals(42, o, () -> "Failure message to keep");
     }
 
     public void moveLongLiteral(long l) {
         // Keep this comment
-        Assertions.assertEquals(l, 42L);
-        Assertions.assertEquals(l, 42L, "Failure message to keep");
-        Assertions.assertNotEquals(l, 42L);
-        Assertions.assertNotEquals(l, 42L, "Failure message to keep");
+        Assertions.assertEquals(42L, l);
+        Assertions.assertEquals(42L, l, "Failure message to keep");
+        Assertions.assertEquals(42L, l, () -> "Failure message to keep");
+        Assertions.assertNotEquals(42L, l);
+        Assertions.assertNotEquals(42L, l, "Failure message to keep");
+        Assertions.assertNotEquals(42L, l, () -> "Failure message to keep");
 
-        assertEquals(l, 42L);
-        assertEquals(l, 42L, "Failure message to keep");
-        assertNotEquals(l, 42L);
-        assertNotEquals(l, 42L, "Failure message to keep");
+        assertEquals(42L, l);
+        assertEquals(42L, l, "Failure message to keep");
+        assertEquals(42L, l, () -> "Failure message to keep");
+        assertNotEquals(42L, l);
+        assertNotEquals(42L, l, "Failure message to keep");
+        assertNotEquals(42L, l, () -> "Failure message to keep");
     }
 
     public void moveIntegerLiteral(int i) {
         // Keep this comment
-        Assertions.assertEquals(i, 42);
-        Assertions.assertEquals(i, 42, "Failure message to keep");
-        Assertions.assertNotEquals(i, 42);
-        Assertions.assertNotEquals(i, 42, "Failure message to keep");
+        Assertions.assertEquals(42, i);
+        Assertions.assertEquals(42, i, "Failure message to keep");
+        Assertions.assertEquals(42, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(42, i);
+        Assertions.assertNotEquals(42, i, "Failure message to keep");
+        Assertions.assertNotEquals(42, i, () -> "Failure message to keep");
 
-        assertEquals(i, 42);
-        assertEquals(i, 42, "Failure message to keep");
-        assertNotEquals(i, 42);
-        assertNotEquals(i, 42, "Failure message to keep");
+        assertEquals(42, i);
+        assertEquals(42, i, "Failure message to keep");
+        assertEquals(42, i, () -> "Failure message to keep");
+        assertNotEquals(42, i);
+        assertNotEquals(42, i, "Failure message to keep");
+        assertNotEquals(42, i, () -> "Failure message to keep");
     }
 
     public void moveCharacterLiteral(char c) {
         // Keep this comment
-        Assertions.assertEquals(c, 'a');
-        Assertions.assertEquals(c, 'a', "Failure message to keep");
-        Assertions.assertNotEquals(c, 'a');
-        Assertions.assertNotEquals(c, 'a', "Failure message to keep");
+        Assertions.assertEquals('a', c);
+        Assertions.assertEquals('a', c, "Failure message to keep");
+        Assertions.assertEquals('a', c, () -> "Failure message to keep");
+        Assertions.assertNotEquals('a', c);
+        Assertions.assertNotEquals('a', c, "Failure message to keep");
+        Assertions.assertNotEquals('a', c, () -> "Failure message to keep");
 
-        assertEquals(c, 'a');
-        assertEquals(c, 'a', "Failure message to keep");
-        assertNotEquals(c, 'a');
-        assertNotEquals(c, 'a', "Failure message to keep");
+        assertEquals('a', c);
+        assertEquals('a', c, "Failure message to keep");
+        assertEquals('a', c, () -> "Failure message to keep");
+        assertNotEquals('a', c);
+        assertNotEquals('a', c, "Failure message to keep");
+        assertNotEquals('a', c, () -> "Failure message to keep");
     }
 
     public void moveExpression(int i) {
         // Keep this comment
-        Assertions.assertEquals(i, 1 + 2 + 3);
-        Assertions.assertEquals(i, 1 + 2 + 3, "Failure message to keep");
-        Assertions.assertNotEquals(i, 1 + 2 + 3);
-        Assertions.assertNotEquals(i, 1 + 2 + 3, "Failure message to keep");
+        Assertions.assertEquals(1 + 2 + 3, i);
+        Assertions.assertEquals(1 + 2 + 3, i, "Failure message to keep");
+        Assertions.assertEquals(1 + 2 + 3, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(1 + 2 + 3, i);
+        Assertions.assertNotEquals(1 + 2 + 3, i, "Failure message to keep");
+        Assertions.assertNotEquals(1 + 2 + 3, i, () -> "Failure message to keep");
 
-        assertEquals(i, 1 + 2 + 3);
-        assertEquals(i, 1 + 2 + 3, "Failure message to keep");
-        assertNotEquals(i, 1 + 2 + 3);
-        assertNotEquals(i, 1 + 2 + 3, "Failure message to keep");
+        assertEquals(1 + 2 + 3, i);
+        assertEquals(1 + 2 + 3, i, "Failure message to keep");
+        assertEquals(1 + 2 + 3, i, () -> "Failure message to keep");
+        assertNotEquals(1 + 2 + 3, i);
+        assertNotEquals(1 + 2 + 3, i, "Failure message to keep");
+        assertNotEquals(1 + 2 + 3, i, () -> "Failure message to keep");
     }
 
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) {
-        Assertions.assertEquals(o, 42);
-        Assertions.assertEquals(o, 42, "Failure message to keep");
-        Assertions.assertNotEquals(o, 42);
-        Assertions.assertNotEquals(o, 42, "Failure message to keep");
+        Assertions.assertEquals(42, o);
+        Assertions.assertEquals(42, o, "Failure message to keep");
+        Assertions.assertEquals(42, o, () -> "Failure message to keep");
+        Assertions.assertNotEquals(42, o);
+        Assertions.assertNotEquals(42, o, "Failure message to keep");
+        Assertions.assertNotEquals(42, o, () -> "Failure message to keep");
 
-        assertEquals(o, 42);
-        assertEquals(o, 42, "Failure message to keep");
-        assertNotEquals(o, 42);
-        assertNotEquals(o, 42, "Failure message to keep");
+        assertEquals(42, o);
+        assertEquals(42, o, "Failure message to keep");
+        assertEquals(42, o, () -> "Failure message to keep");
+        assertNotEquals(42, o);
+        assertNotEquals(42, o, "Failure message to keep");
+        assertNotEquals(42, o, () -> "Failure message to keep");
     }
 
     public void moveConstantAsExpectedArgInWithEquals(Object o) {
         // Keep this comment
-        Assertions.assertEquals(o, FOURTYTWO);
-        Assertions.assertEquals(o, FOURTYTWO, "Failure message to keep");
-        Assertions.assertNotEquals(o, FOURTYTWO);
-        Assertions.assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, o);
+        Assertions.assertEquals(FOURTYTWO, o, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, o, () -> "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, o);
+        Assertions.assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, o, () -> "Failure message to keep");
 
-        assertEquals(o, FOURTYTWO);
-        assertEquals(o, FOURTYTWO, "Failure message to keep");
-        assertNotEquals(o, FOURTYTWO);
-        assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        assertEquals(FOURTYTWO, o);
+        assertEquals(FOURTYTWO, o, "Failure message to keep");
+        assertEquals(FOURTYTWO, o, () -> "Failure message to keep");
+        assertNotEquals(FOURTYTWO, o);
+        assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        assertNotEquals(FOURTYTWO, o, () -> "Failure message to keep");
     }
 
     public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) {
-        Assertions.assertEquals(o, FOURTYTWO);
-        Assertions.assertEquals(o, FOURTYTWO, "Failure message to keep");
-        Assertions.assertNotEquals(o, FOURTYTWO);
-        Assertions.assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, o);
+        Assertions.assertEquals(FOURTYTWO, o, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, o, () -> "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, o);
+        Assertions.assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, o, () -> "Failure message to keep");
 
-        assertEquals(o, FOURTYTWO);
-        assertEquals(o, FOURTYTWO, "Failure message to keep");
-        assertNotEquals(o, FOURTYTWO);
-        assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        assertEquals(FOURTYTWO, o);
+        assertEquals(FOURTYTWO, o, "Failure message to keep");
+        assertEquals(FOURTYTWO, o, () -> "Failure message to keep");
+        assertNotEquals(FOURTYTWO, o);
+        assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        assertNotEquals(FOURTYTWO, o, () -> "Failure message to keep");
     }
 
     public void moveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) {
         // Keep this comment
-        Assertions.assertEquals(o, expected);
-        Assertions.assertEquals(o, expected, "Failure message to keep");
-        Assertions.assertNotEquals(o, expected);
-        Assertions.assertNotEquals(o, expected, "Failure message to keep");
+        Assertions.assertEquals(expected, o);
+        Assertions.assertEquals(expected, o, "Failure message to keep");
+        Assertions.assertEquals(expected, o, () -> "Failure message to keep");
+        Assertions.assertNotEquals(expected, o);
+        Assertions.assertNotEquals(expected, o, "Failure message to keep");
+        Assertions.assertNotEquals(expected, o, () -> "Failure message to keep");
 
-        assertEquals(o, expected);
-        assertEquals(o, expected, "Failure message to keep");
-        assertNotEquals(o, expected);
-        assertNotEquals(o, expected, "Failure message to keep");
+        assertEquals(expected, o);
+        assertEquals(expected, o, "Failure message to keep");
+        assertEquals(expected, o, () -> "Failure message to keep");
+        assertNotEquals(expected, o);
+        assertNotEquals(expected, o, "Failure message to keep");
+        assertNotEquals(expected, o, () -> "Failure message to keep");
 
         // Tests that this works according to levenshtein distance
         int expceted = 0;
-        assertEquals(o, expceted);
+        assertEquals(expceted, o);
+    }
+
+    public void refactorIfOnBoolean(boolean b) {
+        // Keep this comment
+        Assertions.assertFalse(b);
+        Assertions.assertFalse(b, "Failure message to keep");
+
+        assertTrue(b);
+        assertTrue(b, "Failure message to keep");
+    }
+
+    public void refactorSuppliedObject(Date nullDate) {
+        // Keep this comment
+        Assertions.assertNull(nullDate, () -> "The date should be null: " + nullDate.getTime());
+
+        assertNull(nullDate, () -> "The date should be null: " + nullDate.getTime());
+    }
+
+    public void doNotRefactorUsedObject(Date nullDate) {
+        if (nullDate != null) {
+            Assertions.fail("The date should be null: " + nullDate.getTime());
+        }
+
+        if (nullDate != null) {
+            fail("The date should be null: " + nullDate.getTime());
+        }
+    }
+
+    public void refactorNotUsedObject(Date nullDate, Date notNullDate) {
+        // Keep this comment
+        Assertions.assertNull(nullDate, "The date should be null, not like: " + notNullDate.getTime());
+
+        assertNull(nullDate, "The date should be null, not like: " + notNullDate.getTime());
+    }
+
+    public void refactorIfOnExpression(boolean b1, boolean b2) {
+        // Keep this comment
+        Assertions.assertFalse(b1 && b2);
+        Assertions.assertFalse(b1 || b2, "Failure message to keep");
+
+        assertFalse(!b1 && !b2);
+        assertFalse(!b1 || !b2, "Failure message to keep");
     }
 
     public void refactorIfPrimitiveThenFail(int i1, int i2) {
         // Keep this comment
         Assertions.assertNotEquals(i1, i2);
         Assertions.assertNotEquals(i1, i2, "Failure message to keep");
+        Assertions.assertNotEquals(i1, i2, () -> "Failure message to keep");
         Assertions.assertEquals(i1, i2);
         Assertions.assertEquals(i1, i2, "Failure message to keep");
+        Assertions.assertEquals(i1, i2, () -> "Failure message to keep");
 
         assertNotEquals(i1, i2);
         assertNotEquals(i1, i2, "Failure message to keep");
+        assertNotEquals(i1, i2, () -> "Failure message to keep");
         assertEquals(i1, i2);
         assertEquals(i1, i2, "Failure message to keep");
+        assertEquals(i1, i2, () -> "Failure message to keep");
     }
 
     public void refactorIfSameObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         Assertions.assertNotSame(o1, o2);
         Assertions.assertNotSame(o1, o2, "Failure message to keep");
+        Assertions.assertNotSame(o1, o2, () -> "Failure message to keep");
         Assertions.assertSame(o1, o2);
         Assertions.assertSame(o1, o2, "Failure message to keep");
+        Assertions.assertSame(o1, o2, () -> "Failure message to keep");
 
         assertNotSame(o1, o2);
         assertNotSame(o1, o2, "Failure message to keep");
+        assertNotSame(o1, o2, () -> "Failure message to keep");
         assertSame(o1, o2);
         assertSame(o1, o2, "Failure message to keep");
+        assertSame(o1, o2, () -> "Failure message to keep");
     }
 
     public void refactorIfNullThenFail(Object o1) {
         // Keep this comment
         Assertions.assertNotNull(o1);
         Assertions.assertNotNull(o1, "Failure message to keep");
+        Assertions.assertNotNull(o1, () -> "Failure message to keep");
         Assertions.assertNull(o1);
         Assertions.assertNull(o1, "Failure message to keep");
+        Assertions.assertNull(o1, () -> "Failure message to keep");
         Assertions.assertNotNull(o1);
         Assertions.assertNotNull(o1, "Failure message to keep");
+        Assertions.assertNotNull(o1, () -> "Failure message to keep");
         Assertions.assertNull(o1);
         Assertions.assertNull(o1, "Failure message to keep");
+        Assertions.assertNull(o1, () -> "Failure message to keep");
 
         assertNotNull(o1);
         assertNotNull(o1, "Failure message to keep");
+        assertNotNull(o1, () -> "Failure message to keep");
         assertNull(o1);
         assertNull(o1, "Failure message to keep");
+        assertNull(o1, () -> "Failure message to keep");
         assertNotNull(o1);
         assertNotNull(o1, "Failure message to keep");
+        assertNotNull(o1, () -> "Failure message to keep");
         assertNull(o1);
         assertNull(o1, "Failure message to keep");
+        assertNull(o1, () -> "Failure message to keep");
     }
 
     public void refactorIfObjectThenFail(Object o1, Object o2) {
         // Keep this comment
         Assertions.assertNotEquals(o1, o2);
         Assertions.assertNotEquals(o1, o2, "Failure message to keep");
+        Assertions.assertNotEquals(o1, o2, () -> "Failure message to keep");
         Assertions.assertEquals(o1, o2);
         Assertions.assertEquals(o1, o2, "Failure message to keep");
+        Assertions.assertEquals(o1, o2, () -> "Failure message to keep");
 
         assertNotEquals(o1, o2);
         assertNotEquals(o1, o2, "Failure message to keep");
+        assertNotEquals(o1, o2, () -> "Failure message to keep");
         assertEquals(o1, o2);
         assertEquals(o1, o2, "Failure message to keep");
+        assertEquals(o1, o2, () -> "Failure message to keep");
     }
 
     public void refactorIfLiteralThenFail(int i) {
         // Keep this comment
-        Assertions.assertNotEquals(i, 42);
-        Assertions.assertNotEquals(i, 42, "Failure message to keep");
-        Assertions.assertEquals(i, 42);
-        Assertions.assertEquals(i, 42, "Failure message to keep");
-        Assertions.assertNotEquals(i, 42);
-        Assertions.assertNotEquals(i, 42, "Failure message to keep");
-        Assertions.assertEquals(i, 42);
-        Assertions.assertEquals(i, 42, "Failure message to keep");
+        Assertions.assertNotEquals(42, i);
+        Assertions.assertNotEquals(42, i, "Failure message to keep");
+        Assertions.assertNotEquals(42, i, () -> "Failure message to keep");
+        Assertions.assertEquals(42, i);
+        Assertions.assertEquals(42, i, "Failure message to keep");
+        Assertions.assertEquals(42, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(42, i);
+        Assertions.assertNotEquals(42, i, "Failure message to keep");
+        Assertions.assertNotEquals(42, i, () -> "Failure message to keep");
+        Assertions.assertEquals(42, i);
+        Assertions.assertEquals(42, i, "Failure message to keep");
+        Assertions.assertEquals(42, i, () -> "Failure message to keep");
 
-        assertNotEquals(i, 42);
-        assertNotEquals(i, 42, "Failure message to keep");
-        assertEquals(i, 42);
-        assertEquals(i, 42, "Failure message to keep");
-        assertNotEquals(i, 42);
-        assertNotEquals(i, 42, "Failure message to keep");
-        assertEquals(i, 42);
-        assertEquals(i, 42, "Failure message to keep");
+        assertNotEquals(42, i);
+        assertNotEquals(42, i, "Failure message to keep");
+        assertNotEquals(42, i, () -> "Failure message to keep");
+        assertEquals(42, i);
+        assertEquals(42, i, "Failure message to keep");
+        assertEquals(42, i, () -> "Failure message to keep");
+        assertNotEquals(42, i);
+        assertNotEquals(42, i, "Failure message to keep");
+        assertNotEquals(42, i, () -> "Failure message to keep");
+        assertEquals(42, i);
+        assertEquals(42, i, "Failure message to keep");
+        assertEquals(42, i, () -> "Failure message to keep");
     }
 
     public void refactorIfConstantThenFail(int i) {
         // Keep this comment
-        Assertions.assertNotEquals(i, FOURTYTWO);
-        Assertions.assertNotEquals(i, FOURTYTWO, "Failure message to keep");
-        Assertions.assertEquals(i, FOURTYTWO);
-        Assertions.assertEquals(i, FOURTYTWO, "Failure message to keep");
-        Assertions.assertNotEquals(i, FOURTYTWO);
-        Assertions.assertNotEquals(i, FOURTYTWO, "Failure message to keep");
-        Assertions.assertEquals(i, FOURTYTWO);
-        Assertions.assertEquals(i, FOURTYTWO, "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, i);
+        Assertions.assertNotEquals(FOURTYTWO, i, "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, i);
+        Assertions.assertEquals(FOURTYTWO, i, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, i);
+        Assertions.assertNotEquals(FOURTYTWO, i, "Failure message to keep");
+        Assertions.assertNotEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, i);
+        Assertions.assertEquals(FOURTYTWO, i, "Failure message to keep");
+        Assertions.assertEquals(FOURTYTWO, i, () -> "Failure message to keep");
 
-        assertNotEquals(i, FOURTYTWO);
-        assertNotEquals(i, FOURTYTWO, "Failure message to keep");
-        assertEquals(i, FOURTYTWO);
-        assertEquals(i, FOURTYTWO, "Failure message to keep");
-        assertNotEquals(i, FOURTYTWO);
-        assertNotEquals(i, FOURTYTWO, "Failure message to keep");
-        assertEquals(i, FOURTYTWO);
-        assertEquals(i, FOURTYTWO, "Failure message to keep");
+        assertNotEquals(FOURTYTWO, i);
+        assertNotEquals(FOURTYTWO, i, "Failure message to keep");
+        assertNotEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        assertEquals(FOURTYTWO, i);
+        assertEquals(FOURTYTWO, i, "Failure message to keep");
+        assertEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        assertNotEquals(FOURTYTWO, i);
+        assertNotEquals(FOURTYTWO, i, "Failure message to keep");
+        assertNotEquals(FOURTYTWO, i, () -> "Failure message to keep");
+        assertEquals(FOURTYTWO, i);
+        assertEquals(FOURTYTWO, i, "Failure message to keep");
+        assertEquals(FOURTYTWO, i, () -> "Failure message to keep");
     }
 
     public void refactorIfExpectedThenFail(int i, int expected) {
         // Keep this comment
-        Assertions.assertNotEquals(i, expected);
-        Assertions.assertNotEquals(i, expected, "Failure message to keep");
-        Assertions.assertEquals(i, expected);
-        Assertions.assertEquals(i, expected, "Failure message to keep");
-        Assertions.assertNotEquals(i, expected);
-        Assertions.assertNotEquals(i, expected, "Failure message to keep");
-        Assertions.assertEquals(i, expected);
-        Assertions.assertEquals(i, expected, "Failure message to keep");
+        Assertions.assertNotEquals(expected, i);
+        Assertions.assertNotEquals(expected, i, "Failure message to keep");
+        Assertions.assertNotEquals(expected, i, () -> "Failure message to keep");
+        Assertions.assertEquals(expected, i);
+        Assertions.assertEquals(expected, i, "Failure message to keep");
+        Assertions.assertEquals(expected, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(expected, i);
+        Assertions.assertNotEquals(expected, i, "Failure message to keep");
+        Assertions.assertNotEquals(expected, i, () -> "Failure message to keep");
+        Assertions.assertEquals(expected, i);
+        Assertions.assertEquals(expected, i, "Failure message to keep");
+        Assertions.assertEquals(expected, i, () -> "Failure message to keep");
 
-        assertNotEquals(i, expected);
-        assertNotEquals(i, expected, "Failure message to keep");
-        assertEquals(i, expected);
-        assertEquals(i, expected, "Failure message to keep");
-        assertNotEquals(i, expected);
-        assertNotEquals(i, expected, "Failure message to keep");
-        assertEquals(i, expected);
-        assertEquals(i, expected, "Failure message to keep");
+        assertNotEquals(expected, i);
+        assertNotEquals(expected, i, "Failure message to keep");
+        assertNotEquals(expected, i, () -> "Failure message to keep");
+        assertEquals(expected, i);
+        assertEquals(expected, i, "Failure message to keep");
+        assertEquals(expected, i, () -> "Failure message to keep");
+        assertNotEquals(expected, i);
+        assertNotEquals(expected, i, "Failure message to keep");
+        assertNotEquals(expected, i, () -> "Failure message to keep");
+        assertEquals(expected, i);
+        assertEquals(expected, i, "Failure message to keep");
+        assertEquals(expected, i, () -> "Failure message to keep");
     }
 
     public void refactorIfNearlyExpectedThenFail(int i, int expectedI) {
         // Keep this comment
-        Assertions.assertNotEquals(i, expectedI);
-        Assertions.assertNotEquals(i, expectedI, "Failure message to keep");
-        Assertions.assertEquals(i, expectedI);
-        Assertions.assertEquals(i, expectedI, "Failure message to keep");
-        Assertions.assertNotEquals(i, expectedI);
-        Assertions.assertNotEquals(i, expectedI, "Failure message to keep");
-        Assertions.assertEquals(i, expectedI);
-        Assertions.assertEquals(i, expectedI, "Failure message to keep");
+        Assertions.assertNotEquals(expectedI, i);
+        Assertions.assertNotEquals(expectedI, i, "Failure message to keep");
+        Assertions.assertNotEquals(expectedI, i, () -> "Failure message to keep");
+        Assertions.assertEquals(expectedI, i);
+        Assertions.assertEquals(expectedI, i, "Failure message to keep");
+        Assertions.assertEquals(expectedI, i, () -> "Failure message to keep");
+        Assertions.assertNotEquals(expectedI, i);
+        Assertions.assertNotEquals(expectedI, i, "Failure message to keep");
+        Assertions.assertNotEquals(expectedI, i, () -> "Failure message to keep");
+        Assertions.assertEquals(expectedI, i);
+        Assertions.assertEquals(expectedI, i, "Failure message to keep");
+        Assertions.assertEquals(expectedI, i, () -> "Failure message to keep");
 
-        assertNotEquals(i, expectedI);
-        assertNotEquals(i, expectedI, "Failure message to keep");
-        assertEquals(i, expectedI);
-        assertEquals(i, expectedI, "Failure message to keep");
-        assertNotEquals(i, expectedI);
-        assertNotEquals(i, expectedI, "Failure message to keep");
-        assertEquals(i, expectedI);
-        assertEquals(i, expectedI, "Failure message to keep");
+        assertNotEquals(expectedI, i);
+        assertNotEquals(expectedI, i, "Failure message to keep");
+        assertNotEquals(expectedI, i, () -> "Failure message to keep");
+        assertEquals(expectedI, i);
+        assertEquals(expectedI, i, "Failure message to keep");
+        assertEquals(expectedI, i, () -> "Failure message to keep");
+        assertNotEquals(expectedI, i);
+        assertNotEquals(expectedI, i, "Failure message to keep");
+        assertNotEquals(expectedI, i, () -> "Failure message to keep");
+        assertEquals(expectedI, i);
+        assertEquals(expectedI, i, "Failure message to keep");
+        assertEquals(expectedI, i, () -> "Failure message to keep");
     }
 
     public void doNotRefactorBecauseOfElseStatement(int i1, int i2, Object o1) {

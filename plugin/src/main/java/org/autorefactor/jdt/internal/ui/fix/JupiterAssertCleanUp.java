@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -42,6 +43,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
+	private static final String SUPPLIER_STRING_CANONICAL_NAME= Supplier.class.getCanonicalName() + "<" + String.class.getCanonicalName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String JUPITER_CLASS= "org.junit.jupiter.api.Assertions"; //$NON-NLS-1$
 
 	/**
@@ -69,7 +71,7 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	protected Pair<Expression, Expression> getActualAndExpected(final Expression leftValue,
 			final Expression rightValue) {
-		return Pair.of(leftValue, rightValue);
+		return Pair.of(rightValue, leftValue);
 	}
 
 	@Override
@@ -82,7 +84,8 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), null, false);
 		}
 
-		if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertTrue", boolean.class.getSimpleName(), SUPPLIER_STRING_CANONICAL_NAME)) { //$NON-NLS-1$
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), false);
 		}
 
@@ -90,25 +93,28 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), null, false);
 		}
 
-		if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertFalse", boolean.class.getSimpleName(), SUPPLIER_STRING_CANONICAL_NAME)) { //$NON-NLS-1$
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), false);
 		}
 
 		for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
 			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), null);
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(1), args.get(0), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(0), args.get(1), args.get(2));
+			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), SUPPLIER_STRING_CANONICAL_NAME)) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, true, args.get(1), args.get(0), args.get(2));
 			}
 
 			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), null);
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(1), args.get(0), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(0), args.get(1), args.get(2));
+			if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), SUPPLIER_STRING_CANONICAL_NAME)) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node, node, false, args.get(1), args.get(0), args.get(2));
 			}
 		}
 
@@ -128,6 +134,10 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
 			}
 
+			if (ASTNodes.usesGivenSignature(methodInvocation, JUPITER_CLASS, "fail", SUPPLIER_STRING_CANONICAL_NAME)) { //$NON-NLS-1$
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), ((List<Expression>) methodInvocation.arguments()).get(0), true);
+			}
+
 			if (ASTNodes.usesGivenSignature(methodInvocation, JUPITER_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), ((List<Expression>) methodInvocation.arguments()).get(0));
 			}
@@ -144,12 +154,12 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 
 		List<Expression> arguments= new ArrayList<>(4);
 
-		if (copyOfActual != null) {
-			arguments.add(copyOfActual);
-		}
-
 		if (copyOfExpected != null) {
 			arguments.add(copyOfExpected);
+		}
+
+		if (copyOfActual != null) {
+			arguments.add(copyOfActual);
 		}
 
 		if (delta != null) {
