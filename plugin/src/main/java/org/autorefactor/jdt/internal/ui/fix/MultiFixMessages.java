@@ -1301,6 +1301,18 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
+	public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
 	public static String CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
 	/**
 	 * Automatically filled.
