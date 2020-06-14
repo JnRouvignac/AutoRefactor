@@ -366,10 +366,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 			IfStatement is;
 			if (statements.size() == 2) {
 				Pair<Expression, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(statements.get(0));
-				MethodInvocation mi= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
+				MethodInvocation methodInvocation= ASTNodes.as(loopVarPair.getSecond(), MethodInvocation.class);
 
-				if (!ASTNodes.match(mi, item)
-						|| !ASTNodes.isSameVariable(mi.getExpression(), variable)) {
+				if (!ASTNodes.match(methodInvocation, item)
+						|| !ASTNodes.isSameVariable(methodInvocation.getExpression(), variable)) {
 					return true;
 				}
 

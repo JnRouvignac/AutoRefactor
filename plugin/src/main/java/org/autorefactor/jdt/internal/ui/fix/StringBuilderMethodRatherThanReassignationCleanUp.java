@@ -76,12 +76,12 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 			return var;
 		}
 
-		MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
+		MethodInvocation methodInvocation= ASTNodes.as(var, MethodInvocation.class);
 
-		if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+		if (methodInvocation != null && ASTNodes.hasType(methodInvocation.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 				&& Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-						.contains(mi.getName().getIdentifier())) {
-			return getVar(mi.getExpression());
+						.contains(methodInvocation.getName().getIdentifier())) {
+			return getVar(methodInvocation.getExpression());
 		}
 
 		return null;

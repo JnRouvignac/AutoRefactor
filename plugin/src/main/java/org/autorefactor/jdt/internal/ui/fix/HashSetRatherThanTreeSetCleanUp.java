@@ -105,22 +105,22 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
 	}
 
 	@Override
-	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
+		return ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
 	}
 
 	@Override

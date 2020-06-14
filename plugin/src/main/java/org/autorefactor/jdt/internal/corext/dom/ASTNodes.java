@@ -570,11 +570,11 @@ public final class ASTNodes {
 	/**
 	 * Returns the type of the object on which the method is called.
 	 *
-	 * @param mi the node on which to call the equivalent JDT method
+	 * @param methodInvocation the node on which to call the equivalent JDT method
 	 * @return the type of the object on which the method is called.
 	 */
-	public static ITypeBinding getCalledType(final MethodInvocation mi) {
-		IMethodBinding methodBinding= mi.resolveMethodBinding();
+	public static ITypeBinding getCalledType(final MethodInvocation methodInvocation) {
+		IMethodBinding methodBinding= methodInvocation.resolveMethodBinding();
 		if (methodBinding != null) {
 			return methodBinding.getDeclaringClass();
 		}

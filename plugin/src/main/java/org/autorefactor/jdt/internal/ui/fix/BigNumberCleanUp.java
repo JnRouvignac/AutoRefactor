@@ -151,8 +151,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final PrefixExpression node) {
-		MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
-		return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || mi == null || maybeReplaceEquals(false, node, mi);
+		MethodInvocation methodInvocation= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+		return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || methodInvocation == null || maybeReplaceEquals(false, node, methodInvocation);
 	}
 
 	@Override
@@ -193,20 +193,20 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-		if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			Expression arg0= ((List<Expression>) mi.arguments()).get(0);
+	private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation methodInvocation) {
+		if (ASTNodes.usesGivenSignature(methodInvocation, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			Expression arg0= ((List<Expression>) methodInvocation.arguments()).get(0);
 
 			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				if (isInStringAppend(mi.getParent())) {
+				if (isInStringAppend(methodInvocation.getParent())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-					rewrite.replace(node, ast.parenthesize(getCompareToNode(isPositive, mi)), null);
+					rewrite.replace(node, ast.parenthesize(getCompareToNode(isPositive, methodInvocation)), null);
 				} else {
-					rewrite.replace(node, getCompareToNode(isPositive, mi), null);
+					rewrite.replace(node, getCompareToNode(isPositive, methodInvocation), null);
 				}
 
 				return false;
@@ -248,8 +248,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		MethodInvocation mi= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0))); //$NON-NLS-1$
+		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0))); //$NON-NLS-1$
 
-		return ast.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
+		return ast.infixExpression(methodInvocation, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
 	}
 }

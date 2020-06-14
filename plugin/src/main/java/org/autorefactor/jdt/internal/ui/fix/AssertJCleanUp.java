@@ -197,18 +197,18 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
 		if (node.getElseStatement() == null && statements.size() == 1) {
-			MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
-			if (ASTNodes.usesGivenSignature(mi, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(mi, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(mi, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(mi, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
-				if (mi.arguments() == null
-						|| (mi.arguments().size() == 1 && ASTNodes.as((Expression) mi.arguments().get(0), NullLiteral.class) != null)) {
-					return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
+			if (ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
+				if (methodInvocation.arguments() == null
+						|| (methodInvocation.arguments().size() == 1 && ASTNodes.as((Expression) methodInvocation.arguments().get(0), NullLiteral.class) != null)) {
+					return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
 				}
 
-				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), mi);
+				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), methodInvocation);
 			}
 		}
 

@@ -114,9 +114,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 					IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
 
 					if (finallyEs != null) {
-						MethodInvocation mi= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
+						MethodInvocation methodInvocation= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
 
-						if (methodClosesCloseables(mi) && ASTNodes.areSameVariables(previousDeclFragment, mi.getExpression())) {
+						if (methodClosesCloseables(methodInvocation) && ASTNodes.areSameVariables(previousDeclFragment, methodInvocation.getExpression())) {
 							return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
 									nodesToRemove);
 						}
@@ -125,10 +125,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 						Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
 
 						Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
-						MethodInvocation mi= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+						MethodInvocation methodInvocation= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
 
-						if (methodClosesCloseables(mi)
-								&& ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, mi.getExpression())) {
+						if (methodClosesCloseables(methodInvocation)
+								&& ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, methodInvocation.getExpression())) {
 							return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
 									nodesToRemove);
 						}
@@ -157,8 +157,8 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			return false;
 		}
 
-		private boolean methodClosesCloseables(final MethodInvocation mi) {
-			return ASTNodes.usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
+		private boolean methodClosesCloseables(final MethodInvocation methodInvocation) {
+			return ASTNodes.usesGivenSignature(methodInvocation, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
 		}
 
 		private VariableDeclarationExpression newResource(final List<Statement> tryStatements,

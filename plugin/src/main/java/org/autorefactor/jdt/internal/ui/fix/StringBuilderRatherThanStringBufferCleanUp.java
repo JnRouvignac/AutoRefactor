@@ -68,38 +68,38 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
 	}
 
 	@Override
-	protected boolean isMethodReturningExistingClass(final MethodInvocation mi) {
-		return ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", char.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", "char[]") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", "char[]", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", double.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", float.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "append", StringBuffer.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "appendCodePoint", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "delete", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "deleteCharAt", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), char.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), double.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), float.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "replace", int.class.getSimpleName(), int.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "reverse") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, StringBuffer.class.getCanonicalName(), "getChars", int.class.getSimpleName(), int.class.getSimpleName(), "char[]", int.class.getSimpleName()); //$NON-NLS-1$ //$NON-NLS-2$
+	protected boolean isMethodReturningExistingClass(final MethodInvocation methodInvocation) {
+		return ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", char.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", "char[]") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", "char[]", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", double.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", float.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "append", StringBuffer.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "appendCodePoint", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "delete", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "deleteCharAt", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), char.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), double.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), float.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "replace", int.class.getSimpleName(), int.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "reverse") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, StringBuffer.class.getCanonicalName(), "getChars", int.class.getSimpleName(), int.class.getSimpleName(), "char[]", int.class.getSimpleName()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

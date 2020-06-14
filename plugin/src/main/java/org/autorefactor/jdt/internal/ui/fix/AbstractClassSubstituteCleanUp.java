@@ -121,21 +121,21 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 	/**
 	 * Is the method returning existing class.
 	 *
-	 * @param mi The method invocation
+	 * @param methodInvocation The method invocation
 	 * @return True if the method returns the existing class.
 	 */
-	protected boolean isMethodReturningExistingClass(final MethodInvocation mi) {
+	protected boolean isMethodReturningExistingClass(final MethodInvocation methodInvocation) {
 		return false;
 	}
 
 	/**
 	 * If the method can be refactored.
 	 *
-	 * @param mi                    The method invocation
+	 * @param methodInvocation                    The method invocation
 	 * @param methodCallsToRefactor The method calls to refactor
 	 * @return True if the method can be refactored.
 	 */
-	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
 		return true;
 	}
@@ -372,15 +372,15 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 			return false;
 
 		case ASTNode.METHOD_INVOCATION:
-			MethodInvocation mi= (MethodInvocation) parentNode;
+			MethodInvocation methodInvocation= (MethodInvocation) parentNode;
 
-			return node.getLocationInParent() != MethodInvocation.ARGUMENTS_PROPERTY && canMethodBeRefactored(mi, methodCallsToRefactor) && (!isMethodReturningExistingClass(mi) || canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
+			return node.getLocationInParent() != MethodInvocation.ARGUMENTS_PROPERTY && canMethodBeRefactored(methodInvocation, methodCallsToRefactor) && (!isMethodReturningExistingClass(methodInvocation) || canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
 					methodCallsToRefactor));
 		}
 	}
 
-	static String getArgumentType(final MethodInvocation mi) {
-		Expression expression= mi.getExpression();
+	static String getArgumentType(final MethodInvocation methodInvocation) {
+		Expression expression= methodInvocation.getExpression();
 		if (expression != null) {
 			ITypeBinding typeBinding= expression.resolveTypeBinding();
 			if (typeBinding != null) {

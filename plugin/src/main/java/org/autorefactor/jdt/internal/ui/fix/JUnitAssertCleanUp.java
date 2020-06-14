@@ -152,11 +152,11 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
 		if (node.getElseStatement() == null && statements.size() == 1) {
-			MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 			int i= 0;
 			boolean shouldVisit= true;
 			while (shouldVisit && i < PACKAGE_PATHES.length) {
-				shouldVisit= maybeRefactorIf(classesToUseWithImport, importsToAdd, node, mi, PACKAGE_PATHES[i]);
+				shouldVisit= maybeRefactorIf(classesToUseWithImport, importsToAdd, node, methodInvocation, PACKAGE_PATHES[i]);
 				i++;
 			}
 
@@ -167,13 +167,13 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 	}
 
 	private boolean maybeRefactorIf(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
-			final IfStatement node, final MethodInvocation mi, final String unitTestPackagePath) {
-		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
-			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
+			final IfStatement node, final MethodInvocation methodInvocation, final String unitTestPackagePath) {
+		if (ASTNodes.usesGivenSignature(methodInvocation, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ //$NON-NLS-2$
+			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
 		}
 
-		if (ASTNodes.usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
-			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), (Expression) mi.arguments().get(0));
+		if (ASTNodes.usesGivenSignature(methodInvocation, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), (Expression) methodInvocation.arguments().get(0));
 		}
 
 		return true;

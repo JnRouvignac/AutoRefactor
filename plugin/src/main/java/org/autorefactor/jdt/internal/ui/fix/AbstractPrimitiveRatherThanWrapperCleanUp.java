@@ -238,8 +238,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		}
 
 		if (expression instanceof MethodInvocation) {
-			MethodInvocation mi= (MethodInvocation) expression;
-			return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
+			MethodInvocation methodInvocation= (MethodInvocation) expression;
+			return ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
 		}
 
 		return false;

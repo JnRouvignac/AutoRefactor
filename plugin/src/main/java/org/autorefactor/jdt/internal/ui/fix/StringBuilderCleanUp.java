@@ -367,12 +367,12 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.hasType(exp, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())) {
 			if (exp instanceof MethodInvocation) {
-				MethodInvocation mi= (MethodInvocation) exp;
+				MethodInvocation methodInvocation= (MethodInvocation) exp;
 
-				if ("append".equals(mi.getName().getIdentifier()) && mi.arguments().size() == 1) { //$NON-NLS-1$
-					Expression arg0= (Expression) mi.arguments().get(0);
+				if ("append".equals(methodInvocation.getName().getIdentifier()) && methodInvocation.arguments().size() == 1) { //$NON-NLS-1$
+					Expression arg0= (Expression) methodInvocation.arguments().get(0);
 					readSubExpressions(arg0, allOperands, isRefactoringNeeded);
-					return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
+					return readAppendMethod(methodInvocation.getExpression(), allOperands, isRefactoringNeeded,
 							isInstanceCreationToRewrite);
 				}
 			} else if (exp instanceof ClassInstanceCreation) {
@@ -506,35 +506,35 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			Pair<ITypeBinding, Expression> expression= iter.next();
 
 			if (expression.getSecond().getNodeType() == ASTNode.METHOD_INVOCATION) {
-				MethodInvocation mi= (MethodInvocation) expression.getSecond();
+				MethodInvocation methodInvocation= (MethodInvocation) expression.getSecond();
 
-				if (ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
-					if (mi.getExpression() != null) {
-						iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
+				if (ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+					if (methodInvocation.getExpression() != null) {
+						iter.set(Pair.<ITypeBinding, Expression>of(null, methodInvocation.getExpression()));
 					} else {
 						iter.set(Pair.<ITypeBinding, Expression>of(null, cuRewrite.getAST().newThisExpression()));
 					}
 
 					isRefactoringNeeded.set(true);
-				} else if (isToString(mi) || isStringValueOf(mi)) {
-					iter.set(getTypeAndValue(mi));
+				} else if (isToString(methodInvocation) || isStringValueOf(methodInvocation)) {
+					iter.set(getTypeAndValue(methodInvocation));
 					isRefactoringNeeded.set(true);
 				}
 			}
 		}
 	}
 
-	private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
-		IMethodBinding expectedType= mi.resolveMethodBinding();
+	private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation methodInvocation) {
+		IMethodBinding expectedType= methodInvocation.resolveMethodBinding();
 
 		if (expectedType == null) {
 			return null;
 		}
 
-		Expression argument= (Expression) mi.arguments().get(0);
+		Expression argument= (Expression) methodInvocation.arguments().get(0);
 
 		if (ASTNodes.hasType(argument, expectedType.getParameterTypes()[0].getQualifiedName(),
-				Bindings.getBoxedTypeBinding(expectedType.getParameterTypes()[0], mi.getAST()).getQualifiedName())) {
+				Bindings.getBoxedTypeBinding(expectedType.getParameterTypes()[0], methodInvocation.getAST()).getQualifiedName())) {
 			return Pair.<ITypeBinding, Expression>of(null, argument);
 		}
 
@@ -678,31 +678,31 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	private boolean isToString(final MethodInvocation mi) {
-		return ASTNodes.usesGivenSignature(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()); //$NON-NLS-1$
+	private boolean isToString(final MethodInvocation methodInvocation) {
+		return ASTNodes.usesGivenSignature(methodInvocation, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()); //$NON-NLS-1$
 	}
 
-	private boolean isStringValueOf(final MethodInvocation mi) {
-		return ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
+	private boolean isStringValueOf(final MethodInvocation methodInvocation) {
+		return ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
 	}
 
 	private Expression getTypedExpression(final Pair<ITypeBinding, Expression> typeAndValue) {

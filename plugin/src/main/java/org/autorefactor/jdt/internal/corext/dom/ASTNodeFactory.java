@@ -872,9 +872,9 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final Expression... arguments) {
-		MethodInvocation mi= newMethodInvocation(methodName, arguments);
-		mi.setExpression(expression);
-		return mi;
+		MethodInvocation methodInvocation= newMethodInvocation(methodName, arguments);
+		methodInvocation.setExpression(expression);
+		return methodInvocation;
 	}
 
 	/**
@@ -886,10 +886,10 @@ public class ASTNodeFactory {
 	 */
 	@SuppressWarnings("unchecked")
 	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
-		MethodInvocation mi= ast.newMethodInvocation();
-		mi.setName(ast.newSimpleName(methodName));
-		addAll(mi.arguments(), arguments);
-		return mi;
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setName(ast.newSimpleName(methodName));
+		addAll(methodInvocation.arguments(), arguments);
+		return methodInvocation;
 	}
 
 	/**
@@ -902,11 +902,11 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public <E extends Expression> MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final List<E> arguments) {
-		MethodInvocation mi= ast.newMethodInvocation();
-		mi.setExpression(expression);
-		mi.setName(ast.newSimpleName(methodName));
-		addAll(mi, arguments);
-		return mi;
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setExpression(expression);
+		methodInvocation.setName(ast.newSimpleName(methodName));
+		addAll(methodInvocation, arguments);
+		return methodInvocation;
 	}
 
 	private boolean isEmptyRangeCopy(final ASTNode... nodes) {
@@ -1068,9 +1068,9 @@ public class ASTNodeFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <E extends Expression> void addAll(final MethodInvocation mi, final List<E> arguments) {
+	private <E extends Expression> void addAll(final MethodInvocation methodInvocation, final List<E> arguments) {
 		if (!isEmptyRangeCopy(arguments)) {
-			mi.arguments().addAll(arguments);
+			methodInvocation.arguments().addAll(arguments);
 		}
 	}
 

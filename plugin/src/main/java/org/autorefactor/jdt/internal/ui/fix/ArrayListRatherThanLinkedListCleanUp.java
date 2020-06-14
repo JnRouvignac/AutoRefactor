@@ -93,26 +93,26 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
 	}
 
 	@Override
-	protected boolean canMethodBeRefactored(final MethodInvocation mi, final List<MethodInvocation> methodCallsToRefactor) {
-		String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
-		return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation, final List<MethodInvocation> methodCallsToRefactor) {
+		String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(methodInvocation);
+		return ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "hashCode") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "isEmpty") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
 	}
 
 	@Override

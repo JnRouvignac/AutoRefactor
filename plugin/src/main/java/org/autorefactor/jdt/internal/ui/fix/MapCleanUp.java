@@ -79,23 +79,23 @@ public class MapCleanUp extends AbstractCleanUpRule {
 	private final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ExpressionStatement node) {
-			MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.asExpression(node, MethodInvocation.class);
 
-			if (result && ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
-				Expression arg0= (Expression) mi.arguments().get(0);
+			if (result && ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
+				Expression arg0= (Expression) methodInvocation.arguments().get(0);
 				Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
 				Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
 				if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
 					SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
 
-					if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
+					if (lhs != null && ASTNodes.isSameLocalVariable(lhs, methodInvocation.getExpression())) {
 						return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
 					}
 				} else if (previousStatement instanceof VariableDeclarationStatement) {
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(
 							previousStatement);
-					if (fragment != null && ASTNodes.isSameLocalVariable(fragment, mi.getExpression())) {
+					if (fragment != null && ASTNodes.isSameLocalVariable(fragment, methodInvocation.getExpression())) {
 						return maybeReplaceInitializer(fragment.getInitializer(), arg0, node);
 					}
 				}
@@ -140,12 +140,12 @@ public class MapCleanUp extends AbstractCleanUpRule {
 		private boolean isValidCapacityParameter(final Expression sourceMap, final List<Expression> args) {
 			if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
 				Object constant= args.get(0).resolveConstantExpressionValue();
-				MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
+				MethodInvocation methodInvocation= ASTNodes.as(args.get(0), MethodInvocation.class);
 				if (constant != null) {
 					return constant.equals(0);
 				}
 
-				return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceMap); //$NON-NLS-1$
+				return ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "size") && ASTNodes.match(methodInvocation.getExpression(), sourceMap); //$NON-NLS-1$
 			}
 
 			return false;

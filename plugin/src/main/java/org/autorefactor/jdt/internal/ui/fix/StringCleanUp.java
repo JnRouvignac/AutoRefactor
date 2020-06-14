@@ -188,8 +188,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		return stringExpression;
 	}
 
-	private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
-		ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
+	private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation methodInvocation) {
+		ITypeBinding expectedType= methodInvocation.resolveMethodBinding().getParameterTypes()[0];
 
 		if (expectedType == null) {
 			return true;
@@ -198,12 +198,12 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		ITypeBinding actualType= ((Expression) mi.arguments().get(0)).resolveTypeBinding();
+		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
 
-		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), null);
+		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
+			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), null);
 		} else {
-			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), null);
+			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), null);
 		}
 
 		return false;

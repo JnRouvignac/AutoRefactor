@@ -97,25 +97,25 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
 	}
 
 	@Override
-	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
+		return ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
 	}
 
 	@Override

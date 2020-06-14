@@ -120,18 +120,18 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 		} else if (node.getBody() instanceof MethodInvocation) {
-			MethodInvocation mi= (MethodInvocation) node.getBody();
-			Expression calledExpression= mi.getExpression();
-			ITypeBinding calledType= ASTNodes.getCalledType(mi);
+			MethodInvocation methodInvocation= (MethodInvocation) node.getBody();
+			Expression calledExpression= methodInvocation.getExpression();
+			ITypeBinding calledType= ASTNodes.getCalledType(methodInvocation);
 			@SuppressWarnings("unchecked")
-			List<Expression> arguments= mi.arguments();
+			List<Expression> arguments= methodInvocation.arguments();
 
 			if (node.parameters().size() == arguments.size()) {
 				if (!areSameIdentifiers(node, arguments)) {
 					return true;
 				}
 
-				if (isStaticMethod(mi)) {
+				if (isStaticMethod(methodInvocation)) {
 					if (!arguments.isEmpty()) {
 						String[] remainingParams= new String[arguments.size() - 1];
 						for (int i= 0; i < arguments.size() - 1; i++) {
@@ -146,19 +146,19 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
 						for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
 							if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && ASTNodes.usesGivenSignature(methodBinding,
-									calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
+									calledType.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
 								return true;
 							}
 						}
 					}
 
-					replaceByTypeReference(node, mi);
+					replaceByTypeReference(node, methodInvocation);
 					return false;
 				}
 
 				if (calledExpression == null || calledExpression instanceof StringLiteral || calledExpression instanceof NumberLiteral
 						|| calledExpression instanceof ThisExpression) {
-					replaceByMethodReference(node, mi);
+					replaceByMethodReference(node, methodInvocation);
 					return false;
 				}
 
@@ -166,14 +166,14 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 					FieldAccess fieldAccess= (FieldAccess) calledExpression;
 
 					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
-						replaceByMethodReference(node, mi);
+						replaceByMethodReference(node, methodInvocation);
 						return false;
 					}
 				} else if (calledExpression instanceof SuperFieldAccess) {
 					SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
 
 					if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
-						replaceByMethodReference(node, mi);
+						replaceByMethodReference(node, methodInvocation);
 						return false;
 					}
 				}
@@ -210,12 +210,12 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
 					for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
 						if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && ASTNodes.usesGivenSignature(methodBinding,
-								clazz.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
+								clazz.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
 							return true;
 						}
 					}
 
-					replaceByTypeReference(node, mi);
+					replaceByTypeReference(node, methodInvocation);
 					return false;
 				}
 			}
@@ -224,11 +224,11 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private boolean isStaticMethod(final MethodInvocation mi) {
-		Expression calledExpression= mi.getExpression();
+	private boolean isStaticMethod(final MethodInvocation methodInvocation) {
+		Expression calledExpression= methodInvocation.getExpression();
 
 		if (calledExpression == null) {
-			return mi.resolveMethodBinding() != null && (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
+			return methodInvocation.resolveMethodBinding() != null && (methodInvocation.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
 		}
 
 		Name typeName= ASTNodes.as(calledExpression, Name.class);
@@ -303,31 +303,31 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		rewrite.replace(node, creationRef, null);
 	}
 
-	private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
+	private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		TypeNameDecider typeNameDecider= new TypeNameDecider(mi);
+		TypeNameDecider typeNameDecider= new TypeNameDecider(methodInvocation);
 
 		TypeMethodReference typeMethodRef= ast.typeMethodRef();
-		typeMethodRef.setType(ast.toType(ASTNodes.getCalledType(mi).getErasure(), typeNameDecider));
-		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, mi.getName()));
+		typeMethodRef.setType(ast.toType(ASTNodes.getCalledType(methodInvocation).getErasure(), typeNameDecider));
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, methodInvocation.getName()));
 		rewrite.replace(node, typeMethodRef, null);
 	}
 
-	private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
+	private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		ExpressionMethodReference typeMethodRef= ast.exprMethodRef();
 
-		if (mi.getExpression() != null) {
-			typeMethodRef.setExpression(ASTNodes.createMoveTarget(rewrite, mi.getExpression()));
+		if (methodInvocation.getExpression() != null) {
+			typeMethodRef.setExpression(ASTNodes.createMoveTarget(rewrite, methodInvocation.getExpression()));
 		} else {
 			typeMethodRef.setExpression(ast.this0());
 		}
 
-		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, mi.getName()));
+		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, methodInvocation.getName()));
 		rewrite.replace(node, typeMethodRef, null);
 	}
 }

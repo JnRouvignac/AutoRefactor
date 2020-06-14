@@ -163,14 +163,14 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
 
 		if (node.getElseStatement() == null && statements.size() == 1) {
-			MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
-			if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail")) { //$NON-NLS-1$
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), null, true);
+			if (ASTNodes.usesGivenSignature(methodInvocation, TESTNG_CLASS, "fail")) { //$NON-NLS-1$
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
 			}
 
-			if (ASTNodes.usesGivenSignature(mi, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, mi, false, node.getExpression(), ((List<Expression>) mi.arguments()).get(0));
+			if (ASTNodes.usesGivenSignature(methodInvocation, TESTNG_CLASS, "fail", String.class.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), ((List<Expression>) methodInvocation.arguments()).get(0));
 			}
 		}
 

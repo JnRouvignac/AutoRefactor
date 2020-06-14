@@ -159,22 +159,22 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 	}
 
 	@Override
-	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "clear") || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "clear") || ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
 			return true;
 		}
-		if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			methodCallsToRefactor.add(mi);
+		if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			methodCallsToRefactor.add(methodInvocation);
 			return true;
 		}
-		if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-			if (ASTNodes.isPassiveWithoutFallingThrough((Expression) mi.arguments().get(1))) {
-				methodCallsToRefactor.add(mi);
+		if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.isPassiveWithoutFallingThrough((Expression) methodInvocation.arguments().get(1))) {
+				methodCallsToRefactor.add(methodInvocation);
 				return true;
 			}
 
@@ -193,7 +193,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 		// AbstractMap.toString()
 		// HashMap.keySet()
 		// HashMap.putAll(Map)
-		return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) && isReturnValueLost(mi); //$NON-NLS-1$
+		return ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) && isReturnValueLost(methodInvocation); //$NON-NLS-1$
 	}
 
 	private boolean isReturnValueLost(final ASTNode node) {

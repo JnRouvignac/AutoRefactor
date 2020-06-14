@@ -341,14 +341,14 @@ public class CFGBuilder {
 			return addVariableAccess(basicBlock, ioe.getLeftOperand(), flags, throwers);
 
 		case ASTNode.METHOD_INVOCATION:
-			MethodInvocation mi= (MethodInvocation) node;
-			addVariableAccess(basicBlock, mi.getExpression(), flags, throwers);
-			addVariableAccesses(basicBlock, mi.arguments(), flags, throwers);
-			IMethodBinding methodBinding= mi.resolveMethodBinding();
+			MethodInvocation methodInvocation= (MethodInvocation) node;
+			addVariableAccess(basicBlock, methodInvocation.getExpression(), flags, throwers);
+			addVariableAccesses(basicBlock, methodInvocation.arguments(), flags, throwers);
+			IMethodBinding methodBinding= methodInvocation.resolveMethodBinding();
 
 			if (methodBinding != null) {
 				ITypeBinding[] declaredThrows= methodBinding.getExceptionTypes();
-				throwers.addThrow(mi, declaredThrows);
+				throwers.addThrow(methodInvocation, declaredThrows);
 				return declaredThrows.length > 0;
 			}
 

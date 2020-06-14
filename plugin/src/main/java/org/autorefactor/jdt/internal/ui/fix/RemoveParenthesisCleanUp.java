@@ -278,8 +278,8 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	private boolean canRemoveParenthesesAroundExpression(final MethodInvocation mi, final ParenthesizedExpression node) {
-		if (node.equals(mi.getExpression())) {
+	private boolean canRemoveParenthesesAroundExpression(final MethodInvocation methodInvocation, final ParenthesizedExpression node) {
+		if (node.equals(methodInvocation.getExpression())) {
 			switch (node.getExpression().getNodeType()) {
 			case ASTNode.ASSIGNMENT:
 			case ASTNode.CAST_EXPRESSION:

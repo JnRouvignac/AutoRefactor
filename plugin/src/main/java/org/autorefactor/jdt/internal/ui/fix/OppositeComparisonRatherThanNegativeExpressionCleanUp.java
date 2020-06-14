@@ -52,14 +52,14 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 	@Override
 	public boolean visit(final PrefixExpression node) {
 		if (ASTNodes.hasOperator(node, PrefixExpression.Operator.MINUS)) {
-			MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+			MethodInvocation methodInvocation= ASTNodes.as(node.getOperand(), MethodInvocation.class);
 
-			if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
+			if (methodInvocation != null && methodInvocation.getExpression() != null && methodInvocation.arguments().size() == 1) {
 				String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
 				for (String clazz : classes) {
-					if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
-						reverseObjects(node, mi);
+					if (ASTNodes.usesGivenSignature(methodInvocation, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) methodInvocation.arguments().get(0), clazz)) { //$NON-NLS-1$
+						reverseObjects(node, methodInvocation);
 						return false;
 					}
 				}
@@ -69,11 +69,11 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 		return true;
 	}
 
-	private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
+	private void reverseObjects(final PrefixExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		rewrite.replace(node, ast.newMethodInvocation(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$
-				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(mi.getExpression()))), null);
+		rewrite.replace(node, ast.newMethodInvocation(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), "compareTo", //$NON-NLS-1$
+				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression()))), null);
 	}
 }

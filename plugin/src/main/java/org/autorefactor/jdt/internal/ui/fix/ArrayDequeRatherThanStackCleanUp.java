@@ -107,36 +107,36 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 	}
 
 	@Override
-	protected boolean canMethodBeRefactored(final MethodInvocation mi,
+	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		if (ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "firstElement") || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeAllElements") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ //$NON-NLS-2$
-			methodCallsToRefactor.add(mi);
+		if (ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "firstElement") || ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Vector.class.getCanonicalName(), "removeAllElements") || ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ //$NON-NLS-2$
+			methodCallsToRefactor.add(methodInvocation);
 			return true;
 		}
 
-		String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(mi);
-		return ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "clone") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "peek") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "pop") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()); //$NON-NLS-1$
+		String argumentType= AbstractClassSubstituteCleanUp.getArgumentType(methodInvocation);
+		return ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "clone") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "peek") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "pop") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()); //$NON-NLS-1$
 	}
 
 	@Override
