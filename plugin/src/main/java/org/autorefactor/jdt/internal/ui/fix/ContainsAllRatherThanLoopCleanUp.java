@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -57,7 +56,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 	@Override
 	protected Expression getExpressionToFind(final MethodInvocation condition, final Expression forVar, final Expression iterable) {
 		Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-		Expression arg0= ASTNodes.getUnparenthesedExpression(((List<Expression>) condition.arguments()).get(0));
+		Expression arg0= ASTNodes.getUnparenthesedExpression((Expression) condition.arguments().get(0));
 
 		if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
 			return expression;

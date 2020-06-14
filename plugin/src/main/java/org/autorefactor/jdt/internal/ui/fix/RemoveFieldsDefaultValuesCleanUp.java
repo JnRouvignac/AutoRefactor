@@ -56,6 +56,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final FieldDeclaration node) {
 		if (!canRemoveFieldDefaultValue(node)) {
@@ -69,9 +70,9 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		boolean visitSubtree= true;
 		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
 			Expression initializer= fragment.getInitializer();
-			if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
-					|| (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
-							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
+			if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
+					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
+							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
 				cuRewrite.getASTRewrite().remove(initializer, null);
 				visitSubtree= false;
 			}

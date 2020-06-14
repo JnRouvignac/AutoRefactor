@@ -26,7 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -60,7 +59,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 		}
 
 		Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
-		Expression arg0= ASTNodes.getUnparenthesedExpression(((List<Expression>) condition.arguments()).get(0));
+		Expression arg0= ASTNodes.getUnparenthesedExpression((Expression) condition.arguments().get(0));
 
 		if (ASTNodes.isSameVariable(forVar, expression)) {
 			return arg0;

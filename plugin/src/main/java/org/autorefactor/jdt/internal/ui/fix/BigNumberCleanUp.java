@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -69,10 +68,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 		if (node.getAnonymousClassDeclaration() == null
 				&& ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
-				&& ((List<Expression>) node.arguments()).size() == 1) {
+				&& node.arguments().size() == 1) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			Expression arg0= ((List<Expression>) node.arguments()).get(0);
+			Expression arg0= (Expression) node.arguments().get(0);
 
 			if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
 				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "").replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -165,7 +164,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				|| ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
 			ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-			Expression arg0= ((List<Expression>) node.arguments()).get(0);
+			Expression arg0= (Expression) node.arguments().get(0);
 
 			if (arg0 instanceof NumberLiteral) {
 				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -196,7 +195,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation methodInvocation) {
 		if (ASTNodes.usesGivenSignature(methodInvocation, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			Expression arg0= ((List<Expression>) methodInvocation.arguments()).get(0);
+			Expression arg0= (Expression) methodInvocation.arguments().get(0);
 
 			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -248,7 +247,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, ((List<Expression>) node.arguments()).get(0))); //$NON-NLS-1$
+		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))); //$NON-NLS-1$
 
 		return ast.infixExpression(methodInvocation, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
 	}

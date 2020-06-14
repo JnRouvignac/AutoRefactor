@@ -185,6 +185,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
