@@ -225,11 +225,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 		@Override
 		public boolean visit(final MethodInvocation node) {
 			if (isInflateMethod(node)) {
-				ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
+				ASTNode ancestor= ASTNodes.getASTNodeAncestor(node, VariableDeclarationFragment.class, Assignment.class);
 				if (ancestor instanceof VariableDeclarationFragment) {
 					viewVariableDeclFragment= (VariableDeclarationFragment) ancestor;
 					viewVariableName= viewVariableDeclFragment.getName();
-					viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableDeclFragment, VariableDeclarationStatement.class);
+					viewAssignmentStatement= ASTNodes.getTypedAncestor(viewVariableDeclFragment, VariableDeclarationStatement.class);
 					if (viewAssignmentStatement == null) {
 						resetData();
 						return true;
@@ -242,7 +242,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 						return true;
 					}
 					viewVariableName= (SimpleName) lhs;
-					viewAssignmentStatement= ASTNodes.getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
+					viewAssignmentStatement= ASTNodes.getTypedAncestor(viewVariableAssignment, ExpressionStatement.class);
 				}
 
 				return false;
@@ -265,7 +265,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 		private boolean isInflateInsideIf() {
 			if (this.viewAssignmentStatement != null) {
 				Expression inflateExpression= getInflateExpression();
-				return ASTNodes.getFirstAncestorOrNull(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
+				return ASTNodes.getASTNodeAncestor(this.viewAssignmentStatement, IfStatement.class, SwitchStatement.class) != null
 						// Check whether inflate is inside a conditional assignment
 						|| inflateExpression != null && inflateExpression.getNodeType() == ASTNode.CONDITIONAL_EXPRESSION;
 			}
@@ -304,7 +304,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
 			private boolean setAssignment(final MethodInvocation node) {
 				this.findViewByIdInvocation= node;
-				ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, VariableDeclarationFragment.class, Assignment.class);
+				ASTNode ancestor= ASTNodes.getASTNodeAncestor(node, VariableDeclarationFragment.class, Assignment.class);
 				if (ancestor instanceof VariableDeclarationFragment) {
 					VariableDeclarationFragment fragment= (VariableDeclarationFragment) ancestor;
 					variable= fragment.getName();

@@ -294,8 +294,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			@SuppressWarnings("unchecked")
 			List<Statement> statements= ((Block) scope).statements();
 			for (Statement statement : statements) {
-				Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
-				Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
+				Expression parentExpression= ASTNodes.getTypedAncestorOrCrash(varName, Expression.class); // FIXME i=0
+				Statement parentStatement= ASTNodes.getTypedAncestorOrCrash(parentExpression, Statement.class); // FIXME i=0
 				if (statement.equals(parentStatement)) {
 					VariableDeclarationFragment fragment= getVariableDeclarationFragment(parentExpression, varName);
 					VariableDeclarationStatement vds= ast.getAST().newVariableDeclarationStatement(fragment);
@@ -309,7 +309,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			EnhancedForStatement newEfs= ast.createCopyTarget(efs);
 			newEfs.setParameter(ast.createCopyTarget(efs.getParameter()));
 			newEfs.setExpression(ast.createCopyTarget(efs.getExpression()));
-			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			Statement parentStatement= ASTNodes.getTypedAncestorOrCrash(varName, Statement.class);
 			if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
 				newEfs.setBody(copy(efs.getBody(), varName));
 			}
@@ -336,7 +336,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			WhileStatement ws= (WhileStatement) scope;
 			WhileStatement newWs= ast.getAST().newWhileStatement();
 			newWs.setExpression(ast.createCopyTarget(ws.getExpression()));
-			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			Statement parentStatement= ASTNodes.getTypedAncestorOrCrash(varName, Statement.class);
 			if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
 				newWs.setBody(copy(ws.getBody(), varName));
 			}
@@ -345,7 +345,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			IfStatement is= (IfStatement) scope;
 			IfStatement newIs= ast.getAST().newIfStatement();
 			newIs.setExpression(ast.createCopyTarget(is.getExpression()));
-			Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+			Statement parentStatement= ASTNodes.getTypedAncestorOrCrash(varName, Statement.class);
 			if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
 				newIs.setThenStatement(copy(is.getThenStatement(), varName));
 				if (is.getElseStatement() != null) {

@@ -186,7 +186,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 					boolean hasOneWriteInDynamicCode= false;
 
 					for (Assignment assignmentRead : assignmentReads) {
-						ASTNode dynamicCode= ASTNodes.getFirstAncestorOrNull(assignmentRead, LambdaExpression.class, AnonymousClassDeclaration.class);
+						ASTNode dynamicCode= ASTNodes.getASTNodeAncestor(assignmentRead, LambdaExpression.class, AnonymousClassDeclaration.class);
 
 						if (ASTNodes.isParent(dynamicCode, startNode)) {
 							hasOneWriteInDynamicCode= true;

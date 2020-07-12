@@ -109,7 +109,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		}
 
 		private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
-			TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
+			TryStatement tryStatement= ASTNodes.getTypedAncestor(scopeNode, TryStatement.class);
 
 			if (tryStatement == null) {
 				return false;

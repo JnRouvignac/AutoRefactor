@@ -100,12 +100,12 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final TypeDeclaration node) {
 		if (!node.isInterface()) {
-			TypeDeclaration parent= ASTNodes.getAncestorOrNull(node, TypeDeclaration.class);
+			TypeDeclaration parent= ASTNodes.getTypedAncestor(node, TypeDeclaration.class);
 			TypeDeclaration topLevelClass= null;
 
 			while (parent != null) {
 				topLevelClass= parent;
-				parent= ASTNodes.getAncestorOrNull(topLevelClass, TypeDeclaration.class);
+				parent= ASTNodes.getTypedAncestor(topLevelClass, TypeDeclaration.class);
 
 				if (parent != null && !Modifier.isStatic(topLevelClass.getModifiers())) {
 					return true;

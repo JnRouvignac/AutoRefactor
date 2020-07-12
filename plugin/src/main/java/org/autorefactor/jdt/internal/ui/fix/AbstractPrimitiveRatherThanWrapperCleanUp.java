@@ -170,7 +170,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 					&& ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
 					&& fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
 				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
-				Block parentBlock= ASTNodes.getAncestorOrNull(fragment, Block.class);
+				Block parentBlock= ASTNodes.getTypedAncestor(fragment, Block.class);
 
 				if (parentBlock != null) {
 					varOccurrenceVisitor.visitNode(parentBlock);
@@ -325,7 +325,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			case ASTNode.RETURN_STATEMENT:
 				ReturnStatement returnStatement= (ReturnStatement) parentNode;
 				if (returnStatement.getExpression().equals(node)) {
-					MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
+					MethodDeclaration method= ASTNodes.getTypedAncestor(returnStatement, MethodDeclaration.class);
 
 					if (method != null && method.getReturnType2() != null) {
 						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {

@@ -634,12 +634,12 @@ public final class ASTNodes {
 	 * @param node          the start node
 	 * @param ancestorClass the required ancestor's type
 	 * @return the first ancestor of the provided node which has the required type
-	 * @see #getAncestorOrNull(ASTNode, Class)
-	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
+	 * @see #getTypedAncestor(ASTNode, Class)
+	 * @see #getASTNodeAncestor(ASTNode, Class...)
 	 * @throws IllegalStateException if ancestor not found.
 	 */
-	public static <T extends ASTNode> T getAncestor(final ASTNode node, final Class<T> ancestorClass) {
-		T ancestor= getAncestorOrNull(node, ancestorClass);
+	public static <T extends ASTNode> T getTypedAncestorOrCrash(final ASTNode node, final Class<T> ancestorClass) {
+		T ancestor= getTypedAncestor(node, ancestorClass);
 		if (ancestor != null) {
 			return ancestor;
 		}
@@ -654,11 +654,11 @@ public final class ASTNodes {
 	 * @param ancestorClass the required ancestor's type
 	 * @return the first ancestor of the provided node which has the required type,
 	 *         {@code null} if no suitable ancestor can be found
-	 * @see #getAncestor(ASTNode, Class)
-	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
+	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
+	 * @see #getASTNodeAncestor(ASTNode, Class...)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends ASTNode> T getAncestorOrNull(final ASTNode node, final Class<T> ancestorClass) {
+	public static <T extends ASTNode> T getTypedAncestor(final ASTNode node, final Class<T> ancestorClass) {
 		if (node == null || node.getParent() == null) {
 			return null;
 		}
@@ -667,7 +667,35 @@ public final class ASTNodes {
 			return (T) parent;
 		}
 
-		return getAncestorOrNull(parent, ancestorClass);
+		return getTypedAncestor(parent, ancestorClass);
+	}
+
+	/**
+	 * Returns the first ancestor of the provided node which has any of the required
+	 * types.
+	 *
+	 * @param node            the start node
+	 * @param ancestorClasses the required ancestor's types
+	 * @return the first ancestor of the provided node which has any of the required
+	 *         type, or {@code null}
+	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
+	 * @see #getTypedAncestor(ASTNode, Class)
+	 */
+	public static ASTNode getASTNodeAncestor(final ASTNode node, final Class<?>... ancestorClasses) {
+		if (ancestorClasses.length == 1) {
+			throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
+		}
+		if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
+			return null;
+		}
+		ASTNode parent= node.getParent();
+		for (Class<?> ancestorClass : ancestorClasses) {
+			if (ancestorClass.isAssignableFrom(parent.getClass())) {
+				return parent;
+			}
+		}
+
+		return getASTNodeAncestor(parent, ancestorClasses);
 	}
 
 	/**
@@ -703,7 +731,7 @@ public final class ASTNodes {
 	 */
 	public static ASTNode getEnclosingType(final ASTNode node) {
 		Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
-		ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
+		ASTNode ancestor= getASTNodeAncestor(node, ancestorClasses);
 		if (ancestor == null) {
 			throw new IllegalStateException(node,
 					"Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ //$NON-NLS-2$
@@ -711,34 +739,6 @@ public final class ASTNodes {
 		}
 
 		return ancestor;
-	}
-
-	/**
-	 * Returns the first ancestor of the provided node which has any of the required
-	 * types.
-	 *
-	 * @param node            the start node
-	 * @param ancestorClasses the required ancestor's types
-	 * @return the first ancestor of the provided node which has any of the required
-	 *         type, or {@code null}
-	 * @see #getAncestor(ASTNode, Class)
-	 * @see #getAncestorOrNull(ASTNode, Class)
-	 */
-	public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<?>... ancestorClasses) {
-		if (ancestorClasses.length == 1) {
-			throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
-		}
-		if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
-			return null;
-		}
-		ASTNode parent= node.getParent();
-		for (Class<?> ancestorClass : ancestorClasses) {
-			if (ancestorClass.isAssignableFrom(parent.getClass())) {
-				return parent;
-			}
-		}
-
-		return getFirstAncestorOrNull(parent, ancestorClasses);
 	}
 
 	/**
@@ -758,7 +758,7 @@ public final class ASTNodes {
 			if (parent instanceof ReturnStatement) {
 				ReturnStatement returnStatement= (ReturnStatement) parent;
 				if (returnStatement.getExpression().equals(node)) {
-					MethodDeclaration method= getAncestorOrNull(returnStatement, MethodDeclaration.class);
+					MethodDeclaration method= getTypedAncestor(returnStatement, MethodDeclaration.class);
 					if (method != null && method.getReturnType2() != null) {
 						return method.getReturnType2().resolveBinding();
 					}
@@ -1650,7 +1650,7 @@ public final class ASTNodes {
 	 * @return true if a checked exception is supposed to be caught.
 	 */
 	public static boolean isExceptionExpected(final ASTNode node) {
-		ASTNode parentNode= getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
+		ASTNode parentNode= getASTNodeAncestor(node, TryStatement.class, BodyDeclaration.class);
 
 		while (parentNode instanceof TryStatement) {
 			TryStatement tryStatement= (TryStatement) parentNode;
@@ -1665,7 +1665,7 @@ public final class ASTNodes {
 				}
 			}
 
-			parentNode= getFirstAncestorOrNull(parentNode, TryStatement.class, BodyDeclaration.class);
+			parentNode= getASTNodeAncestor(parentNode, TryStatement.class, BodyDeclaration.class);
 		}
 
 		return false;

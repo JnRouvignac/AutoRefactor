@@ -275,7 +275,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 		for (VariableDeclaration varDecl : varDecls) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(varDecl);
 
-			Statement parent= ASTNodes.getAncestorOrNull(varDecl, Statement.class);
+			Statement parent= ASTNodes.getTypedAncestor(varDecl, Statement.class);
 			Statement nextSibling= ASTNodes.getNextSibling(parent);
 			while (nextSibling != null) {
 				varOccurrenceVisitor.visitNode(nextSibling);

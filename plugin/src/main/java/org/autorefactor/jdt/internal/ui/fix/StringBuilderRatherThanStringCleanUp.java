@@ -204,7 +204,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				if (unvisitedReads.size() == 1
 						&& !writes.isEmpty()
 						&& writes.size() == assignmentWrites.size() + concatenationWrites.size()) {
-					Statement declarationStatement= ASTNodes.getAncestorOrNull(type, Statement.class);
+					Statement declarationStatement= ASTNodes.getTypedAncestor(type, Statement.class);
 					SimpleName finalRead= unvisitedReads.iterator().next();
 
 					if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {

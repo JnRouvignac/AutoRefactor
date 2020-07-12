@@ -272,7 +272,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 			return false;
 		}
 
-		MethodDeclaration md= ASTNodes.getAncestor(node, MethodDeclaration.class);
+		MethodDeclaration md= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
 		Type returnType= md.getReturnType2();
 
 		if (returnType != null && returnType.isPrimitiveType()) {
@@ -399,7 +399,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 				exprToReturn= ast.negate(exprToReturn, Copy.NONE);
 			}
 
-			MethodDeclaration md= ASTNodes.getAncestor(node, MethodDeclaration.class);
+			MethodDeclaration md= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
 			Expression returnExpression= getReturnExpression(md, exprToReturn);
 
 			if (returnExpression != null) {
@@ -486,7 +486,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Name getBooleanName(final ASTNode node) {
-		if (!isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), ASTNodes.getAncestor(node, CompilationUnit.class))) {
+		if (!isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), ASTNodes.getTypedAncestorOrCrash(node, CompilationUnit.class))) {
 			return ast.simpleName(Boolean.class.getSimpleName());
 		}
 

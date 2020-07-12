@@ -123,7 +123,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
 			Statement parent= aBreak;
 			do {
-				parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
+				parent= ASTNodes.getTypedAncestor(parent, Statement.class);
 			} while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
 
 			if (parent != root) {

@@ -129,7 +129,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		MethodDeclaration oneMethodDeclaration= null;
 
 		for (SimpleName occurrence : occurrences) {
-			MethodDeclaration currentMethodDeclaration= ASTNodes.getAncestorOrNull(occurrence, MethodDeclaration.class);
+			MethodDeclaration currentMethodDeclaration= ASTNodes.getTypedAncestor(occurrence, MethodDeclaration.class);
 
 			if (isVariableDeclaration(occurrence)
 					|| isExternalField(occurrence)
@@ -186,7 +186,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		rewrite.replace(ASTNodes.getAncestor(reassignmentAssignment, Statement.class),
+		rewrite.replace(ASTNodes.getTypedAncestorOrCrash(reassignmentAssignment, Statement.class),
 				newDeclareStatement, null);
 
 		if (isFieldKept) {
@@ -210,7 +210,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	private boolean isReassignmentForAll(final SimpleName reassignment, final List<SimpleName> occurrences) {
 		for (SimpleName occurrence : occurrences) {
 			if (reassignment != occurrence) {
-				Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
+				Statement statement= ASTNodes.getTypedAncestor(occurrence, Statement.class);
 				boolean isReassigned= false;
 
 				while (statement != null) {
@@ -242,7 +242,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	private boolean isAlwaysErased(final List<SimpleName> occurrences) {
 		for (SimpleName occurrence : occurrences) {
 			if (!isReassigned(occurrence)) {
-				Statement statement= ASTNodes.getAncestorOrNull(occurrence, Statement.class);
+				Statement statement= ASTNodes.getTypedAncestor(occurrence, Statement.class);
 				boolean isReassigned= false;
 
 				while (statement != null) {

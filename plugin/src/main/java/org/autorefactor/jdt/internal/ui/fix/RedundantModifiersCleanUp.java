@@ -281,7 +281,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		if (parent instanceof MethodDeclaration) {
 			MethodDeclaration method= (MethodDeclaration) parent;
-			TypeDeclaration type= ASTNodes.getAncestorOrNull(method, TypeDeclaration.class);
+			TypeDeclaration type= ASTNodes.getTypedAncestor(method, TypeDeclaration.class);
 
 			if (Modifier.isAbstract(method.getModifiers()) || isInterface(type)) {
 				return removeFinalModifier(node.modifiers());

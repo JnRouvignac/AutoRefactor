@@ -285,7 +285,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		private ITypeBinding getDeclaringTypeInTopLevelHierarchy(final String simpleName, final FqnType fqnType,
 				final ASTNode node) {
 			Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
-			ASTNode enclosingType= ASTNodes.getFirstAncestorOrNull(node, ancestorClasses);
+			ASTNode enclosingType= ASTNodes.getASTNodeAncestor(node, ancestorClasses);
 
 			while (enclosingType != null) {
 				ITypeBinding enclosingTypeBinding= resolveEnclosingTypeBinding(enclosingType);
@@ -295,7 +295,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 						return enclosingTypeBinding;
 					}
 				}
-				enclosingType= ASTNodes.getFirstAncestorOrNull(enclosingType, ancestorClasses);
+				enclosingType= ASTNodes.getASTNodeAncestor(enclosingType, ancestorClasses);
 			}
 
 			return null;
@@ -705,7 +705,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	}
 
 	private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<SimpleName> localIdentifiers) {
-		ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
+		ASTNode ancestor= ASTNodes.getASTNodeAncestor(node, PackageDeclaration.class, ImportDeclaration.class);
 		QName qname= getFullyQualifiedNameOrNull(node);
 
 		if (ancestor != null || qname == null) {

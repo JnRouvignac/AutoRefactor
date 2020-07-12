@@ -290,7 +290,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		if (node instanceof Statement) {
 			statement= (Statement) node;
 		} else {
-			statement= ASTNodes.getAncestorOrNull(node, Statement.class);
+			statement= ASTNodes.getTypedAncestor(node, Statement.class);
 		}
 
 		if (statement == null) {

@@ -391,8 +391,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			return isObjectValid(data, condition) || isBooleanValid(data, condition);
 		} else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
 			MethodInvocation specificMethod= (MethodInvocation) newHash;
-			TypeDeclaration innerClass= ASTNodes.getAncestorOrNull(newHash, TypeDeclaration.class);
-			TypeDeclaration topLevelClass= ASTNodes.getAncestorOrNull(innerClass, TypeDeclaration.class);
+			TypeDeclaration innerClass= ASTNodes.getTypedAncestor(newHash, TypeDeclaration.class);
+			TypeDeclaration topLevelClass= ASTNodes.getTypedAncestor(innerClass, TypeDeclaration.class);
 
 			if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
@@ -496,7 +496,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 				if (te.getQualifier().isSimpleName()) {
 					SimpleName qualifier= (SimpleName) te.getQualifier();
-					TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
+					TypeDeclaration visitedClass= ASTNodes.getTypedAncestor(expression, TypeDeclaration.class);
 
 					if (visitedClass != null
 							&& ASTNodes.isSameVariable(visitedClass.getName(), qualifier)) {
@@ -515,7 +515,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 			if (superFieldAccess.getQualifier().isSimpleName()) {
 				SimpleName qualifier= (SimpleName) superFieldAccess.getQualifier();
-				TypeDeclaration visitedClass= ASTNodes.getAncestorOrNull(expression, TypeDeclaration.class);
+				TypeDeclaration visitedClass= ASTNodes.getTypedAncestor(expression, TypeDeclaration.class);
 
 				if (visitedClass != null
 						&& ASTNodes.isSameVariable(visitedClass.getName(), qualifier)) {
