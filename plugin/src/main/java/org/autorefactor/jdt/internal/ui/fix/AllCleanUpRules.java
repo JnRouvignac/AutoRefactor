@@ -127,6 +127,7 @@ public final class AllCleanUpRules {
 				new StringBuilderCleanUp(), new StringBuilderMethodRatherThanReassignationCleanUp(),
 				new StringBuilderRatherThanStringBufferCleanUp(),
 				new StringBuilderRatherThanStringCleanUp(),
+				new AtomicObjectRatherThanMonoIndexArrayCleanUp(),
 				new PatternRatherThanRegExStringCleanUp(),
 				new HashMapRatherThanHashtableCleanUp(),
 				new ArrayListRatherThanVectorCleanUp(), new ArrayDequeRatherThanStackCleanUp(),
