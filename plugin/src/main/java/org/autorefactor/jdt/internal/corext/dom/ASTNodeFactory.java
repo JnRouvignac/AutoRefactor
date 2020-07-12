@@ -144,7 +144,7 @@ public class ASTNodeFactory {
 	}
 
 	private final AST ast;
-	private final ASTRewrite refactorings;
+	private final ASTRewrite rewrite;
 
 	/**
 	 * Class constructor.
@@ -152,7 +152,7 @@ public class ASTNodeFactory {
 	 * @param refactorings the cleanups
 	 */
 	public ASTNodeFactory(final ASTRewrite refactorings) {
-		this.refactorings= refactorings;
+		this.rewrite= refactorings;
 		this.ast= refactorings.getAST();
 	}
 
@@ -511,7 +511,7 @@ public class ASTNodeFactory {
 					"The provided nodes are not valid for doing a range copy: " + nodes); //$NON-NLS-1$
 		}
 
-		return refactorings.createCopyTarget(nodes.get(0), Utils.getLast(nodes));
+		return rewrite.createCopyTarget(nodes.get(0), Utils.getLast(nodes));
 	}
 
 	/**
@@ -530,11 +530,11 @@ public class ASTNodeFactory {
 					"The provided nodes are not valid for doing a range move: " + nodes); //$NON-NLS-1$
 		}
 
-		return refactorings.createMoveTarget(nodes.get(0), Utils.getLast(nodes));
+		return rewrite.createMoveTarget(nodes.get(0), Utils.getLast(nodes));
 	}
 
 	private boolean isValidForRangeOperation(final List<? extends ASTNode> nodes) {
-		return nodesHaveSameParentAndLocation(nodes) && refactorings.isValidRange(nodes);
+		return nodesHaveSameParentAndLocation(nodes) && rewrite.isValidRange(nodes);
 	}
 
 	private boolean nodesHaveSameParentAndLocation(final List<? extends ASTNode> nodes) {
@@ -984,14 +984,14 @@ public class ASTNodeFactory {
 			return (T) copyType((Type) nodeToCopy);
 		}
 		if (isValidInCurrentAST(nodeToCopy)) {
-			return refactorings.createCopyTarget(nodeToCopy);
+			return rewrite.createCopyTarget(nodeToCopy);
 		}
 
 		return copySubtree(nodeToCopy);
 	}
 
 	private <T extends ASTNode> T createMoveTarget(final T nodeToMove) {
-		return ASTNodes.createMoveTarget(refactorings, nodeToMove);
+		return ASTNodes.createMoveTarget(rewrite, nodeToMove);
 	}
 
 	/**
@@ -1319,7 +1319,7 @@ public class ASTNodeFactory {
 	 * @return a newline statement
 	 */
 	public Statement newlinePlaceholder() {
-		return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT); //$NON-NLS-1$
+		return (Statement) rewrite.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT); //$NON-NLS-1$
 	}
 
 	/**
@@ -1330,7 +1330,7 @@ public class ASTNodeFactory {
 	 * @return a newline statement
 	 */
 	public ASTNode rawComment(String text) {
-		return refactorings.getRewrite().createStringPlaceholder(text, ASTNode.EMPTY_STATEMENT);
+		return rewrite.getRewrite().createStringPlaceholder(text, ASTNode.EMPTY_STATEMENT);
 	}
 
 	/**
