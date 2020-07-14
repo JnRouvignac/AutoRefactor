@@ -100,6 +100,32 @@ public class AtomicObjectRatherThanMonoIndexArraySample {
         return longRef[0];
     }
 
+    public static boolean useInitializedAtomicBoolean() {
+        // Keep this comment
+        boolean[] booleanRef= new boolean[] {true};
+        // Keep this comment also
+        Runnable runnable = () -> booleanRef[0] = true;
+        runnable.run();
+        // Keep this comment too
+        return booleanRef[0];
+    }
+
+    public static void doNotRefactorVoidArray() {
+        Date[] dateRef= new Date[] {};
+        Runnable runnable = () -> {
+            dateRef[0] = new Date();
+        };
+        System.out.println(dateRef[0]);
+    }
+
+    public static void doNotRefactorBadlyInitializedArray() {
+        Date[] dateRef= new Date[] {new Date(), new Date()};
+        Runnable runnable = () -> {
+            dateRef[0] = new Date();
+        };
+        System.out.println(dateRef[0]);
+    }
+
     public static Date useAtomicReferenceInAnonymousClass() {
         // Keep this comment
         Date[] dateRef= new Date[1];

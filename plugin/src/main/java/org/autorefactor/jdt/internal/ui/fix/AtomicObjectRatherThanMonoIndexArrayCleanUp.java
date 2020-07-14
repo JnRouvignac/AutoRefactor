@@ -154,12 +154,12 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 
 			if (result
 					&& arrayCreation != null
-					&& arrayCreation.getInitializer() == null // TODO Handle initializer
-					&& arrayCreation.dimensions().size() == 1
-					&& Long.valueOf(1).equals(ASTNodes.getIntegerLiteral((Expression) arrayCreation.dimensions().get(0)))
-					&& (type.resolveBinding().isArray() ? variableDimensions.isEmpty() && type.resolveBinding().getDimensions() == 1
-							&& Utils.equalNotNull(type.resolveBinding().getElementType(), arrayCreation.getType().getElementType().resolveBinding())
-					: variableDimensions.size() == 1 && Utils.equalNotNull(type.resolveBinding(), arrayCreation.getType().getElementType().resolveBinding()))
+					&& (arrayCreation.getInitializer() != null
+							? arrayCreation.getInitializer().expressions().size() == 1
+							: arrayCreation.dimensions().size() == 1 && Long.valueOf(1).equals(ASTNodes.getIntegerLiteral((Expression) arrayCreation.dimensions().get(0))))
+					&& (type.resolveBinding().isArray()
+							? variableDimensions.isEmpty() && type.resolveBinding().getDimensions() == 1 && Utils.equalNotNull(type.resolveBinding().getElementType(), arrayCreation.getType().getElementType().resolveBinding())
+									: variableDimensions.size() == 1 && Utils.equalNotNull(type.resolveBinding(), arrayCreation.getType().getElementType().resolveBinding()))
 					&& !ASTNodes.hasType(arrayCreation.getType().getElementType().resolveBinding(),
 							double.class.getCanonicalName(),
 							float.class.getCanonicalName(),
@@ -264,6 +264,13 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			}
 
 			ClassInstanceCreation newAtomicObject= ast.new0(atomicType);
+
+			if (arrayCreation.getInitializer() != null) {
+				@SuppressWarnings("unchecked")
+				List<Expression> arguments= newAtomicObject.arguments();
+				arguments.add(ASTNodes.createMoveTarget(rewrite, (Expression) arrayCreation.getInitializer().expressions().get(0)));
+			}
+
 			rewrite.replace(arrayCreation, newAtomicObject, null);
 
 			for (Object variableDimension : variableDimensions) {
