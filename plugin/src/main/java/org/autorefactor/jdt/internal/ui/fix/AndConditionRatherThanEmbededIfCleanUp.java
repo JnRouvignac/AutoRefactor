@@ -66,13 +66,13 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 		return true;
 	}
 
-	private void replaceIfNoElseStatement(final IfStatement outerIf, final IfStatement innerIf) {
+	private void replaceIfNoElseStatement(final IfStatement node, final IfStatement innerIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		InfixExpression infixExpression= ast.infixExpression(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
-				ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
+		InfixExpression infixExpression= ast.infixExpression(ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+				ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
 		rewrite.replace(innerIf.getExpression(), infixExpression, null);
-		rewrite.replace(outerIf, ASTNodes.createMoveTarget(rewrite, innerIf), null);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, innerIf), null);
 	}
 }

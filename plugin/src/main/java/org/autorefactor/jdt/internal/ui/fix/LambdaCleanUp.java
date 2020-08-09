@@ -280,7 +280,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-		rewrite.replace(node.getBody(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), null);
+		rewrite.replace(node.getBody(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), null);
 	}
 
 	private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {

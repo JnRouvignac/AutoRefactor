@@ -347,16 +347,16 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 	private ReturnStatement getReturnStatement(final IfStatement node, final Boolean thenBool, final Boolean elseBool,
 			final Expression thenExpression, final Expression elseExpression) {
 		if (thenBool == null && elseBool != null) {
-			Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())), !elseBool);
+			Expression leftOp= signExpression(ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(node.getExpression())), !elseBool);
 			return ast.return0(ast.infixExpression(leftOp, getConditionalOperator(elseBool),
-					ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression))));
+					ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(thenExpression))));
 		}
 
 		if (thenBool != null && elseBool == null) {
-			Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())),
+			Expression leftOp= signExpression(ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(node.getExpression())),
 					thenBool);
 			return ast.return0(ast.infixExpression(leftOp, getConditionalOperator(thenBool),
-					ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression))));
+					ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(elseExpression))));
 		}
 
 		return null;

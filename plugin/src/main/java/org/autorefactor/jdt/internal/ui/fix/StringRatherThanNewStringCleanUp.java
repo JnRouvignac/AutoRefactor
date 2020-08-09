@@ -60,7 +60,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), null);
+				rewrite.replace(node, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), null);
 				return false;
 			}
 		}

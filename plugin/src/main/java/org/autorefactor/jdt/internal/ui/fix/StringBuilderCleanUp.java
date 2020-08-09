@@ -782,7 +782,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(typeAndValue))); //$NON-NLS-1$
 					isFirstAndNotAString= false;
 				} else {
-					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(typeAndValue)));
+					concatenateStrings.add(ASTRewrite.parenthesizeIfNeeded(ast, getTypedExpression(typeAndValue)));
 				}
 			}
 
