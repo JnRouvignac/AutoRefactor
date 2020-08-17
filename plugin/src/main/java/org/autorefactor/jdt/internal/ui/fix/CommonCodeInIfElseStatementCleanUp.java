@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
@@ -179,6 +180,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
 
 		// Remove the nodes common to all cases
 		boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
@@ -190,13 +192,13 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			if (ASTNodes.canHaveSiblings(node)) {
 				insertIdenticalCode(node, oneCaseToRemove);
 
-				rewrite.removeButKeepComment(node, null);
+				rewrite.removeButKeepComment(node, group);
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
 				for (Statement stmtToRemove : oneCaseToRemove) {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
-				rewrite.replace(node, ast.block(orderedStatements), null);
+				rewrite.replace(node, ast.block(orderedStatements), group);
 			}
 		} else {
 			// Remove empty cases
@@ -207,14 +209,14 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
 						// Then clause is empty and there is only one else clause
 						// => revert if statement
-						rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), null);
+						rewrite.replace(parent, ast.if0(ast.negate(((IfStatement) parent).getExpression()), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), group);
 						break;
 					}
 					if (allRemovable(areCasesRemovable, i)) {
-						rewrite.remove(parent, null);
+						rewrite.remove(parent, group);
 						break;
 					}
-					rewrite.replace(((IfStatement) parent).getThenStatement(), ast.block(), null);
+					rewrite.replace(((IfStatement) parent).getThenStatement(), ast.block(), group);
 				}
 			}
 
@@ -226,16 +228,17 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
 				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
-				rewrite.replace(node, ast.block(orderedStatements), null);
+				rewrite.replace(node, ast.block(orderedStatements), group);
 			}
 		}
 	}
 
 	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
 
 		for (Statement stmtToRemove : stmtsToRemove) {
-			rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, stmtToRemove), node, null);
+			rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, stmtToRemove), node, group);
 		}
 	}
 
@@ -259,7 +262,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					&& (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
 				areCasesRemovable[i]= true;
 			} else {
-				cuRewrite.getASTRewrite().remove(removedStatements, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
+				cuRewrite.getASTRewrite().remove(removedStatements, group);
 			}
 		}
 	}

@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpRule {
@@ -73,7 +74,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
 					if (isConditionValid(condition, container)) {
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
-						rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), null);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name);
+						rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
 						return false;
 					}
 
@@ -169,14 +171,15 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 	private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name);
 
 		if (operands.size() == 2) {
-			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), null);
+			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), group);
 		} else {
 			operands.remove(operands.size() - 1);
 			InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
-			rewrite.replace(condition, newCondition, null);
+			rewrite.replace(condition, newCondition, group);
 		}
 	}
 }

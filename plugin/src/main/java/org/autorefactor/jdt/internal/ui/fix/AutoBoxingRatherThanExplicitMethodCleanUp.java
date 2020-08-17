@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
@@ -89,13 +90,14 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 			final ITypeBinding actualResultType) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name);
 
 		if (primitiveType != null && !primitiveType.equals(actualParameterType)
 				&& !primitiveType.equals(actualResultType)
 				&& (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
-			rewrite.replace(node, ast.cast(ast.type(primitiveType.getName()), ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))), null);
+			rewrite.replace(node, ast.cast(ast.type(primitiveType.getName()), ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))), group);
 		} else {
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), group);
 		}
 	}
 }

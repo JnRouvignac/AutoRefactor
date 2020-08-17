@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
@@ -73,7 +74,8 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 			if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
 					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
-				cuRewrite.getASTRewrite().remove(initializer, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name);
+				cuRewrite.getASTRewrite().remove(initializer, group);
 				visitSubtree= false;
 			}
 		}

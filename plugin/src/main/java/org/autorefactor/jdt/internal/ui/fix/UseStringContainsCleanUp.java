@@ -34,6 +34,7 @@ import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class UseStringContainsCleanUp extends AbstractCleanUpRule {
@@ -89,13 +90,14 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 	private void replaceWithStringContains(final InfixExpression node, final MethodInvocation method, final boolean isPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name);
 
-		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), null); //$NON-NLS-1$
+		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), group); //$NON-NLS-1$
 
 		if (isPositive) {
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, method), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, method), group);
 		} else {
-			rewrite.replace(node, ast.not(ASTNodes.createMoveTarget(rewrite, method)), null);
+			rewrite.replace(node, ast.not(ASTNodes.createMoveTarget(rewrite, method)), group);
 		}
 	}
 }

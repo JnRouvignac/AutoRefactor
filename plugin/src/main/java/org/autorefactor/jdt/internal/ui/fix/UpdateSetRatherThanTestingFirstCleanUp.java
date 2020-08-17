@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule {
@@ -89,16 +90,17 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 					&& ASTNodes.match(((List<Expression>) miContains.arguments()).get(0), ((List<Expression>) miAddOrRemove.arguments()).get(0))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name);
 
 				if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
 					// Only one statement: replace if statement with col.add() (or col.remove())
-					rewrite.replace(ifStmtToReplace, ASTNodes.createMoveTarget(rewrite, firstStatement), null);
+					rewrite.replace(ifStmtToReplace, ASTNodes.createMoveTarget(rewrite, firstStatement), group);
 				} else {
 					// There are other statements, replace the if condition with col.add() (or
 					// col.remove())
 					rewrite.replace(ifStmtToReplace.getExpression(),
-							negate ? ast.negate(miAddOrRemove) : ASTNodes.createMoveTarget(rewrite, miAddOrRemove), null);
-					rewrite.remove(firstStatement, null);
+							negate ? ast.negate(miAddOrRemove) : ASTNodes.createMoveTarget(rewrite, miAddOrRemove), group);
+					rewrite.remove(firstStatement, group);
 				}
 
 				return false;

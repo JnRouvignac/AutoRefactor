@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCleanUpRule {
@@ -88,8 +89,9 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 	private void addStaticModifier(final Modifier finalModifier) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name);
 
-		rewrite.insertBefore(ast.static0(), finalModifier, null);
+		rewrite.insertBefore(ast.static0(), finalModifier, group);
 	}
 
 	private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {

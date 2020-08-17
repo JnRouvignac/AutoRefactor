@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
@@ -78,6 +79,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 	private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name);
 
 		InfixExpression.Operator lazyOperator;
 
@@ -87,6 +89,6 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 			lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
 		}
 
-		rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)), null);
+		rewrite.replace(node, ast.infixExpression(lazyOperator, rewrite.createMoveTarget(allOperands)), group);
 	}
 }

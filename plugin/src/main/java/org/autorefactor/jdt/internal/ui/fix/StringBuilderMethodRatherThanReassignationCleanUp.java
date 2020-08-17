@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractCleanUpRule {
@@ -63,7 +64,8 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 
 			if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name);
+				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), group);
 				return false;
 			}
 		}

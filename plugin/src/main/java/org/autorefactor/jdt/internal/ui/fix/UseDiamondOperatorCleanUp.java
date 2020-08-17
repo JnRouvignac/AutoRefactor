@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
@@ -72,7 +73,8 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 			List<Type> typeArguments= ((ParameterizedType) type).typeArguments();
 
 			if (!typeArguments.isEmpty()) {
-				cuRewrite.getASTRewrite().remove(typeArguments, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name);
+				cuRewrite.getASTRewrite().remove(typeArguments, group);
 				return false;
 			}
 		}

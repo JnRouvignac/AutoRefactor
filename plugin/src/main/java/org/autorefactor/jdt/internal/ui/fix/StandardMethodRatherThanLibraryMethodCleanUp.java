@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImportCleanUp {
@@ -104,40 +105,44 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				|| ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
 						Object.class.getCanonicalName())) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), //$NON-NLS-1$
-					ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(1))), null);
+					ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(1))), group);
 			return false;
 		}
 
 		if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			rewrite.replace(node,
-					ast.newMethodInvocation(javaUtilObjects, "toString", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), ast.string("")), null); //$NON-NLS-1$ //$NON-NLS-2$
+					ast.newMethodInvocation(javaUtilObjects, "toString", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), ast.string("")), group); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 
 		if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ //$NON-NLS-2$
 				"com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), null); //$NON-NLS-1$
+			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
 			return false;
 		}
 
 		if (ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			if (node.getExpression() != null) {
-				rewrite.replace(node.getExpression(), javaUtilObjects, null);
-				rewrite.replace(node.getName(), ast.simpleName("hash"), null); //$NON-NLS-1$
+				rewrite.replace(node.getExpression(), javaUtilObjects, group);
+				rewrite.replace(node.getName(), ast.simpleName("hash"), group); //$NON-NLS-1$
 			} else {
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), null); //$NON-NLS-1$
+				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
 			}
 
 			return false;
@@ -152,17 +157,18 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				|| ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						Object[].class.getCanonicalName())) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 			List<Expression> copyOfArgs= copyArguments(node);
 			Name javaUtilObjects= ast.name(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 
 			if (copyOfArgs.size() <= 2) {
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), null); //$NON-NLS-1$
+				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), group); //$NON-NLS-1$
 			} else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
 				LambdaExpression messageSupplier= ast.lambda();
 				messageSupplier
 						.setBody(ast.newMethodInvocation(ast.simpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier), null); //$NON-NLS-1$
+				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier), group); //$NON-NLS-1$
 			} else {
 				return true;
 			}
@@ -174,6 +180,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 	private List<Expression> copyArguments(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
 		List<Expression> copyOfArgs= new ArrayList<>(node.arguments().size());
 
@@ -186,7 +193,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 	private void replaceUtilClass(final MethodInvocation node, final Name javaUtilObjects) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name);
 
-		rewrite.replace(node.getExpression(), javaUtilObjects, null);
+		rewrite.replace(node.getExpression(), javaUtilObjects, group);
 	}
 }

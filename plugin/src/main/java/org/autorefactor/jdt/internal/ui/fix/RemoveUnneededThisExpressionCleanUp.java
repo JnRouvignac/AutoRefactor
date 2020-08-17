@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
@@ -62,7 +63,8 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 		if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
 				&& node.typeArguments().isEmpty()) {
 			// Remove useless thisExpressions
-			cuRewrite.getASTRewrite().remove(node.getExpression(), null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name);
+			cuRewrite.getASTRewrite().remove(node.getExpression(), group);
 			return false;
 		}
 

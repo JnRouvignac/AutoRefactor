@@ -66,6 +66,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * TODO JNR can we also transform singular fields into local variables?
@@ -286,6 +287,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 	private void replace(final VariableAccess varDecl, final VariableAccess varAccess) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		ASTNode scope= varAccess.getScope();
 		Name varName= varAccess.getVariableName();
@@ -300,7 +302,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 					VariableDeclarationFragment fragment= getVariableDeclarationFragment(parentExpression, varName);
 					VariableDeclarationStatement vds= ast.getAST().newVariableDeclarationStatement(fragment);
 					vds.setType(varType);
-					rewrite.replace(statement, vds, null);
+					rewrite.replace(statement, vds, group);
 					break;
 				}
 			}
@@ -313,7 +315,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
 				newEfs.setBody(copy(efs.getBody(), varName));
 			}
-			rewrite.replace(efs, newEfs, null);
+			rewrite.replace(efs, newEfs, group);
 		} else if (scope instanceof ForStatement) {
 			ForStatement fs= (ForStatement) scope;
 			ForStatement newFs= ast.createCopyTarget(fs);
@@ -327,7 +329,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			VariableDeclarationExpression variableDeclarationExpression= ast.getAST().newVariableDeclarationExpression(fragment);
 			variableDeclarationExpression.setType(varType);
 			initializers.add(variableDeclarationExpression);
-			rewrite.replace(fs, newFs, null);
+			rewrite.replace(fs, newFs, group);
 			// TODO JNR
 			// if (equalNotNull(fs.getBody(), parentStatement)) {
 			// newFs.setBody(copy(fs.getBody()));
@@ -340,7 +342,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
 				newWs.setBody(copy(ws.getBody(), varName));
 			}
-			rewrite.replace(ws, newWs, null);
+			rewrite.replace(ws, newWs, group);
 		} else if (scope instanceof IfStatement) {
 			IfStatement is= (IfStatement) scope;
 			IfStatement newIs= ast.getAST().newIfStatement();
@@ -360,7 +362,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				throw new IllegalStateException(is,
 						"Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
 			}
-			rewrite.replace(is, newIs, null);
+			rewrite.replace(is, newIs, group);
 		} else {
 			throw new NotImplementedException(scope);
 		}
@@ -413,7 +415,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
 	private void remove(final ASTNode node) {
 		if (node instanceof VariableDeclarationFragment) {
-			cuRewrite.getASTRewrite().remove(node.getParent(), null);
+			TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
+			cuRewrite.getASTRewrite().remove(node.getParent(), group);
 		} else {
 			remove(node.getParent());
 		}

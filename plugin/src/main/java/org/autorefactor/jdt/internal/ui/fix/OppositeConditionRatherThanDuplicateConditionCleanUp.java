@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Refactors:
@@ -119,6 +120,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 			final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name);
 
 		Statement negativeStmtCopy;
 		if (negativeStatement instanceof IfStatement) {
@@ -142,8 +144,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 			thirdStmtCopy= ASTNodes.createMoveTarget(rewrite, positiveStatement);
 		}
 
-		rewrite.replace(node.getExpression(), ast.negate(duplicateExpression), null);
-		rewrite.replace(node.getThenStatement(), negativeStmtCopy, null);
-		rewrite.replace(node.getElseStatement(), ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), null);
+		rewrite.replace(node.getExpression(), ast.negate(duplicateExpression), group);
+		rewrite.replace(node.getThenStatement(), negativeStmtCopy, group);
+		rewrite.replace(node.getElseStatement(), ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), group);
 	}
 }

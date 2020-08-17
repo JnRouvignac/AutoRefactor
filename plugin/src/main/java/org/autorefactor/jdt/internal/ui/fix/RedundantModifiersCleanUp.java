@@ -51,6 +51,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
@@ -122,7 +123,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
-				cuRewrite.getASTRewrite().remove(modifier, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
+				cuRewrite.getASTRewrite().remove(modifier, group);
 				result= false;
 			}
 		}
@@ -176,7 +178,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isProtected()) {
-				cuRewrite.getASTRewrite().remove(modifier, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
+				cuRewrite.getASTRewrite().remove(modifier, group);
 				return false;
 			}
 		}
@@ -191,7 +194,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isAbstract()) {
-				cuRewrite.getASTRewrite().remove(modifier, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
+				cuRewrite.getASTRewrite().remove(modifier, group);
 				result= false;
 			}
 		}
@@ -249,14 +253,15 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 	private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
 
 		for (int i= 0; i < reorderedModifiers.size(); i++) {
 			IExtendedModifier extendedModifier= reorderedModifiers.get(i);
 
 			if (extendedModifier.isModifier()) {
-				rewrite.moveToIndex((Modifier) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Modifier) extendedModifier), null);
+				rewrite.moveToIndex((Modifier) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Modifier) extendedModifier), group);
 			} else {
-				rewrite.moveToIndex((Annotation) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Annotation) extendedModifier), null);
+				rewrite.moveToIndex((Annotation) extendedModifier, i, ASTNodes.createMoveTarget(rewrite, (Annotation) extendedModifier), group);
 			}
 		}
 	}
@@ -266,7 +271,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isStatic() || modifier.isAbstract()) {
-				cuRewrite.getASTRewrite().remove(modifier, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
+				cuRewrite.getASTRewrite().remove(modifier, group);
 				result= false;
 			}
 		}
@@ -296,7 +302,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isFinal()) {
-				cuRewrite.getASTRewrite().remove(modifier, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name);
+				cuRewrite.getASTRewrite().remove(modifier, group);
 				result= false;
 			}
 		}

@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Refactors:
@@ -98,7 +99,8 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name);
+				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), group);
 				return false;
 			}
 		}

@@ -51,6 +51,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
@@ -185,12 +186,13 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation addMethod) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
 				ast.toStatement(ast.newMethodInvocation(ast.name(classname),
 						"addAll", addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.this0(), //$NON-NLS-1$
-						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), null);
+						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), group);
 	}
 
 	private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
@@ -255,6 +257,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			final Expression data) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name);
 
 		MethodInvocation newMethod;
 		if (affectedCollection != null) {
@@ -263,6 +266,6 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			newMethod= ast.newMethodInvocation(methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
 		}
 
-		rewrite.replace(toReplace, ast.toStatement(newMethod), null);
+		rewrite.replace(toReplace, ast.toStatement(newMethod), group);
 	}
 }

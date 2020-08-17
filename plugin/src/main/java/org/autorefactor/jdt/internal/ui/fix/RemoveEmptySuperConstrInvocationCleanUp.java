@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule {
@@ -47,7 +48,8 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
 	@Override
 	public boolean visit(final SuperConstructorInvocation node) {
 		if (node.arguments().isEmpty()) {
-			cuRewrite.getASTRewrite().removeButKeepComment(node, null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name);
+			cuRewrite.getASTRewrite().removeButKeepComment(node, group);
 			return false;
 		}
 

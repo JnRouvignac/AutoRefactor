@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * See {@link #getDescription()} method.
@@ -124,11 +125,12 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final BlockComment node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
 
 		String comment= getComment(node);
 
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
-			rewrite.remove(node, null);
+			rewrite.remove(node, group);
 			return false;
 		}
 
@@ -136,7 +138,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 		if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
 			if (ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
-				rewrite.remove(node, null);
+				rewrite.remove(node, group);
 			} else {
 				rewrite.toJavadoc(node);
 			}
@@ -212,13 +214,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final Javadoc node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
 
 		String comment= getComment(node);
 		boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
 		Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
 		Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
 		if (EMPTY_JAVADOC.matcher(comment).matches()) {
-			rewrite.remove(node, null);
+			rewrite.remove(node, group);
 			return false;
 		}
 
@@ -233,7 +236,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		}
 
 		if (allTagsEmpty(node.tags())) {
-			rewrite.remove(node, null);
+			rewrite.remove(node, group);
 			return false;
 		}
 
@@ -246,7 +249,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 			ASTNode nextNode= getNextNode(node);
 			if (hasOverrideAnnotation(nextNode)) {
 				// {@inheritDoc} tag is redundant with @Override annotation
-				rewrite.remove(node, null);
+				rewrite.remove(node, group);
 				return false;
 			}
 
@@ -322,11 +325,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private void replaceEmptyLineAtStartOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 
 	private void replaceEmptyLineAtEndOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1));
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 
@@ -451,11 +456,12 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final LineComment node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
 
 		String comment= getComment(node);
 
 		if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
-			rewrite.remove(node, null);
+			rewrite.remove(node, group);
 			return false;
 		}
 

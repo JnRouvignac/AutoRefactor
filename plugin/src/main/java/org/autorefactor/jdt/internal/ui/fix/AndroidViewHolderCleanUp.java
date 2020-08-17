@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * TODO when findViewById is reusing a local variable, the viewHolderItem will
@@ -102,6 +103,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 			if (visitor.canApplyRefactoring()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name);
 
 				TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
 
@@ -113,7 +115,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				InfixExpression condition= ast.infixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.null0());
 				Block thenBlock= ast.block();
 				IfStatement ifStatement= ast.if0(condition, thenBlock);
-				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, null);
+				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, group);
 				@SuppressWarnings("unchecked")
 				List<Statement> thenStatements= thenBlock.statements();
 
@@ -130,14 +132,14 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 								.toStatement(ast.assign(ast.createCopyTarget(visitor.viewVariableName), Assignment.Operator.ASSIGN, convertViewVar.varName()));
 					}
 					if (assignConvertViewToView != null) {
-						rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement, null);
+						rewrite.insertBefore(assignConvertViewToView, visitor.viewAssignmentStatement, group);
 					}
 				}
 
 				// Make sure method returns the view to be reused
 				if (visitor.returnStatement != null) {
-					rewrite.insertAfter(ast.return0(ast.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement, null);
-					rewrite.remove(visitor.returnStatement, null);
+					rewrite.insertAfter(ast.return0(ast.createCopyTarget(visitor.viewVariableName)), visitor.returnStatement, group);
+					rewrite.remove(visitor.returnStatement, group);
 				}
 
 				// Optimize findViewById calls
@@ -149,10 +151,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
 					// Create ViewHolderItem class
 					rewrite.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
-							typeNameDecider), node, null);
+							typeNameDecider), node, group);
 
 					// Declare viewhHolderItem object
-					rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement(), null);
+					rewrite.insertFirst(body, Block.STATEMENTS_PROPERTY, viewHolderItemVar.declareStatement(), group);
 					// Initialize viewHolderItem
 					thenStatements.add(
 							ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN, ast.new0(viewHolderItemVar.type()))));
@@ -169,7 +171,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 						thenStatements.add(ast.toStatement(ast.assign(fieldAccess, Assignment.Operator.ASSIGN, ast.copySubtree(item.findViewByIdExpression))));
 
 						// Replace previous findViewById with accesses to viewHolderItem
-						rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), null);
+						rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), group);
 					}
 					// Store viewHolderItem in convertView
 					thenStatements.add(ast.toStatement(ast.newMethodInvocation("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -178,7 +180,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 					ifStatement.setElseStatement(ast.block(ast.toStatement(ast.assign(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
 							ast.cast(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				rewrite.remove(visitor.viewAssignmentStatement, null);
+				rewrite.remove(visitor.viewAssignmentStatement, group);
 				return false;
 			}
 		}

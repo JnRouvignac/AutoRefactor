@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Removes overriding of method if the overriding only call the super class.
@@ -96,7 +97,8 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 							|| declaredInSamePackage(bodyMethodBinding, declMethodBinding)
 							// protected also means package visibility, so check if it is required
 							|| !isMethodUsedInItsPackage(declMethodBinding, node)) {
-						cuRewrite.getASTRewrite().remove(node, null);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name);
+						cuRewrite.getASTRewrite().remove(node, group);
 						return false;
 					}
 				}

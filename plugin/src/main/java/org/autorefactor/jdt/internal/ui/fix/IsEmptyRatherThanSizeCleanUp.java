@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
@@ -75,25 +76,26 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 							|| (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), LENGTH_METHOD) && getJavaMinorVersion() >= 6))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name);
 
 				if (literalSize == 0) {
 					if (Arrays.asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), null);
+						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
 						return false;
 					}
 
 					if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.LESS_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), null);
+						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
 						return false;
 					}
 				} else if (literalSize == 1) {
 					if (InfixExpression.Operator.GREATER_EQUALS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), null);
+						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
 						return false;
 					}
 
 					if (InfixExpression.Operator.LESS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), null);
+						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
 						return false;
 					}
 				}

@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractCleanUpRule {
@@ -152,6 +153,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 	private void moveDeclaration(final Statement statement, final VariableDeclarationStatement varToMove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name);
 
 		VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
@@ -178,12 +180,12 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 				}
 			}
 
-			rewrite.insertBefore(newDeclareStatement, statement, null);
+			rewrite.insertBefore(newDeclareStatement, statement, group);
 			rewrite.replace(varToMove,
-					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), null);
+					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), group);
 		} else {
-			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, null);
-			rewrite.remove(varToMove, null);
+			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, group);
+			rewrite.remove(varToMove, group);
 		}
 	}
 }

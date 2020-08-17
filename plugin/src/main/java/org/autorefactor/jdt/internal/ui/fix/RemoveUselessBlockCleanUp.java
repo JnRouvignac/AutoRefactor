@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
@@ -98,15 +99,16 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	private void replaceBlock(final Block node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name);
 
 		List<Statement> statements= node.statements();
 		List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
 
 		for (String comment : extraLeadingComments) {
-			rewrite.insertBefore(ast.rawComment(comment), node, null);
+			rewrite.insertBefore(ast.rawComment(comment), node, group);
 		}
 
-		rewrite.replace(node, ast.copyRange(statements), null);
+		rewrite.replace(node, ast.copyRange(statements), group);
 	}
 
 	/**

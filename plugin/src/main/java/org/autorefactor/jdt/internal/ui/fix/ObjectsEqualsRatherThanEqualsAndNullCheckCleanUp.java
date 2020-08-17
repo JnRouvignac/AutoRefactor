@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassImportCleanUp {
@@ -194,6 +195,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final ReturnStatement returnStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name);
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 
@@ -201,16 +203,16 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
 		rewrite.replace(node.getExpression(),
 				ast.not(ast.newMethodInvocation(ast.name(classname),
-						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), null);
+						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), group);
 
 		if (node.getThenStatement() instanceof Block) {
-			rewrite.replace((ASTNode) ((Block) node.getThenStatement()).statements().get(0), copyOfReturnStatement, null);
+			rewrite.replace((ASTNode) ((Block) node.getThenStatement()).statements().get(0), copyOfReturnStatement, group);
 		} else {
-			rewrite.replace(node.getThenStatement(), copyOfReturnStatement, null);
+			rewrite.replace(node.getThenStatement(), copyOfReturnStatement, group);
 		}
 
 		if (node.getElseStatement() != null) {
-			rewrite.remove(node.getElseStatement(), null);
+			rewrite.remove(node.getElseStatement(), group);
 		}
 	}
 }

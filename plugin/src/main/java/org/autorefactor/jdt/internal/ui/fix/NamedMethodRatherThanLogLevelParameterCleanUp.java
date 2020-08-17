@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractCleanUpRule {
@@ -93,8 +94,9 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name);
 
-		rewrite.replace(node.getName(), ast.simpleName(methodName), null);
-		rewrite.remove((Expression) node.arguments().get(0), null);
+		rewrite.replace(node.getName(), ast.simpleName(methodName), group);
+		rewrite.remove((Expression) node.arguments().get(0), group);
 	}
 }

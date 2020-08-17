@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Replaces HashSet for enum type creation to EnumSet factory static methods.
@@ -117,7 +118,9 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 			invocation= ast.newMethodInvocation(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
 		}
 
-		cuRewrite.getASTRewrite().replace(cic, invocation, null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name);
+
+		cuRewrite.getASTRewrite().replace(cic, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());
 		return false;
 	}

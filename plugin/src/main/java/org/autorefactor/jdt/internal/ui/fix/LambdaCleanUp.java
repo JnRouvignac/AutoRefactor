@@ -58,6 +58,7 @@ import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LambdaCleanUp extends AbstractCleanUpRule {
@@ -266,58 +267,64 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 	private void removeParamParentheses(final LambdaExpression node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		LambdaExpression copyOfLambdaExpression= ast.lambda();
 		ASTNode copyOfParameter= ASTNodes.createMoveTarget(rewrite, (ASTNode) node.parameters().get(0));
 		copyOfLambdaExpression.parameters().add(copyOfParameter);
 		copyOfLambdaExpression.setBody(ASTNodes.createMoveTarget(rewrite, node.getBody()));
 		copyOfLambdaExpression.setParentheses(false);
-		rewrite.replace(node, copyOfLambdaExpression, null);
+		rewrite.replace(node, copyOfLambdaExpression, group);
 	}
 
 	private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-		rewrite.replace(node.getBody(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), null);
+		rewrite.replace(node.getBody(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), group);
 	}
 
 	private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(ci);
 
 		CreationReference creationRef= ast.creationRef();
 		creationRef.setType(ast.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
-		rewrite.replace(node, creationRef, null);
+		rewrite.replace(node, creationRef, group);
 	}
 
 	private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		SuperMethodReference creationRef= ast.superMethodRef();
 		creationRef.setName(ASTNodes.createMoveTarget(rewrite, ci.getName()));
-		rewrite.replace(node, creationRef, null);
+		rewrite.replace(node, creationRef, group);
 	}
 
 	private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(methodInvocation);
 
 		TypeMethodReference typeMethodRef= ast.typeMethodRef();
 		typeMethodRef.setType(ast.toType(ASTNodes.getCalledType(methodInvocation).getErasure(), typeNameDecider));
 		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, methodInvocation.getName()));
-		rewrite.replace(node, typeMethodRef, null);
+		rewrite.replace(node, typeMethodRef, group);
 	}
 
 	private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name);
 
 		ExpressionMethodReference typeMethodRef= ast.exprMethodRef();
 
@@ -328,6 +335,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		}
 
 		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, methodInvocation.getName()));
-		rewrite.replace(node, typeMethodRef, null);
+		rewrite.replace(node, typeMethodRef, group);
 	}
 }

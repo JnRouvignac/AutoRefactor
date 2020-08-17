@@ -34,6 +34,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
@@ -110,14 +111,15 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 	private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name);
 
 		List<Expression> copyOfOperands= rewrite.createMoveTarget(previousOperands);
 		copyOfOperands.addAll(rewrite.createMoveTarget(nextOperands));
 
 		if (copyOfOperands.size() == 1) {
-			rewrite.replace(operandWithRedundance, copyOfOperands.get(0), null);
+			rewrite.replace(operandWithRedundance, copyOfOperands.get(0), group);
 		} else {
-			rewrite.replace(operandWithRedundance, ast.infixExpression(operator, copyOfOperands), null);
+			rewrite.replace(operandWithRedundance, ast.infixExpression(operator, copyOfOperands), group);
 		}
 	}
 }

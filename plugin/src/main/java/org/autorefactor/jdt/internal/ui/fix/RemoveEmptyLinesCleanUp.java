@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
@@ -74,6 +75,8 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 		computeLineEnds(node);
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name);
 
 		int index= getIndexOfFirstNonWhitespaceChar(source, 0);
 		if (index != -1) {
@@ -254,6 +257,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 			boolean isEqualToNewline= matcher.matches();
 			if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
 				SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name);
 				cuRewrite.getASTRewrite().remove(toRemove);
 				return true;
 			}

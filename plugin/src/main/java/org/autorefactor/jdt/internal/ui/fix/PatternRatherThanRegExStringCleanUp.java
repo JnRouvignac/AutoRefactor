@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
@@ -189,10 +190,11 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 		private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_name);
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
-			rewrite.replace(type, ast.type(patternName), null);
-			rewrite.replace(initializer, ast.newMethodInvocation(ast.name(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), null);
+			rewrite.replace(type, ast.type(patternName), group);
+			rewrite.replace(initializer, ast.newMethodInvocation(ast.name(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), group);
 
 			for (SimpleName regExUse : regExUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
@@ -214,7 +216,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					}
 				}
 
-				rewrite.replace(methodInvocation, newExpression, null);
+				rewrite.replace(methodInvocation, newExpression, group);
 			}
 		}
 	}

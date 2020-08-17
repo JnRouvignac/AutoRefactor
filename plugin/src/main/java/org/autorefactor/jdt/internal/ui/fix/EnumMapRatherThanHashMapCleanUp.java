@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Replaces HashMap for enum type creation to EnumMap.
@@ -123,7 +124,9 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 			typeArgs(newType).clear();
 		}
 
-		cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name);
+
+		cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), group);
 	}
 
 	/**

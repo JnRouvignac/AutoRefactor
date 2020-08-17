@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends AbstractCleanUpRule {
@@ -107,13 +108,15 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 						Modifier modifier= (Modifier) extendedModifier;
 						if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
 								|| modifier.isPrivate() && isPrivateClass) {
-							cuRewrite.getASTRewrite().remove(uniqueConstructor, null);
+							TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name);
+							cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
 							return false;
 						}
 					}
 				} else if (Utils.isEmpty(uniqueConstructor.modifiers())
 						&& isPackageClass) {
-					cuRewrite.getASTRewrite().remove(uniqueConstructor, null);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name);
+					cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
 					return false;
 				}
 			}

@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule {
@@ -85,16 +86,17 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 	private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name);
 
 		for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
 			if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(breakStatement, null);
+				rewrite.remove(breakStatement, group);
 			} else {
-				rewrite.replace(breakStatement, ast.block(), null);
+				rewrite.replace(breakStatement, ast.block(), group);
 			}
 		}
 
-		rewrite.replace(node, ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), null);
+		rewrite.replace(node, ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
 	}
 
 	private static class BreakVisitor extends InterruptibleVisitor {

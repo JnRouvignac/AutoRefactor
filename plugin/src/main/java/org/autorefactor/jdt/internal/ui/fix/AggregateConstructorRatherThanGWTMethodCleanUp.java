@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImportCleanUp {
@@ -133,11 +134,12 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 							Class.class.getCanonicalName() + generic)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name);
 
 				String classname= addImport(EnumMap.class, classesToUseWithImport, importsToAdd);
 				Type type= ast.getAST().newParameterizedType(
 						ast.type(classname));
-				rewrite.replace(node, ast.new0(type, ASTNodes.createMoveTarget(rewrite, arg)), null);
+				rewrite.replace(node, ast.new0(type, ASTNodes.createMoveTarget(rewrite, arg)), group);
 				importsToAdd.add(EnumMap.class.getCanonicalName());
 				return false;
 			}
@@ -152,12 +154,13 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 				"com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name);
 
 			String classname= classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass; //$NON-NLS-1$ //$NON-NLS-2$
 			importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
 			Type type= ast.getAST().newParameterizedType(ast.type(
 					classname));
-			rewrite.replace(node, ast.new0(type), null);
+			rewrite.replace(node, ast.new0(type), group);
 			return false;
 		}
 

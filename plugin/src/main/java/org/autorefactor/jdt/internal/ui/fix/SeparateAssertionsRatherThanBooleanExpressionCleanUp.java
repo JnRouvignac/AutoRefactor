@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends AbstractCleanUpRule {
@@ -94,9 +95,10 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 		if (booleanExpression != null && ASTNodes.hasOperator(booleanExpression, operator)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_name);
 
 			List<Expression> allOperands= ASTNodes.allOperands(booleanExpression);
-			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), null);
+			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), group);
 			List<Statement> expressionStatements= new ArrayList<>(allOperands.size());
 
 			for (Expression operand : allOperands) {
@@ -124,12 +126,12 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				Collections.reverse(expressionStatements);
 
 				for (Statement expressionStatement : expressionStatements) {
-					rewrite.insertAfter(expressionStatement, node, null);
+					rewrite.insertAfter(expressionStatement, node, group);
 				}
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 				Block newBlock= ast.block(expressionStatements);
-				rewrite.replace(node, newBlock, null);
+				rewrite.replace(node, newBlock, group);
 			}
 
 			return false;

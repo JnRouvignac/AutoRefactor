@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends AbstractCleanUpRule {
@@ -81,6 +82,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			final List<?> fragments, final Javadoc docComment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name);
 
 		for (int i= fragments.size() - 1; 0 <= i; i--) {
 			VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
@@ -110,9 +112,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			}
 
 			if (i > 0) {
-				rewrite.insertAfter(newNode, node, null);
+				rewrite.insertAfter(newNode, node, group);
 			} else {
-				rewrite.replace(node, newNode, null);
+				rewrite.replace(node, newNode, group);
 			}
 		}
 	}

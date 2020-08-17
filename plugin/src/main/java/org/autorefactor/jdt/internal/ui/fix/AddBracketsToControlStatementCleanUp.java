@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
@@ -90,10 +91,12 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 		}
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name);
 
 		Block block= ast.block(ASTNodes.createMoveTarget(rewrite, statement));
-		rewrite.replace(statement, block, null);
+		rewrite.replace(statement, block, group);
 		return false;
 	}
 }

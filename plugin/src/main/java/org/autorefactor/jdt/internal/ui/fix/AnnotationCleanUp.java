@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AnnotationCleanUp extends AbstractCleanUpRule {
@@ -65,17 +66,18 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final NormalAnnotation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_name);
 
 		@SuppressWarnings("unchecked")
 		List<MemberValuePair> values= node.values();
 		if (values.isEmpty()) {
-			rewrite.replace(node, ast.markerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), null);
+			rewrite.replace(node, ast.markerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), group);
 			return false;
 		}
 		if (values.size() == 1) {
 			MemberValuePair pair= values.get(0);
 			if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-				rewrite.replace(node, ast.singleValueAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName()), ASTNodes.createMoveTarget(rewrite, pair.getValue())), null);
+				rewrite.replace(node, ast.singleValueAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName()), ASTNodes.createMoveTarget(rewrite, pair.getValue())), group);
 				return false;
 			}
 		}
@@ -85,13 +87,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 		for (MemberValuePair pair : values) {
 			IMethodBinding elementBinding= elements.get(pair.getName().getIdentifier());
 			if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
-				rewrite.remove(pair, null);
+				rewrite.remove(pair, group);
 				result= false;
 			} else if (pair.getValue().getNodeType() == ASTNode.ARRAY_INITIALIZER) {
 				ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
 				List<?> exprs= arrayInit.expressions();
 				if (exprs.size() == 1) {
-					rewrite.replace(arrayInit, ASTNodes.createMoveTarget(rewrite, (Expression) exprs.get(0)), null);
+					rewrite.replace(arrayInit, ASTNodes.createMoveTarget(rewrite, (Expression) exprs.get(0)), group);
 					result= false;
 				}
 			}

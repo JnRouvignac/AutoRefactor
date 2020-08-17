@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRule {
@@ -82,6 +83,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 			final InfixExpression message) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name);
 
 		StringBuilder messageBuilder= new StringBuilder();
 		List<Expression> allOperands= ASTNodes.allOperands(message);
@@ -123,8 +125,9 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 			final List<Expression> params) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name);
 
 		params.add(0, ast.string(messageBuilder.toString()));
-		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), null);
+		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), group);
 	}
 }

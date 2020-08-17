@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
@@ -162,6 +163,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name);
 
 		boolean isFieldKept= field.fragments().size() != 1;
 
@@ -187,13 +189,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		}
 
 		rewrite.replace(ASTNodes.getTypedAncestorOrCrash(reassignmentAssignment, Statement.class),
-				newDeclareStatement, null);
+				newDeclareStatement, group);
 
 		if (isFieldKept) {
-			rewrite.remove(fragment, null);
-			rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), null);
+			rewrite.remove(fragment, group);
+			rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), group);
 		} else {
-			rewrite.remove(field, null);
+			rewrite.remove(field, group);
 		}
 	}
 

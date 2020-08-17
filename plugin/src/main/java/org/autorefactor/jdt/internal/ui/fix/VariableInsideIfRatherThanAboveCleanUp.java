@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule {
@@ -131,15 +132,16 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 				final List<Statement> statements) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name);
 
 			if (statement instanceof Block) {
-				rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, variableAssignment), statements.get(0), null);
-				rewrite.remove(variableAssignment, null);
+				rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, variableAssignment), statements.get(0), group);
+				rewrite.remove(variableAssignment, group);
 			} else {
 				List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
 				copyOfThenStatements.add(0, ASTNodes.createMoveTarget(rewrite, variableAssignment));
 				Block block= ast.block(copyOfThenStatements);
-				rewrite.replace(statement, block, null);
+				rewrite.replace(statement, block, group);
 			}
 		}
 	}

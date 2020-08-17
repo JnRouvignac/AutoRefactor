@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
@@ -69,8 +70,9 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 							// is not strictly equivalent to `Map.keySet().remove(key)`
 							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name);
 
-				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
+				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
 				return false;
 			}
 
@@ -86,8 +88,9 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	private void replaceContains(final MethodInvocation node, final MethodInvocation miExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name);
 
-		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), null);
-		rewrite.replace(node.getName(), ast.simpleName("containsKey"), null); //$NON-NLS-1$
+		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
+		rewrite.replace(node.getName(), ast.simpleName("containsKey"), group); //$NON-NLS-1$
 	}
 }

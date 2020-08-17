@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
@@ -161,6 +162,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name);
 
 		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= node.getExpression();
@@ -202,7 +204,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		rewrite.replace(node, currentBlock, null);
+		rewrite.replace(node, currentBlock, group);
 	}
 
 	private Expression buildEquality(final Expression discriminant, final Expression value) {

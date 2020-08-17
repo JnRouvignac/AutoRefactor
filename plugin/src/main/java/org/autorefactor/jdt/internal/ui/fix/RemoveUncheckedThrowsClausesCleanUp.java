@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRule {
@@ -57,7 +58,8 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 		Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
 		if (!nodesToRemove.isEmpty()) {
 			for (ASTNode n : nodesToRemove) {
-				cuRewrite.getASTRewrite().replace(n, null, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name);
+				cuRewrite.getASTRewrite().replace(n, null, group);
 			}
 
 			return false;

@@ -60,6 +60,7 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCleanUp {
@@ -621,6 +622,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			final Set<String> importsToAdd, final CollectedData data) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name);
 
 		@SuppressWarnings("unchecked")
 		List<Statement> statements= node.getBody().statements();
@@ -628,10 +630,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		Name objectsClassName= ast.name(classname);
 
 		rewrite.replace(statements.get(0),
-				ast.return0(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), null); //$NON-NLS-1$
+				ast.return0(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), group); //$NON-NLS-1$
 
 		for (int i= 1; i < statements.size(); i++) {
-			rewrite.remove(statements.get(i), null);
+			rewrite.remove(statements.get(i), group);
 		}
 	}
 }

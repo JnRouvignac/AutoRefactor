@@ -36,6 +36,7 @@ import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
@@ -87,35 +88,39 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	private void replaceWith(final MethodInvocation node, final String newMethodName) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
+
+		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
 	}
 
 	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
 
 		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
 		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-			rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), null);
+			rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		}
 	}
 
 	private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
 
 		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 		assertSize(args, 2);
 		Expression arg1= args.get(1);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), null);
-		rewrite.moveToIndex(arg1, 0, ASTNodes.createMoveTarget(rewrite, arg1), null);
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
+		rewrite.moveToIndex(arg1, 0, ASTNodes.createMoveTarget(rewrite, arg1), group);
 	}
 
 	private void assertSize(final List<Expression> args, final int expectedSize) {

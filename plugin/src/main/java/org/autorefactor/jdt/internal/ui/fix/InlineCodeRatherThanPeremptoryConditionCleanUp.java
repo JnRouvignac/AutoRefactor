@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractCleanUpRule {
@@ -83,10 +84,12 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(node, null);
+						rewrite.remove(node, group);
 					} else {
-						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+						rewrite.replace(node, cuRewrite.getASTBuilder().block(), group);
 					}
 
 					this.result= false;
@@ -101,6 +104,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		public boolean visit(final IfStatement node) {
 			if (result) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
 
 				Statement thenStatement= node.getThenStatement();
 				Statement elseStatement= node.getElseStatement();
@@ -118,9 +122,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 					}
 
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(node, null);
+						rewrite.remove(node, group);
 					} else {
-						rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+						rewrite.replace(node, cuRewrite.getASTBuilder().block(), group);
 					}
 
 					this.result= false;
@@ -189,17 +193,19 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
 
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-			rewrite.replace(sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), null);
+			rewrite.replace(sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), group);
 		} else {
-			rewrite.replace(sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), null);
+			rewrite.replace(sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), group);
 		}
 	}
 
 	private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
 		if (ASTNodes.canHaveSiblings(astNode)) {
-			cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+			cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), group);
 			removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
 		} else if (astNode.getParent() instanceof TryStatement) {
 			removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

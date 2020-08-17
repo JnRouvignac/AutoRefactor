@@ -29,6 +29,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule {
@@ -67,6 +68,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
 	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
 		BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().boolean0(val);
-		cuRewrite.getASTRewrite().replace(node, booleanLiteral, null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name);
+		cuRewrite.getASTRewrite().replace(node, booleanLiteral, group);
 	}
 }

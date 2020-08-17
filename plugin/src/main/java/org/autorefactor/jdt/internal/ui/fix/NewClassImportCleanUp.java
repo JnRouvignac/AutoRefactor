@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Handle the need to add an import for a class.
@@ -197,6 +198,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 
 			if (!refactoringClass.getImportsToAdd().isEmpty()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 				for (String importToAdd : refactoringClass.getImportsToAdd()) {
 					rewrite.getImportRewrite().addImport(importToAdd);

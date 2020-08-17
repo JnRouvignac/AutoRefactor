@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class TryWithResourceCleanUp extends AbstractCleanUpRule {
@@ -151,8 +152,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			}
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, null);
-			rewrite.remove(nodesToRemove, null);
+
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name);
+			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, group);
+			rewrite.remove(nodesToRemove, group);
 			this.result= false;
 			return false;
 		}
@@ -166,6 +169,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 				final List<ASTNode> nodesToRemove) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name);
 
 			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
 			return fragment != null ? ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment) : null;
@@ -177,7 +181,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			List<SimpleName> definitions= visitor.getWrites();
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name);
 
 			if (!tryStatements.isEmpty()) {
 				Statement tryStatement= tryStatements.get(0);
@@ -216,9 +222,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 		private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name);
 
-			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), null);
-			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), null);
+			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
+			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
 			this.result= false;
 			return false;
 		}

@@ -64,6 +64,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
@@ -606,6 +607,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 				final Expression delimiter, final List<SimpleName> readsToRefactor, final Set<SimpleName> booleanUses) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_name);
 
 			Expression copyOfDelimiter= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(delimiter));
 
@@ -624,14 +626,14 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			varModifiers.addAll(rewrite.createMoveTarget(modifiers));
 
 			if (!booleanUses.isEmpty()) {
-				rewrite.removeButKeepComment(booleanStatement, null);
+				rewrite.removeButKeepComment(booleanStatement, group);
 			}
 
-			rewrite.removeButKeepComment(builderStatement, null);
-			rewrite.replace(node, joinStatement, null);
+			rewrite.removeButKeepComment(builderStatement, group);
+			rewrite.replace(node, joinStatement, group);
 
 			for (SimpleName readToRefactor : readsToRefactor) {
-				rewrite.replace(readToRefactor.getParent(), ASTNodes.createMoveTarget(rewrite, readToRefactor), null);
+				rewrite.replace(readToRefactor.getParent(), ASTNodes.createMoveTarget(rewrite, readToRefactor), group);
 			}
 		}
 	}

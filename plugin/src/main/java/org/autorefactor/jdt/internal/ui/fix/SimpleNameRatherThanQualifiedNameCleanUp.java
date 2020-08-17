@@ -71,6 +71,7 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRule {
@@ -630,7 +631,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			ITypeBinding declaringClass= methodBinding.getDeclaringClass();
 			QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
 			if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
-				cuRewrite.getASTRewrite().remove(expression, null);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name);
+				cuRewrite.getASTRewrite().remove(expression, group);
 				return false;
 			}
 		}
@@ -716,7 +718,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 				|| (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
 						&& !containsLocalName(localIdentifiers, qname))) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getName()), null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);
 			return false;
 		}
 

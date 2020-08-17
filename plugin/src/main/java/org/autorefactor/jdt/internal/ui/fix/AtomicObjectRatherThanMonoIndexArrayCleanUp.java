@@ -60,6 +60,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportCleanUp {
@@ -238,6 +239,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 		private void replaceArray(final Type type, final List<?> variableDimensions, final ArrayCreation arrayCreation, final Set<Assignment> assignmentReads, final Set<ArrayAccess> accessReads) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_name);
 
 			Class<?> atomicClass;
 			Type objectClass= null;
@@ -271,10 +273,10 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 				arguments.add(ASTNodes.createMoveTarget(rewrite, (Expression) arrayCreation.getInitializer().expressions().get(0)));
 			}
 
-			rewrite.replace(arrayCreation, newAtomicObject, null);
+			rewrite.replace(arrayCreation, newAtomicObject, group);
 
 			for (Object variableDimension : variableDimensions) {
-				rewrite.remove((ASTNode) variableDimension, null);
+				rewrite.remove((ASTNode) variableDimension, group);
 			}
 
 			if (objectClass == null) {
@@ -283,15 +285,15 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 				atomicType= ast.genericType(atomicClassName, ASTNodes.createMoveTarget(rewrite, objectClass));
 			}
 
-			rewrite.replace(type, atomicType, null);
+			rewrite.replace(type, atomicType, group);
 
 			for (ArrayAccess accessRead : accessReads) {
-				rewrite.replace(accessRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()), "get"), null); //$NON-NLS-1$
+				rewrite.replace(accessRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()), "get"), group); //$NON-NLS-1$
 			}
 
 			for (Assignment assignmentRead : assignmentReads) {
 				rewrite.replace(assignmentRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()),
-						"set", ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide())), null); //$NON-NLS-1$
+						"set", ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide())), group); //$NON-NLS-1$
 			}
 		}
 	}

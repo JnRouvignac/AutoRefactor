@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
@@ -79,7 +80,8 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 				}
 
 				if (isOverridden && !isRead) {
-					cuRewrite.getASTRewrite().remove(fragment.getInitializer(), null);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name);
+					cuRewrite.getASTRewrite().remove(fragment.getInitializer(), group);
 					return false;
 				}
 			}

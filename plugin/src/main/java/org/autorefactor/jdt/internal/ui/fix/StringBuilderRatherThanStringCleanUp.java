@@ -63,6 +63,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
@@ -223,6 +224,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name);
 
 			Class<?> builder;
 			if (getJavaMinorVersion() >= 5) {
@@ -231,14 +233,14 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				builder= StringBuffer.class;
 			}
 
-			rewrite.replace(type, ast.type(builder.getSimpleName()), null);
+			rewrite.replace(type, ast.type(builder.getSimpleName()), group);
 
 			StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
 			if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-				rewrite.replace(initializer, ast.new0(builder.getSimpleName()), null);
+				rewrite.replace(initializer, ast.new0(builder.getSimpleName()), group);
 			} else {
-				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), null);
+				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), group);
 			}
 
 			for (SimpleName simpleName : assignmentWrites) {
@@ -259,7 +261,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					newExpression= ast.newMethodInvocation(newExpression, "append", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
 				}
 
-				rewrite.replace(assignment, newExpression, null);
+				rewrite.replace(assignment, newExpression, group);
 			}
 
 			for (SimpleName simpleName : concatenationWrites) {
@@ -274,10 +276,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					}
 				}
 
-				rewrite.replace(assignment, newExpression, null);
+				rewrite.replace(assignment, newExpression, group);
 			}
 
-			rewrite.replace(finalRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, finalRead), "toString"), null); //$NON-NLS-1$
+			rewrite.replace(finalRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, finalRead), "toString"), group); //$NON-NLS-1$
 		}
 
 		private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

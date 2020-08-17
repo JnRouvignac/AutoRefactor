@@ -42,6 +42,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportCleanUp {
@@ -112,6 +113,7 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name);
 
 		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 
@@ -123,6 +125,6 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 		}
 
 		MethodInvocation newCollectionsAddAllMethod= ast.newMethodInvocation(ast.name(collectionsName), ADD_ALL_METHOD, copyOfArguments);
-		rewrite.replace(node, newCollectionsAddAllMethod, null);
+		rewrite.replace(node, newCollectionsAddAllMethod, group);
 	}
 }

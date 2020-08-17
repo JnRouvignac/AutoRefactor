@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
@@ -111,11 +112,12 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 			final AtomicBoolean isSecondExprPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name);
 
 		if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), null);
+			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
 		} else {
-			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), null);
+			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
 		}
 	}
 }

@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
@@ -185,15 +186,16 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				if (match) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name);
 
 					if (redundantStatement instanceof Block) {
-						rewrite.remove(stmtsToCompare, null);
+						rewrite.remove(stmtsToCompare, group);
 
 						if (lastStatement != null) {
-							rewrite.remove(lastStatement, null);
+							rewrite.remove(lastStatement, group);
 						}
 					} else {
-						rewrite.replace(redundantStatement, ast.block(), null);
+						rewrite.replace(redundantStatement, ast.block(), group);
 					}
 
 					this.result= false;

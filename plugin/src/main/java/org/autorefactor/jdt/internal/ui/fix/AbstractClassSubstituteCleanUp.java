@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteCleanUp extends NewClassImportCleanUp {
@@ -304,19 +305,20 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		Type substituteType= substituteType(originalInstanceCreation.getType(), originalInstanceCreation, classesToUseWithImport,
 				importsToAdd);
 
 		if (substituteType != null) {
-			rewrite.replace(originalInstanceCreation.getType(), substituteType, null);
+			rewrite.replace(originalInstanceCreation.getType(), substituteType, group);
 			originalInstanceCreation.setType(substituteType);
 		}
 
 		for (MethodInvocation methodCall : methodCallsToRefactor) {
 			MethodInvocation copyOfMethodCall= ast.copySubtree(methodCall);
 			refactorMethod(methodCall, copyOfMethodCall);
-			rewrite.replace(methodCall, copyOfMethodCall, null);
+			rewrite.replace(methodCall, copyOfMethodCall, group);
 		}
 
 		for (VariableDeclaration variableDecl : variableDecls) {
@@ -325,7 +327,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 					classesToUseWithImport, importsToAdd);
 
 			if (substituteVarType != null) {
-				rewrite.replace(oldDeclareStatement.getType(), substituteVarType, null);
+				rewrite.replace(oldDeclareStatement.getType(), substituteVarType, group);
 			}
 		}
 	}

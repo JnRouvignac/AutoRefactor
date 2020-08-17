@@ -30,6 +30,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
@@ -76,6 +77,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
 
 	private void useUnboxing(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 	}
 }

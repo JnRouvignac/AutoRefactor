@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class PushNegationDownCleanUp extends AbstractCleanUpRule {
@@ -62,7 +63,8 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 		Expression replacement= getOppositeExpression(node.getOperand());
 
 		if (replacement != null) {
-			cuRewrite.getASTRewrite().replace(node, replacement, null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name);
+			cuRewrite.getASTRewrite().replace(node, replacement, group);
 			return false;
 		}
 
@@ -72,6 +74,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 	private Expression getOppositeExpression(final Expression negativeExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name);
 
 		Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 

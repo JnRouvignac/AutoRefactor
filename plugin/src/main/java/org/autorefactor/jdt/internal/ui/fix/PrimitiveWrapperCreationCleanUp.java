@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
@@ -121,8 +122,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 							node.getName().getIdentifier());
 
 					if (methodName != null) {
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
 						cuRewrite.getASTRewrite().replace(node,
-								newMethodInvocation(typeBinding.getName(), methodName, arg0), null);
+								newMethodInvocation(typeBinding.getName(), methodName, arg0), group);
 						return false;
 					}
 				}
@@ -140,13 +142,15 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
 		SimpleName name= cuRewrite.getASTBuilder().simpleName(methodName);
-		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, group);
 		return false;
 	}
 
 	private void replaceWithTheSingleArgument(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), group);
 	}
 
 	private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -207,27 +211,30 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 			final List<Expression> args) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
 
 		Expression arg0= args.get(0);
 
 		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
 			rewrite.replace(node,
-					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), null); //$NON-NLS-1$
+					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), group); //$NON-NLS-1$
 		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), null); //$NON-NLS-1$
+			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), group); //$NON-NLS-1$
 		} else {
 			replaceWithValueOf(node, typeBinding);
 		}
 	}
 
 	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
 		cuRewrite.getASTRewrite().replace(node,
-				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), null); //$NON-NLS-1$
+				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), group); //$NON-NLS-1$
 	}
 
 	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
 
 		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
 	}

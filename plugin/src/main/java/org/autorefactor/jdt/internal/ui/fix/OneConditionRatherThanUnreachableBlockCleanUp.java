@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractCleanUpRule {
@@ -66,11 +67,12 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 
 	private void refactorCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name);
 
 		if (secondIf.getElseStatement() == null) {
-			rewrite.remove(secondIf, null);
+			rewrite.remove(secondIf, group);
 		} else {
-			rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getElseStatement()), null);
+			rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getElseStatement()), group);
 		}
 	}
 }

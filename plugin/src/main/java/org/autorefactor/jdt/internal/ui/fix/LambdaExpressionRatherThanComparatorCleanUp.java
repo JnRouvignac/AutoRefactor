@@ -63,6 +63,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportCleanUp {
@@ -437,7 +438,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		}
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name);
 
 		Expression comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
@@ -453,12 +456,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			}
 		}
 
-		rewrite.replace(node, comparingMethod, null);
+		rewrite.replace(node, comparingMethod, group);
 	}
 
 	private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(method);
 
@@ -473,6 +477,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 

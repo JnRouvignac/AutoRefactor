@@ -29,6 +29,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule {
@@ -65,7 +66,8 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 
 	private void removeCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name);
 
-		rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), null);
+		rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), group);
 	}
 }

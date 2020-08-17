@@ -53,6 +53,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * See {@link #getDescription()} method.
@@ -310,26 +311,28 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private void refactorToAssertTrueOrFalse(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), null);
+		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), group);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode nodeToReplace, final MethodInvocation originalMethod, final boolean replace, final Expression failureMessage) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		if (replace) {
-			rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), null);
+			rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), group);
 			return false;
 		}
 
 		if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
 			if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent()) || nodeToReplace.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(nodeToReplace.getParent(), null);
+				rewrite.remove(nodeToReplace.getParent(), group);
 			} else {
-				rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block(), null);
+				rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block(), group);
 			}
 
 			return false;
@@ -357,11 +360,12 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 		if (isComparingObjects(infixExpression) && !ASTNodes.is(infixExpression.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(infixExpression.getRightOperand(), NullLiteral.class)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Same"), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
 					null, failureMessage);
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
 			return false;
 		}
 
@@ -393,14 +397,15 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			final Expression actualValue, final Expression expectedValue, final Expression failureMessage, final boolean isRewriteNeeded) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		if (ASTNodes.is(actualValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), group);
 			return false;
 		}
 
 		if (ASTNodes.is(expectedValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), group);
 			return false;
 		}
 
@@ -429,7 +434,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), null);
+			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
 			return false;
 		}
 
@@ -471,6 +476,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private MethodInvocation invokeAssertNull(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final MethodInvocation originalMethod, final boolean isPositive, final Expression actual, final Expression failureMessage) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
 		Expression copyOfActual= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actual));

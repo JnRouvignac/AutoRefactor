@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * See {@link #getDescription()} method.
@@ -83,7 +84,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		if (canRemoveCast(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), null);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 			return false;
 		}
 
@@ -95,7 +97,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		NumberLiteral numberLiteral= ast.number(literal.getToken() + postfix);
 
-		cuRewrite.getASTRewrite().replace(node, numberLiteral, null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name);
+
+		cuRewrite.getASTRewrite().replace(node, numberLiteral, group);
 	}
 
 	private boolean canRemoveCast(final CastExpression node) {

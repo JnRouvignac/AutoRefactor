@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
@@ -307,14 +308,15 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 				MergeDirection direction= mergeDirection(typeBindings, i, j);
 				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name);
 					UnionType ut= unionTypes(catchClause1.getException().getType(),
 							catchClause2.getException().getType());
 					if (MergeDirection.UP.equals(direction)) {
-						rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, null);
-						rewrite.remove(catchClause2, null);
+						rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, group);
+						rewrite.remove(catchClause2, group);
 					} else if (MergeDirection.DOWN.equals(direction)) {
-						rewrite.remove(catchClause1, null);
-						rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, null);
+						rewrite.remove(catchClause1, group);
+						rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, group);
 					}
 
 					return false;
@@ -404,6 +406,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		removeSupersededAlternatives(allTypes);
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name);
 		UnionType result= cuRewrite.getAST().newUnionType();
 		@SuppressWarnings("unchecked")
 		List<Type> unionedTypes= result.types();

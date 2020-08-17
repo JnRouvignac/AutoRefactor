@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
@@ -83,6 +84,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 	private void replaceMethod(final MethodInvocation node, final boolean literal) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name);
 
 		FieldAccess fieldAccess= ast.getAST().newFieldAccess();
 		Name expression= ASTNodes.as(node.getExpression(), Name.class);
@@ -92,6 +94,6 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 		}
 
 		fieldAccess.setName(ast.simpleName(literal ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-		rewrite.replace(node, fieldAccess, null);
+		rewrite.replace(node, fieldAccess, group);
 	}
 }

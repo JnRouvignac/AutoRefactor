@@ -59,6 +59,7 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class SwitchCleanUp extends AbstractCleanUpRule {
@@ -357,6 +358,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			final List<SwitchCaseSection> cases, final Statement remainingStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
 
 		SwitchStatement switchStatement= ast.switch0(ASTNodes.createMoveTarget(rewrite, switchExpression));
 
@@ -369,16 +371,17 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (int i= 0; i < ifStatements.size() - 1; i++) {
-			rewrite.removeButKeepComment(ifStatements.get(i), null);
+			rewrite.removeButKeepComment(ifStatements.get(i), group);
 		}
 
-		rewrite.replace(Utils.getLast(ifStatements), switchStatement, null);
+		rewrite.replace(Utils.getLast(ifStatements), switchStatement, group);
 	}
 
 	private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
 			final List<Statement> innerStatements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
 
 		@SuppressWarnings("unchecked")
 		List<Statement> switchStatements= switchStatement.statements();
@@ -538,6 +541,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
 
 		Statement caseKept;
 		if (merge == Merge.BEFORE_SWITCH_CASES) {
@@ -547,8 +551,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (SwitchCase caseToMove : sectionToRemove.existingCases) {
-			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, caseToMove), caseKept, null);
+			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, caseToMove), caseKept, group);
 		}
-		rewrite.remove(sectionToRemove.statements, null);
+		rewrite.remove(sectionToRemove.statements, group);
 	}
 }

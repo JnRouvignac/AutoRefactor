@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
@@ -129,23 +130,24 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 	private void makeStatic(final TypeDeclaration node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name);
 
 		List<?> modifiers= node.modifiers();
 		Modifier static0= ast.static0();
 
 		if (modifiers.isEmpty()) {
-			rewrite.insertBefore(static0, node, null);
+			rewrite.insertBefore(static0, node, group);
 		} else {
 			IExtendedModifier lastModifier= (IExtendedModifier) Utils.getLast(modifiers);
 
 			if (lastModifier.isModifier()) {
 				if (((Modifier) lastModifier).isFinal()) {
-					rewrite.insertBefore(static0, (Modifier) lastModifier, null);
+					rewrite.insertBefore(static0, (Modifier) lastModifier, group);
 				} else {
-					rewrite.insertAfter(static0, (Modifier) lastModifier, null);
+					rewrite.insertAfter(static0, (Modifier) lastModifier, group);
 				}
 			} else {
-				rewrite.insertAfter(static0, (Annotation) lastModifier, null);
+				rewrite.insertAfter(static0, (Annotation) lastModifier, group);
 			}
 		}
 	}

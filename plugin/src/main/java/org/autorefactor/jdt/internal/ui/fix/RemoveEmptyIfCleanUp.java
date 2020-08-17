@@ -32,6 +32,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
@@ -53,12 +54,13 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name);
 
 		Statement thenStatement= node.getThenStatement();
 		Statement elseStatement= node.getElseStatement();
 
 		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-			rewrite.remove(elseStatement, null);
+			rewrite.remove(elseStatement, group);
 			return false;
 		}
 
@@ -66,8 +68,8 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 			Expression condition= node.getExpression();
 
 			if (elseStatement != null) {
-				rewrite.replace(condition, cuRewrite.getASTBuilder().negate(condition), null);
-				rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), null);
+				rewrite.replace(condition, cuRewrite.getASTBuilder().negate(condition), group);
+				rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
 			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
 				removeBlock(node);
 				return false;
@@ -79,13 +81,14 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
 	private void removeBlock(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name);
 
 		if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-			rewrite.remove(node, null);
+			rewrite.remove(node, group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.block(), null);
+			rewrite.replace(node, ast.block(), group);
 		}
 	}
 }

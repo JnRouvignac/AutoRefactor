@@ -42,6 +42,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * See {@link #getDescription()} method.
@@ -124,7 +125,8 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		NumberLiteral replacement= ast.number(integers + suffix);
-		cuRewrite.getASTRewrite().replace(node, replacement, null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_name);
+		cuRewrite.getASTRewrite().replace(node, replacement, group);
 	}
 
 	private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,

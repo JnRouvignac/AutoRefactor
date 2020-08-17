@@ -53,6 +53,7 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
@@ -285,11 +286,12 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 	private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name);
 
 		if (ifStatement.getThenStatement() instanceof Block) {
-			rewrite.insertAfter(ast.break0(), Utils.getLast(assignments), null);
+			rewrite.insertAfter(ast.break0(), Utils.getLast(assignments), group);
 		} else {
-			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), null);
+			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), group);
 		}
 	}
 }

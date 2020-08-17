@@ -31,6 +31,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Refactors:
@@ -96,10 +97,11 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 	private void refactorIf(final IfStatement node, final IfStatement thenInnerIfStatement, final IfStatement elseInnerIfStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name);
 
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
 		IfStatement newInnerIf= ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
 				ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
-		rewrite.replace(node, ast.if0(newCondition, ast.block(newInnerIf)), null);
+		rewrite.replace(node, ast.if0(newCondition, ast.block(newInnerIf)), group);
 	}
 }

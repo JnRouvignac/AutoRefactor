@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
@@ -76,6 +77,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 				&& !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name);
 
 			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
 
@@ -86,9 +88,9 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 				newOperands.add(newInvoke);
 				newOperands.addAll(rewrite.createMoveTarget(extendedOperands));
 
-				rewrite.replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands), null);
+				rewrite.replace(node, ast.infixExpression(InfixExpression.Operator.PLUS, newOperands), group);
 			} else {
-				rewrite.replace(node, newInvoke, null);
+				rewrite.replace(node, newInvoke, group);
 			}
 
 			return false;

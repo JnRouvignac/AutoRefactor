@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
@@ -69,31 +70,33 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			MethodDeclaration enclosingMethod= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
 			if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name);
 
 				TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(enclosingMethod, TypeDeclaration.class);
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-					rewrite.remove(node.getParent(), null);
-					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), null);
+					rewrite.remove(node.getParent(), group);
+					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), group);
 				} else {
 					// Add the missing onPause() method to the class.
-					rewrite.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod, null);
+					rewrite.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod, group);
 				}
 
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name);
 
 			TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(node, TypeDeclaration.class);
 			ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
 			if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), null);
+					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), group);
 				} else {
 					rewrite.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
-							createOnPauseMethodDeclaration(), null);
+							createOnPauseMethodDeclaration(), group);
 				}
 
 				return false;

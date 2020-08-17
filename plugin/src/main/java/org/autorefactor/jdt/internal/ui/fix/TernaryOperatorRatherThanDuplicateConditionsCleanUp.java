@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
@@ -133,18 +134,20 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 		}
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name);
 
 		ParenthesizedExpression newConditionalExpression= ast.parenthesize(ast.conditionalExpression(ASTNodes.createMoveTarget(rewrite, basicExpression),
 				ASTNodes.createMoveTarget(rewrite, thenExpression), ASTNodes.createMoveTarget(rewrite, elseExpression)));
 
 		if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
-			rewrite.replace(node, newConditionalExpression, null);
+			rewrite.replace(node, newConditionalExpression, group);
 		} else {
 			List<Expression> operands= rewrite.createMoveTarget(previousOperands);
 			operands.add(newConditionalExpression);
 			operands.addAll(rewrite.createMoveTarget(nextOperands));
-			rewrite.replace(node, ast.infixExpression(node.getOperator(), operands), null);
+			rewrite.replace(node, ast.infixExpression(node.getOperator(), operands), group);
 		}
 	}
 

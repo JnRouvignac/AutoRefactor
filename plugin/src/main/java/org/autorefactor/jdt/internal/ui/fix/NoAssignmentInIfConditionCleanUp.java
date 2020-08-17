@@ -181,26 +181,28 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			VariableDeclarationFragment fragment= findVariableDeclarationFragment(vds, lhs);
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name);
 
 			TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
 
 			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
-				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), editGroup);
-				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
+				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), group);
+				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
 				this.result= false;
 				return false;
 			}
 
 			if (!ASTNodes.isInElse(node)) {
-				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), editGroup);
+				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
 				Statement newAssignment= ast.toStatement(ASTNodes.createMoveTarget(rewrite, assignment));
 
 				if (ASTNodes.canHaveSiblings(node)) {
-					rewrite.insertBefore(newAssignment, node, editGroup);
+					rewrite.insertBefore(newAssignment, node, group);
 				} else {
 					Block newBlock= ast.block(newAssignment, ASTNodes.createMoveTarget(rewrite, node));
-					rewrite.replace(node, newBlock, editGroup);
+					rewrite.replace(node, newBlock, group);
 				}
 
 				this.result= false;

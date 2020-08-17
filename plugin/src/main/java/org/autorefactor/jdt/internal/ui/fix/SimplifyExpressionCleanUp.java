@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
@@ -85,9 +86,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 						operands.remove(i);
 
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-						rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), null);
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+
+						rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), group);
 						return false;
 					}
 				}
@@ -163,15 +166,17 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		}
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
 
 		if (leftOppositeExpression != null) {
 			if (rightOppositeExpression != null) {
 				rewrite.replace(node,
-						ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), getAppropriateOperator(node), ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), null);
+						ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), getAppropriateOperator(node), ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), group);
 			} else {
 				InfixExpression.Operator reverseOp= getReverseOperator(node);
-				rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightExpression)), null);
+				rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightExpression)), group);
 			}
 
 			return false;
@@ -179,7 +184,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 		if (rightOppositeExpression != null) {
 			InfixExpression.Operator reverseOp= getReverseOperator(node);
-			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), null);
+			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, leftExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), group);
 			return false;
 		}
 
@@ -216,6 +221,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		// fearing we would introduce a previously non existing NPE.
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
 
 		Expression operand;
 		if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
@@ -224,25 +230,27 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			operand= ast.negate(exprToCopy);
 		}
 
-		rewrite.replace(node, operand, null);
+		rewrite.replace(node, operand, group);
 		return false;
 	}
 
 	private void replaceWithNewInfixExpression(final InfixExpression node, final List<Expression> remainingOperands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
 
 		if (remainingOperands.size() == 1) {
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), null);
+			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), null);
+			rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), group);
 		}
 	}
 
 	private void replaceBy(final ASTNode node, final Expression expression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expression), null);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expression), group);
 	}
 
 	/**

@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUpRule {
@@ -70,13 +71,14 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 
 	private void refactorWithInitializer(final ArrayCreation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name);
 
 		if (node.getInitializer() != null) {
-			rewrite.replace(node, node.getInitializer(), null);
+			rewrite.replace(node, node.getInitializer(), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.createCopyTarget(ast.arrayInitializer()), null);
+			rewrite.replace(node, ast.createCopyTarget(ast.arrayInitializer()), group);
 		}
 	}
 

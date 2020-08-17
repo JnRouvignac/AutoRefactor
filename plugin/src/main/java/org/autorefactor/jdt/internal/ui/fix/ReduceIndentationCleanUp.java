@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
@@ -177,17 +178,18 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 	private void moveThenStatement(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name);
 
 		List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
 		if (ASTNodes.canHaveSiblings(node)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, group);
 			}
 
-			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
-			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
-			rewrite.remove(node.getElseStatement(), null);
+			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), group);
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
+			rewrite.remove(node.getElseStatement(), group);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -195,27 +197,28 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), null);
-			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), null);
+			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), group);
+			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.block(copyOfStatements);
-			rewrite.replace(node, block, null);
+			rewrite.replace(node, block, group);
 		}
 	}
 
 	private void moveElseStatement(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name);
 
 		List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 
 		if (ASTNodes.canHaveSiblings(node)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, null);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, group);
 			}
 
-			rewrite.remove(node.getElseStatement(), null);
+			rewrite.remove(node.getElseStatement(), group);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -223,11 +226,11 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			rewrite.remove(node.getElseStatement(), null);
+			rewrite.remove(node.getElseStatement(), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.block(copyOfStatements);
-			rewrite.replace(node, block, null);
+			rewrite.replace(node, block, group);
 		}
 	}
 }

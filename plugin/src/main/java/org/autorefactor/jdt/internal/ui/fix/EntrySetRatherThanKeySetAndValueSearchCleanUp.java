@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractCleanUpRule {
@@ -228,6 +229,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name);
 
 		VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
 		enhancedFor.getBody().accept(keyUseVisitor);
@@ -243,11 +245,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		if (typeBinding != null && typeBinding.isRawType()) {
 			// for (Object key : map.keySet()) => for (Object key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), group); //$NON-NLS-1$
 			Type objectType= ast.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
 			Variable objectVar= new Variable(
 					new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), ast); //$NON-NLS-1$
-			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(objectVar.varNameRaw(), objectType), null);
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(objectVar.varNameRaw(), objectType), group);
 
 			// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
 			// Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
@@ -257,22 +259,22 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			VariableDeclarationStatement newKeyDecl= ast.declareStatement(mapKeyType, ASTNodes.createMoveTarget(rewrite, parameter.getName()),
 					ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
-			rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl, null);
+			rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl, group);
 
 			if (keyUses > getValueMis.size()) {
 				String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
 				VariableDeclarationStatement newEntryDecl= ast.declareStatement(ast.type(mapEntryTypeName),
 						entryVar.varName(), ast.cast(ast.type(mapEntryTypeName), objectVar.varName()));
-				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl, null);
+				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl, group);
 			}
 		} else {
 			// for (K key : map.keySet()) => for (K key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), null); //$NON-NLS-1$
+			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, mapExpression), "entrySet"), group); //$NON-NLS-1$
 			// for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
 			// map.entrySet())
 			Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
-			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(entryVar.varNameRaw(), mapEntryType), null);
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(entryVar.varNameRaw(), mapEntryType), group);
 
 			if (keyUses > getValueMis.size()) {
 				// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
@@ -281,13 +283,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 				VariableDeclarationStatement newKeyDeclaration= ast.declareStatement(mapKeyType,
 						ASTNodes.createMoveTarget(rewrite, parameter.getName()), ast.newMethodInvocation(entryVar.varName(), "getKey")); //$NON-NLS-1$
-				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration, null);
+				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration, group);
 			}
 		}
 
 		// Replace all occurrences of map.get(key) => mapEntry.getValue()
 		for (MethodInvocation getValueMi : getValueMis) {
-			rewrite.replace(getValueMi, ast.newMethodInvocation(entryVar.varName(), "getValue"), null); //$NON-NLS-1$
+			rewrite.replace(getValueMi, ast.newMethodInvocation(entryVar.varName(), "getValue"), group); //$NON-NLS-1$
 		}
 	}
 
@@ -311,6 +313,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			mapKeyType= ast.toType(keyTypeBinding, typeNameDecider);
 		} else {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name);
 			// Use the type as defined in the code
 			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
 		}

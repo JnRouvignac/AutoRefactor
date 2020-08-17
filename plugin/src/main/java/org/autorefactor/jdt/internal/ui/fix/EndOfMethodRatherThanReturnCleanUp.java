@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
@@ -57,11 +58,12 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final ReturnStatement node) {
 		if (node.getExpression() == null && isLastStatement(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name);
 
 			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(node, null);
+				rewrite.remove(node, group);
 			} else {
-				rewrite.replace(node, cuRewrite.getASTBuilder().block(), null);
+				rewrite.replace(node, cuRewrite.getASTBuilder().block(), group);
 			}
 
 			return false;

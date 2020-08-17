@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class IncrementStatementRatherThanIncrementExpressionCleanUp extends AbstractCleanUpRule {
@@ -218,18 +219,19 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				final Statement statement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_name);
 
-			rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), null);
+			rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
 
 			if (node instanceof PostfixExpression) {
 				Statement newAssignment= ast.toStatement(ASTNodes.createMoveTarget(rewrite, node));
 
 				if (ASTNodes.canHaveSiblings(statement)) {
-					rewrite.insertAfter(newAssignment, statement, null);
+					rewrite.insertAfter(newAssignment, statement, group);
 				} else {
 					Block newBlock= ast.block(ASTNodes.createMoveTarget(rewrite, statement), newAssignment);
 
-					rewrite.replace(statement, newBlock, null);
+					rewrite.replace(statement, newBlock, group);
 				}
 			} else {
 				Statement newAssignment;
@@ -240,11 +242,11 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				}
 
 				if (ASTNodes.canHaveSiblings(statement)) {
-					rewrite.insertBefore(newAssignment, statement, null);
+					rewrite.insertBefore(newAssignment, statement, group);
 				} else {
 					Block newBlock= ast.block(newAssignment, ASTNodes.createMoveTarget(rewrite, statement));
 
-					rewrite.replace(statement, newBlock, null);
+					rewrite.replace(statement, newBlock, group);
 				}
 			}
 

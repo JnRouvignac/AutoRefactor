@@ -29,6 +29,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule {
@@ -63,10 +64,11 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 	private void replace(final InfixExpression node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name);
 
 		rewrite.replace(node,
 				ast.infixExpression(
 						ast.newMethodInvocation(Double.class.getSimpleName(), "compare", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getLeftOperand())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getRightOperand()))), //$NON-NLS-1$
-						node.getOperator(), ast.number("0")), null); //$NON-NLS-1$
+						node.getOperator(), ast.number("0")), group); //$NON-NLS-1$
 	}
 }

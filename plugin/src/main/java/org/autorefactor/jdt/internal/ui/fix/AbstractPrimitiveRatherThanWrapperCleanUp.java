@@ -54,6 +54,7 @@ import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends AbstractCleanUpRule {
@@ -190,7 +191,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Type primitiveType= ast.type(getPrimitiveTypeName());
-		cuRewrite.getASTRewrite().replace(node.getType(), primitiveType, null);
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
+		cuRewrite.getASTRewrite().replace(node.getType(), primitiveType, group);
 	}
 
 	private boolean isNotNull(final Expression expression) {
