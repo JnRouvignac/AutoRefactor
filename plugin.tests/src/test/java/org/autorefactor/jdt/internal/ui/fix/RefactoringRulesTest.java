@@ -39,7 +39,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.jdt.internal.corext.dom.ApplyRefactoringsJob;

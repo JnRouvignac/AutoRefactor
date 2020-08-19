@@ -607,4 +607,8 @@ class TypeBindingStub implements ITypeBinding {
 	public String toString() {
 		return fullyQualifiedName;
 	}
+
+	public boolean isRecord() {
+		return false;
+	}
 }

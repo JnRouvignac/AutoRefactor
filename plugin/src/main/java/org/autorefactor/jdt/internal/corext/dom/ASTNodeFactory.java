@@ -172,7 +172,6 @@ public class ASTNodeFactory {
 	 * @return a new annotation
 	 */
 	public Annotation annotation(final String typeName) {
-		// TODO handle SingleMemberAnnotation and NormalAnnotation
 		return markerAnnotation(simpleName(typeName));
 	}
 
