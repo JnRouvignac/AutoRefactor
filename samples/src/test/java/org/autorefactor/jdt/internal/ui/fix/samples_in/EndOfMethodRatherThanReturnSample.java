@@ -60,6 +60,15 @@ public class EndOfMethodRatherThanReturnSample {
             return;
     }
 
+    public void removeElseBlock(boolean isValid) {
+        System.out.println("Keep this line");
+        if (isValid) {
+            System.out.println("isValid is true");
+        } else {
+            return;
+        }
+    }
+
     public void removeUselessReturnWithSwitch(int myNumber) {
         switch (myNumber) {
         case 0:

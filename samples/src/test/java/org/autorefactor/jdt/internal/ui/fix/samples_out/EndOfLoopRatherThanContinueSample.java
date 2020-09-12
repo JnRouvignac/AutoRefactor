@@ -90,6 +90,15 @@ public class EndOfLoopRatherThanContinueSample {
         }
     }
 
+    public void removeElseBlock(List<String> texts, boolean isValid) {
+        for (String text : texts) {
+            System.out.println("Keep this line");
+            if (isValid) {
+                System.out.println("isValid is true");
+            }
+        }
+    }
+
     public void removeUselessContinueWithSwitch(List<String> texts, int myNumber) {
         for (String text : texts) {
             switch (myNumber) {

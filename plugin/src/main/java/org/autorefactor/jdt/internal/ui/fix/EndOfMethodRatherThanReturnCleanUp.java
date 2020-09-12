@@ -27,6 +27,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -55,39 +58,55 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final ReturnStatement node) {
-		if (node.getExpression() == null && isLastStatement(node)) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name);
+	public boolean visit(final Block node) {
+		ReturnInBlockVisitor returnInBlockVisitor= new ReturnInBlockVisitor();
+		returnInBlockVisitor.visitNode(node);
+		return returnInBlockVisitor.result;
+	}
 
-			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(node, group);
-			} else {
-				rewrite.replace(node, cuRewrite.getASTBuilder().block(), group);
+	private final class ReturnInBlockVisitor extends BlockSubVisitor {
+		@Override
+		public boolean visit(final ReturnStatement node) {
+			if (result && node.getExpression() == null && isLastStatement(node)) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name);
+
+				if (startNode.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY
+						&& ASTNodes.asList(startNode).size() == 1
+						&& Utils.equalNotNull(ASTNodes.asList(startNode).get(0), node)) {
+					rewrite.remove(startNode, group);
+				} else if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+					rewrite.remove(node, group);
+				} else {
+					rewrite.replace(node, cuRewrite.getASTBuilder().block(), group);
+				}
+
+				result= false;
+				return false;
+			}
+
+			return true;
+		}
+
+		private boolean isLastStatement(final Statement node) {
+			Statement nextStatement= ASTNodes.getNextStatement(node);
+
+			if (nextStatement == null) {
+				if (node.getParent() instanceof MethodDeclaration) {
+					return true;
+				}
+
+				if (node.getParent() instanceof WhileStatement || node.getParent() instanceof EnhancedForStatement
+						|| node.getParent() instanceof ForStatement || node.getParent() instanceof DoStatement) {
+					return false;
+				}
+
+				if (node.getParent() instanceof Statement) {
+					return isLastStatement((Statement) node.getParent());
+				}
 			}
 
 			return false;
 		}
-
-		return true;
-	}
-
-	private boolean isLastStatement(final Statement node) {
-		Statement nextStatement= ASTNodes.getNextStatement(node);
-
-		if (nextStatement == null) {
-			if (node.getParent() instanceof MethodDeclaration) {
-				return true;
-			}
-			if (node.getParent() instanceof EnhancedForStatement || node.getParent() instanceof ForStatement
-					|| node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement) {
-				return false;
-			}
-			if (node.getParent() instanceof Statement) {
-				return isLastStatement((Statement) node.getParent());
-			}
-		}
-
-		return false;
 	}
 }
