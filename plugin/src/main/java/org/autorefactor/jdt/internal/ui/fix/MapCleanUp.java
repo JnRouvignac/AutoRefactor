@@ -115,7 +115,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
 				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				rewrite.remove(nodeToRemove, group);
-				this.result= false;
+				result= false;
 				return false;
 			}
 
@@ -130,22 +130,24 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			List<Expression> args= cic.arguments();
 			boolean noArgsCtor= args.isEmpty();
 			boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-			return (noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+			return noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
 					ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
 					IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
-					WeakHashMap.class.getCanonicalName()))
-					|| (mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+					WeakHashMap.class.getCanonicalName())
+					|| mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
 							HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
-							WeakHashMap.class.getCanonicalName()));
+							WeakHashMap.class.getCanonicalName());
 		}
 
 		private boolean isValidCapacityParameter(final Expression sourceMap, final List<Expression> args) {
 			if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
-				Object constant= args.get(0).resolveConstantExpressionValue();
-				MethodInvocation methodInvocation= ASTNodes.as(args.get(0), MethodInvocation.class);
+				Long constant= ASTNodes.getIntegerLiteral(args.get(0));
+
 				if (constant != null) {
-					return constant.equals(0);
+					return Long.valueOf(0).equals(constant);
 				}
+
+				MethodInvocation methodInvocation= ASTNodes.as(args.get(0), MethodInvocation.class);
 
 				return ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "size") && ASTNodes.match(methodInvocation.getExpression(), sourceMap); //$NON-NLS-1$
 			}
