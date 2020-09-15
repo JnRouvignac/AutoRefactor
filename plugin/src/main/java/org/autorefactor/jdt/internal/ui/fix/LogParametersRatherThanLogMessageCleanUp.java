@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name;
+		return MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_description;
+		return MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_reason;
+		return MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_reason;
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 			final InfixExpression message) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description);
 
 		StringBuilder messageBuilder= new StringBuilder();
 		List<Expression> allOperands= ASTNodes.allOperands(message);
@@ -125,7 +125,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 			final List<Expression> params) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description);
 
 		params.add(0, ast.string(messageBuilder.toString()));
 		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), group);

@@ -66,17 +66,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class OppositeConditionRatherThanDuplicateConditionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
+		return MultiFixMessages.OppositeConditionRatherThanDuplicateConditionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
+		return MultiFixMessages.OppositeConditionRatherThanDuplicateConditionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
+		return MultiFixMessages.OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 			final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.OppositeConditionRatherThanDuplicateConditionCleanUp_description);
 
 		Statement negativeStmtCopy;
 		if (negativeStatement instanceof IfStatement) {

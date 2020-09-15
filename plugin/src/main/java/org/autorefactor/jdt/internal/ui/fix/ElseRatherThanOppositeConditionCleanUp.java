@@ -35,17 +35,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name;
+		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_description;
+		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_reason;
+		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_reason;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 
 	private void removeCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_description);
 
 		rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), group);
 	}

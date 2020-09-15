@@ -65,17 +65,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
+		return MultiFixMessages.CommonIfInIfElseCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
+		return MultiFixMessages.CommonIfInIfElseCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
+		return MultiFixMessages.CommonIfInIfElseCleanUp_reason;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 	private void refactorIf(final IfStatement node, final IfStatement thenInnerIfStatement, final IfStatement elseInnerIfStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonIfInIfElseCleanUp_description);
 
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
 		IfStatement newInnerIf= ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),

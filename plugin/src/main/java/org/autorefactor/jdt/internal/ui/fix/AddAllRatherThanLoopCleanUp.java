@@ -70,17 +70,17 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name;
+		return MultiFixMessages.AddAllRatherThanLoopCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_description;
+		return MultiFixMessages.AddAllRatherThanLoopCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_reason;
+		return MultiFixMessages.AddAllRatherThanLoopCleanUp_reason;
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			final Set<String> importsToAdd, final Expression iterable, final MethodInvocation addMethod) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,
@@ -257,7 +257,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			final Expression data) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
 		MethodInvocation newMethod;
 		if (affectedCollection != null) {

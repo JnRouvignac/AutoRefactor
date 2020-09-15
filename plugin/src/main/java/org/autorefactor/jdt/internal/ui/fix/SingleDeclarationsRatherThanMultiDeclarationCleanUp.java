@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
+		return MultiFixMessages.SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
+		return MultiFixMessages.SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
+		return MultiFixMessages.SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			final List<?> fragments, final Javadoc docComment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SingleDeclarationsRatherThanMultiDeclarationCleanUp_description);
 
 		for (int i= fragments.size() - 1; 0 <= i; i--) {
 			VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);

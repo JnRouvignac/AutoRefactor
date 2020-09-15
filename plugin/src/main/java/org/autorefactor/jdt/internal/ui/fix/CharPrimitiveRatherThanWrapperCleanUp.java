@@ -40,17 +40,17 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_name;
+		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_description;
+		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_reason;
+		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_reason;
 	}
 
 	@Override

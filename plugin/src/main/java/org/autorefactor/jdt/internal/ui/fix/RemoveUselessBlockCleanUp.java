@@ -49,17 +49,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
+		return MultiFixMessages.RemoveUselessBlockCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
+		return MultiFixMessages.RemoveUselessBlockCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
+		return MultiFixMessages.RemoveUselessBlockCleanUp_reason;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	private void replaceBlock(final Block node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUselessBlockCleanUp_description);
 
 		List<Statement> statements= node.statements();
 		List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);

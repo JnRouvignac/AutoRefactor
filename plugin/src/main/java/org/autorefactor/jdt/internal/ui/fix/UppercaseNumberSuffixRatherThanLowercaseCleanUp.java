@@ -37,17 +37,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
+		return MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
+		return MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
+		return MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 
 		String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
 		NumberLiteral replacement= ast.number(newToken);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement, group);
 	}
 }

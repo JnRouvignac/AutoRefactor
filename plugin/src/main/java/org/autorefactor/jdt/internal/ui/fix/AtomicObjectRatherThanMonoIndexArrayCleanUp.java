@@ -73,17 +73,17 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_name;
+		return MultiFixMessages.AtomicObjectRatherThanMonoIndexArrayCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_description;
+		return MultiFixMessages.AtomicObjectRatherThanMonoIndexArrayCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
+		return MultiFixMessages.AtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
 	}
 
 	@Override
@@ -239,7 +239,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 		private void replaceArray(final Type type, final List<?> variableDimensions, final ArrayCreation arrayCreation, final Set<Assignment> assignmentReads, final Set<ArrayAccess> accessReads) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.AtomicObjectRatherThanMonoIndexArrayCleanUp_description);
 
 			Class<?> atomicClass;
 			Type objectClass= null;

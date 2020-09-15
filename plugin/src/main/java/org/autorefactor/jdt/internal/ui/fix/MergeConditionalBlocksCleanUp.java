@@ -42,17 +42,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
+        return MultiFixMessages.MergeConditionalBlocksCleanUp_name;
     }
 
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
+        return MultiFixMessages.MergeConditionalBlocksCleanUp_description;
     }
 
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
+        return MultiFixMessages.MergeConditionalBlocksCleanUp_reason;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
     private void mergeCode(final List<IfStatement> duplicateIfBlocks, final List<Boolean> isThenStatement) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name);
+        TextEditGroup group= new TextEditGroup(MultiFixMessages.MergeConditionalBlocksCleanUp_description);
 
         List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 

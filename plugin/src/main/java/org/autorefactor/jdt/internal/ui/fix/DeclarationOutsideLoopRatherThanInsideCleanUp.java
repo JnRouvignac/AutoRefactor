@@ -54,17 +54,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
+		return MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
+		return MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
+		return MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 	private void moveDeclaration(final Statement statement, final VariableDeclarationStatement varToMove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_description);
 
 		VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 

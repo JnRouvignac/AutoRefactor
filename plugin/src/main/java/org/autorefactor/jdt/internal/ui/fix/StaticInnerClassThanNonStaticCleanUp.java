@@ -84,17 +84,17 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name;
+		return MultiFixMessages.StaticInnerClassThanNonStaticCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_description;
+		return MultiFixMessages.StaticInnerClassThanNonStaticCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_reason;
+		return MultiFixMessages.StaticInnerClassThanNonStaticCleanUp_reason;
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 	private void makeStatic(final TypeDeclaration node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StaticInnerClassThanNonStaticCleanUp_description);
 
 		List<?> modifiers= node.modifiers();
 		Modifier static0= ast.static0();

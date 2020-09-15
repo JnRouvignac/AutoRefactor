@@ -68,17 +68,17 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_name;
+		return MultiFixMessages.SetRatherThanMapCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_description;
+		return MultiFixMessages.SetRatherThanMapCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_reason;
+		return MultiFixMessages.SetRatherThanMapCleanUp_reason;
 	}
 
 	@Override

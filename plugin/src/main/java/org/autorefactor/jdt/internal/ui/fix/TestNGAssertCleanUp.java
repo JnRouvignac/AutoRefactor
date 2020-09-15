@@ -54,17 +54,17 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_name;
+		return MultiFixMessages.TestNGAssertCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_description;
+		return MultiFixMessages.TestNGAssertCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TestNGAssertCleanUp_reason;
+		return MultiFixMessages.TestNGAssertCleanUp_reason;
 	}
 
 	@Override

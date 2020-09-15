@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name;
+		return MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_description;
+		return MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_reason;
+		return MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_reason;
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 			final AtomicBoolean isSecondExprPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_description);
 
 		if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
 			rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);

@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
+		return MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
+		return MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
+		return MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_reason;
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_description);
 
 		rewrite.replace(node.getName(), ast.simpleName(methodName), group);
 		rewrite.remove((Expression) node.arguments().get(0), group);

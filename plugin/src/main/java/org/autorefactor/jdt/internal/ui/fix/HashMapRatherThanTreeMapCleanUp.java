@@ -58,17 +58,17 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_name;
+		return MultiFixMessages.HashMapRatherThanTreeMapCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_description;
+		return MultiFixMessages.HashMapRatherThanTreeMapCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_reason;
+		return MultiFixMessages.HashMapRatherThanTreeMapCleanUp_reason;
 	}
 
 	@Override

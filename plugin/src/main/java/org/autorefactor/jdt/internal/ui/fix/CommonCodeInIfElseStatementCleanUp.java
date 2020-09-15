@@ -54,17 +54,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
+		return MultiFixMessages.CommonCodeInIfElseStatementCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
+		return MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
+		return MultiFixMessages.CommonCodeInIfElseStatementCleanUp_reason;
 	}
 
 	// TODO handle switch statements
@@ -179,7 +179,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove, final List<Integer> casesToRefactor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
 
 		// Remove the nodes common to all cases
 		boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
@@ -234,7 +234,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 	private void insertIdenticalCode(final IfStatement node, final List<Statement> stmtsToRemove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
 
 		for (Statement stmtToRemove : stmtsToRemove) {
 			rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, stmtToRemove), node, group);
@@ -261,7 +261,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					&& (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
 				areCasesRemovable[i]= true;
 			} else {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
 				cuRewrite.getASTRewrite().remove(removedStatements, group);
 			}
 		}

@@ -79,17 +79,17 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name;
+		return MultiFixMessages.LocalVariableRatherThanFieldCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_description;
+		return MultiFixMessages.LocalVariableRatherThanFieldCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_reason;
+		return MultiFixMessages.LocalVariableRatherThanFieldCleanUp_reason;
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	private void replaceFieldByLocalVariable(final FieldDeclaration field, final VariableDeclarationFragment fragment, final SimpleName reassignment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LocalVariableRatherThanFieldCleanUp_description);
 
 		boolean isFieldKept= field.fragments().size() != 1;
 

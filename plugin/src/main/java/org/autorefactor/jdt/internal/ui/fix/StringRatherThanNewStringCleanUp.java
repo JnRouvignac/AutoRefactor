@@ -39,17 +39,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
+		return MultiFixMessages.StringRatherThanNewStringCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
+		return MultiFixMessages.StringRatherThanNewStringCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
+		return MultiFixMessages.StringRatherThanNewStringCleanUp_reason;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 					&& (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringRatherThanNewStringCleanUp_description);
 
 				rewrite.replace(node, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				return false;

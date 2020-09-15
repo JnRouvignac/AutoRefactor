@@ -35,17 +35,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name;
+		return MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_description;
+		return MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_reason;
+		return MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_reason;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 	private void replace(final InfixExpression node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_description);
 
 		rewrite.replace(node,
 				ast.infixExpression(

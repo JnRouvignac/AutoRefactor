@@ -62,17 +62,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class IfElseIfCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name;
+		return MultiFixMessages.IfElseIfCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_description;
+		return MultiFixMessages.IfElseIfCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
+		return MultiFixMessages.IfElseIfCleanUp_reason;
 	}
 
 	// TODO JNR
@@ -99,7 +99,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.IfElseIfCleanUp_description);
 				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), group);
 				return false;
 			}

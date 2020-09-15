@@ -134,17 +134,17 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name;
+		return MultiFixMessages.StringBuilderRatherThanStringCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_description;
+		return MultiFixMessages.StringBuilderRatherThanStringCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_reason;
+		return MultiFixMessages.StringBuilderRatherThanStringCleanUp_reason;
 	}
 
 	@Override
@@ -224,7 +224,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				final Set<SimpleName> concatenationWrites, final SimpleName finalRead) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderRatherThanStringCleanUp_description);
 
 			Class<?> builder;
 			if (getJavaMinorVersion() >= 5) {

@@ -38,17 +38,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
+		return MultiFixMessages.AutoBoxingRatherThanExplicitMethodCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
+		return MultiFixMessages.AutoBoxingRatherThanExplicitMethodCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
+		return MultiFixMessages.AutoBoxingRatherThanExplicitMethodCleanUp_reason;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 			final ITypeBinding actualResultType) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AutoBoxingRatherThanExplicitMethodCleanUp_description);
 
 		if (primitiveType != null && !primitiveType.equals(actualParameterType)
 				&& !primitiveType.equals(actualResultType)

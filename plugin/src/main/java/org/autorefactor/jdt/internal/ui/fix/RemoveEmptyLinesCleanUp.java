@@ -46,17 +46,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name;
+		return MultiFixMessages.RemoveEmptyLinesCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_description;
+		return MultiFixMessages.RemoveEmptyLinesCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_reason;
+		return MultiFixMessages.RemoveEmptyLinesCleanUp_reason;
 	}
 
 	private static final Pattern NEWLINE_PATTERN= Pattern.compile("\\r\\n|\\n|\\r"); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyLinesCleanUp_description);
 
 		int index= getIndexOfFirstNonWhitespaceChar(source, 0);
 		if (index != -1) {
@@ -257,7 +257,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 			boolean isEqualToNewline= matcher.matches();
 			if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
 				SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyLinesCleanUp_description);
 				cuRewrite.getASTRewrite().remove(toRemove);
 				return true;
 			}

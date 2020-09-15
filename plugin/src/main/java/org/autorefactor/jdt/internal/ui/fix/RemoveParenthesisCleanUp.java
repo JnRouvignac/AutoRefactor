@@ -59,17 +59,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveParenthesisCleanUp_name;
+		return MultiFixMessages.RemoveParenthesisCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveParenthesisCleanUp_description;
+		return MultiFixMessages.RemoveParenthesisCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveParenthesisCleanUp_reason;
+		return MultiFixMessages.RemoveParenthesisCleanUp_reason;
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 
 		if (expressionWithoutParentheses != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveParenthesisCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), group);
 			return false;
 		}
@@ -316,7 +316,7 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	private void addParentheses(final Expression expression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveParenthesisCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
 
 		rewrite.replace(expression, ast.parenthesize(ASTNodes.createMoveTarget(rewrite, expression)), group);
 	}

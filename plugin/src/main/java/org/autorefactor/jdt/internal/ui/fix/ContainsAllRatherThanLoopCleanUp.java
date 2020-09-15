@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_name;
+		return MultiFixMessages.ContainsAllRatherThanLoopCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_description;
+		return MultiFixMessages.ContainsAllRatherThanLoopCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_reason;
+		return MultiFixMessages.ContainsAllRatherThanLoopCleanUp_reason;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 	protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ContainsAllRatherThanLoopCleanUp_description);
 
 		MethodInvocation invoke= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, toFind), "containsAll", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable))); //$NON-NLS-1$
 

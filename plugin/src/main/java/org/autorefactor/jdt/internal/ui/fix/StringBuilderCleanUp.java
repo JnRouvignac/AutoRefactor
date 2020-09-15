@@ -68,17 +68,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name;
+		return MultiFixMessages.StringBuilderCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_description;
+		return MultiFixMessages.StringBuilderCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_reason;
+		return MultiFixMessages.StringBuilderCleanUp_reason;
 	}
 
 	private boolean isEmptyString(final Expression expression) {
@@ -195,7 +195,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				final List<MethodInvocation> toStringToRefactor) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 			rewrite.replace(initializer, createStringConcats(allAppendedStrings), group);
 			rewrite.replace(type, ast.type(String.class.getSimpleName()), group);
@@ -308,7 +308,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (lastExpression instanceof ClassInstanceCreation) {
 				// Replace with String concatenation
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 				cuRewrite.getASTRewrite().replace(node, createStringConcats(allAppendedStrings), group);
 				return false;
 			}
@@ -351,7 +351,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 				if (ASTNodes.canHaveSiblings((Statement) node.getParent()) || node.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node.getParent(), group);
 				} else {
@@ -561,7 +561,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			final boolean isInstanceCreationToRewrite) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 		Expression result= null;
 		List<Expression> tempStringLiterals= new ArrayList<>();
@@ -623,7 +623,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (isFirst.get()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
@@ -656,7 +656,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 		Expression lastExpression= ASTNodes.createMoveTarget(rewrite, node.getExpression());
 		Expression stringVar= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(embeddedMI.getExpression()));
@@ -734,7 +734,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
 
 			if (replaceNeeded) {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 				cuRewrite.getASTRewrite().replace(node, createStringConcats(allOperands), group);
 				return false;
 			}
@@ -769,7 +769,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 		switch (appendedStrings.size()) {
 		case 0:

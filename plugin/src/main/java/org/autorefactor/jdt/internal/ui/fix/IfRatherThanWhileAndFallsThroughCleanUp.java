@@ -50,17 +50,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
+		return MultiFixMessages.IfRatherThanWhileAndFallsThroughCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
+		return MultiFixMessages.IfRatherThanWhileAndFallsThroughCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
+		return MultiFixMessages.IfRatherThanWhileAndFallsThroughCleanUp_reason;
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 	private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.IfRatherThanWhileAndFallsThroughCleanUp_description);
 
 		for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
 			if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {

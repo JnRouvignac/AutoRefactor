@@ -71,17 +71,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name;
+		return MultiFixMessages.DoWhileRatherThanWhileCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_description;
+		return MultiFixMessages.DoWhileRatherThanWhileCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_reason;
+		return MultiFixMessages.DoWhileRatherThanWhileCleanUp_reason;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression()) && Boolean.TRUE.equals(peremptoryValue(node, node.getExpression()))) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.DoWhileRatherThanWhileCleanUp_description);
 
 			rewrite.replace(node, ast.doWhile(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
 			return false;

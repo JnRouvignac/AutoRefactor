@@ -95,17 +95,17 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_name;
+		return MultiFixMessages.GenericMapRatherThanRawMapCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_description;
+		return MultiFixMessages.GenericMapRatherThanRawMapCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_reason;
+		return MultiFixMessages.GenericMapRatherThanRawMapCleanUp_reason;
 	}
 
 	@Override

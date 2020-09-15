@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
+		return MultiFixMessages.RemoveUnneededThisExpressionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
+		return MultiFixMessages.RemoveUnneededThisExpressionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
+		return MultiFixMessages.RemoveUnneededThisExpressionCleanUp_reason;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 		if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
 				&& node.typeArguments().isEmpty()) {
 			// Remove useless thisExpressions
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnneededThisExpressionCleanUp_description);
 			cuRewrite.getASTRewrite().remove(node.getExpression(), group);
 			return false;
 		}

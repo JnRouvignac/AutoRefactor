@@ -45,17 +45,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StringCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_name;
+		return MultiFixMessages.StringCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_description;
+		return MultiFixMessages.StringCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_reason;
+		return MultiFixMessages.StringCleanUp_reason;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
 
 		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
 			Expression stringExpression= node.getExpression();
@@ -201,7 +201,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
 
 		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
 
@@ -219,7 +219,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 		if (expression != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
 			return ASTNodes.createMoveTarget(rewrite, expression);
 		}
 

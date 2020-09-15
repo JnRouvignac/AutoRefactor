@@ -38,23 +38,23 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
+		return MultiFixMessages.RemoveEmptyIfCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
+		return MultiFixMessages.RemoveEmptyIfCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
+		return MultiFixMessages.RemoveEmptyIfCleanUp_reason;
 	}
 
 	@Override
 	public boolean visit(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
 
 		Statement thenStatement= node.getThenStatement();
 		Statement elseStatement= node.getElseStatement();
@@ -81,7 +81,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
 	private void removeBlock(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
 
 		if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 			rewrite.remove(node, group);

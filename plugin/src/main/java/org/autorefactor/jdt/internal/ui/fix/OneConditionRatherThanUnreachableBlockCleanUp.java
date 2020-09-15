@@ -34,17 +34,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
+		return MultiFixMessages.OneConditionRatherThanUnreachableBlockCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
+		return MultiFixMessages.OneConditionRatherThanUnreachableBlockCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
+		return MultiFixMessages.OneConditionRatherThanUnreachableBlockCleanUp_reason;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 
 	private void refactorCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.OneConditionRatherThanUnreachableBlockCleanUp_description);
 
 		if (secondIf.getElseStatement() == null) {
 			rewrite.remove(secondIf, group);

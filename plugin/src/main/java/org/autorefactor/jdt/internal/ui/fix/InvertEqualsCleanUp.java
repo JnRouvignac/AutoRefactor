@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
+		return MultiFixMessages.InvertEqualsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
+		return MultiFixMessages.InvertEqualsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
+		return MultiFixMessages.InvertEqualsCleanUp_reason;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 	private void invertEqualsInvocation(final MethodInvocation node, final Expression expression, final Expression arg0) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.InvertEqualsCleanUp_description);
 
 		rewrite.replace(node.getExpression(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		rewrite.replace(arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), group);

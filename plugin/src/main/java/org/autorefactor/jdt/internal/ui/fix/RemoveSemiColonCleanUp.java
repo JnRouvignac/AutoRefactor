@@ -63,17 +63,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
+		return MultiFixMessages.RemoveSemiColonCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
+		return MultiFixMessages.RemoveSemiColonCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
+		return MultiFixMessages.RemoveSemiColonCleanUp_reason;
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 			while (m.find()) {
 				int startPos= entry.getValue().getStartPosition();
 				SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveSemiColonCleanUp_description);
 				cuRewrite.getASTRewrite().remove(toRemove);
 				result= false;
 			}

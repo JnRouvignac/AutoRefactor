@@ -50,17 +50,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_name;
+		return MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_description;
+		return MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_reason;
+		return MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_reason;
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		NumberLiteral replacement= ast.number(integers + suffix);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement, group);
 	}
 

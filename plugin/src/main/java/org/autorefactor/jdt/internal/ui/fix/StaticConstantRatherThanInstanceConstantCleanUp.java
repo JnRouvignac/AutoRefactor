@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
+		return MultiFixMessages.StaticConstantRatherThanInstanceConstantCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
+		return MultiFixMessages.StaticConstantRatherThanInstanceConstantCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
+		return MultiFixMessages.StaticConstantRatherThanInstanceConstantCleanUp_reason;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 	private void addStaticModifier(final Modifier finalModifier) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StaticConstantRatherThanInstanceConstantCleanUp_description);
 
 		rewrite.insertBefore(ast.static0(), finalModifier, group);
 	}

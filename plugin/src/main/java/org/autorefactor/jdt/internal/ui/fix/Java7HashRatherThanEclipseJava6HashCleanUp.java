@@ -180,17 +180,17 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name;
+		return MultiFixMessages.Java7HashRatherThanEclipseJava6HashCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_description;
+		return MultiFixMessages.Java7HashRatherThanEclipseJava6HashCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_reason;
+		return MultiFixMessages.Java7HashRatherThanEclipseJava6HashCleanUp_reason;
 	}
 
 	@Override
@@ -622,7 +622,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			final Set<String> importsToAdd, final CollectedData data) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.Java7HashRatherThanEclipseJava6HashCleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<Statement> statements= node.getBody().statements();

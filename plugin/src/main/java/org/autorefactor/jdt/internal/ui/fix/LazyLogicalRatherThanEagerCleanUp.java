@@ -38,17 +38,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
+		return MultiFixMessages.LazyLogicalRatherThanEagerCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
+		return MultiFixMessages.LazyLogicalRatherThanEagerCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
+		return MultiFixMessages.LazyLogicalRatherThanEagerCleanUp_reason;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 	private void replaceWithLazyOperator(final InfixExpression node, final List<Expression> allOperands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LazyLogicalRatherThanEagerCleanUp_description);
 
 		InfixExpression.Operator lazyOperator;
 

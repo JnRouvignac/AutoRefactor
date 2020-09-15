@@ -42,17 +42,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ComparisonCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name;
+		return MultiFixMessages.ComparisonCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_description;
+		return MultiFixMessages.ComparisonCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_reason;
+		return MultiFixMessages.ComparisonCleanUp_reason;
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 			final InfixExpression.Operator operator) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ComparisonCleanUp_description);
 
 		rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, comparisonMI), operator, ast.number("0")), group); //$NON-NLS-1$
 	}

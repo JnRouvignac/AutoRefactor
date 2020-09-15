@@ -73,17 +73,17 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NIORatherThanIOCleanUp_name;
+		return MultiFixMessages.NIORatherThanIOCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NIORatherThanIOCleanUp_description;
+		return MultiFixMessages.NIORatherThanIOCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NIORatherThanIOCleanUp_reason;
+		return MultiFixMessages.NIORatherThanIOCleanUp_reason;
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 				&& isFileUse(node.getExpression())) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NIORatherThanIOCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.NIORatherThanIOCleanUp_description);
 
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 
@@ -209,7 +209,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		private void refactorFile(final Type type, final Expression initializer, final List<SimpleName> fileUses) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NIORatherThanIOCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.NIORatherThanIOCleanUp_description);
 
 			ClassInstanceCreation classInstanceCreation= ASTNodes.as(initializer, ClassInstanceCreation.class);
 

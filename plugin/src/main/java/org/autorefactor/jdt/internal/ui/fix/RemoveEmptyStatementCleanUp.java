@@ -49,17 +49,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
+		return MultiFixMessages.RemoveEmptyStatementCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
+		return MultiFixMessages.RemoveEmptyStatementCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
+		return MultiFixMessages.RemoveEmptyStatementCleanUp_reason;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
 			if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
 				if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
@@ -134,7 +134,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final Block node) {
 		if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 			cuRewrite.getASTRewrite().remove(node, group);
 			return false;
 		}
@@ -146,7 +146,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final EmptyStatement node) {
 		if (isEmptyCode(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
 			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(node, group);
@@ -177,7 +177,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
 		if (isEmptyCode(emptyCode)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
 			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(node, group);

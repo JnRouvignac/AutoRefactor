@@ -176,17 +176,17 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
+		return MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
+		return MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
+		return MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_reason;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -286,7 +286,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 	private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_description);
 
 		if (ifStatement.getThenStatement() instanceof Block) {
 			rewrite.insertAfter(ast.break0(), assignments.get(assignments.size() - 1), group);

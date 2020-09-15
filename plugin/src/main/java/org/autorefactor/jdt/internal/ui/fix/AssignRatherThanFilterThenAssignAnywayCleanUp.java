@@ -45,17 +45,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name;
+		return MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_description;
+		return MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
+		return MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 		private void replaceWithStraightAssign(final IfStatement node, final Expression leftHandSide, final Expression rightHandSide) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.replace(node,
 					ast.toStatement(ast.assign(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), group);
@@ -190,7 +190,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 		private void replaceWithStraightReturn(final IfStatement node, final Expression returnedExpression, final Statement toRemove) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.remove(toRemove, group);
 			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);

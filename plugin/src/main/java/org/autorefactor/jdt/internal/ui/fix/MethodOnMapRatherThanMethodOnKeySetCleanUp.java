@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
+		return MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
+		return MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
+		return MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 							// is not strictly equivalent to `Map.keySet().remove(key)`
 							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 
 				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
 				return false;
@@ -88,7 +88,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	private void replaceContains(final MethodInvocation node, final MethodInvocation miExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 
 		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
 		rewrite.replace(node.getName(), ast.simpleName("containsKey"), group); //$NON-NLS-1$

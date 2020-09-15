@@ -77,17 +77,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class BooleanCleanUp extends AbstractCleanUpRule {
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name;
+        return MultiFixMessages.BooleanCleanUp_name;
     }
 
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_description;
+        return MultiFixMessages.BooleanCleanUp_description;
     }
 
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_reason;
+        return MultiFixMessages.BooleanCleanUp_reason;
     }
 
     private static class BooleanASTMatcher extends ASTSemanticMatcher {
@@ -256,7 +256,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getThenExpression(), node.getElseExpression());
 
             if (newE != null) {
-                TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name);
+                TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
                 cuRewrite.getASTRewrite().replace(node, newE, group);
                 return false;
             }
@@ -270,7 +270,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
         if (newRs != null) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name);
+            TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
             rewrite.replace(node, newRs, group);
             rewrite.remove(elseRs, group);
@@ -290,7 +290,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                 if (newRs != null) {
                     ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                    TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name);
+                    TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
                     rewrite.replace(node, newRs, group);
                     rewrite.remove(elseRs, group);
@@ -342,7 +342,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
             if (newE != null) {
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name);
+                TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
                 rewrite.replace(rightHandSide, newE, group);
                 rewrite.remove(node, group);
@@ -535,7 +535,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                 if (ASTNodes.match(matcher2, copyStatement, node.getElseStatement())) {
                     ASTRewrite rewrite = cuRewrite.getASTRewrite();
-                    TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name);
+                    TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
                     copyStatement.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));

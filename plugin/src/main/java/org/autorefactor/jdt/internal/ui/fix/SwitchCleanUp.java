@@ -209,17 +209,17 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name;
+		return MultiFixMessages.SwitchCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_description;
+		return MultiFixMessages.SwitchCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_reason;
+		return MultiFixMessages.SwitchCleanUp_reason;
 	}
 
 	@Override
@@ -358,7 +358,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			final List<SwitchCaseSection> cases, final Statement remainingStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SwitchCleanUp_description);
 
 		SwitchStatement switchStatement= ast.switch0(ASTNodes.createMoveTarget(rewrite, switchExpression));
 
@@ -381,7 +381,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			final List<Statement> innerStatements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SwitchCleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<Statement> switchStatements= switchStatement.statements();
@@ -541,7 +541,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 	private void mergeCases(final Merge merge, final SwitchCaseSection sectionToKeep, final SwitchCaseSection sectionToRemove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SwitchCleanUp_description);
 
 		Statement caseKept;
 		if (merge == Merge.BEFORE_SWITCH_CASES) {

@@ -54,17 +54,17 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_name;
+		return MultiFixMessages.HashMapRatherThanHashtableCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_description;
+		return MultiFixMessages.HashMapRatherThanHashtableCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_reason;
+		return MultiFixMessages.HashMapRatherThanHashtableCleanUp_reason;
 	}
 
 	@Override

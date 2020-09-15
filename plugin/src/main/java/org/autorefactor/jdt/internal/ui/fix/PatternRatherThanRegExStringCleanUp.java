@@ -67,17 +67,17 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_name;
+		return MultiFixMessages.PatternRatherThanRegExStringCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_description;
+		return MultiFixMessages.PatternRatherThanRegExStringCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_reason;
+		return MultiFixMessages.PatternRatherThanRegExStringCleanUp_reason;
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 		private void refactorRegEx(final Type type, final Expression initializer, final List<SimpleName> regExUses) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.PatternRatherThanRegExStringCleanUp_description);
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
 			rewrite.replace(type, ast.type(patternName), group);

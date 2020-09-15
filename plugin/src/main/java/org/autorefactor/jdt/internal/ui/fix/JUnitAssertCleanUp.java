@@ -49,17 +49,17 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
+		return MultiFixMessages.JUnitAssertCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
+		return MultiFixMessages.JUnitAssertCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
+		return MultiFixMessages.JUnitAssertCleanUp_reason;
 	}
 
 	@Override

@@ -49,17 +49,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
+		return MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
+		return MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
+		return MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 						rewrite.remove(node, group);
@@ -104,7 +104,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		public boolean visit(final IfStatement node) {
 			if (result) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
 				Statement thenStatement= node.getThenStatement();
 				Statement elseStatement= node.getElseStatement();
@@ -193,7 +193,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
 			rewrite.replace(sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), group);
@@ -204,7 +204,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 	private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
 		if (ASTNodes.canHaveSiblings(astNode)) {
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 			cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), group);
 			removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
 		} else if (astNode.getParent() instanceof TryStatement) {

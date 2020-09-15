@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name;
+		return MultiFixMessages.AndroidWakeLockCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_description;
+		return MultiFixMessages.AndroidWakeLockCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_reason;
+		return MultiFixMessages.AndroidWakeLockCleanUp_reason;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			MethodDeclaration enclosingMethod= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
 			if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidWakeLockCleanUp_description);
 
 				TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(enclosingMethod, TypeDeclaration.class);
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
@@ -86,7 +86,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidWakeLockCleanUp_description);
 
 			TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(node, TypeDeclaration.class);
 			ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();

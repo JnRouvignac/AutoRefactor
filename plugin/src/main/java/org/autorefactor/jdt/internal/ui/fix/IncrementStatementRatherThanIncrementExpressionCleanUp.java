@@ -50,17 +50,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class IncrementStatementRatherThanIncrementExpressionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_name;
+		return MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_description;
+		return MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_reason;
+		return MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_reason;
 	}
 
 	@Override
@@ -219,7 +219,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				final Statement statement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_description);
 
 			rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
 

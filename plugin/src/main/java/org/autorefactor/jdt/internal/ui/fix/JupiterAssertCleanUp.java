@@ -54,17 +54,17 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JupiterAssertCleanUp_name;
+		return MultiFixMessages.JupiterAssertCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JupiterAssertCleanUp_description;
+		return MultiFixMessages.JupiterAssertCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JupiterAssertCleanUp_reason;
+		return MultiFixMessages.JupiterAssertCleanUp_reason;
 	}
 
 	@Override

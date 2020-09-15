@@ -39,17 +39,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
+		return MultiFixMessages.RemoveOverriddenAssignmentCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
+		return MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
+		return MultiFixMessages.RemoveOverriddenAssignmentCleanUp_reason;
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 				}
 
 				if (isOverridden && !isRead) {
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description);
 					cuRewrite.getASTRewrite().remove(fragment.getInitializer(), group);
 					return false;
 				}

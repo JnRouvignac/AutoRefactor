@@ -48,17 +48,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectionReplacementCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
+		return MultiFixMessages.EnumSetRatherThanHashSetCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
+		return MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
+		return MultiFixMessages.EnumSetRatherThanHashSetCleanUp_reason;
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 			invocation= ast.newMethodInvocation(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
 		}
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description);
 
 		cuRewrite.getASTRewrite().replace(cic, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());

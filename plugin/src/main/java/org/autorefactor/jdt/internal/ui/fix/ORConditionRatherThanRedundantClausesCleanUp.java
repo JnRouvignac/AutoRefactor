@@ -40,17 +40,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name;
+		return MultiFixMessages.ORConditionRatherThanRedundantClausesCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_description;
+		return MultiFixMessages.ORConditionRatherThanRedundantClausesCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_reason;
+		return MultiFixMessages.ORConditionRatherThanRedundantClausesCleanUp_reason;
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 	private void replaceDuplicateExpression(final List<Expression> previousOperands, final List<Expression> nextOperands, final Expression operandWithRedundance, final InfixExpression.Operator operator) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ORConditionRatherThanRedundantClausesCleanUp_description);
 
 		List<Expression> copyOfOperands= rewrite.createMoveTarget(previousOperands);
 		copyOfOperands.addAll(rewrite.createMoveTarget(nextOperands));

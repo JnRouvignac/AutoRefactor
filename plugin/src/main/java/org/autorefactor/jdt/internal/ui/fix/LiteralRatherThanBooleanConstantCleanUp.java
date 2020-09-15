@@ -35,17 +35,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
+		return MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
+		return MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
+		return MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_reason;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
 	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
 		BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().boolean0(val);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, booleanLiteral, group);
 	}
 }

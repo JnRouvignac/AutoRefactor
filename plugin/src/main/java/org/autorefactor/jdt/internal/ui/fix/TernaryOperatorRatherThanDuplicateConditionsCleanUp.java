@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
+		return MultiFixMessages.TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
+		return MultiFixMessages.TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
+		return MultiFixMessages.TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.TernaryOperatorRatherThanDuplicateConditionsCleanUp_description);
 
 		ParenthesizedExpression newConditionalExpression= ast.parenthesize(ast.conditionalExpression(ASTNodes.createMoveTarget(rewrite, basicExpression),
 				ASTNodes.createMoveTarget(rewrite, thenExpression), ASTNodes.createMoveTarget(rewrite, elseExpression)));

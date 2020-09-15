@@ -58,17 +58,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
+		return MultiFixMessages.NoAssignmentInIfConditionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
+		return MultiFixMessages.NoAssignmentInIfConditionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
+		return MultiFixMessages.NoAssignmentInIfConditionCleanUp_reason;
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.NoAssignmentInIfConditionCleanUp_description);
 
 			TextEditGroup editGroup= new TextEditGroup(NoAssignmentInIfConditionCleanUp.class.getCanonicalName());
 

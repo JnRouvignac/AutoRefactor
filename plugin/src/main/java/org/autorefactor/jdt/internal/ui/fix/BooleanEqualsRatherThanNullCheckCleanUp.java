@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name;
+		return MultiFixMessages.BooleanEqualsRatherThanNullCheckCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_description;
+		return MultiFixMessages.BooleanEqualsRatherThanNullCheckCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_reason;
+		return MultiFixMessages.BooleanEqualsRatherThanNullCheckCleanUp_reason;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 			final boolean isAndExpression, final boolean isPositiveExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanEqualsRatherThanNullCheckCleanUp_description);
 
 		Name booleanConstant= ast.name(Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
 		MethodInvocation equalsMethod= ast.newMethodInvocation(booleanConstant, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstExpression))); //$NON-NLS-1$

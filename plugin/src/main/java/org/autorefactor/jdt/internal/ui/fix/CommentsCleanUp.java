@@ -70,17 +70,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name;
+		return MultiFixMessages.CommentsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_description;
+		return MultiFixMessages.CommentsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_reason;
+		return MultiFixMessages.CommentsCleanUp_reason;
 	}
 
 	private static final Pattern EMPTY_LINE_COMMENT= Pattern.compile("//\\s*"); //$NON-NLS-1$
@@ -125,7 +125,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final BlockComment node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 
 		String comment= getComment(node);
 
@@ -214,7 +214,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final Javadoc node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 
 		String comment= getComment(node);
 		boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
@@ -325,13 +325,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private void replaceEmptyLineAtStartOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 
 	private void replaceEmptyLineAtEndOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1));
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 
@@ -456,7 +456,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final LineComment node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 
 		String comment= getComment(node);
 

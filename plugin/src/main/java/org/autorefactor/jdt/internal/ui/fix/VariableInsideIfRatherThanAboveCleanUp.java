@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
+		return MultiFixMessages.VariableInsideIfRatherThanAboveCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
+		return MultiFixMessages.VariableInsideIfRatherThanAboveCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
+		return MultiFixMessages.VariableInsideIfRatherThanAboveCleanUp_reason;
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 				final List<Statement> statements) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.VariableInsideIfRatherThanAboveCleanUp_description);
 
 			if (statement instanceof Block) {
 				rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, variableAssignment), statements.get(0), group);

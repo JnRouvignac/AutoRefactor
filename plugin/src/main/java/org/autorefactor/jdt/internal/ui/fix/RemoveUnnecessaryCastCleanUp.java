@@ -48,17 +48,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name;
+		return MultiFixMessages.RemoveUnnecessaryCastCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_description;
+		return MultiFixMessages.RemoveUnnecessaryCastCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_reason;
+		return MultiFixMessages.RemoveUnnecessaryCastCleanUp_reason;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		if (canRemoveCast(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 			return false;
 		}
@@ -97,7 +97,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		NumberLiteral numberLiteral= ast.number(literal.getToken() + postfix);
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 
 		cuRewrite.getASTRewrite().replace(node, numberLiteral, group);
 	}

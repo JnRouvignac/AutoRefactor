@@ -62,17 +62,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name;
+		return MultiFixMessages.UseMultiCatchCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_description;
+		return MultiFixMessages.UseMultiCatchCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_reason;
+		return MultiFixMessages.UseMultiCatchCleanUp_reason;
 	}
 
 	@Override
@@ -308,7 +308,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 				MergeDirection direction= mergeDirection(typeBindings, i, j);
 				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
 					UnionType ut= unionTypes(catchClause1.getException().getType(),
 							catchClause2.getException().getType());
 					if (MergeDirection.UP.equals(direction)) {
@@ -407,7 +407,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
 		UnionType result= cuRewrite.getAST().newUnionType();
 		@SuppressWarnings("unchecked")
 		List<Type> unionedTypes= result.types();

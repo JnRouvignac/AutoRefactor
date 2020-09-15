@@ -59,17 +59,17 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name;
+		return MultiFixMessages.CollectionsAddAllRatherThanAsListCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_description;
+		return MultiFixMessages.CollectionsAddAllRatherThanAsListCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_reason;
+		return MultiFixMessages.CollectionsAddAllRatherThanAsListCleanUp_reason;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.CollectionsAddAllRatherThanAsListCleanUp_description);
 
 		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 

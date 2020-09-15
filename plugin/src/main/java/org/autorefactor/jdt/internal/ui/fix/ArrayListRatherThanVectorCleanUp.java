@@ -63,17 +63,17 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_name;
+		return MultiFixMessages.ArrayListRatherThanVectorCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_description;
+		return MultiFixMessages.ArrayListRatherThanVectorCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_reason;
+		return MultiFixMessages.ArrayListRatherThanVectorCleanUp_reason;
 	}
 
 	@Override

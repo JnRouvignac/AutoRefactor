@@ -38,17 +38,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule {
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
+        return MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_name;
     }
 
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
+        return MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_description;
     }
 
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
+        return MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_reason;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
     private void replaceIfNoElseStatement(final IfStatement node, final IfStatement innerIf) {
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name);
+        TextEditGroup group= new TextEditGroup(MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_description);
 
         InfixExpression infixExpression= ast.infixExpression(ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));

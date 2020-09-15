@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
+		return MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
+		return MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
+		return MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_reason;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 
 	private void refactorWithInitializer(final ArrayCreation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description);
 
 		if (node.getInitializer() != null) {
 			rewrite.replace(node, node.getInitializer(), group);

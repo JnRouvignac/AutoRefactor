@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name;
+		return MultiFixMessages.AddBracketsToControlStatementCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_description;
+		return MultiFixMessages.AddBracketsToControlStatementCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_reason;
+		return MultiFixMessages.AddBracketsToControlStatementCleanUp_reason;
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddBracketsToControlStatementCleanUp_description);
 
 		Block block= ast.block(ASTNodes.createMoveTarget(rewrite, statement));
 		rewrite.replace(statement, block, group);

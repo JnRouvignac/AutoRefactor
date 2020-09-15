@@ -42,17 +42,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
+		return MultiFixMessages.UpdateSetRatherThanTestingFirstCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
+		return MultiFixMessages.UpdateSetRatherThanTestingFirstCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
+		return MultiFixMessages.UpdateSetRatherThanTestingFirstCleanUp_reason;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 					&& ASTNodes.match(((List<Expression>) miContains.arguments()).get(0), ((List<Expression>) miAddOrRemove.arguments()).get(0))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.UpdateSetRatherThanTestingFirstCleanUp_description);
 
 				if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
 					// Only one statement: replace if statement with col.add() (or col.remove())

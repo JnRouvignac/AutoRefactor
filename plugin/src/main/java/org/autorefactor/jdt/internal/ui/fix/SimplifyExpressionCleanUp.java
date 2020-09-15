@@ -45,17 +45,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name;
+		return MultiFixMessages.SimplifyExpressionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_description;
+		return MultiFixMessages.SimplifyExpressionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_reason;
+		return MultiFixMessages.SimplifyExpressionCleanUp_reason;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 						rewrite.replace(node, ast.infixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), group);
 						return false;
@@ -168,7 +168,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		if (leftOppositeExpression != null) {
 			if (rightOppositeExpression != null) {
@@ -221,7 +221,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		// fearing we would introduce a previously non existing NPE.
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		Expression operand;
 		if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
@@ -236,7 +236,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithNewInfixExpression(final InfixExpression node, final List<Expression> remainingOperands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		if (remainingOperands.size() == 1) {
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
@@ -249,7 +249,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 	private void replaceBy(final ASTNode node, final Expression expression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expression), group);
 	}
 

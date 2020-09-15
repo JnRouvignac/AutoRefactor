@@ -70,17 +70,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_name;
+		return MultiFixMessages.JoinRatherThanLoopCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_description;
+		return MultiFixMessages.JoinRatherThanLoopCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_reason;
+		return MultiFixMessages.JoinRatherThanLoopCleanUp_reason;
 	}
 
 	@Override
@@ -607,7 +607,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 				final Expression delimiter, final List<SimpleName> readsToRefactor, final Set<SimpleName> booleanUses) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.JoinRatherThanLoopCleanUp_description);
 
 			Expression copyOfDelimiter= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(delimiter));
 

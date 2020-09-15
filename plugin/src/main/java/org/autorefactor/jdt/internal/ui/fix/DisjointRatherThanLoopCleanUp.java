@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name;
+		return MultiFixMessages.DisjointRatherThanLoopCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_description;
+		return MultiFixMessages.DisjointRatherThanLoopCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_reason;
+		return MultiFixMessages.DisjointRatherThanLoopCleanUp_reason;
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class DisjointRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 	protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DisjointRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		MethodInvocation invoke= ast.newMethodInvocation(classname, "disjoint", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(toFind)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable))); //$NON-NLS-1$

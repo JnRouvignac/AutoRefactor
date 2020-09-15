@@ -40,17 +40,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
+		return MultiFixMessages.BooleanConstantRatherThanValueOfCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
+		return MultiFixMessages.BooleanConstantRatherThanValueOfCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;
+		return MultiFixMessages.BooleanConstantRatherThanValueOfCleanUp_reason;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 	private void replaceMethod(final MethodInvocation node, final boolean literal) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanConstantRatherThanValueOfCleanUp_description);
 
 		FieldAccess fieldAccess= ast.getAST().newFieldAccess();
 		Name expression= ASTNodes.as(node.getExpression(), Name.class);

@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
+		return MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
+		return MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
+		return MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_reason;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 
 			if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_description);
 				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), group);
 				return false;
 			}

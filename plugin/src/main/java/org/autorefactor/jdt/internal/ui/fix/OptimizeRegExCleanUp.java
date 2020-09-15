@@ -65,17 +65,17 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
 
     @Override
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OptimizeRegExCleanUp_name;
+        return MultiFixMessages.OptimizeRegExCleanUp_name;
     }
 
     @Override
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OptimizeRegExCleanUp_description;
+        return MultiFixMessages.OptimizeRegExCleanUp_description;
     }
 
     @Override
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_OptimizeRegExCleanUp_reason;
+        return MultiFixMessages.OptimizeRegExCleanUp_reason;
     }
 
     @Override
@@ -244,7 +244,7 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
     }
 
     private void rewriteRegEx(final StringLiteral node, String pattern) {
-        TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OptimizeRegExCleanUp_name);
+        TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
         cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().string(pattern), group);
     }

@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
+		return MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
+		return MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
+		return MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_reason;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,7 +74,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 			if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
 					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_description);
 				cuRewrite.getASTRewrite().remove(initializer, group);
 				visitSubtree= false;
 			}

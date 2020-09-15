@@ -36,17 +36,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
+		return MultiFixMessages.UnboxingRatherThanExplicitMethodCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
+		return MultiFixMessages.UnboxingRatherThanExplicitMethodCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
+		return MultiFixMessages.UnboxingRatherThanExplicitMethodCleanUp_reason;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
 
 	private void useUnboxing(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.UnboxingRatherThanExplicitMethodCleanUp_description);
 		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 	}
 }

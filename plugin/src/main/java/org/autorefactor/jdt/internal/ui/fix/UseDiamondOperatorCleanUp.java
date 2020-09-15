@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name;
+		return MultiFixMessages.UseDiamondOperatorCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_description;
+		return MultiFixMessages.UseDiamondOperatorCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_reason;
+		return MultiFixMessages.UseDiamondOperatorCleanUp_reason;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 			List<Type> typeArguments= ((ParameterizedType) type).typeArguments();
 
 			if (!typeArguments.isEmpty()) {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.UseDiamondOperatorCleanUp_description);
 				cuRewrite.getASTRewrite().remove(typeArguments, group);
 				return false;
 			}

@@ -54,17 +54,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
+		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
+		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
+		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				if (match) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_description);
 
 					if (redundantStatement instanceof Block) {
 						rewrite.remove(stmtsToCompare, group);

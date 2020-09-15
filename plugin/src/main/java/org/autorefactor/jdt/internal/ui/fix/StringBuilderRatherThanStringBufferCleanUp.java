@@ -34,17 +34,17 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSubstituteCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_name;
+		return MultiFixMessages.StringBuilderRatherThanStringBufferCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_description;
+		return MultiFixMessages.StringBuilderRatherThanStringBufferCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_reason;
+		return MultiFixMessages.StringBuilderRatherThanStringBufferCleanUp_reason;
 	}
 
 	@Override

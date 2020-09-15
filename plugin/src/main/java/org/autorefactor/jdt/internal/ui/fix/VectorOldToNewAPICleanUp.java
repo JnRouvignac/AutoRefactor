@@ -42,17 +42,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name;
+		return MultiFixMessages.VectorOldToNewAPICleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_description;
+		return MultiFixMessages.VectorOldToNewAPICleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_reason;
+		return MultiFixMessages.VectorOldToNewAPICleanUp_reason;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	private void replaceWith(final MethodInvocation node, final String newMethodName) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
 		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
 	}
@@ -96,7 +96,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
@@ -112,7 +112,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();

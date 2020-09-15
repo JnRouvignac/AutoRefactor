@@ -70,17 +70,17 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssertJCleanUp_name;
+		return MultiFixMessages.AssertJCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssertJCleanUp_description;
+		return MultiFixMessages.AssertJCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssertJCleanUp_reason;
+		return MultiFixMessages.AssertJCleanUp_reason;
 	}
 
 	@Override

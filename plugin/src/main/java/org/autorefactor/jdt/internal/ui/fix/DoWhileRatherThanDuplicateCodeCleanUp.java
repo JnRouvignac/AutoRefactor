@@ -39,17 +39,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
+		return MultiFixMessages.DoWhileRatherThanDuplicateCodeCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
+		return MultiFixMessages.DoWhileRatherThanDuplicateCodeCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
+		return MultiFixMessages.DoWhileRatherThanDuplicateCodeCleanUp_reason;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoWhileRatherThanDuplicateCodeCleanUp_description);
 		rewrite.remove(previousStatements, group);
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();

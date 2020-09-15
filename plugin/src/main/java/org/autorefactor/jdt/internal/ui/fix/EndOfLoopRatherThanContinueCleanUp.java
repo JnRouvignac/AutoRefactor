@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_name;
+		return MultiFixMessages.EndOfLoopRatherThanContinueCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_description;
+		return MultiFixMessages.EndOfLoopRatherThanContinueCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_reason;
+		return MultiFixMessages.EndOfLoopRatherThanContinueCleanUp_reason;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 		public boolean visit(final ContinueStatement node) {
 			if (result && node.getLabel() == null && isLastStatementInLoop(node)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.EndOfLoopRatherThanContinueCleanUp_description);
 
 				if (startNode.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY
 						&& ASTNodes.asList(startNode).size() == 1

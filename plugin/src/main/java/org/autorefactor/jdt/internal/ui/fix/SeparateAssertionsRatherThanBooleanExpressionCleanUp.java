@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_name;
+		return MultiFixMessages.SeparateAssertionsRatherThanBooleanExpressionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_description;
+		return MultiFixMessages.SeparateAssertionsRatherThanBooleanExpressionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_reason;
+		return MultiFixMessages.SeparateAssertionsRatherThanBooleanExpressionCleanUp_reason;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 		if (booleanExpression != null && ASTNodes.hasOperator(booleanExpression, operator)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.SeparateAssertionsRatherThanBooleanExpressionCleanUp_description);
 
 			List<Expression> allOperands= ASTNodes.allOperands(booleanExpression);
 			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), group);

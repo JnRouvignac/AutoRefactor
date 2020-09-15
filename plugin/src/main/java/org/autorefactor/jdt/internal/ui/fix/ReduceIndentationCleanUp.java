@@ -126,17 +126,17 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name;
+		return MultiFixMessages.ReduceIndentationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_description;
+		return MultiFixMessages.ReduceIndentationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_reason;
+		return MultiFixMessages.ReduceIndentationCleanUp_reason;
 	}
 
 	@Override
@@ -178,7 +178,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 	private void moveThenStatement(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ReduceIndentationCleanUp_description);
 
 		List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
 
@@ -209,7 +209,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 	private void moveElseStatement(final IfStatement node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ReduceIndentationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ReduceIndentationCleanUp_description);
 
 		List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
 

@@ -40,17 +40,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name;
+		return MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_description;
+		return MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_reason;
+		return MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_reason;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 		Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
 		if (!nodesToRemove.isEmpty()) {
 			for (ASTNode n : nodesToRemove) {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_description);
 				cuRewrite.getASTRewrite().replace(n, null, group);
 			}
 

@@ -32,23 +32,23 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name;
+		return MultiFixMessages.RemoveEmptySuperConstrInvocationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_description;
+		return MultiFixMessages.RemoveEmptySuperConstrInvocationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_reason;
+		return MultiFixMessages.RemoveEmptySuperConstrInvocationCleanUp_reason;
 	}
 
 	@Override
 	public boolean visit(final SuperConstructorInvocation node) {
 		if (node.arguments().isEmpty()) {
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptySuperConstrInvocationCleanUp_description);
 			cuRewrite.getASTRewrite().removeButKeepComment(node, group);
 			return false;
 		}

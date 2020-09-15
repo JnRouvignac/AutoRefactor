@@ -74,17 +74,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
+		return MultiFixMessages.AndroidViewHolderCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
+		return MultiFixMessages.AndroidViewHolderCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
+		return MultiFixMessages.AndroidViewHolderCleanUp_reason;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 			if (visitor.canApplyRefactoring()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidViewHolderCleanUp_description);
 
 				TypeNameDecider typeNameDecider= new TypeNameDecider(visitor.viewVariableName);
 

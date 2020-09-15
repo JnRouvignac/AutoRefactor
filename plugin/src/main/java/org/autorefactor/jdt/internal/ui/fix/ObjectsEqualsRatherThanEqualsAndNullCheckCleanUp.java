@@ -62,17 +62,17 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
+		return MultiFixMessages.ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
+		return MultiFixMessages.ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
+		return MultiFixMessages.ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
 	}
 
 	@Override
@@ -195,7 +195,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 			final ReturnStatement returnStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description);
 
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 

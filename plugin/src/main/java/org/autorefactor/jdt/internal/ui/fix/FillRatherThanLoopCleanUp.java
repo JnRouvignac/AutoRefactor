@@ -55,17 +55,17 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name;
+		return MultiFixMessages.FillRatherThanLoopCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_description;
+		return MultiFixMessages.FillRatherThanLoopCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_reason;
+		return MultiFixMessages.FillRatherThanLoopCleanUp_reason;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			final Set<String> importsToAdd, final Assignment assignment, final ArrayAccess arrayAccess) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.FillRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
 		rewrite.replace(node,

@@ -37,17 +37,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
+		return MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
+		return MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
+		return MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 	private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description);
 
 		rewrite.replace(node, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, valuedExpression)), group);
 	}

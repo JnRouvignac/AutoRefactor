@@ -41,1635 +41,1635 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_name;
+    public static String IntPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_description;
+    public static String IntPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String IntPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_name;
+    public static String ShortPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_description;
+    public static String ShortPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String ShortPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_name;
+    public static String LongPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_description;
+    public static String LongPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String LongPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_name;
+    public static String DoublePrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_description;
+    public static String DoublePrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_reason;
+    public static String DoublePrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_name;
+    public static String FloatPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_description;
+    public static String FloatPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String FloatPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_name;
+    public static String CharPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_description;
+    public static String CharPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String CharPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_name;
+    public static String BytePrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_description;
+    public static String BytePrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_reason;
+    public static String BytePrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_name;
+    public static String AssignRatherThanFilterThenAssignAnywayCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_description;
+    public static String AssignRatherThanFilterThenAssignAnywayCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
+    public static String AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
+    public static String AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
+    public static String AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
+    public static String AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name;
+    public static String VectorOldToNewAPICleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_description;
+    public static String VectorOldToNewAPICleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_reason;
+    public static String VectorOldToNewAPICleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name;
+    public static String PrimitiveWrapperCreationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_description;
+    public static String PrimitiveWrapperCreationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
+    public static String PrimitiveWrapperCreationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
+    public static String AutoBoxingRatherThanExplicitMethodCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
+    public static String AutoBoxingRatherThanExplicitMethodCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
+    public static String AutoBoxingRatherThanExplicitMethodCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
+    public static String UnboxingRatherThanExplicitMethodCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
+    public static String UnboxingRatherThanExplicitMethodCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
+    public static String UnboxingRatherThanExplicitMethodCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
+    public static String BracketsRatherThanArrayInstantiationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
+    public static String BracketsRatherThanArrayInstantiationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
+    public static String BracketsRatherThanArrayInstantiationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name;
+    public static String LambdaExpressionRatherThanComparatorCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_description;
+    public static String LambdaExpressionRatherThanComparatorCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_reason;
+    public static String LambdaExpressionRatherThanComparatorCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaCleanUp_name;
+    public static String LambdaCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaCleanUp_description;
+    public static String LambdaCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LambdaCleanUp_reason;
+    public static String LambdaCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
+    public static String LiteralRatherThanBooleanConstantCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
+    public static String LiteralRatherThanBooleanConstantCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
+    public static String LiteralRatherThanBooleanConstantCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanCleanUp_name;
+    public static String BooleanCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanCleanUp_description;
+    public static String BooleanCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanCleanUp_reason;
+    public static String BooleanCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_name;
+    public static String BooleanPrimitiveRatherThanWrapperCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_description;
+    public static String BooleanPrimitiveRatherThanWrapperCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_reason;
+    public static String BooleanPrimitiveRatherThanWrapperCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
+    public static String LazyLogicalRatherThanEagerCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
+    public static String LazyLogicalRatherThanEagerCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
+    public static String LazyLogicalRatherThanEagerCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
+    public static String BooleanConstantRatherThanValueOfCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
+    public static String BooleanConstantRatherThanValueOfCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;
+    public static String BooleanConstantRatherThanValueOfCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name;
+    public static String BooleanEqualsRatherThanNullCheckCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_description;
+    public static String BooleanEqualsRatherThanNullCheckCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_reason;
+    public static String BooleanEqualsRatherThanNullCheckCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name;
+    public static String XORRatherThanDuplicateConditionsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_description;
+    public static String XORRatherThanDuplicateConditionsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_reason;
+    public static String XORRatherThanDuplicateConditionsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name;
+    public static String ORConditionRatherThanRedundantClausesCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_description;
+    public static String ORConditionRatherThanRedundantClausesCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_reason;
+    public static String ORConditionRatherThanRedundantClausesCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
+    public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
+    public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
+    public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
+    public static String InvertEqualsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
+    public static String InvertEqualsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
+    public static String InvertEqualsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ComparisonCleanUp_name;
+    public static String ComparisonCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ComparisonCleanUp_description;
+    public static String ComparisonCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ComparisonCleanUp_reason;
+    public static String ComparisonCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name;
+    public static String DoubleCompareRatherThanEqualityCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_description;
+    public static String DoubleCompareRatherThanEqualityCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_reason;
+    public static String DoubleCompareRatherThanEqualityCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
+    public static String RemoveUnneededThisExpressionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
+    public static String RemoveUnneededThisExpressionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
+    public static String RemoveUnneededThisExpressionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name;
+    public static String AggregateConstructorRatherThanGWTMethodCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_description;
+    public static String AggregateConstructorRatherThanGWTMethodCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_reason;
+    public static String AggregateConstructorRatherThanGWTMethodCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name;
+    public static String StandardMethodRatherThanLibraryMethodCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_description;
+    public static String StandardMethodRatherThanLibraryMethodCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_reason;
+    public static String StandardMethodRatherThanLibraryMethodCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
+    public static String StringRatherThanNewStringCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
+    public static String StringRatherThanNewStringCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
+    public static String StringRatherThanNewStringCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringCleanUp_name;
+    public static String StringCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringCleanUp_description;
+    public static String StringCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringCleanUp_reason;
+    public static String StringCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
+    public static String StringValueOfRatherThanConcatCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
+    public static String StringValueOfRatherThanConcatCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
+    public static String StringValueOfRatherThanConcatCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BigNumberCleanUp_name;
+    public static String BigNumberCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BigNumberCleanUp_description;
+    public static String BigNumberCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BigNumberCleanUp_reason;
+    public static String BigNumberCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
+    public static String OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
+    public static String OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
+    public static String OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
+    public static String RemoveEmptyIfCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
+    public static String RemoveEmptyIfCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
+    public static String RemoveEmptyIfCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name;
+    public static String NoLoopIterationRatherThanEmptyCheckCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_description;
+    public static String NoLoopIterationRatherThanEmptyCheckCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
+    public static String NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
+    public static String InlineCodeRatherThanPeremptoryConditionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
+    public static String InlineCodeRatherThanPeremptoryConditionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
+    public static String InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
+    public static String RemoveUselessBlockCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
+    public static String RemoveUselessBlockCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
+    public static String RemoveUselessBlockCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
+    public static String RemoveEmptyStatementCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
+    public static String RemoveEmptyStatementCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
+    public static String RemoveEmptyStatementCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
+    public static String SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
+    public static String SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
+    public static String SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name;
+    public static String EndOfMethodRatherThanReturnCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_description;
+    public static String EndOfMethodRatherThanReturnCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_reason;
+    public static String EndOfMethodRatherThanReturnCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_name;
+    public static String EndOfLoopRatherThanContinueCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_description;
+    public static String EndOfLoopRatherThanContinueCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EndOfLoopRatherThanContinueCleanUp_reason;
+    public static String EndOfLoopRatherThanContinueCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name;
+    public static String DoWhileRatherThanWhileCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_description;
+    public static String DoWhileRatherThanWhileCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_reason;
+    public static String DoWhileRatherThanWhileCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_name;
+    public static String DoWhileRatherThanDuplicateCodeCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_description;
+    public static String DoWhileRatherThanDuplicateCodeCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DoWhileRatherThanDuplicateCodeCleanUp_reason;
+    public static String DoWhileRatherThanDuplicateCodeCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
+    public static String IfRatherThanWhileAndFallsThroughCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
+    public static String IfRatherThanWhileAndFallsThroughCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
+    public static String IfRatherThanWhileAndFallsThroughCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
+    public static String SuperCallRatherThanUselessOverridingCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
+    public static String SuperCallRatherThanUselessOverridingCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
+    public static String SuperCallRatherThanUselessOverridingCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
+    public static String AndConditionRatherThanEmbededIfCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
+    public static String AndConditionRatherThanEmbededIfCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
+    public static String AndConditionRatherThanEmbededIfCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
+    public static String CommonCodeInIfElseStatementCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
+    public static String CommonCodeInIfElseStatementCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
+    public static String CommonCodeInIfElseStatementCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
+    public static String OppositeConditionRatherThanDuplicateConditionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
+    public static String OppositeConditionRatherThanDuplicateConditionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
+    public static String OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
+    public static String OneConditionRatherThanUnreachableBlockCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
+    public static String OneConditionRatherThanUnreachableBlockCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
+    public static String OneConditionRatherThanUnreachableBlockCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
+    public static String MergeConditionalBlocksCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
+    public static String MergeConditionalBlocksCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
+    public static String MergeConditionalBlocksCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+    public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+    public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+    public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
+    public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
+    public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
+    public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name;
+    public static String ElseRatherThanOppositeConditionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_description;
+    public static String ElseRatherThanOppositeConditionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_reason;
+    public static String ElseRatherThanOppositeConditionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_name;
+    public static String GenericMapRatherThanRawMapCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_description;
+    public static String GenericMapRatherThanRawMapCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_reason;
+    public static String GenericMapRatherThanRawMapCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_name;
+    public static String GenericListRatherThanRawListCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_description;
+    public static String GenericListRatherThanRawListCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_reason;
+    public static String GenericListRatherThanRawListCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name;
+    public static String UseDiamondOperatorCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_description;
+    public static String UseDiamondOperatorCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NIORatherThanIOCleanUp_reason;
+    public static String NIORatherThanIOCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NIORatherThanIOCleanUp_name;
+    public static String NIORatherThanIOCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NIORatherThanIOCleanUp_description;
+    public static String NIORatherThanIOCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_reason;
+    public static String UseDiamondOperatorCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseMultiCatchCleanUp_name;
+    public static String UseMultiCatchCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseMultiCatchCleanUp_description;
+    public static String UseMultiCatchCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseMultiCatchCleanUp_reason;
+    public static String UseMultiCatchCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_name;
+    public static String ContainsRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_description;
+    public static String ContainsRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsRatherThanLoopCleanUp_reason;
+    public static String ContainsRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_name;
+    public static String ContainsAllRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_description;
+    public static String ContainsAllRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ContainsAllRatherThanLoopCleanUp_reason;
+    public static String ContainsAllRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_name;
+    public static String DisjointRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_description;
+    public static String DisjointRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DisjointRatherThanLoopCleanUp_reason;
+    public static String DisjointRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionCleanUp_name;
+    public static String CollectionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionCleanUp_description;
+    public static String CollectionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionCleanUp_reason;
+    public static String CollectionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name;
+    public static String AddAllRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_description;
+    public static String AddAllRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_reason;
+    public static String AddAllRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_name;
+    public static String FillRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_description;
+    public static String FillRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FillRatherThanLoopCleanUp_reason;
+    public static String FillRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_name;
+    public static String JoinRatherThanLoopCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_description;
+    public static String JoinRatherThanLoopCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JoinRatherThanLoopCleanUp_reason;
+    public static String JoinRatherThanLoopCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
+    public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
+    public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
+    public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
+    public static String BreakRatherThanPassiveIterationsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
+    public static String BreakRatherThanPassiveIterationsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
+    public static String BreakRatherThanPassiveIterationsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
+    public static String UpdateSetRatherThanTestingFirstCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
+    public static String UpdateSetRatherThanTestingFirstCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
+    public static String UpdateSetRatherThanTestingFirstCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name;
+    public static String IsEmptyRatherThanSizeCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_description;
+    public static String IsEmptyRatherThanSizeCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_reason;
+    public static String IsEmptyRatherThanSizeCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ReduceIndentationCleanUp_name;
+    public static String ReduceIndentationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ReduceIndentationCleanUp_description;
+    public static String ReduceIndentationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ReduceIndentationCleanUp_reason;
+    public static String ReduceIndentationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_name;
+    public static String VariableInsideIfRatherThanAboveCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_description;
+    public static String VariableInsideIfRatherThanAboveCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_VariableInsideIfRatherThanAboveCleanUp_reason;
+    public static String VariableInsideIfRatherThanAboveCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MapCleanUp_name;
+    public static String MapCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MapCleanUp_description;
+    public static String MapCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MapCleanUp_reason;
+    public static String MapCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
+    public static String EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
+    public static String EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
+    public static String EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
+    public static String MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
+    public static String MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
+    public static String MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
+    public static String NoAssignmentInIfConditionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
+    public static String NoAssignmentInIfConditionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
+    public static String NoAssignmentInIfConditionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_name;
+    public static String IncrementStatementRatherThanIncrementExpressionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_description;
+    public static String IncrementStatementRatherThanIncrementExpressionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IncrementStatementRatherThanIncrementExpressionCleanUp_reason;
+    public static String IncrementStatementRatherThanIncrementExpressionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
+    public static String DeclarationOutsideLoopRatherThanInsideCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
+    public static String DeclarationOutsideLoopRatherThanInsideCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
+    public static String DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfElseIfCleanUp_name;
+    public static String IfElseIfCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfElseIfCleanUp_description;
+    public static String IfElseIfCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
+    public static String IfElseIfCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
+    public static String CommonIfInIfElseCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
+    public static String CommonIfInIfElseCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
+    public static String CommonIfInIfElseCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderCleanUp_name;
+    public static String StringBuilderCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderCleanUp_description;
+    public static String StringBuilderCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderCleanUp_reason;
+    public static String StringBuilderCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
+    public static String StringBuilderMethodRatherThanReassignationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
+    public static String StringBuilderMethodRatherThanReassignationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
+    public static String StringBuilderMethodRatherThanReassignationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_name;
+    public static String StringBuilderRatherThanStringBufferCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_description;
+    public static String StringBuilderRatherThanStringBufferCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_reason;
+    public static String StringBuilderRatherThanStringBufferCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_name;
+    public static String StringBuilderRatherThanStringCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_description;
+    public static String StringBuilderRatherThanStringCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StringBuilderRatherThanStringCleanUp_reason;
+    public static String StringBuilderRatherThanStringCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_name;
+    public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_description;
+    public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
+    public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_name;
+    public static String PatternRatherThanRegExStringCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_description;
+    public static String PatternRatherThanRegExStringCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PatternRatherThanRegExStringCleanUp_reason;
+    public static String PatternRatherThanRegExStringCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OptimizeRegExCleanUp_name;
+    public static String OptimizeRegExCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OptimizeRegExCleanUp_description;
+    public static String OptimizeRegExCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_OptimizeRegExCleanUp_reason;
+    public static String OptimizeRegExCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_name;
+    public static String CollectionsAddAllRatherThanAsListCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_description;
+    public static String CollectionsAddAllRatherThanAsListCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CollectionsAddAllRatherThanAsListCleanUp_reason;
+    public static String CollectionsAddAllRatherThanAsListCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_name;
+    public static String HashMapRatherThanHashtableCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_description;
+    public static String HashMapRatherThanHashtableCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanHashtableCleanUp_reason;
+    public static String HashMapRatherThanHashtableCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_name;
+    public static String ArrayListRatherThanVectorCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_description;
+    public static String ArrayListRatherThanVectorCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_reason;
+    public static String ArrayListRatherThanVectorCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_name;
+    public static String ArrayDequeRatherThanStackCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_description;
+    public static String ArrayDequeRatherThanStackCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_reason;
+    public static String ArrayDequeRatherThanStackCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanMapCleanUp_name;
+    public static String SetRatherThanMapCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanMapCleanUp_description;
+    public static String SetRatherThanMapCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanMapCleanUp_reason;
+    public static String SetRatherThanMapCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_name;
+    public static String ArrayListRatherThanLinkedListCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_description;
+    public static String ArrayListRatherThanLinkedListCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_reason;
+    public static String ArrayListRatherThanLinkedListCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanListCleanUp_name;
+    public static String SetRatherThanListCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanListCleanUp_description;
+    public static String SetRatherThanListCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SetRatherThanListCleanUp_reason;
+    public static String SetRatherThanListCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_name;
+    public static String HashMapRatherThanTreeMapCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_description;
+    public static String HashMapRatherThanTreeMapCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_reason;
+    public static String HashMapRatherThanTreeMapCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_name;
+    public static String HashSetRatherThanTreeSetCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_description;
+    public static String HashSetRatherThanTreeSetCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_reason;
+    public static String HashSetRatherThanTreeSetCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseStringContainsCleanUp_name;
+    public static String UseStringContainsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseStringContainsCleanUp_description;
+    public static String UseStringContainsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UseStringContainsCleanUp_reason;
+    public static String UseStringContainsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommentsCleanUp_name;
+    public static String CommentsCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommentsCleanUp_description;
+    public static String CommentsCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_CommentsCleanUp_reason;
+    public static String CommentsCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
+    public static String RemoveFieldsDefaultValuesCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
+    public static String RemoveFieldsDefaultValuesCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
+    public static String RemoveFieldsDefaultValuesCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
+    public static String StaticConstantRatherThanInstanceConstantCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
+    public static String StaticConstantRatherThanInstanceConstantCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
+    public static String StaticConstantRatherThanInstanceConstantCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_name;
+    public static String RemoveOverriddenAssignmentCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_description;
+    public static String RemoveOverriddenAssignmentCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveOverriddenAssignmentCleanUp_reason;
+    public static String RemoveOverriddenAssignmentCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_name;
+    public static String Java7HashRatherThanEclipseJava6HashCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_description;
+    public static String Java7HashRatherThanEclipseJava6HashCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_Java7HashRatherThanEclipseJava6HashCleanUp_reason;
+    public static String Java7HashRatherThanEclipseJava6HashCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AnnotationCleanUp_name;
+    public static String AnnotationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AnnotationCleanUp_description;
+    public static String AnnotationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AnnotationCleanUp_reason;
+    public static String AnnotationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TryWithResourceCleanUp_name;
+    public static String TryWithResourceCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TryWithResourceCleanUp_description;
+    public static String TryWithResourceCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TryWithResourceCleanUp_reason;
+    public static String TryWithResourceCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TestNGAssertCleanUp_name;
+    public static String TestNGAssertCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TestNGAssertCleanUp_description;
+    public static String TestNGAssertCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_TestNGAssertCleanUp_reason;
+    public static String TestNGAssertCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_name;
+    public static String JupiterAssertCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_description;
+    public static String JupiterAssertCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JupiterAssertCleanUp_reason;
+    public static String JupiterAssertCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
+    public static String JUnitAssertCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
+    public static String JUnitAssertCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
+    public static String JUnitAssertCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssertJCleanUp_name;
+    public static String AssertJCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssertJCleanUp_description;
+    public static String AssertJCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AssertJCleanUp_reason;
+    public static String AssertJCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_name;
+    public static String SeparateAssertionsRatherThanBooleanExpressionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_description;
+    public static String SeparateAssertionsRatherThanBooleanExpressionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SeparateAssertionsRatherThanBooleanExpressionCleanUp_reason;
+    public static String SeparateAssertionsRatherThanBooleanExpressionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name;
+    public static String RemoveEmptyLinesCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_description;
+    public static String RemoveEmptyLinesCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_reason;
+    public static String RemoveEmptyLinesCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_name;
+    public static String RemoveEmptySuperConstrInvocationCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_description;
+    public static String RemoveEmptySuperConstrInvocationCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveEmptySuperConstrInvocationCleanUp_reason;
+    public static String RemoveEmptySuperConstrInvocationCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
+    public static String ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
+    public static String ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
+    public static String ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name;
+    public static String AndroidWakeLockCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidWakeLockCleanUp_description;
+    public static String AndroidWakeLockCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidWakeLockCleanUp_reason;
+    public static String AndroidWakeLockCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
+    public static String AndroidViewHolderCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
+    public static String AndroidViewHolderCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
+    public static String AndroidViewHolderCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name;
+    public static String LogParametersRatherThanLogMessageCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_description;
+    public static String LogParametersRatherThanLogMessageCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_reason;
+    public static String LogParametersRatherThanLogMessageCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
+    public static String NamedMethodRatherThanLogLevelParameterCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
+    public static String NamedMethodRatherThanLogLevelParameterCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
+    public static String NamedMethodRatherThanLogLevelParameterCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name;
+    public static String EnumMapRatherThanHashMapCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_description;
+    public static String EnumMapRatherThanHashMapCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_reason;
+    public static String EnumMapRatherThanHashMapCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
+    public static String EnumSetRatherThanHashSetCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
+    public static String EnumSetRatherThanHashSetCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
+    public static String EnumSetRatherThanHashSetCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name;
+    public static String RemoveUncheckedThrowsClausesCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_description;
+    public static String RemoveUncheckedThrowsClausesCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_reason;
+    public static String RemoveUncheckedThrowsClausesCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
+    public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
+    public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
+    public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_name;
+    public static String FormattedNumberRatherThanPackedNumberCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_description;
+    public static String FormattedNumberRatherThanPackedNumberCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_FormattedNumberRatherThanPackedNumberCleanUp_reason;
+    public static String FormattedNumberRatherThanPackedNumberCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SwitchCleanUp_name;
+    public static String SwitchCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SwitchCleanUp_description;
+    public static String SwitchCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SwitchCleanUp_reason;
+    public static String SwitchCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
+    public static String IfRatherThanTwoSwitchCasesCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
+    public static String IfRatherThanTwoSwitchCasesCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
+    public static String IfRatherThanTwoSwitchCasesCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
+    public static String RemoveSemiColonCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
+    public static String RemoveSemiColonCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
+    public static String RemoveSemiColonCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name;
+    public static String AddBracketsToControlStatementCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_description;
+    public static String AddBracketsToControlStatementCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_reason;
+    public static String AddBracketsToControlStatementCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
+    public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
+    public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
+    public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
+    public static String RedundantModifiersCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
+    public static String RedundantModifiersCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
+    public static String RedundantModifiersCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_name;
+    public static String StaticInnerClassThanNonStaticCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_description;
+    public static String StaticInnerClassThanNonStaticCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_StaticInnerClassThanNonStaticCleanUp_reason;
+    public static String StaticInnerClassThanNonStaticCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name;
+    public static String RemoveUnnecessaryCastCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_description;
+    public static String RemoveUnnecessaryCastCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_reason;
+    public static String RemoveUnnecessaryCastCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PushNegationDownCleanUp_name;
+    public static String PushNegationDownCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PushNegationDownCleanUp_description;
+    public static String PushNegationDownCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_PushNegationDownCleanUp_reason;
+    public static String PushNegationDownCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_name;
+    public static String LocalVariableRatherThanFieldCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_description;
+    public static String LocalVariableRatherThanFieldCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_LocalVariableRatherThanFieldCleanUp_reason;
+    public static String LocalVariableRatherThanFieldCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name;
+    public static String SimpleNameRatherThanQualifiedNameCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_description;
+    public static String SimpleNameRatherThanQualifiedNameCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_reason;
+    public static String SimpleNameRatherThanQualifiedNameCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name;
+    public static String SimplifyExpressionCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimplifyExpressionCleanUp_description;
+    public static String SimplifyExpressionCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_SimplifyExpressionCleanUp_reason;
+    public static String SimplifyExpressionCleanUp_reason;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_name;
+    public static String RemoveParenthesisCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_description;
+    public static String RemoveParenthesisCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String CleanUpRefactoringWizard_RemoveParenthesisCleanUp_reason;
+    public static String RemoveParenthesisCleanUp_reason;
 
     static {
         // Initialize resource bundle

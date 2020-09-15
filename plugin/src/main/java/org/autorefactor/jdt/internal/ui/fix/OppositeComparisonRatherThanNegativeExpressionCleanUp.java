@@ -37,17 +37,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
+		return MultiFixMessages.OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
+		return MultiFixMessages.OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
+		return MultiFixMessages.OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 	private void reverseObjects(final PrefixExpression node, final MethodInvocation methodInvocation) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.OppositeComparisonRatherThanNegativeExpressionCleanUp_description);
 
 		rewrite.replace(node, ast.newMethodInvocation(ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), "compareTo", //$NON-NLS-1$
 				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression()))), group);

@@ -49,24 +49,24 @@ import org.eclipse.text.edits.TextEditGroup;
 public class AnnotationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_name;
+		return MultiFixMessages.AnnotationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_description;
+		return MultiFixMessages.AnnotationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_reason;
+		return MultiFixMessages.AnnotationCleanUp_reason;
 	}
 
 	@Override
 	public boolean visit(final NormalAnnotation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.AnnotationCleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<MemberValuePair> values= node.values();

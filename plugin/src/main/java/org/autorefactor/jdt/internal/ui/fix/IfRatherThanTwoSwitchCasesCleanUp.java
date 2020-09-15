@@ -49,17 +49,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
+		return MultiFixMessages.IfRatherThanTwoSwitchCasesCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
+		return MultiFixMessages.IfRatherThanTwoSwitchCasesCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
+		return MultiFixMessages.IfRatherThanTwoSwitchCasesCleanUp_reason;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -161,7 +161,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.IfRatherThanTwoSwitchCasesCleanUp_description);
 
 		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= node.getExpression();

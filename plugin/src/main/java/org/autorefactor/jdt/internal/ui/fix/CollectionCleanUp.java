@@ -67,17 +67,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class CollectionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
+		return MultiFixMessages.CollectionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
+		return MultiFixMessages.CollectionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
+		return MultiFixMessages.CollectionCleanUp_reason;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 			if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.CollectionCleanUp_description);
 
 				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				rewrite.remove(nodeToRemove, group);

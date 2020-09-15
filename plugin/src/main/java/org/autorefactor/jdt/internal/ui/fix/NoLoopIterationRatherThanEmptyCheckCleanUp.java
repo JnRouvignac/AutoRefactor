@@ -46,17 +46,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name;
+		return MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_description;
+		return MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
+		return MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_reason;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
 					if (isConditionValid(condition, container)) {
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description);
 						rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
 						return false;
 					}
@@ -170,7 +170,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 	private void removeCondition(final InfixExpression condition, final List<Expression> operands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_NoLoopIterationRatherThanEmptyCheckCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description);
 
 		if (operands.size() == 2) {
 			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), group);

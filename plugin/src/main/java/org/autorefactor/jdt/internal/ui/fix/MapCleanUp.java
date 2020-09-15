@@ -57,17 +57,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class MapCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_name;
+		return MultiFixMessages.MapCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_description;
+		return MultiFixMessages.MapCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_reason;
+		return MultiFixMessages.MapCleanUp_reason;
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.MapCleanUp_description);
 
 				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				rewrite.remove(nodeToRemove, group);

@@ -40,17 +40,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name;
+		return MultiFixMessages.UseStringContainsCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_description;
+		return MultiFixMessages.UseStringContainsCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_reason;
+		return MultiFixMessages.UseStringContainsCleanUp_reason;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 	private void replaceWithStringContains(final InfixExpression node, final MethodInvocation method, final boolean isPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseStringContainsCleanUp_description);
 
 		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), group); //$NON-NLS-1$
 

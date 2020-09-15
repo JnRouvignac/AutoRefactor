@@ -43,17 +43,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
+		return MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
+		return MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
+		return MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,14 +108,14 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 						Modifier modifier= (Modifier) extendedModifier;
 						if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
 								|| modifier.isPrivate() && isPrivateClass) {
-							TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name);
+							TextEditGroup group= new TextEditGroup(MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description);
 							cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
 							return false;
 						}
 					}
 				} else if (Utils.isEmpty(uniqueConstructor.modifiers())
 						&& isPackageClass) {
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description);
 					cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
 					return false;
 				}

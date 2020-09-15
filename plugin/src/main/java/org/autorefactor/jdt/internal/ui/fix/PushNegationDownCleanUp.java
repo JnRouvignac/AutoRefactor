@@ -41,17 +41,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name;
+		return MultiFixMessages.PushNegationDownCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_description;
+		return MultiFixMessages.PushNegationDownCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_reason;
+		return MultiFixMessages.PushNegationDownCleanUp_reason;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 		Expression replacement= getOppositeExpression(node.getOperand());
 
 		if (replacement != null) {
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.PushNegationDownCleanUp_description);
 			cuRewrite.getASTRewrite().replace(node, replacement, group);
 			return false;
 		}
@@ -74,7 +74,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 	private Expression getOppositeExpression(final Expression negativeExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PushNegationDownCleanUp_description);
 
 		Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 

@@ -44,17 +44,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name;
+		return MultiFixMessages.PrimitiveWrapperCreationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_description;
+		return MultiFixMessages.PrimitiveWrapperCreationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
+		return MultiFixMessages.PrimitiveWrapperCreationCleanUp_reason;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 							node.getName().getIdentifier());
 
 					if (methodName != null) {
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 						cuRewrite.getASTRewrite().replace(node,
 								newMethodInvocation(typeBinding.getName(), methodName, arg0), group);
 						return false;
@@ -142,14 +142,14 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
 		SimpleName name= cuRewrite.getASTBuilder().simpleName(methodName);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, group);
 		return false;
 	}
 
 	private void replaceWithTheSingleArgument(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), group);
 	}
 
@@ -211,7 +211,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 			final List<Expression> args) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
 		Expression arg0= args.get(0);
 
@@ -226,7 +226,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node,
 				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), group); //$NON-NLS-1$
 	}
@@ -234,7 +234,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
 		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
 	}

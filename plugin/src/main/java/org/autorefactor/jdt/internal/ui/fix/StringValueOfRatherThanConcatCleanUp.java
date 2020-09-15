@@ -42,17 +42,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
+		return MultiFixMessages.StringValueOfRatherThanConcatCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
+		return MultiFixMessages.StringValueOfRatherThanConcatCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
+		return MultiFixMessages.StringValueOfRatherThanConcatCleanUp_reason;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 				&& !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringValueOfRatherThanConcatCleanUp_description);
 
 			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
 

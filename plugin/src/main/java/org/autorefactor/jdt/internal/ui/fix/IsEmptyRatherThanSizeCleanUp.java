@@ -48,17 +48,17 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name;
+		return MultiFixMessages.IsEmptyRatherThanSizeCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_description;
+		return MultiFixMessages.IsEmptyRatherThanSizeCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_reason;
+		return MultiFixMessages.IsEmptyRatherThanSizeCleanUp_reason;
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 							|| (ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), LENGTH_METHOD) && getJavaMinorVersion() >= 6))) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.IsEmptyRatherThanSizeCleanUp_description);
 
 				if (literalSize == 0) {
 					if (Arrays.asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {

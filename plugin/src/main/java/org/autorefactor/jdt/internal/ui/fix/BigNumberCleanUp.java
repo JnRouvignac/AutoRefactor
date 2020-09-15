@@ -50,17 +50,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class BigNumberCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name;
+		return MultiFixMessages.BigNumberCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_description;
+		return MultiFixMessages.BigNumberCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_reason;
+		return MultiFixMessages.BigNumberCleanUp_reason;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				&& ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
 				&& node.arguments().size() == 1) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
 			Expression arg0= (Expression) node.arguments().get(0);
 
@@ -136,7 +136,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field), group);
 		return false;
 	}
@@ -173,7 +173,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 					cuRewrite.getASTRewrite().replace(node,
 							getClassInstanceCreatorNode(node.getExpression(), token), group);
 				} else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -203,7 +203,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
 				if (isInStringAppend(methodInvocation.getParent())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -251,7 +251,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))); //$NON-NLS-1$
 

@@ -51,17 +51,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
+		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
+		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
+		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		public boolean visit(final ReturnStatement node) {
 			if (result) {
 				Statement previousSibling= ASTNodes.getPreviousSibling(node);
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
 					VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
@@ -131,7 +131,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			Type varType= vds.getType();
 			VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
@@ -160,7 +160,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
 				final ReturnStatement newReturnStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 			rewrite.remove(previousSibling, group);
 			rewrite.replace(node, newReturnStatement, group);
 		}
@@ -169,7 +169,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				final Expression returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			rewrite.remove(previousSibling, group);
 			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);

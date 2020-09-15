@@ -59,17 +59,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
+		return MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
+		return MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
+		return MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_reason;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 							|| declaredInSamePackage(bodyMethodBinding, declMethodBinding)
 							// protected also means package visibility, so check if it is required
 							|| !isMethodUsedInItsPackage(declMethodBinding, node)) {
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name);
+						TextEditGroup group= new TextEditGroup(MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_description);
 						cuRewrite.getASTRewrite().remove(node, group);
 						return false;
 					}

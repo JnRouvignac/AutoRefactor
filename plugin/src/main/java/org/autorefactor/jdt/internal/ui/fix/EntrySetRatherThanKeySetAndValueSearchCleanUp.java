@@ -63,17 +63,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
+		return MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
+		return MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
+		return MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_description);
 
 		VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
 		enhancedFor.getBody().accept(keyUseVisitor);
@@ -313,7 +313,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			mapKeyType= ast.toType(keyTypeBinding, typeNameDecider);
 		} else {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_description);
 			// Use the type as defined in the code
 			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
 		}

@@ -61,17 +61,17 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_name;
+		return MultiFixMessages.ArrayDequeRatherThanStackCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_description;
+		return MultiFixMessages.ArrayDequeRatherThanStackCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_reason;
+		return MultiFixMessages.ArrayDequeRatherThanStackCleanUp_reason;
 	}
 
 	@Override

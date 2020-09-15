@@ -398,17 +398,17 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name;
+		return MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_description;
+		return MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_reason;
+		return MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_reason;
 	}
 
 	@Override
@@ -631,7 +631,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			ITypeBinding declaringClass= methodBinding.getDeclaringClass();
 			QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
 			if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
 				cuRewrite.getASTRewrite().remove(expression, group);
 				return false;
 			}
@@ -718,7 +718,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 				|| (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
 						&& !containsLocalName(localIdentifiers, qname))) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);
 			return false;
 		}

@@ -78,17 +78,17 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_name;
+		return MultiFixMessages.GenericListRatherThanRawListCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_description;
+		return MultiFixMessages.GenericListRatherThanRawListCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_reason;
+		return MultiFixMessages.GenericListRatherThanRawListCleanUp_reason;
 	}
 
 	@Override

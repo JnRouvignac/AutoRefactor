@@ -47,17 +47,17 @@ import org.eclipse.text.edits.TextEditGroup;
 public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectionReplacementCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name;
+		return MultiFixMessages.EnumMapRatherThanHashMapCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_description;
+		return MultiFixMessages.EnumMapRatherThanHashMapCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_reason;
+		return MultiFixMessages.EnumMapRatherThanHashMapCleanUp_reason;
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 			typeArgs(newType).clear();
 		}
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumMapRatherThanHashMapCleanUp_description);
 
 		cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), group);
 	}

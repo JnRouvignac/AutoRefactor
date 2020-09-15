@@ -57,17 +57,17 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name;
+		return MultiFixMessages.AggregateConstructorRatherThanGWTMethodCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_description;
+		return MultiFixMessages.AggregateConstructorRatherThanGWTMethodCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_reason;
+		return MultiFixMessages.AggregateConstructorRatherThanGWTMethodCleanUp_reason;
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 							Class.class.getCanonicalName() + generic)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name);
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.AggregateConstructorRatherThanGWTMethodCleanUp_description);
 
 				String classname= addImport(EnumMap.class, classesToUseWithImport, importsToAdd);
 				Type type= ast.getAST().newParameterizedType(
@@ -154,7 +154,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 				"com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ //$NON-NLS-2$
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.AggregateConstructorRatherThanGWTMethodCleanUp_description);
 
 			String classname= classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass; //$NON-NLS-1$ //$NON-NLS-2$
 			importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
