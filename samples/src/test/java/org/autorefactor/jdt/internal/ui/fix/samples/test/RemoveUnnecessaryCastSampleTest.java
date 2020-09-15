@@ -32,7 +32,6 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastSampleTest {
-
     private org.autorefactor.jdt.internal.ui.fix.samples_in.RemoveUnnecessaryCastSample sampleIn;
     private org.autorefactor.jdt.internal.ui.fix.samples_out.RemoveUnnecessaryCastSample sampleOut;
 

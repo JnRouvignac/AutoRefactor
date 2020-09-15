@@ -40,7 +40,6 @@ import static org.junit.Assert.*;
 @SuppressWarnings("javadoc")
 @RunWith(value = Parameterized.class)
 public class BooleanSampleTest {
-
     private boolean samplesReturn;
     private boolean sampleInResult;
     private org.autorefactor.jdt.internal.ui.fix.samples_in.BooleanSample sampleIn;

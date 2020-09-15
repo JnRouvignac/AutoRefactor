@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ContainsAllRatherThanLoopSampleTest {
-
     public org.autorefactor.jdt.internal.ui.fix.samples_in.ContainsAllRatherThanLoopSample sampleIn;
     public org.autorefactor.jdt.internal.ui.fix.samples_out.ContainsAllRatherThanLoopSample sampleOut;
 
