@@ -37,7 +37,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTComments;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -203,7 +202,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 		if (resources.isEmpty()) {
 			return true;
 		}
-		VariableDeclarationExpression lastResource= Utils.getLast(resources);
+		VariableDeclarationExpression lastResource= resources.get(resources.size() - 1);
 		Block body= node.getBody();
 		return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
 	}

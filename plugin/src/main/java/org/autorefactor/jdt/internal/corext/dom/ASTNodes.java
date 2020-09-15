@@ -879,7 +879,7 @@ public final class ASTNodes {
 			return null;
 		}
 
-		return Utils.getLast(siblings);
+		return siblings.get(siblings.size() - 1);
 	}
 
 	/**
@@ -2445,7 +2445,7 @@ public final class ASTNodes {
 			return false;
 		}
 
-		Statement lastStatement= Utils.getLast(statements);
+		Statement lastStatement= statements.get(statements.size() - 1);
 		switch (lastStatement.getNodeType()) {
 		case ASTNode.RETURN_STATEMENT:
 		case ASTNode.THROW_STATEMENT:

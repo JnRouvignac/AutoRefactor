@@ -126,7 +126,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		private boolean fallsThrough() {
-			return statements.isEmpty() || !ASTNodes.fallsThrough(Utils.getLast(statements));
+			return statements.isEmpty() || !ASTNodes.fallsThrough(statements.get(statements.size() - 1));
 		}
 
 		private boolean hasSameCode(final SwitchCaseSection other) {
@@ -374,7 +374,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			rewrite.removeButKeepComment(ifStatements.get(i), group);
 		}
 
-		rewrite.replace(Utils.getLast(ifStatements), switchStatement, group);
+		rewrite.replace(ifStatements.get(ifStatements.size() - 1), switchStatement, group);
 	}
 
 	private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,
@@ -401,7 +401,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			for (Statement statement : innerStatements) {
 				switchStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
-			isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStatements));
+			isBreakNeeded= !ASTNodes.fallsThrough(innerStatements.get(innerStatements.size() - 1));
 		}
 
 		// When required: end with a break

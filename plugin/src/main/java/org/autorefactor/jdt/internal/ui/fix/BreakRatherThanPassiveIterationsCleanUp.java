@@ -238,7 +238,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 			}
 		}
 
-		IfStatement ifStatement= ASTNodes.as(Utils.getLast(statements), IfStatement.class);
+		IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
 
 		if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
 			List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
@@ -289,7 +289,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name);
 
 		if (ifStatement.getThenStatement() instanceof Block) {
-			rewrite.insertAfter(ast.break0(), Utils.getLast(assignments), group);
+			rewrite.insertAfter(ast.break0(), assignments.get(assignments.size() - 1), group);
 		} else {
 			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), group);
 		}

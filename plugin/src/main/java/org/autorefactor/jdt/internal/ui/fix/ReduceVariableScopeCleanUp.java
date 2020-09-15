@@ -210,7 +210,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				list= new ArrayList<>();
 				this.allVariableAccesses.put(varName, list);
 			}
-			if (list.isEmpty() || !Utils.getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
+			if (list.isEmpty() || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
 				// Only keep first write in scope
 				list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
 			}

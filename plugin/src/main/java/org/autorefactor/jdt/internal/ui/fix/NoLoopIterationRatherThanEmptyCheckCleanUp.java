@@ -32,7 +32,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ForLoops;
 import org.autorefactor.jdt.internal.corext.dom.ForLoops.ForLoopContent;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -81,7 +80,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 
 					if (ASTNodes.hasOperator(condition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
 						List<Expression> operands= ASTNodes.allOperands(condition);
-						Expression operand= ASTNodes.as(Utils.getLast(operands), InfixExpression.class);
+						Expression operand= ASTNodes.as(operands.get(operands.size() - 1), InfixExpression.class);
 
 						if (isConditionValid(operand, container)) {
 							removeCondition(condition, operands);

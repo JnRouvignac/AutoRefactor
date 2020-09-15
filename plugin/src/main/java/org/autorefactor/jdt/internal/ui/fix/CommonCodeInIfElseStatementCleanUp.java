@@ -44,7 +44,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -121,7 +120,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 		for (int i= 0; i < allCasesStatements.size(); i++) {
 			boolean isMatching= false;
-			Statement currentStatement= Utils.getLast(allCasesStatements.get(i));
+			Statement currentStatement= allCasesStatements.get(i).get(allCasesStatements.get(i).size() - 1);
 
 			for (Pair<Statement, List<Integer>> pair : matchingCases) {
 				if (ASTNodes.match(matcher, pair.getFirst(), currentStatement)) {

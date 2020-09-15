@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import org.eclipse.text.edits.TextEditGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,11 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
@@ -79,9 +78,9 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks, final List<Boolean> isThenStatement, final AtomicInteger operandCount) {
-        IfStatement lastBlock= Utils.getLast(duplicateIfBlocks);
-        Statement previousStatement= Utils.getLast(isThenStatement) ? lastBlock.getThenStatement() : lastBlock.getElseStatement();
-        Statement nextStatement= Utils.getLast(isThenStatement) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
+        IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
+        Statement previousStatement= isThenStatement.get(isThenStatement.size() - 1) ? lastBlock.getThenStatement() : lastBlock.getElseStatement();
+        Statement nextStatement= isThenStatement.get(isThenStatement.size() - 1) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
 
         if (nextStatement != null) {
             IfStatement nextElse= ASTNodes.as(nextStatement, IfStatement.class);
@@ -124,8 +123,8 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        IfStatement lastBlock= Utils.getLast(duplicateIfBlocks);
-        Statement remainingStatement= Utils.getLast(isThenStatement) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
+        IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
+        Statement remainingStatement= isThenStatement.get(isThenStatement.size() - 1) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
         InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
 
         rewrite.replace(duplicateIfBlocks.get(0).getExpression(), newCondition, group);

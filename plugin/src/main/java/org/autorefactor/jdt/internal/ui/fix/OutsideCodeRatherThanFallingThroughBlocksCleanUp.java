@@ -120,7 +120,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				List<Statement> statements= ASTNodes.asList(node);
 
 				if (!Utils.isEmpty(statements)) {
-					collectStatements(Utils.getLast(statements), redundantStatements);
+					collectStatements(statements.get(statements.size() - 1), redundantStatements);
 				}
 			}
 		}
@@ -135,7 +135,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 			for (Statement redundantStatement : redundantStatements) {
 				List<Statement> statements= ASTNodes.asList(redundantStatement);
 
-				if (Utils.isEmpty(statements) || !ASTNodes.fallsThrough(Utils.getLast(statements))) {
+				if (Utils.isEmpty(statements) || !ASTNodes.fallsThrough(statements.get(statements.size() - 1))) {
 					continue;
 				}
 
@@ -162,7 +162,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				boolean match= ASTNodes.match(matcher, referenceStatements, stmtsToCompare);
 
 				if (!match) {
-					lastStatement= Utils.getLast(statements);
+					lastStatement= statements.get(statements.size() - 1);
 					ReturnStatement returnStatement= ASTNodes.as(lastStatement, ReturnStatement.class);
 					ContinueStatement continueStatement= ASTNodes.as(lastStatement, ContinueStatement.class);
 

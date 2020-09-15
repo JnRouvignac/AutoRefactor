@@ -26,7 +26,6 @@
 package org.autorefactor.util;
 
 import java.util.Collection;
-import java.util.List;
 
 /** Utility class containing miscellaneous helper methods. */
 public final class Utils {
@@ -142,37 +141,5 @@ public final class Utils {
 	 */
 	public static  boolean isEmpty(final Collection<?> collection) {
 		return collection == null || collection.isEmpty();
-	}
-
-	/**
-	 * Returns the first element in the list.
-	 * <p>
-	 * Note: Care must be taken to first test that the list is not empty before
-	 * calling this method.
-	 *
-	 * @param list the list
-	 * @param <E>  the type of elements in the list
-	 * @return the first element
-	 * @throws NullPointerException      if the list is {@code null}
-	 * @throws IndexOutOfBoundsException if the list is empty
-	 */
-	public static <E> E getFirst(final List<E> list) {
-		return list.get(0);
-	}
-
-	/**
-	 * Returns the last element in the list.
-	 * <p>
-	 * Note: Care must be taken to first test that the list is not empty before
-	 * calling this method.
-	 *
-	 * @param list the list
-	 * @param <E>  the type of elements in the list
-	 * @return the last element
-	 * @throws NullPointerException      if the list is {@code null}
-	 * @throws IndexOutOfBoundsException if the list is empty
-	 */
-	public static <E> E getLast(final List<E> list) {
-		return list.get(list.size() - 1);
 	}
 }
