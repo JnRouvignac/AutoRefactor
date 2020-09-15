@@ -38,7 +38,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class HashSetRatherThanTreeSetSample {
-
     public void replaceTreeSetInstanceCreation() {
         // Keep this comment
         boolean isFooContained = new HashSet<String>().contains("foo");

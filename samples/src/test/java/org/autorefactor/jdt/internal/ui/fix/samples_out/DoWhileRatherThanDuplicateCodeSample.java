@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class DoWhileRatherThanDuplicateCodeSample {
-
     public void replaceWhileByDoWhile(int i) {
 
         // Keep this comment

@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class CharPrimitiveRatherThanWrapperSample {
-
     public Character doNotRefactorFields = Character.MIN_VALUE;
 
     public char charField;

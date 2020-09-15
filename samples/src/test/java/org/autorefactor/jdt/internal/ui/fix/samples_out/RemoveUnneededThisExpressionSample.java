@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class RemoveUnneededThisExpressionSample {
-
     public void removeThisExpression() {
         // Keep this comment
         testRemoveThisExpression(42);

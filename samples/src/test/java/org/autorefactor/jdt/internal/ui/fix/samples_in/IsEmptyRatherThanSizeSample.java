@@ -33,7 +33,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class IsEmptyRatherThanSizeSample {
-
     public void replaceChecksOnSize(Collection<Integer> col) {
         // Keep this comment
         System.out.println(col.size() > 0);

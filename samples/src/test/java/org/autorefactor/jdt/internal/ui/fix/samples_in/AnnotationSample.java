@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class AnnotationSample {
-
     private @interface MyAnnotation {
         boolean booleanField() default true;
         char charField() default 'c';

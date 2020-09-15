@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.time.DayOfWeek;
 
 public class IfRatherThanTwoSwitchCasesSample {
-
     public int i2 = 0;
 
     public void replaceSwitchWithParameterDiscriminant(int i1) {

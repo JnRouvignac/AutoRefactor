@@ -29,7 +29,6 @@ import java.io.Closeable;
 import java.util.concurrent.Callable;
 
 public class CommentsSample implements Runnable, Callable<Void>, Closeable {
-
     /** @NonNull */
     public Object o = new Object();
 

@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class AddBracketsToControlStatementSample {
-
     public static void main(String[] args) {
         int i = 0;
         // Keep this comment

@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class ReduceVariableScopeSample {
-
     public static void main(String[] args) {
         // Push variable into for loops initializers
         int i;

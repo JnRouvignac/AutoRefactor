@@ -29,7 +29,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class CommonIfInIfElseSample {
-
     public void refactorCommonInnerIf(boolean b1, boolean b2) throws Exception {
         if (b1) {
             if (b2) {

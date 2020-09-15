@@ -27,7 +27,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class StringRatherThanNewStringSample {
-
     public String replaceNewString() {
         // Keep this comment
         return new String("");

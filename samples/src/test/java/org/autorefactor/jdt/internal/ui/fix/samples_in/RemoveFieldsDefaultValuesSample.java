@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 
 public class RemoveFieldsDefaultValuesSample {
-
     private interface Constants {
         String NULL = null;
     }

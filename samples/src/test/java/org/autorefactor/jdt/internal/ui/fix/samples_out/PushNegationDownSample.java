@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class PushNegationDownSample {
-
     public boolean replaceDoubleNegation(boolean b) {
         return b;
     }

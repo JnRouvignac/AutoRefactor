@@ -29,7 +29,6 @@ import java.util.AbstractList;
 import java.util.List;
 
 public class RemoveEmptyIfSample {
-
     public int removeEmptyElseClause(boolean b) {
         int i = 0;
         if (b) {

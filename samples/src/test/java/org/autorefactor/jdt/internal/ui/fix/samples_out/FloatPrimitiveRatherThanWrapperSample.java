@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class FloatPrimitiveRatherThanWrapperSample {
-
     public Float doNotRefactorFields = Float.MIN_VALUE;
 
     public float floatField;

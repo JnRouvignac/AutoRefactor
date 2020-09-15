@@ -42,7 +42,6 @@ import java.util.Map;
 
 @SuppressWarnings("javadoc")
 public class SimpleNameRatherThanQualifiedNameSample {
-
     private static final String TOP_LEVEL_PRIVATE_CONSTANT = "visible from sublevel";
 
     static long classField;

@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
-
     public void mergeConditionsWithReturn(int i1) {
         // Keep this comment
         if ((i1 == 0) || (i1 == 1)) {

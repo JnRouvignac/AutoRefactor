@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class SetRatherThanMapSample {
-
     public SetRatherThanMapSample() {
         this(new TreeMap<String, String>());
     }

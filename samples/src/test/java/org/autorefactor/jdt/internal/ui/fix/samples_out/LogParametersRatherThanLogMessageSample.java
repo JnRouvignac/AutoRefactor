@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import org.slf4j.Logger;
 
 public class LogParametersRatherThanLogMessageSample {
-
     public void replaceConcatenationByParameter(Logger slf4jLog, int returnCode) {
         // Keep this comment
         slf4jLog.debug("Processed with return code : {}", returnCode);

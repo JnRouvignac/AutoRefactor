@@ -28,7 +28,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class PrimitiveWrapperCreationSample {
-
     public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte byPrimitive = 4;

@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 public class CollectionSample {
-
     public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
         // Keep this comment
         output = new ArrayList<String>();

@@ -30,7 +30,6 @@ import java.io.IOException;
 import javax.naming.NamingException;
 
 public class UseMultiCatchSample {
-
     private static final class ThrowingObject<E1 extends Throwable, E2 extends Throwable> {
         private void throwingMethod() throws E1, E2 {
         }

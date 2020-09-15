@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class RemoveUnnecessaryLocalBeforeReturnSample {
-
     private int i;
 
     private double[] arrayField = new double[] { 42.42 };

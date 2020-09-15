@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class BytePrimitiveRatherThanWrapperSample {
-
     public Byte doNotRefactorFields = Byte.MIN_VALUE;
 
     public byte byteField;

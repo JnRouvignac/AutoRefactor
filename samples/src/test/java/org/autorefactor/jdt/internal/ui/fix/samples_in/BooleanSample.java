@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.List;
 
 public class BooleanSample {
-
     public boolean booleanPrimitive;
     public Boolean booleanWrapper;
 

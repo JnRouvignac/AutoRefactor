@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class IntPrimitiveRatherThanWrapperSample {
-
     public Integer doNotRefactorFields = Integer.MIN_VALUE;
 
     public int intField;

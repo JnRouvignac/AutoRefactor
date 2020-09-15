@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class StringBuilderMethodRatherThanReassignationSample {
-
     private StringBuffer classBuffer = new StringBuffer();
 
     private StringBuilder classBuilder = new StringBuilder();

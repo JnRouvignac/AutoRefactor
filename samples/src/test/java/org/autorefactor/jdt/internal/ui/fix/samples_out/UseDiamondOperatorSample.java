@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class UseDiamondOperatorSample {
-
     public List<String> refactorVariableDeclarationStatement() {
         // Keep this comment
         List<String> l = new ArrayList<>();

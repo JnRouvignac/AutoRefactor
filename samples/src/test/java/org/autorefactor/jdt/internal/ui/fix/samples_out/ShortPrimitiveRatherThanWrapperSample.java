@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class ShortPrimitiveRatherThanWrapperSample {
-
     public Short doNotRefactorFields = Short.MIN_VALUE;
 
     public short shortField;

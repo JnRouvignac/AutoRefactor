@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public abstract class RemoveSemiColonSample {
-
     static {
     }
 

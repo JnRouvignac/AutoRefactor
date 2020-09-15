@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class BooleanEqualsRatherThanNullCheckSample {
-
     private static int staticField = 0;
 
     public void replaceNullCheck(Boolean b1) {

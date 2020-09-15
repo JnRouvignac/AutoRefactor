@@ -36,7 +36,6 @@ import java.util.Observable;
 import java.util.Properties;
 
 public class SetRatherThanListSample {
-
     public void replaceArrayListInstanceCreation() {
         new ArrayList<String>().contains("foo");
         new ArrayList<String>(new java.util.ArrayList<String>()).contains("bar");

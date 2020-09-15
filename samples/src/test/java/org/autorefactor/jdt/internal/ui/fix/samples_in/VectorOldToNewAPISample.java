@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 import java.util.Vector;
 
 public class VectorOldToNewAPISample {
-
     public void main() {
         byte b = 43;
         short s = 44;

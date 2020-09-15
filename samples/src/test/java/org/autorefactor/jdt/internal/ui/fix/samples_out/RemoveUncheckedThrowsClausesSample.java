@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.sql.SQLException;
 
 public class RemoveUncheckedThrowsClausesSample {
-
     public void refactorMethod() throws Exception {
         // Some code
     }

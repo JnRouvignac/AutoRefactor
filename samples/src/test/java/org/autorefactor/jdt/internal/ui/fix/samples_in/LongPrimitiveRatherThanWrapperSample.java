@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class LongPrimitiveRatherThanWrapperSample {
-
     public Long doNotRefactorFields = Long.MIN_VALUE;
 
     public long longField;

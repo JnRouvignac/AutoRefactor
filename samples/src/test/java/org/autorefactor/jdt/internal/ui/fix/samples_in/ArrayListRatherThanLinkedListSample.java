@@ -35,7 +35,6 @@ import java.util.ListIterator;
 import java.util.Observable;
 
 public class ArrayListRatherThanLinkedListSample {
-
     public void replaceLinkedListInstanceCreation() {
         // Keep this comment
         boolean isFooContained = new LinkedList<String>().contains("foo");

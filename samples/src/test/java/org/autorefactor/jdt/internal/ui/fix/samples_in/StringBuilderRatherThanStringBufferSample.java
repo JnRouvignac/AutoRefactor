@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 public class StringBuilderRatherThanStringBufferSample {
-
     private StringBuffer doNotReplaceField = new StringBuffer("foo");
 
     public void replaceStringBufferInstanceCreation() {

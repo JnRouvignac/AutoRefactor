@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class BooleanPrimitiveRatherThanWrapperSample {
-
     public Boolean doNotRefactorFields = Boolean.TRUE;
 
     public boolean booleanField;

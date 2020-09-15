@@ -45,7 +45,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 public class GenericListRatherThanRawListSample {
-
     public void replaceLinkedListInstanceCreation(List<String> sourceList) {
         // Keep this comment
         boolean isFooContained = new LinkedList(sourceList).contains("foo");

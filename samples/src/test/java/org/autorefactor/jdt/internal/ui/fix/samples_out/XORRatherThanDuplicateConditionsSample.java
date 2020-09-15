@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class XORRatherThanDuplicateConditionsSample {
-
     private static int staticField = 0;
 
     public void replaceDuplicateConditionsWithEagerOperator(boolean b1, boolean b2) {

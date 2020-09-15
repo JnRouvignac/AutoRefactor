@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Observable;
 
 public class DoublePrimitiveRatherThanWrapperSample {
-
     public Double doNotRefactorFields = Double.MIN_VALUE;
 
     public double doubleField;

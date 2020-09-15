@@ -38,7 +38,6 @@ import java.util.Properties;
 import java.util.Set;
 
 public class SetRatherThanListSample {
-
     public void replaceArrayListInstanceCreation() {
         new HashSet<String>().contains("foo");
         new HashSet<String>(new java.util.ArrayList<String>()).contains("bar");

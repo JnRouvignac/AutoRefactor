@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 public class UpdateSetRatherThanTestingFirstSample {
-
     public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
         // Keep this comment
         if (col.add(s)) {

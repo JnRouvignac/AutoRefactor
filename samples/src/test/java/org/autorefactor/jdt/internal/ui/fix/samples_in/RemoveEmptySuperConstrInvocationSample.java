@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class RemoveEmptySuperConstrInvocationSample {
-
     class A {
 
         A(int a) {}

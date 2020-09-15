@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class LiteralRatherThanBooleanConstantSample {
-
     public static boolean replaceUselessUnboxing() {
         // Keep this comment
         boolean bo1 = true;

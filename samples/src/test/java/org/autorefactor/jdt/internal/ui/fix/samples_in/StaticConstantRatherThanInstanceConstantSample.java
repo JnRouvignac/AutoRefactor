@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class StaticConstantRatherThanInstanceConstantSample {
-
     public final byte refactorBytePrimitive = 12;
     public final char refactorCharacterPrimitive = 'a';
     public final short refactorShortPrimitive = 0;

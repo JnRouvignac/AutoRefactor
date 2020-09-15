@@ -36,7 +36,6 @@ import java.util.Observer;
 import java.util.Set;
 
 public class HashMapRatherThanHashtableSample {
-
     private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
 
     private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();

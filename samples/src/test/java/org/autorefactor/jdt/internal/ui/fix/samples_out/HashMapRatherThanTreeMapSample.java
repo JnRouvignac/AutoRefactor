@@ -39,7 +39,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class HashMapRatherThanTreeMapSample {
-
     public void replaceTreeMapInstanceCreation() {
         // Keep this comment
         boolean isFooContained = new HashMap<String, Observer>().containsKey("foo");

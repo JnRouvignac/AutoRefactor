@@ -43,7 +43,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class GenericMapRatherThanRawMapSample {
-
     public void replaceTreeMapInstanceCreation(Map<String, String> sourceMap) {
         // Keep this comment
         boolean isFooContained = new TreeMap<String, String>(sourceMap).containsKey("foo");
