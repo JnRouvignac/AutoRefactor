@@ -1319,6 +1319,7 @@ public final class ASTNodes {
 
 		if (operation != null
 				&& hasOperator(operation,
+						// All numerical operators
 						InfixExpression.Operator.AND,
 						InfixExpression.Operator.DIVIDE,
 						InfixExpression.Operator.LEFT_SHIFT,
@@ -1348,46 +1349,28 @@ public final class ASTNodes {
 
 				if (hasOperator(operation, InfixExpression.Operator.PLUS)) {
 					result= result + newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.MINUS)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.MINUS)) {
 					result= result - newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.TIMES)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.TIMES)) {
 					result= result * newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.DIVIDE) && result % newValue == 0) {
-					result= result / newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.AND)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.AND)) {
 					result= result & newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.OR)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.OR)) {
 					result= result | newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.XOR)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.XOR)) {
 					result= result ^ newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.LEFT_SHIFT)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.LEFT_SHIFT)) {
 					result= result << newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.REMAINDER)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.REMAINDER)) {
 					result= result % newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_SIGNED)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_SIGNED)) {
 					result= result >> newValue;
-				}
-
-				if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
+				} else if (hasOperator(operation, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
 					result= result >>> newValue;
+				} else if (hasOperator(operation, InfixExpression.Operator.DIVIDE) && result % newValue == 0) {
+					result= result / newValue;
+				} else {
+					return null;
 				}
 			}
 
