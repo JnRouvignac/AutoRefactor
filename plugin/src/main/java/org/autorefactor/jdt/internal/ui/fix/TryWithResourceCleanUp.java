@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			if (result) {
 				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
-				if (!tryStatements.isEmpty() && tryStatements.get(0).getNodeType() == ASTNode.TRY_STATEMENT) {
+				if (!tryStatements.isEmpty()) {
 					TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
 					if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
@@ -155,8 +156,12 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
 			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, group);
-			rewrite.remove(nodesToRemove, group);
-			this.result= false;
+
+			for (ASTNode nodeToRemove : nodesToRemove) {
+				rewrite.removeButKeepComment(nodeToRemove, group);
+			}
+
+			result= false;
 			return false;
 		}
 
@@ -169,10 +174,14 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 				final List<ASTNode> nodesToRemove) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
 
 			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-			return fragment != null ? ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment) : null;
+
+			if (fragment != null) {
+				return ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment);
+			}
+
+			return null;
 		}
 
 		private VariableDeclarationFragment newFragment(final List<Statement> tryStatements,
@@ -181,9 +190,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			List<SimpleName> definitions= visitor.getWrites();
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
 
 			if (!tryStatements.isEmpty()) {
 				Statement tryStatement= tryStatements.get(0);
@@ -209,13 +216,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			for (Expression simpleName : simpleNames) {
-				if (!definitions.contains(simpleName)) {
-					return false;
-				}
-			}
-
-			return true;
+			return definitions.containsAll(Arrays.asList(simpleNames));
 		}
 
 		@SuppressWarnings({ "deprecation", "unchecked" })
@@ -226,7 +227,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
 			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
-			this.result= false;
+			result= false;
 			return false;
 		}
 	}

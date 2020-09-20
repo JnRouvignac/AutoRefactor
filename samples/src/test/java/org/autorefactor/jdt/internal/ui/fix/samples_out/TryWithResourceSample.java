@@ -29,12 +29,16 @@ import java.io.FileInputStream;
 
 public class TryWithResourceSample {
     public void refactorFullyInitializedResourceRemoveFinally() throws Exception {
+        // Keep this comment
+        // Keep this comment too
         try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         }
     }
 
     public void refactorFullyInitializedResourceDoNotRemoveFinally() throws Exception {
+        // Keep this comment
+        // Keep this comment too
         try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         } finally {
@@ -43,12 +47,16 @@ public class TryWithResourceSample {
     }
 
     public void refactorNullInitializedResourceRemoveFinally() throws Exception {
+        // Keep this comment
+        // Keep this comment too
         try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         }
     }
 
     public void refactorNullInitializedResourceDoNotRemoveFinally() throws Exception {
+        // Keep this comment
+        // Keep this comment too
         try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         } finally {
