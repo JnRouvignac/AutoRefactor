@@ -365,7 +365,9 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 			if (varDecl.getParent() instanceof VariableDeclarationStatement) {
 				VariableDeclarationStatement variableDeclaration= (VariableDeclarationStatement) varDecl
 						.getParent();
-				if (isTypeCompatible(variableDeclaration.getType().resolveBinding(), nodeTypeBinding)) {
+				if (variableDeclaration.fragments() != null
+						&& variableDeclaration.fragments().size() == 1
+								&& isTypeCompatible(variableDeclaration.getType().resolveBinding(), nodeTypeBinding)) {
 					variablesToRefactor.add(varDecl);
 					return true;
 				}

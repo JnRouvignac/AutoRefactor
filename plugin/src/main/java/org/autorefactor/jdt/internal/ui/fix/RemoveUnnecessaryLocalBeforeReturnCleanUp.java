@@ -76,7 +76,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		public boolean visit(final ReturnStatement node) {
 			if (result) {
 				Statement previousSibling= ASTNodes.getPreviousSibling(node);
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
+
 				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
 					VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
@@ -96,6 +96,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 					}
 				} else {
 					Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
+
 					if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
 							&& as.getLeftHandSide() instanceof Name
 							&& !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
@@ -131,7 +132,6 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			Type varType= vds.getType();
 			VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);

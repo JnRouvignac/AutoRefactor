@@ -162,6 +162,16 @@ public class ArrayListRatherThanLinkedListSample {
         return list2.isEmpty();
     }
 
+    public boolean doNotReplaceMultipleAssignment(LinkedList<String> list3) {
+        LinkedList<String> list1 = new LinkedList<String>();
+        list1.add("FOO");
+
+        LinkedList<String> list2 = list1, list4 = list3;
+        list2.add("BAR");
+
+        return list2.isEmpty();
+    }
+
     public void doNotReplaceLinkedListParameter(LinkedList<String> aLinkedList) {
         LinkedList<String> list = aLinkedList;
         list.add("bar");
