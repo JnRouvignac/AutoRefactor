@@ -37,7 +37,6 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -103,14 +102,10 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 		}
 
 		private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
-			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(variableAssignment, VariableDeclarationStatement.class);
+			VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(variableAssignment);
 
-			if (variableDeclarationStatement != null && variableDeclarationStatement.fragments().size() == 1) {
-				VariableDeclarationFragment fragment= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
-
-				if (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-					return fragment;
-				}
+			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer()))) {
+				return fragment;
 			}
 
 			return null;

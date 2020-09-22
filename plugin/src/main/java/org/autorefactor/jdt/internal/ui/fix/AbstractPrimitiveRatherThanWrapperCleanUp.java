@@ -164,22 +164,20 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 	@Override
 	public boolean visit(final VariableDeclarationStatement node) {
-		if (node.fragments().size() == 1) {
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
 
-			if (fragment.resolveBinding() != null
-					&& ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
-					&& fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
-				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
-				Block parentBlock= ASTNodes.getTypedAncestor(fragment, Block.class);
+		if (fragment.resolveBinding() != null
+				&& ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
+				&& fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
+			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
+			Block parentBlock= ASTNodes.getTypedAncestor(fragment, Block.class);
 
-				if (parentBlock != null) {
-					varOccurrenceVisitor.visitNode(parentBlock);
+			if (parentBlock != null) {
+				varOccurrenceVisitor.visitNode(parentBlock);
 
-					if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-						refactorWrapper(node);
-						return false;
-					}
+				if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
+					refactorWrapper(node);
+					return false;
 				}
 			}
 		}
@@ -235,8 +233,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		if (expression instanceof CastExpression) {
 			CastExpression castExpression= (CastExpression) expression;
 			return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
-					|| (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
-							&& isNotNull(castExpression.getExpression()));
+					|| ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+							&& isNotNull(castExpression.getExpression());
 		}
 
 		if (expression instanceof MethodInvocation) {

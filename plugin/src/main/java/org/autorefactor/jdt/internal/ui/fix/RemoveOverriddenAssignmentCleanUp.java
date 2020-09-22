@@ -54,36 +54,34 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final VariableDeclarationStatement node) {
-		if (node.fragments() != null && node.fragments().size() == 1) {
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
+		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
 
-			if (fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
-				SimpleName varName= fragment.getName();
-				IVariableBinding variable= fragment.resolveBinding();
-				Statement stmtToInspect= ASTNodes.getNextSibling(node);
-				boolean isOverridden= false;
-				boolean isRead= false;
+		if (fragment != null && fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+			SimpleName varName= fragment.getName();
+			IVariableBinding variable= fragment.resolveBinding();
+			Statement stmtToInspect= ASTNodes.getNextSibling(node);
+			boolean isOverridden= false;
+			boolean isRead= false;
 
-				while (stmtToInspect != null && !isOverridden && !isRead) {
-					Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
+			while (stmtToInspect != null && !isOverridden && !isRead) {
+				Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
 
-					if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
-						if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
-							isOverridden= true;
-						} else {
-							isRead= true;
-						}
+				if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
+					if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+						isOverridden= true;
+					} else {
+						isRead= true;
 					}
-
-					isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty();
-					stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
 				}
 
-				if (isOverridden && !isRead) {
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description);
-					cuRewrite.getASTRewrite().remove(fragment.getInitializer(), group);
-					return false;
-				}
+				isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty();
+				stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
+			}
+
+			if (isOverridden && !isRead) {
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description);
+				cuRewrite.getASTRewrite().remove(fragment.getInitializer(), group);
+				return false;
 			}
 		}
 

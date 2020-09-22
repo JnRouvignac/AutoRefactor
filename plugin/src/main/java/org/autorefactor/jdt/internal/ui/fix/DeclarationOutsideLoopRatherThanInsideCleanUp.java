@@ -99,6 +99,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 						varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
 					}
 				}
+
 				for (int j= i + 1; j < blockStatement.size(); j++) {
 					varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
 				}
@@ -106,12 +107,10 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 				List<VariableDeclarationStatement> candidates= new ArrayList<>();
 
 				for (Statement declarationStatement : forStatements) {
-					VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
+					VariableDeclarationStatement declaration= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
+					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(declaration);
 
-					if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
-							&& decl.fragments() != null && decl.fragments().size() == 1) {
-						VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
-								.get(0);
+					if (fragment != null && !Modifier.isFinal(declaration.getModifiers()) && !hasAnnotation(declaration.modifiers())) {
 						SimpleName name= fragment.getName();
 						boolean isFound= false;
 
@@ -123,7 +122,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 						}
 
 						if (!isFound) {
-							candidates.add(decl);
+							candidates.add(declaration);
 							varNames.add(name);
 						}
 					}

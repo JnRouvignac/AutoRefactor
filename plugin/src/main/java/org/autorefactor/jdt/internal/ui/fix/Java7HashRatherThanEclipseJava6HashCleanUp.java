@@ -249,13 +249,12 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	private SimpleName isVariableValid(final CollectedData data, final int initValue) {
 		Statement statement= data.getStmtIterator().next();
 		VariableDeclarationStatement varDecl= ASTNodes.as(statement, VariableDeclarationStatement.class);
+		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(varDecl);
 
-		if (varDecl != null && ASTNodes.hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName()) && varDecl.fragments().size() == 1) {
-			VariableDeclarationFragment varFragment= (VariableDeclarationFragment) varDecl.fragments().get(0);
-
-			if (Long.valueOf(initValue).equals(ASTNodes.getIntegerLiteral(varFragment.getInitializer()))) {
-				return varFragment.getName();
-			}
+		if (fragment != null
+				&& ASTNodes.hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName())
+				&& Long.valueOf(initValue).equals(ASTNodes.getIntegerLiteral(fragment.getInitializer()))) {
+			return fragment.getName();
 		}
 
 		return null;
@@ -264,18 +263,26 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	private boolean isStmtValid(final CollectedData data) {
 		Statement statement= data.getStmtIterator().next();
 		ExpressionStatement exprStatement= ASTNodes.as(statement, ExpressionStatement.class);
-		VariableDeclarationStatement varStatement= ASTNodes.as(statement, VariableDeclarationStatement.class);
-		ReturnStatement returnStatement= ASTNodes.as(statement, ReturnStatement.class);
 
 		if (exprStatement != null) {
 			return isAssignmentValid(data, exprStatement);
 		}
-		if (varStatement != null && data.getTempVar() == null) {
-			@SuppressWarnings("unchecked")
-			List<VariableDeclarationFragment> fragments= varStatement.fragments();
 
-			if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName()) && fragments != null && fragments.size() == 1) {
-				VariableDeclarationFragment fragment= fragments.get(0);
+		ReturnStatement returnStatement= ASTNodes.as(statement, ReturnStatement.class);
+
+		if (returnStatement != null) {
+			data.setHasReturnStatement(true);
+			Expression expression= returnStatement.getExpression();
+
+			return returnStatement != null && (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
+		}
+
+		VariableDeclarationStatement varStatement= ASTNodes.as(statement, VariableDeclarationStatement.class);
+
+		if (varStatement != null && data.getTempVar() == null) {
+			VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(varStatement);
+
+			if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName()) && fragment != null) {
 				data.setTempVar(fragment.getName());
 				Expression initializer= fragment.getInitializer();
 
@@ -297,11 +304,6 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					}
 				}
 			}
-		} else if (returnStatement != null) {
-			data.setHasReturnStatement(true);
-			Expression expression= returnStatement.getExpression();
-
-			return returnStatement != null && (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
 		}
 
 		return false;
@@ -361,10 +363,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
 					&& primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
 					&& ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
-					&& ((isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
-							&& isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId()))
-							|| (isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
-									&& isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId())))) {
+					&& (isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
+							&& isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId())
+							|| isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
+									&& isGivenVariable(primeTimesResult.getRightOperand(), data.getPrimeId()))) {
 				return isNewHashValid(data, newHash);
 			}
 		}
@@ -596,7 +598,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					zero= ASTNodes.getIntegerLiteral(condition.getElseExpression());
 				}
 
-				if (zero != null && zero.longValue() == 0 && hashOnField != null && hashOnField.getExpression() != null
+				if (Long.valueOf(0).equals(zero) && hashOnField != null && hashOnField.getExpression() != null
 						&& HASH_CODE_METHOD.equals(hashOnField.getName().getIdentifier())
 						&& Utils.isEmpty(hashOnField.arguments())) {
 					SimpleName fieldToHash= getField(hashOnField.getExpression());
