@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class DoWhileRatherThanWhileSample {
-    private void replaceWhileByDoWhile(int i) {
+    public void replaceWhileByDoWhile(int i) {
         // Keep this comment
         while (true) {
             // Keep this comment too
@@ -42,7 +42,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithInitedBoolean(int i) {
+    public void replaceWithInitedBoolean(int i) {
         boolean isInitedToTrue= true;
 
         // Keep this comment
@@ -55,7 +55,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithInitedInteger(int i) {
+    public void replaceWithInitedInteger(int i) {
         int j= 1_000;
 
         // Keep this comment
@@ -69,7 +69,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithConditionalInitialization(int aNumber, boolean isValid) {
+    public void doNotReplaceWithConditionalInitialization(int aNumber, boolean isValid) {
         int isNotAlwaysPositive = -1;
         int anotherVariable= isValid ? isNotAlwaysPositive = 1_000 : 0;
 
@@ -82,7 +82,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithIfStatement(int aNumber, boolean isValid) {
+    public void doNotReplaceWithIfStatement(int aNumber, boolean isValid) {
         int isNotAlwaysPositive = -2;
         if (isValid) {
             isNotAlwaysPositive = 2_000;
@@ -97,7 +97,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithInitedBooleanAndInteger(int i) {
+    public void replaceWithInitedBooleanAndInteger(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;
 
@@ -112,7 +112,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithORExpression(int i) {
+    public void replaceWithORExpression(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;
 
@@ -127,7 +127,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithFalseOperand(int i) {
+    public void replaceWithFalseOperand(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;
 
@@ -142,7 +142,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithUnnkownOperand(int i, boolean isValid) {
+    public void doNotReplaceWithUnnkownOperand(int i, boolean isValid) {
         int j= 1_000;
         boolean isInitedToTrue= true;
 
@@ -155,7 +155,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithUnnkownInitialization(int i, boolean isValid) {
+    public void doNotReplaceWithUnnkownInitialization(int i, boolean isValid) {
         int j= 1_000;
         boolean isInitedToTrue= isValid;
 
@@ -168,7 +168,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithIncrement(int i) {
+    public void doNotReplaceWithIncrement(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;
 
@@ -181,7 +181,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceRecursiveInitialization(int i) {
+    public void replaceRecursiveInitialization(int i) {
         int j= 1_000;
         int k= -1_000;
         boolean isInitedToTrue= k < 0;
@@ -197,7 +197,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithReassignment(int i) {
+    public void replaceWithReassignment(int i) {
         int j= 1_000;
         int k= -1_000;
         boolean isInitedToTrue= false;
@@ -214,7 +214,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithAllowedUse(int i) {
+    public void replaceWithAllowedUse(int i) {
         int j= 1_000;
         int k= -1_000;
         boolean isInitedToTrue= k == -1_000;
@@ -231,13 +231,13 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWhileWithUnknownValue(int i) {
+    public void doNotReplaceWhileWithUnknownValue(int i) {
         while (i <= 100) {
             i *= 2;
         }
     }
 
-    private void replaceWithControlWorkflow(int m, boolean isValid) {
+    public void replaceWithControlWorkflow(int m, boolean isValid) {
         int o= 1_000;
         int p= -1_000;
 
@@ -257,7 +257,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithTryWithResource(int m) {
+    public void replaceWithTryWithResource(int m) {
         int o= 1_000;
         int p= -1_000;
 
@@ -281,7 +281,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceWithBlock(int m) {
+    public void replaceWithBlock(int m) {
         int o= 1_000;
         int p= -1_000;
 
@@ -307,7 +307,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void replaceInCatch(int m, boolean isValid) {
+    public void replaceInCatch(int m, boolean isValid) {
         int o= 1_000;
         int p= -1_000;
 
@@ -329,7 +329,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithActiveCondition(int m) {
+    public void doNotReplaceWithActiveCondition(int m) {
         int o= 1_000;
         int p= -1_000;
 
@@ -347,7 +347,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithActiveResource(int m, boolean isValid) {
+    public void doNotReplaceWithActiveResource(int m, boolean isValid) {
         int o= 1_000;
         int p= -1_000;
 
@@ -369,7 +369,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithActiveBody(int m, boolean isValid) {
+    public void doNotReplaceWithActiveBody(int m, boolean isValid) {
         int o= 1_000;
         int p= -1_000;
 
@@ -391,7 +391,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceInFinally(int m, boolean isValid) throws IOException {
+    public void doNotReplaceInFinally(int m, boolean isValid) throws IOException {
         int o= 1_000;
         int p= -1_000;
 
@@ -413,7 +413,7 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
-    private void doNotReplaceWithLoop(int q, List<String> texts) {
+    public void doNotReplaceWithLoop(int q, List<String> texts) {
         int r= 1_000;
         int s= -1_000;
         for (String string : texts) {
