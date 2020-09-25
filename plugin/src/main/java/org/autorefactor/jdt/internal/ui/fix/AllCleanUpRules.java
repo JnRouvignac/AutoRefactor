@@ -99,6 +99,7 @@ public final class AllCleanUpRules {
                 new RemoveUselessBlockCleanUp(), new RemoveEmptyStatementCleanUp(),
                 new SingleDeclarationsRatherThanMultiDeclarationCleanUp(), new EndOfMethodRatherThanReturnCleanUp(),
                 new EndOfLoopRatherThanContinueCleanUp(),
+                new WhileConditionRatherThanInnerIfCleanUp(),
                 new DoWhileRatherThanWhileCleanUp(), new DoWhileRatherThanDuplicateCodeCleanUp(),
                 new IfRatherThanWhileAndFallsThroughCleanUp(), new SuperCallRatherThanUselessOverridingCleanUp(),
                 new AndConditionRatherThanEmbededIfCleanUp(), new CommonCodeInIfElseStatementCleanUp(),
