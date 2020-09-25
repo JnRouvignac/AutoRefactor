@@ -202,7 +202,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		ReturnStatement copyOfReturnStatement= ASTNodes.createMoveTarget(rewrite, returnStatement);
 
 		rewrite.replace(node.getExpression(),
-				ast.not(ast.newMethodInvocation(ast.name(classname),
+				ast.not(ast.newMethodInvocation(ast.newName(classname),
 						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), group);
 
 		if (node.getThenStatement() instanceof Block) {

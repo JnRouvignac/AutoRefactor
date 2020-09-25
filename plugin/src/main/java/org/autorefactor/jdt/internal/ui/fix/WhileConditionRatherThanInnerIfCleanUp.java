@@ -108,7 +108,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			ifCondition= ASTNodes.createMoveTarget(rewrite, ifCondition);
 		}
 
-		InfixExpression newCondition= ast.infixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ASTRewrite.parenthesizeIfNeeded(ast, ifCondition));
+		InfixExpression newCondition= ast.newInfixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ASTRewrite.parenthesizeIfNeeded(ast, ifCondition));
 		rewrite.replace(node.getExpression(), newCondition, group);
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);
@@ -124,7 +124,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 				rewrite.remove(ifStatement, group);
 			}
 		} else if (otherStatement == null || otherStatements.isEmpty()) {
-			rewrite.replace(node.getBody(), ast.block(), group);
+			rewrite.replace(node.getBody(), ast.newBlock(), group);
 		} else if (otherStatements.size() == 1) {
 			rewrite.replace(originalCondition, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 		} else {
@@ -134,7 +134,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 				newStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			Block block= ast.block(newStatements);
+			Block block= ast.newBlock(newStatements);
 
 			rewrite.replace(node.getBody(), block, group);
 		}

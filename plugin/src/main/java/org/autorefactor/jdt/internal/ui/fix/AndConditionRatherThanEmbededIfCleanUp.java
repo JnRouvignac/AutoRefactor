@@ -72,7 +72,7 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         TextEditGroup group= new TextEditGroup(MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_description);
 
-        InfixExpression infixExpression= ast.infixExpression(ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+        InfixExpression infixExpression= ast.newInfixExpression(ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
                 ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
         rewrite.replace(innerIf.getExpression(), infixExpression, group);
         rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, innerIf), group);

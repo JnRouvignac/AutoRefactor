@@ -92,7 +92,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseStringContainsCleanUp_description);
 
-		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.simpleName("contains"), group); //$NON-NLS-1$
+		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.newSimpleName("contains"), group); //$NON-NLS-1$
 
 		if (isPositive) {
 			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, method), group);

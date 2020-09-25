@@ -117,7 +117,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 					newMethod= ast.newMethodInvocation(null, originalMethod.getName().getIdentifier(), newArguments);
 				}
 
-				ExpressionStatement newStatement= ast.toStatement(newMethod);
+				ExpressionStatement newStatement= ast.newExpressionStatement(newMethod);
 
 				expressionStatements.add(newStatement);
 			}
@@ -130,7 +130,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				}
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
-				Block newBlock= ast.block(expressionStatements);
+				Block newBlock= ast.newBlock(expressionStatements);
 				rewrite.replace(node, newBlock, group);
 			}
 

@@ -232,7 +232,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            Statement replacement= ast.if0(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.block(ast.copyRange(thenStatements)));
+            Statement replacement= ast.newIfStatement(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.newBlock(ast.copyRange(thenStatements)));
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
             cuRewrite.getASTRewrite().replace(forNode, replacement, group);
 
@@ -246,7 +246,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
-            rewrite.replace(forNode, ast.return0(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), group);
+            rewrite.replace(forNode, ast.newReturnStatement(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), group);
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
                 rewrite.remove(forNextStatement, group);
@@ -292,7 +292,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                 replacement= ast.declareStatement(ast.type(boolean.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, (SimpleName) initName),
                         newMethod(iterable, toFind, isPositive, classesToUseWithImport, importsToAdd));
             } else if (!previousStmtIsPreviousSibling || previousStatement instanceof ExpressionStatement) {
-                replacement= ast.toStatement(ast.assign(ASTNodes.createMoveTarget(rewrite, initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, classesToUseWithImport, importsToAdd)));
+                replacement= ast.newExpressionStatement(ast.newAssignment(ASTNodes.createMoveTarget(rewrite, initName), Assignment.Operator.ASSIGN, newMethod(iterable, toFind, isPositive, classesToUseWithImport, importsToAdd)));
             } else {
                 throw new NotImplementedException(forNode);
             }

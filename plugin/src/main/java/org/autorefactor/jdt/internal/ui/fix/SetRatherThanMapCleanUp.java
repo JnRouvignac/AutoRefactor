@@ -152,7 +152,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 				newTypes= new Type[0];
 			}
 
-			return ast.genericType(substitutingType, newTypes);
+			return ast.newParameterizedType(substitutingType, newTypes);
 		}
 
 		return ast.type(substitutingType);
@@ -208,9 +208,9 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("contains")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("contains")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("add")); //$NON-NLS-1$
 			refactoredMi.arguments().remove(1);
 		}
 	}

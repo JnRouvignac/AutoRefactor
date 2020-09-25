@@ -144,7 +144,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				Expression rightExpression= rightInvocation.getExpression();
 
 				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, leftExpression), group);
-				rewrite.replace(node.getName(), ast.simpleName("equalsIgnoreCase"), group); //$NON-NLS-1$
+				rewrite.replace(node.getName(), ast.newSimpleName("equalsIgnoreCase"), group); //$NON-NLS-1$
 				rewrite.replace((Expression) node.arguments().get(0), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)), group);
 				return false;
 			}
@@ -168,7 +168,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				String value= stringLiteral.getLiteralValue();
 
 				if (value.length() == 1) {
-					CharacterLiteral replacement= ast.charLiteral();
+					CharacterLiteral replacement= ast.newCharacterLiteral();
 					replacement.setCharValue(value.charAt(0));
 					rewrite.replace(stringLiteral, replacement, group);
 					return false;
@@ -208,7 +208,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
 			rewrite.replace(toReplace, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
 		} else {
-			rewrite.replace(toReplace, ast.cast(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
+			rewrite.replace(toReplace, ast.newCastExpression(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
 		}
 
 		return false;
@@ -223,7 +223,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			return ASTNodes.createMoveTarget(rewrite, expression);
 		}
 
-		return ast.this0();
+		return ast.newThisExpression();
 	}
 
 	private boolean isToStringForPrimitive(final MethodInvocation node) {

@@ -176,7 +176,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), group);
 		} else {
 			operands.remove(operands.size() - 1);
-			InfixExpression newCondition= ast.infixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
+			InfixExpression newCondition= ast.newInfixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
 			rewrite.replace(condition, newCondition, group);
 		}

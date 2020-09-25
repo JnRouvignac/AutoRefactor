@@ -91,6 +91,6 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 
 		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
-		rewrite.replace(node.getName(), ast.simpleName("containsKey"), group); //$NON-NLS-1$
+		rewrite.replace(node.getName(), ast.newSimpleName("containsKey"), group); //$NON-NLS-1$
 	}
 }

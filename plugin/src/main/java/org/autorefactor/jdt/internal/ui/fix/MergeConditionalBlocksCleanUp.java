@@ -125,7 +125,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
         IfStatement lastBlock= duplicateIfBlocks.get(duplicateIfBlocks.size() - 1);
         Statement remainingStatement= isThenStatement.get(isThenStatement.size() - 1) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
-        InfixExpression newCondition= ast.infixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
+        InfixExpression newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
 
         rewrite.replace(duplicateIfBlocks.get(0).getExpression(), newCondition, group);
 

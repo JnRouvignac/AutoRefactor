@@ -92,11 +92,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 			if (ASTNodes.canHaveSiblings(breakStatement) || breakStatement.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(breakStatement, group);
 			} else {
-				rewrite.replace(breakStatement, ast.block(), group);
+				rewrite.replace(breakStatement, ast.newBlock(), group);
 			}
 		}
 
-		rewrite.replace(node, ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
+		rewrite.replace(node, ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
 	}
 
 	private static class BreakVisitor extends InterruptibleVisitor {

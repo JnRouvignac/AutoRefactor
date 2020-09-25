@@ -608,7 +608,7 @@ public class ASTRewrite {
 			return expression;
 
 		default:
-			return ast.parenthesize(expression);
+			return ast.newParenthesizedExpression(expression);
 		}
 	}
 

@@ -137,18 +137,18 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 	private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().name(typeBinding.getName(), field), group);
+		cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().newName(typeBinding.getName(), field), group);
 		return false;
 	}
 
 	private ASTNode getValueOf(final String name, final String numberLiteral) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		return ast.newMethodInvocation(name, "valueOf", ast.number(numberLiteral)); //$NON-NLS-1$
+		return ast.newMethodInvocation(name, "valueOf", ast.newNumberLiteral(numberLiteral)); //$NON-NLS-1$
 	}
 
 	private StringLiteral getStringLiteral(final String numberLiteral) {
-		return cuRewrite.getASTBuilder().string(numberLiteral);
+		return cuRewrite.getASTBuilder().newStringLiteral(numberLiteral);
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				if (isInStringAppend(methodInvocation.getParent())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-					rewrite.replace(node, ast.parenthesize(getCompareToNode(isPositive, methodInvocation)), group);
+					rewrite.replace(node, ast.newParenthesizedExpression(getCompareToNode(isPositive, methodInvocation)), group);
 				} else {
 					rewrite.replace(node, getCompareToNode(isPositive, methodInvocation), group);
 				}
@@ -245,7 +245,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			throw new IllegalArgumentException();
 		}
 
-		return ast.new0(fullyQualifiedName, ast.string(numberLiteral));
+		return ast.newClassInstanceCreation(fullyQualifiedName, ast.newStringLiteral(numberLiteral));
 	}
 
 	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
@@ -255,6 +255,6 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))); //$NON-NLS-1$
 
-		return ast.infixExpression(methodInvocation, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.int0(0));
+		return ast.newInfixExpression(methodInvocation, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.newNumberLiteral(0));
 	}
 }

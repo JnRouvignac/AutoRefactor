@@ -357,14 +357,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Expression thenExpression, final Expression elseExpression) {
         if (thenBool == null && elseBool != null) {
             Expression leftOp= signExpression(ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(node.getExpression())), !elseBool);
-            return ast.return0(ast.infixExpression(leftOp, getConditionalOperator(elseBool),
+            return ast.newReturnStatement(ast.newInfixExpression(leftOp, getConditionalOperator(elseBool),
                     ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(thenExpression))));
         }
 
         if (thenBool != null && elseBool == null) {
             Expression leftOp= signExpression(ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(node.getExpression())),
                     thenBool);
-            return ast.return0(ast.infixExpression(leftOp, getConditionalOperator(thenBool),
+            return ast.newReturnStatement(ast.newInfixExpression(leftOp, getConditionalOperator(thenBool),
                     ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(elseExpression))));
         }
 
@@ -412,7 +412,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             Expression returnExpression= getReturnExpression(md, exprToReturn);
 
             if (returnExpression != null) {
-                return ast.return0(returnExpression);
+                return ast.newReturnStatement(returnExpression);
             }
         }
 
@@ -464,18 +464,18 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             // care
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
-                    return ast.infixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(elseExpression));
+                    return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(elseExpression));
                 }
 
-                return ast.infixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(elseExpression));
+                return ast.newInfixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(elseExpression));
             }
 
             if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
-                    return ast.infixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(thenExpression));
+                    return ast.newInfixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(thenExpression));
                 }
 
-                return ast.infixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(thenExpression));
+                return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(thenExpression));
             }
         }
 
@@ -496,10 +496,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private Name getBooleanName(final ASTNode node) {
         if (!isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), ASTNodes.getTypedAncestorOrCrash(node, CompilationUnit.class))) {
-            return ast.simpleName(Boolean.class.getSimpleName());
+            return ast.newSimpleName(Boolean.class.getSimpleName());
         }
 
-        return ast.name(Boolean.class.getCanonicalName());
+        return ast.newName(Boolean.class.getCanonicalName());
     }
 
     @SuppressWarnings("unchecked")

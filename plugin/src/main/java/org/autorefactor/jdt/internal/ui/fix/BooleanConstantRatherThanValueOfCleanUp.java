@@ -93,7 +93,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 			fieldAccess.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
 		}
 
-		fieldAccess.setName(ast.simpleName(literal ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
+		fieldAccess.setName(ast.newSimpleName(literal ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
 		rewrite.replace(node, fieldAccess, group);
 	}
 }

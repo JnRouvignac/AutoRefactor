@@ -124,7 +124,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		}
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		NumberLiteral replacement= ast.number(integers + suffix);
+		NumberLiteral replacement= ast.newNumberLiteral(integers + suffix);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement, group);
 	}

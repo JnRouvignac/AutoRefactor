@@ -96,14 +96,14 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 				copyOfInitializer= null;
 			}
 
-			VariableDeclarationFragment newFragment= ast.declareFragment(copyOfFragment, copyOfInitializer);
+			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(copyOfFragment, copyOfInitializer);
 			ASTNode newNode;
 			if (node instanceof VariableDeclarationStatement) {
-				VariableDeclarationStatement newStatement= ast.declareStatement(copyOfType, newFragment);
+				VariableDeclarationStatement newStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
 				updateModifiers(modifiers, newStatement.modifiers());
 				newNode= newStatement;
 			} else {
-				FieldDeclaration newField= ast.declareField(copyOfType, newFragment);
+				FieldDeclaration newField= ast.newFieldDeclaration(copyOfType, newFragment);
 				if (docComment != null) {
 					newField.setJavadoc(ast.createCopyTarget(docComment));
 				}

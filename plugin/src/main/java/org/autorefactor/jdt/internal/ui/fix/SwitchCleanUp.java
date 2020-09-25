@@ -360,7 +360,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SwitchCleanUp_description);
 
-		SwitchStatement switchStatement= ast.switch0(ASTNodes.createMoveTarget(rewrite, switchExpression));
+		SwitchStatement switchStatement= ast.newSwitchStatement(ASTNodes.createMoveTarget(rewrite, switchExpression));
 
 		for (SwitchCaseSection aCase : cases) {
 			addCaseWithStatements(switchStatement, aCase.constantExprs, aCase.statements);
@@ -389,7 +389,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		// Add the case statement(s)
 		if (caseValuesOrNullForDefault != null) {
 			for (Expression caseValue : caseValuesOrNullForDefault) {
-				switchStatements.add(ast.case0(ASTNodes.createMoveTarget(rewrite, caseValue)));
+				switchStatements.add(ast.newSwitchCase(ASTNodes.createMoveTarget(rewrite, caseValue)));
 			}
 		} else {
 			switchStatements.add(ast.default0());
@@ -406,7 +406,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
 		// When required: end with a break
 		if (isBreakNeeded) {
-			switchStatements.add(ast.break0());
+			switchStatements.add(ast.newBreakStatement());
 		}
 	}
 

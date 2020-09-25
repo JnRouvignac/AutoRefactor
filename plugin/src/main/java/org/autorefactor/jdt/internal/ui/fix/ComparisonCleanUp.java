@@ -100,6 +100,6 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ComparisonCleanUp_description);
 
-		rewrite.replace(node, ast.infixExpression(ASTNodes.createMoveTarget(rewrite, comparisonMI), operator, ast.number("0")), group); //$NON-NLS-1$
+		rewrite.replace(node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, comparisonMI), operator, ast.newNumberLiteral("0")), group); //$NON-NLS-1$
 	}
 }

@@ -332,7 +332,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent()) || nodeToReplace.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(nodeToReplace.getParent(), group);
 			} else {
-				rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().block(), group);
+				rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
 			}
 
 			return false;
@@ -427,9 +427,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			Expression delta= null;
 
 			if (ASTNodes.hasType(actualValue, double.class.getCanonicalName()) && ASTNodes.hasType(expectedValue, double.class.getCanonicalName())) {
-				delta= ast.number(".0"); //$NON-NLS-1$
+				delta= ast.newNumberLiteral(".0"); //$NON-NLS-1$
 			} else if (ASTNodes.hasType(actualValue, float.class.getCanonicalName()) && ASTNodes.hasType(expectedValue, float.class.getCanonicalName())) {
-				delta= ast.number(".0F"); //$NON-NLS-1$
+				delta= ast.newNumberLiteral(".0F"); //$NON-NLS-1$
 			}
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
@@ -467,7 +467,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private ASTNode invokeMethodOrStatement(final ASTNode nodeToReplace, final MethodInvocation newMethod) {
 		if (nodeToReplace instanceof Statement) {
 			// The new node should be also a statement
-			return cuRewrite.getASTBuilder().toStatement(newMethod);
+			return cuRewrite.getASTBuilder().newExpressionStatement(newMethod);
 		}
 
 		return newMethod;
@@ -506,7 +506,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		Expression qualifiedClass;
 		if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
 				&& !staticImports.contains(qualifiedClassName + ".*")) { //$NON-NLS-1$
-			qualifiedClass= ast.name(qualifiedClassName);
+			qualifiedClass= ast.newName(qualifiedClassName);
 		} else {
 			qualifiedClass= ast.copyExpression(originalMethod);
 		}

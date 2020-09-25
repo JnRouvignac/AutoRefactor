@@ -138,7 +138,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.TernaryOperatorRatherThanDuplicateConditionsCleanUp_description);
 
-		ParenthesizedExpression newConditionalExpression= ast.parenthesize(ast.conditionalExpression(ASTNodes.createMoveTarget(rewrite, basicExpression),
+		ParenthesizedExpression newConditionalExpression= ast.newParenthesizedExpression(ast.newConditionalExpression(ASTNodes.createMoveTarget(rewrite, basicExpression),
 				ASTNodes.createMoveTarget(rewrite, thenExpression), ASTNodes.createMoveTarget(rewrite, elseExpression)));
 
 		if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
@@ -147,7 +147,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 			List<Expression> operands= rewrite.createMoveTarget(previousOperands);
 			operands.add(newConditionalExpression);
 			operands.addAll(rewrite.createMoveTarget(nextOperands));
-			rewrite.replace(node, ast.infixExpression(node.getOperator(), operands), group);
+			rewrite.replace(node, ast.newInfixExpression(node.getOperator(), operands), group);
 		}
 	}
 

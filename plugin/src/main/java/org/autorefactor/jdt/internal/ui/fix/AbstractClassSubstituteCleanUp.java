@@ -203,7 +203,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 					}
 				}
 
-				return ast.genericType(substitutingClassName, newTypes);
+				return ast.newParameterizedType(substitutingClassName, newTypes);
 			}
 
 			return ast.type(substitutingClassName);

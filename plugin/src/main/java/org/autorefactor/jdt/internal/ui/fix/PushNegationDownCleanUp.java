@@ -102,13 +102,13 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 					allOperands= rewrite.createMoveTarget(allOperands);
 				}
 
-				return ast.parenthesize(ast.infixExpression(reverseOp, allOperands));
+				return ast.newParenthesizedExpression(ast.newInfixExpression(reverseOp, allOperands));
 			}
 		} else {
 			Boolean constant= ASTNodes.getBooleanLiteral(operand);
 
 			if (constant != null) {
-				return ast.boolean0(!constant);
+				return ast.newBooleanLiteral(!constant);
 			}
 		}
 

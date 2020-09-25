@@ -318,6 +318,6 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
 
-		rewrite.replace(expression, ast.parenthesize(ASTNodes.createMoveTarget(rewrite, expression)), group);
+		rewrite.replace(expression, ast.newParenthesizedExpression(ASTNodes.createMoveTarget(rewrite, expression)), group);
 	}
 }

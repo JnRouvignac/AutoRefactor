@@ -124,7 +124,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.CollectionCleanUp_description);
 
-				rewrite.replace(nodeToReplace, ast.new0(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
+				rewrite.replace(nodeToReplace, ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				rewrite.remove(nodeToRemove, group);
 				result= false;
 				return false;

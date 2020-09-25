@@ -95,7 +95,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		NumberLiteral numberLiteral= ast.number(literal.getToken() + postfix);
+		NumberLiteral numberLiteral= ast.newNumberLiteral(literal.getToken() + postfix);
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 

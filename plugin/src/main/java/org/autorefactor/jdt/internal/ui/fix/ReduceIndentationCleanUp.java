@@ -201,7 +201,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
-			Block block= ast.block(copyOfStatements);
+			Block block= ast.newBlock(copyOfStatements);
 			rewrite.replace(node, block, group);
 		}
 	}
@@ -229,7 +229,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			rewrite.remove(node.getElseStatement(), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
-			Block block= ast.block(copyOfStatements);
+			Block block= ast.newBlock(copyOfStatements);
 			rewrite.replace(node, block, group);
 		}
 	}

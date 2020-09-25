@@ -159,13 +159,13 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		if (fragment.getInitializer() != null) {
 			Type copyOfType= ast.createCopyTarget(varToMove.getType());
 			SimpleName name= fragment.getName();
-			VariableDeclarationFragment newFragment= ast.declareFragment(ast.createCopyTarget(name));
+			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ast.createCopyTarget(name));
 			@SuppressWarnings("unchecked")
 			List<Dimension> extraDimensions= fragment.extraDimensions();
 			@SuppressWarnings("unchecked")
 			List<Dimension> newExtraDimensions= newFragment.extraDimensions();
 			newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
-			VariableDeclarationStatement newDeclareStatement= ast.declareStatement(copyOfType, newFragment);
+			VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
 			@SuppressWarnings("unchecked")
 			List<IExtendedModifier> modifiers= varToMove.modifiers();
 			@SuppressWarnings("unchecked")
@@ -181,7 +181,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
 			rewrite.insertBefore(newDeclareStatement, statement, group);
 			rewrite.replace(varToMove,
-					ast.toStatement(ast.assign(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), group);
+					ast.newExpressionStatement(ast.newAssignment(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), group);
 		} else {
 			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, group);
 			rewrite.remove(varToMove, group);

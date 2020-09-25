@@ -442,7 +442,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaExpressionRatherThanComparatorCleanUp_description);
 
-		Expression comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
+		Expression comparingMethod= ast.newMethodInvocation(ast.newName(comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
 		if (!isForward.get()) {
 			comparingMethod= ast.newMethodInvocation(comparingMethod, "reversed"); //$NON-NLS-1$
@@ -450,9 +450,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		if (isNullFirst != null) {
 			if (isNullFirst) {
-				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
+				comparingMethod= ast.newMethodInvocation(ast.newName(comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
 			} else {
-				comparingMethod= ast.newMethodInvocation(ast.name(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
+				comparingMethod= ast.newMethodInvocation(ast.newName(comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
 			}
 		}
 
@@ -466,7 +466,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(method);
 
-		TypeMethodReference typeMethodRef= ast.typeMethodRef();
+		TypeMethodReference typeMethodRef= ast.newTypeMethodReference();
 		typeMethodRef.setType(ast.toType(type, typeNameDecider));
 		typeMethodRef.setName(ASTNodes.createMoveTarget(rewrite, method.getName()));
 		return typeMethodRef;
@@ -481,19 +481,19 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
-		LambdaExpression lambdaExpression= ast.lambda();
+		LambdaExpression lambdaExpression= ast.newLambdaExpression();
 		ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
 		boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
 				&& destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
 		if (isTypeKnown && straightOrder && isNullFirst == null) {
-			lambdaExpression.parameters().add(ast.declareFragment(ast.createCopyTarget(name1)));
+			lambdaExpression.parameters().add(ast.newVariableDeclarationFragment(ast.createCopyTarget(name1)));
 		} else {
-			lambdaExpression.parameters().add(ast.declareSingleVariable(name1.getIdentifier(), ast.toType(type, typeNameDecider)));
+			lambdaExpression.parameters().add(ast.newSingleVariableDeclaration(name1.getIdentifier(), ast.toType(type, typeNameDecider)));
 		}
 
-		lambdaExpression.setBody(ast.fieldAccess(ast.createCopyTarget(name1), ASTNodes.createMoveTarget(rewrite, field.getName())));
+		lambdaExpression.setBody(ast.newFieldAccess(ast.createCopyTarget(name1), ASTNodes.createMoveTarget(rewrite, field.getName())));
 		lambdaExpression.setParentheses(false);
 		return lambdaExpression;
 	}

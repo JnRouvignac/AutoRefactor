@@ -289,9 +289,9 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_description);
 
 		if (ifStatement.getThenStatement() instanceof Block) {
-			rewrite.insertAfter(ast.break0(), assignments.get(assignments.size() - 1), group);
+			rewrite.insertAfter(ast.newBreakStatement(), assignments.get(assignments.size() - 1), group);
 		} else {
-			rewrite.replace(ifStatement.getThenStatement(), ast.block(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.break0()), group);
+			rewrite.replace(ifStatement.getThenStatement(), ast.newBlock(ASTNodes.createMoveTarget(rewrite, ifStatement.getThenStatement()), ast.newBreakStatement()), group);
 		}
 	}
 }

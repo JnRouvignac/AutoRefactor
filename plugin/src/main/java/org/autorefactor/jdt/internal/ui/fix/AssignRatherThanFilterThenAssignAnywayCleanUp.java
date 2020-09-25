@@ -161,7 +161,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.replace(node,
-					ast.toStatement(ast.assign(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), group);
+					ast.newExpressionStatement(ast.newAssignment(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), group);
 		}
 
 		private boolean maybeReplaceWithStraightReturn(final IfStatement node, final InfixExpression condition, final ReturnStatement valuedReturn,
@@ -193,7 +193,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.remove(toRemove, group);
-			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
+			rewrite.replace(node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
 		}
 	}
 }

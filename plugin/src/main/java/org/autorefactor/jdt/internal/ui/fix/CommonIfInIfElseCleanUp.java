@@ -100,8 +100,8 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonIfInIfElseCleanUp_description);
 
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
-		IfStatement newInnerIf= ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
+		IfStatement newInnerIf= ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
 				ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
-		rewrite.replace(node, ast.if0(newCondition, ast.block(newInnerIf)), group);
+		rewrite.replace(node, ast.newIfStatement(newCondition, ast.newBlock(newInnerIf)), group);
 	}
 }

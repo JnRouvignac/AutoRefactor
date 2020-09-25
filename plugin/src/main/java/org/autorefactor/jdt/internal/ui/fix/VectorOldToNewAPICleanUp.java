@@ -90,7 +90,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
+		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 	}
 
 	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
@@ -103,9 +103,9 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-			rewrite.replace(arg0, ast.cast(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
+			rewrite.replace(arg0, ast.newCastExpression(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		assertSize(args, 2);
 		Expression arg1= args.get(1);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.simpleName(newMethodName), group);
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 		rewrite.moveToIndex(arg1, 0, ASTNodes.createMoveTarget(rewrite, arg1), group);
 	}
 

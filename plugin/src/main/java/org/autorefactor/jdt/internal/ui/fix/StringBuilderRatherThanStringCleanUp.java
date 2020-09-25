@@ -238,9 +238,9 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 			StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
 			if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-				rewrite.replace(initializer, ast.new0(builder.getSimpleName()), group);
+				rewrite.replace(initializer, ast.newClassInstanceCreation(builder.getSimpleName()), group);
 			} else {
-				rewrite.replace(initializer, ast.new0(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), group);
+				rewrite.replace(initializer, ast.newClassInstanceCreation(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), group);
 			}
 
 			for (SimpleName simpleName : assignmentWrites) {

@@ -144,19 +144,19 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("add")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("add")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("toArray")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("toArray")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "firstElement")) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("getFirst")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("getFirst")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "lastElement")) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("getLast")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("getLast")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("remove")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("remove")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("clear")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("clear")); //$NON-NLS-1$
 		} else if (ASTNodes.usesGivenSignature(originalMi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$
-			refactoredMi.setName(ast.simpleName("isEmpty")); //$NON-NLS-1$
+			refactoredMi.setName(ast.newSimpleName("isEmpty")); //$NON-NLS-1$
 		}
 	}
 

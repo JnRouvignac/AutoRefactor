@@ -88,7 +88,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.block(), group);
+			rewrite.replace(node, ast.newBlock(), group);
 		}
 	}
 }

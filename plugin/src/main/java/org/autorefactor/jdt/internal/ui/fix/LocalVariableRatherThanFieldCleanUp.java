@@ -168,13 +168,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		boolean isFieldKept= field.fragments().size() != 1;
 
 		Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
-		VariableDeclarationFragment newFragment= ast.declareFragment(ASTNodes.createMoveTarget(rewrite, reassignment), ASTNodes.createMoveTarget(rewrite, reassignmentAssignment.getRightHandSide()));
+		VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, reassignment), ASTNodes.createMoveTarget(rewrite, reassignmentAssignment.getRightHandSide()));
 		@SuppressWarnings("unchecked")
 		List<Dimension> extraDimensions= fragment.extraDimensions();
 		@SuppressWarnings("unchecked")
 		List<Dimension> newExtraDimensions= newFragment.extraDimensions();
 		newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
-		VariableDeclarationStatement newDeclareStatement= ast.declareStatement(isFieldKept ? ASTNodes.createMoveTarget(rewrite, field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
+		VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(isFieldKept ? ASTNodes.createMoveTarget(rewrite, field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
 		@SuppressWarnings("unchecked")
 		List<IExtendedModifier> modifiers= field.modifiers();
 		@SuppressWarnings("unchecked")

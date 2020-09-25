@@ -195,7 +195,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 							rewrite.remove(lastStatement, group);
 						}
 					} else {
-						rewrite.replace(redundantStatement, ast.block(), group);
+						rewrite.replace(redundantStatement, ast.newBlock(), group);
 					}
 
 					this.result= false;

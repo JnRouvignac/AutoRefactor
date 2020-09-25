@@ -629,10 +629,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		@SuppressWarnings("unchecked")
 		List<Statement> statements= node.getBody().statements();
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
-		Name objectsClassName= ast.name(classname);
+		Name objectsClassName= ast.newName(classname);
 
 		rewrite.replace(statements.get(0),
-				ast.return0(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), group); //$NON-NLS-1$
+				ast.newReturnStatement(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), group); //$NON-NLS-1$
 
 		for (int i= 1; i < statements.size(); i++) {
 			rewrite.remove(statements.get(i), group);

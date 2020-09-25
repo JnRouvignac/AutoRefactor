@@ -196,12 +196,12 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
 			if (!ASTNodes.isInElse(node)) {
 				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
-				Statement newAssignment= ast.toStatement(ASTNodes.createMoveTarget(rewrite, assignment));
+				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, assignment));
 
 				if (ASTNodes.canHaveSiblings(node)) {
 					rewrite.insertBefore(newAssignment, node, group);
 				} else {
-					Block newBlock= ast.block(newAssignment, ASTNodes.createMoveTarget(rewrite, node));
+					Block newBlock= ast.newBlock(newAssignment, ASTNodes.createMoveTarget(rewrite, node));
 					rewrite.replace(node, newBlock, group);
 				}
 

@@ -70,7 +70,7 @@ public class Variable {
 	 * @return a new {@link SimpleName}
 	 */
 	public SimpleName varName() {
-		return ast.simpleName(variableName);
+		return ast.newSimpleName(variableName);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Variable {
 	 */
 	public SimpleName typeName() {
 		checkTypeDefined();
-		return ast.simpleName(typeName);
+		return ast.newSimpleName(typeName);
 	}
 
 	/**

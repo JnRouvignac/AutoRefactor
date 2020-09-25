@@ -66,7 +66,7 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
-		NumberLiteral replacement= ast.number(newToken);
+		NumberLiteral replacement= ast.newNumberLiteral(newToken);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement, group);
 	}

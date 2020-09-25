@@ -235,7 +235,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 		if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
 				&& !staticImports.contains(qualifiedClassName + ".*")) { //$NON-NLS-1$
-			qualifiedClass= ast.name(qualifiedClassName);
+			qualifiedClass= ast.newName(qualifiedClassName);
 		}
 
 		if (FAIL_METHOD.equals(methodName)) {
@@ -259,7 +259,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
 		}
 
-		return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, ast.null0());
+		return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, ast.newNullLiteral());
 	}
 
 	@Override

@@ -260,12 +260,12 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			if (objectClass == null) {
 				atomicType= ast.type(atomicClassName);
 			} else if (getJavaMinorVersion() >= 7) {
-				atomicType= ast.genericType(atomicClassName);
+				atomicType= ast.newParameterizedType(atomicClassName);
 			} else {
-				atomicType= ast.genericType(atomicClassName, rewrite.createCopyTarget(objectClass));
+				atomicType= ast.newParameterizedType(atomicClassName, rewrite.createCopyTarget(objectClass));
 			}
 
-			ClassInstanceCreation newAtomicObject= ast.new0(atomicType);
+			ClassInstanceCreation newAtomicObject= ast.newClassInstanceCreation(atomicType);
 
 			if (arrayCreation.getInitializer() != null) {
 				@SuppressWarnings("unchecked")
@@ -282,7 +282,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			if (objectClass == null) {
 				atomicType= ast.type(atomicClassName);
 			} else {
-				atomicType= ast.genericType(atomicClassName, ASTNodes.createMoveTarget(rewrite, objectClass));
+				atomicType= ast.newParameterizedType(atomicClassName, ASTNodes.createMoveTarget(rewrite, objectClass));
 			}
 
 			rewrite.replace(type, atomicType, group);

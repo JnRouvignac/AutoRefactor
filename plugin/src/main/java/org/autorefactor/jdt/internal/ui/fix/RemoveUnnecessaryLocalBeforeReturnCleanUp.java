@@ -144,13 +144,13 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				}
 				// Java style array "Type[] var"
 				ReturnStatement newReturnStatement= ast
-						.return0(ast.newArray(ast.createCopyTarget(arrayType), ASTNodes.createMoveTarget(rewrite, returnExpression)));
+						.newReturnStatement(ast.newArrayCreation(ast.createCopyTarget(arrayType), ASTNodes.createMoveTarget(rewrite, returnExpression)));
 				replaceReturnStatementForArray(node, vds, newReturnStatement);
 			} else {
 				// C style array "Type var[]"
 				ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
 				ReturnStatement newReturnStatement= ast
-						.return0(ast.newArray(arrayType, ASTNodes.createMoveTarget(rewrite, returnExpression)));
+						.newReturnStatement(ast.newArrayCreation(arrayType, ASTNodes.createMoveTarget(rewrite, returnExpression)));
 				replaceReturnStatementForArray(node, vds, newReturnStatement);
 			}
 
@@ -172,7 +172,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			rewrite.remove(previousSibling, group);
-			rewrite.replace(node, ast.return0(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
+			rewrite.replace(node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
 		}
 	}
 }

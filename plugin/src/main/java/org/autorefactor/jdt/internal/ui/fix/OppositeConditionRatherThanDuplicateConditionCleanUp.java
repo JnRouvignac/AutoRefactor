@@ -124,7 +124,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
 		Statement negativeStmtCopy;
 		if (negativeStatement instanceof IfStatement) {
-			negativeStmtCopy= ast.block(ASTNodes.createMoveTarget(rewrite, negativeStatement));
+			negativeStmtCopy= ast.newBlock(ASTNodes.createMoveTarget(rewrite, negativeStatement));
 		} else {
 			negativeStmtCopy= ASTNodes.createMoveTarget(rewrite, negativeStatement);
 		}
@@ -146,6 +146,6 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
 		rewrite.replace(node.getExpression(), ast.negate(duplicateExpression), group);
 		rewrite.replace(node.getThenStatement(), negativeStmtCopy, group);
-		rewrite.replace(node.getElseStatement(), ast.if0(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), group);
+		rewrite.replace(node.getElseStatement(), ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), group);
 	}
 }

@@ -108,7 +108,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
 
 	@Override
 	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
-		refactoredMi.setName(cuRewrite.getASTBuilder().simpleName("containsValue")); //$NON-NLS-1$
+		refactoredMi.setName(cuRewrite.getASTBuilder().newSimpleName("containsValue")); //$NON-NLS-1$
 	}
 
 	@Override

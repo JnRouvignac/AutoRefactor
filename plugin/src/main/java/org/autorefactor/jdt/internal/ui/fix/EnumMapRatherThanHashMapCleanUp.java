@@ -114,7 +114,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		Expression newParam= resolveParameter(keyType, arguments);
-		Type newType= ast.genericType(
+		Type newType= ast.newParameterizedType(
 				alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? EnumMap.class.getSimpleName() : EnumMap.class.getCanonicalName(), ast.createCopyTarget(keyType),
 				ast.createCopyTarget(valueType));
 
@@ -126,7 +126,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumMapRatherThanHashMapCleanUp_description);
 
-		cuRewrite.getASTRewrite().replace(cic, ast.new0(newType, newParam), group);
+		cuRewrite.getASTRewrite().replace(cic, ast.newClassInstanceCreation(newType, newParam), group);
 	}
 
 	/**

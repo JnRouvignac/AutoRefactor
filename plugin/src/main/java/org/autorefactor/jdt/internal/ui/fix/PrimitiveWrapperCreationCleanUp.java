@@ -141,7 +141,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
-		SimpleName name= cuRewrite.getASTBuilder().simpleName(methodName);
+		SimpleName name= cuRewrite.getASTBuilder().newSimpleName(methodName);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, group);
 		return false;
@@ -217,7 +217,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
 			rewrite.replace(node,
-					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.cast(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), group); //$NON-NLS-1$
+					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), group); //$NON-NLS-1$
 		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
 			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), group); //$NON-NLS-1$
 		} else {

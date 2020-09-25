@@ -194,7 +194,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
 			rewrite.replace(type, ast.type(patternName), group);
-			rewrite.replace(initializer, ast.newMethodInvocation(ast.name(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), group);
+			rewrite.replace(initializer, ast.newMethodInvocation(ast.newName(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), group);
 
 			for (SimpleName regExUse : regExUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();

@@ -249,7 +249,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			Type objectType= ast.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
 			Variable objectVar= new Variable(
 					new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), ast); //$NON-NLS-1$
-			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(objectVar.varNameRaw(), objectType), group);
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.newSingleVariableDeclaration(objectVar.varNameRaw(), objectType), group);
 
 			// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
 			// Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
@@ -265,7 +265,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 				String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
 				VariableDeclarationStatement newEntryDecl= ast.declareStatement(ast.type(mapEntryTypeName),
-						entryVar.varName(), ast.cast(ast.type(mapEntryTypeName), objectVar.varName()));
+						entryVar.varName(), ast.newCastExpression(ast.type(mapEntryTypeName), objectVar.varName()));
 				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl, group);
 			}
 		} else {
@@ -274,7 +274,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			// for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
 			// map.entrySet())
 			Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
-			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.declareSingleVariable(entryVar.varNameRaw(), mapEntryType), group);
+			rewrite.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, ast.newSingleVariableDeclaration(entryVar.varNameRaw(), mapEntryType), group);
 
 			if (keyUses > getValueMis.size()) {
 				// for (Map.Entry<K, V> mapEntry : map.entrySet()) {
@@ -318,7 +318,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
 		}
 		Type mapValueType= ast.copyType(getValueMi, typeNameDecider);
-		return ast.genericType(mapEntryType, mapKeyType, mapValueType);
+		return ast.newParameterizedType(mapEntryType, mapKeyType, mapValueType);
 	}
 
 	private boolean isKeySetMethod(final MethodInvocation foreachExpression) {

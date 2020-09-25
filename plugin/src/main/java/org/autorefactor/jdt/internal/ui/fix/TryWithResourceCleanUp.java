@@ -178,7 +178,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
 
 			if (fragment != null) {
-				return ast.declareExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment);
+				return ast.newVariableDeclarationExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment);
 			}
 
 			return null;
@@ -200,7 +200,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 					nodesToRemove.add(tryStatement);
 
 					if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-						return ast.declareFragment(ASTNodes.createMoveTarget(rewrite, existingFragment.getName()),
+						return ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, existingFragment.getName()),
 								ASTNodes.createMoveTarget(rewrite, assignResource.getRightHandSide()));
 					}
 

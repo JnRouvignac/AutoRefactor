@@ -71,13 +71,13 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 		@SuppressWarnings("unchecked")
 		List<MemberValuePair> values= node.values();
 		if (values.isEmpty()) {
-			rewrite.replace(node, ast.markerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), group);
+			rewrite.replace(node, ast.newMarkerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), group);
 			return false;
 		}
 		if (values.size() == 1) {
 			MemberValuePair pair= values.get(0);
 			if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
-				rewrite.replace(node, ast.singleValueAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName()), ASTNodes.createMoveTarget(rewrite, pair.getValue())), group);
+				rewrite.replace(node, ast.newSingleMemberAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName()), ASTNodes.createMoveTarget(rewrite, pair.getValue())), group);
 				return false;
 			}
 		}

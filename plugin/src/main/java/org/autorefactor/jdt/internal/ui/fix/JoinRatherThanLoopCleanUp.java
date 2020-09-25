@@ -612,10 +612,10 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			Expression copyOfDelimiter= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(delimiter));
 
 			if (!ASTNodes.hasType(delimiter, String.class.getCanonicalName())) {
-				copyOfDelimiter= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "valueOf", copyOfDelimiter); //$NON-NLS-1$
+				copyOfDelimiter= ast.newMethodInvocation(ast.newName(String.class.getSimpleName()), "valueOf", copyOfDelimiter); //$NON-NLS-1$
 			}
 
-			MethodInvocation joinMethod= ast.newMethodInvocation(ast.name(String.class.getSimpleName()), "join", copyOfDelimiter, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(containerVariable))); //$NON-NLS-1$
+			MethodInvocation joinMethod= ast.newMethodInvocation(ast.newName(String.class.getSimpleName()), "join", copyOfDelimiter, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(containerVariable))); //$NON-NLS-1$
 			VariableDeclarationStatement joinStatement= ast.declareStatement(ast.type(String.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, builder), joinMethod);
 			@SuppressWarnings("unchecked")
 			List<ASTNode> varModifiers= joinStatement.modifiers();

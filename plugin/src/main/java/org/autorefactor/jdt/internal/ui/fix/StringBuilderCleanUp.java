@@ -356,7 +356,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				if (ASTNodes.canHaveSiblings((Statement) node.getParent()) || node.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node.getParent(), group);
 				} else {
-					rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().block(), group);
+					rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
 				}
 
 				return false;
@@ -589,10 +589,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					} else if (appendedString.getFirst() != null
 							? ASTNodes.hasType(appendedString.getFirst(), String.class.getCanonicalName())
 							: ASTNodes.hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
-						result= ast.new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()),
+						result= ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()),
 								getTypedExpression(appendedString));
 					} else {
-						result= ast.new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()));
+						result= ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()));
 						finalStrings.add(getTypedExpression(appendedString));
 					}
 				} else {
@@ -628,7 +628,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
-					result= cuRewrite.getASTBuilder().new0(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()), newExpression);
+					result= cuRewrite.getASTBuilder().newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()), newExpression);
 				} else {
 					result= ASTNodes.createMoveTarget(rewrite, lastExpression);
 					finalStrings.add(newExpression);
@@ -648,7 +648,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		if (tempStringLiterals.size() == 1) {
 			newExpression= tempStringLiterals.get(0);
 		} else {
-			newExpression= cuRewrite.getASTBuilder().infixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
+			newExpression= cuRewrite.getASTBuilder().newInfixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
 		}
 
 		return newExpression;
@@ -719,7 +719,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		Expression expression= null;
 		if (typeAndValue.getFirst() != null) {
-			expression= ast.cast(ast.type(typeAndValue.getFirst().getQualifiedName()), ast.createCopyTarget(typeAndValue.getSecond()));
+			expression= ast.newCastExpression(ast.type(typeAndValue.getFirst().getQualifiedName()), ast.createCopyTarget(typeAndValue.getSecond()));
 		} else if (typeAndValue.getFirst() == null) {
 			expression= ast.createCopyTarget(typeAndValue.getSecond());
 		}
@@ -774,7 +774,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		switch (appendedStrings.size()) {
 		case 0:
-			return ast.string(""); //$NON-NLS-1$
+			return ast.newStringLiteral(""); //$NON-NLS-1$
 
 		case 1:
 			Pair<ITypeBinding, Expression> expression= appendedStrings.get(0);
@@ -797,7 +797,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			return ast.infixExpression(InfixExpression.Operator.PLUS, concatenateStrings);
+			return ast.newInfixExpression(InfixExpression.Operator.PLUS, concatenateStrings);
 		}
 	}
 
