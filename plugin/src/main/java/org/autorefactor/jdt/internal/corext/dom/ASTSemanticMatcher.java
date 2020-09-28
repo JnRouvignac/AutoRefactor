@@ -646,8 +646,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
 		}
 
 		if (other instanceof ASTNode) {
-			Boolean value= ASTNodes.booleanConstant(node);
-			Boolean otherValue= ASTNodes.booleanConstant((ASTNode) other);
+			Boolean value= ASTNodes.getBooleanLiteral(node);
+			Boolean otherValue= ASTNodes.getBooleanLiteral((ASTNode) other);
 
 			if (value != null && otherValue != null) {
 				return value ^ otherValue;
@@ -791,7 +791,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 			Expression operand= iterator.next();
 
 			Long numberLiteral= ASTNodes.getIntegerLiteral(operand);
-			Boolean booleanValue= ASTNodes.booleanConstant(operand);
+			Boolean booleanValue= ASTNodes.getBooleanLiteral(operand);
 
 			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND)) {
 				if (Boolean.TRUE.equals(booleanValue)) {

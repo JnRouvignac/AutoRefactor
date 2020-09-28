@@ -118,20 +118,20 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", boolean.class.getSimpleName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
-			if (ASTNodes.booleanConstant(args.get(1)) != null) {
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(1)), args.get(0), null, true);
+			if (ASTNodes.getBooleanLiteral(args.get(1)) != null) {
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.getBooleanLiteral(args.get(1)), args.get(0), null, true);
 			}
 
-			if (ASTNodes.booleanConstant(args.get(0)) != null) {
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(0)), args.get(1), null, true);
+			if (ASTNodes.getBooleanLiteral(args.get(0)) != null) {
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.getBooleanLiteral(args.get(0)), args.get(1), null, true);
 			}
 		} else if (ASTNodes.usesGivenSignature(node, TESTNG_CLASS, "assertEquals", boolean.class.getSimpleName(), boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-			if (ASTNodes.booleanConstant(args.get(1)) != null) {
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(1)), args.get(0), args.get(2), true);
+			if (ASTNodes.getBooleanLiteral(args.get(1)) != null) {
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.getBooleanLiteral(args.get(1)), args.get(0), args.get(2), true);
 			}
 
-			if (ASTNodes.booleanConstant(args.get(0)) != null) {
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.booleanConstant(args.get(0)), args.get(1), args.get(2), true);
+			if (ASTNodes.getBooleanLiteral(args.get(0)) != null) {
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, node, ASTNodes.getBooleanLiteral(args.get(0)), args.get(1), args.get(2), true);
 			}
 		}
 

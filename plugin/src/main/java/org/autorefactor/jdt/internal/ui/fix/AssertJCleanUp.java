@@ -127,7 +127,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			}
 
 			if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
-				final Boolean booleanConstant= ASTNodes.booleanConstant((Expression) node.arguments().get(0));
+				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) node.arguments().get(0));
 
 				if (booleanConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
@@ -135,7 +135,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 							actualExpression, message, true);
 				}
 
-				final Boolean actualConstant= ASTNodes.booleanConstant(actualExpression);
+				final Boolean actualConstant= ASTNodes.getBooleanLiteral(actualExpression);
 
 				if (actualConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
@@ -143,7 +143,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 							(Expression) node.arguments().get(0), message, true);
 				}
 			} else if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
-				final Boolean booleanConstant= ASTNodes.booleanConstant((Expression) node.arguments().get(0));
+				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) node.arguments().get(0));
 
 				if (booleanConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
@@ -151,7 +151,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 							actualExpression, message, true);
 				}
 
-				final Boolean actualConstant= ASTNodes.booleanConstant(actualExpression);
+				final Boolean actualConstant= ASTNodes.getBooleanLiteral(actualExpression);
 
 				if (actualConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,

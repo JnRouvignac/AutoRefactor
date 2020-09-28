@@ -586,18 +586,33 @@ public final class ASTNodes {
 	 * Returns the {@link Boolean} object value represented by the provided
 	 * expression.
 	 *
-	 * @param expression the expression to analyze
+	 * @param node the expression to analyze
 	 * @return the {@link Boolean} object value if the provided expression
 	 *         represents one, null otherwise
 	 */
-	public static Boolean getBooleanLiteral(final Expression expression) {
-		BooleanLiteral bl= as(expression, BooleanLiteral.class);
-		if (bl != null) {
-			return bl.booleanValue();
+	public static Boolean getBooleanLiteral(final ASTNode node) {
+		if (!(node instanceof Expression)) {
+			return null;
 		}
-		QualifiedName qn= as(expression, QualifiedName.class);
-		if (hasType(qn, Boolean.class.getCanonicalName())) {
-			return getBooleanObject(qn);
+
+		Expression expression= (Expression) node;
+
+		BooleanLiteral booleanLiteral= as(expression, BooleanLiteral.class);
+
+		if (booleanLiteral != null) {
+			return booleanLiteral.booleanValue();
+		}
+
+		QualifiedName booleanConstant= as(expression, QualifiedName.class);
+
+		if (booleanConstant != null) {
+			if (isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
+				return Boolean.TRUE;
+			}
+
+			if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+				return Boolean.FALSE;
+			}
 		}
 
 		return null;
@@ -2531,39 +2546,6 @@ public final class ASTNodes {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Returns a boolean constant value, if present.
-	 *
-	 * @param node The node
-	 * @return a boolean constant value, if present.
-	 */
-	public static Boolean booleanConstant(final ASTNode node) {
-		if (!(node instanceof Expression)) {
-			return null;
-		}
-
-		Expression expression= (Expression) node;
-
-		BooleanLiteral booleanLiteral= as(expression, BooleanLiteral.class);
-		QualifiedName booleanConstant= as(expression, QualifiedName.class);
-
-		if (booleanLiteral != null) {
-			return booleanLiteral.booleanValue();
-		}
-
-		if (booleanConstant != null) {
-			if (isField(booleanConstant, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
-				return Boolean.TRUE;
-			}
-
-			if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
-				return Boolean.FALSE;
-			}
-		}
-
-		return null;
 	}
 
 	/**

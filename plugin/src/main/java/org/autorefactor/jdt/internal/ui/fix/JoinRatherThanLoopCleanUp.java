@@ -487,7 +487,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			if (changeBoolean != null
 					&& ASTNodes.hasOperator(changeBoolean, Assignment.Operator.ASSIGN)
 					&& ASTNodes.as(changeBoolean.getLeftHandSide(), SimpleName.class) != null) {
-				Boolean booleanInstantiation= ASTNodes.booleanConstant(changeBoolean.getRightHandSide());
+				Boolean booleanInstantiation= ASTNodes.getBooleanLiteral(changeBoolean.getRightHandSide());
 
 				if (booleanInstantiation != null && isInitedToTrue != booleanInstantiation) {
 					booleanUses.add(ASTNodes.as(changeBoolean.getLeftHandSide(), SimpleName.class));
@@ -585,7 +585,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 			if (fragment != null
 					&& ASTNodes.hasType(fragment.getName(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())) {
-				Boolean booleanInstantiation= ASTNodes.booleanConstant(fragment.getInitializer());
+				Boolean booleanInstantiation= ASTNodes.getBooleanLiteral(fragment.getInitializer());
 
 				if (booleanInstantiation != null) {
 					isInitedToTrue.set(booleanInstantiation);
