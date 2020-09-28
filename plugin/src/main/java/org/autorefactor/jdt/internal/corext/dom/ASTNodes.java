@@ -1193,6 +1193,49 @@ public final class ASTNodes {
 	}
 
 	/**
+	 * Returns the opposite infix operator. For boolean operators, the operands should be negated
+	 * too.
+	 *
+	 * @param operator the infix operator
+	 * @return the opposite infix operator
+	 */
+	public static InfixExpression.Operator oppositeInfixOperator(InfixExpression.Operator operator) {
+		if (InfixExpression.Operator.LESS.equals(operator)) {
+			return InfixExpression.Operator.GREATER_EQUALS;
+		}
+
+		if (InfixExpression.Operator.LESS_EQUALS.equals(operator)) {
+			return InfixExpression.Operator.GREATER;
+		}
+
+		if (InfixExpression.Operator.GREATER.equals(operator)) {
+			return InfixExpression.Operator.LESS_EQUALS;
+		}
+
+		if (InfixExpression.Operator.GREATER_EQUALS.equals(operator)) {
+			return InfixExpression.Operator.LESS;
+		}
+
+		if (InfixExpression.Operator.EQUALS.equals(operator)) {
+			return InfixExpression.Operator.NOT_EQUALS;
+		}
+
+		if (InfixExpression.Operator.NOT_EQUALS.equals(operator)) {
+			return InfixExpression.Operator.EQUALS;
+		}
+
+		if (InfixExpression.Operator.CONDITIONAL_AND.equals(operator)) {
+			return InfixExpression.Operator.CONDITIONAL_OR;
+		}
+
+		if (InfixExpression.Operator.CONDITIONAL_OR.equals(operator)) {
+			return InfixExpression.Operator.CONDITIONAL_AND;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns whether the provided expression is an instance of the qualified type
 	 * name.
 	 *

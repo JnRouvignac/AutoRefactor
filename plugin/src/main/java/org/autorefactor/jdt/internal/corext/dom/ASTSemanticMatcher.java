@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.autorefactor.jdt.internal.ui.fix.OperatorEnum;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AssertStatement;
@@ -691,7 +690,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 			return false;
 		}
 
-		InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
+		InfixExpression.Operator reverseOp= ASTNodes.oppositeInfixOperator(ie1.getOperator());
 
 		if (ie2.getOperator().equals(reverseOp)) {
 			if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR,
