@@ -283,7 +283,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaCleanUp_description);
 
 		ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-		rewrite.replace(node.getBody(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), group);
+		rewrite.replace(node.getBody(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), group);
 	}
 
 	private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {

@@ -624,7 +624,6 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (isFirst.get()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
@@ -770,7 +769,6 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
 		switch (appendedStrings.size()) {
 		case 0:
@@ -793,7 +791,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(typeAndValue))); //$NON-NLS-1$
 					isFirstAndNotAString= false;
 				} else {
-					concatenateStrings.add(ASTRewrite.parenthesizeIfNeeded(ast, getTypedExpression(typeAndValue)));
+					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(typeAndValue)));
 				}
 			}
 

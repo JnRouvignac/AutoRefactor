@@ -268,7 +268,7 @@ public class ASTNodeFactory {
 	public CastExpression newCastExpression(final Type type, final Expression expression) {
 		CastExpression ce= ast.newCastExpression();
 		ce.setType(type);
-		ce.setExpression(ASTRewrite.parenthesizeIfNeeded(this, expression));
+		ce.setExpression(parenthesizeIfNeeded(expression));
 		return ce;
 	}
 
@@ -1093,7 +1093,7 @@ public class ASTNodeFactory {
 	 * @return a new prefix expression
 	 */
 	public Expression not(final Expression expression) {
-		return newPrefixExpression(PrefixExpression.Operator.NOT, ASTRewrite.parenthesizeIfNeeded(this, expression));
+		return newPrefixExpression(PrefixExpression.Operator.NOT, parenthesizeIfNeeded(expression));
 	}
 
 	/**
@@ -1360,5 +1360,51 @@ public class ASTNodeFactory {
 	 */
 	public NullLiteral newNullLiteral() {
 		return ast.newNullLiteral();
+	}
+
+	/**
+	 * Parenthesizes the provided expression if its type requires it.
+	 *
+	 * @param expression the expression to conditionally return parenthesized
+	 * @return the parenthesized expression of the provided expression to return or
+	 *         this expression itself
+	 */
+	public Expression parenthesizeIfNeeded(final Expression expression) {
+		switch (expression.getNodeType()) {
+		case ASTNode.ANNOTATION_TYPE_DECLARATION:
+		case ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION:
+		case ASTNode.ANONYMOUS_CLASS_DECLARATION:
+		case ASTNode.ARRAY_ACCESS:
+		case ASTNode.ARRAY_CREATION:
+		case ASTNode.ARRAY_INITIALIZER:
+		case ASTNode.BOOLEAN_LITERAL:
+		case ASTNode.CHARACTER_LITERAL:
+		case ASTNode.CLASS_INSTANCE_CREATION:
+		case ASTNode.CREATION_REFERENCE:
+		case ASTNode.EXPRESSION_METHOD_REFERENCE:
+		case ASTNode.FIELD_ACCESS:
+		case ASTNode.MEMBER_REF:
+		case ASTNode.METHOD_INVOCATION:
+		case ASTNode.METHOD_REF:
+		case ASTNode.NULL_LITERAL:
+		case ASTNode.NUMBER_LITERAL:
+		case ASTNode.PARENTHESIZED_EXPRESSION:
+		case ASTNode.POSTFIX_EXPRESSION:
+		case ASTNode.PREFIX_EXPRESSION:
+		case ASTNode.QUALIFIED_NAME:
+		case ASTNode.SIMPLE_NAME:
+		case ASTNode.STRING_LITERAL:
+		case ASTNode.SUPER_FIELD_ACCESS:
+		case ASTNode.SUPER_METHOD_INVOCATION:
+		case ASTNode.SUPER_METHOD_REFERENCE:
+		case ASTNode.THIS_EXPRESSION:
+		case ASTNode.TYPE_LITERAL:
+		case ASTNode.TYPE_METHOD_REFERENCE:
+		case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+			return expression;
+
+		default:
+			return newParenthesizedExpression(expression);
+		}
 	}
 }

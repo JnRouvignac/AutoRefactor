@@ -98,8 +98,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.WhileConditionRatherThanInnerIfCleanUp_description);
-
-		Expression originalCondition= ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression()));
+		Expression originalCondition= ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, node.getExpression()));
 		Expression ifCondition= ifStatement.getExpression();
 
 		if (isPositive) {
@@ -107,8 +106,9 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		} else {
 			ifCondition= ASTNodes.createMoveTarget(rewrite, ifCondition);
 		}
+		final Expression expression= ifCondition;
 
-		InfixExpression newCondition= ast.newInfixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ASTRewrite.parenthesizeIfNeeded(ast, ifCondition));
+		InfixExpression newCondition= ast.newInfixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ast.parenthesizeIfNeeded(expression));
 		rewrite.replace(node.getExpression(), newCondition, group);
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);

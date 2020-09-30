@@ -81,7 +81,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.InvertEqualsCleanUp_description);
 
-		rewrite.replace(node.getExpression(), ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
+		rewrite.replace(node.getExpression(), ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		rewrite.replace(arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), group);
 	}
 }

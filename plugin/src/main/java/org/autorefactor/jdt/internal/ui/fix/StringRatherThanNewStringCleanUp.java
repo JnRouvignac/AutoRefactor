@@ -56,13 +56,13 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final ClassInstanceCreation node) {
 		if (ASTNodes.hasType(node, String.class.getCanonicalName()) && node.arguments().size() == 1) {
 			Expression arg0= (Expression) node.arguments().get(0);
+
 			if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
 					&& (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringRatherThanNewStringCleanUp_description);
-
-				rewrite.replace(node, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				return false;
 			}
 		}

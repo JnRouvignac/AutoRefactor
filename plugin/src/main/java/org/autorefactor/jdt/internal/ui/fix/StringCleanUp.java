@@ -107,7 +107,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (isStringValueOf && ASTNodes.hasType((Expression) node.arguments().get(0), String.class.getCanonicalName())) {
 			if ((Expression) node.arguments().get(0) instanceof StringLiteral || (Expression) node.arguments().get(0) instanceof InfixExpression) {
-				rewrite.replace(node, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))), group);
+				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))), group);
 				return false;
 			}
 		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(node))) {
@@ -206,7 +206,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
 
 		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
-			rewrite.replace(toReplace, ASTRewrite.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
+			rewrite.replace(toReplace, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
 		} else {
 			rewrite.replace(toReplace, ast.newCastExpression(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
 		}
@@ -219,7 +219,6 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 		if (expression != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
 			return ASTNodes.createMoveTarget(rewrite, expression);
 		}
 

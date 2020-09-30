@@ -179,7 +179,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				List<Expression> equalities= new ArrayList<>();
 
 				for (Expression value : caseStructure.getFirst()) {
-					equalities.add(ASTRewrite.parenthesizeIfNeeded(ast, buildEquality(discriminant, value)));
+					equalities.add(ast.parenthesizeIfNeeded(buildEquality(discriminant, value)));
 				}
 				newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
 			}
@@ -209,19 +209,17 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 	private Expression buildEquality(final Expression discriminant, final Expression value) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		Expression equality;
-
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
 				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-			equality= ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
-		} else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-			equality= ast.newInfixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
-					ast.newName(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
-		} else {
-			equality= ast.newInfixExpression(ASTRewrite.parenthesizeIfNeeded(ast, ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
-					ast.createCopyTarget(value));
+			return ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
 		}
 
-		return equality;
+		if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
+			return ast.newInfixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
+					ast.newName(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+		}
+
+		return ast.newInfixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
+				ast.createCopyTarget(value));
 	}
 }
