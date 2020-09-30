@@ -585,9 +585,9 @@ public class ASTNodeFactory {
 	 * @return a new variable declaration statement
 	 */
 	public VariableDeclarationStatement newVariableDeclarationStatement(final Type type, final VariableDeclarationFragment fragment) {
-		VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(fragment);
-		vds.setType(type);
-		return vds;
+		VariableDeclarationStatement variableDeclarationStatement= ast.newVariableDeclarationStatement(fragment);
+		variableDeclarationStatement.setType(type);
+		return variableDeclarationStatement;
 	}
 
 	/**

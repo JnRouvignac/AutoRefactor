@@ -300,9 +300,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				Statement parentStatement= ASTNodes.getTypedAncestorOrCrash(parentExpression, Statement.class); // FIXME i=0
 				if (statement.equals(parentStatement)) {
 					VariableDeclarationFragment fragment= getVariableDeclarationFragment(parentExpression, varName);
-					VariableDeclarationStatement vds= ast.getAST().newVariableDeclarationStatement(fragment);
-					vds.setType(varType);
-					rewrite.replace(statement, vds, group);
+					VariableDeclarationStatement variableDeclarationStatement= ast.getAST().newVariableDeclarationStatement(fragment);
+					variableDeclarationStatement.setType(varType);
+					rewrite.replace(statement, variableDeclarationStatement, group);
 					break;
 				}
 			}
@@ -387,8 +387,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
 	private Type getType(final ASTNode node) {
 		if (node instanceof VariableDeclarationStatement) {
-			VariableDeclarationStatement vds= (VariableDeclarationStatement) node;
-			return cuRewrite.getASTBuilder().createCopyTarget(vds.getType());
+			VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) node;
+			return cuRewrite.getASTBuilder().createCopyTarget(variableDeclarationStatement.getType());
 		}
 
 		return getType(node.getParent());

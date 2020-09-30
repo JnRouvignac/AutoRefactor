@@ -79,17 +79,17 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
 				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
-					VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(vds);
+					VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) previousSibling;
+					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(variableDeclarationStatement);
 
 					if (fragment != null && ASTNodes.isSameLocalVariable(node.getExpression(), fragment.getName())) {
 						Expression returnExpression= fragment.getInitializer();
 						if (returnExpression instanceof ArrayInitializer) {
-							if (!removeArrayVariable(node, vds, (ArrayInitializer) returnExpression)) {
+							if (!removeArrayVariable(node, variableDeclarationStatement, (ArrayInitializer) returnExpression)) {
 								return true;
 							}
 						} else {
-							replaceReturnStatement(node, vds, returnExpression);
+							replaceReturnStatement(node, variableDeclarationStatement, returnExpression);
 						}
 						this.result= false;
 						return false;
@@ -129,12 +129,12 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			return isUsedAfterReturn(varToSearch, tryStatement);
 		}
 
-		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement vds, final ArrayInitializer returnExpression) {
+		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement variableDeclarationStatement, final ArrayInitializer returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			Type varType= vds.getType();
-			VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) vds.fragments().get(0);
+			Type varType= variableDeclarationStatement.getType();
+			VariableDeclarationFragment varDeclFrag= (VariableDeclarationFragment) variableDeclarationStatement.fragments().get(0);
 
 			if (varType instanceof ArrayType) {
 				ArrayType arrayType= (ArrayType) varType;
@@ -145,13 +145,13 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				// Java style array "Type[] var"
 				ReturnStatement newReturnStatement= ast
 						.newReturnStatement(ast.newArrayCreation(ast.createCopyTarget(arrayType), ASTNodes.createMoveTarget(rewrite, returnExpression)));
-				replaceReturnStatementForArray(node, vds, newReturnStatement);
+				replaceReturnStatementForArray(node, variableDeclarationStatement, newReturnStatement);
 			} else {
 				// C style array "Type var[]"
-				ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(vds.getType()), varDeclFrag.getExtraDimensions());
+				ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(variableDeclarationStatement.getType()), varDeclFrag.getExtraDimensions());
 				ReturnStatement newReturnStatement= ast
 						.newReturnStatement(ast.newArrayCreation(arrayType, ASTNodes.createMoveTarget(rewrite, returnExpression)));
-				replaceReturnStatementForArray(node, vds, newReturnStatement);
+				replaceReturnStatementForArray(node, variableDeclarationStatement, newReturnStatement);
 			}
 
 			return true;

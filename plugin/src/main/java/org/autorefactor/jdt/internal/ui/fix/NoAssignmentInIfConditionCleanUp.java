@@ -137,9 +137,9 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			ConditionalExpression ce= ASTNodes.as(expression, ConditionalExpression.class);
+			ConditionalExpression conditionalExpression= ASTNodes.as(expression, ConditionalExpression.class);
 
-			return ce == null || moveAssignmentBeforeIfStatementIfPossible(node, ce.getExpression(), evaluatedExpression);
+			return conditionalExpression == null || moveAssignmentBeforeIfStatementIfPossible(node, conditionalExpression.getExpression(), evaluatedExpression);
 		}
 
 		private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
@@ -177,8 +177,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
-			VariableDeclarationFragment fragment= findVariableDeclarationFragment(vds, lhs);
+			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
+			VariableDeclarationFragment fragment= findVariableDeclarationFragment(variableDeclarationStatement, lhs);
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -188,7 +188,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
 				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), group);
 				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
-				this.result= false;
+				result= false;
 				return false;
 			}
 
@@ -203,7 +203,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 					rewrite.replace(node, newBlock, group);
 				}
 
-				this.result= false;
+				result= false;
 				return false;
 			}
 
@@ -211,10 +211,10 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 		}
 
 		@SuppressWarnings("unchecked")
-		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
+		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
 				final Expression expression) {
-			if (vds != null && expression instanceof SimpleName) {
-				for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) vds.fragments()) {
+			if (variableDeclarationStatement != null && expression instanceof SimpleName) {
+				for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) variableDeclarationStatement.fragments()) {
 					if (ASTNodes.isSameVariable(expression, fragment)) {
 						return fragment;
 					}

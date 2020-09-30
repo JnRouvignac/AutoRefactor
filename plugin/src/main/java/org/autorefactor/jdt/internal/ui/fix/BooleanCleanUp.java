@@ -310,15 +310,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             Statement previousSibling= ASTNodes.getPreviousSibling(node);
 
             if (previousSibling instanceof VariableDeclarationStatement) {
-                VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-                VariableDeclarationFragment fragment= getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
+                VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) previousSibling;
+                VariableDeclarationFragment fragment= getVariableDeclarationFragment(variableDeclarationStatement, thenA.getLeftHandSide());
 
                 if (fragment != null) {
                     VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
                             fragment.resolveBinding(), node.getExpression(), true).find();
 
                     if (variableUseVisitor.getReads().isEmpty()) {
-                        ITypeBinding typeBinding= vds.getType().resolveBinding();
+                        ITypeBinding typeBinding= variableDeclarationStatement.getType().resolveBinding();
                         return maybeReplace(node, thenA, typeBinding, fragment.getInitializer());
                     }
                 }
@@ -384,13 +384,13 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     @SuppressWarnings("unchecked")
-    private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement vds,
+    private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
             final Expression expression) {
-        if (vds == null) {
+        if (variableDeclarationStatement == null) {
             return null;
         }
 
-        for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) vds.fragments()) {
+        for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) variableDeclarationStatement.fragments()) {
             if (ASTNodes.isSameVariable(expression, fragment)) {
                 return fragment;
             }
