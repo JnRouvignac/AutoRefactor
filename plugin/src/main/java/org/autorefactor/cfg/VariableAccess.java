@@ -40,21 +40,17 @@ public class VariableAccess {
 	/** A variable write. */
 	public static final int WRITE= 1 << 4;
 
-	private final ASTNode astNode;
 	private final Name name;
 	private final Type type;
 	private final int accessType;
 
 	/**
 	 * Class constructor.
-	 *
-	 * @param astNode    the AST node of the variable
 	 * @param name       the name of the variable
 	 * @param type       the type of the variable
 	 * @param accessType the access type to the variable
 	 */
-	public VariableAccess(final ASTNode astNode, final Name name, final Type type, final int accessType) {
-		this.astNode= astNode;
+	public VariableAccess(final Name name, final Type type, final int accessType) {
 		this.name= name;
 		this.type= type;
 		this.accessType= accessType;
@@ -67,7 +63,7 @@ public class VariableAccess {
 	 * @param accessType the access type to the variable
 	 */
 	public VariableAccess(final ASTNode astNode, final int accessType) {
-		this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
+		this(astNode instanceof Name ? (Name) astNode : null, null, accessType);
 	}
 
 	@Override

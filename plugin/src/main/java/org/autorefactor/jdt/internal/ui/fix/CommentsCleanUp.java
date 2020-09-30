@@ -325,7 +325,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private void replaceEmptyLineAtStartOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 

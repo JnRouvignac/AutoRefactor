@@ -460,7 +460,7 @@ public class CFGBuilder {
 	private boolean addDeclaration(final CFGBasicBlock basicBlock, final VariableDeclarationFragment fragment, final Type type,
 			final ThrowerBlocks throwers) {
 		int accessType= fragment.getInitializer() == null ? VariableAccess.DECL_UNINIT : VariableAccess.DECL_INIT | VariableAccess.WRITE;
-		basicBlock.addVariableAccess(new VariableAccess(fragment, fragment.getName(), type, accessType));
+		basicBlock.addVariableAccess(new VariableAccess(fragment.getName(), type, accessType));
 		return addVariableAccess(basicBlock, fragment.getInitializer(), VariableAccess.READ, throwers);
 	}
 
@@ -480,7 +480,7 @@ public class CFGBuilder {
 	}
 
 	private void addDeclaration(final CFGBasicBlock basicBlock, final SingleVariableDeclaration varDecl, final int flags) {
-		basicBlock.addVariableAccess(new VariableAccess(varDecl, varDecl.getName(), varDecl.getType(), flags));
+		basicBlock.addVariableAccess(new VariableAccess(varDecl.getName(), varDecl.getType(), flags));
 	}
 
 	private LivenessState buildCFG(final Statement node, final LivenessState state, final ThrowerBlocks throwers) {
