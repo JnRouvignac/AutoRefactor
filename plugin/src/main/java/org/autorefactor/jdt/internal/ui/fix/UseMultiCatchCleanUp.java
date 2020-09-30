@@ -407,7 +407,6 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
 		UnionType result= cuRewrite.getAST().newUnionType();
 		@SuppressWarnings("unchecked")
 		List<Type> unionedTypes= result.types();

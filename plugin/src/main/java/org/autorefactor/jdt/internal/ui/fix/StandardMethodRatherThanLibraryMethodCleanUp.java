@@ -180,7 +180,6 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 	private List<Expression> copyArguments(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 		List<Expression> copyOfArgs= new ArrayList<>(node.arguments().size());
 

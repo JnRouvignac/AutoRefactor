@@ -476,7 +476,6 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 	private MethodInvocation invokeAssertNull(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final MethodInvocation originalMethod, final boolean isPositive, final Expression actual, final Expression failureMessage) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
 		Expression copyOfActual= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actual));

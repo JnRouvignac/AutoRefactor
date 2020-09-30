@@ -462,7 +462,6 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaExpressionRatherThanComparatorCleanUp_description);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(method);
 
@@ -477,7 +476,6 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaExpressionRatherThanComparatorCleanUp_description);
 
 		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 

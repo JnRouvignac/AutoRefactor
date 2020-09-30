@@ -313,7 +313,6 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			mapKeyType= ast.toType(keyTypeBinding, typeNameDecider);
 		} else {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_description);
 			// Use the type as defined in the code
 			mapKeyType= ASTNodes.createMoveTarget(rewrite, paramType);
 		}

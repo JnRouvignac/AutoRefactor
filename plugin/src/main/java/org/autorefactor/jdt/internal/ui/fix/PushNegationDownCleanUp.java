@@ -74,7 +74,6 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 	private Expression getOppositeExpression(final Expression negativeExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PushNegationDownCleanUp_description);
 
 		Expression operand= ASTNodes.getUnparenthesedExpression(negativeExpression);
 

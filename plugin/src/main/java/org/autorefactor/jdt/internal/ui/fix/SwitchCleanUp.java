@@ -381,7 +381,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			final List<Statement> innerStatements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SwitchCleanUp_description);
 
 		@SuppressWarnings("unchecked")
 		List<Statement> switchStatements= switchStatement.statements();

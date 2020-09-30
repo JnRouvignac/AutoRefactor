@@ -53,7 +53,6 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * See {@link #getDescription()} method.
@@ -152,7 +151,6 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 			while (m.find()) {
 				int startPos= entry.getValue().getStartPosition();
 				SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveSemiColonCleanUp_description);
 				cuRewrite.getASTRewrite().remove(toRemove);
 				result= false;
 			}

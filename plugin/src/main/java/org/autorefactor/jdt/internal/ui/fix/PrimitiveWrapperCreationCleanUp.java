@@ -136,8 +136,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private boolean is(final MethodInvocation node, final String declaringTypeQualifiedName) {
 		return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-				|| (ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-						&& Objects.equals(10, ((Expression) node.arguments().get(1)).resolveConstantExpressionValue()));
+				|| ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
+						&& Objects.equals(10, ((Expression) node.arguments().get(1)).resolveConstantExpressionValue());
 	}
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
@@ -234,7 +234,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
 		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
 	}

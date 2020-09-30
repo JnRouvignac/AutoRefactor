@@ -83,7 +83,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 			final InfixExpression message) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description);
 
 		StringBuilder messageBuilder= new StringBuilder();
 		List<Expression> allOperands= ASTNodes.allOperands(message);

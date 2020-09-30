@@ -331,7 +331,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private void replaceEmptyLineAtEndOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1));
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommentsCleanUp_description);
 		cuRewrite.getASTRewrite().replace(node, replacement);
 	}
 
@@ -568,7 +567,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		// PackageDeclaration node accept javadoc in package-info.java files,
 		// but they are useless everywhere else.
 		return node instanceof BodyDeclaration
-				|| (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
+				|| node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("unchecked")

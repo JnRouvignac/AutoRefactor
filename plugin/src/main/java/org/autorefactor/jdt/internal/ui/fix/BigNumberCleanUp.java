@@ -251,7 +251,6 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))); //$NON-NLS-1$
 
