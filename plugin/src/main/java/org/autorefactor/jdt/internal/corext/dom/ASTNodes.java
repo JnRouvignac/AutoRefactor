@@ -2504,6 +2504,24 @@ public final class ASTNodes {
 			Statement elseStatement= ifStatement.getElseStatement();
 			return fallsThrough(thenStatement) && fallsThrough(elseStatement);
 
+		case ASTNode.TRY_STATEMENT:
+			TryStatement tryStatement= (TryStatement) lastStatement;
+
+			if (!fallsThrough(tryStatement.getBody())
+					|| tryStatement.getFinally() != null && !fallsThrough(tryStatement.getFinally())) {
+				return false;
+			}
+
+			if (tryStatement.catchClauses() != null) {
+				for (Object catchClause : tryStatement.catchClauses()) {
+					if (!fallsThrough((Statement) catchClause)) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+
 		default:
 			return false;
 		}
