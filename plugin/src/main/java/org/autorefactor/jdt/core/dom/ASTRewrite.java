@@ -298,7 +298,7 @@ public class ASTRewrite {
 	 * @param node        The node to remove
 	 * @param replacement The replacement node
 	 * @param editGroup   The edit group
-	 * @see ASTRewrite#replace(ASTNode, ASTNode,
+	 * @see ASTRewrite#replaceButKeepComment(ASTNode, ASTNode,
 	 *      org.eclipse.text.edits.TextEditGroup)
 	 */
 	public void replace(final ASTNode node, final ASTNode replacement, final TextEditGroup editGroup) {

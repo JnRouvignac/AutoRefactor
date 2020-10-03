@@ -190,7 +190,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 		Type primitiveType= ast.type(getPrimitiveTypeName());
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
-		cuRewrite.getASTRewrite().replace(node.getType(), primitiveType, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node.getType(), primitiveType, group);
 	}
 
 	private boolean isNotNull(final Expression expression) {

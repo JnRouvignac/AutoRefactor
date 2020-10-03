@@ -187,8 +187,8 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, group);
 			}
 
-			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), group);
-			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(node.getExpression()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
 			rewrite.remove(node.getElseStatement(), group);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
@@ -197,12 +197,12 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			rewrite.replace(node.getExpression(), ast.negate(node.getExpression()), group);
-			rewrite.replace(node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(node.getExpression()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.newBlock(copyOfStatements);
-			rewrite.replace(node, block, group);
+			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
 		}
 	}
 
@@ -230,7 +230,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 
 			Block block= ast.newBlock(copyOfStatements);
-			rewrite.replace(node, block, group);
+			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
 		}
 	}
 }

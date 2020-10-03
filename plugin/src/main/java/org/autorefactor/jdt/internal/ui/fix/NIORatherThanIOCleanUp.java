@@ -120,9 +120,9 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			Expression copyOfPathText= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
 
 			if (ASTNodes.usesGivenSignature(node, File.class.getCanonicalName(), TOPATH_METHOD)) {
-				rewrite.replace(node, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), group);
 			} else {
-				rewrite.replace(node, ast.newMethodInvocation(ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
 			}
 
 			return false;
@@ -215,16 +215,16 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 			String pathName= addImport(Path.class, classesToUseWithImport, importsToAdd);
-			rewrite.replace(type, ast.type(pathName), group);
-			rewrite.replace(classInstanceCreation, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), group);
+			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(pathName), group);
+			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), group);
 
 			for (SimpleName fileUse : fileUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();
 
 				if (ASTNodes.usesGivenSignature(methodInvocation, File.class.getCanonicalName(), TOPATH_METHOD)) {
-					rewrite.replace(methodInvocation, ASTNodes.createMoveTarget(rewrite, fileUse), group);
+					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, ASTNodes.createMoveTarget(rewrite, fileUse), group);
 				} else {
-					rewrite.replace(methodInvocation, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, fileUse), TOURI_METHOD), group);
+					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, fileUse), TOURI_METHOD), group);
 				}
 			}
 		}

@@ -115,9 +115,9 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_description);
 
 		if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-			rewrite.replace(node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
 		} else {
-			rewrite.replace(node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
 		}
 	}
 }

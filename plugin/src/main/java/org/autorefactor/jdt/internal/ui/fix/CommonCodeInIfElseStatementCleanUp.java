@@ -197,7 +197,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				for (Statement stmtToRemove : oneCaseToRemove) {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
-				rewrite.replace(node, ast.newBlock(orderedStatements), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(orderedStatements), group);
 			}
 		} else {
 			// Remove empty cases
@@ -208,14 +208,14 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
 						// Then clause is empty and there is only one else clause
 						// => revert if statement
-						rewrite.replace(parent, ast.newIfStatement(ast.negate(((IfStatement) parent).getExpression()), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), group);
+						ASTNodes.replaceButKeepComment(rewrite, parent, ast.newIfStatement(ast.negate(((IfStatement) parent).getExpression()), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), group);
 						break;
 					}
 					if (allRemovable(areCasesRemovable, i)) {
 						rewrite.remove(parent, group);
 						break;
 					}
-					rewrite.replace(((IfStatement) parent).getThenStatement(), ast.newBlock(), group);
+					ASTNodes.replaceButKeepComment(rewrite, ((IfStatement) parent).getThenStatement(), ast.newBlock(), group);
 				}
 			}
 
@@ -227,7 +227,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
 				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
-				rewrite.replace(node, ast.newBlock(orderedStatements), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(orderedStatements), group);
 			}
 		}
 	}

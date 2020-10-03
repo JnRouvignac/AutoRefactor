@@ -221,7 +221,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_description);
 
-			rewrite.replace(ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
+			ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
 
 			if (node instanceof PostfixExpression) {
 				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, node));
@@ -231,7 +231,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				} else {
 					Block newBlock= ast.newBlock(ASTNodes.createMoveTarget(rewrite, statement), newAssignment);
 
-					rewrite.replace(statement, newBlock, group);
+					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}
 			} else {
 				Statement newAssignment;
@@ -246,7 +246,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				} else {
 					Block newBlock= ast.newBlock(newAssignment, ASTNodes.createMoveTarget(rewrite, statement));
 
-					rewrite.replace(statement, newBlock, group);
+					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}
 			}
 

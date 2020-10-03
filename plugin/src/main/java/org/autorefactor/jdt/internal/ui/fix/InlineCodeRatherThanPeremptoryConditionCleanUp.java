@@ -89,7 +89,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 						rewrite.remove(node, group);
 					} else {
-						rewrite.replace(node, cuRewrite.getASTBuilder().newBlock(), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
 					}
 
 					result= false;
@@ -124,7 +124,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 						rewrite.remove(node, group);
 					} else {
-						rewrite.replace(node, cuRewrite.getASTBuilder().newBlock(), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
 					}
 
 					result= false;
@@ -196,9 +196,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
 		if (unconditionnalStatement instanceof Block && ASTNodes.canHaveSiblings(sourceNode)) {
-			rewrite.replace(sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), group);
+			ASTNodes.replaceButKeepComment(rewrite, sourceNode, ast.copyRange((List<Statement>) ((Block) unconditionnalStatement).statements()), group);
 		} else {
-			rewrite.replace(sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), group);
+			ASTNodes.replaceButKeepComment(rewrite, sourceNode, ASTNodes.createMoveTarget(rewrite, unconditionnalStatement), group);
 		}
 	}
 

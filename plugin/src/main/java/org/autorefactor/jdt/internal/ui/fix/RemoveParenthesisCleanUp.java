@@ -96,7 +96,7 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 		if (expressionWithoutParentheses != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), group);
 			return false;
 		}
 
@@ -318,6 +318,6 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
 
-		rewrite.replace(expression, ast.newParenthesizedExpression(ASTNodes.createMoveTarget(rewrite, expression)), group);
+		ASTNodes.replaceButKeepComment(rewrite, expression, ast.newParenthesizedExpression(ASTNodes.createMoveTarget(rewrite, expression)), group);
 	}
 }

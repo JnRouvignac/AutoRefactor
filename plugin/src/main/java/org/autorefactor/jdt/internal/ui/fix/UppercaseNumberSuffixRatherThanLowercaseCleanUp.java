@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -68,6 +69,6 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 		String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();
 		NumberLiteral replacement= ast.newNumberLiteral(newToken);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node, replacement, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, replacement, group);
 	}
 }

@@ -374,7 +374,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 			rewrite.removeButKeepComment(ifStatements.get(i), group);
 		}
 
-		rewrite.replace(ifStatements.get(ifStatements.size() - 1), switchStatement, group);
+		ASTNodes.replaceButKeepComment(rewrite, ifStatements.get(ifStatements.size() - 1), switchStatement, group);
 	}
 
 	private void addCaseWithStatements(final SwitchStatement switchStatement, final List<Expression> caseValuesOrNullForDefault,

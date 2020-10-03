@@ -127,6 +127,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description);
 
 		params.add(0, ast.newStringLiteral(messageBuilder.toString()));
-		rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), group);
 	}
 }

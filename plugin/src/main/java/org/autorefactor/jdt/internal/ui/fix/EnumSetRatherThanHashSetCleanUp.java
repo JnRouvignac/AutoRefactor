@@ -120,7 +120,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description);
 
-		cuRewrite.getASTRewrite().replace(cic, invocation, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), cic, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());
 		return false;
 	}

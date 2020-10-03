@@ -80,7 +80,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 				if (token.contains(".")) { //$NON-NLS-1$
 					// Only instantiation from double, not from integer
-					rewrite.replace(arg0, getStringLiteral(token), group);
+					ASTNodes.replaceButKeepComment(rewrite, arg0, getStringLiteral(token), group);
 					return false;
 				}
 
@@ -97,7 +97,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 						return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
 					}
 
-					rewrite.replace(node, getValueOf(typeBinding.getName(), token), group);
+					ASTNodes.replaceButKeepComment(rewrite, node, getValueOf(typeBinding.getName(), token), group);
 					return false;
 				}
 			} else if (arg0 instanceof StringLiteral) {
@@ -109,7 +109,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 				if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
 					// Only instantiation from double, not from integer
-					rewrite.replace(arg0, getStringLiteral(literalValue.replace("_", "")), group); //$NON-NLS-1$ //$NON-NLS-2$
+					ASTNodes.replaceButKeepComment(rewrite, arg0, getStringLiteral(literalValue.replace("_", "")), group); //$NON-NLS-1$ //$NON-NLS-2$
 					return false;
 				}
 
@@ -126,7 +126,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				}
 
 				if (literalValue.matches("\\d+")) { //$NON-NLS-1$
-					rewrite.replace(node, getValueOf(typeBinding.getName(), literalValue), group);
+					ASTNodes.replaceButKeepComment(rewrite, node, getValueOf(typeBinding.getName(), literalValue), group);
 					return false;
 				}
 			}
@@ -137,7 +137,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 	private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().newName(typeBinding.getName(), field), group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, cuRewrite.getASTBuilder().newName(typeBinding.getName(), field), group);
 		return false;
 	}
 
@@ -174,7 +174,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 				if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-					cuRewrite.getASTRewrite().replace(node,
+					ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
 							getClassInstanceCreatorNode(node.getExpression(), token), group);
 				} else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
 					replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
@@ -208,9 +208,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 				if (isInStringAppend(methodInvocation.getParent())) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-					rewrite.replace(node, ast.newParenthesizedExpression(getCompareToNode(isPositive, methodInvocation)), group);
+					ASTNodes.replaceButKeepComment(rewrite, node, ast.newParenthesizedExpression(getCompareToNode(isPositive, methodInvocation)), group);
 				} else {
-					rewrite.replace(node, getCompareToNode(isPositive, methodInvocation), group);
+					ASTNodes.replaceButKeepComment(rewrite, node, getCompareToNode(isPositive, methodInvocation), group);
 				}
 
 				return false;

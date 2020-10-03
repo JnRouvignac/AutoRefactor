@@ -72,7 +72,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 		if (secondIf.getElseStatement() == null) {
 			rewrite.remove(secondIf, group);
 		} else {
-			rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getElseStatement()), group);
+			ASTNodes.replaceButKeepComment(rewrite, secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getElseStatement()), group);
 		}
 	}
 }

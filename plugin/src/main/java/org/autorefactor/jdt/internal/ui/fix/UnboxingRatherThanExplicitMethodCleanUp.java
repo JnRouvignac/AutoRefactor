@@ -78,6 +78,6 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
 	private void useUnboxing(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UnboxingRatherThanExplicitMethodCleanUp_description);
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 	}
 }

@@ -226,7 +226,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
 
 			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
-			rewrite.replace(innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
+			ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
 			result= false;
 			return false;
 		}

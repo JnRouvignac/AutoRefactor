@@ -289,7 +289,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		// Replace all occurrences of map.get(key) => mapEntry.getValue()
 		for (MethodInvocation getValueMi : getValueMis) {
-			rewrite.replace(getValueMi, ast.newMethodInvocation(entryVar.varName(), "getValue"), group); //$NON-NLS-1$
+			ASTNodes.replaceButKeepComment(rewrite, getValueMi, ast.newMethodInvocation(entryVar.varName(), "getValue"), group); //$NON-NLS-1$
 		}
 	}
 

@@ -90,7 +90,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
-						rewrite.replace(node, ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(operands)), group);
 						return false;
 					}
 				}
@@ -172,11 +172,11 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 		if (leftOppositeExpression != null) {
 			if (rightOppositeExpression != null) {
-				rewrite.replace(node,
+				ASTNodes.replaceButKeepComment(rewrite, node,
 						ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), getAppropriateOperator(node), ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), group);
 			} else {
 				InfixExpression.Operator reverseOp= getReverseOperator(node);
-				rewrite.replace(node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightExpression)), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, leftOppositeExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightExpression)), group);
 			}
 
 			return false;
@@ -184,7 +184,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 		if (rightOppositeExpression != null) {
 			InfixExpression.Operator reverseOp= getReverseOperator(node);
-			rewrite.replace(node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, leftExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, leftExpression), reverseOp, ASTNodes.createMoveTarget(rewrite, rightOppositeExpression)), group);
 			return false;
 		}
 
@@ -230,7 +230,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			operand= ast.negate(exprToCopy);
 		}
 
-		rewrite.replace(node, operand, group);
+		ASTNodes.replaceButKeepComment(rewrite, node, operand, group);
 		return false;
 	}
 
@@ -239,18 +239,18 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		if (remainingOperands.size() == 1) {
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands)), group);
 		}
 	}
 
 	private void replaceBy(final ASTNode node, final Expression expression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, expression), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, expression), group);
 	}
 
 	/**

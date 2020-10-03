@@ -89,6 +89,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Helper class for manipulating, converting, navigating and checking
@@ -2652,5 +2653,19 @@ public final class ASTNodes {
 	 */
 	public static <T extends ASTNode> T createMoveTarget(final ASTRewrite rewrite, final T expression) {
 		return rewrite.createMoveTarget(expression);
+	}
+
+	/**
+	 * Replaces the provided node from the AST with the provided replacement node.
+	 *
+	 * @param rewrite     The AST rewrite
+	 * @param node        The node to remove
+	 * @param replacement The replacement node
+	 * @param editGroup   The edit group
+	 * @see ASTRewrite#replaceButKeepComment(ASTNode, ASTNode,
+	 *      org.eclipse.text.edits.TextEditGroup)
+	 */
+	public static void replaceButKeepComment(final ASTRewrite rewrite, final ASTNode node, final ASTNode replacement, final TextEditGroup editGroup) {
+		rewrite.replace(node, replacement, editGroup);
 	}
 }

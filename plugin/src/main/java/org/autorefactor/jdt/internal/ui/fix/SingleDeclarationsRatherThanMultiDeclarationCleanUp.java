@@ -114,7 +114,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			if (i > 0) {
 				rewrite.insertAfter(newNode, node, group);
 			} else {
-				rewrite.replace(node, newNode, group);
+				ASTNodes.replaceButKeepComment(rewrite, node, newNode, group);
 			}
 		}
 	}

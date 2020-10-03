@@ -105,7 +105,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
 		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-			rewrite.replace(arg0, ast.newCastExpression(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, arg0, ast.newCastExpression(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		}
 	}
 

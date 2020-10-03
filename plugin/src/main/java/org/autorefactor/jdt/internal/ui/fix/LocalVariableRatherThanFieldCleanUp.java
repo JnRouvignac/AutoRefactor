@@ -188,12 +188,12 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		rewrite.replace(ASTNodes.getTypedAncestorOrCrash(reassignmentAssignment, Statement.class),
+		ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getTypedAncestorOrCrash(reassignmentAssignment, Statement.class),
 				newDeclareStatement, group);
 
 		if (isFieldKept) {
 			rewrite.remove(fragment, group);
-			rewrite.replace(field.getType(), ast.createCopyTarget(field.getType()), group);
+			ASTNodes.replaceButKeepComment(rewrite, field.getType(), ast.createCopyTarget(field.getType()), group);
 		} else {
 			rewrite.remove(field, group);
 		}

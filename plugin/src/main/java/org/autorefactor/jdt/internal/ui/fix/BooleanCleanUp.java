@@ -257,7 +257,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
             if (newE != null) {
                 TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
-                cuRewrite.getASTRewrite().replace(node, newE, group);
+                ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, newE, group);
                 return false;
             }
         }
@@ -272,7 +272,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
-            rewrite.replace(node, newRs, group);
+            ASTNodes.replaceButKeepComment(rewrite, node, newRs, group);
             rewrite.remove(elseRs, group);
             return false;
         }
@@ -292,7 +292,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     ASTRewrite rewrite= cuRewrite.getASTRewrite();
                     TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
-                    rewrite.replace(node, newRs, group);
+                    ASTNodes.replaceButKeepComment(rewrite, node, newRs, group);
                     rewrite.remove(elseRs, group);
                     return false;
                 }
@@ -344,7 +344,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 ASTRewrite rewrite= cuRewrite.getASTRewrite();
                 TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
-                rewrite.replace(rightHandSide, newE, group);
+                ASTNodes.replaceButKeepComment(rewrite, rightHandSide, newE, group);
                 rewrite.remove(node, group);
                 return false;
             }
@@ -542,7 +542,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                     if (!ASTNodes.canHaveSiblings(node)) {
                         // Make sure to keep curly braces if the node is an else statement
-                        rewrite.replace(node, copyStatement, group);
+                        ASTNodes.replaceButKeepComment(rewrite, node, copyStatement, group);
                         return false;
                     }
 
@@ -553,7 +553,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                             rewrite.insertAfter(statementsToMove.get(i), node, group);
                         }
 
-                        rewrite.replace(node, statementsToMove.get(0), group);
+                        ASTNodes.replaceButKeepComment(rewrite, node, statementsToMove.get(0), group);
                         return false;
                     }
                 }

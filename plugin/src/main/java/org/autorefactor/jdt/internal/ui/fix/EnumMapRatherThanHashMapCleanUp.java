@@ -126,7 +126,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumMapRatherThanHashMapCleanUp_description);
 
-		cuRewrite.getASTRewrite().replace(cic, ast.newClassInstanceCreation(newType, newParam), group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), cic, ast.newClassInstanceCreation(newType, newParam), group);
 	}
 
 	/**

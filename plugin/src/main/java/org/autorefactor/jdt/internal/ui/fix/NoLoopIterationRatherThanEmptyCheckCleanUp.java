@@ -74,7 +74,7 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 					if (isConditionValid(condition, container)) {
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description);
-						rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
 						return false;
 					}
 
@@ -173,12 +173,12 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description);
 
 		if (operands.size() == 2) {
-			rewrite.replace(condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, condition, ASTNodes.createMoveTarget(rewrite, operands.get(0)), group);
 		} else {
 			operands.remove(operands.size() - 1);
 			InfixExpression newCondition= ast.newInfixExpression(condition.getOperator(), rewrite.createMoveTarget(operands));
 
-			rewrite.replace(condition, newCondition, group);
+			ASTNodes.replaceButKeepComment(rewrite, condition, newCondition, group);
 		}
 	}
 }

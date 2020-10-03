@@ -108,7 +108,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 			rewrite.insertBefore(ast.rawComment(comment), node, group);
 		}
 
-		rewrite.replace(node, ast.copyRange(statements), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ast.copyRange(statements), group);
 	}
 
 	/**

@@ -180,7 +180,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			}
 
 			rewrite.insertBefore(newDeclareStatement, statement, group);
-			rewrite.replace(varToMove,
+			ASTNodes.replaceButKeepComment(rewrite, varToMove,
 					ast.newExpressionStatement(ast.newAssignment(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), group);
 		} else {
 			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, group);

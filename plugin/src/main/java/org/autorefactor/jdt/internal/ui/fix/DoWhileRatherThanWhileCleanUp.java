@@ -91,7 +91,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.DoWhileRatherThanWhileCleanUp_description);
 
-			rewrite.replace(node, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
 			return false;
 		}
 

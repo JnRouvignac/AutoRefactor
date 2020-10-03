@@ -189,7 +189,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
-		rewrite.replace(node,
+		ASTNodes.replaceButKeepComment(rewrite, node,
 				ast.newExpressionStatement(ast.newMethodInvocation(ast.newName(classname),
 						"addAll", addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression(), //$NON-NLS-1$
 						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), group);
@@ -266,6 +266,6 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 			newMethod= ast.newMethodInvocation(methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
 		}
 
-		rewrite.replace(toReplace, ast.newExpressionStatement(newMethod), group);
+		ASTNodes.replaceButKeepComment(rewrite, toReplace, ast.newExpressionStatement(newMethod), group);
 	}
 }

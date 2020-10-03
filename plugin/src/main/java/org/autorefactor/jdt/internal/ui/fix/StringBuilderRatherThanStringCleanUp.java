@@ -233,14 +233,14 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				builder= StringBuffer.class;
 			}
 
-			rewrite.replace(type, ast.type(builder.getSimpleName()), group);
+			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(builder.getSimpleName()), group);
 
 			StringLiteral stringLiteral= ASTNodes.as(initializer, StringLiteral.class);
 
 			if (stringLiteral != null && stringLiteral.getLiteralValue().matches("")) { //$NON-NLS-1$
-				rewrite.replace(initializer, ast.newClassInstanceCreation(builder.getSimpleName()), group);
+				ASTNodes.replaceButKeepComment(rewrite, initializer, ast.newClassInstanceCreation(builder.getSimpleName()), group);
 			} else {
-				rewrite.replace(initializer, ast.newClassInstanceCreation(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), group);
+				ASTNodes.replaceButKeepComment(rewrite, initializer, ast.newClassInstanceCreation(builder.getSimpleName(), ASTNodes.createMoveTarget(rewrite, initializer)), group);
 			}
 
 			for (SimpleName simpleName : assignmentWrites) {
@@ -261,7 +261,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					newExpression= ast.newMethodInvocation(newExpression, "append", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand))); //$NON-NLS-1$
 				}
 
-				rewrite.replace(assignment, newExpression, group);
+				ASTNodes.replaceButKeepComment(rewrite, assignment, newExpression, group);
 			}
 
 			for (SimpleName simpleName : concatenationWrites) {
@@ -276,10 +276,10 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					}
 				}
 
-				rewrite.replace(assignment, newExpression, group);
+				ASTNodes.replaceButKeepComment(rewrite, assignment, newExpression, group);
 			}
 
-			rewrite.replace(finalRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, finalRead), "toString"), group); //$NON-NLS-1$
+			ASTNodes.replaceButKeepComment(rewrite, finalRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, finalRead), "toString"), group); //$NON-NLS-1$
 		}
 
 		private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

@@ -315,7 +315,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 		String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), group);
+		ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeMethod(classesToUseWithImport, importsToAdd, originalMethod, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(condition)), null, null, failureMessage)), group);
 	}
 
 	private boolean maybeReplaceOrRemove(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
@@ -324,7 +324,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		if (replace) {
-			rewrite.replace(nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), group);
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeFail(classesToUseWithImport, importsToAdd, nodeToReplace, originalMethod, failureMessage), group);
 			return false;
 		}
 
@@ -332,7 +332,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent()) || nodeToReplace.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(nodeToReplace.getParent(), group);
 			} else {
-				rewrite.replace(nodeToReplace.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
+				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
 			}
 
 			return false;
@@ -365,7 +365,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Same"), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getFirst())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(actualAndExpected.getSecond())), //$NON-NLS-1$
 					null, failureMessage);
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
 			return false;
 		}
 
@@ -400,12 +400,12 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		if (ASTNodes.is(actualValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), group);
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, expectedValue, failureMessage)), group);
 			return false;
 		}
 
 		if (ASTNodes.is(expectedValue, NullLiteral.class)) {
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), group);
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeMethodOrStatement(nodeToReplace, invokeAssertNull(classesToUseWithImport, importsToAdd, originalMethod, isAssertEquals, actualValue, failureMessage)), group);
 			return false;
 		}
 
@@ -434,7 +434,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 			MethodInvocation newAssert= invokeMethod(classesToUseWithImport, importsToAdd, originalMethod,
 					getAssertName(isAssertEquals, "Equals"), copyOfActual, copyOfExpected, delta, failureMessage); //$NON-NLS-1$
-			rewrite.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, invokeMethodOrStatement(nodeToReplace, newAssert), group);
 			return false;
 		}
 

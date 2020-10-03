@@ -72,7 +72,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 
-				rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
+				ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
 				return false;
 			}
 
@@ -90,7 +90,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 
-		rewrite.replace(node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
-		rewrite.replace(node.getName(), ast.newSimpleName("containsKey"), group); //$NON-NLS-1$
+		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ASTNodes.createMoveTarget(rewrite, miExpression.getExpression()), group);
+		ASTNodes.replaceButKeepComment(rewrite, node.getName(), ast.newSimpleName("containsKey"), group); //$NON-NLS-1$
 	}
 }

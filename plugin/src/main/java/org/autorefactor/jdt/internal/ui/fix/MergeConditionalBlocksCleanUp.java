@@ -127,10 +127,10 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
         Statement remainingStatement= isThenStatement.get(isThenStatement.size() - 1) ? lastBlock.getElseStatement() : lastBlock.getThenStatement();
         InfixExpression newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
 
-        rewrite.replace(duplicateIfBlocks.get(0).getExpression(), newCondition, group);
+        ASTNodes.replaceButKeepComment(rewrite, duplicateIfBlocks.get(0).getExpression(), newCondition, group);
 
         if (remainingStatement != null) {
-            rewrite.replace(duplicateIfBlocks.get(0).getElseStatement(), ASTNodes.createMoveTarget(rewrite, remainingStatement), group);
+            ASTNodes.replaceButKeepComment(rewrite, duplicateIfBlocks.get(0).getElseStatement(), ASTNodes.createMoveTarget(rewrite, remainingStatement), group);
         } else if (duplicateIfBlocks.get(0).getElseStatement() != null) {
             rewrite.remove(duplicateIfBlocks.get(0).getElseStatement(), group);
         }

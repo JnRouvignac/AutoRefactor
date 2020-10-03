@@ -80,22 +80,22 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
 				if (literalSize == 0) {
 					if (Arrays.asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
 						return false;
 					}
 
 					if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.LESS_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
 						return false;
 					}
 				} else if (literalSize == 1) {
 					if (InfixExpression.Operator.GREATER_EQUALS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.not(ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD)), group);
 						return false;
 					}
 
 					if (InfixExpression.Operator.LESS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.copyExpression(miToReplace), IS_EMPTY_METHOD), group);
 						return false;
 					}
 				}

@@ -64,7 +64,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 
 		if (replacement != null) {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.PushNegationDownCleanUp_description);
-			cuRewrite.getASTRewrite().replace(node, replacement, group);
+			ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, replacement, group);
 			return false;
 		}
 

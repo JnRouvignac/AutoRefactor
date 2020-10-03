@@ -108,7 +108,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), //$NON-NLS-1$
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), //$NON-NLS-1$
 					ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(1))), group);
 			return false;
 		}
@@ -118,7 +118,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			rewrite.replace(node,
+			ASTNodes.replaceButKeepComment(rewrite, node,
 					ast.newMethodInvocation(javaUtilObjects, "toString", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), ast.newStringLiteral("")), group); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
@@ -129,7 +129,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
 			return false;
 		}
 
@@ -139,10 +139,10 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			if (node.getExpression() != null) {
-				rewrite.replace(node.getExpression(), javaUtilObjects, group);
-				rewrite.replace(node.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), javaUtilObjects, group);
+				ASTNodes.replaceButKeepComment(rewrite, node.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
 			} else {
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
 			}
 
 			return false;
@@ -163,12 +163,12 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
 
 			if (copyOfArgs.size() <= 2) {
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), group); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), group); //$NON-NLS-1$
 			} else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
 				LambdaExpression messageSupplier= ast.newLambdaExpression();
 				messageSupplier
 						.setBody(ast.newMethodInvocation(ast.newSimpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
-				rewrite.replace(node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier), group); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier), group); //$NON-NLS-1$
 			} else {
 				return true;
 			}
@@ -194,6 +194,6 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-		rewrite.replace(node.getExpression(), javaUtilObjects, group);
+		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), javaUtilObjects, group);
 	}
 }

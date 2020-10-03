@@ -187,20 +187,20 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
 			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
 				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), group);
-				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
+				ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
 				result= false;
 				return false;
 			}
 
 			if (!ASTNodes.isInElse(node)) {
-				rewrite.replace(ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
+				ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getParent(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
 				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, assignment));
 
 				if (ASTNodes.canHaveSiblings(node)) {
 					rewrite.insertBefore(newAssignment, node, group);
 				} else {
 					Block newBlock= ast.newBlock(newAssignment, ASTNodes.createMoveTarget(rewrite, node));
-					rewrite.replace(node, newBlock, group);
+					ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 				}
 
 				result= false;

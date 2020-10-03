@@ -65,7 +65,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 			if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_description);
-				rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), group);
 				return false;
 			}
 		}

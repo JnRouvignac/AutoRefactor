@@ -160,7 +160,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
-			rewrite.replace(node,
+			ASTNodes.replaceButKeepComment(rewrite, node,
 					ast.newExpressionStatement(ast.newAssignment(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), group);
 		}
 
@@ -193,7 +193,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.remove(toRemove, group);
-			rewrite.replace(node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
 		}
 	}
 }

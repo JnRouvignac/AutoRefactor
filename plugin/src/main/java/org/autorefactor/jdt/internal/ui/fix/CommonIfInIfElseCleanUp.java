@@ -102,6 +102,6 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
 		IfStatement newInnerIf= ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
 				ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
-		rewrite.replace(node, ast.newIfStatement(newCondition, ast.newBlock(newInnerIf)), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ast.newIfStatement(newCondition, ast.newBlock(newInnerIf)), group);
 	}
 }

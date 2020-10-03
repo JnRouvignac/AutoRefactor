@@ -630,10 +630,10 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			}
 
 			rewrite.removeButKeepComment(builderStatement, group);
-			rewrite.replace(node, joinStatement, group);
+			ASTNodes.replaceButKeepComment(rewrite, node, joinStatement, group);
 
 			for (SimpleName readToRefactor : readsToRefactor) {
-				rewrite.replace(readToRefactor.getParent(), ASTNodes.createMoveTarget(rewrite, readToRefactor), group);
+				ASTNodes.replaceButKeepComment(rewrite, readToRefactor.getParent(), ASTNodes.createMoveTarget(rewrite, readToRefactor), group);
 			}
 		}
 	}

@@ -78,7 +78,7 @@ public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 				} else if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node, group);
 				} else {
-					rewrite.replace(node, cuRewrite.getASTBuilder().newBlock(), group);
+					ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
 				}
 
 				result= false;

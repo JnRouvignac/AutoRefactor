@@ -74,11 +74,11 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description);
 
 		if (node.getInitializer() != null) {
-			rewrite.replace(node, node.getInitializer(), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, node.getInitializer(), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			rewrite.replace(node, ast.createCopyTarget(ast.newArrayInitializer()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.createCopyTarget(ast.newArrayInitializer()), group);
 		}
 	}
 

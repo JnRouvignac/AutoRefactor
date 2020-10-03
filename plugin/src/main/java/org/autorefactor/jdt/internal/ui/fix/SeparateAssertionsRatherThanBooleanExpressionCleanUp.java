@@ -98,7 +98,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.SeparateAssertionsRatherThanBooleanExpressionCleanUp_description);
 
 			List<Expression> allOperands= ASTNodes.allOperands(booleanExpression);
-			rewrite.replace(booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, booleanExpression, ASTNodes.createMoveTarget(rewrite, allOperands.remove(0)), group);
 			List<Statement> expressionStatements= new ArrayList<>(allOperands.size());
 
 			for (Expression operand : allOperands) {
@@ -131,7 +131,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
 				Block newBlock= ast.newBlock(expressionStatements);
-				rewrite.replace(node, newBlock, group);
+				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 			}
 
 			return false;

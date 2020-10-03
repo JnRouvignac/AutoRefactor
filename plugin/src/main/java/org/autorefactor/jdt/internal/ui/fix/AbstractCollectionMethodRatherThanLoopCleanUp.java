@@ -234,7 +234,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
             Statement replacement= ast.newIfStatement(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.newBlock(ast.copyRange(thenStatements)));
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
-            cuRewrite.getASTRewrite().replace(forNode, replacement, group);
+            ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), forNode, replacement, group);
 
             thenStatements.add(bs);
         }
@@ -246,7 +246,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
-            rewrite.replace(forNode, ast.newReturnStatement(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), group);
+            ASTNodes.replaceButKeepComment(rewrite, forNode, ast.newReturnStatement(newMethod(iterable, toFind, negate, classesToUseWithImport, importsToAdd)), group);
 
             if (forNextStatement.equals(ASTNodes.getNextSibling(forNode))) {
                 rewrite.remove(forNextStatement, group);
@@ -297,7 +297,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                 throw new NotImplementedException(forNode);
             }
 
-            rewrite.replace(forNode, replacement, group);
+            ASTNodes.replaceButKeepComment(rewrite, forNode, replacement, group);
 
             if (previousStmtIsPreviousSibling) {
                 rewrite.removeButKeepComment(previousStatement, group);

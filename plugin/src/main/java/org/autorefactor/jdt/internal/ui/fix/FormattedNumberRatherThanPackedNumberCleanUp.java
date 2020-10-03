@@ -126,7 +126,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 
 		NumberLiteral replacement= ast.newNumberLiteral(integers + suffix);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node, replacement, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, replacement, group);
 	}
 
 	private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,

@@ -136,7 +136,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 				List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
 				copyOfThenStatements.add(0, ASTNodes.createMoveTarget(rewrite, variableAssignment));
 				Block block= ast.newBlock(copyOfThenStatements);
-				rewrite.replace(statement, block, group);
+				ASTNodes.replaceButKeepComment(rewrite, statement, block, group);
 			}
 		}
 	}

@@ -59,7 +59,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 		if (!nodesToRemove.isEmpty()) {
 			for (ASTNode n : nodesToRemove) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_description);
-				cuRewrite.getASTRewrite().replace(n, null, group);
+				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), n, null, group);
 			}
 
 			return false;

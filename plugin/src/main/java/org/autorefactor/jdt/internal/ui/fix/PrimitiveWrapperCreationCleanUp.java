@@ -123,7 +123,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 					if (methodName != null) {
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-						cuRewrite.getASTRewrite().replace(node,
+						ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
 								newMethodInvocation(typeBinding.getName(), methodName, arg0), group);
 						return false;
 					}
@@ -150,7 +150,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	private void replaceWithTheSingleArgument(final MethodInvocation node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0)), group);
 	}
 
 	private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -216,10 +216,10 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		Expression arg0= args.get(0);
 
 		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-			rewrite.replace(node,
+			ASTNodes.replaceButKeepComment(rewrite, node,
 					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), group); //$NON-NLS-1$
 		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-			rewrite.replace(node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), group); //$NON-NLS-1$
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), group); //$NON-NLS-1$
 		} else {
 			replaceWithValueOf(node, typeBinding);
 		}
@@ -227,7 +227,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node,
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
 				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), group); //$NON-NLS-1$
 	}
 

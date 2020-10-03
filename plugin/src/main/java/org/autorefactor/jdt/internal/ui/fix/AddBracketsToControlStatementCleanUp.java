@@ -96,7 +96,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddBracketsToControlStatementCleanUp_description);
 
 		Block block= ast.newBlock(ASTNodes.createMoveTarget(rewrite, statement));
-		rewrite.replace(statement, block, group);
+		ASTNodes.replaceButKeepComment(rewrite, statement, block, group);
 		return false;
 	}
 }

@@ -109,7 +109,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		final Expression expression= ifCondition;
 
 		InfixExpression newCondition= ast.newInfixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ast.parenthesizeIfNeeded(expression));
-		rewrite.replace(node.getExpression(), newCondition, group);
+		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), newCondition, group);
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);
 
@@ -119,14 +119,14 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 					rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, otherStatements.get(i)), ifStatement, group);
 				}
 
-				rewrite.replace(ifStatement, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
+				ASTNodes.replaceButKeepComment(rewrite, ifStatement, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 			} else {
 				rewrite.remove(ifStatement, group);
 			}
 		} else if (otherStatement == null || otherStatements.isEmpty()) {
-			rewrite.replace(node.getBody(), ast.newBlock(), group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getBody(), ast.newBlock(), group);
 		} else if (otherStatements.size() == 1) {
-			rewrite.replace(originalCondition, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, originalCondition, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 		} else {
 			List<Statement> newStatements= new ArrayList<>(otherStatements.size());
 
@@ -136,7 +136,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 
 			Block block= ast.newBlock(newStatements);
 
-			rewrite.replace(node.getBody(), block, group);
+			ASTNodes.replaceButKeepComment(rewrite, node.getBody(), block, group);
 		}
 	}
 }

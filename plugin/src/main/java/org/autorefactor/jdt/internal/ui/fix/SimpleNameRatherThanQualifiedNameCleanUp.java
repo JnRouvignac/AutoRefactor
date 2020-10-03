@@ -719,7 +719,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 						&& !containsLocalName(localIdentifiers, qname))) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);
 			return false;
 		}
 

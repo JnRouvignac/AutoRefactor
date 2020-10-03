@@ -68,6 +68,6 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_description);
 
-		rewrite.replace(secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), group);
+		ASTNodes.replaceButKeepComment(rewrite, secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), group);
 	}
 }

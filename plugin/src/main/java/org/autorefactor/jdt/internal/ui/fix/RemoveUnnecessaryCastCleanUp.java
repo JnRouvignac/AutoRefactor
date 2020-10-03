@@ -85,7 +85,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		if (canRemoveCast(node)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
-			rewrite.replace(node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getExpression()), group);
 			return false;
 		}
 
@@ -99,7 +99,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 
-		cuRewrite.getASTRewrite().replace(node, numberLiteral, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, numberLiteral, group);
 	}
 
 	private boolean canRemoveCast(final CastExpression node) {

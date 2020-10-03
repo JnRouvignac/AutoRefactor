@@ -162,7 +162,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 			rewrite.remove(previousSibling, group);
-			rewrite.replace(node, newReturnStatement, group);
+			ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
 		}
 
 		private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
@@ -172,7 +172,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			rewrite.remove(previousSibling, group);
-			rewrite.replace(node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
 		}
 	}
 }

@@ -62,7 +62,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringRatherThanNewStringCleanUp_description);
-				rewrite.replace(node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				return false;
 			}
 		}

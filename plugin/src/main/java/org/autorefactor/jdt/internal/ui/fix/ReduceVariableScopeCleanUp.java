@@ -302,7 +302,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 					VariableDeclarationFragment fragment= getVariableDeclarationFragment(parentExpression, varName);
 					VariableDeclarationStatement variableDeclarationStatement= ast.getAST().newVariableDeclarationStatement(fragment);
 					variableDeclarationStatement.setType(varType);
-					rewrite.replace(statement, variableDeclarationStatement, group);
+					ASTNodes.replaceButKeepComment(rewrite, statement, variableDeclarationStatement, group);
 					break;
 				}
 			}
@@ -315,7 +315,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
 				newEfs.setBody(copy(efs.getBody(), varName));
 			}
-			rewrite.replace(efs, newEfs, group);
+			ASTNodes.replaceButKeepComment(rewrite, efs, newEfs, group);
 		} else if (scope instanceof ForStatement) {
 			ForStatement fs= (ForStatement) scope;
 			ForStatement newFs= ast.createCopyTarget(fs);
@@ -329,7 +329,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			VariableDeclarationExpression variableDeclarationExpression= ast.getAST().newVariableDeclarationExpression(fragment);
 			variableDeclarationExpression.setType(varType);
 			initializers.add(variableDeclarationExpression);
-			rewrite.replace(fs, newFs, group);
+			ASTNodes.replaceButKeepComment(rewrite, fs, newFs, group);
 			// TODO JNR
 			// if (equalNotNull(fs.getBody(), parentStatement)) {
 			// newFs.setBody(copy(fs.getBody()));
@@ -342,7 +342,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 			if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
 				newWs.setBody(copy(ws.getBody(), varName));
 			}
-			rewrite.replace(ws, newWs, group);
+			ASTNodes.replaceButKeepComment(rewrite, ws, newWs, group);
 		} else if (scope instanceof IfStatement) {
 			IfStatement is= (IfStatement) scope;
 			IfStatement newIs= ast.getAST().newIfStatement();
@@ -362,7 +362,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 				throw new IllegalStateException(is,
 						"Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
 			}
-			rewrite.replace(is, newIs, group);
+			ASTNodes.replaceButKeepComment(rewrite, is, newIs, group);
 		} else {
 			throw new NotImplementedException(scope);
 		}

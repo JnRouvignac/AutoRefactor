@@ -273,7 +273,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 				arguments.add(ASTNodes.createMoveTarget(rewrite, (Expression) arrayCreation.getInitializer().expressions().get(0)));
 			}
 
-			rewrite.replace(arrayCreation, newAtomicObject, group);
+			ASTNodes.replaceButKeepComment(rewrite, arrayCreation, newAtomicObject, group);
 
 			for (Object variableDimension : variableDimensions) {
 				rewrite.remove((ASTNode) variableDimension, group);
@@ -285,14 +285,14 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 				atomicType= ast.newParameterizedType(atomicClassName, ASTNodes.createMoveTarget(rewrite, objectClass));
 			}
 
-			rewrite.replace(type, atomicType, group);
+			ASTNodes.replaceButKeepComment(rewrite, type, atomicType, group);
 
 			for (ArrayAccess accessRead : accessReads) {
-				rewrite.replace(accessRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()), "get"), group); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, accessRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()), "get"), group); //$NON-NLS-1$
 			}
 
 			for (Assignment assignmentRead : assignmentReads) {
-				rewrite.replace(assignmentRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()),
+				ASTNodes.replaceButKeepComment(rewrite, assignmentRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()),
 						"set", ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide())), group); //$NON-NLS-1$
 			}
 		}

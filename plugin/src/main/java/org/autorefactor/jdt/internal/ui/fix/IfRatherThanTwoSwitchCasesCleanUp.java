@@ -203,7 +203,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		rewrite.replace(node, currentBlock, group);
+		ASTNodes.replaceButKeepComment(rewrite, node, currentBlock, group);
 	}
 
 	private Expression buildEquality(final Expression discriminant, final Expression value) {

@@ -69,6 +69,6 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
 		BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().newBooleanLiteral(val);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description);
-		cuRewrite.getASTRewrite().replace(node, booleanLiteral, group);
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, booleanLiteral, group);
 	}
 }

@@ -198,15 +198,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
-			rewrite.replace(initializer, createStringConcats(allAppendedStrings), group);
-			rewrite.replace(type, ast.type(String.class.getSimpleName()), group);
+			ASTNodes.replaceButKeepComment(rewrite, initializer, createStringConcats(allAppendedStrings), group);
+			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(String.class.getSimpleName()), group);
 
 			for (Statement statementToRemove : statementsToRemove) {
 				rewrite.removeButKeepComment(statementToRemove, group);
 			}
 
 			for (MethodInvocation readToRefactor : toStringToRefactor) {
-				rewrite.replace(readToRefactor, ASTNodes.createMoveTarget(rewrite, readToRefactor.getExpression()), group);
+				ASTNodes.replaceButKeepComment(rewrite, readToRefactor, ASTNodes.createMoveTarget(rewrite, readToRefactor.getExpression()), group);
 			}
 		}
 
@@ -310,7 +310,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (lastExpression instanceof ClassInstanceCreation) {
 				// Replace with String concatenation
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
-				cuRewrite.getASTRewrite().replace(node, createStringConcats(allAppendedStrings), group);
+				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, createStringConcats(allAppendedStrings), group);
 				return false;
 			}
 		}
@@ -356,7 +356,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				if (ASTNodes.canHaveSiblings((Statement) node.getParent()) || node.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node.getParent(), group);
 				} else {
-					rewrite.replace(node.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
+					ASTNodes.replaceButKeepComment(rewrite, node.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
 				}
 
 				return false;
@@ -612,7 +612,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		rewrite.replace(node, result, group);
+		ASTNodes.replaceButKeepComment(rewrite, node, result, group);
 		return false;
 	}
 
@@ -671,7 +671,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			newAppendSubstring= ast.newMethodInvocation(lastExpression, "append", stringVar, arg0, arg1); //$NON-NLS-1$
 		}
 
-		rewrite.replace(node, newAppendSubstring, group);
+		ASTNodes.replaceButKeepComment(rewrite, node, newAppendSubstring, group);
 	}
 
 	private boolean isVariable(final Expression expression) {
@@ -735,7 +735,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (replaceNeeded) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
-				cuRewrite.getASTRewrite().replace(node, createStringConcats(allOperands), group);
+				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, createStringConcats(allOperands), group);
 				return false;
 			}
 		}

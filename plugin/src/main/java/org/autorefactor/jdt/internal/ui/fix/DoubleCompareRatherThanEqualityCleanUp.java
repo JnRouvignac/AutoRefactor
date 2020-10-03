@@ -66,7 +66,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_description);
 
-		rewrite.replace(node,
+		ASTNodes.replaceButKeepComment(rewrite, node,
 				ast.newInfixExpression(
 						ast.newMethodInvocation(Double.class.getSimpleName(), "compare", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getLeftOperand())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getRightOperand()))), //$NON-NLS-1$
 						node.getOperator(), ast.newNumberLiteral("0")), group); //$NON-NLS-1$

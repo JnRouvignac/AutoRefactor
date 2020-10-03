@@ -116,7 +116,7 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FillRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
-		rewrite.replace(node,
+		ASTNodes.replaceButKeepComment(rewrite, node,
 				ast.newExpressionStatement(ast.newMethodInvocation(ast.newName(classname),
 						"fill", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())), //$NON-NLS-1$
 						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())))), group);

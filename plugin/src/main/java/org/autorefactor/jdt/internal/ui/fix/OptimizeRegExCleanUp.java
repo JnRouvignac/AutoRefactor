@@ -246,6 +246,6 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
     private void rewriteRegEx(final StringLiteral node, String pattern) {
         TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
-        cuRewrite.getASTRewrite().replace(node, cuRewrite.getASTBuilder().newStringLiteral(pattern), group);
+        ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, cuRewrite.getASTBuilder().newStringLiteral(pattern), group);
     }
 }

@@ -193,8 +193,8 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.PatternRatherThanRegExStringCleanUp_description);
 
 			String patternName= addImport(Pattern.class, classesToUseWithImport, importsToAdd);
-			rewrite.replace(type, ast.type(patternName), group);
-			rewrite.replace(initializer, ast.newMethodInvocation(ast.newName(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), group);
+			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(patternName), group);
+			ASTNodes.replaceButKeepComment(rewrite, initializer, ast.newMethodInvocation(ast.newName(patternName), COMPILE_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(initializer))), group);
 
 			for (SimpleName regExUse : regExUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) regExUse.getParent();
@@ -216,7 +216,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					}
 				}
 
-				rewrite.replace(methodInvocation, newExpression, group);
+				ASTNodes.replaceButKeepComment(rewrite, methodInvocation, newExpression, group);
 			}
 		}
 	}
