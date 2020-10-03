@@ -211,7 +211,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					if (isOccurrencesValid(declarationStatement, reads, writes, finalRead)) {
 						replaceString(type, initializer, assignmentWrites, concatenationWrites, finalRead);
 
-						this.result= false;
+						result= false;
 						return false;
 					}
 				}

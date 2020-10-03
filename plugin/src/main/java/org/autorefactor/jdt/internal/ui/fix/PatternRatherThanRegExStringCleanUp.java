@@ -159,7 +159,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					}
 					refactorRegEx(type, initializer, reads);
 
-					this.result= false;
+					result= false;
 					return false;
 				}
 			}

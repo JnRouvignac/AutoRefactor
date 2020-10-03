@@ -216,7 +216,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 							&& isConcatenationUseValid(node, builder, builderClass, readsToRefactor, builderUses)) {
 						replaceWithStringJoin(node, containerVariable, booleanStatement, builderStatement, builder, delimiter,
 								readsToRefactor, booleanUses);
-						this.result= false;
+						result= false;
 						return false;
 					}
 				}

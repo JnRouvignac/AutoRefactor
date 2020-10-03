@@ -197,7 +197,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 						refactorFile(type, initializer, reads);
 
-						this.result= false;
+						result= false;
 						return false;
 					}
 				}

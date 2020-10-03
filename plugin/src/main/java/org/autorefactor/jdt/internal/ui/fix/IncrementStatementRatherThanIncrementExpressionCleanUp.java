@@ -208,7 +208,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 					&& (node instanceof PrefixExpression || !ASTNodes.fallsThrough(statement))) {
 				extractIncrement(node, variable, statement);
 
-				this.result= false;
+				result= false;
 				return false;
 			}
 

@@ -115,7 +115,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
 					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
-					this.result= false;
+					result= false;
 					return false;
 				}
 
@@ -123,7 +123,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
 					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
-					this.result= false;
+					result= false;
 					return false;
 				}
 			}
@@ -171,7 +171,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getLeftOperand(), valuedReturn.getExpression())) {
 					replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
-					this.result= false;
+					result= false;
 					return false;
 				}
 
@@ -179,7 +179,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getRightOperand(), valuedReturn.getExpression())) {
 					replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
-					this.result= false;
+					result= false;
 					return false;
 				}
 			}

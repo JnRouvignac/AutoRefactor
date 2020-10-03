@@ -163,7 +163,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
                             if (isPositive != null) {
                                 replaceLoopAndReturn(forNode, iterable, toFind, forNextStatement, isPositive);
-                                this.result= false;
+                                result= false;
                                 return false;
                             }
 
@@ -184,7 +184,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                             }
 
                             replaceLoopByIf(forNode, iterable, thenStatements, toFind, bs);
-                            this.result= false;
+                            result= false;
                             return false;
                         }
                     }
@@ -272,7 +272,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                     if (isPositive != null) {
                         replaceLoopAndVariable(forNode, iterable, toFind, previousStatement, previousStmtIsPreviousSibling,
                                 initName, isPositive);
-                        this.result= false;
+                        result= false;
                         return false;
                     }
                 }

@@ -92,7 +92,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 						rewrite.replace(node, cuRewrite.getASTBuilder().newBlock(), group);
 					}
 
-					this.result= false;
+					result= false;
 					return false;
 				}
 			}
@@ -127,7 +127,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 						rewrite.replace(node, cuRewrite.getASTBuilder().newBlock(), group);
 					}
 
-					this.result= false;
+					result= false;
 					return false;
 				}
 			}
@@ -139,7 +139,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			if (ASTNodes.fallsThrough(unconditionnalStatement)) {
 				replaceBlockByPlainCode(node, unconditionnalStatement);
 				removeForwardCode(node, unconditionnalStatement);
-				this.result= false;
+				result= false;
 				return false;
 			}
 
@@ -159,7 +159,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			}
 
 			replaceBlockByPlainCode(node, unconditionnalStatement);
-			this.result= false;
+			result= false;
 			return false;
 		}
 	}

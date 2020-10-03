@@ -79,7 +79,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
                 if (duplicateIfBlocks.size() > 1) {
                     mergeCode(duplicateIfBlocks);
-                    this.result= false;
+                    result= false;
                     return false;
                 }
             }

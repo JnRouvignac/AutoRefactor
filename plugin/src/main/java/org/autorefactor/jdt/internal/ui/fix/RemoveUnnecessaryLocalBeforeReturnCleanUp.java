@@ -91,7 +91,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 						} else {
 							replaceReturnStatement(node, variableDeclarationStatement, returnExpression);
 						}
-						this.result= false;
+						result= false;
 						return false;
 					}
 				} else {
@@ -102,7 +102,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 							&& !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
 									node)) {
 						replaceReturnStatement(node, previousSibling, as.getRightHandSide());
-						this.result= false;
+						result= false;
 						return false;
 					}
 				}

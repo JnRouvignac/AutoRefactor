@@ -143,7 +143,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 boolean result= visitIfStatement(node);
 
                 if (!result) {
-                    this.result= false;
+                    result= false;
                 }
             }
 

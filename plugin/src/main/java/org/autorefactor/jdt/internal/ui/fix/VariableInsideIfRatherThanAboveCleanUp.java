@@ -119,7 +119,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 			}
 
 			moveAssignmentInsideIf(variableAssignment, statement, statements);
-			this.result= false;
+			result= false;
 			return false;
 		}
 

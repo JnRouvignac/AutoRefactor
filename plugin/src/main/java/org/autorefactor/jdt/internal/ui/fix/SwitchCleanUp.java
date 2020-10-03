@@ -294,7 +294,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 				final List<SwitchCaseSection> cases, final Statement remainingStatement) {
 			if (switchExpression != null && cases.size() > 2) {
 				replaceWithSwitchStatement(ifStatements, switchExpression, cases, remainingStatement);
-				this.result= false;
+				result= false;
 				return false;
 			}
 
