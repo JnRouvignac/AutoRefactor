@@ -119,7 +119,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             if (isThenStatement.get(i)) {
                 newConditions.add(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, duplicateIfBlocks.get(i).getExpression())));
             } else {
-                newConditions.add(ast.parenthesizeIfNeeded(ast.negate(duplicateIfBlocks.get(i).getExpression())));
+                newConditions.add(ast.parenthesizeIfNeeded(ast.negate(duplicateIfBlocks.get(i).getExpression(), true)));
             }
         }
 

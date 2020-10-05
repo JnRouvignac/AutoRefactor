@@ -102,7 +102,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		Expression ifCondition= ifStatement.getExpression();
 
 		if (isPositive) {
-			ifCondition= ast.negate(ifCondition);
+			ifCondition= ast.negate(ifCondition, true);
 		} else {
 			ifCondition= ASTNodes.createMoveTarget(rewrite, ifCondition);
 		}

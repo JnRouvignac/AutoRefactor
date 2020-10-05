@@ -68,7 +68,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 			Expression condition= node.getExpression();
 
 			if (elseStatement != null) {
-				ASTNodes.replaceButKeepComment(rewrite, condition, cuRewrite.getASTBuilder().negate(condition), group);
+				ASTNodes.replaceButKeepComment(rewrite, condition, cuRewrite.getASTBuilder().negate(condition, true), group);
 				ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
 			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
 				removeBlock(node);

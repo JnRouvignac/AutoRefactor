@@ -107,42 +107,6 @@ import org.eclipse.jdt.core.dom.WildcardType;
  * which are also java keywords are postfixed with a "0".
  */
 public class ASTNodeFactory {
-	/** Copy operations to be performed deeply into {@link ASTNodeFactory} methods. */
-	public enum Copy {
-		/** Do not perform any copy. Returns the node as is. */
-		NONE {
-			@Override
-			protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
-				return node;
-			}
-		},
-		/** Delegates to {@link ASTBuilder#copy(ASTNode)}. */
-		COPY {
-			@Override
-			protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
-				return ast.createCopyTarget(node);
-			}
-		},
-		/** Delegates to {@link ASTBuilder#move(ASTNode)}. */
-		MOVE {
-			@Override
-			protected <T extends ASTNode> T perform(final ASTNodeFactory ast, final T node) {
-				return ast.createMoveTarget(node);
-			}
-		};
-
-		/**
-		 * Performs the copy operation on the provided node with the provided
-		 * {@link ASTNodeFactory}.
-		 *
-		 * @param ast    the {@link ASTNodeFactory} allowing to copy the provided node
-		 * @param node the node on which to perform the copy operation
-		 * @param <T>  the node type
-		 * @return the copied node
-		 */
-		protected abstract <T extends ASTNode> T perform(ASTNodeFactory ast, T node);
-	}
-
 	private final AST ast;
 	private final ASTRewrite rewrite;
 
@@ -1095,16 +1059,6 @@ public class ASTNodeFactory {
 	 */
 	public Expression not(final Expression expression) {
 		return newPrefixExpression(PrefixExpression.Operator.NOT, parenthesizeIfNeeded(expression));
-	}
-
-	/**
-	 * Negates the provided expression by moving it in the AST.
-	 *
-	 * @param expression the expression to negate
-	 * @return the negated expression, moved in the AST
-	 */
-	public Expression negate(final Expression expression) {
-		return negate(expression, true);
 	}
 
 	/**

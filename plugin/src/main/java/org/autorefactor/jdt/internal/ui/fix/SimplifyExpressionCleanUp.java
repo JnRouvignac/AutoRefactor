@@ -227,7 +227,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
 			operand= ASTNodes.createMoveTarget(rewrite, exprToCopy);
 		} else {
-			operand= ast.negate(exprToCopy);
+			operand= ast.negate(exprToCopy, true);
 		}
 
 		ASTNodes.replaceButKeepComment(rewrite, node, operand, group);

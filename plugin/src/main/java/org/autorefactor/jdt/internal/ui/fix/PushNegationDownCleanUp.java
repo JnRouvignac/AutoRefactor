@@ -95,7 +95,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 						Expression anOperand= it.next();
 						Expression oppositeOperand= getOppositeExpression(anOperand);
 
-						it.set(oppositeOperand != null ? oppositeOperand : ast.negate(anOperand));
+						it.set(oppositeOperand != null ? oppositeOperand : ast.negate(anOperand, true));
 					}
 				} else {
 					allOperands= rewrite.createMoveTarget(allOperands);
