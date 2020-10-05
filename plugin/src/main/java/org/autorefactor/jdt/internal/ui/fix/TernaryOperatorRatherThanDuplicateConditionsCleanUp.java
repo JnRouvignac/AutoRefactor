@@ -105,7 +105,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 	private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
 			final Expression oppositeCondition, final Expression oneExpression, final Expression oppositeExpression,
 			final List<Expression> previousOperands, final List<Expression> nextOperands) {
-		if (ASTSemanticMatcher.INSTANCE.matchOpposite(oneCondition, oppositeCondition)
+		if (ASTSemanticMatcher.INSTANCE.matchNegative(oneCondition, oppositeCondition)
 				&& !ASTNodes.match(oneExpression, oppositeExpression)) {
 			replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression, previousOperands,
 					nextOperands);

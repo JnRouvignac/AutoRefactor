@@ -1190,7 +1190,7 @@ public final class ASTNodes {
 	 * @param operator the infix operator
 	 * @return the opposite infix operator
 	 */
-	public static InfixExpression.Operator oppositeInfixOperator(InfixExpression.Operator operator) {
+	public static InfixExpression.Operator negatedInfixOperator(InfixExpression.Operator operator) {
 		if (InfixExpression.Operator.LESS.equals(operator)) {
 			return InfixExpression.Operator.GREATER_EQUALS;
 		}

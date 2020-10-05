@@ -1080,7 +1080,7 @@ public class ASTNodeFactory {
 			}
 		} else if (unparenthesedExpression instanceof InfixExpression) {
 			InfixExpression booleanOperation= (InfixExpression) unparenthesedExpression;
-			InfixExpression.Operator negatedOperator= ASTNodes.oppositeInfixOperator(booleanOperation.getOperator());
+			InfixExpression.Operator negatedOperator= ASTNodes.negatedInfixOperator(booleanOperation.getOperator());
 
 			if (negatedOperator != null) {
 				return getNegatedOperation(booleanOperation, negatedOperator, isMove);

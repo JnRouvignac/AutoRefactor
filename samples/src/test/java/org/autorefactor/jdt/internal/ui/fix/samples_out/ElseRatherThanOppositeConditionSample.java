@@ -78,6 +78,17 @@ public class ElseRatherThanOppositeConditionSample {
         return i;
     }
 
+    public int doNotRemoveMovedOperands(int number1, int number2) {
+        int i = -1;
+        if (number1 < number2) {
+            i = 0;
+        } else if (number2 < number1) {
+            i = 1;
+        }
+
+        return i;
+    }
+
     public int doNotRemoveActiveCondition(List<String> myList) {
         int i = -1;
         if (myList.remove("I will be removed")) {

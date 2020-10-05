@@ -77,8 +77,8 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 
 	private boolean maybeReplaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
 			final Expression firstOppositeExpression, final Expression secondExpression, final Expression secondOppositeExpression) {
-		if (ASTSemanticMatcher.INSTANCE.matchOpposite(firstExpression, firstOppositeExpression)
-				&& ASTSemanticMatcher.INSTANCE.matchOpposite(secondExpression, secondOppositeExpression)) {
+		if (ASTSemanticMatcher.INSTANCE.matchNegative(firstExpression, firstOppositeExpression)
+				&& ASTSemanticMatcher.INSTANCE.matchNegative(secondExpression, secondOppositeExpression)) {
 			AtomicBoolean isFirstExprPositive= new AtomicBoolean();
 			AtomicBoolean isSecondExprPositive= new AtomicBoolean();
 

@@ -181,7 +181,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
 			}
 
-			if (ASTSemanticMatcher.INSTANCE.matchOpposite(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+			if (ASTSemanticMatcher.INSTANCE.matchNegative(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
 				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
 			}
 		}

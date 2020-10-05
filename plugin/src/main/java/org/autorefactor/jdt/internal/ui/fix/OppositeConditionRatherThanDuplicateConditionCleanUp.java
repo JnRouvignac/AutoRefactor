@@ -107,7 +107,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 			return false;
 		}
 
-		if (ASTSemanticMatcher.INSTANCE.matchOpposite(duplicateExpression, secondIf.getExpression())) {
+		if (ASTSemanticMatcher.INSTANCE.matchNegative(duplicateExpression, secondIf.getExpression())) {
 			refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
 					secondIf.getThenStatement());
 			return false;

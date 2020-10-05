@@ -55,7 +55,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 		if (secondIf != null && (secondIf.getElseStatement() == null || !ASTNodes.isExceptionExpected(node))
 				&& (!ASTNodes.fallsThrough(node.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getThenStatement()))
 				&& ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(secondIf.getExpression())
-				&& ASTSemanticMatcher.INSTANCE.matchOpposite(node.getExpression(), secondIf.getExpression())) {
+				&& ASTSemanticMatcher.INSTANCE.matchNegative(node.getExpression(), secondIf.getExpression())) {
 			removeCondition(secondIf);
 
 			return false;
