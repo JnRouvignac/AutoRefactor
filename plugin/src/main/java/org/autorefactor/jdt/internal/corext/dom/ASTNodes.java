@@ -651,7 +651,7 @@ public final class ASTNodes {
 	 * @param ancestorClass the required ancestor's type
 	 * @return the first ancestor of the provided node which has the required type
 	 * @see #getTypedAncestor(ASTNode, Class)
-	 * @see #getASTNodeAncestor(ASTNode, Class...)
+	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
 	 * @throws IllegalStateException if ancestor not found.
 	 */
 	public static <T extends ASTNode> T getTypedAncestorOrCrash(final ASTNode node, final Class<T> ancestorClass) {
@@ -671,7 +671,7 @@ public final class ASTNodes {
 	 * @return the first ancestor of the provided node which has the required type,
 	 *         {@code null} if no suitable ancestor can be found
 	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
-	 * @see #getASTNodeAncestor(ASTNode, Class...)
+	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends ASTNode> T getTypedAncestor(final ASTNode node, final Class<T> ancestorClass) {
@@ -697,7 +697,7 @@ public final class ASTNodes {
 	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
 	 * @see #getTypedAncestor(ASTNode, Class)
 	 */
-	public static ASTNode getASTNodeAncestor(final ASTNode node, final Class<?>... ancestorClasses) {
+	public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<?>... ancestorClasses) {
 		if (ancestorClasses.length == 1) {
 			throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
 		}
@@ -711,7 +711,7 @@ public final class ASTNodes {
 			}
 		}
 
-		return getASTNodeAncestor(parent, ancestorClasses);
+		return getFirstAncestorOrNull(parent, ancestorClasses);
 	}
 
 	/**
@@ -747,7 +747,7 @@ public final class ASTNodes {
 	 */
 	public static ASTNode getEnclosingType(final ASTNode node) {
 		Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
-		ASTNode ancestor= getASTNodeAncestor(node, ancestorClasses);
+		ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
 		if (ancestor == null) {
 			throw new IllegalStateException(node,
 					"Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ //$NON-NLS-2$
@@ -1692,7 +1692,7 @@ public final class ASTNodes {
 	 * @return true if a checked exception is supposed to be caught.
 	 */
 	public static boolean isExceptionExpected(final ASTNode node) {
-		ASTNode parentNode= getASTNodeAncestor(node, TryStatement.class, BodyDeclaration.class);
+		ASTNode parentNode= getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
 
 		while (parentNode instanceof TryStatement) {
 			TryStatement tryStatement= (TryStatement) parentNode;
@@ -1707,7 +1707,7 @@ public final class ASTNodes {
 				}
 			}
 
-			parentNode= getASTNodeAncestor(parentNode, TryStatement.class, BodyDeclaration.class);
+			parentNode= getFirstAncestorOrNull(parentNode, TryStatement.class, BodyDeclaration.class);
 		}
 
 		return false;

@@ -71,7 +71,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 		Type type= node.getType();
 
 		if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
-			ASTNode parent= ASTNodes.getASTNodeAncestor(node, ReturnStatement.class, Assignment.class,
+			ASTNode parent= ASTNodes.getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
 					VariableDeclarationStatement.class);
 			if (parent != null) {
 				switch (parent.getNodeType()) {

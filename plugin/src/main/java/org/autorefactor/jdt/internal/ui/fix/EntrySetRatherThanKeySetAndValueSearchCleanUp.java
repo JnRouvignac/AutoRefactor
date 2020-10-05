@@ -98,7 +98,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		private ASTNode getNamingScope(final ASTNode scope) {
 			Class<?>[] ancestorClasses= { MethodDeclaration.class, Initializer.class };
-			ASTNode ancestor= ASTNodes.getASTNodeAncestor(scope, ancestorClasses);
+			ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
 			if (ancestor == null) {
 				throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
 						+ Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
