@@ -66,7 +66,7 @@ public class ReduceIndentationSample {
 
     public int refactorThen(int i) {
         // Keep this comment
-        if (!(i > 0)) {
+        if (i <= 0) {
             // Keep this comment also
             return 0;
         }
@@ -116,7 +116,7 @@ public class ReduceIndentationSample {
 
     public int reduceIndentationFromIf(int i, List<Integer> integers) {
         // Keep this comment
-        if (!(i > 0)) {
+        if (i <= 0) {
             // Keep this comment also
             return 51;
         }
@@ -129,7 +129,7 @@ public class ReduceIndentationSample {
 
     public int reduceBigIndentationFromIf(int i, List<String> integers) {
         // Keep this comment
-        if (!(i > 0)) {
+        if (i <= 0) {
             // Keep this comment also
             return 51;
         }
@@ -181,7 +181,7 @@ public class ReduceIndentationSample {
 
     public int refactorThenInUnbrackettedForLoop(int[] integers) {
         for (int integer : integers) {
-            if (!(integer > 0)) {
+            if (integer <= 0) {
                 // Keep this comment
                 return 0;
             }

@@ -34,7 +34,6 @@ import java.util.Map;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -62,6 +61,7 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -187,7 +187,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 if (booleanValue) {
                     orientedCondition= ast.createCopyTarget(ifCondition);
                 } else {
-                    orientedCondition= ast.negate(ifCondition, Copy.COPY);
+                    orientedCondition= ast.negate(ifCondition, false);
                 }
 
                 Expression expression= getExpression(orientedCondition, boolean.class.getSimpleName(), null);
@@ -208,7 +208,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     if (booleanValue) {
                         orientedCondition= ast.createCopyTarget(ifCondition);
                     } else {
-                        orientedCondition= ast.negate(ifCondition, Copy.COPY);
+                        orientedCondition= ast.negate(ifCondition, false);
                     }
 
                     Expression expression= getExpression(orientedCondition, Boolean.class.getCanonicalName(), booleanName);
@@ -380,7 +380,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             return infixExpression;
         }
 
-        return ast.negate(infixExpression, Copy.NONE);
+        return negate(infixExpression);
     }
 
     @SuppressWarnings("unchecked")
@@ -405,7 +405,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             Expression exprToReturn= ast.createCopyTarget(node.getExpression());
 
             if (ASTNodes.getBooleanLiteral(elseExpression)) {
-                exprToReturn= ast.negate(exprToReturn, Copy.NONE);
+                exprToReturn= negate(exprToReturn);
             }
 
             MethodDeclaration md= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
@@ -451,7 +451,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             if (thenLiteral) {
                 orientedCondition= ast.createCopyTarget(condition);
             } else {
-                orientedCondition= ast.negate(condition, Copy.COPY);
+                orientedCondition= ast.negate(condition, false);
             }
 
             return getExpression(orientedCondition, typeBinding.getQualifiedName(), booleanName);
@@ -467,12 +467,12 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(elseExpression));
                 }
 
-                return ast.newInfixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(elseExpression));
+                return ast.newInfixExpression(ast.negate(condition, false), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(elseExpression));
             }
 
             if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
-                    return ast.newInfixExpression(ast.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(thenExpression));
+                    return ast.newInfixExpression(ast.negate(condition, false), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(thenExpression));
                 }
 
                 return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(thenExpression));
@@ -572,4 +572,18 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
         return noThenReturnStatement(node);
     }
+
+	private Expression negate(final Expression expression) {
+		Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
+
+		if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
+			PrefixExpression pe= (PrefixExpression) exprNoParen;
+
+			if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
+				return pe.getOperand();
+			}
+		}
+
+		return ast.not(expression);
+	}
 }

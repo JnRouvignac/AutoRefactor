@@ -55,7 +55,7 @@ public class BooleanSample {
 
     public boolean returnIfConditionWithInfixExpressionBooleanPrimitive(int i) {
         // Keep this comment
-        return !(0 < i && i < 12);
+        return 0 >= i || i >= 12;
     }
 
     public boolean returnIfConditionWithInstanceofExpressionBooleanPrimitive(Object o) {
@@ -237,7 +237,7 @@ public class BooleanSample {
 
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression2(int i1, int i2) {
         // Keep this comment
-        Boolean b = !(i1 == 1) && (i2 == 2);
+        Boolean b = i1 != 1 && (i2 == 2);
         return b;
     }
 
@@ -249,7 +249,7 @@ public class BooleanSample {
 
     public Boolean replaceTernaryOperatorByOrOperatorWithExpression2(int i1, int i2) {
         // Keep this comment
-        Boolean b = !(i1 == 1) || (i2 == 2);
+        Boolean b = i1 != 1 || (i2 == 2);
         return b;
     }
 

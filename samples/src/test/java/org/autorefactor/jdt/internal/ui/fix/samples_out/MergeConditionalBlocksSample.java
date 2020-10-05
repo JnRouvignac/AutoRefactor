@@ -41,7 +41,7 @@ public class MergeConditionalBlocksSample {
     /** Duplicate if and else code, merge it */
     public void duplicateIfAndElse(int i) {
         // Keep this comment
-        if ((i == 0) || !(i == 1)) {
+        if ((i == 0) || (i != 1)) {
             // Keep this comment too
             System.out.println("Duplicate");
         } else {

@@ -26,6 +26,7 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -1103,29 +1104,105 @@ public class ASTNodeFactory {
 	 * @return the negated expression, moved in the AST
 	 */
 	public Expression negate(final Expression expression) {
-		return negate(expression, Copy.MOVE);
+		return negate(expression, true);
 	}
 
 	/**
 	 * Negates the provided expression and applies the provided copy operation on
-	 * the returned expression.
+	 * the returned expression:
 	 *
-	 * @param expression the expression to negate
-	 * @param copy the copy operation to perform
-	 * @return the negated expression, copied according to the copy operation
+	 * isValid                        =>  !isValid
+	 * !isValid                       =>  isValid
+	 * true                           =>  false
+	 * false                          =>  true
+	 * i > 0                          =>  i <= 0
+	 * isValid || isEnabled           =>  !isValid && !isEnabled
+	 * !isValid || !isEnabled         =>  isValid && isEnabled
+	 * isValid ? (i > 0) : !isEnabled =>  isValid ? (i <= 0) : isEnabled
+	 * @param booleanExpression the expression to negate
+	 * @param isMove False if the returned nodes need to be new nodes
+	 *
+	 * @return the negated expression, as move or copy
 	 */
-	public Expression negate(final Expression expression, final Copy copy) {
-		Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
+	public Expression negate(final Expression booleanExpression, final boolean isMove) {
+		Expression unparenthesedExpression= ASTNodes.getUnparenthesedExpression(booleanExpression);
 
-		if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
-			PrefixExpression pe= (PrefixExpression) exprNoParen;
+		if (unparenthesedExpression instanceof PrefixExpression) {
+			PrefixExpression prefixExpression= (PrefixExpression) unparenthesedExpression;
 
-			if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-				return copy.perform(this, pe.getOperand());
+			if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.NOT)) {
+				Expression otherExpression= prefixExpression.getOperand();
+				PrefixExpression otherPrefixExpression= ASTNodes.as(otherExpression, PrefixExpression.class);
+
+				if (otherPrefixExpression != null && ASTNodes.hasOperator(otherPrefixExpression, PrefixExpression.Operator.NOT)) {
+					return negate(otherPrefixExpression.getOperand(), isMove);
+				}
+
+				return isMove ? createMoveTarget(otherExpression) : createCopyTarget(otherExpression);
+			}
+		} else if (unparenthesedExpression instanceof InfixExpression) {
+			InfixExpression booleanOperation= (InfixExpression) unparenthesedExpression;
+			InfixExpression.Operator negatedOperator= ASTNodes.oppositeInfixOperator(booleanOperation.getOperator());
+
+			if (negatedOperator != null) {
+				return getNegatedOperation(booleanOperation, negatedOperator, isMove);
+			}
+		} else if (unparenthesedExpression instanceof ConditionalExpression) {
+			ConditionalExpression aConditionalExpression= (ConditionalExpression) unparenthesedExpression;
+
+			ConditionalExpression newConditionalExpression= newConditionalExpression(isMove ? createMoveTarget(aConditionalExpression.getExpression()) : createCopyTarget(aConditionalExpression.getExpression()),
+					negate(aConditionalExpression.getThenExpression(), isMove),
+					negate(aConditionalExpression.getElseExpression(), isMove));
+			return newConditionalExpression;
+		} else {
+			Boolean constant= ASTNodes.getBooleanLiteral(unparenthesedExpression);
+
+			if (constant != null) {
+				return newBooleanLiteral(!constant.booleanValue());
 			}
 		}
 
-		return not(copy.perform(this, expression));
+		if (isMove) {
+			return not(createMoveTarget(unparenthesedExpression));
+		}
+
+		return not(createCopyTarget(unparenthesedExpression));
+	}
+
+	private Expression getNegatedOperation(final InfixExpression booleanOperation, final InfixExpression.Operator negatedOperator, final boolean isMove) {
+		List<Expression> allOperands= ASTNodes.allOperands(booleanOperation);
+		List<Expression> allTargetOperands;
+
+		if (ASTNodes.hasOperator(booleanOperation, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND,
+				InfixExpression.Operator.OR)) {
+			allTargetOperands= new ArrayList<>(allOperands.size());
+
+			for (Expression booleanOperand : allOperands) {
+				Expression negatedOperand= negate(booleanOperand, isMove);
+
+				if (negatedOperand != null) {
+					allTargetOperands.add(negatedOperand);
+				} else {
+					PrefixExpression prefixExpression= newPrefixExpression(PrefixExpression.Operator.NOT, isMove ? createMoveTarget(booleanOperand) : createCopyTarget(booleanOperand));
+
+					allTargetOperands.add(prefixExpression);
+				}
+			}
+		} else {
+			allTargetOperands= new ArrayList<>(allOperands.size());
+
+			if (isMove) {
+				for (Expression anOperand : allOperands) {
+					allTargetOperands.add(createMoveTarget(anOperand));
+				}
+			} else {
+				for (Expression anOperand : allOperands) {
+					allTargetOperands.add(createCopyTarget(anOperand));
+				}
+			}
+		}
+
+		return newInfixExpression(negatedOperator, allTargetOperands);
 	}
 
 	/**
@@ -1150,7 +1227,7 @@ public class ASTNodeFactory {
 		return pe;
 	}
 
-	private Expression newPrefixExpression(final PrefixExpression.Operator operator, final Expression operand) {
+	private PrefixExpression newPrefixExpression(final PrefixExpression.Operator operator, final Expression operand) {
 		PrefixExpression pe= ast.newPrefixExpression();
 		pe.setOperator(operator);
 		pe.setOperand(operand);

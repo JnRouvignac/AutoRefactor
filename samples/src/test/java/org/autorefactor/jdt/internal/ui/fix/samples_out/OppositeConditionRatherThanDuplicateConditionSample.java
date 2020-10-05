@@ -178,7 +178,7 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
 
     public String mergeDuplicateExpressionCondition(int i, boolean anotherCondition) {
         // Keep this comment
-        if (!(i == 0)) {
+        if (i != 0) {
             return "foo";
         } else if (anotherCondition) {
             // Keep this comment also
@@ -190,7 +190,7 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
 
     public double mergeDuplicateComplexCondition(int i, boolean anotherCondition) {
         // Keep this comment
-        if (!(i < 10 || i > 20)) {
+        if (i >= 10 && i <= 20) {
             return 20.0;
         } else if (anotherCondition) {
             // Keep this comment also
@@ -202,7 +202,7 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
 
     public double mergeOppositeCondition(int i, boolean anotherCondition) {
         // Keep this comment
-        if (!(i < 10 || 20 < i)) {
+        if (i >= 10 && 20 >= i) {
             return 10.0;
         } else if (anotherCondition) {
             // Keep this comment also

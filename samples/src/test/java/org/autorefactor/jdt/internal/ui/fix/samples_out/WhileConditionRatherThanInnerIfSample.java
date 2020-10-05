@@ -65,7 +65,7 @@ public class WhileConditionRatherThanInnerIfSample {
 
     public void moveComplexConditionIntoWhileCondition(int i, int j) {
         // Keep this comment
-        while ((i < 10) && !(j == 0)) {
+        while ((i < 10) && (j != 0)) {
             i++;
         }
     }

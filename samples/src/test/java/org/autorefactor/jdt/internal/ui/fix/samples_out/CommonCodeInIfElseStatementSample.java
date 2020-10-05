@@ -294,7 +294,7 @@ public class CommonCodeInIfElseStatementSample {
 
     public String refactorExceptLastCase(boolean isValid, boolean isEnabled, int i, int j) {
         if (isValid) {
-        } else if (!(i > 0)) {
+        } else if (i <= 0) {
             return "Do completely other stuff";
         }
         // Keep this comment
@@ -426,7 +426,7 @@ public class CommonCodeInIfElseStatementSample {
             return "Common code";
         } else if (i > 0) {
         } else if (i > 10) {
-        } else if (!(i > 20)) {
+        } else if (i <= 20) {
             i++;
             if (false || !isEnabled) {
                 j++;
