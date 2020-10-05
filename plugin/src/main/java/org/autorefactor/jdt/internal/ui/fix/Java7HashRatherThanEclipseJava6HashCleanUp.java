@@ -218,7 +218,6 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		Block body= node.getBody();
 
 		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), HASH_CODE_METHOD) && body != null) {
-			@SuppressWarnings("unchecked")
 			List<Statement> statements= body.statements();
 
 			if (statements.size() > 2) {
@@ -626,7 +625,6 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.Java7HashRatherThanEclipseJava6HashCleanUp_description);
 
-		@SuppressWarnings("unchecked")
 		List<Statement> statements= node.getBody().statements();
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		Name objectsClassName= ast.newName(classname);

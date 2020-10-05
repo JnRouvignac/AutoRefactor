@@ -64,7 +64,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 	private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
 		if (ASTNodes.usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
-			@SuppressWarnings("unchecked")
 			List<Expression> args= node.arguments();
 
 			if (args != null && args.size() == 1) {

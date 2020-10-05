@@ -167,7 +167,6 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
 	}
 
 	private void reorderArguments(final MethodInvocation refactoredMi) {
-		@SuppressWarnings("unchecked")
 		List<Expression> args= refactoredMi.arguments();
 		Expression item= args.get(0);
 		Expression index= args.get(1);
@@ -175,7 +174,6 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
 		args.add(index);
 		args.add(item);
 
-		@SuppressWarnings("unchecked")
 		List<Type> typeArgs= refactoredMi.typeArguments();
 		if (!Utils.isEmpty(typeArgs)) {
 			Type itemType= typeArgs.get(0);

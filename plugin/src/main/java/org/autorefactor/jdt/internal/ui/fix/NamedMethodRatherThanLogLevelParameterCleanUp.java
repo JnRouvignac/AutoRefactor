@@ -57,7 +57,6 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 	@Override
 	public boolean visit(final MethodInvocation node) {
 		if (ASTNodes.usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-			@SuppressWarnings("unchecked")
 			List<Expression> args= node.arguments();
 
 			if (args != null && args.size() == 2) {

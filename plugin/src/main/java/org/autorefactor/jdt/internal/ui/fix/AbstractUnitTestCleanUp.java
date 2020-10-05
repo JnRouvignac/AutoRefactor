@@ -343,7 +343,6 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private MethodInvocation invokeFail(final Set<String> classesToUseWithImport, final Set<String> importsToAdd,
 			final ASTNode node, final MethodInvocation originalMethod, final Expression failureMessage) {
-		@SuppressWarnings("unchecked")
 		List<Expression> args= originalMethod.arguments();
 
 		if (args.size() == 1 || args.size() == 2) {

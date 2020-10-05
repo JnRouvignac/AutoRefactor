@@ -148,7 +148,6 @@ public class ASTRewrite {
 	 * @return the new placeholder node
 	 * @see ASTRewrite#createCopyTarget(ASTNode)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T createCopyTarget(final T node) {
 		return (T) rewrite.createCopyTarget(node);
 	}
@@ -168,7 +167,6 @@ public class ASTRewrite {
 	 * @return the new placeholder node
 	 * @see ListRewrite#createCopyTarget(ASTNode, ASTNode)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T createCopyTarget(final T first, final T last) {
 		return (T) getListRewrite(first).createCopyTarget(first, last);
 	}
@@ -207,7 +205,6 @@ public class ASTRewrite {
 	 * @return the new placeholder node
 	 * @see ASTRewrite#createMoveTarget(ASTNode)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T createMoveTarget(final T node) {
 		return (T) rewrite.createMoveTarget(node);
 	}
@@ -251,7 +248,6 @@ public class ASTRewrite {
 	 *                                  moved or copied range.
 	 * @see ListRewrite#createMoveTarget(ASTNode, ASTNode)
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T createMoveTarget(final T first, final T last) {
 		return (T) getListRewrite(first).createMoveTarget(first, last);
 	}
@@ -267,7 +263,7 @@ public class ASTRewrite {
 		if (nodes.isEmpty()) {
 			return true;
 		}
-		@SuppressWarnings("unchecked") List<ASTNode> originalList= getListRewrite(nodes.get(0)).getOriginalList();
+		List<ASTNode> originalList= getListRewrite(nodes.get(0)).getOriginalList();
 		Iterator<ASTNode> origIter= originalList.iterator();
 		while (origIter.hasNext()) {
 			ASTNode origNode= origIter.next();

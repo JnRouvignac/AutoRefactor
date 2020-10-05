@@ -98,7 +98,6 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
@@ -114,7 +113,6 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 		assertSize(args, 2);
 		Expression arg1= args.get(1);

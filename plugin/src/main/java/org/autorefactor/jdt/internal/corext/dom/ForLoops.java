@@ -171,9 +171,7 @@ public final class ForLoops {
 	 *         container, null otherwise
 	 */
 	public static ForLoopContent iterateOverContainer(final ForStatement node) {
-		@SuppressWarnings("unchecked")
 		List<Expression> initializers= node.initializers();
-		@SuppressWarnings("unchecked")
 		List<Expression> updaters= node.updaters();
 
 		if (initializers.size() == 1 && updaters.size() <= 1) {

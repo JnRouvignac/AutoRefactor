@@ -76,7 +76,6 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 
 		if (ASTNodes.usesGivenSignature(node, JUPITER_CLASS, "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$
@@ -120,7 +119,6 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {

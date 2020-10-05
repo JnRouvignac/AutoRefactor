@@ -68,7 +68,6 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AnnotationCleanUp_description);
 
-		@SuppressWarnings("unchecked")
 		List<MemberValuePair> values= node.values();
 		if (values.isEmpty()) {
 			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMarkerAnnotation(ASTNodes.createMoveTarget(rewrite, node.getTypeName())), group);
@@ -168,7 +167,6 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 	private boolean arraysEqual(final ITypeBinding typeBinding, final ArrayInitializer arrayInit, final Object javaObj) {
 		if (javaObj instanceof Object[]) {
 			Object[] javaObjArray= (Object[]) javaObj;
-			@SuppressWarnings("unchecked")
 			List<Expression> exprs= arrayInit.expressions();
 
 			if (exprs.size() == javaObjArray.length) {

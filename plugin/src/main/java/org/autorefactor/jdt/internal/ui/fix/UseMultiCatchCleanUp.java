@@ -202,9 +202,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			@SuppressWarnings("unchecked")
 			List<VariableDeclarationFragment> fragments1= node.fragments();
-			@SuppressWarnings("unchecked")
 			List<VariableDeclarationFragment> fragments2= ((VariableDeclarationStatement) other).fragments();
 			if (fragments1.size() == fragments2.size()) {
 				Iterator<VariableDeclarationFragment> it1= fragments1.iterator();
@@ -298,7 +296,6 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		@SuppressWarnings("unchecked")
 		List<CatchClause> catchClauses= node.catchClauses();
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
 		for (int i= 0; i < catchClauses.size(); i++) {
@@ -346,7 +343,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			return new SingleBinding(type.resolveBinding());
 
 		case ASTNode.UNION_TYPE:
-			@SuppressWarnings("unchecked") List<Type> types= ((UnionType) type).types();
+			List<Type> types= ((UnionType) type).types();
 			ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
 			for (int j= 0; j < types.size(); j++) {
 				typeBindings[j]= types.get(j).resolveBinding();
@@ -408,13 +405,11 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		UnionType result= cuRewrite.getAST().newUnionType();
-		@SuppressWarnings("unchecked")
 		List<Type> unionedTypes= result.types();
 		unionedTypes.addAll(rewrite.createMoveTarget(allTypes));
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void collectAllUnionedTypes(final List<Type> results, final Collection<Type> types) {
 		for (Type type : types) {
 			if (type instanceof UnionType) {

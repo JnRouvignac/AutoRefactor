@@ -293,7 +293,6 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		Name varName= varAccess.getVariableName();
 		Type varType= getType(varDecl.getVariableName().getParent());
 		if (scope instanceof Block) {
-			@SuppressWarnings("unchecked")
 			List<Statement> statements= ((Block) scope).statements();
 			for (Statement statement : statements) {
 				Expression parentExpression= ASTNodes.getTypedAncestorOrCrash(varName, Expression.class); // FIXME i=0
@@ -319,7 +318,6 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		} else if (scope instanceof ForStatement) {
 			ForStatement fs= (ForStatement) scope;
 			ForStatement newFs= ast.createCopyTarget(fs);
-			@SuppressWarnings("unchecked")
 			List<Expression> initializers= newFs.initializers();
 			if (initializers.size() != 1) {
 				throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
@@ -368,7 +366,6 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private Block copy(final Statement stmtToCopy, final Name varName) {
 		if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
 			Block block= cuRewrite.getAST().newBlock();

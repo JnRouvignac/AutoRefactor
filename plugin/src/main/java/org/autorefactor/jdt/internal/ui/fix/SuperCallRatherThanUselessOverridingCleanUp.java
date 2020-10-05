@@ -78,7 +78,6 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Statement> bodyStatements= node.getBody().statements();
 
 		if (bodyStatements.size() == 1) {

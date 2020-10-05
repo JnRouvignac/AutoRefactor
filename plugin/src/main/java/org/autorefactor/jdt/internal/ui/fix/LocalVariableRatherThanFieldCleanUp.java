@@ -135,7 +135,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			if (isVariableDeclaration(occurrence)
 					|| isExternalField(occurrence)
 					|| currentMethodDeclaration == null
-					|| (oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration)) {
+					|| oneMethodDeclaration != null && currentMethodDeclaration != oneMethodDeclaration) {
 				return true;
 			}
 
@@ -169,15 +169,11 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
 		Assignment reassignmentAssignment= (Assignment) reassignment.getParent();
 		VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, reassignment), ASTNodes.createMoveTarget(rewrite, reassignmentAssignment.getRightHandSide()));
-		@SuppressWarnings("unchecked")
 		List<Dimension> extraDimensions= fragment.extraDimensions();
-		@SuppressWarnings("unchecked")
 		List<Dimension> newExtraDimensions= newFragment.extraDimensions();
 		newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
 		VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(isFieldKept ? ASTNodes.createMoveTarget(rewrite, field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
-		@SuppressWarnings("unchecked")
 		List<IExtendedModifier> modifiers= field.modifiers();
-		@SuppressWarnings("unchecked")
 		List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
 
 		for (IExtendedModifier iExtendedModifier : modifiers) {
@@ -308,7 +304,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean hasAnnotation(final FieldDeclaration field) {
-		@SuppressWarnings("unchecked") List<IExtendedModifier> modifiers= field.modifiers();
+		List<IExtendedModifier> modifiers= field.modifiers();
 
 		for (IExtendedModifier em : modifiers) {
 			if (em.isAnnotation()) {

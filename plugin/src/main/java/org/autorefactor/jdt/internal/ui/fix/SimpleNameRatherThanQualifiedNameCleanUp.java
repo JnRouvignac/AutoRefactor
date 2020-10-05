@@ -273,8 +273,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			do {
 				for (IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
 					if (binding.getName().equals(simpleName) && (Modifier.isPublic(binding.getModifiers())
-							|| Modifier.isProtected(binding.getModifiers()) || (!Modifier.isPrivate(binding.getModifiers())
-									&& superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
+							|| Modifier.isProtected(binding.getModifiers()) || !Modifier.isPrivate(binding.getModifiers())
+									&& superTypeBinding.getPackage().equals(typeBinding.getPackage()))) {
 						return superTypeBinding;
 					}
 				}
@@ -519,7 +519,6 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TypeDeclaration node) {
 		ITypeBinding typeBinding= node.resolveBinding();
@@ -582,7 +581,6 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean visit(final FieldDeclaration node) {
 			for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
@@ -656,7 +654,6 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final MethodDeclaration node) {
 		// Method parameters
@@ -715,8 +712,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 
 		if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-				|| (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
-						&& !containsLocalName(localIdentifiers, qname))) {
+				|| fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+						&& !containsLocalName(localIdentifiers, qname)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
 			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);

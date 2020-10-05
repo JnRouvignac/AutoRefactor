@@ -91,14 +91,12 @@ public class TypeNameDecider {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		private <T> T invokeMethod(final Object object, final Method method, final Object... args)
 				throws IllegalAccessException, InvocationTargetException {
 			method.setAccessible(true);
 			return (T) method.invoke(object, args);
 		}
 
-		@SuppressWarnings("unchecked")
 		private <T> T getField(final Object object, final String fieldName)
 				throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
 			Field f= object.getClass().getDeclaredField(fieldName);

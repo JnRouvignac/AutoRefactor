@@ -142,7 +142,6 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 		TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
 		ParameterizedType parameterizedType= ast.getAST().newParameterizedType(ast.createCopyTarget(origType));
-		@SuppressWarnings("unchecked")
 		List<Type> typeArgs= parameterizedType.typeArguments();
 		typeArgs.clear();
 		typeArgs.add(ast.toType(keyType, typeNameDecider));
@@ -163,7 +162,6 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 		ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
 		if (parameterTypes.length > 0 && ASTNodes.hasType(parameterTypes[0], Map.class.getCanonicalName())) {
-			@SuppressWarnings("unchecked")
 			ITypeBinding actualParameter= ((List<Expression>) instanceCreation.arguments()).get(0).resolveTypeBinding();
 
 			if (isParameterizedTypeWithNbArguments(actualParameter, 2)) {
@@ -183,7 +181,6 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 			return false;
 		}
 
-		@SuppressWarnings("unchecked")
 		List<Expression> arguments= methodInvocation.arguments();
 		if (ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$

@@ -101,7 +101,6 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				IfStatement is= ASTNodes.as(node, IfStatement.class);
 
 				if (ts != null && ts.getFinally() == null) {
-					@SuppressWarnings("unchecked")
 					List<CatchClause> catchClauses= ts.catchClauses();
 
 					for (CatchClause catchClause : catchClauses) {
@@ -155,7 +154,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 						return other instanceof SimpleName
 								&& node.resolveBinding() != null
 								&& ((SimpleName) other).resolveBinding() != null
-								&& ((node.resolveBinding().getKind() != IBinding.VARIABLE && ((SimpleName) other).resolveBinding().getKind() != IBinding.VARIABLE) || ASTNodes.isSameVariable(node, (SimpleName) other))
+								&& (node.resolveBinding().getKind() != IBinding.VARIABLE && ((SimpleName) other).resolveBinding().getKind() != IBinding.VARIABLE || ASTNodes.isSameVariable(node, (SimpleName) other))
 								&& super.match(node, other);
 					}
 				};
@@ -166,12 +165,12 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 					ReturnStatement returnStatement= ASTNodes.as(lastStatement, ReturnStatement.class);
 					ContinueStatement continueStatement= ASTNodes.as(lastStatement, ContinueStatement.class);
 
-					if ((isIn(node, MethodDeclaration.class)
+					if (isIn(node, MethodDeclaration.class)
 							&& returnStatement != null
-							&& returnStatement.getExpression() == null)
-							|| (isIn(node, EnhancedForStatement.class, ForStatement.class, WhileStatement.class, DoStatement.class)
+							&& returnStatement.getExpression() == null
+							|| isIn(node, EnhancedForStatement.class, ForStatement.class, WhileStatement.class, DoStatement.class)
 									&& continueStatement != null
-									&& continueStatement.getLabel() == null)) {
+									&& continueStatement.getLabel() == null) {
 						if (statements.size() > referenceStatements.size() + 1) {
 							stmtsToCompare= statements.subList(statements.size() - referenceStatements.size() - 1,
 									statements.size() - 1);
@@ -208,7 +207,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 		private boolean isIn(final Statement node, final Class<?>... domClasses) {
 			for (Class<?> domClass : domClasses) {
 				if (node.getParent().getClass().isAssignableFrom(domClass)
-						|| (node.getParent() instanceof Block && node.getParent().getParent().getClass().isAssignableFrom(domClass))) {
+						|| node.getParent() instanceof Block && node.getParent().getParent().getClass().isAssignableFrom(domClass)) {
 					return true;
 				}
 			}

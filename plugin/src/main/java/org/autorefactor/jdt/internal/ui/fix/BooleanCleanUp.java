@@ -231,7 +231,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 nodeToReplace.getParent().setStructuralProperty(cpd, replacementNode);
             } else if (locationInParent instanceof ChildListPropertyDescriptor) {
                 ChildListPropertyDescriptor clpd= (ChildListPropertyDescriptor) locationInParent;
-                @SuppressWarnings("unchecked") List<ASTNode> property= (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
+                List<ASTNode> property= (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
                 property.set(property.indexOf(nodeToReplace), replacementNode);
             } else {
                 throw new NotImplementedException(nodeToReplace, locationInParent);
@@ -383,7 +383,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return negate(infixExpression);
     }
 
-    @SuppressWarnings("unchecked")
     private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
             final Expression expression) {
         if (variableDeclarationStatement == null) {
@@ -502,7 +501,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return ast.newName(Boolean.class.getCanonicalName());
     }
 
-    @SuppressWarnings("unchecked")
     private boolean isSimpleNameAlreadyUsed(final String simpleName, final CompilationUnit cu) {
         for (ImportDeclaration id : (List<ImportDeclaration>) cu.imports()) {
             if (!(id.getName() instanceof QualifiedName)) {

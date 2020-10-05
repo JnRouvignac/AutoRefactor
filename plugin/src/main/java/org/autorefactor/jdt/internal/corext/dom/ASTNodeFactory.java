@@ -171,7 +171,6 @@ public class ASTNodeFactory {
 	 * @param statements the statements to add to the block
 	 * @return a new Block
 	 */
-	@SuppressWarnings("unchecked")
 	public Block newBlock(final Statement... statements) {
 		Block block= ast.newBlock();
 		addAll(block.statements(), statements);
@@ -184,7 +183,6 @@ public class ASTNodeFactory {
 	 * @param statements the statements to add to the block
 	 * @return a new Block
 	 */
-	@SuppressWarnings("unchecked")
 	public Block newBlock(final Collection<Statement> statements) {
 		Block block= ast.newBlock();
 		block.statements().addAll(statements);
@@ -302,7 +300,6 @@ public class ASTNodeFactory {
 	 * @param typeArguments the type arguments
 	 * @return a new parameterized type
 	 */
-	@SuppressWarnings("unchecked")
 	public Type newParameterizedType(final String typeName, final Type... typeArguments) {
 		Type type= type(typeName);
 		ParameterizedType parameterizedType= ast.newParameterizedType(type);
@@ -318,7 +315,6 @@ public class ASTNodeFactory {
 	 * @param statements          the statements to add to the catch clause
 	 * @return a new catch clause
 	 */
-	@SuppressWarnings("unchecked")
 	public CatchClause newCatchClause(final String exceptionTypeName, final String caughtExceptionName, final Statement... statements) {
 		CatchClause cc= ast.newCatchClause();
 		SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
@@ -363,7 +359,6 @@ public class ASTNodeFactory {
 
 		if (typeBinding.isParameterizedType()) {
 			ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-			@SuppressWarnings("unchecked")
 			List<Type> typeArgs= type.typeArguments();
 			for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
 				typeArgs.add(toType(typeArg, typeNameDecider));
@@ -431,7 +426,6 @@ public class ASTNodeFactory {
 		case ASTNode.PARAMETERIZED_TYPE:
 			ParameterizedType pType= (ParameterizedType) type;
 			ParameterizedType copyOfType= ast.newParameterizedType(createCopyTarget(pType.getType()));
-			@SuppressWarnings("unchecked")
 			List<Type> newTypeArgs= copyOfType.typeArguments();
 			for (Object typeArg : pType.typeArguments()) {
 				if (((Type) typeArg).isWildcardType()) {
@@ -524,7 +518,6 @@ public class ASTNodeFactory {
 	 * @param node the node to copy
 	 * @return a copy of the node
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T copySubtree(final T node) {
 		return (T) ASTNode.copySubtree(ast, node);
 	}
@@ -563,7 +556,6 @@ public class ASTNodeFactory {
 	 * @param initializer the variable initializer, can be null
 	 * @return a new variable declaration expression
 	 */
-	@SuppressWarnings("unchecked")
 	public VariableDeclarationExpression newVariableDeclarationExpression(final Type type, final SimpleName varName, final Expression initializer) {
 		VariableDeclarationFragment fragment= newVariableDeclarationFragment(varName, initializer);
 		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
@@ -748,7 +740,6 @@ public class ASTNodeFactory {
 	 * @param allOperands the operands
 	 * @return a new infix expression
 	 */
-	@SuppressWarnings("unchecked")
 	public InfixExpression newInfixExpression(final InfixExpression.Operator operator, final Collection<? extends Expression> allOperands) {
 		if (allOperands.size() < 2) {
 			throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
@@ -793,7 +784,6 @@ public class ASTNodeFactory {
 	 * @param extendedOperands the extended operands
 	 * @return a new infix expression
 	 */
-	@SuppressWarnings("unchecked")
 	public InfixExpression newInfixExpression(final Expression leftOperand, final InfixExpression.Operator operator, final Expression rightOperand,
 			final Expression... extendedOperands) {
 		InfixExpression infixExpression= ast.newInfixExpression();
@@ -847,7 +837,6 @@ public class ASTNodeFactory {
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	@SuppressWarnings("unchecked")
 	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
 		MethodInvocation methodInvocation= ast.newMethodInvocation();
 		methodInvocation.setName(ast.newSimpleName(methodName));
@@ -941,7 +930,6 @@ public class ASTNodeFactory {
 	 * @param nodeToCopy the node to copy
 	 * @return a copy of the node
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends ASTNode> T createCopyTarget(final T nodeToCopy) {
 		if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
 			return (T) copyType((Type) nodeToCopy);
@@ -1000,7 +988,6 @@ public class ASTNodeFactory {
 	 * @param arguments the constructor invocation arguments
 	 * @return a new class instance creation
 	 */
-	@SuppressWarnings("unchecked")
 	public ClassInstanceCreation newClassInstanceCreation(final String typeName, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(simpleType(typeName));
@@ -1015,7 +1002,6 @@ public class ASTNodeFactory {
 	 * @param arguments the constructor invocation arguments
 	 * @return a new class instance creation
 	 */
-	@SuppressWarnings("unchecked")
 	public ClassInstanceCreation newClassInstanceCreation(final Type type, final Expression... arguments) {
 		ClassInstanceCreation cic= ast.newClassInstanceCreation();
 		cic.setType(type);
@@ -1023,14 +1009,12 @@ public class ASTNodeFactory {
 		return cic;
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T extends ASTNode> void addAll(final List<T> whereToAdd, final T... toAdd) {
 		if (!isEmptyRangeCopy(toAdd)) {
 			Collections.addAll(whereToAdd, toAdd);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private <E extends Expression> void addAll(final MethodInvocation methodInvocation, final List<E> arguments) {
 		if (!isEmptyRangeCopy(arguments)) {
 			methodInvocation.arguments().addAll(arguments);
@@ -1288,7 +1272,6 @@ public class ASTNodeFactory {
 	 * @param catchClauses the catch clauses for the try
 	 * @return a new try statement
 	 */
-	@SuppressWarnings("unchecked")
 	public TryStatement newTryStatement(final Block body, final CatchClause... catchClauses) {
 		TryStatement tryS= ast.newTryStatement();
 		tryS.setBody(body);
@@ -1373,7 +1356,6 @@ public class ASTNodeFactory {
 	 * @param block      the block of the method
 	 * @return a new method declaration
 	 */
-	@SuppressWarnings("unchecked")
 	public MethodDeclaration newMethodDeclaration(final List<IExtendedModifier> modifiers, final String methodName,
 			final List<SingleVariableDeclaration> parameters, final Block block) {
 		MethodDeclaration md= ast.newMethodDeclaration();

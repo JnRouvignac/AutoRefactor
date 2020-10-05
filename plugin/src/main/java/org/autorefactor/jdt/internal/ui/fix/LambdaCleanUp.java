@@ -101,7 +101,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (node.getBody() instanceof ClassInstanceCreation) {
 			ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
-			@SuppressWarnings("unchecked")
 			List<Expression> arguments= ci.arguments();
 
 			if (ci.resolveTypeBinding() != null
@@ -113,7 +112,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			}
 		} else if (node.getBody() instanceof SuperMethodInvocation) {
 			SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
-			@SuppressWarnings("unchecked")
 			List<Expression> arguments= smi.arguments();
 
 			if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
@@ -124,7 +122,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 			MethodInvocation methodInvocation= (MethodInvocation) node.getBody();
 			Expression calledExpression= methodInvocation.getExpression();
 			ITypeBinding calledType= ASTNodes.getCalledType(methodInvocation);
-			@SuppressWarnings("unchecked")
 			List<Expression> arguments= methodInvocation.arguments();
 
 			if (node.parameters().size() == arguments.size()) {
@@ -263,7 +260,6 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void removeParamParentheses(final LambdaExpression node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();

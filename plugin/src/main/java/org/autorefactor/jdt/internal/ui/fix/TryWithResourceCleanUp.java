@@ -219,7 +219,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			return definitions.containsAll(Arrays.asList(simpleNames));
 		}
 
-		@SuppressWarnings({ "deprecation", "unchecked" })
+		@SuppressWarnings({ "deprecation" })
 		private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();

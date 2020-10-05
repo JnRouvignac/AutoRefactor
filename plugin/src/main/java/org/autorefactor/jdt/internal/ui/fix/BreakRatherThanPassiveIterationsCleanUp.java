@@ -116,7 +116,6 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 			return visitVar(node.getOperand());
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean visit(final InfixExpression node) {
 			if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.hasType(node, String.class.getCanonicalName())
@@ -189,7 +188,6 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		return MultiFixMessages.BreakRatherThanPassiveIterationsCleanUp_reason;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final ForStatement node) {
 		Set<SimpleName> vars= new HashSet<>();

@@ -93,7 +93,6 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 		int i= 0;
 		boolean shouldVisit= true;

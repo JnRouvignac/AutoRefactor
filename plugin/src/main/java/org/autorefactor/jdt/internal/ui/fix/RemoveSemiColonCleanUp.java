@@ -195,7 +195,6 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final TryStatement node) {
-		@SuppressWarnings("unchecked")
 		List<VariableDeclarationExpression> resources= node.resources();
 		if (resources.isEmpty()) {
 			return true;

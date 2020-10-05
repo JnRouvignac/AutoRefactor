@@ -74,7 +74,6 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 				&& maybeReplaceSetContains(ifStmtToReplace, ifExpression, oppositeStatement, statement, !negate, "remove"); //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
 			final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
 		List<Statement> statements= ASTNodes.asList(statement);

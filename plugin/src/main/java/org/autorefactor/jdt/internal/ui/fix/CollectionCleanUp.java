@@ -138,7 +138,6 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			@SuppressWarnings("unchecked")
 			List<Expression> args= cic.arguments();
 			boolean noArgsCtor= args.isEmpty();
 

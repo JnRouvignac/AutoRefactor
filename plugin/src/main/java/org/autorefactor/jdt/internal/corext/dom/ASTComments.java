@@ -23,7 +23,6 @@ public final class ASTComments {
 	 * @param cu compilation unit
 	 * @return comments
 	 */
-	@SuppressWarnings("unchecked")
 	public static List<Comment> filterCommentsInRange(int start, int end, final CompilationUnit cu) {
 		return filterCommentsInRange(start, end, cu.getCommentList());
 	}

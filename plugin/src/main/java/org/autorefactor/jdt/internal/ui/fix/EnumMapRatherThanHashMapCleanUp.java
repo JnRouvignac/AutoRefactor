@@ -96,7 +96,6 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		Type keyType= types[0];
 		Type valueType= types[1];
-		@SuppressWarnings("unchecked")
 		List<Expression> arguments= cic.arguments();
 
 		if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())

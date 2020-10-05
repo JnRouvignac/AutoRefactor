@@ -210,7 +210,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return finder.getCoveringNode();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final Javadoc node) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -290,7 +289,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean hasOverrideAnnotation(final ASTNode node) {
 		if (node instanceof BodyDeclaration) {
 			for (IExtendedModifier modifier : (List<IExtendedModifier>) ((BodyDeclaration) node).modifiers()) {
@@ -312,7 +310,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean hasNoTags(final Javadoc node) {
 		for (TagElement tag : (List<TagElement>) node.tags()) {
 			if (tag.getTagName() != null) {
@@ -346,7 +343,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 		}
 		Matcher matcher= JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
 		if (matcher.matches()) {
-			@SuppressWarnings("unchecked")
 			List<TagElement> tagElements= node.tags();
 			if (tagElements.size() >= 2) {
 				TagElement firstLine= tagElements.get(0);
@@ -569,7 +565,6 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 				|| node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node)); //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final CompilationUnit node) {
 		comments.clear();

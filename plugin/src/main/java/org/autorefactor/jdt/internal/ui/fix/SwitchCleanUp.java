@@ -382,7 +382,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		@SuppressWarnings("unchecked")
 		List<Statement> switchStatements= switchStatement.statements();
 
 		// Add the case statement(s)
@@ -505,7 +504,6 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 		return switchStructure.get(idx - 1).fallsThrough();
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
 		List<SwitchCaseSection> switchStructure= new ArrayList<>();
 

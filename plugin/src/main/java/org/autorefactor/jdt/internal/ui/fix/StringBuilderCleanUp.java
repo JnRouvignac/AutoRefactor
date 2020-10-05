@@ -415,7 +415,6 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		if (infixExpression != null && isStringConcat(infixExpression)) {
 			if (infixExpression.hasExtendedOperands()) {
-				@SuppressWarnings("unchecked")
 				List<Expression> reversed= new ArrayList<>(infixExpression.extendedOperands());
 				Collections.reverse(reversed);
 

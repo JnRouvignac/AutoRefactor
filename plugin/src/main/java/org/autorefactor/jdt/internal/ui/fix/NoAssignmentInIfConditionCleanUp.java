@@ -210,7 +210,6 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
 		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
 				final Expression expression) {
 			if (variableDeclarationStatement != null && expression instanceof SimpleName) {

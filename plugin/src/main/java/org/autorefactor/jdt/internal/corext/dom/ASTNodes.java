@@ -191,7 +191,6 @@ public final class ASTNodes {
 			return interruptVisit();
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public boolean visit(final InfixExpression node) {
 			if (hasOperator(node, InfixExpression.Operator.DIVIDE)) {
@@ -319,7 +318,6 @@ public final class ASTNodes {
 	 * @param statement the statement to analyze
 	 * @return the provided statement as a non null list of statements
 	 */
-	@SuppressWarnings("unchecked")
 	public static List<Statement> asList(final Statement statement) {
 		if (statement == null) {
 			return Collections.emptyList();
@@ -341,7 +339,6 @@ public final class ASTNodes {
 	 * @param stmtClass the class representing the required statement type
 	 * @return the provided statement as an object of the provided type if type matches, null otherwise
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends Statement> T as(final Statement statement, final Class<T> stmtClass) {
 		if (statement == null) {
 			return null;
@@ -381,7 +378,6 @@ public final class ASTNodes {
 	 * @return the provided expression as an object of the provided type if type
 	 *         matches, null otherwise
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends Expression> T as(final Expression expression, final Class<T> exprClass) {
 		if (expression != null) {
 			if (exprClass.isAssignableFrom(expression.getClass())) {
@@ -548,7 +544,6 @@ public final class ASTNodes {
 	 * @return a List of expressions
 	 */
 	public static List<Expression> allOperands(final InfixExpression node) {
-		@SuppressWarnings("unchecked")
 		List<Expression> extOps= node.extendedOperands();
 		List<Expression> operands= new ArrayList<>(2 + extOps.size());
 		operands.add(node.getLeftOperand());
@@ -673,7 +668,6 @@ public final class ASTNodes {
 	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
 	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends ASTNode> T getTypedAncestor(final ASTNode node, final Class<T> ancestorClass) {
 		if (node == null || node.getParent() == null) {
 			return null;
@@ -967,7 +961,6 @@ public final class ASTNodes {
 		return getSiblings(startNode, false);
 	}
 
-	@SuppressWarnings("unchecked")
 	private static List<Statement> getSiblings(final Statement startNode, final boolean isForward) {
 		Statement statementAtLevel= statementAtLevel(startNode);
 
@@ -1025,7 +1018,6 @@ public final class ASTNodes {
 		}
 		if (parent instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) parent;
-			@SuppressWarnings("unchecked")
 			List<AbstractTypeDeclaration> types= cu.types();
 			int index= types.indexOf(node);
 			if (index != -1 && index + 1 < types.size()) {
@@ -1036,13 +1028,11 @@ public final class ASTNodes {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final AbstractTypeDeclaration parent,
 			final boolean lookForPrevious) {
 		return getSibling(node, parent.bodyDeclarations(), lookForPrevious);
 	}
 
-	@SuppressWarnings("unchecked")
 	private static BodyDeclaration getSibling(final BodyDeclaration node, final AnonymousClassDeclaration parent,
 			final boolean lookForPrevious) {
 		return getSibling(node, parent.bodyDeclarations(), lookForPrevious);
@@ -1659,7 +1649,6 @@ public final class ASTNodes {
 		if (statement == null) {
 			return null;
 		}
-		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> fragments= statement.fragments();
 		return fragments.size() == 1 ? fragments.get(0) : null;
 	}
@@ -2540,7 +2529,6 @@ public final class ASTNodes {
 	public static Pair<Expression, Expression> decomposeInitializer(final Expression init) {
 		if (init instanceof VariableDeclarationExpression) {
 			VariableDeclarationExpression variableDeclarationExpression= (VariableDeclarationExpression) init;
-			@SuppressWarnings("unchecked")
 			List<VariableDeclarationFragment> fragments= variableDeclarationExpression.fragments();
 
 			if (fragments.size() == 1) {

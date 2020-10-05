@@ -254,7 +254,6 @@ public class CFGBuilder {
 	/**
 	 * @return whether the current variable access can throw an exception.
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean addVariableAccess(final CFGBasicBlock basicBlock, final Expression node, final int flags, final ThrowerBlocks throwers) {
 		if (node == null) {
 			return false;
@@ -1137,7 +1136,6 @@ public class CFGBuilder {
 	 * @return the list of basic blocks representing CFGs for each method in this
 	 *         compilation unit
 	 */
-	@SuppressWarnings("unchecked")
 	public List<CFGBasicBlock> buildCFG(final CompilationUnit node) {
 		List<CFGBasicBlock> results= new LinkedList<>();
 		for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {

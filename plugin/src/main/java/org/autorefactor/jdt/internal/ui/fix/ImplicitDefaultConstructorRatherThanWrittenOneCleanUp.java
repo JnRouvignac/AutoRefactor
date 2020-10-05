@@ -56,7 +56,6 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 		return MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final TypeDeclaration node) {
 		if (!node.isInterface()) {
@@ -126,7 +125,6 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 	}
 
 	private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
-		@SuppressWarnings("unchecked")
 		List<Statement> statements= uniqueConstructor.getBody().statements();
 
 		if (Utils.isEmpty(statements)) {

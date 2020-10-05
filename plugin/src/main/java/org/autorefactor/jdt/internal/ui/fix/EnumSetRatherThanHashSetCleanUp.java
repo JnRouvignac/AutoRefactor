@@ -101,7 +101,6 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 		Type type= types[0];
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		@SuppressWarnings("unchecked")
 		List<Expression> arguments= cic.arguments();
 		MethodInvocation invocation;
 		Name newClassName= ast.newName(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());

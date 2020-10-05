@@ -82,7 +82,6 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
 
 			if (node.hasExtendedOperands()) {
-				@SuppressWarnings("unchecked")
 				List<Expression> extendedOperands= node.extendedOperands();
 				List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
 				newOperands.add(newInvoke);

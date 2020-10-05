@@ -185,7 +185,6 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				&& anonymousClassDecl != null
 				&& anonymousClassDecl.bodyDeclarations() != null
 				&& anonymousClassDecl.bodyDeclarations().size() == 1) {
-			@SuppressWarnings("unchecked")
 			List<BodyDeclaration> bodies= anonymousClassDecl.bodyDeclarations();
 			ITypeBinding typeArgument= type.resolveBinding().getTypeArguments()[0];
 
@@ -210,7 +209,6 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			VariableDeclaration object1= (VariableDeclaration) methodDecl.parameters().get(0);
 			VariableDeclaration object2= (VariableDeclaration) methodDecl.parameters().get(1);
 
-			@SuppressWarnings("unchecked")
 			List<Statement> statements= methodBody.statements();
 
 			return maybeRefactorBody(node, typeArgument, classesToUseWithImport, object1, object2, statements);
@@ -471,7 +469,6 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return typeMethodRef;
 	}
 
-	@SuppressWarnings("unchecked")
 	private LambdaExpression buildField(final Expression node, final ITypeBinding type, final boolean straightOrder,
 			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();

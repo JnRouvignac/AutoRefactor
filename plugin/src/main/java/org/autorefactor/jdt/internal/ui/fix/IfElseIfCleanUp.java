@@ -94,7 +94,6 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 		Statement elseStatement= node.getElseStatement();
 
 		if (elseStatement instanceof Block) {
-			@SuppressWarnings("unchecked")
 			List<Statement> elseStatements= ((Block) elseStatement).statements();
 
 			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {

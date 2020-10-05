@@ -188,7 +188,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public boolean visit(final ClassInstanceCreation node) {
 		ITypeBinding typeBinding= node.getType().resolveBinding();
-		@SuppressWarnings("unchecked")
 		List<Expression> args= node.arguments();
 
 		if (getJavaMinorVersion() >= 5 && args.size() == 1) {

@@ -61,7 +61,6 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 		if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
 				Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
 			Modifier finalModifier= null;
-			@SuppressWarnings("unchecked")
 			Collection<IExtendedModifier> modifiers= node.modifiers();
 
 			for (Modifier modifier : getModifiersOnly(modifiers)) {

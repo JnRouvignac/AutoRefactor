@@ -164,7 +164,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 	 * @param visitors the visitors that will be executed by this
 	 *                 {@link AggregateASTVisitor}
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	public AggregateASTVisitor(final List<RefactoringRule> visitors) {
 		this.visitors= (List) visitors;
 		analyzeVisitors();

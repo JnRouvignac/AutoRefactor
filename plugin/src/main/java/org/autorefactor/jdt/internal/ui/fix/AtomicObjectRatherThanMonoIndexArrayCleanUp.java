@@ -268,7 +268,6 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			ClassInstanceCreation newAtomicObject= ast.newClassInstanceCreation(atomicType);
 
 			if (arrayCreation.getInitializer() != null) {
-				@SuppressWarnings("unchecked")
 				List<Expression> arguments= newAtomicObject.arguments();
 				arguments.add(ASTNodes.createMoveTarget(rewrite, (Expression) arrayCreation.getInitializer().expressions().get(0)));
 			}

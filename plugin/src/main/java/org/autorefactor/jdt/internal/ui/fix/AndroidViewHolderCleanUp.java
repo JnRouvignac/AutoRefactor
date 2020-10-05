@@ -116,7 +116,6 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				Block thenBlock= ast.newBlock();
 				IfStatement ifStatement= ast.newIfStatement(condition, thenBlock);
 				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, group);
-				@SuppressWarnings("unchecked")
 				List<Statement> thenStatements= thenBlock.statements();
 
 				thenStatements.add(ast.newExpressionStatement(ast.newAssignment(convertViewVar.varName(), Assignment.Operator.ASSIGN, ast.createCopyTarget(visitor.getInflateExpression()))));
@@ -188,7 +187,6 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	private TypeDeclaration createViewHolderItemClass(final FindViewByIdVisitor findViewByIdVisitor, final SimpleName typeName,
 			final TypeNameDecider typeNameDecider) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -330,7 +328,6 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				return true;
 			}
 
-			@SuppressWarnings("unchecked")
 			private FieldDeclaration toFieldDecl(final ASTNodeFactory ast, final TypeNameDecider typeNameDecider) {
 				FieldDeclaration field= ast.newFieldDeclaration(ast.copyType(variable, typeNameDecider),
 						ast.newVariableDeclarationFragment(ast.createCopyTarget(variable)));

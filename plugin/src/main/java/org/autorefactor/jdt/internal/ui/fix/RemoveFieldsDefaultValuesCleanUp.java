@@ -57,7 +57,6 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		return MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_reason;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(final FieldDeclaration node) {
 		if (!canRemoveFieldDefaultValue(node)) {

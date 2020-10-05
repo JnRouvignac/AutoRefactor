@@ -77,7 +77,6 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 	 *                                          this method is replaced by
 	 *                                          {@link MethodDeclaration#thrownExceptionTypes}.
 	 */
-	@SuppressWarnings("unchecked")
 	private Collection<ASTNode> getUncheckedExceptions(final MethodDeclaration node) {
 		List<ASTNode> result= new ArrayList<>();
 		for (Type n : (List<Type>) node.thrownExceptionTypes()) {

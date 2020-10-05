@@ -138,7 +138,6 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean hasAnnotation(final List<?> modifiers) {
 		for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
 			if (em.isAnnotation()) {
@@ -160,15 +159,11 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			Type copyOfType= ast.createCopyTarget(varToMove.getType());
 			SimpleName name= fragment.getName();
 			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ast.createCopyTarget(name));
-			@SuppressWarnings("unchecked")
 			List<Dimension> extraDimensions= fragment.extraDimensions();
-			@SuppressWarnings("unchecked")
 			List<Dimension> newExtraDimensions= newFragment.extraDimensions();
 			newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
 			VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
-			@SuppressWarnings("unchecked")
 			List<IExtendedModifier> modifiers= varToMove.modifiers();
-			@SuppressWarnings("unchecked")
 			List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
 
 			for (IExtendedModifier iExtendedModifier : modifiers) {

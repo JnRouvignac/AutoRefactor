@@ -112,7 +112,6 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 		return origRawType;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Type substituteType(final Type origType, final ASTNode originalExpression, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
