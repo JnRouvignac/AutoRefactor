@@ -113,27 +113,27 @@ public class BooleanSample {
         return !b;
     }
 
-    public boolean removeUselessTernaryOperatorWithBooleanPrimitive1(boolean bo) {
+    public boolean removeUselessTernaryOperatorWithBooleanPrimitive1(boolean isValid) {
         // Keep this comment
-        boolean b = bo;
+        boolean b = isValid;
         return b;
     }
 
-    public boolean removeUselessTernaryOperatorWithBooleanPrimitive2(boolean bo) {
+    public boolean removeUselessTernaryOperatorWithBooleanPrimitive2(boolean isValid) {
         // Keep this comment
-        boolean b = !bo;
+        boolean b = !isValid;
         return b;
     }
 
-    public Boolean removeUselessTernaryOperatorWithBooleanObject1(boolean bo) {
+    public Boolean removeUselessTernaryOperatorWithBooleanObject1(boolean isValid) {
         // Keep this comment
-        Boolean b = Boolean.valueOf(bo);
+        Boolean b = Boolean.valueOf(isValid);
         return b;
     }
 
-    public Boolean removeUselessTernaryOperatorWithBooleanObject2(boolean bo) {
+    public Boolean removeUselessTernaryOperatorWithBooleanObject2(boolean isValid) {
         // Keep this comment
-        Boolean b = Boolean.valueOf(!bo);
+        Boolean b = Boolean.valueOf(!isValid);
         return b;
     }
 
@@ -217,8 +217,8 @@ public class BooleanSample {
         return b;
     }
 
-    public Object doNotReplaceNonBooleanExpression(boolean bo) {
-        Object anything = bo ? true : "false";
+    public Object doNotReplaceNonBooleanExpression(boolean isValid) {
+        Object anything = isValid ? true : "false";
         return anything;
     }
 
@@ -229,174 +229,174 @@ public class BooleanSample {
         b = bo1 ? bo2 : Boolean.TRUE;
     }
 
-    public Boolean replaceTernaryOperatorByAndOperatorWithExpression(int i1, int i2) {
+    public Boolean replaceTernaryOperatorByAndOperatorWithExpression(int number1, int number2) {
         // Keep this comment
-        Boolean b = (i1 == 1) && (i2 == 2);
+        Boolean b = (number1 == 1) && (number2 == 2);
         return b;
     }
 
-    public Boolean replaceTernaryOperatorByAndOperatorWithExpression2(int i1, int i2) {
+    public Boolean replaceTernaryOperatorByAndOperatorWithExpression2(int number1, int number2) {
         // Keep this comment
-        Boolean b = i1 != 1 && (i2 == 2);
+        Boolean b = number1 != 1 && (number2 == 2);
         return b;
     }
 
-    public Boolean replaceTernaryOperatorByOrOperatorWithExpression(int i1, int i2) {
+    public Boolean replaceTernaryOperatorByOrOperatorWithExpression(int number1, int number2) {
         // Keep this comment
-        Boolean b = (i1 == 1) || (i2 == 2);
+        Boolean b = (number1 == 1) || (number2 == 2);
         return b;
     }
 
-    public Boolean replaceTernaryOperatorByOrOperatorWithExpression2(int i1, int i2) {
+    public Boolean replaceTernaryOperatorByOrOperatorWithExpression2(int number1, int number2) {
         // Keep this comment
-        Boolean b = i1 != 1 || (i2 == 2);
+        Boolean b = number1 != 1 || (number2 == 2);
         return b;
     }
 
-    public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean bo) {
+    public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean isValid) {
         boolean b = true;
-        if (bo) {
+        if (isValid) {
             b = false;
         } else {
             System.out.println();
         }
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment1(boolean bo) {
+    public void removeUselessIfInBooleanPrimitiveAssignment1(boolean isValid) {
         // Keep this comment
-        boolean b = !bo;
+        boolean b = !isValid;
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment2(boolean bo) {
+    public void removeUselessIfInBooleanPrimitiveAssignment2(boolean isValid) {
         // Keep this comment
-        boolean b = bo;
+        boolean b = isValid;
     }
 
-    public void removeUselessIfInBooleanObjectAssignment1(boolean bo) {
+    public void removeUselessIfInBooleanObjectAssignment1(boolean isValid) {
         // Keep this comment
-        Boolean b = Boolean.valueOf(!bo);
+        Boolean b = Boolean.valueOf(!isValid);
     }
 
-    public void removeUselessIfInBooleanObjectAssignment2(boolean bo) {
+    public void removeUselessIfInBooleanObjectAssignment2(boolean isValid) {
         // Keep this comment
-        boolean b = bo;
+        boolean b = isValid;
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment3(boolean bo,
+    public void removeUselessIfInBooleanPrimitiveAssignment3(boolean isValid,
             boolean b) {
         // Keep this comment
-        b = !bo;
+        b = !isValid;
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment4(boolean bo,
+    public void removeUselessIfInBooleanPrimitiveAssignment4(boolean isValid,
             boolean b) {
         // Keep this comment
-        b = bo;
+        b = isValid;
     }
 
-    public void doNotInlineAlreadyUsedVariable(boolean bo) {
+    public void doNotInlineAlreadyUsedVariable(boolean isValid) {
         boolean b = false;
-        if (bo || b) {
+        if (isValid || b) {
             b = true;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling(
-            boolean bo, boolean b) {
+            boolean isValid, boolean b) {
         b = false;
         char c = 'a';
         byte by = 0;
         double d = 0.0;
-        if (bo) {
+        if (isValid) {
             b = true;
         }
     }
 
-    public void removeUselessIfInBooleanObjectAssignment3(boolean bo, Boolean b) {
+    public void removeUselessIfInBooleanObjectAssignment3(boolean isValid, Boolean b) {
         // Keep this comment
-        b = Boolean.valueOf(!bo);
+        b = Boolean.valueOf(!isValid);
     }
 
-    public void removeUselessIfInBooleanObjectAssignment4(boolean bo, Boolean b) {
+    public void removeUselessIfInBooleanObjectAssignment4(boolean isValid, Boolean b) {
         // Keep this comment
-        b = Boolean.valueOf(bo);
+        b = Boolean.valueOf(isValid);
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment5(boolean bo) {
+    public void removeUselessIfInBooleanPrimitiveAssignment5(boolean isValid) {
         // Keep this comment
-        this.booleanPrimitive = bo;
+        this.booleanPrimitive = isValid;
     }
 
-    public void removeUselessIfInBooleanObjectAssignment5(boolean bo) {
+    public void removeUselessIfInBooleanObjectAssignment5(boolean isValid) {
         // Keep this comment
-        this.booleanWrapper = Boolean.valueOf(bo);
+        this.booleanWrapper = Boolean.valueOf(isValid);
     }
 
-    public void removeUselessIfInBooleanPrimitiveAssignment6(boolean bo) {
+    public void removeUselessIfInBooleanPrimitiveAssignment6(boolean isValid) {
         // Keep this comment
-        booleanPrimitive = bo;
+        booleanPrimitive = isValid;
     }
 
-    public void removeUselessIfInBooleanObjectAssignment6(boolean bo) {
+    public void removeUselessIfInBooleanObjectAssignment6(boolean isValid) {
         // Keep this comment
-        booleanWrapper = Boolean.valueOf(bo);
+        booleanWrapper = Boolean.valueOf(isValid);
     }
 
-    public void removeUselessIfInBooleanObjectAssignment7(boolean bo) {
+    public void removeUselessIfInBooleanObjectAssignment7(boolean isValid) {
         // Keep this comment
-        BooleanSample.this.booleanWrapper = Boolean.valueOf(bo);
+        BooleanSample.this.booleanWrapper = Boolean.valueOf(isValid);
     }
 
-    public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
+    public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean isValid) {
         // Keep this comment
-        return bo && aMethodThatReturnsBoolean();
+        return isValid && aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
+    public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean isValid) {
         // Keep this comment
-        return !bo || aMethodThatReturnsBoolean();
+        return !isValid || aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
+    public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean isValid) {
         // Keep this comment
-        return !bo && aMethodThatReturnsBoolean();
+        return !isValid && aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
+    public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean isValid) {
         // Keep this comment
-        return bo || aMethodThatReturnsBoolean();
+        return isValid || aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfWithBooleanObjectParameter1(Boolean bo) {
+    public boolean removeUselessIfWithBooleanObjectParameter1(Boolean isValid) {
         // Keep this comment
-        return bo && aMethodThatReturnsBoolean();
+        return isValid && aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfWithBooleanObjectParameter2(Boolean bo) {
+    public boolean removeUselessIfWithBooleanObjectParameter2(Boolean isValid) {
         // Keep this comment
-        return !bo || aMethodThatReturnsBoolean();
+        return !isValid || aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfWithBooleanObjectParameter3(Boolean bo) {
+    public boolean removeUselessIfWithBooleanObjectParameter3(Boolean isValid) {
         // Keep this comment
-        return !bo && aMethodThatReturnsBoolean();
+        return !isValid && aMethodThatReturnsBoolean();
     }
 
-    public boolean removeUselessIfWithBooleanObjectParameter4(Boolean bo) {
+    public boolean removeUselessIfWithBooleanObjectParameter4(Boolean isValid) {
         // Keep this comment
-        return bo || aMethodThatReturnsBoolean();
+        return isValid || aMethodThatReturnsBoolean();
     }
 
-    public void removeUselessTernaryOperatorWithBooleanPrimitive(boolean bo) {
-        aMethodThatAcceptsABoolean(bo);
-        aMethodThatAcceptsABoolean(!bo);
-        aMethodThatAcceptsABoolean(Boolean.valueOf(bo));
-        aMethodThatAcceptsABoolean(Boolean.valueOf(!bo));
+    public void removeUselessTernaryOperatorWithBooleanPrimitive(boolean isValid) {
+        aMethodThatAcceptsABoolean(isValid);
+        aMethodThatAcceptsABoolean(!isValid);
+        aMethodThatAcceptsABoolean(Boolean.valueOf(isValid));
+        aMethodThatAcceptsABoolean(Boolean.valueOf(!isValid));
     }
 
-    public void directlyPassBooleanPrimitiveAsParameter(boolean bo) {
+    public void directlyPassBooleanPrimitiveAsParameter(boolean isValid) {
         // Keep this comment
-        aMethodThatAcceptsABoolean(bo);
+        aMethodThatAcceptsABoolean(isValid);
     }
 
     public void directlyPassBooleanExpressionAsParameter(int i) {
@@ -430,14 +430,14 @@ public class BooleanSample {
         }
     }
 
-    public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean bo) {
+    public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean isValid) {
         // Keep this comment
-        aMethodThatAcceptsABoolean(!bo);
+        aMethodThatAcceptsABoolean(!isValid);
     }
 
-    public int directlyPassBooleanAmongOtherCode(boolean bo) {
+    public int directlyPassBooleanAmongOtherCode(boolean isValid) {
         // Keep this comment
-        aMethodThatAcceptsABoolean(bo);
+        aMethodThatAcceptsABoolean(isValid);
         if (aMethodThatReturnsBoolean()) {
             return 0;
         } else {
@@ -445,19 +445,19 @@ public class BooleanSample {
         }
     }
 
-    public int directlyPassBooleanAmongOtherBoolean(boolean bo, int i) {
+    public int directlyPassBooleanAmongOtherBoolean(boolean isValid, int i) {
         // Keep this comment
         aMethodThatAcceptsABoolean(true);
-        aMethodThatAcceptsABoolean(bo);
+        aMethodThatAcceptsABoolean(isValid);
         aMethodThatAcceptsABoolean(true);
         i++;
         return i;
     }
 
-    public int directlyPassOppositeBoolean(boolean bo) {
+    public int directlyPassOppositeBoolean(boolean isValid) {
         // Keep this comment
-        aMethodThatAcceptsABoolean(bo);
-        aMethodThatAcceptsABoolean(!bo);
+        aMethodThatAcceptsABoolean(isValid);
+        aMethodThatAcceptsABoolean(!isValid);
         if (aMethodThatReturnsBoolean()) {
             return 0;
         } else
@@ -474,14 +474,14 @@ public class BooleanSample {
             return 10;
     }
 
-    public int refactorWithFollowingCode(boolean bo) {
+    public int refactorWithFollowingCode(boolean isValid) {
         // Keep this comment
-        aMethodThatAcceptsABoolean(!bo);
+        aMethodThatAcceptsABoolean(!isValid);
         return 42;
     }
 
-    public int doNotRefactorWithNameConflict(boolean bo) {
-        if (bo) {
+    public int doNotRefactorWithNameConflict(boolean isValid) {
+        if (isValid) {
             boolean b = true;
             aMethodThatAcceptsABoolean(b);
         } else {
@@ -503,40 +503,40 @@ public class BooleanSample {
         }
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression12(boolean bo) {
-        if (bo) {
+    public void removeUselessIfInBooleanPrimitiveExpression12(boolean isValid) {
+        if (isValid) {
             aMethodThatAcceptsABoolean(true);
         } else {
             aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
         }
-        // FIXME This should be converted to aMethodThatAcceptsABoolean(bo || aMethodThatReturnsBoolean());
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(isValid || aMethodThatReturnsBoolean());
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression13(boolean bo) {
-        if (bo) {
+    public void removeUselessIfInBooleanPrimitiveExpression13(boolean isValid) {
+        if (isValid) {
             aMethodThatAcceptsABoolean(false);
         } else {
             aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
         }
-        // FIXME This should be converted to aMethodThatAcceptsABoolean(!bo && aMethodThatReturnsBoolean());
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(!isValid && aMethodThatReturnsBoolean());
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression14(boolean bo) {
-        if (bo) {
+    public void removeUselessIfInBooleanPrimitiveExpression14(boolean isValid) {
+        if (isValid) {
             aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
         } else {
             aMethodThatAcceptsABoolean(true);
         }
-        // FIXME This should be converted to aMethodThatAcceptsABoolean(!bo || aMethodThatReturnsBoolean());
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(!isValid || aMethodThatReturnsBoolean());
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression15(boolean bo) {
-        if (bo) {
+    public void removeUselessIfInBooleanPrimitiveExpression15(boolean isValid) {
+        if (isValid) {
             aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
         } else {
             aMethodThatAcceptsABoolean(false);
         }
-        // FIXME This should be converted to aMethodThatAcceptsABoolean(bo && aMethodThatReturnsBoolean());
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(isValid && aMethodThatReturnsBoolean());
     }
 
     public boolean invertConditionalExpression(int i, boolean res1, boolean res2) {
@@ -563,12 +563,12 @@ public class BooleanSample {
         return false;
     }
 
-    public Boolean doNotThrowAnyException(boolean bo) {
+    public Boolean doNotThrowAnyException(boolean isValid) {
         class ClassWithBooleanField {
             Boolean b;
         }
         ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
-        return bo ? objWithBooleanField.b : Boolean.TRUE;
+        return isValid ? objWithBooleanField.b : Boolean.TRUE;
     }
 
     protected boolean aMethodThatReturnsBoolean() {
