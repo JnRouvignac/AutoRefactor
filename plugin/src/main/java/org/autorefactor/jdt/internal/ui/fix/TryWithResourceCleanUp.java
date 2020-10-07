@@ -41,7 +41,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -112,12 +111,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 					Statement finallyStatement= finallyStatements.get(0);
 					nodesToRemove.add(finallyStatements.size() == 1 ? node.getFinally() : finallyStatement);
 
-					ExpressionStatement finallyEs= ASTNodes.as(finallyStatement, ExpressionStatement.class);
+					MethodInvocation methodInvocation= ASTNodes.asExpression(finallyStatement, MethodInvocation.class);
 					IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
 
-					if (finallyEs != null) {
-						MethodInvocation methodInvocation= ASTNodes.as(finallyEs.getExpression(), MethodInvocation.class);
-
+					if (methodInvocation != null) {
 						if (methodClosesCloseables(methodInvocation) && ASTNodes.areSameVariables(previousDeclFragment, methodInvocation.getExpression())) {
 							return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
 									nodesToRemove);
@@ -127,10 +124,10 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 						Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(finallyIs.getExpression());
 
 						Statement thenStatement= ASTNodes.asList(finallyIs.getThenStatement()).get(0);
-						MethodInvocation methodInvocation= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
+						MethodInvocation methodInvocation2= ASTNodes.asExpression(thenStatement, MethodInvocation.class);
 
-						if (methodClosesCloseables(methodInvocation)
-								&& ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, methodInvocation.getExpression())) {
+						if (methodClosesCloseables(methodInvocation2)
+								&& ASTNodes.areSameVariables(previousDeclFragment, nullCheckedExpression, methodInvocation2.getExpression())) {
 							return maybeRefactorToTryWithResources(node, tryStatements, previousDeclStatement, previousDeclFragment,
 									nodesToRemove);
 						}

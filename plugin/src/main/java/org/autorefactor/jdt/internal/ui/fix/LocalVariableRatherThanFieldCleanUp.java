@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Dimension;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -212,17 +211,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 				boolean isReassigned= false;
 
 				while (statement != null) {
-					ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
+					Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
 
-					if (expressionStatement != null) {
-						Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
-
-						if (assignment != null
-								&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
-								&& assignment.getLeftHandSide() == reassignment) {
-							isReassigned= true;
-							break;
-						}
+					if (assignment != null
+							&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+							&& assignment.getLeftHandSide() == reassignment) {
+						isReassigned= true;
+						break;
 					}
 
 					statement= ASTNodes.getPreviousStatement(statement);
@@ -245,17 +240,13 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 
 				while (statement != null) {
 					statement= ASTNodes.getPreviousStatement(statement);
-					ExpressionStatement expressionStatement= ASTNodes.as(statement, ExpressionStatement.class);
+					Assignment assignment= ASTNodes.asExpression(statement, Assignment.class);
 
-					if (expressionStatement != null) {
-						Assignment assignment= ASTNodes.as(expressionStatement.getExpression(), Assignment.class);
-
-						if (assignment != null
-								&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
-								&& ASTNodes.areSameVariables(assignment.getLeftHandSide(), occurrence)) {
-							isReassigned= true;
-							break;
-						}
+					if (assignment != null
+							&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+							&& ASTNodes.areSameVariables(assignment.getLeftHandSide(), occurrence)) {
+						isReassigned= true;
+						break;
 					}
 				}
 
