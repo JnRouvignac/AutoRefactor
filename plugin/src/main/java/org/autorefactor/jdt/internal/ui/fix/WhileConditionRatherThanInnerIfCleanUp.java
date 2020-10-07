@@ -79,15 +79,11 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 
 	private boolean maybeRefactorWhile(final WhileStatement node, final IfStatement ifStatement, final Statement breakingStatement,
 			final Statement otherStatement, final boolean isPositive) {
-		List<Statement> breakingStatements= ASTNodes.asList(breakingStatement);
+		BreakStatement breakStatement= ASTNodes.as(breakingStatement, BreakStatement.class);
 
-		if (breakingStatements.size() == 1) {
-			BreakStatement breakStatement= ASTNodes.as(breakingStatements.get(0), BreakStatement.class);
-
-			if (breakStatement != null && breakStatement.getLabel() == null) {
-				refactorWhileCondition(node, ifStatement, otherStatement, isPositive);
-				return false;
-			}
+		if (breakStatement != null && breakStatement.getLabel() == null) {
+			refactorWhileCondition(node, ifStatement, otherStatement, isPositive);
+			return false;
 		}
 
 		return true;

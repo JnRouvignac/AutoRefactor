@@ -101,17 +101,13 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	private boolean maybeRefactorEnhancedForStatement(final EnhancedForStatement node,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		Expression iterable= node.getExpression();
-		List<Statement> statements= ASTNodes.asList(node.getBody());
+		MethodInvocation methodInvocation= ASTNodes.asExpression(node.getBody(), MethodInvocation.class);
 
-		if (statements.size() != 1) {
-			return true;
-		}
-
-		MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 		IVariableBinding foreachVariable= node.getParameter().resolveBinding();
 		// We should remove all the loop variable occurrences
 		// As we replace only one, there should be no more than one occurrence
-		if (getVariableUseCount(foreachVariable, node.getBody()) == 1
+		if (methodInvocation != null
+				&& getVariableUseCount(foreachVariable, node.getBody()) == 1
 				&& methodInvocation != null && methodInvocation.arguments().size() == 1) {
 			if (ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
 				if (ASTNodes.isSameLocalVariable(node.getParameter(), (Expression) methodInvocation.arguments().get(0))) {
@@ -133,17 +129,18 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
 		ForLoopContent loopContent= ForLoops.iterateOverContainer(node);
-		List<Statement> statements= ASTNodes.asList(node.getBody());
+		MethodInvocation methodInvocation= ASTNodes.asExpression(node.getBody(), MethodInvocation.class);
 
-		if (loopContent != null && loopContent.getLoopVariable() != null && statements.size() == 1) {
+		if (loopContent != null
+				&& loopContent.getLoopVariable() != null
+				&& methodInvocation != null) {
 			Name loopVariable= loopContent.getLoopVariable();
 			IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
-			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
 			// We should remove all the loop variable occurrences
 			// As we replace only one, there should be no more than one occurrence
 			if (methodInvocation != null && methodInvocation.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
-					&& (loopContent.isLoopingForward() || (methodInvocation.resolveMethodBinding() != null && ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName())))) {
+					&& (loopContent.isLoopingForward() || methodInvocation.resolveMethodBinding() != null && ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
 				Expression addArg0= (Expression) methodInvocation.arguments().get(0);
 
 				switch (loopContent.getContainerType()) {

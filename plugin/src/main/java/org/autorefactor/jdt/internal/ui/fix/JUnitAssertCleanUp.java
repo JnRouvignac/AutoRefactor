@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Statement;
 
 /**
  * See {@link #getDescription()} method.
@@ -148,10 +147,9 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+		MethodInvocation methodInvocation= ASTNodes.asExpression(node.getThenStatement(), MethodInvocation.class);
 
-		if (node.getElseStatement() == null && statements.size() == 1) {
-			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
+		if (node.getElseStatement() == null && methodInvocation != null) {
 			int i= 0;
 			boolean shouldVisit= true;
 			while (shouldVisit && i < PACKAGE_PATHES.length) {

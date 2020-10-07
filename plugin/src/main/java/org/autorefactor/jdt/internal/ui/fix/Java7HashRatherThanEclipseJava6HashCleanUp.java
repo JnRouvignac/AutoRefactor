@@ -452,24 +452,20 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			}
 
 			if (getEnclosingInstanceDeclaration != null) {
-				List<Statement> methodStatements= ASTNodes.asList(getEnclosingInstanceDeclaration.getBody());
+				ReturnStatement returnStatement= ASTNodes.as(getEnclosingInstanceDeclaration.getBody(), ReturnStatement.class);
 
-				if (methodStatements != null && methodStatements.size() == 1) {
-					ReturnStatement returnStatement= ASTNodes.as(methodStatements.get(0), ReturnStatement.class);
+				if (returnStatement != null) {
+					ThisExpression thisExpression= ASTNodes.as(returnStatement.getExpression(),
+							ThisExpression.class);
 
-					if (returnStatement != null) {
-						ThisExpression thisExpression= ASTNodes.as(returnStatement.getExpression(),
-								ThisExpression.class);
+					if (thisExpression != null) {
+						SimpleName topLevelClassReference= ASTNodes.as(thisExpression.getQualifier(),
+								SimpleName.class);
 
-						if (thisExpression != null) {
-							SimpleName topLevelClassReference= ASTNodes.as(thisExpression.getQualifier(),
-									SimpleName.class);
-
-							if (topLevelClassReference != null
-									&& topLevelClass.getName().getIdentifier().equals(topLevelClassReference.getIdentifier())) {
-								data.getFields().add(ASTNodes.getUnparenthesedExpression(specificMethod));
-								return true;
-							}
+						if (topLevelClassReference != null
+								&& topLevelClass.getName().getIdentifier().equals(topLevelClassReference.getIdentifier())) {
+							data.getFields().add(ASTNodes.getUnparenthesedExpression(specificMethod));
+							return true;
 						}
 					}
 				}

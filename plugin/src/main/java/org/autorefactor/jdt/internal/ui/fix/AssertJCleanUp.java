@@ -38,7 +38,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.Statement;
 
 /**
  * See {@link #getDescription()} method.
@@ -194,22 +193,20 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 	@Override
 	public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+		MethodInvocation methodInvocation= ASTNodes.asExpression(node.getThenStatement(), MethodInvocation.class);
 
-		if (node.getElseStatement() == null && statements.size() == 1) {
-			MethodInvocation methodInvocation= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
-
-			if (ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())) {
-				if (methodInvocation.arguments() == null
-						|| (methodInvocation.arguments().size() == 1 && ASTNodes.as((Expression) methodInvocation.arguments().get(0), NullLiteral.class) != null)) {
-					return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
-				}
-
-				return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), methodInvocation);
+		if (node.getElseStatement() == null
+				&& methodInvocation != null
+				&& (ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName())
+						|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName())
+						|| ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName())
+						|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName()))) {
+			if (methodInvocation.arguments() == null
+					|| methodInvocation.arguments().size() == 1 && ASTNodes.as((Expression) methodInvocation.arguments().get(0), NullLiteral.class) != null) {
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
 			}
+
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), methodInvocation);
 		}
 
 		return true;

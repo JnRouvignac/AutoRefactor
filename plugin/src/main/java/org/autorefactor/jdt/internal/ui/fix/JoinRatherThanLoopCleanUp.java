@@ -232,12 +232,11 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 
 			if (delimiterCondition != null) {
 				Expression delimiter= null;
-				List<Statement> delimiterStatements= ASTNodes.asList(delimiterCondition.getThenStatement());
+				ExpressionStatement delimiterStatement= ASTNodes.as(delimiterCondition.getThenStatement(), ExpressionStatement.class);
 
 				if (delimiterCondition.getElseStatement() == null
-						&& delimiterStatements != null
-						&& delimiterStatements.size() == 1) {
-					delimiter= getDelimiterAppend(builderClass, delimiterStatements.get(0), builderUses);
+						&& delimiterStatement != null) {
+					delimiter= getDelimiterAppend(builderClass, delimiterStatement, builderUses);
 				}
 
 				if (isConditionOnIndexValid(iterationType, containerVariable, loopVariable, isDelimiterFirst, delimiterCondition, builderUses)) {

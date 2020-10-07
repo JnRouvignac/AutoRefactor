@@ -134,18 +134,17 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		if (checkNullityStatement != null && checkNullityStatement.getElseStatement() == null && checkEqualsStatement != null
 				&& checkEqualsStatement.getElseStatement() == null) {
 			InfixExpression nullityCondition= ASTNodes.as(checkNullityStatement.getExpression(), InfixExpression.class);
-			List<Statement> nullityStatements= ASTNodes.asList(checkNullityStatement.getThenStatement());
+			ReturnStatement nullityStatement= ASTNodes.as(checkNullityStatement.getThenStatement(), ReturnStatement.class);
 
 			PrefixExpression equalsCondition= ASTNodes.as(checkEqualsStatement.getExpression(), PrefixExpression.class);
-			List<Statement> equalsStatements= ASTNodes.asList(checkEqualsStatement.getThenStatement());
+			ReturnStatement equalsStatement= ASTNodes.as(checkEqualsStatement.getThenStatement(), ReturnStatement.class);
 
 			if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
-					&& ASTNodes.hasOperator(nullityCondition, InfixExpression.Operator.NOT_EQUALS) && nullityStatements != null
-					&& nullityStatements.size() == 1 && equalsCondition != null
-					&& ASTNodes.hasOperator(equalsCondition, PrefixExpression.Operator.NOT) && equalsStatements != null
-					&& equalsStatements.size() == 1) {
-				return maybeReplaceEquals(node, firstField, nullityCondition, nullityStatements, equalsCondition,
-						equalsStatements, classesToUseWithImport, importsToAdd);
+					&& ASTNodes.hasOperator(nullityCondition, InfixExpression.Operator.NOT_EQUALS) && nullityStatement != null
+					&& equalsCondition != null
+					&& ASTNodes.hasOperator(equalsCondition, PrefixExpression.Operator.NOT) && equalsStatement != null) {
+				return maybeReplaceEquals(node, firstField, nullityCondition, nullityStatement, equalsCondition,
+						equalsStatement, classesToUseWithImport, importsToAdd);
 			}
 		}
 
@@ -153,12 +152,10 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 	}
 
 	private boolean maybeReplaceEquals(final IfStatement node, final Expression firstField,
-			final InfixExpression nullityCondition, final List<Statement> nullityStatements,
-			final PrefixExpression equalsCondition, final List<Statement> equalsStatements,
+			final InfixExpression nullityCondition, final ReturnStatement returnStatement1,
+			final PrefixExpression equalsCondition, final ReturnStatement returnStatement2,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		OrderedInfixExpression<Expression, NullLiteral> nullityOrderedCondition= ASTNodes.orderedInfix(nullityCondition, Expression.class, NullLiteral.class);
-		ReturnStatement returnStatement1= ASTNodes.as(nullityStatements.get(0), ReturnStatement.class);
-		ReturnStatement returnStatement2= ASTNodes.as(equalsStatements.get(0), ReturnStatement.class);
 		MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
 		if (nullityOrderedCondition != null && returnStatement1 != null && returnStatement2 != null && equalsMethod != null

@@ -27,7 +27,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -40,7 +39,6 @@ import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -91,18 +89,20 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
 		ForLoopContent loopContent= ForLoops.iterateOverContainer(node);
-		List<Statement> statements= ASTNodes.asList(node.getBody());
+		Assignment assignment= ASTNodes.asExpression(node.getBody(), Assignment.class);
 
-		if (loopContent != null && loopContent.getLoopVariable() != null && loopContent.getContainerType() == ContainerType.ARRAY && statements.size() == 1) {
-			Assignment assignment= ASTNodes.asExpression(statements.get(0), Assignment.class);
+		if (assignment != null
+				&& loopContent != null
+				&& loopContent.getLoopVariable() != null
+				&& loopContent.getContainerType() == ContainerType.ARRAY
+				&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
+				&& ASTNodes.isHardCoded(assignment.getRightHandSide())
+				&& ASTNodes.isPassive(assignment.getRightHandSide())) {
+			ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
 
-			if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isHardCoded(assignment.getRightHandSide()) && ASTNodes.isPassive(assignment.getRightHandSide())) {
-				ArrayAccess arrayAccess= ASTNodes.as(assignment.getLeftHandSide(), ArrayAccess.class);
-
-				if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
-					replaceWithArraysFill(node, classesToUseWithImport, importsToAdd, assignment, arrayAccess);
-					return false;
-				}
+			if (arrayAccess != null && isSameVariable(loopContent, arrayAccess)) {
+				replaceWithArraysFill(node, classesToUseWithImport, importsToAdd, assignment, arrayAccess);
+				return false;
 			}
 		}
 
