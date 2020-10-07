@@ -93,6 +93,7 @@ public final class AllCleanUpRules {
                 new StandardMethodRatherThanLibraryMethodCleanUp(), new StringRatherThanNewStringCleanUp(),
                 new StringCleanUp(), new StringValueOfRatherThanConcatCleanUp(), new BigNumberCleanUp(),
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
+                new PrimitiveComparisonRatherThanWrapperComparisonCleanUp(),
                 new RemoveEmptyIfCleanUp(),
                 new NoLoopIterationRatherThanEmptyCheckCleanUp(),
                 new InlineCodeRatherThanPeremptoryConditionCleanUp(),

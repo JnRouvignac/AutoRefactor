@@ -473,6 +473,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String RemoveEmptyIfCleanUp_name;
     /**
      * Automatically filled.
