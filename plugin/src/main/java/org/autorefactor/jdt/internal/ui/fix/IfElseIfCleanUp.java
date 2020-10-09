@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.List;
-
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
@@ -75,35 +73,26 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 		return MultiFixMessages.IfElseIfCleanUp_reason;
 	}
 
-	// TODO JNR
-
-	// UseIfElseIfRefactoring
-	// if (ast) {
-	// return i;
-	// }
-	// if (c) {
-	// return j;
-	// }
-	// if (d) {
-	// return k;
-	// }
-	// return l;
-
 	@Override
 	public boolean visit(final IfStatement node) {
 		Statement elseStatement= node.getElseStatement();
 
 		if (elseStatement instanceof Block) {
-			List<Statement> elseStatements= ((Block) elseStatement).statements();
+			IfStatement ifStatement= ASTNodes.as(elseStatement, IfStatement.class);
 
-			if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.IfElseIfCleanUp_description);
-				rewrite.set(node, IfStatement.ELSE_STATEMENT_PROPERTY, ASTNodes.createMoveTarget(rewrite, elseStatements.get(0)), group);
+			if (ifStatement != null) {
+				removeBlock(node, ifStatement);
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	private void removeBlock(final IfStatement node, final IfStatement ifStatement) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.IfElseIfCleanUp_description);
+
+		rewrite.replace(node.getElseStatement(), ASTNodes.createMoveTarget(rewrite, ifStatement), group);
 	}
 }
