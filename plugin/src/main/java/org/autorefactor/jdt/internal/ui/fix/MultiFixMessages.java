@@ -1337,6 +1337,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String OneTryRatherThanTwoCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String OneTryRatherThanTwoCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String OneTryRatherThanTwoCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String TestNGAssertCleanUp_name;
     /**
      * Automatically filled.

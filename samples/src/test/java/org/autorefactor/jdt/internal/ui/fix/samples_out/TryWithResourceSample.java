@@ -81,28 +81,6 @@ public class TryWithResourceSample {
         }
     }
 
-    public void removeInnerTry() throws Exception {
-        try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-            {
-                System.out.println(inputStream.read());
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    public void doNotRemoveInnerTryWithCatchClause() throws Exception {
-        try {
-            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-                System.out.println(inputStream.read());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
     public void doNotRefactorUnrelated() throws Exception {
         FileInputStream inputStream = new FileInputStream("out.txt");
         Object o = null;

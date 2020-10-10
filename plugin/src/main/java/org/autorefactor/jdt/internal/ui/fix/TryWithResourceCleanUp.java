@@ -84,18 +84,6 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 		@Override
 		public boolean visit(final TryStatement node) {
 			if (result) {
-				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
-
-				if (!tryStatements.isEmpty()) {
-					TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
-
-					if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
-						collapseTryStatements(node, innerTryStatement);
-						result= false;
-						return false;
-					}
-				}
-
 				VariableDeclarationStatement previousDeclStatement= ASTNodes.as(ASTNodes.getPreviousStatement(node),
 						VariableDeclarationStatement.class);
 
@@ -115,6 +103,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 					MethodInvocation methodInvocation= ASTNodes.asExpression(finallyStatement, MethodInvocation.class);
 					IfStatement finallyIs= ASTNodes.as(finallyStatement, IfStatement.class);
+					List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
 					if (methodInvocation != null) {
 						if (methodClosesCloseables(methodInvocation) && ASTNodes.areSameVariables(previousDeclFragment, methodInvocation.getExpression())) {
@@ -181,16 +170,6 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 		private boolean methodClosesCloseables(final MethodInvocation methodInvocation) {
 			return ASTNodes.usesGivenSignature(methodInvocation, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
-		}
-
-		@SuppressWarnings("deprecation")
-		private void collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
-
-			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
-			ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
 		}
 
 		private void refactorFromDeclaration(final TryStatement node,

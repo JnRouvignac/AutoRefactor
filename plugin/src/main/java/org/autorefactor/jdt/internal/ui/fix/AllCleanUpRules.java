@@ -140,6 +140,7 @@ public final class AllCleanUpRules {
                 new RemoveFieldsDefaultValuesCleanUp(), new StaticConstantRatherThanInstanceConstantCleanUp(),
                 new RemoveOverriddenAssignmentCleanUp(), new Java7HashRatherThanEclipseJava6HashCleanUp(),
                 new AnnotationCleanUp(), new TryWithResourceCleanUp(),
+                new OneTryRatherThanTwoCleanUp(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for
                 // the project
                 new TestNGAssertCleanUp(),
@@ -157,7 +158,7 @@ public final class AllCleanUpRules {
                 new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
                 new VariableInsideIfRatherThanAboveCleanUp(),
 
-                // Those cleanups should end the list because some other cleanups are prioritary
+                // Those cleanups should end the list because some other cleanups are primary
                 new ReduceIndentationCleanUp());
     }
 
