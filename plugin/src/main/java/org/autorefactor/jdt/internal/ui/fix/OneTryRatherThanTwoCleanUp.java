@@ -65,7 +65,10 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 		if (!tryStatements.isEmpty()) {
 			TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
-			if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
+			if (innerTryStatement != null
+					&& !innerTryStatement.resources().isEmpty()
+					&& innerTryStatement.getFinally() == null
+					&& innerTryStatement.catchClauses().isEmpty()) {
 				collapseTryStatements(node, innerTryStatement);
 				return false;
 			}
@@ -81,6 +84,16 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.OneTryRatherThanTwoCleanUp_description);
 
 		rewrite.insertLast(node, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
-		ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
+		List<Statement> innerStatements= ASTNodes.asList(innerTryStatement.getBody());
+
+		if (innerStatements == null || innerStatements.isEmpty()) {
+			rewrite.removeButKeepComment(innerTryStatement, group);
+		} else {
+			ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerStatements.get(0)), group);
+
+			for (int i= innerStatements.size() - 1; i > 1; i--) {
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, innerStatements.get(i)), innerTryStatement, group);
+			}
+		}
 	}
 }

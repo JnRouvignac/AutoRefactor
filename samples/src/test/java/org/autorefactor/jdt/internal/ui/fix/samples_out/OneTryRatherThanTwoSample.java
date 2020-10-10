@@ -30,8 +30,18 @@ import java.io.FileInputStream;
 public class OneTryRatherThanTwoSample {
     public void removeInnerTry() throws Exception {
         try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-            {
+            System.out.println(inputStream.read());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public void doNotRemoveInnerTryWithFinally() throws Exception {
+        try {
+            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
                 System.out.println(inputStream.read());
+            } finally {
+                System.out.println("Do not lose me!");
             }
         } catch (Exception e) {
             throw e;
