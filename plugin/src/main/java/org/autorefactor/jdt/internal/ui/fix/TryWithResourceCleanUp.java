@@ -75,9 +75,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final Block node) {
-		DeclarationAndTryVisitor returnStatementVisitor= new DeclarationAndTryVisitor();
-		returnStatementVisitor.visitNode(node);
-		return returnStatementVisitor.result;
+		DeclarationAndTryVisitor declarationAndTryVisitor= new DeclarationAndTryVisitor();
+		declarationAndTryVisitor.visitNode(node);
+		return declarationAndTryVisitor.result;
 	}
 
 	private final class DeclarationAndTryVisitor extends BlockSubVisitor {
@@ -90,7 +90,9 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 					TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
 					if (innerTryStatement != null && !innerTryStatement.resources().isEmpty() && innerTryStatement.catchClauses().isEmpty()) {
-						return collapseTryStatements(node, innerTryStatement);
+						collapseTryStatements(node, innerTryStatement);
+						result= false;
+						return false;
 					}
 				}
 
@@ -138,18 +140,88 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		@SuppressWarnings("deprecation")
 		private boolean maybeRefactorToTryWithResources(final TryStatement node, final List<Statement> tryStatements,
 				final VariableDeclarationStatement previousDeclStatement,
 				final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
-			VariableDeclarationExpression newResource= newResource(tryStatements, previousDeclStatement,
-					previousDeclFragment, nodesToRemove);
+			VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(previousDeclFragment).find();
+			List<SimpleName> definitions= visitor.getWrites();
 
-			if (newResource == null) {
-				return true;
+			boolean hasAssignment= false;
+			Statement tryStatement= null;
+			Assignment assignResource= null;
+
+			if (!tryStatements.isEmpty()) {
+				tryStatement= tryStatements.get(0);
+				assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
+
+				hasAssignment= assignResource != null && ASTNodes.isSameVariable(previousDeclFragment, assignResource.getLeftHandSide());
 			}
 
+			if (hasAssignment) {
+				if (containsOnly(definitions, assignResource.getLeftHandSide(), previousDeclFragment.getName())) {
+					refactorFromAssignment(node, previousDeclStatement, previousDeclFragment, nodesToRemove,
+							tryStatement, assignResource);
+
+					result= false;
+					return false;
+				}
+			} else if (containsOnly(definitions, previousDeclFragment.getName())) {
+				refactorFromDeclaration(node, previousDeclStatement, previousDeclFragment, nodesToRemove);
+
+				result= false;
+				return false;
+			}
+
+			return true;
+		}
+
+		private boolean containsOnly(final Collection<SimpleName> definitions, final Expression... simpleNames) {
+			return definitions.size() == simpleNames.length && definitions.containsAll(Arrays.asList(simpleNames));
+		}
+
+		private boolean methodClosesCloseables(final MethodInvocation methodInvocation) {
+			return ASTNodes.usesGivenSignature(methodInvocation, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
+		}
+
+		@SuppressWarnings("deprecation")
+		private void collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
+
+			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
+			ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
+		}
+
+		private void refactorFromDeclaration(final TryStatement node,
+				final VariableDeclarationStatement previousDeclStatement,
+				final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			VariableDeclarationFragment newFragment= ASTNodes.createMoveTarget(rewrite, previousDeclFragment);
+			refactorToTryWithResources(node, previousDeclStatement, nodesToRemove, newFragment, rewrite, ast);
+		}
+
+		private void refactorFromAssignment(final TryStatement node,
+				final VariableDeclarationStatement previousDeclStatement,
+				final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove,
+				final Statement tryStatement, final Assignment assignResource) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			nodesToRemove.add(tryStatement);
+
+			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, previousDeclFragment.getName()),
+					ASTNodes.createMoveTarget(rewrite, assignResource.getRightHandSide()));
+			refactorToTryWithResources(node, previousDeclStatement, nodesToRemove, newFragment, rewrite, ast);
+		}
+
+		@SuppressWarnings("deprecation")
+		private void refactorToTryWithResources(final TryStatement node,
+				final VariableDeclarationStatement previousDeclStatement, final List<ASTNode> nodesToRemove,
+				final VariableDeclarationFragment newFragment, final ASTRewrite rewrite, final ASTNodeFactory ast) {
+			VariableDeclarationExpression newResource= ast.newVariableDeclarationExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), newFragment);
 
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
 			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, group);
@@ -157,75 +229,6 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 			for (ASTNode nodeToRemove : nodesToRemove) {
 				rewrite.removeButKeepComment(nodeToRemove, group);
 			}
-
-			result= false;
-			return false;
-		}
-
-		private boolean methodClosesCloseables(final MethodInvocation methodInvocation) {
-			return ASTNodes.usesGivenSignature(methodInvocation, Closeable.class.getCanonicalName(), "close"); //$NON-NLS-1$
-		}
-
-		private VariableDeclarationExpression newResource(final List<Statement> tryStatements,
-				final VariableDeclarationStatement previousDeclStatement, final VariableDeclarationFragment previousDeclFragment,
-				final List<ASTNode> nodesToRemove) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-			VariableDeclarationFragment fragment= newFragment(tryStatements, previousDeclFragment, nodesToRemove);
-
-			if (fragment != null) {
-				return ast.newVariableDeclarationExpression(ASTNodes.createMoveTarget(rewrite, previousDeclStatement.getType()), fragment);
-			}
-
-			return null;
-		}
-
-		private VariableDeclarationFragment newFragment(final List<Statement> tryStatements,
-				final VariableDeclarationFragment existingFragment, final List<ASTNode> nodesToRemove) {
-			VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(existingFragment).find();
-			List<SimpleName> definitions= visitor.getWrites();
-
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-			if (!tryStatements.isEmpty()) {
-				Statement tryStatement= tryStatements.get(0);
-				Assignment assignResource= ASTNodes.asExpression(tryStatement, Assignment.class);
-
-				if (assignResource != null && ASTNodes.isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
-					nodesToRemove.add(tryStatement);
-
-					if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
-						return ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, existingFragment.getName()),
-								ASTNodes.createMoveTarget(rewrite, assignResource.getRightHandSide()));
-					}
-
-					return null;
-				}
-			}
-
-			return containsOnly(definitions, existingFragment.getName()) ? ASTNodes.createMoveTarget(rewrite, existingFragment) : null;
-		}
-
-		private boolean containsOnly(final Collection<SimpleName> definitions, final Expression... simpleNames) {
-			if (definitions.size() != simpleNames.length) {
-				return false;
-			}
-
-			return definitions.containsAll(Arrays.asList(simpleNames));
-		}
-
-		@SuppressWarnings({ "deprecation" })
-		private boolean collapseTryStatements(final TryStatement outerTryStatement, final TryStatement innerTryStatement) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.TryWithResourceCleanUp_description);
-
-			rewrite.insertLast(outerTryStatement, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
-			ASTNodes.replaceButKeepComment(rewrite, innerTryStatement, ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
-			result= false;
-			return false;
 		}
 	}
 }
