@@ -137,15 +137,15 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
         @Override
         public boolean visit(final EnhancedForStatement node) {
             SingleVariableDeclaration loopVariable= node.getParameter();
-            IfStatement is= uniqueStmtAs(node.getBody(), IfStatement.class);
-            return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), is);
+            IfStatement ifStatement= uniqueStmtAs(node.getBody(), IfStatement.class);
+            return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), ifStatement);
         }
 
         private boolean maybeReplaceWithCollectionContains(final Statement forNode, final Expression iterable,
-                final Expression loopElement, final IfStatement is) {
-            if (result && is != null && is.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
-                MethodInvocation condition= getMethodToReplace(is.getExpression());
-                List<Statement> thenStatements= ASTNodes.asList(is.getThenStatement());
+                final Expression loopElement, final IfStatement ifStatement) {
+            if (result && ifStatement != null && ifStatement.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
+                MethodInvocation condition= getMethodToReplace(ifStatement.getExpression());
+                List<Statement> thenStatements= ASTNodes.asList(ifStatement.getThenStatement());
 
                 if (!thenStatements.isEmpty()
                         && condition != null) {
@@ -154,12 +154,12 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                     if (toFind != null) {
                         if (thenStatements.size() == 1) {
                             Statement thenStatement= thenStatements.get(0);
-                            BooleanLiteral innerBl= getReturnedBooleanLiteral(thenStatement);
+                            BooleanLiteral innerBooleanLiteral= getReturnedBooleanLiteral(thenStatement);
 
                             Statement forNextStatement= ASTNodes.getNextStatement(forNode);
-                            BooleanLiteral outerBl= getReturnedBooleanLiteral(forNextStatement);
+                            BooleanLiteral outerBooleanLiteral= getReturnedBooleanLiteral(forNextStatement);
 
-                            Boolean isPositive= signCollectionContains(innerBl, outerBl);
+                            Boolean isPositive= signCollectionContains(innerBooleanLiteral, outerBooleanLiteral);
 
                             if (isPositive != null) {
                                 replaceLoopAndReturn(forNode, iterable, toFind, forNextStatement, isPositive);
@@ -170,9 +170,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                             return maybeReplaceLoopAndVariable(forNode, iterable, thenStatement, toFind);
                         }
 
-                        BreakStatement bs= ASTNodes.as(thenStatements.get(thenStatements.size() - 1), BreakStatement.class);
+                        BreakStatement breakStatement= ASTNodes.as(thenStatements.get(thenStatements.size() - 1), BreakStatement.class);
 
-                        if (bs != null && bs.getLabel() == null) {
+                        if (breakStatement != null && breakStatement.getLabel() == null) {
                             if (thenStatements.size() == 2 && !maybeReplaceLoopAndVariable(forNode, iterable,
                                     thenStatements.get(0), toFind)) {
                                 return false;
@@ -183,7 +183,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
                                 return true;
                             }
 
-                            replaceLoopByIf(forNode, iterable, thenStatements, toFind, bs);
+                            replaceLoopByIf(forNode, iterable, thenStatements, toFind, breakStatement);
                             result= false;
                             return false;
                         }
@@ -231,8 +231,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
             thenStatements.remove(thenStatements.size() - 1);
 
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			IfStatement replacement= ast.newIfStatement();
+			replacement.setExpression(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd));
+			replacement.setThenStatement(ast.newBlock(ast.copyRange(thenStatements)));
 
-            Statement replacement= ast.newIfStatement(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd), ast.newBlock(ast.copyRange(thenStatements)));
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
             ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), forNode, replacement, group);
 

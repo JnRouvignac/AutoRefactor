@@ -34,6 +34,7 @@ import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
@@ -109,8 +110,10 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 	private Statement createWakelockReleaseStatement(final MethodInvocation methodInvocation) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		return ast.newIfStatement(ast.not(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
-				ast.newBlock(ast.newExpressionStatement(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
+		IfStatement newIfStatement= ast.newIfStatement();
+		newIfStatement.setExpression(ast.not(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "isHeld"))); //$NON-NLS-1$
+		newIfStatement.setThenStatement(ast.newBlock(ast.newExpressionStatement(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
+		return newIfStatement;
 	}
 
 	private MethodDeclaration createOnPauseMethodDeclaration() {

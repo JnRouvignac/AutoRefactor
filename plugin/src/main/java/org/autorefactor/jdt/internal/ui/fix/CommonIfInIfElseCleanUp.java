@@ -99,9 +99,16 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonIfInIfElseCleanUp_description);
 
+		IfStatement newInnerIf= ast.newIfStatement();
+		newInnerIf.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())));
+		newInnerIf.setThenStatement(ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()));
+		newInnerIf.setElseStatement(ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
+
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
-		IfStatement newInnerIf= ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())),
-				ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()), ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
-		ASTNodes.replaceButKeepComment(rewrite, node, ast.newIfStatement(newCondition, ast.newBlock(newInnerIf)), group);
+		IfStatement newIfStatement= ast.newIfStatement();
+		newIfStatement.setExpression(newCondition);
+		newIfStatement.setThenStatement(ast.newBlock(newInnerIf));
+
+		ASTNodes.replaceButKeepComment(rewrite, node, newIfStatement, group);
 	}
 }

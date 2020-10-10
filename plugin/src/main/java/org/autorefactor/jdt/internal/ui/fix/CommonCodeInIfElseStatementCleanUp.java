@@ -208,9 +208,13 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					if (i == areCasesRemovable.length - 2 && !areCasesRemovable[i + 1]) {
 						// Then clause is empty and there is only one else clause
 						// => revert if statement
-						ASTNodes.replaceButKeepComment(rewrite, parent, ast.newIfStatement(ast.negate(((IfStatement) parent).getExpression(), true), ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement())), group);
+						IfStatement newIfStatement= ast.newIfStatement();
+						newIfStatement.setExpression(ast.negate(((IfStatement) parent).getExpression(), true));
+						newIfStatement.setThenStatement(ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement()));
+						ASTNodes.replaceButKeepComment(rewrite, parent, newIfStatement, group);
 						break;
 					}
+
 					if (allRemovable(areCasesRemovable, i)) {
 						rewrite.remove(parent, group);
 						break;

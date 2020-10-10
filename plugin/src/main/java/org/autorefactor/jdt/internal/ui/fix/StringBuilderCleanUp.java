@@ -44,6 +44,7 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -717,7 +718,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		Expression expression= null;
 		if (typeAndValue.getFirst() != null) {
-			expression= ast.newCastExpression(ast.type(typeAndValue.getFirst().getQualifiedName()), ast.createCopyTarget(typeAndValue.getSecond()));
+			CastExpression newCastExpression= ast.newCastExpression();
+			newCastExpression.setType(ast.type(typeAndValue.getFirst().getQualifiedName()));
+			newCastExpression.setExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(typeAndValue.getSecond())));
+			expression= newCastExpression;
 		} else if (typeAndValue.getFirst() == null) {
 			expression= ast.createCopyTarget(typeAndValue.getSecond());
 		}

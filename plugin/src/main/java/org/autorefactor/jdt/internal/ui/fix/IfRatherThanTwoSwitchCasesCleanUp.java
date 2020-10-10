@@ -38,6 +38,7 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -193,11 +194,18 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			Block newBlock= ast.newBlock(copyOfStatements);
 
 			if (currentBlock != null) {
-				currentBlock= ast.newIfStatement(newCondition, newBlock, currentBlock);
+				IfStatement newIfStatement= ast.newIfStatement();
+				newIfStatement.setExpression(newCondition);
+				newIfStatement.setThenStatement(newBlock);
+				newIfStatement.setElseStatement(currentBlock);
+				currentBlock= newIfStatement;
 			} else if (copyOfStatements.length == 0) {
-				localCaseIndexWithDefault= -1;
+				localCaseIndexWithDefault = -1;
 			} else if (localCaseIndexWithDefault == -1) {
-				currentBlock= ast.newIfStatement(newCondition, newBlock);
+				IfStatement newIfStatement= ast.newIfStatement();
+				newIfStatement.setExpression(newCondition);
+				newIfStatement.setThenStatement(newBlock);
+				currentBlock= newIfStatement;
 			} else {
 				currentBlock= newBlock;
 			}

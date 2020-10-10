@@ -152,17 +152,26 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link Assignment} instance.
 	 *
-	 * @param lhs      the left hand side expression
-	 * @param operator the assignment operator
-	 * @param rhs      the right hand side expression
-	 * @return a new Block
+	 * @return a new Assignment
 	 */
-	public Assignment newAssignment(final Expression lhs, final Assignment.Operator operator, final Expression rhs) {
-		Assignment assign= ast.newAssignment();
-		assign.setLeftHandSide(lhs);
-		assign.setOperator(operator);
-		assign.setRightHandSide(rhs);
-		return assign;
+	public Assignment newAssignment() {
+		return ast.newAssignment();
+	}
+
+	/**
+	 * Builds a new {@link Assignment} instance.
+	 *
+	 * @param leftHandSide      the left hand side expression
+	 * @param operator the assignment operator
+	 * @param rightHandSide      the right hand side expression
+	 * @return a new Assignment
+	 */
+	public Assignment newAssignment(final Expression leftHandSide, final Assignment.Operator operator, final Expression rightHandSide) {
+		Assignment newAssignment= newAssignment();
+		newAssignment.setLeftHandSide(leftHandSide);
+		newAssignment.setOperator(operator);
+		newAssignment.setRightHandSide(rightHandSide);
+		return newAssignment;
 	}
 
 	/**
@@ -224,15 +233,24 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link CastExpression} instance.
 	 *
+	 * @return a new CastExpression
+	 */
+	public CastExpression newCastExpression() {
+		return ast.newCastExpression();
+	}
+
+	/**
+	 * Builds a new {@link CastExpression} instance.
+	 *
 	 * @param type the type being cast to
 	 * @param expression the expression being cast
 	 * @return a new CastExpression
 	 */
 	public CastExpression newCastExpression(final Type type, final Expression expression) {
-		CastExpression ce= ast.newCastExpression();
-		ce.setType(type);
-		ce.setExpression(parenthesizeIfNeeded(expression));
-		return ce;
+		CastExpression newCastExpression= newCastExpression();
+		newCastExpression.setType(type);
+		newCastExpression.setExpression(parenthesizeIfNeeded(expression));
+		return newCastExpression;
 	}
 
 	/**
@@ -664,17 +682,6 @@ public class ASTNodeFactory {
 	}
 
 	/**
-	 * Builds a new {@link IfStatement} instance.
-	 *
-	 * @param condition     the if condition
-	 * @param thenStatement the then statement
-	 * @return a new if statement
-	 */
-	public IfStatement newIfStatement(final Expression condition, final Statement thenStatement) {
-		return newIfStatement(condition, thenStatement, null);
-	}
-
-	/**
 	 * Builds a new {@link DoStatement} instance.
 	 *
 	 * @param condition the while condition
@@ -691,17 +698,10 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link IfStatement} instance.
 	 *
-	 * @param condition     the if condition
-	 * @param thenStatement the statement of the then clause
-	 * @param elseStatement the statement of the else clause
 	 * @return a new if statement
 	 */
-	public IfStatement newIfStatement(final Expression condition, final Statement thenStatement, final Statement elseStatement) {
-		IfStatement is= ast.newIfStatement();
-		is.setExpression(condition);
-		is.setThenStatement(thenStatement);
-		is.setElseStatement(elseStatement);
-		return is;
+	public IfStatement newIfStatement() {
+		return ast.newIfStatement();
 	}
 
 	/**

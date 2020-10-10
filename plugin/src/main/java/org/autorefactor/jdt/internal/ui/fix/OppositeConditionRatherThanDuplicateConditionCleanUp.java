@@ -146,6 +146,10 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
 		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(duplicateExpression, true), group);
 		ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), negativeStmtCopy, group);
-		ASTNodes.replaceButKeepComment(rewrite, node.getElseStatement(), ast.newIfStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy), group);
+		IfStatement newIfStatement= ast.newIfStatement();
+		newIfStatement.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondCond)));
+		newIfStatement.setThenStatement(secondStmtCopy);
+		newIfStatement.setElseStatement(thirdStmtCopy);
+		ASTNodes.replaceButKeepComment(rewrite, node.getElseStatement(), newIfStatement, group);
 	}
 }

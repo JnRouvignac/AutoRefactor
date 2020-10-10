@@ -114,8 +114,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				Variable convertViewVar= new Variable(viewArg.getName().getIdentifier(), ast);
 				InfixExpression condition= ast.newInfixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.newNullLiteral());
 				Block thenBlock= ast.newBlock();
-				IfStatement ifStatement= ast.newIfStatement(condition, thenBlock);
-				rewrite.insertBefore(ifStatement, visitor.viewAssignmentStatement, group);
+				IfStatement newIfStatement= ast.newIfStatement();
+				newIfStatement.setExpression(condition);
+				newIfStatement.setThenStatement(thenBlock);
+				rewrite.insertBefore(newIfStatement, visitor.viewAssignmentStatement, group);
 				List<Statement> thenStatements= thenBlock.statements();
 
 				thenStatements.add(ast.newExpressionStatement(ast.newAssignment(convertViewVar.varName(), Assignment.Operator.ASSIGN, ast.createCopyTarget(visitor.getInflateExpression()))));
@@ -176,7 +178,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 					thenStatements.add(ast.newExpressionStatement(ast.newMethodInvocation("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
 
 					// Retrieve viewHolderItem from convertView
-					ifStatement.setElseStatement(ast.newBlock(ast.newExpressionStatement(ast.newAssignment(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
+					newIfStatement.setElseStatement(ast.newBlock(ast.newExpressionStatement(ast.newAssignment(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
 							ast.newCastExpression(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				rewrite.remove(visitor.viewAssignmentStatement, group);
