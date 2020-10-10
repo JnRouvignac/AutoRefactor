@@ -26,14 +26,14 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class IfElseIfSample {
-    public void refactor(boolean b1, boolean b2) throws Exception {
-        if (b1) {
+    public void refactor(boolean isValid, boolean isEnabled) throws Exception {
+        if (isValid) {
             // Keep this comment
-            System.out.println(b1);
+            System.out.println(isValid);
         } else {
-            if (b2) {
+            if (isEnabled) {
                 // Keep this comment
-                System.out.println(b2);
+                System.out.println(isEnabled);
             }
         }
     }
