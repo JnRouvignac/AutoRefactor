@@ -625,8 +625,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 		Name objectsClassName= ASTNodeFactory.newName(ast, classname);
 
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields())); //$NON-NLS-1$
+		ReturnStatement newReturnStatement= ast.newReturnStatement(newMethodInvocation);
 		ASTNodes.replaceButKeepComment(rewrite, statements.get(0),
-				ast.newReturnStatement(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), group); //$NON-NLS-1$
+				newReturnStatement, group);
 
 		for (int i= 1; i < statements.size(); i++) {
 			rewrite.remove(statements.get(i), group);
