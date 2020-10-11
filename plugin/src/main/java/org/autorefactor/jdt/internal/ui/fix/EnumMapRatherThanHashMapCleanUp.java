@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -125,7 +126,9 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumMapRatherThanHashMapCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), cic, ast.newClassInstanceCreation(newType, newParam), group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, cic, ast.newClassInstanceCreation(newType, newParam), group);
 	}
 
 	/**

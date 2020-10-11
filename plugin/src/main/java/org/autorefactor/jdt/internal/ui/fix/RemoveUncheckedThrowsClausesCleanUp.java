@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -59,7 +60,9 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 		if (!nodesToRemove.isEmpty()) {
 			for (ASTNode n : nodesToRemove) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_description);
-				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), n, null, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				ASTNodes.replaceButKeepComment(rewrite, n, null, group);
 			}
 
 			return false;

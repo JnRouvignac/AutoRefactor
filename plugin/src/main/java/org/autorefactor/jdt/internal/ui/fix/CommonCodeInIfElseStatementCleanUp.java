@@ -266,7 +266,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				areCasesRemovable[i]= true;
 			} else {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
-				cuRewrite.getASTRewrite().remove(removedStatements, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(removedStatements, group);
 			}
 		}
 	}

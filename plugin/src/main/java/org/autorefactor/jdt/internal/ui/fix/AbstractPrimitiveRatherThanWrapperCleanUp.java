@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
@@ -186,11 +187,13 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	}
 
 	private void refactorWrapper(final VariableDeclarationStatement node) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
 		Type primitiveType= ast.type(getPrimitiveTypeName());
-		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node.getType(), primitiveType, group);
+
+		ASTNodes.replaceButKeepComment(rewrite, node.getType(), primitiveType, group);
 	}
 
 	private boolean isNotNull(final Expression expression) {

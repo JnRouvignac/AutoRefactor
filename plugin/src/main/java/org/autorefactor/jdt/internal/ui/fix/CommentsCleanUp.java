@@ -322,12 +322,16 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
 	private void replaceEmptyLineAtStartOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
-		cuRewrite.getASTRewrite().replace(node, replacement);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		rewrite.replace(node, replacement);
 	}
 
 	private void replaceEmptyLineAtEndOfComment(final Comment node, final Matcher matcher) {
 		String replacement= matcher.replaceFirst(matcher.group(1));
-		cuRewrite.getASTRewrite().replace(node, replacement);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		rewrite.replace(node, replacement);
 	}
 
 	private String addPeriodAtEndOfFirstLine(final Javadoc node, final String comment) {

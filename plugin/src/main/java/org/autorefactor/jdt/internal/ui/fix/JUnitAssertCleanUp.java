@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Pair;
@@ -185,7 +186,9 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 		List<Expression> arguments= new ArrayList<>(4);
 
 		if (failureMessage != null) {
-			arguments.add(ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), ASTNodes.getUnparenthesedExpression(failureMessage)));
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			arguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
 		if (copyOfExpected != null) {

@@ -139,7 +139,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, ASTNodeFactory.newName(ast, typeBinding.getName(), field), group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodeFactory.newName(ast, typeBinding.getName(), field), group);
 		return false;
 	}
 
@@ -178,7 +180,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 				if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-					ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
+					ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+					ASTNodes.replaceButKeepComment(rewrite, node,
 							getClassInstanceCreatorNode(node.getExpression(), token), group);
 				} else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
 					replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$

@@ -630,7 +630,9 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
 			if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
-				cuRewrite.getASTRewrite().remove(expression, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(expression, group);
 				return false;
 			}
 		}

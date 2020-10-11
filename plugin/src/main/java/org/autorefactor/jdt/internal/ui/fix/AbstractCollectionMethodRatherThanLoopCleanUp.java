@@ -235,8 +235,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 			replacement.setExpression(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd));
 			replacement.setThenStatement(ast.newBlock(ast.copyRange(thenStatements)));
 
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
             TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
-            ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), forNode, replacement, group);
+            ASTNodes.replaceButKeepComment(rewrite, forNode, replacement, group);
 
             thenStatements.add(bs);
         }

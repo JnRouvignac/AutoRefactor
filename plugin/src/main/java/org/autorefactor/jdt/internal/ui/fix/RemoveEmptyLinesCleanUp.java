@@ -255,7 +255,9 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
 			if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
 				SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
-				cuRewrite.getASTRewrite().remove(toRemove);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(toRemove);
 				return true;
 			}
 		}

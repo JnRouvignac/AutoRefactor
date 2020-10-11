@@ -311,7 +311,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (lastExpression instanceof ClassInstanceCreation) {
 				// Replace with String concatenation
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
-				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, createStringConcats(allAppendedStrings), group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				ASTNodes.replaceButKeepComment(rewrite, node, createStringConcats(allAppendedStrings), group);
 				return false;
 			}
 		}
@@ -744,7 +746,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (replaceNeeded) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
-				ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, createStringConcats(allOperands), group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				ASTNodes.replaceButKeepComment(rewrite, node, createStringConcats(allOperands), group);
 				return false;
 			}
 		}

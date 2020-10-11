@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -80,7 +81,9 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 
 			if (isOverridden && !isRead) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description);
-				cuRewrite.getASTRewrite().remove(fragment.getInitializer(), group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(fragment.getInitializer(), group);
 				return false;
 			}
 		}

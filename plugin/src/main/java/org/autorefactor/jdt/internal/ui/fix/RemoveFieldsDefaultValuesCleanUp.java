@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -74,7 +75,9 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_description);
-				cuRewrite.getASTRewrite().remove(initializer, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(initializer, group);
 				visitSubtree= false;
 			}
 		}

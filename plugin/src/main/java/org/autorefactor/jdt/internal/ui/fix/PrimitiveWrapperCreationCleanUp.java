@@ -123,7 +123,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 					if (methodName != null) {
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-						ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
+						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+						ASTNodes.replaceButKeepComment(rewrite, node,
 								newMethodInvocation(typeBinding.getName(), methodName, arg0), group);
 						return false;
 					}
@@ -145,7 +147,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 		SimpleName name= ast.newSimpleName(methodName);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, name, group);
 		return false;
 	}
 
@@ -228,7 +232,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 	private void replaceWithValueOf(final ClassInstanceCreation node, final ITypeBinding typeBinding) {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node,
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, node,
 				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) node.arguments().get(0)), group); //$NON-NLS-1$
 	}
 

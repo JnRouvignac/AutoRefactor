@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -108,14 +109,18 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 						if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
 								|| modifier.isPrivate() && isPrivateClass) {
 							TextEditGroup group= new TextEditGroup(MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description);
-							cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
+							ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+							rewrite.remove(uniqueConstructor, group);
 							return false;
 						}
 					}
 				} else if (Utils.isEmpty(uniqueConstructor.modifiers())
 						&& isPackageClass) {
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description);
-					cuRewrite.getASTRewrite().remove(uniqueConstructor, group);
+					ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+					rewrite.remove(uniqueConstructor, group);
 					return false;
 				}
 			}

@@ -208,7 +208,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 	private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
 		if (ASTNodes.canHaveSiblings(astNode)) {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
-			cuRewrite.getASTRewrite().remove(ASTNodes.getNextSiblings(astNode), group);
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			rewrite.remove(ASTNodes.getNextSiblings(astNode), group);
 			removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
 		} else if (astNode.getParent() instanceof TryStatement) {
 			removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

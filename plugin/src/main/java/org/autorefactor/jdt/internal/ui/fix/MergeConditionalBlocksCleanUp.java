@@ -85,8 +85,10 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
         if (nextStatement != null) {
             IfStatement nextElse= ASTNodes.as(nextStatement, IfStatement.class);
 
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
             if (nextElse != null
-                    && !cuRewrite.getASTRewrite().hasBeenRefactored(nextElse)
+                    && !rewrite.hasBeenRefactored(nextElse)
                     && operandCount.get() + ASTNodes.getNbOperands(nextElse.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
                 if (ASTNodes.match(previousStatement, nextElse.getThenStatement())) {
                     operandCount.addAndGet(ASTNodes.getNbOperands(nextElse.getExpression()));

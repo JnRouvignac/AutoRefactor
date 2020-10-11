@@ -138,7 +138,9 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final Block node) {
 		if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
-			cuRewrite.getASTRewrite().remove(node, group);
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			rewrite.remove(node, group);
 			return false;
 		}
 

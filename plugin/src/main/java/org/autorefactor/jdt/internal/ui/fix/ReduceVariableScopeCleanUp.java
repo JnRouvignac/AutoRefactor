@@ -414,8 +414,10 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
 	private void remove(final ASTNode node) {
 		if (node instanceof VariableDeclarationFragment) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
 			TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
-			cuRewrite.getASTRewrite().remove(node.getParent(), group);
+			rewrite.remove(node.getParent(), group);
 		} else {
 			remove(node.getParent());
 		}

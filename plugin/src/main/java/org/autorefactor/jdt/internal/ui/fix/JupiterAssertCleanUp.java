@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Pair;
@@ -161,7 +162,9 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 		}
 
 		if (failureMessage != null) {
-			arguments.add(ASTNodes.createMoveTarget(cuRewrite.getASTRewrite(), ASTNodes.getUnparenthesedExpression(failureMessage)));
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			arguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
 		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[0]));

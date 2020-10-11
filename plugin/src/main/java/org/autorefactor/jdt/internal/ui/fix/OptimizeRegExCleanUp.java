@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
@@ -249,6 +250,8 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
 
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-        ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, ast.newStringLiteral(pattern), group);
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+        ASTNodes.replaceButKeepComment(rewrite, node, ast.newStringLiteral(pattern), group);
     }
 }

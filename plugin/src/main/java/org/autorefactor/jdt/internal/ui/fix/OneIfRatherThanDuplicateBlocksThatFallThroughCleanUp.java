@@ -93,9 +93,11 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             if (lastBlock.getElseStatement() == null) {
                 IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
                 if (nextSibling != null && nextSibling.getElseStatement() == null
                         && operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER
-                        && !cuRewrite.getASTRewrite().hasBeenRefactored(nextSibling)
+                        && !rewrite.hasBeenRefactored(nextSibling)
                         && ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())) {
                     operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
                     duplicateIfBlocks.add(nextSibling);

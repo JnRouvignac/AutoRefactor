@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTComments;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
@@ -151,7 +152,9 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 			while (m.find()) {
 				int startPos= entry.getValue().getStartPosition();
 				SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
-				cuRewrite.getASTRewrite().remove(toRemove);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(toRemove);
 				result= false;
 			}
 		}

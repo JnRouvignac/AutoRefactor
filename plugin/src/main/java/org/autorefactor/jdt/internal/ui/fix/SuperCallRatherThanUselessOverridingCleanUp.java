@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
@@ -97,7 +98,9 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 							// protected also means package visibility, so check if it is required
 							|| !isMethodUsedInItsPackage(declMethodBinding, node)) {
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_description);
-						cuRewrite.getASTRewrite().remove(node, group);
+						ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+						rewrite.remove(node, group);
 						return false;
 					}
 				}

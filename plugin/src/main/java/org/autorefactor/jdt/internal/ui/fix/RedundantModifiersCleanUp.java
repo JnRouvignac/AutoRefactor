@@ -123,7 +123,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
-				cuRewrite.getASTRewrite().remove(modifier, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
 				result= false;
 			}
 		}
@@ -176,7 +178,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isProtected()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
-				cuRewrite.getASTRewrite().remove(modifier, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
 				return false;
 			}
 		}
@@ -191,7 +195,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isPublic() || modifier.isAbstract()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
-				cuRewrite.getASTRewrite().remove(modifier, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
 				result= false;
 			}
 		}
@@ -264,7 +270,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isStatic() || modifier.isAbstract()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
-				cuRewrite.getASTRewrite().remove(modifier, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
 				result= false;
 			}
 		}
@@ -294,7 +302,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isFinal()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
-				cuRewrite.getASTRewrite().remove(modifier, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
 				result= false;
 			}
 		}

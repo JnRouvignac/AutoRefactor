@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -64,7 +65,9 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 				&& node.typeArguments().isEmpty()) {
 			// Remove useless thisExpressions
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnneededThisExpressionCleanUp_description);
-			cuRewrite.getASTRewrite().remove(node.getExpression(), group);
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+			rewrite.remove(node.getExpression(), group);
 			return false;
 		}
 

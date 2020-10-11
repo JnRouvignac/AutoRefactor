@@ -37,6 +37,7 @@ import java.util.SimpleTimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogRecord;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -126,7 +127,9 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 
 		NumberLiteral replacement= ast.newNumberLiteral(integers + suffix);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, replacement, group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, node, replacement, group);
 	}
 
 	private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,

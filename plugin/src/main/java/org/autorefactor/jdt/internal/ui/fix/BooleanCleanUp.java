@@ -257,7 +257,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
             if (newE != null) {
                 TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
-                ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, newE, group);
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+                ASTNodes.replaceButKeepComment(rewrite, node, newE, group);
                 return false;
             }
         }

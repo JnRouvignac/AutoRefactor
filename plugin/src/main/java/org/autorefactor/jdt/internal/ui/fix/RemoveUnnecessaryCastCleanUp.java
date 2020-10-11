@@ -99,7 +99,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, numberLiteral, group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, node, numberLiteral, group);
 	}
 
 	private boolean canRemoveCast(final CastExpression node) {

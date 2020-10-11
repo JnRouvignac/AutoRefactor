@@ -77,7 +77,9 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			if (result) {
 				Statement previousSibling= ASTNodes.getPreviousSibling(node);
 
-				if (!cuRewrite.getASTRewrite().hasBeenRefactored(previousSibling)
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				if (!rewrite.hasBeenRefactored(previousSibling)
 						&& previousSibling instanceof VariableDeclarationStatement) {
 					VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) previousSibling;
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(variableDeclarationStatement);

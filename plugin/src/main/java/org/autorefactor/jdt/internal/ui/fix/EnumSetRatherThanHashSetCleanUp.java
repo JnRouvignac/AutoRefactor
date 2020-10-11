@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -119,7 +120,9 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), cic, invocation, group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		ASTNodes.replaceButKeepComment(rewrite, cic, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());
 		return false;
 	}

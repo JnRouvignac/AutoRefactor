@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -73,7 +74,9 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
 			if (!typeArguments.isEmpty()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.UseDiamondOperatorCleanUp_description);
-				cuRewrite.getASTRewrite().remove(typeArguments, group);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(typeArguments, group);
 				return false;
 			}
 		}

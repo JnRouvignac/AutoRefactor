@@ -90,7 +90,9 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 	}
 
 	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
