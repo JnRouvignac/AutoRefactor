@@ -89,7 +89,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 						rewrite.remove(node, group);
 					} else {
-						ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
 					}
 
 					result= false;
@@ -124,7 +126,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 						rewrite.remove(node, group);
 					} else {
-						ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
+						ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+						ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
 					}
 
 					result= false;

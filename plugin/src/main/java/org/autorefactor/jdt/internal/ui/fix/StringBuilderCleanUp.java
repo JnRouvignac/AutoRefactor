@@ -357,7 +357,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				if (ASTNodes.canHaveSiblings((Statement) node.getParent()) || node.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node.getParent(), group);
 				} else {
-					ASTNodes.replaceButKeepComment(rewrite, node.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+					ASTNodes.replaceButKeepComment(rewrite, node.getParent(), ast.newBlock(), group);
 				}
 
 				return false;
@@ -627,7 +629,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 				isFirst.set(false);
 				if (isInstanceCreationToRewrite) {
-					result= cuRewrite.getASTBuilder().newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()), newExpression);
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+					result= ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, ((ClassInstanceCreation) lastExpression).getType()), newExpression);
 				} else {
 					result= ASTNodes.createMoveTarget(rewrite, lastExpression);
 					finalStrings.add(newExpression);
@@ -647,7 +651,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		if (tempStringLiterals.size() == 1) {
 			newExpression= tempStringLiterals.get(0);
 		} else {
-			newExpression= cuRewrite.getASTBuilder().newInfixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			newExpression= ast.newInfixExpression(InfixExpression.Operator.PLUS, tempStringLiterals);
 		}
 
 		return newExpression;

@@ -150,7 +150,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	}
 
 	private StringLiteral getStringLiteral(final String numberLiteral) {
-		return cuRewrite.getASTBuilder().newStringLiteral(numberLiteral);
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		return ast.newStringLiteral(numberLiteral);
 	}
 
 	@Override

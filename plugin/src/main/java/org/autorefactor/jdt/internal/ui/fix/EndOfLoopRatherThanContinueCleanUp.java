@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.util.Utils;
@@ -78,7 +79,9 @@ public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 				} else if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 					rewrite.remove(node, group);
 				} else {
-					ASTNodes.replaceButKeepComment(rewrite, node, cuRewrite.getASTBuilder().newBlock(), group);
+					ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+					ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
 				}
 
 				result= false;

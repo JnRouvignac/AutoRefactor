@@ -332,7 +332,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 			if (ASTNodes.canHaveSiblings((Statement) nodeToReplace.getParent()) || nodeToReplace.getParent().getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
 				rewrite.remove(nodeToReplace.getParent(), group);
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace.getParent(), cuRewrite.getASTBuilder().newBlock(), group);
+				ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace.getParent(), ast.newBlock(), group);
 			}
 
 			return false;
@@ -465,8 +467,10 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 
 	private ASTNode invokeMethodOrStatement(final ASTNode nodeToReplace, final MethodInvocation newMethod) {
 		if (nodeToReplace instanceof Statement) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 			// The new node should be also a statement
-			return cuRewrite.getASTBuilder().newExpressionStatement(newMethod);
+			return ast.newExpressionStatement(newMethod);
 		}
 
 		return newMethod;

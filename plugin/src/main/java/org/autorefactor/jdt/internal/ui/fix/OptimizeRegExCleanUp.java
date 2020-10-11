@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.util.Utils;
@@ -246,6 +247,8 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
     private void rewriteRegEx(final StringLiteral node, String pattern) {
         TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
-        ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, cuRewrite.getASTBuilder().newStringLiteral(pattern), group);
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+        ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, ast.newStringLiteral(pattern), group);
     }
 }

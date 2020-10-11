@@ -385,7 +385,9 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 	private Type getType(final ASTNode node) {
 		if (node instanceof VariableDeclarationStatement) {
 			VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) node;
-			return cuRewrite.getASTBuilder().createCopyTarget(variableDeclarationStatement.getType());
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			return ast.createCopyTarget(variableDeclarationStatement.getType());
 		}
 
 		return getType(node.getParent());

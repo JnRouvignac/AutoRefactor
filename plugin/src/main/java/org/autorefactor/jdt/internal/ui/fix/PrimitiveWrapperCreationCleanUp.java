@@ -141,7 +141,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean replaceMethodName(final MethodInvocation node, final String methodName) {
-		SimpleName name= cuRewrite.getASTBuilder().newSimpleName(methodName);
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		SimpleName name= ast.newSimpleName(methodName);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 		cuRewrite.getASTRewrite().set(node, MethodInvocation.NAME_PROPERTY, name, group);
 		return false;

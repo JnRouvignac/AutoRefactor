@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -67,7 +68,9 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 	}
 
 	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
-		BooleanLiteral booleanLiteral= cuRewrite.getASTBuilder().newBooleanLiteral(val);
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+		BooleanLiteral booleanLiteral= ast.newBooleanLiteral(val);
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description);
 		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, booleanLiteral, group);
 	}
