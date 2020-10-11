@@ -120,9 +120,9 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			Expression copyOfPathText= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
 
 			if (ASTNodes.usesGivenSignature(node, File.class.getCanonicalName(), TOPATH_METHOD)) {
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), group);
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
+				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
 			}
 
 			return false;
@@ -216,7 +216,7 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 			String pathName= addImport(Path.class, classesToUseWithImport, importsToAdd);
 			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(pathName), group);
-			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newMethodInvocation(ast.newName(pathsName), GET_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), group);
+			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), group);
 
 			for (SimpleName fileUse : fileUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();

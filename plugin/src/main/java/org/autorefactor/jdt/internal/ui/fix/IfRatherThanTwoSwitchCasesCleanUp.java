@@ -224,7 +224,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 		if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
 			return ast.newInfixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
-					ast.newName(value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+					ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
 		}
 
 		return ast.newInfixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,

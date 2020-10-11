@@ -96,7 +96,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 						Object.class.getCanonicalName())
 				|| ASTNodes.usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ //$NON-NLS-2$
 						String.class.getCanonicalName())) {
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			replaceUtilClass(node, javaUtilObjects);
 			return false;
 		}
@@ -107,7 +107,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), //$NON-NLS-1$
 					ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(1))), group);
 			return false;
@@ -117,7 +117,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			ASTNodes.replaceButKeepComment(rewrite, node,
 					ast.newMethodInvocation(javaUtilObjects, "toString", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))), ast.newStringLiteral("")), group); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
@@ -128,7 +128,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(node)), group); //$NON-NLS-1$
 			return false;
 		}
@@ -137,7 +137,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			if (node.getExpression() != null) {
 				ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), javaUtilObjects, group);
 				ASTNodes.replaceButKeepComment(rewrite, node.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
@@ -160,7 +160,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			List<Expression> copyOfArgs= copyArguments(node);
-			Name javaUtilObjects= ast.newName(addImport(Objects.class, classesToUseWithImport, importsToAdd));
+			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 
 			if (copyOfArgs.size() <= 2) {
 				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), group); //$NON-NLS-1$

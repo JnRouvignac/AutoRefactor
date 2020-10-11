@@ -187,7 +187,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 		ASTNodes.replaceButKeepComment(rewrite, node,
-				ast.newExpressionStatement(ast.newMethodInvocation(ast.newName(classname),
+				ast.newExpressionStatement(ast.newMethodInvocation(ASTNodeFactory.newName(ast, classname),
 						"addAll", addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression(), //$NON-NLS-1$
 						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), group);
 	}

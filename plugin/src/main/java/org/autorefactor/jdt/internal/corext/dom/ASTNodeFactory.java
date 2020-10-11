@@ -813,7 +813,7 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public MethodInvocation newMethodInvocation(final String expression, final String methodName, final Expression... arguments) {
-		return newMethodInvocation(newName(expression), methodName, arguments);
+		return newMethodInvocation(newName(this, expression), methodName, arguments);
 	}
 
 	/**
@@ -950,11 +950,12 @@ public class ASTNodeFactory {
 	 * {@link SimpleName} is returned, if several names are provided then a
 	 * {@link QualifiedName} is built.
 	 *
+	 * @param astNodeFactory the AST node factory
 	 * @param names the qualified or simple name
 	 * @return a new name
 	 * @throws IllegalArgumentException if no names are provided
 	 */
-	public Name newName(final String... names) {
+	public static Name newName(final ASTNodeFactory astNodeFactory, final String... names) {
 		if (names.length == 0) {
 			throw new IllegalArgumentException(null, "Expected at least one name, but was given 0 names"); //$NON-NLS-1$
 		}
@@ -962,13 +963,13 @@ public class ASTNodeFactory {
 		if (names.length == 1) {
 			String[] simpleNames= names[0].split("\\."); //$NON-NLS-1$
 			if (simpleNames.length == 1) {
-				return newSimpleName(simpleNames[0]);
+				return astNodeFactory.newSimpleName(simpleNames[0]);
 			}
 
-			return ast.newName(simpleNames);
+			return astNodeFactory.ast.newName(simpleNames);
 		}
 
-		return ast.newName(names);
+		return astNodeFactory.ast.newName(names);
 	}
 
 	/**

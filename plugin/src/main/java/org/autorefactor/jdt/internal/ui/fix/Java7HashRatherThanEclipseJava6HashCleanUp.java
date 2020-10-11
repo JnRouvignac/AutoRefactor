@@ -623,7 +623,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 		List<Statement> statements= node.getBody().statements();
 		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
-		Name objectsClassName= ast.newName(classname);
+		Name objectsClassName= ASTNodeFactory.newName(ast, classname);
 
 		ASTNodes.replaceButKeepComment(rewrite, statements.get(0),
 				ast.newReturnStatement(ast.newMethodInvocation(objectsClassName, "hash", rewrite.createMoveTarget(data.getFields()))), group); //$NON-NLS-1$

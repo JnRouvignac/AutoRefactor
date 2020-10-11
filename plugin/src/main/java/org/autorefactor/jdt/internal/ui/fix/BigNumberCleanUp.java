@@ -136,8 +136,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean replaceWithQualifiedName(final ASTNode node, final ITypeBinding typeBinding, final String field) {
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, cuRewrite.getASTBuilder().newName(typeBinding.getName(), field), group);
+
+		ASTNodes.replaceButKeepComment(cuRewrite.getASTRewrite(), node, ASTNodeFactory.newName(ast, typeBinding.getName(), field), group);
 		return false;
 	}
 

@@ -232,7 +232,7 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 		if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedClassName + "." + methodName) //$NON-NLS-1$
 				&& !staticImports.contains(qualifiedClassName + ".*")) { //$NON-NLS-1$
-			qualifiedClass= ast.newName(qualifiedClassName);
+			qualifiedClass= ASTNodeFactory.newName(ast, qualifiedClassName);
 		}
 
 		if (FAIL_METHOD.equals(methodName)) {
