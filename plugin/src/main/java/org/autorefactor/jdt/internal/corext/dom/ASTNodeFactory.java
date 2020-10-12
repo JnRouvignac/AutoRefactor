@@ -64,6 +64,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -309,6 +310,16 @@ public class ASTNodeFactory {
 
 			return type;
 		}
+	}
+
+	/**
+	 * Returns a type for the provided type name (simple or qualified name).
+	 *
+	 * @param typeName the type name (simple or qualified name)
+	 * @return a type for the provided type name
+	 */
+	public Type newSimpleType(final Name typeName) {
+		return ast.newSimpleType(typeName);
 	}
 
 	/**
@@ -1365,6 +1376,15 @@ public class ASTNodeFactory {
 		md.parameters().addAll(parameters);
 		md.setBody(block);
 		return md;
+	}
+
+	/**
+	 * Builds a new {@link InstanceofExpression}.
+	 *
+	 * @return a {@code instanceof} expression
+	 */
+	public InstanceofExpression newInstanceofExpression() {
+		return ast.newInstanceofExpression();
 	}
 
 	/**
