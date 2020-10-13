@@ -106,7 +106,10 @@ abstract public interface RedundantModifiersSample {
     }
 
     static public enum RemoveStaticSampleEnum {
-        VALUE1, VALUE2
+        VALUE1("1"), VALUE2("2");
+
+        private RemoveStaticSampleEnum(String string) {
+        }
     }
 
     static public @interface FixModifierOrderSampleAnnotation {

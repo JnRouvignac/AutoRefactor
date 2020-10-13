@@ -80,14 +80,18 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 				return -1;
 			}
+
 			if (o2.isAnnotation()) {
 				return 1;
 			}
+
 			int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
 			int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+
 			if (i1 == -1) {
 				throw new NotImplementedException((Modifier) o1, "cannot determine order for modifier " + o1); //$NON-NLS-1$
 			}
+
 			if (i2 == -1) {
 				throw new NotImplementedException((Modifier) o2, "cannot compare modifier " + o2); //$NON-NLS-1$
 			}
@@ -148,6 +152,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 			return removePublicAbstractModifiers(node);
 		}
 
+		if (node.getParent() instanceof EnumDeclaration) {
+			return removePrivateModifier(node);
+		}
+
 		int modifiers= node.getModifiers();
 
 		if (Modifier.isFinal(modifiers) && (isFinalClass(node.getParent()) || Modifier.isPrivate(modifiers))) {
@@ -177,6 +185,22 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
 			if (modifier.isProtected()) {
+				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				rewrite.remove(modifier, group);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean removePrivateModifier(final BodyDeclaration node) {
+		List<IExtendedModifier> modifiers= node.modifiers();
+
+		for (Modifier modifier : getModifiersOnly(modifiers)) {
+			if (modifier.isPrivate()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
