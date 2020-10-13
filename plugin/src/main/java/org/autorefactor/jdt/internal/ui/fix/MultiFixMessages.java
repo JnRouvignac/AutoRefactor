@@ -461,6 +461,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String SubstringWithOneParameterRatherThanTwoCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String SubstringWithOneParameterRatherThanTwoCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String SubstringWithOneParameterRatherThanTwoCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String BigNumberCleanUp_name;
     /**
      * Automatically filled.
