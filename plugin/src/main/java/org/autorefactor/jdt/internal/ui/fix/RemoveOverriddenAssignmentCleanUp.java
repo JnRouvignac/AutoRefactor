@@ -57,29 +57,34 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final VariableDeclarationStatement node) {
 		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
 
-		if (fragment != null && fragment.getInitializer() != null && ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
+		if (fragment != null
+				&& fragment.getInitializer() != null
+				&& ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
 			SimpleName varName= fragment.getName();
 			IVariableBinding variable= fragment.resolveBinding();
 			Statement stmtToInspect= ASTNodes.getNextSibling(node);
 			boolean isOverridden= false;
-			boolean isRead= false;
 
-			while (stmtToInspect != null && !isOverridden && !isRead) {
+			while (stmtToInspect != null) {
+				if (!new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty()) {
+					return true;
+				}
+
 				Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
 
 				if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
-					if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
-						isOverridden= true;
-					} else {
-						isRead= true;
+					if (!ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
+						return true;
 					}
+
+					isOverridden= true;
+					break;
 				}
 
-				isRead|= !new VarDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getReads().isEmpty();
 				stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
 			}
 
-			if (isOverridden && !isRead) {
+			if (isOverridden) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveOverriddenAssignmentCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
