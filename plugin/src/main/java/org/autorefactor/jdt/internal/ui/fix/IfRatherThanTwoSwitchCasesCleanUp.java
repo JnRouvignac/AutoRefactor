@@ -222,12 +222,18 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			return ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
 		}
 
+		InfixExpression newInfixExpression= ast.newInfixExpression();
+		newInfixExpression.setOperator(InfixExpression.Operator.EQUALS);
+
 		if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-			return ast.newInfixExpression(ast.createCopyTarget(discriminant), InfixExpression.Operator.EQUALS, ast.getAST().newQualifiedName(
-					ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+			newInfixExpression.setLeftOperand(ast.createCopyTarget(discriminant));
+			newInfixExpression.setRightOperand(ast.getAST().newQualifiedName(
+								ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+		} else {
+			newInfixExpression.setLeftOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)));
+			newInfixExpression.setRightOperand(ast.createCopyTarget(value));
 		}
 
-		return ast.newInfixExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)), InfixExpression.Operator.EQUALS,
-				ast.createCopyTarget(value));
+		return newInfixExpression;
 	}
 }

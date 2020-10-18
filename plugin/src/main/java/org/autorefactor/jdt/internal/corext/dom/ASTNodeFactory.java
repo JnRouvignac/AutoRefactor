@@ -745,30 +745,6 @@ public class ASTNodeFactory {
 	}
 
 	/**
-	 * Builds a new {@link InfixExpression} instance.
-	 *
-	 * @param operator    the infix operator
-	 * @param allOperands the operands
-	 * @return a new infix expression
-	 */
-	public InfixExpression newInfixExpression(final InfixExpression.Operator operator, final Collection<? extends Expression> allOperands) {
-		if (allOperands.size() < 2) {
-			throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
-					+ "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
-		}
-		Iterator<? extends Expression> it= allOperands.iterator();
-		InfixExpression infixExpression= ast.newInfixExpression();
-		infixExpression.setLeftOperand(it.next());
-		infixExpression.setOperator(operator);
-		infixExpression.setRightOperand(it.next());
-		while (it.hasNext()) {
-			infixExpression.extendedOperands().add(it.next());
-		}
-
-		return infixExpression;
-	}
-
-	/**
 	 * Builds a new {@link ConditionalExpression} instance.
 	 *
 	 * @param mainExpression the main expression
@@ -789,20 +765,53 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link InfixExpression} instance.
 	 *
+	 * @return a new infix expression
+	 */
+	public InfixExpression newInfixExpression() {
+		return ast.newInfixExpression();
+	}
+
+	/**
+	 * Builds a new {@link InfixExpression} instance.
+	 *
 	 * @param leftOperand      the left operand
 	 * @param operator         the infix operator
 	 * @param rightOperand     the right operand
 	 * @param extendedOperands the extended operands
 	 * @return a new infix expression
 	 */
-	public InfixExpression newInfixExpression(final Expression leftOperand, final InfixExpression.Operator operator, final Expression rightOperand,
-			final Expression... extendedOperands) {
-		InfixExpression infixExpression= ast.newInfixExpression();
-		infixExpression.setLeftOperand(leftOperand);
-		infixExpression.setOperator(operator);
-		infixExpression.setRightOperand(rightOperand);
-		Collections.addAll(infixExpression.extendedOperands(), extendedOperands);
-		return infixExpression;
+	public InfixExpression newInfixExpression(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand,
+			Expression... extendedOperands) {
+		InfixExpression newInfixExpression= newInfixExpression();
+		newInfixExpression.setLeftOperand(leftOperand);
+		newInfixExpression.setOperator(operator);
+		newInfixExpression.setRightOperand(rightOperand);
+		Collections.addAll(newInfixExpression.extendedOperands(), extendedOperands);
+		return newInfixExpression;
+	}
+
+	/**
+	 * Builds a new {@link InfixExpression} instance.
+	 *
+	 * @param operator    the infix operator
+	 * @param allOperands the operands
+	 * @return a new infix expression
+	 */
+	public InfixExpression newInfixExpression(final InfixExpression.Operator operator, final Collection<? extends Expression> allOperands) {
+		if (allOperands.size() < 2) {
+			throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
+					+ "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
+		}
+		Iterator<? extends Expression> it= allOperands.iterator();
+		InfixExpression newInfixExpression= ast.newInfixExpression();
+		newInfixExpression.setLeftOperand(it.next());
+		newInfixExpression.setOperator(operator);
+		newInfixExpression.setRightOperand(it.next());
+		while (it.hasNext()) {
+			newInfixExpression.extendedOperands().add(it.next());
+		}
+
+		return newInfixExpression;
 	}
 
 	/**

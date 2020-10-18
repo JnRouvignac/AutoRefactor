@@ -359,15 +359,22 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Expression thenExpression, final Expression elseExpression) {
         if (thenBool == null && elseBool != null) {
             Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())), !elseBool);
-			return ast.newReturnStatement(ast.newInfixExpression(leftOp, getConditionalOperator(elseBool),
-                    ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression))));
+
+			InfixExpression newInfixExpression= ast.newInfixExpression();
+			newInfixExpression.setLeftOperand(leftOp);
+			newInfixExpression.setOperator(getConditionalOperator(elseBool));
+			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression)));
+			return ast.newReturnStatement(newInfixExpression);
         }
 
         if (thenBool != null && elseBool == null) {
-            Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())),
-                    thenBool);
-			return ast.newReturnStatement(ast.newInfixExpression(leftOp, getConditionalOperator(thenBool),
-                    ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression))));
+            Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())), thenBool);
+
+			InfixExpression newInfixExpression= ast.newInfixExpression();
+			newInfixExpression.setLeftOperand(leftOp);
+			newInfixExpression.setOperator(getConditionalOperator(thenBool));
+			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression)));
+			return ast.newReturnStatement(newInfixExpression);
         }
 
         return null;
@@ -464,19 +471,33 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             // If only one expression is primitive, a NPE is already possible so we do not
             // care
             if (thenLiteral != null && elseLiteral == null) {
+                InfixExpression newInfixExpression= ast.newInfixExpression();
+
                 if (thenLiteral) {
-                    return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(elseExpression));
+					newInfixExpression.setLeftOperand(ast.createCopyTarget(condition));
+					newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_OR);
+                } else {
+    				newInfixExpression.setLeftOperand(ast.negate(condition, false));
+    				newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
                 }
 
-                return ast.newInfixExpression(ast.negate(condition, false), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(elseExpression));
+				newInfixExpression.setRightOperand(ast.createCopyTarget(elseExpression));
+				return newInfixExpression;
             }
 
             if (thenLiteral == null && elseLiteral != null) {
+                InfixExpression newInfixExpression= ast.newInfixExpression();
+
                 if (elseLiteral) {
-                    return ast.newInfixExpression(ast.negate(condition, false), InfixExpression.Operator.CONDITIONAL_OR, ast.createCopyTarget(thenExpression));
+					newInfixExpression.setLeftOperand(ast.negate(condition, false));
+					newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_OR);
+                } else {
+    				newInfixExpression.setLeftOperand(ast.createCopyTarget(condition));
+    				newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
                 }
 
-                return ast.newInfixExpression(ast.createCopyTarget(condition), InfixExpression.Operator.CONDITIONAL_AND, ast.createCopyTarget(thenExpression));
+				newInfixExpression.setRightOperand(ast.createCopyTarget(thenExpression));
+				return newInfixExpression;
             }
         }
 

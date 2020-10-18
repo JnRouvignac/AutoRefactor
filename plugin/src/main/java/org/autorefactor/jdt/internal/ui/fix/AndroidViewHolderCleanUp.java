@@ -112,7 +112,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 				// Create If statement
 				SingleVariableDeclaration viewArg= (SingleVariableDeclaration) node.parameters().get(1);
 				Variable convertViewVar= new Variable(viewArg.getName().getIdentifier(), ast);
-				InfixExpression condition= ast.newInfixExpression(convertViewVar.varName(), InfixExpression.Operator.EQUALS, ast.newNullLiteral());
+				InfixExpression newInfixExpression= ast.newInfixExpression();
+				newInfixExpression.setLeftOperand(convertViewVar.varName());
+				newInfixExpression.setOperator(InfixExpression.Operator.EQUALS);
+				newInfixExpression.setRightOperand(ast.newNullLiteral());
+				InfixExpression condition= newInfixExpression;
 				Block thenBlock= ast.newBlock();
 				IfStatement newIfStatement= ast.newIfStatement();
 				newIfStatement.setExpression(condition);

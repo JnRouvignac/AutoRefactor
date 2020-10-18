@@ -102,9 +102,12 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		} else {
 			ifCondition= ASTNodes.createMoveTarget(rewrite, ifCondition);
 		}
-		final Expression expression= ifCondition;
 
-		InfixExpression newCondition= ast.newInfixExpression(originalCondition, InfixExpression.Operator.CONDITIONAL_AND, ast.parenthesizeIfNeeded(expression));
+		InfixExpression newCondition= ast.newInfixExpression();
+		newCondition.setLeftOperand(originalCondition);
+		newCondition.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
+		newCondition.setRightOperand(ast.parenthesizeIfNeeded(ifCondition));
+
 		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), newCondition, group);
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);

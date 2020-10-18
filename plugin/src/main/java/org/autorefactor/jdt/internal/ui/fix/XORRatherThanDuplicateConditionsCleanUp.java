@@ -114,10 +114,16 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.XORRatherThanDuplicateConditionsCleanUp_description);
 
+		InfixExpression newInfixExpression= ast.newInfixExpression();
+		newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, firstExpression));
+		newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, secondExpression));
+
 		if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.EQUALS, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
+			newInfixExpression.setOperator(InfixExpression.Operator.EQUALS);
 		} else {
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(ASTNodes.createMoveTarget(rewrite, firstExpression), InfixExpression.Operator.XOR, ASTNodes.createMoveTarget(rewrite, secondExpression)), group);
+			newInfixExpression.setOperator(InfixExpression.Operator.XOR);
 		}
+
+		ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
 	}
 }

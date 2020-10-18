@@ -262,6 +262,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))); //$NON-NLS-1$
 
-		return ast.newInfixExpression(methodInvocation, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, ast.newNumberLiteral(0));
+		InfixExpression newInfixExpression= ast.newInfixExpression();
+		newInfixExpression.setLeftOperand(methodInvocation);
+		newInfixExpression.setOperator(isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS);
+		newInfixExpression.setRightOperand(ast.newNumberLiteral(0));
+		return newInfixExpression;
 	}
 }
