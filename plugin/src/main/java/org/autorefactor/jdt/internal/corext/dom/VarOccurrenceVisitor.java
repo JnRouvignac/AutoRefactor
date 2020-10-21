@@ -62,9 +62,9 @@ public class VarOccurrenceVisitor extends InterruptibleVisitor {
 	}
 
 	@Override
-	public void visitNode(final ASTNode startNode) {
+	public void traverseNodeInterruptibly(final ASTNode startNode) {
 		this.startNode= startNode;
-		super.visitNode(this.startNode);
+		super.traverseNodeInterruptibly(this.startNode);
 	}
 
 	@Override

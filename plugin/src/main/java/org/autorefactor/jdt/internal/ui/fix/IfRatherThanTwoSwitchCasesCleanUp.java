@@ -114,7 +114,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				isPreviousStmtACase= true;
 			} else {
 				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
-				varOccurrenceVisitor.visitNode(statement);
+				varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
 				if (varOccurrenceVisitor.isVarUsed()) {
 					return true;

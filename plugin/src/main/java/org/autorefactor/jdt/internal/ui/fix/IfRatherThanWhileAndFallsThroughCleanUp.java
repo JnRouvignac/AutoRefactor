@@ -67,11 +67,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 	public boolean visit(final WhileStatement node) {
 		if (ASTNodes.fallsThrough(node.getBody())) {
 			ContinueVisitor continueVisitor= new ContinueVisitor(node);
-			continueVisitor.visitNode(node);
+			continueVisitor.traverseNodeInterruptibly(node);
 
 			if (continueVisitor.canBeRefactored()) {
 				BreakVisitor breakVisitor= new BreakVisitor(node);
-				breakVisitor.visitNode(node);
+				breakVisitor.traverseNodeInterruptibly(node);
 
 				if (breakVisitor.canBeRefactored()) {
 					replaceByIf(node, breakVisitor);

@@ -2445,7 +2445,7 @@ public final class ASTNodes {
 	 */
 	public static boolean isPassiveWithoutFallingThrough(final ASTNode node) {
 		ExprActivityVisitor visitor= new ExprActivityVisitor();
-		visitor.visitNode(node);
+		visitor.traverseNodeInterruptibly(node);
 		return ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH.equals(visitor.getActivityLevel());
 	}
 
@@ -2458,7 +2458,7 @@ public final class ASTNodes {
 	 */
 	public static boolean isPassive(final ASTNode node) {
 		ExprActivityVisitor visitor= new ExprActivityVisitor();
-		visitor.visitNode(node);
+		visitor.traverseNodeInterruptibly(node);
 		return ExprActivity.PASSIVE_WITHOUT_FALLING_THROUGH.equals(visitor.getActivityLevel())
 				|| ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
 	}
@@ -2588,7 +2588,7 @@ public final class ASTNodes {
 
 		for (Statement statement : getNextSiblings(node)) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(existingVariableNames, true);
-			varOccurrenceVisitor.visitNode(statement);
+			varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
 			if (varOccurrenceVisitor.isVarUsed()) {
 				return true;

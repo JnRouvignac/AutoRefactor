@@ -98,7 +98,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
 	public boolean preVisit2(final ASTNode node) {
 		if (node instanceof CompilationUnit) {
 			LombokVisitor lombokVisitor= new LombokVisitor();
-			lombokVisitor.visitNode(node);
+			lombokVisitor.traverseNodeInterruptibly(node);
 
 			if (lombokVisitor.isUseLombok()) {
 				return false;

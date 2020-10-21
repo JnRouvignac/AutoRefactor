@@ -226,7 +226,7 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		condition.accept(visitor);
 
 		VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(visitor.getVariables(), true);
-		varOccurrenceVisitor.visitNode((Expression) originalMethod.arguments().get(0));
+		varOccurrenceVisitor.traverseNodeInterruptibly((Expression) originalMethod.arguments().get(0));
 
 		if (!varOccurrenceVisitor.isVarUsed()) {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd,

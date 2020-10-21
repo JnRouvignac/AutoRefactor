@@ -174,7 +174,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			Block parentBlock= ASTNodes.getTypedAncestor(fragment, Block.class);
 
 			if (parentBlock != null) {
-				varOccurrenceVisitor.visitNode(parentBlock);
+				varOccurrenceVisitor.traverseNodeInterruptibly(parentBlock);
 
 				if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
 					refactorWrapper(node);

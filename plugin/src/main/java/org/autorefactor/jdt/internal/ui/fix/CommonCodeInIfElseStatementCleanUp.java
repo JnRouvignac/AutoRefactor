@@ -348,7 +348,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
 		for (Statement statement : ASTNodes.getNextSiblings(node)) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames, true);
-			varOccurrenceVisitor.visitNode(statement);
+			varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
 			if (varOccurrenceVisitor.isVarUsed()) {
 				return true;

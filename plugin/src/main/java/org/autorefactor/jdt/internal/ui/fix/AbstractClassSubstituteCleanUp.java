@@ -279,7 +279,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 			Statement parent= ASTNodes.getTypedAncestor(varDecl, Statement.class);
 			Statement nextSibling= ASTNodes.getNextSibling(parent);
 			while (nextSibling != null) {
-				varOccurrenceVisitor.visitNode(nextSibling);
+				varOccurrenceVisitor.traverseNodeInterruptibly(nextSibling);
 				nextSibling= ASTNodes.getNextSibling(nextSibling);
 			}
 

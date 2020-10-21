@@ -114,7 +114,7 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 
 			if (topLevelClass != null && !Modifier.isStatic(node.getModifiers())) {
 				TopLevelClassMemberVisitor topLevelClassMemberVisitor= new TopLevelClassMemberVisitor(node);
-				topLevelClassMemberVisitor.visitNode(node);
+				topLevelClassMemberVisitor.traverseNodeInterruptibly(node);
 
 				if (!topLevelClassMemberVisitor.isTopLevelClassMemberUsed()) {
 					makeStatic(node);

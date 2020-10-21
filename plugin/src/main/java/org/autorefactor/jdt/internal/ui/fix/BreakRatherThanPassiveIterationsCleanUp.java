@@ -211,7 +211,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
 	private boolean hasSideEffect(final ASTNode node, final Set<SimpleName> allowedVars) {
 		SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
-		variableUseVisitor.visitNode(node);
+		variableUseVisitor.traverseNodeInterruptibly(node);
 		return variableUseVisitor.hasSideEffect();
 	}
 
@@ -268,7 +268,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 					&& ASTNodes.isHardCoded(assignment.getRightHandSide())
 					&& ASTNodes.isPassive(assignment.getLeftHandSide())) {
 				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
-				varOccurrenceVisitor.visitNode(assignment.getLeftHandSide());
+				varOccurrenceVisitor.traverseNodeInterruptibly(assignment.getLeftHandSide());
 
 				if (varOccurrenceVisitor.isVarUsed()) {
 					return false;

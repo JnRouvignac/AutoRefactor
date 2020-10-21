@@ -251,7 +251,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 	private void filterLocallyUsedNames(final CompilationUnit node, final Map<String, String> importsByClassname,
 			final Set<String> classesToImport) {
 		LocalClassVisitor nestedClassVisitor= new LocalClassVisitor(importsByClassname.keySet());
-		nestedClassVisitor.visitNode(node);
+		nestedClassVisitor.traverseNodeInterruptibly(node);
 		Set<String> classnamesNeverUsedLocally= nestedClassVisitor.getClassnamesNeverUsedLocally();
 		Iterator<String> iterator= classesToImport.iterator();
 
