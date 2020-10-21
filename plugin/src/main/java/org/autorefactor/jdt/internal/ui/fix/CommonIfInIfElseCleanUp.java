@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.text.edits.TextEditGroup;
@@ -107,7 +108,9 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		Expression newCondition= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(thenInnerIfStatement.getExpression()));
 		IfStatement newIfStatement= ast.newIfStatement();
 		newIfStatement.setExpression(newCondition);
-		newIfStatement.setThenStatement(ast.newBlock(newInnerIf));
+		Block newBlock= ast.newBlock();
+		newBlock.statements().add(newInnerIf);
+		newIfStatement.setThenStatement(newBlock);
 
 		ASTNodes.replaceButKeepComment(rewrite, node, newIfStatement, group);
 	}

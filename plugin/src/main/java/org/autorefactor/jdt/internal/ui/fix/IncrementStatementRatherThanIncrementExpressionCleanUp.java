@@ -229,7 +229,10 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertAfter(newAssignment, statement, group);
 				} else {
-					Block newBlock= ast.newBlock(ASTNodes.createMoveTarget(rewrite, statement), newAssignment);
+					Block newBlock1= ast.newBlock();
+					newBlock1.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
+					newBlock1.statements().add(newAssignment);
+					Block newBlock= newBlock1;
 
 					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}
@@ -244,7 +247,10 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertBefore(newAssignment, statement, group);
 				} else {
-					Block newBlock= ast.newBlock(newAssignment, ASTNodes.createMoveTarget(rewrite, statement));
+					Block newBlock1= ast.newBlock();
+					newBlock1.statements().add(newAssignment);
+					newBlock1.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
+					Block newBlock= newBlock1;
 
 					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}

@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -130,7 +131,9 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				}
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
-				Block newBlock= ast.newBlock(expressionStatements);
+				Block newBlock1= ast.newBlock();
+				newBlock1.statements().addAll((Collection<Statement>) expressionStatements);
+				Block newBlock= newBlock1;
 				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 			}
 

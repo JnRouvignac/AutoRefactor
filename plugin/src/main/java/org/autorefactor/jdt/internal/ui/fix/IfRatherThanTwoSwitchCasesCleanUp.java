@@ -185,13 +185,11 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
 			}
 
-			Statement[] copyOfStatements= new Statement[caseStructure.getSecond().size()];
+			Block newBlock= ast.newBlock();
 
-			for (int j= 0; j < caseStructure.getSecond().size(); j++) {
-				copyOfStatements[j]= ast.createCopyTarget(caseStructure.getSecond().get(j));
+			for (Statement statement : caseStructure.getSecond()) {
+				newBlock.statements().add(ast.createCopyTarget(statement));
 			}
-
-			Block newBlock= ast.newBlock(copyOfStatements);
 
 			if (currentBlock != null) {
 				IfStatement newIfStatement= ast.newIfStatement();
@@ -199,7 +197,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				newIfStatement.setThenStatement(newBlock);
 				newIfStatement.setElseStatement(currentBlock);
 				currentBlock= newIfStatement;
-			} else if (copyOfStatements.length == 0) {
+			} else if (caseStructure.getSecond().size() == 0) {
 				localCaseIndexWithDefault = -1;
 			} else if (localCaseIndexWithDefault == -1) {
 				IfStatement newIfStatement= ast.newIfStatement();

@@ -180,10 +180,12 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 					}
 					// Store viewHolderItem in convertView
 					thenStatements.add(ast.newExpressionStatement(ast.newMethodInvocation("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
+					Block newBlock= ast.newBlock();
+					newBlock.statements().add(ast.newExpressionStatement(ast.newAssignment(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
+							ast.newCastExpression(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag"))))); //$NON-NLS-1$ //$NON-NLS-2$
 
 					// Retrieve viewHolderItem from convertView
-					newIfStatement.setElseStatement(ast.newBlock(ast.newExpressionStatement(ast.newAssignment(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
-							ast.newCastExpression(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag")))))); //$NON-NLS-1$ //$NON-NLS-2$
+					newIfStatement.setElseStatement(newBlock);
 				}
 				rewrite.remove(visitor.viewAssignmentStatement, group);
 				return false;

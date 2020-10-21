@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -200,8 +201,10 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(node.getExpression(), true), group);
 			ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+			Block newBlock= ast.newBlock();
+			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
 
-			Block block= ast.newBlock(copyOfStatements);
+			Block block= newBlock;
 			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
 		}
 	}
@@ -228,8 +231,10 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 
 			rewrite.remove(node.getElseStatement(), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+			Block newBlock= ast.newBlock();
+			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
 
-			Block block= ast.newBlock(copyOfStatements);
+			Block block= newBlock;
 			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
 		}
 	}

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -135,7 +136,9 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 			} else {
 				List<Statement> copyOfThenStatements= rewrite.createMoveTarget(statements);
 				copyOfThenStatements.add(0, ASTNodes.createMoveTarget(rewrite, variableAssignment));
-				Block block= ast.newBlock(copyOfThenStatements);
+				Block newBlock= ast.newBlock();
+				newBlock.statements().addAll((Collection<Statement>) copyOfThenStatements);
+				Block block= newBlock;
 				ASTNodes.replaceButKeepComment(rewrite, statement, block, group);
 			}
 		}

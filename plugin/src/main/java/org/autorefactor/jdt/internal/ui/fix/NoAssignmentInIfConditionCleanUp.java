@@ -199,7 +199,10 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				if (ASTNodes.canHaveSiblings(node)) {
 					rewrite.insertBefore(newAssignment, node, group);
 				} else {
-					Block newBlock= ast.newBlock(newAssignment, ASTNodes.createMoveTarget(rewrite, node));
+					Block newBlock1= ast.newBlock();
+					newBlock1.statements().add(newAssignment);
+					newBlock1.statements().add((Statement) ASTNodes.createMoveTarget(rewrite, node));
+					Block newBlock= newBlock1;
 					ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 				}
 

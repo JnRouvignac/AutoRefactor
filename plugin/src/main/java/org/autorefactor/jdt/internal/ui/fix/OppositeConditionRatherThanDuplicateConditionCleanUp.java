@@ -29,6 +29,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -124,7 +125,9 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
 		Statement negativeStmtCopy;
 		if (negativeStatement instanceof IfStatement) {
-			negativeStmtCopy= ast.newBlock(ASTNodes.createMoveTarget(rewrite, negativeStatement));
+			Block newBlock= ast.newBlock();
+			newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, negativeStatement));
+			negativeStmtCopy= newBlock;
 		} else {
 			negativeStmtCopy= ASTNodes.createMoveTarget(rewrite, negativeStatement);
 		}

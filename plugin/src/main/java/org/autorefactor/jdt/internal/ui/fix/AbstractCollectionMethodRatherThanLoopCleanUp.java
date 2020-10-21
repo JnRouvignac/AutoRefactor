@@ -233,7 +233,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			IfStatement replacement= ast.newIfStatement();
 			replacement.setExpression(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd));
-			replacement.setThenStatement(ast.newBlock(ast.copyRange(thenStatements)));
+			Block newBlock= ast.newBlock();
+			newBlock.statements().add(ast.copyRange(thenStatements));
+			replacement.setThenStatement(newBlock);
 
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
 

@@ -178,25 +178,10 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link Block} instance.
 	 *
-	 * @param statements the statements to add to the block
 	 * @return a new Block
 	 */
-	public Block newBlock(final Statement... statements) {
-		Block block= ast.newBlock();
-		addAll(block.statements(), statements);
-		return block;
-	}
-
-	/**
-	 * Builds a new {@link Block} instance.
-	 *
-	 * @param statements the statements to add to the block
-	 * @return a new Block
-	 */
-	public Block newBlock(final Collection<Statement> statements) {
-		Block block= ast.newBlock();
-		block.statements().addAll(statements);
-		return block;
+	public Block newBlock() {
+		return ast.newBlock();
 	}
 
 	/**

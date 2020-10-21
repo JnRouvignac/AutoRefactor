@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -197,7 +199,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				for (Statement stmtToRemove : oneCaseToRemove) {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(orderedStatements), group);
+				Block newBlock= ast.newBlock();
+				newBlock.statements().addAll(orderedStatements);
+				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 			}
 		} else {
 			// Remove empty cases
@@ -231,7 +235,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
 				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(orderedStatements), group);
+				Block newBlock= ast.newBlock();
+				newBlock.statements().addAll((Collection<Statement>) orderedStatements);
+				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 			}
 		}
 	}

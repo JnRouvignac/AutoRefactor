@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -132,8 +133,10 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			for (Statement statement : otherStatements) {
 				newStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
+			Block newBlock= ast.newBlock();
+			newBlock.statements().addAll((Collection<Statement>) newStatements);
 
-			Block block= ast.newBlock(newStatements);
+			Block block= newBlock;
 
 			ASTNodes.replaceButKeepComment(rewrite, node.getBody(), block, group);
 		}
