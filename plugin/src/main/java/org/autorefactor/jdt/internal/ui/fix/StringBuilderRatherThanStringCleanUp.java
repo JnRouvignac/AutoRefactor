@@ -191,6 +191,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				List<SimpleName> reads= varOccurrencesVisitor.getReads();
 				List<SimpleName> writes= varOccurrencesVisitor.getWrites();
 				writes.remove(declaration);
+				reads.removeAll(writes);
 
 				Set<SimpleName> unvisitedReads= new HashSet<>(reads);
 				Set<SimpleName> assignmentWrites= new HashSet<>();

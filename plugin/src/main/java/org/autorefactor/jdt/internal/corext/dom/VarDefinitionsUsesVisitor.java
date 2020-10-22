@@ -112,6 +112,10 @@ public final class VarDefinitionsUsesVisitor extends ASTVisitor {
 			switch (node.getParent().getNodeType()) {
 			case ASTNode.ASSIGNMENT:
 				addWriteOrRead(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
+				if (node.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY
+						&& !ASTNodes.hasOperator((Assignment) node.getParent(), Assignment.Operator.ASSIGN)) {
+					reads.add(node);
+				}
 				break;
 
 			case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
