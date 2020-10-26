@@ -2324,11 +2324,11 @@ public final class ASTNodes {
 	 * @return the last parent node of the provided classes, or the current node
 	 *         otherwise
 	 */
-	public static ASTNode getParent(final ASTNode node, final Class<?>... includedClasses) {
+	public static ASTNode getMatchingParent(final ASTNode node, final Class<?>... includedClasses) {
 		ASTNode parent= node.getParent();
 
 		if (instanceOf(parent, includedClasses)) {
-			return getParent(parent, includedClasses);
+			return getMatchingParent(parent, includedClasses);
 		}
 
 		return node;
@@ -2346,28 +2346,6 @@ public final class ASTNodes {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Returns the first parent node which has a different type that the provided
-	 * ignored classes.
-	 *
-	 * @param node           the node
-	 * @param ignoredClasses the classes to ignore when looking for the parent node
-	 * @return the parent node by ignoring the provided types
-	 */
-	public static ASTNode getParentIgnoring(final ASTNode node, final Class<?>... ignoredClasses) {
-		ASTNode parent= node.getParent();
-
-		if (parent == null) {
-			return node;
-		}
-
-		if (instanceOf(parent, ignoredClasses)) {
-			return getParentIgnoring(parent, ignoredClasses);
-		}
-
-		return parent;
 	}
 
 	/**
