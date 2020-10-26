@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
+import java.util.List;
+
 public class AndConditionRatherThanEmbededIfSample {
     public void collapseIfStatements(boolean isActive, boolean isValid) {
         // Keep this comment
@@ -35,6 +37,13 @@ public class AndConditionRatherThanEmbededIfSample {
                 int i = 0;
             }
         }
+    }
+
+    public void collapseLoneIfStatements(boolean isActive, boolean isValid, List<String> texts) {
+        // Keep this comment
+        if (isActive)
+            if (isValid)
+                texts.clear();
     }
 
     public void collapseWithFourOperands(int i1, int i2) {
