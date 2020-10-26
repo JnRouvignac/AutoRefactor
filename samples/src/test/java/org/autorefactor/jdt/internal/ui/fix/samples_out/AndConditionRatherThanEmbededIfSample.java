@@ -64,19 +64,19 @@ public class AndConditionRatherThanEmbededIfSample {
     }
 
     public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean isActive, boolean isValid, boolean isEditMode) {
-        // Keep this comment 1
-        // Keep this comment 2
+        // Keep this comment
+        // Keep this comment too
         if (isActive && (isValid || isEditMode)) {
-            // Keep this comment 3
+            // Keep this comment also
             int i = 0;
         }
     }
 
     public void collapseIfWithOROperator(boolean isActive, boolean isValid, boolean isEditMode) {
-        // Keep this comment 1
-        // Keep this comment 2
+        // Keep this comment
+        // Keep this comment too
         if (isActive && (isValid | isEditMode)) {
-            // Keep this comment 3
+            // Keep this comment also
             int i = 0;
         }
     }

@@ -118,21 +118,21 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
     public int removePeremptoryTest(int increment, int j, byte by, boolean b, Long longObject,
             List<Date> anotherObject) {
 
-        // Keep this comment 1
+        // Keep this comment
         if (j == j) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment 2
+        // Keep this comment too
         if (j != j) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment 3
+        // Keep this comment also
         if (by == by) {
             increment++;
         } else {
