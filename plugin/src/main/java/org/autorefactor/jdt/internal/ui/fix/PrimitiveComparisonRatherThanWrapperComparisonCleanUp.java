@@ -29,6 +29,8 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
+import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.text.edits.TextEditGroup;
@@ -66,11 +68,29 @@ public class PrimitiveComparisonRatherThanWrapperComparisonCleanUp extends Abstr
 					if (methodInvocation != null
 							&& ASTNodes.usesGivenSignature(methodInvocation, canonicalName, "valueOf", Bindings.getUnboxedTypeName(canonicalName)) //$NON-NLS-1$
 							&& ASTNodes.isPrimitive((Expression) methodInvocation.arguments().get(0))) {
-						refactor(node, methodInvocation, wrapperClass);
+						refactor(node, (Expression) methodInvocation.arguments().get(0), wrapperClass);
 						return false;
-					} else {
-						return true;
 					}
+
+					ClassInstanceCreation classInstanceCreation = ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
+
+					if (classInstanceCreation != null
+							&& ASTNodes.hasType(classInstanceCreation.getType().resolveBinding(), canonicalName)
+							&& ASTNodes.isPrimitive((Expression) classInstanceCreation.arguments().get(0))) {
+						refactor(node, (Expression) classInstanceCreation.arguments().get(0), wrapperClass);
+						return false;
+					}
+
+					CastExpression castExpression = ASTNodes.as(node.getExpression(), CastExpression.class);
+
+					if (castExpression != null
+							&& ASTNodes.hasType(castExpression.getType().resolveBinding(), canonicalName)
+							&& ASTNodes.isPrimitive(castExpression.getExpression())) {
+						refactor(node, castExpression.getExpression(), wrapperClass);
+						return false;
+					}
+
+					return true;
 				}
 			}
 		}
@@ -78,13 +98,13 @@ public class PrimitiveComparisonRatherThanWrapperComparisonCleanUp extends Abstr
 		return true;
 	}
 
-	private void refactor(final MethodInvocation node, final MethodInvocation methodInvocation, final Class<?> wrapperClass) {
+	private void refactor(final MethodInvocation node, final Expression primitiveValue, final Class<?> wrapperClass) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description);
 
 		MethodInvocation newMethodInvocation= ast.newMethodInvocation(ast.newSimpleName(wrapperClass.getSimpleName()), "compare", //$NON-NLS-1$
-				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) methodInvocation.arguments().get(0))),
+				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)),
 				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) node.arguments().get(0))));
 		ASTNodes.replaceButKeepComment(rewrite, node, newMethodInvocation, group);
 	}

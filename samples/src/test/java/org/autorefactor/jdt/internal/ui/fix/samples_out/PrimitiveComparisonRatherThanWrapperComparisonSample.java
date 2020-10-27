@@ -66,6 +66,16 @@ public class PrimitiveComparisonRatherThanWrapperComparisonSample {
         return Boolean.compare(number, anotherNumber);
     }
 
+    public int refactorIntegerInstantiation(int number, int anotherNumber) {
+        // Keep this comment
+        return Integer.compare(number, anotherNumber);
+    }
+
+    public int refactorIntegerCast(int number, int anotherNumber) {
+        // Keep this comment
+        return Integer.compare(number, anotherNumber);
+    }
+
     public int doNotRefactorWrapper(Integer number, int anotherNumber) {
         return Integer.valueOf(number).compareTo(anotherNumber);
     }
