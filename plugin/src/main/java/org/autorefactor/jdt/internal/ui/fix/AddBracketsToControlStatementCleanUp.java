@@ -86,19 +86,22 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean maybeAddBrackets(final Statement statement) {
-		if (statement == null || statement instanceof Block) {
-			return true;
+		if (statement != null && !(statement instanceof Block)) {
+			addBrackets(statement);
+			return false;
 		}
 
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		return true;
+	}
 
+	private void addBrackets(final Statement statement) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddBracketsToControlStatementCleanUp_description);
+
 		Block newBlock= ast.newBlock();
 		newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
 
-		Block block= newBlock;
-		ASTNodes.replaceButKeepComment(rewrite, statement, block, group);
-		return false;
+		ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 	}
 }
