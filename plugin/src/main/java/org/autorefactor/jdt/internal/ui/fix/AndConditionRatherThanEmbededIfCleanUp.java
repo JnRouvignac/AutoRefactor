@@ -30,6 +30,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.text.edits.TextEditGroup;
@@ -72,12 +73,21 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
         TextEditGroup group= new TextEditGroup(MultiFixMessages.AndConditionRatherThanEmbededIfCleanUp_description);
 
-		InfixExpression newInfixExpression= ast.newInfixExpression();
-		newInfixExpression.setLeftOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, node.getExpression())));
-		newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
-		newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
+		if (node.getThenStatement() instanceof Block || innerIf.getThenStatement() instanceof Block) {
+			InfixExpression newInfixExpression= ast.newInfixExpression();
+			newInfixExpression.setLeftOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, node.getExpression())));
+			newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
+			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
 
-		ASTNodes.replaceButKeepComment(rewrite, innerIf.getExpression(), newInfixExpression, group);
-        ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, innerIf), group);
+			ASTNodes.replaceButKeepComment(rewrite, innerIf.getExpression(), newInfixExpression, group);
+	        ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, innerIf), group);
+		} else {
+			// Do not do the cleanup
+			// Prepare the code for the next pass
+			Block newBlock= ast.newBlock();
+			newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, innerIf));
+
+			ASTNodes.replaceButKeepComment(rewrite, innerIf, newBlock, group);
+		}
     }
 }

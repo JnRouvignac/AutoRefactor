@@ -43,6 +43,12 @@ public class AndConditionRatherThanEmbededIfSample {
             texts.clear();
     }
 
+    public void collapseCommentedLoneIfStatements(boolean isActive, boolean isValid, List<String> texts) {
+        // Keep this comment
+        if (isActive && isValid)
+            texts.clear(); // Keep this comment too
+    }
+
     public void collapseWithFourOperands(int i1, int i2) {
         // Keep this comment
         // Keep this comment too
