@@ -509,6 +509,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String SerializeRatherThanBoxingAndSerializeCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String SerializeRatherThanBoxingAndSerializeCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String SerializeRatherThanBoxingAndSerializeCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String RemoveEmptyIfCleanUp_name;
     /**
      * Automatically filled.

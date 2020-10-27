@@ -97,6 +97,7 @@ public final class AllCleanUpRules {
                 new SubstringWithOneParameterRatherThanTwoCleanUp(), new BigNumberCleanUp(),
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
                 new PrimitiveComparisonRatherThanWrapperComparisonCleanUp(),
+                new SerializeRatherThanBoxingAndSerializeCleanUp(),
                 new RemoveEmptyIfCleanUp(),
                 new NoLoopIterationRatherThanEmptyCheckCleanUp(),
                 new InlineCodeRatherThanPeremptoryConditionCleanUp(),
