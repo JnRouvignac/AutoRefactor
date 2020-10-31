@@ -32,12 +32,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -75,35 +71,6 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			if (hasUselessOperand.get()) {
 				replaceWithNewInfixExpression(visited, remainingOperands);
 				return false;
-			}
-
-			List<Expression> operands= ASTNodes.allOperands(visited);
-
-			if (operands.size() > 2) {
-				for (int i= 0; i < operands.size() - 1; i++) {
-					Expression nullCheckedExpression= ASTNodes.getNullCheckedExpression(operands.get(i));
-
-					if (nullCheckedExpression != null && isNullCheckRedundant(operands.get(i + 1), nullCheckedExpression)) {
-						operands.remove(i);
-
-						ASTRewrite rewrite= cuRewrite.getASTRewrite();
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-
-						InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(operands));
-						ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
-						return false;
-					}
-				}
-			} else {
-				Expression leftOperand= visited.getLeftOperand();
-				Expression rightOperand= visited.getRightOperand();
-				Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(leftOperand);
-
-				if (nullCheckedExpressionLHS != null && isNullCheckRedundant(rightOperand, nullCheckedExpressionLHS)) {
-					replaceBy(visited, rightOperand);
-					return false;
-				}
 			}
 		} else if (ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
 				&& !visited.hasExtendedOperands()) {
@@ -259,44 +226,5 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(remainingOperands));
 			ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 		}
-	}
-
-	private void replaceBy(final ASTNode visited, final Expression expression) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, expression), group);
-	}
-
-	/**
-	 * The previous null check is redundant if:
-	 * <ul>
-	 * <li>the null checked expression is reused in an instanceof expression</li>
-	 * <li>the null checked expression is reused in an expression checking for
-	 * object equality against an expression that resolves to a non null
-	 * constant</li>
-	 * </ul>
-	 */
-	private boolean isNullCheckRedundant(final Expression expression, final Expression nullCheckedExpression) {
-		if (nullCheckedExpression != null) {
-			if (expression instanceof InstanceofExpression) {
-				Expression leftOperand= ((InstanceofExpression) expression).getLeftOperand();
-				return leftOperand.subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression);
-			}
-
-			if (expression instanceof MethodInvocation) {
-				MethodInvocation methodInvocation= (MethodInvocation) expression;
-
-				if (methodInvocation.getExpression() != null && methodInvocation.getExpression().resolveConstantExpressionValue() != null
-						&& methodInvocation.arguments().size() == 1
-						&& ((Expression) methodInvocation.arguments().get(0)).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
-					// Did we invoke java.lang.Object.equals() or
-					// java.lang.String.equalsIgnoreCase()?
-					return ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-							|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
-				}
-			}
-		}
-
-		return false;
 	}
 }

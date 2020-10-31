@@ -39,99 +39,31 @@ public class SimplifyExpressionSample {
     }
 
     public void removeUselessNullCheck(String s) {
-        // Remove redundant null checks
-        boolean b1 = s != null && "".equals(s);
-        boolean b2 = s != null && "".equalsIgnoreCase(s);
-        boolean b3 = s != null && s instanceof String;
-
-        // Remove redundant null checks
-        boolean b4 = null != s && "".equals(s);
-        boolean b5 = null != s && "".equalsIgnoreCase(s);
-        boolean b6 = null != s && s instanceof String;
-
         // Remove redundant constant operands
-        boolean b7 = true && s != null;
-        boolean b8 = false && s != null;
-        boolean b9 = true || s != null;
-        boolean b10 = false || s != null;
-        boolean b11 = true && s != null && s.startsWith("");
-        boolean b12 = false || s == null || s.startsWith("");
-        boolean b13 = s != null && true && s.startsWith("");
-        boolean b14 = s == null || false || s.startsWith("");
-        boolean b15 = s != null && s.startsWith("") && true;
-        boolean b16 = s == null || s.startsWith("") || false;
-    }
-
-    public boolean doNotRemoveUselessNullCheckOnInstance(Object o) {
-        return o != null && equals(o);
-    }
-
-    public boolean doNotRemoveUselessNullCheckOnThis(Object o) {
-        return o != null && this.equals(o);
-    }
-
-    public boolean removeExtendedNullCheck(boolean enabled, String s) {
-        // Remove redundant null checks
-        boolean b1 = enabled && s != null && "".equals(s);
-        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s);
-        boolean b3 = enabled && s != null && s instanceof String;
-
-        // Remove redundant null checks
-        boolean b4 = enabled && null != s && "".equals(s);
-        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s);
-        boolean b6 = enabled && null != s && s instanceof String;
-
-        return b1 && b2 && b3 && b4 && b5 && b6;
-    }
-
-    public boolean removeExtendedNullCheck(boolean enabled, boolean isValid, String s) {
-        // Remove redundant null checks
-        boolean b1 = enabled && isValid && s != null && "".equals(s);
-        boolean b2 = enabled && isValid && s != null && "".equalsIgnoreCase(s);
-        boolean b3 = enabled && isValid && s != null && s instanceof String;
-
-        // Remove redundant null checks
-        boolean b4 = enabled && isValid && null != s && "".equals(s);
-        boolean b5 = enabled && isValid && null != s && "".equalsIgnoreCase(s);
-        boolean b6 = enabled && isValid && null != s && s instanceof String;
-
-        return b1 && b2 && b3 && b4 && b5 && b6;
-    }
-
-    public boolean removeNullCheckInTheMiddle(boolean enabled, boolean isValid, String s) {
-        // Remove redundant null checks
-        boolean b1 = enabled && s != null && "".equals(s) && isValid;
-        boolean b2 = enabled && s != null && "".equalsIgnoreCase(s) && isValid;
-        boolean b3 = enabled && s != null && s instanceof String && isValid;
-
-        // Remove redundant null checks
-        boolean b4 = enabled && null != s && "".equals(s) && isValid;
-        boolean b5 = enabled && null != s && "".equalsIgnoreCase(s) && isValid;
-        boolean b6 = enabled && null != s && s instanceof String && isValid;
-
-        return b1 && b2 && b3 && b4 && b5 && b6;
+        boolean b0 = true && s != null;
+        boolean b1 = false && s != null;
+        boolean b2 = true || s != null;
+        boolean b3 = false || s != null;
+        boolean b4 = true && s != null && s.startsWith("");
+        boolean b5 = false || s == null || s.startsWith("");
+        boolean b6 = s != null && true && s.startsWith("");
+        boolean b7 = s == null || false || s.startsWith("");
+        boolean b8 = s != null && s.startsWith("") && true;
+        boolean b9 = s == null || s.startsWith("") || false;
     }
 
     public boolean doNotRemoveNullCheck(String s) {
-        // Do not remove non redundant null checks
-        boolean b1 = s != null && s.equals(NULL_CONSTANT);
-        boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
-
-        // Do not remove non redundant null checks
-        boolean b3 = null != s && s.equals(NULL_CONSTANT);
-        boolean b4 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
+        // Right-hand-side left unchanged because left-hand-side can have
+        // side effects
+        boolean b1 = s != null && false;
+        boolean b2 = s != null || true;
 
         // Right-hand-side left unchanged because left-hand-side can have
         // side effects
-        boolean b5 = s != null && false;
-        boolean b6 = s != null || true;
+        boolean b3 = null != s && false;
+        boolean b4 = null != s || true;
 
-        // Right-hand-side left unchanged because left-hand-side can have
-        // side effects
-        boolean b7 = null != s && false;
-        boolean b8 = null != s || true;
-
-        return b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8;
+        return b1 && b2 && b3;
     }
 
     public void simplifyPrimitiveBooleanExpression(boolean b) {

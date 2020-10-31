@@ -1733,6 +1733,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String EqualsNullableCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String EqualsNullableCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String EqualsNullableCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String RemoveParenthesisCleanUp_name;
     /**
      * Automatically filled.

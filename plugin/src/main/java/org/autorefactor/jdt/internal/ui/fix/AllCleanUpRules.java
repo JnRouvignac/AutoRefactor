@@ -72,6 +72,7 @@ public final class AllCleanUpRules {
                 new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
                 new RemoveParenthesisCleanUp(),
                 // The previous cleanups should run first as they make the code more standard and avoid weird code
+                new EqualsNullableCleanUp(),
                 new LocalVariableRatherThanFieldCleanUp(),
                 new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
                 new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
