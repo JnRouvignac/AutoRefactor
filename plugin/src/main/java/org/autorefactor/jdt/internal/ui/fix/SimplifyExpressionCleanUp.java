@@ -59,24 +59,25 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR)) {
+	public boolean visit(final InfixExpression visited) {
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_OR)) {
 			AtomicBoolean hasUselessOperand= new AtomicBoolean(false);
-			List<Expression> remainingOperands= removeUselessOperands(node, hasUselessOperand, false, true);
+			List<Expression> remainingOperands= removeUselessOperands(visited, Boolean.FALSE, Boolean.TRUE, hasUselessOperand);
 
 			if (hasUselessOperand.get()) {
-				replaceWithNewInfixExpression(node, remainingOperands);
+				replaceWithNewInfixExpression(visited, remainingOperands);
 				return false;
 			}
-		} else if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND)) {
+		} else if (ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_AND)) {
 			AtomicBoolean hasUselessOperand= new AtomicBoolean(false);
-			List<Expression> remainingOperands= removeUselessOperands(node, hasUselessOperand, true, false);
+			List<Expression> remainingOperands= removeUselessOperands(visited, Boolean.TRUE, Boolean.FALSE, hasUselessOperand);
 
 			if (hasUselessOperand.get()) {
-				replaceWithNewInfixExpression(node, remainingOperands);
+				replaceWithNewInfixExpression(visited, remainingOperands);
 				return false;
 			}
-			List<Expression> operands= ASTNodes.allOperands(node);
+
+			List<Expression> operands= ASTNodes.allOperands(visited);
 
 			if (operands.size() > 2) {
 				for (int i= 0; i < operands.size() - 1; i++) {
@@ -89,68 +90,67 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
-						InfixExpression newInfixExpression= ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(operands));
-						ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
+						InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(operands));
+						ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 						return false;
 					}
 				}
 			} else {
-				Expression leftOperand= node.getLeftOperand();
-				Expression rightOperand= node.getRightOperand();
+				Expression leftOperand= visited.getLeftOperand();
+				Expression rightOperand= visited.getRightOperand();
 				Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(leftOperand);
 
 				if (nullCheckedExpressionLHS != null && isNullCheckRedundant(rightOperand, nullCheckedExpressionLHS)) {
-					replaceBy(node, rightOperand);
+					replaceBy(visited, rightOperand);
 					return false;
 				}
 			}
-		} else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR) && !node.hasExtendedOperands()
-				&& !maybeReduceBooleanExpression(node)) {
-			return false;
+		} else if (ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
+				&& !visited.hasExtendedOperands()) {
+			return maybeReduceBooleanExpression(visited);
 		}
 
 		return true;
 	}
 
-	private List<Expression> removeUselessOperands(final InfixExpression node, final AtomicBoolean hasUselessOperand, final Boolean neutralElement, final Boolean shortCircuitValue) {
-		List<Expression> allOperands= ASTNodes.allOperands(node);
+	private List<Expression> removeUselessOperands(final InfixExpression visited, final Boolean neutralElement, final Boolean shortCircuitValue, final AtomicBoolean hasUselessOperand) {
+		List<Expression> allOperands= ASTNodes.allOperands(visited);
 
-		for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
-			Expression operand= it.next();
+		for (ListIterator<Expression> iterator= allOperands.listIterator(); iterator.hasNext();) {
+			Expression operand= iterator.next();
 			Object value= operand.resolveConstantExpressionValue();
-
-			if (shortCircuitValue.equals(value)) {
-				while (it.hasNext()) {
-					hasUselessOperand.set(true);
-					it.next();
-					it.remove();
-				}
-				break;
-			}
 
 			if (neutralElement.equals(value)) {
 				hasUselessOperand.set(true);
-				it.remove();
+				iterator.remove();
+			} else if (shortCircuitValue.equals(value)) {
+				while (iterator.hasNext()) {
+					hasUselessOperand.set(true);
+					iterator.next();
+					iterator.remove();
+				}
+
+				return allOperands;
 			}
 		}
 
 		return allOperands;
 	}
 
-	private boolean maybeReduceBooleanExpression(final InfixExpression node) {
-		Expression leftExpression= node.getLeftOperand();
-		Expression rightExpression= node.getRightOperand();
+	private boolean maybeReduceBooleanExpression(final InfixExpression visited) {
+		Expression leftExpression= visited.getLeftOperand();
+		Expression rightExpression= visited.getRightOperand();
 
 		Boolean leftBoolean= ASTNodes.getBooleanLiteral(leftExpression);
 
 		if (leftBoolean != null) {
-			return replace(node, leftBoolean, rightExpression);
+			return maybeRemoveBooleanConstant(visited, leftBoolean, rightExpression);
 		}
 
 		Boolean rightBoolean= ASTNodes.getBooleanLiteral(rightExpression);
 
 		if (rightBoolean != null) {
-			return replace(node, rightBoolean, leftExpression);
+			return maybeRemoveBooleanConstant(visited, rightBoolean, leftExpression);
 		}
 
 		Expression leftNegatedExpression= null;
@@ -165,45 +165,48 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			rightNegatedExpression= rightPrefix.getOperand();
 		}
 
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-
-		if (leftNegatedExpression != null) {
-			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, leftNegatedExpression));
-
-			if (rightNegatedExpression != null) {
-				newInfixExpression.setOperator(getAppropriateOperator(node));
-				newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightNegatedExpression));
-			} else {
-				newInfixExpression.setOperator(getNegatedOperator(node));
-				newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightExpression));
-			}
-
-			ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
-
-			return false;
-		}
-
-		if (rightNegatedExpression != null) {
-			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, leftExpression));
-			newInfixExpression.setOperator(getNegatedOperator(node));
-			newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightNegatedExpression));
-			ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
+		if (leftNegatedExpression != null || rightNegatedExpression != null) {
+			removeDoubleNegation(visited, leftExpression, rightExpression, leftNegatedExpression,
+					rightNegatedExpression);
 			return false;
 		}
 
 		return true;
 	}
 
-	private InfixExpression.Operator getAppropriateOperator(final InfixExpression node) {
-		if (ASTNodes.hasOperator(node, InfixExpression.Operator.NOT_EQUALS)) {
+	private void removeDoubleNegation(final InfixExpression visited, final Expression leftExpression,
+			final Expression rightExpression, final Expression leftNegatedExpression, final Expression rightNegatedExpression) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
+
+		InfixExpression newInfixExpression= ast.newInfixExpression();
+
+		if (leftNegatedExpression != null) {
+			newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, leftNegatedExpression));
+
+			if (rightNegatedExpression != null) {
+				newInfixExpression.setOperator(getAppropriateOperator(visited));
+				newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightNegatedExpression));
+			} else {
+				newInfixExpression.setOperator(getNegatedOperator(visited));
+				newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightExpression));
+			}
+		} else {
+			newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, leftExpression));
+			newInfixExpression.setOperator(getNegatedOperator(visited));
+			newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightNegatedExpression));
+		}
+
+		ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
+	}
+
+	private InfixExpression.Operator getAppropriateOperator(final InfixExpression visited) {
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.NOT_EQUALS)) {
 			return InfixExpression.Operator.XOR;
 		}
 
-		return node.getOperator();
+		return visited.getOperator();
 	}
 
 	private InfixExpression.Operator getNegatedOperator(final InfixExpression node) {
@@ -214,51 +217,54 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		return InfixExpression.Operator.EQUALS;
 	}
 
-	private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
-		ASTNodes.checkNoExtendedOperands(node);
-
-		if (!ASTNodes.isPrimitive(node.getLeftOperand(), boolean.class.getSimpleName()) && !ASTNodes.isPrimitive(node.getRightOperand(), boolean.class.getSimpleName())) {
-			return true;
-		}
-
+	private boolean maybeRemoveBooleanConstant(final InfixExpression visited, final boolean isTrue, final Expression expressionToCopy) {
 		// Either:
 		// - Two boolean primitives: no possible NPE
 		// - One boolean primitive and one Boolean object, this code already run
 		// the risk of an NPE, so we can replace the infix expression without
 		// fearing we would introduce a previously non existing NPE.
+		if (ASTNodes.isPrimitive(visited.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.isPrimitive(visited.getRightOperand(), boolean.class.getSimpleName())) {
+			removeBooleanConstant(visited, isTrue, expressionToCopy);
+			return false;
+		}
+
+		return true;
+	}
+
+	private void removeBooleanConstant(final InfixExpression visited, final boolean isTrue,
+			final Expression expressionToCopy) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		Expression operand;
-		if (isTrue == ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
-			operand= ASTNodes.createMoveTarget(rewrite, exprToCopy);
+		if (isTrue == ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS)) {
+			operand= ASTNodes.createMoveTarget(rewrite, expressionToCopy);
 		} else {
-			operand= ast.negate(exprToCopy, true);
+			operand= ast.negate(expressionToCopy, true);
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, node, operand, group);
-		return false;
+		ASTNodes.replaceButKeepComment(rewrite, visited, operand, group);
 	}
 
-	private void replaceWithNewInfixExpression(final InfixExpression node, final List<Expression> remainingOperands) {
+	private void replaceWithNewInfixExpression(final InfixExpression visited, final List<Expression> remainingOperands) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
 
 		if (remainingOperands.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			InfixExpression newInfixExpression= ast.newInfixExpression(node.getOperator(), rewrite.createMoveTarget(remainingOperands));
-			ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
+			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(remainingOperands));
+			ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 		}
 	}
 
-	private void replaceBy(final ASTNode node, final Expression expression) {
+	private void replaceBy(final ASTNode visited, final Expression expression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, expression), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, expression), group);
 	}
 
 	/**
@@ -270,23 +276,23 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 	 * constant</li>
 	 * </ul>
 	 */
-	private boolean isNullCheckRedundant(final Expression e, final Expression nullCheckedExpression) {
+	private boolean isNullCheckRedundant(final Expression expression, final Expression nullCheckedExpression) {
 		if (nullCheckedExpression != null) {
-			if (e instanceof InstanceofExpression) {
-				Expression expression= ((InstanceofExpression) e).getLeftOperand();
-				return expression.subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression);
+			if (expression instanceof InstanceofExpression) {
+				Expression leftOperand= ((InstanceofExpression) expression).getLeftOperand();
+				return leftOperand.subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression);
 			}
 
-			if (e instanceof MethodInvocation) {
-				MethodInvocation expression= (MethodInvocation) e;
+			if (expression instanceof MethodInvocation) {
+				MethodInvocation methodInvocation= (MethodInvocation) expression;
 
-				if (expression.getExpression() != null && expression.getExpression().resolveConstantExpressionValue() != null
-						&& expression.arguments().size() == 1
-						&& ((Expression) expression.arguments().get(0)).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
+				if (methodInvocation.getExpression() != null && methodInvocation.getExpression().resolveConstantExpressionValue() != null
+						&& methodInvocation.arguments().size() == 1
+						&& ((Expression) methodInvocation.arguments().get(0)).subtreeMatch(ASTSemanticMatcher.INSTANCE, nullCheckedExpression)) {
 					// Did we invoke java.lang.Object.equals() or
 					// java.lang.String.equalsIgnoreCase()?
-					return ASTNodes.usesGivenSignature(expression, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-							|| ASTNodes.usesGivenSignature(expression, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+					return ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+							|| ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
 				}
 			}
 		}
