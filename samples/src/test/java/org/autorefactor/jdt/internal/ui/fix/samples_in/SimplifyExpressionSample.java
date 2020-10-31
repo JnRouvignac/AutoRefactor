@@ -32,38 +32,8 @@ import java.util.List;
 import java.util.Random;
 
 public class SimplifyExpressionSample {
-    private static final String NULL_CONSTANT = null;
-
     private boolean addedToMakeCodeFail(boolean b1, boolean b2, Object o) {
         return !b1 && b2 && o != null && addedToMakeCodeFail(b1, b2, o);
-    }
-
-    public void removeUselessNullCheck(String s) {
-        // Remove redundant constant operands
-        boolean b0 = true && s != null;
-        boolean b1 = false && s != null;
-        boolean b2 = true || s != null;
-        boolean b3 = false || s != null;
-        boolean b4 = true && s != null && s.startsWith("");
-        boolean b5 = false || s == null || s.startsWith("");
-        boolean b6 = s != null && true && s.startsWith("");
-        boolean b7 = s == null || false || s.startsWith("");
-        boolean b8 = s != null && s.startsWith("") && true;
-        boolean b9 = s == null || s.startsWith("") || false;
-    }
-
-    public boolean doNotRemoveNullCheck(String s) {
-        // Right-hand-side left unchanged because left-hand-side can have
-        // side effects
-        boolean b1 = s != null && false;
-        boolean b2 = s != null || true;
-
-        // Right-hand-side left unchanged because left-hand-side can have
-        // side effects
-        boolean b3 = null != s && false;
-        boolean b4 = null != s || true;
-
-        return b1 && b2 && b3;
     }
 
     public void simplifyPrimitiveBooleanExpression(boolean b) {

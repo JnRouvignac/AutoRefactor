@@ -25,10 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -56,52 +52,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final InfixExpression visited) {
-		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_OR)) {
-			AtomicBoolean hasUselessOperand= new AtomicBoolean(false);
-			List<Expression> remainingOperands= removeUselessOperands(visited, Boolean.FALSE, Boolean.TRUE, hasUselessOperand);
-
-			if (hasUselessOperand.get()) {
-				replaceWithNewInfixExpression(visited, remainingOperands);
-				return false;
-			}
-		} else if (ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_AND)) {
-			AtomicBoolean hasUselessOperand= new AtomicBoolean(false);
-			List<Expression> remainingOperands= removeUselessOperands(visited, Boolean.TRUE, Boolean.FALSE, hasUselessOperand);
-
-			if (hasUselessOperand.get()) {
-				replaceWithNewInfixExpression(visited, remainingOperands);
-				return false;
-			}
-		} else if (ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
 				&& !visited.hasExtendedOperands()) {
 			return maybeReduceBooleanExpression(visited);
 		}
 
 		return true;
-	}
-
-	private List<Expression> removeUselessOperands(final InfixExpression visited, final Boolean neutralElement, final Boolean shortCircuitValue, final AtomicBoolean hasUselessOperand) {
-		List<Expression> allOperands= ASTNodes.allOperands(visited);
-
-		for (ListIterator<Expression> iterator= allOperands.listIterator(); iterator.hasNext();) {
-			Expression operand= iterator.next();
-			Object value= operand.resolveConstantExpressionValue();
-
-			if (neutralElement.equals(value)) {
-				hasUselessOperand.set(true);
-				iterator.remove();
-			} else if (shortCircuitValue.equals(value)) {
-				while (iterator.hasNext()) {
-					hasUselessOperand.set(true);
-					iterator.next();
-					iterator.remove();
-				}
-
-				return allOperands;
-			}
-		}
-
-		return allOperands;
 	}
 
 	private boolean maybeReduceBooleanExpression(final InfixExpression visited) {
@@ -212,19 +168,5 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		}
 
 		ASTNodes.replaceButKeepComment(rewrite, visited, operand, group);
-	}
-
-	private void replaceWithNewInfixExpression(final InfixExpression visited, final List<Expression> remainingOperands) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-
-		if (remainingOperands.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
-		} else {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(remainingOperands));
-			ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
-		}
 	}
 }

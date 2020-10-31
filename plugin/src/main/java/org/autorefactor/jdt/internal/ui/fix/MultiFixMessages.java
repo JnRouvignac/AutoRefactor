@@ -1733,6 +1733,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String RedundantBooleanCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String RedundantBooleanCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String RedundantBooleanCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String EqualsNullableCleanUp_name;
     /**
      * Automatically filled.
