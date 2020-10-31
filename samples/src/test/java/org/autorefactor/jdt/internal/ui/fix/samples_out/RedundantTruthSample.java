@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2020 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,84 +25,66 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
-public class SimplifyExpressionSample {
-    private boolean addedToMakeCodeFail(boolean b1, boolean b2, Object o) {
-        return !b1 && b2 && o != null && addedToMakeCodeFail(b1, b2, o);
-    }
-
-    public void simplifyPrimitiveBooleanExpression(boolean b) {
-        if (b) {
+public class RedundantTruthSample {
+    public void simplifyPrimitiveBooleanExpression(boolean isValid) {
+        if (isValid) {
             int i = 0;
         }
-        if (b) {
+        if (isValid) {
             int i = 0;
         }
-        if (!b) {
+        if (!isValid) {
             int i = 0;
         }
-        if (!b) {
+        if (!isValid) {
             int i = 0;
         }
-        if (b) {
+        if (isValid) {
             int i = 0;
         }
-        if (b) {
+        if (isValid) {
             int i = 0;
         }
-        if (!b) {
+        if (!isValid) {
             int i = 0;
         }
-        if (!b) {
+        if (!isValid) {
             int i = 0;
         }
     }
 
-    public void simplifyBooleanWrapperExpression(Boolean b) {
-        if (b) {
+    public void simplifyBooleanWrapperExpression(Boolean isValid) {
+        if (isValid) {
             int i = 0;
         }
-        if (b) {
+        if (isValid) {
             int i = 0;
         }
-        if (!b) {
+        if (!isValid) {
             int i = 0;
         }
-        if (!b) {
-            int i = 0;
-        }
-    }
-
-    public void doNotSimplifyBooleanWrapperExpression(Boolean b) {
-        if (b == Boolean.TRUE) {
-            int i = 0;
-        }
-        if (b != Boolean.FALSE) {
-            int i = 0;
-        }
-        if (b == Boolean.FALSE) {
-            int i = 0;
-        }
-        if (b != Boolean.TRUE) {
+        if (!isValid) {
             int i = 0;
         }
     }
 
-    public boolean reduceBooleanExpression(boolean b1, boolean b2) {
-        boolean b3 = b1 == b2;
-        boolean b4 = b1 ^ b2;
-        boolean b5 = b1 ^ b2;
-        boolean b6 = b1 ^ b2;
-        boolean b7 = b1 == b2;
-        boolean b8 = b1 == b2;
-        boolean b9 = b1 ^ b2;
-        boolean b10 = b1 == b2;
-        boolean b11 = b1 == b2;
-        return b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11;
+    public int doNotSimplifyBooleanWrapperExpression(Boolean isValid) {
+        if (isValid == Boolean.TRUE) {
+            return 1;
+        }
+
+        if (isValid != Boolean.FALSE) {
+            return 2;
+        }
+
+        if (isValid == Boolean.FALSE) {
+            return 3;
+        }
+
+        if (isValid != Boolean.TRUE) {
+            return 4;
+        }
+
+        return 0;
     }
 }

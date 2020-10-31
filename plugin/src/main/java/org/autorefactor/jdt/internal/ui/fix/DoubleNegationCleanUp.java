@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2020 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,64 +34,46 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
+public class DoubleNegationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.SimplifyExpressionCleanUp_name;
+		return MultiFixMessages.DoubleNegationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.SimplifyExpressionCleanUp_description;
+		return MultiFixMessages.DoubleNegationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.SimplifyExpressionCleanUp_reason;
+		return MultiFixMessages.DoubleNegationCleanUp_reason;
 	}
 
 	@Override
 	public boolean visit(final InfixExpression visited) {
-		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
-				&& !visited.hasExtendedOperands()) {
-			return maybeReduceBooleanExpression(visited);
-		}
+		if (!visited.hasExtendedOperands()
+				&& ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)) {
+			Expression leftExpression= visited.getLeftOperand();
+			Expression rightExpression= visited.getRightOperand();
 
-		return true;
-	}
+			Expression leftNegatedExpression= null;
+			PrefixExpression leftPrefix= ASTNodes.as(leftExpression, PrefixExpression.class);
+			if (leftPrefix != null && ASTNodes.hasOperator(leftPrefix, PrefixExpression.Operator.NOT)) {
+				leftNegatedExpression= leftPrefix.getOperand();
+			}
 
-	private boolean maybeReduceBooleanExpression(final InfixExpression visited) {
-		Expression leftExpression= visited.getLeftOperand();
-		Expression rightExpression= visited.getRightOperand();
+			Expression rightNegatedExpression= null;
+			PrefixExpression rightPrefix= ASTNodes.as(rightExpression, PrefixExpression.class);
+			if (rightPrefix != null && ASTNodes.hasOperator(rightPrefix, PrefixExpression.Operator.NOT)) {
+				rightNegatedExpression= rightPrefix.getOperand();
+			}
 
-		Boolean leftBoolean= ASTNodes.getBooleanLiteral(leftExpression);
-
-		if (leftBoolean != null) {
-			return maybeRemoveBooleanConstant(visited, leftBoolean, rightExpression);
-		}
-
-		Boolean rightBoolean= ASTNodes.getBooleanLiteral(rightExpression);
-
-		if (rightBoolean != null) {
-			return maybeRemoveBooleanConstant(visited, rightBoolean, leftExpression);
-		}
-
-		Expression leftNegatedExpression= null;
-		PrefixExpression leftPrefix= ASTNodes.as(leftExpression, PrefixExpression.class);
-		if (leftPrefix != null && ASTNodes.hasOperator(leftPrefix, PrefixExpression.Operator.NOT)) {
-			leftNegatedExpression= leftPrefix.getOperand();
-		}
-
-		Expression rightNegatedExpression= null;
-		PrefixExpression rightPrefix= ASTNodes.as(rightExpression, PrefixExpression.class);
-		if (rightPrefix != null && ASTNodes.hasOperator(rightPrefix, PrefixExpression.Operator.NOT)) {
-			rightNegatedExpression= rightPrefix.getOperand();
-		}
-
-		if (leftNegatedExpression != null || rightNegatedExpression != null) {
-			removeDoubleNegation(visited, leftExpression, rightExpression, leftNegatedExpression,
-					rightNegatedExpression);
-			return false;
+			if (leftNegatedExpression != null || rightNegatedExpression != null) {
+				removeDoubleNegation(visited, leftExpression, rightExpression, leftNegatedExpression,
+						rightNegatedExpression);
+				return false;
+			}
 		}
 
 		return true;
@@ -101,7 +83,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 			final Expression rightExpression, final Expression leftNegatedExpression, final Expression rightNegatedExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleNegationCleanUp_description);
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();
 
@@ -138,35 +120,5 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 		}
 
 		return InfixExpression.Operator.EQUALS;
-	}
-
-	private boolean maybeRemoveBooleanConstant(final InfixExpression visited, final boolean isTrue, final Expression expressionToCopy) {
-		// Either:
-		// - Two boolean primitives: no possible NPE
-		// - One boolean primitive and one Boolean object, this code already run
-		// the risk of an NPE, so we can replace the infix expression without
-		// fearing we would introduce a previously non existing NPE.
-		if (ASTNodes.isPrimitive(visited.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.isPrimitive(visited.getRightOperand(), boolean.class.getSimpleName())) {
-			removeBooleanConstant(visited, isTrue, expressionToCopy);
-			return false;
-		}
-
-		return true;
-	}
-
-	private void removeBooleanConstant(final InfixExpression visited, final boolean isTrue,
-			final Expression expressionToCopy) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.SimplifyExpressionCleanUp_description);
-
-		Expression operand;
-		if (isTrue == ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS)) {
-			operand= ASTNodes.createMoveTarget(rewrite, expressionToCopy);
-		} else {
-			operand= ast.negate(expressionToCopy, true);
-		}
-
-		ASTNodes.replaceButKeepComment(rewrite, visited, operand, group);
 	}
 }
