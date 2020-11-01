@@ -55,15 +55,16 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.text.edits.TextEditGroup;
@@ -251,43 +252,73 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean withThenReturnStatement(final IfStatement node, final ReturnStatement thenReturnStatement, final ReturnStatement elseReturnStatement) {
-        ReturnStatement newReturnStatement= getReturnStatement(node, thenReturnStatement.getExpression(), elseReturnStatement.getExpression());
+    	ASTNode callable= ASTNodes.getFirstAncestorOrNull(node, MethodDeclaration.class, TypeDeclaration.class, LambdaExpression.class);
 
-        if (newReturnStatement != null) {
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
-            TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
+        if (callable instanceof MethodDeclaration) {
+        	MethodDeclaration methodDeclaration= (MethodDeclaration) callable;
+            ReturnStatement newReturnStatement= getReturnStatement(node, thenReturnStatement.getExpression(), elseReturnStatement.getExpression(), methodDeclaration);
 
-            ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
-            rewrite.remove(elseReturnStatement, group);
-            return false;
-        }
+            if (newReturnStatement != null) {
+                ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
 
-        MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
-
-        if (methodDeclaration != null) {
-            Type returnType= methodDeclaration.getReturnType2();
-
-            if (returnType != null && returnType.isPrimitiveType()) {
-                PrimitiveType primitiveType= (PrimitiveType) returnType;
-
-                if (PrimitiveType.BOOLEAN.equals(primitiveType.getPrimitiveTypeCode())) {
-                    Boolean thenBoolean= ASTNodes.getBooleanLiteral(thenReturnStatement.getExpression());
-                    Boolean elseBoolean= ASTNodes.getBooleanLiteral(elseReturnStatement.getExpression());
-                    newReturnStatement= getReturnStatement(node, thenBoolean, elseBoolean, thenReturnStatement.getExpression(), elseReturnStatement.getExpression());
-
-                    if (newReturnStatement != null) {
-                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                        TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
-
-                        ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
-                        rewrite.remove(elseReturnStatement, group);
-                        return false;
-                    }
-                }
+                ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
+                rewrite.remove(elseReturnStatement, group);
+                return false;
             }
         }
 
         return true;
+    }
+
+    private ReturnStatement getReturnStatement(final IfStatement node, final Expression thenExpression,
+            final Expression elseExpression, final MethodDeclaration methodDeclaration) {
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+        if (areNegatedBooleanValues(thenExpression, elseExpression)) {
+            Expression expressionToReturn;
+            if (ASTNodes.getBooleanLiteral(elseExpression)) {
+                expressionToReturn= ast.negate(node.getExpression(), false);
+            } else {
+            	expressionToReturn= ast.createCopyTarget(node.getExpression());
+            }
+
+            Expression returnExpression= getReturnExpression(methodDeclaration, expressionToReturn);
+
+            if (returnExpression != null) {
+                return ast.newReturnStatement(returnExpression);
+            }
+        }
+
+
+        Type returnType= methodDeclaration.getReturnType2();
+
+        if (returnType != null && ASTNodes.hasType(returnType.resolveBinding(), boolean.class.getCanonicalName())) {
+            Boolean thenBoolean= ASTNodes.getBooleanLiteral(thenExpression);
+            Boolean elseBoolean= ASTNodes.getBooleanLiteral(elseExpression);
+
+            if (thenBoolean == null && elseBoolean != null) {
+                Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), !elseBoolean));
+
+    			InfixExpression newInfixExpression= ast.newInfixExpression();
+    			newInfixExpression.setLeftOperand(leftOperand);
+    			newInfixExpression.setOperator(getConditionalOperator(elseBoolean));
+    			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression)));
+    			return ast.newReturnStatement(newInfixExpression);
+            }
+
+            if (thenBoolean != null && elseBoolean == null) {
+                Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), thenBoolean));
+
+    			InfixExpression newInfixExpression= ast.newInfixExpression();
+    			newInfixExpression.setLeftOperand(leftOperand);
+    			newInfixExpression.setOperator(getConditionalOperator(thenBoolean));
+    			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression)));
+    			return ast.newReturnStatement(newInfixExpression);
+            }
+        }
+
+        return null;
     }
 
     private boolean noThenReturnStatement(final IfStatement node) {
@@ -341,33 +372,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private ReturnStatement getReturnStatement(final IfStatement node, final Boolean thenBoolean, final Boolean elseBoolean,
-            final Expression thenExpression, final Expression elseExpression) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-        if (thenBoolean == null && elseBoolean != null) {
-            Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), !elseBoolean));
-
-			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(leftOperand);
-			newInfixExpression.setOperator(getConditionalOperator(elseBoolean));
-			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression)));
-			return ast.newReturnStatement(newInfixExpression);
-        }
-
-        if (thenBoolean != null && elseBoolean == null) {
-            Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), thenBoolean));
-
-			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(leftOperand);
-			newInfixExpression.setOperator(getConditionalOperator(thenBoolean));
-			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression)));
-			return ast.newReturnStatement(newInfixExpression);
-        }
-
-        return null;
-    }
-
     private InfixExpression.Operator getConditionalOperator(final boolean isOrOperator) {
         return isOrOperator ? InfixExpression.Operator.CONDITIONAL_OR : InfixExpression.Operator.CONDITIONAL_AND;
     }
@@ -391,32 +395,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) variableDeclarationStatement.fragments()) {
             if (ASTNodes.isSameVariable(expression, fragment)) {
                 return fragment;
-            }
-        }
-
-        return null;
-    }
-
-    private ReturnStatement getReturnStatement(final IfStatement node, final Expression thenExpression,
-            final Expression elseExpression) {
-        if (areNegatedBooleanValues(thenExpression, elseExpression)) {
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-            Expression exprToReturn;
-            if (ASTNodes.getBooleanLiteral(elseExpression)) {
-                exprToReturn= ast.negate(node.getExpression(), false);
-            } else {
-            	exprToReturn= ast.createCopyTarget(node.getExpression());
-            }
-
-            MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
-
-            if (methodDeclaration != null) {
-                Expression returnExpression= getReturnExpression(methodDeclaration, exprToReturn);
-
-                if (returnExpression != null) {
-                    return ast.newReturnStatement(returnExpression);
-                }
             }
         }
 
