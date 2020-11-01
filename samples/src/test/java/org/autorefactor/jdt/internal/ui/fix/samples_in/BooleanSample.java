@@ -31,38 +31,38 @@ public class BooleanSample {
     public boolean booleanPrimitive;
     public Boolean booleanWrapper;
 
-    public void replaceIfByAssignment(boolean b) {
+    public void replaceIfByAssignment(boolean isValueValid) {
         boolean varToAssign;
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             varToAssign = true;
         } else {
             varToAssign = false;
         }
     }
 
-    public void replaceIfByOppositeAssignment(boolean b) {
+    public void replaceIfByOppositeAssignment(boolean isValueValid) {
         boolean varToAssign;
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             varToAssign = false;
         } else {
             varToAssign = true;
         }
     }
 
-    public boolean returnIfConditionBooleanPrimitive(boolean b) {
+    public boolean returnIfConditionBooleanPrimitive(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean returnIfConditionBooleanPrimitive2(boolean b) {
+    public boolean returnIfConditionBooleanPrimitive2(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return false;
         } else {
             return true;
@@ -107,69 +107,69 @@ public class BooleanSample {
         }
     }
 
-    public Boolean returnIfConditionBooleanObject(boolean b) {
+    public Boolean returnIfConditionBooleanObject(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    public Boolean returnIfConditionBooleanObject2(boolean b) {
+    public Boolean returnIfConditionBooleanObject2(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return Boolean.FALSE;
         } else {
             return Boolean.TRUE;
         }
     }
 
-    public boolean returnIfConditionMixedBoolean1(boolean b) {
+    public boolean returnIfConditionMixedBoolean1(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return Boolean.TRUE;
         } else {
             return false;
         }
     }
 
-    public boolean returnIfConditionMixedBoolean2(boolean b) {
+    public boolean returnIfConditionMixedBoolean2(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return true;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    public boolean returnIfConditionBooleanPrimitive3(boolean b) {
+    public boolean returnIfConditionBooleanPrimitive3(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return true;
         }
         return false;
     }
 
-    public boolean returnIfConditionBooleanPrimitive4(boolean b) {
+    public boolean returnIfConditionBooleanPrimitive4(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return false;
         }
         return true;
     }
 
-    public boolean returnIfConditionBooleanObject3(boolean b) {
+    public boolean returnIfConditionBooleanObject3(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
 
-    public boolean returnIfConditionBooleanObject4(boolean b) {
+    public boolean returnIfConditionBooleanObject4(boolean isValueValid) {
         // Keep this comment
-        if (b) {
+        if (isValueValid) {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
@@ -177,106 +177,106 @@ public class BooleanSample {
 
     public boolean removeUselessTernaryOperatorWithBooleanPrimitive1(boolean isValid) {
         // Keep this comment
-        boolean b = isValid ? true : false;
-        return b;
+        boolean isValueValid = isValid ? true : false;
+        return isValueValid;
     }
 
     public boolean removeUselessTernaryOperatorWithBooleanPrimitive2(boolean isValid) {
         // Keep this comment
-        boolean b = isValid ? false : true;
-        return b;
+        boolean isValueValid = isValid ? false : true;
+        return isValueValid;
     }
 
     public Boolean removeUselessTernaryOperatorWithBooleanObject1(boolean isValid) {
         // Keep this comment
-        Boolean b = isValid ? Boolean.TRUE : Boolean.FALSE;
-        return b;
+        Boolean isValueValid = isValid ? Boolean.TRUE : Boolean.FALSE;
+        return isValueValid;
     }
 
     public Boolean removeUselessTernaryOperatorWithBooleanObject2(boolean isValid) {
         // Keep this comment
-        Boolean b = isValid ? Boolean.FALSE : Boolean.TRUE;
-        return b;
+        Boolean isValueValid = isValid ? Boolean.FALSE : Boolean.TRUE;
+        return isValueValid;
     }
 
     public boolean replaceTernaryOperatorByAndOperator(boolean bo1, boolean bo2) {
         // Keep this comment
-        boolean b = bo1 ? bo2 : false;
-        return b;
+        boolean isValueValid = bo1 ? bo2 : false;
+        return isValueValid;
     }
 
     public boolean replaceTernaryOperatorByAndOperator2(boolean bo1, boolean bo2) {
         // Keep this comment
-        boolean b = bo1 ? false : bo2;
-        return b;
+        boolean isValueValid = bo1 ? false : bo2;
+        return isValueValid;
     }
 
     public boolean replaceTernaryOperatorByOrOperator(boolean bo1, boolean bo2) {
         // Keep this comment
-        boolean b = bo1 ? true : bo2;
-        return b;
+        boolean isValueValid = bo1 ? true : bo2;
+        return isValueValid;
     }
 
     public boolean replaceTernaryOperatorByOrOperator2(boolean bo1, boolean bo2) {
         // Keep this comment
-        boolean b = bo1 ? bo2 : true;
-        return b;
+        boolean isValueValid = bo1 ? bo2 : true;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObjectConstant(
             boolean bo1, boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? bo2 : Boolean.FALSE;
-        return b;
+        Boolean isValueValid = bo1 ? bo2 : Boolean.FALSE;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObjectConstant2(
             boolean bo1, boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? Boolean.FALSE : bo2;
-        return b;
+        Boolean isValueValid = bo1 ? Boolean.FALSE : bo2;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObjectConstant(
             boolean bo1, boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? Boolean.TRUE : bo2;
-        return b;
+        Boolean isValueValid = bo1 ? Boolean.TRUE : bo2;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObjectConstant2(
             boolean bo1, boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? bo2 : Boolean.TRUE;
-        return b;
+        Boolean isValueValid = bo1 ? bo2 : Boolean.TRUE;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObject(
             Boolean bo1, Boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? bo2 : false;
-        return b;
+        Boolean isValueValid = bo1 ? bo2 : false;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObject2(
             Boolean bo1, Boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? false : bo2;
-        return b;
+        Boolean isValueValid = bo1 ? false : bo2;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObject(
             Boolean bo1, Boolean bo2) {
         // Keep this comment
-        Boolean b = bo1 ? true : bo2;
-        return b;
+        Boolean isValueValid = bo1 ? true : bo2;
+        return isValueValid;
     }
 
     public Object replaceTernaryOperatorByOrOperatorWithObject2(
             Boolean bo1, Boolean bo2) {
         // Keep this comment
-        Object b = bo1 ? bo2 : true;
-        return b;
+        Object isValueValid = bo1 ? bo2 : true;
+        return isValueValid;
     }
 
     public Object doNotReplaceNonBooleanExpression(boolean isValid) {
@@ -285,40 +285,40 @@ public class BooleanSample {
     }
 
     public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
-        Boolean b = bo1 ? bo2 : Boolean.FALSE;
-        b = bo1 ? Boolean.FALSE : bo2;
-        b = bo1 ? Boolean.TRUE : bo2;
-        b = bo1 ? bo2 : Boolean.TRUE;
+        Boolean isValueValid = bo1 ? bo2 : Boolean.FALSE;
+        isValueValid = bo1 ? Boolean.FALSE : bo2;
+        isValueValid = bo1 ? Boolean.TRUE : bo2;
+        isValueValid = bo1 ? bo2 : Boolean.TRUE;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression(int number1, int number2) {
         // Keep this comment
-        Boolean b = (number1 == 1) ? (number2 == 2) : Boolean.FALSE;
-        return b;
+        Boolean isValueValid = (number1 == 1) ? (number2 == 2) : Boolean.FALSE;
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression2(int number1, int number2) {
         // Keep this comment
-        Boolean b = (number1 == 1) ? Boolean.FALSE : (number2 == 2);
-        return b;
+        Boolean isValueValid = (number1 == 1) ? Boolean.FALSE : (number2 == 2);
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithExpression(int number1, int number2) {
         // Keep this comment
-        Boolean b = (number1 == 1) ? Boolean.TRUE : (number2 == 2);
-        return b;
+        Boolean isValueValid = (number1 == 1) ? Boolean.TRUE : (number2 == 2);
+        return isValueValid;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithExpression2(int number1, int number2) {
         // Keep this comment
-        Boolean b = (number1 == 1) ? (number2 == 2) : Boolean.TRUE;
-        return b;
+        Boolean isValueValid = (number1 == 1) ? (number2 == 2) : Boolean.TRUE;
+        return isValueValid;
     }
 
     public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean isValid) {
-        boolean b = true;
+        boolean isValueValid = true;
         if (isValid) {
-            b = false;
+            isValueValid = false;
         } else {
             System.out.println();
         }
@@ -326,85 +326,85 @@ public class BooleanSample {
 
     public void removeUselessIfInBooleanPrimitiveAssignment1(boolean isValid) {
         // Keep this comment
-        boolean b = true;
+        boolean isValueValid = true;
         if (isValid) {
-            b = false;
+            isValueValid = false;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment2(boolean isValid) {
         // Keep this comment
-        boolean b = false;
+        boolean isValueValid = false;
         if (isValid) {
-            b = true;
+            isValueValid = true;
         }
     }
 
     public void removeUselessIfInBooleanObjectAssignment1(boolean isValid) {
         // Keep this comment
-        Boolean b = Boolean.TRUE;
+        Boolean isValueValid = Boolean.TRUE;
         if (isValid) {
-            b = Boolean.FALSE;
+            isValueValid = Boolean.FALSE;
         }
     }
 
     public void removeUselessIfInBooleanObjectAssignment2(boolean isValid) {
         // Keep this comment
-        boolean b = Boolean.FALSE;
+        boolean isValueValid = Boolean.FALSE;
         if (isValid) {
-            b = Boolean.TRUE;
+            isValueValid = Boolean.TRUE;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment3(boolean isValid,
-            boolean b) {
+            boolean isValueValid) {
         // Keep this comment
-        b = true;
+        isValueValid = true;
         if (isValid) {
-            b = false;
+            isValueValid = false;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment4(boolean isValid,
-            boolean b) {
+            boolean isValueValid) {
         // Keep this comment
-        b = false;
+        isValueValid = false;
         if (isValid) {
-            b = true;
+            isValueValid = true;
         }
     }
 
     public void doNotInlineAlreadyUsedVariable(boolean isValid) {
-        boolean b = false;
-        if (isValid || b) {
-            b = true;
+        boolean isValueValid = false;
+        if (isValid || isValueValid) {
+            isValueValid = true;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling(
-            boolean isValid, boolean b) {
-        b = false;
+            boolean isValid, boolean isValueValid) {
+        isValueValid = false;
         char c = 'a';
         byte by = 0;
         double d = 0.0;
         if (isValid) {
-            b = true;
+            isValueValid = true;
         }
     }
 
-    public void removeUselessIfInBooleanObjectAssignment3(boolean isValid, Boolean b) {
+    public void removeUselessIfInBooleanObjectAssignment3(boolean isValid, Boolean isValueValid) {
         // Keep this comment
-        b = Boolean.TRUE;
+        isValueValid = Boolean.TRUE;
         if (isValid) {
-            b = Boolean.FALSE;
+            isValueValid = Boolean.FALSE;
         }
     }
 
-    public void removeUselessIfInBooleanObjectAssignment4(boolean isValid, Boolean b) {
+    public void removeUselessIfInBooleanObjectAssignment4(boolean isValid, Boolean isValueValid) {
         // Keep this comment
-        b = Boolean.FALSE;
+        isValueValid = Boolean.FALSE;
         if (isValid) {
-            b = Boolean.TRUE;
+            isValueValid = Boolean.TRUE;
         }
     }
 
@@ -664,15 +664,15 @@ public class BooleanSample {
 
     public int doNotRefactorWithNameConflict(boolean isValid) {
         if (isValid) {
-            boolean b = true;
-            aMethodThatAcceptsABoolean(b);
+            boolean isValueValid = true;
+            aMethodThatAcceptsABoolean(isValueValid);
         } else {
-            boolean b = false;
-            aMethodThatAcceptsABoolean(b);
+            boolean isValueValid = false;
+            aMethodThatAcceptsABoolean(isValueValid);
         }
 
-        int b = 42;
-        return b;
+        int isValueValid = 42;
+        return isValueValid;
     }
 
     public void doNotMoveActiveExpression(List<Integer> modifiableList) {
@@ -756,16 +756,16 @@ public class BooleanSample {
 
     public Boolean doNotThrowAnyException(boolean isValid) {
         class ClassWithBooleanField {
-            Boolean b;
+            Boolean isValueValid;
         }
         ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
-        return isValid ? objWithBooleanField.b : Boolean.TRUE;
+        return isValid ? objWithBooleanField.isValueValid : Boolean.TRUE;
     }
 
     protected boolean aMethodThatReturnsBoolean() {
         return false;
     }
 
-    protected void aMethodThatAcceptsABoolean(boolean b) {
+    protected void aMethodThatAcceptsABoolean(boolean isValueValid) {
     }
 }
