@@ -38,9 +38,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
-import org.autorefactor.util.IllegalArgumentException;
-import org.autorefactor.util.IllegalStateException;
-import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -221,10 +218,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         }
 
         private void replaceInParent(final ASTNode nodeToReplace, final ASTNode replacementNode) {
-            if (nodeToReplace.getParent() == null) {
-                throw new IllegalArgumentException(nodeToReplace, "The node to replace does not have a parent"); //$NON-NLS-1$
-            }
-
             StructuralPropertyDescriptor locationInParent= nodeToReplace.getLocationInParent();
 
             if (locationInParent instanceof ChildPropertyDescriptor) {
@@ -234,8 +227,6 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 ChildListPropertyDescriptor childListPropertyDescriptor= (ChildListPropertyDescriptor) locationInParent;
                 List<ASTNode> property= (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(childListPropertyDescriptor);
                 property.set(property.indexOf(nodeToReplace), replacementNode);
-            } else {
-                throw new NotImplementedException(nodeToReplace, locationInParent);
             }
         }
     }
@@ -272,24 +263,27 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
-        Type returnType= methodDeclaration.getReturnType2();
+        MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
 
-        if (returnType != null && returnType.isPrimitiveType()) {
-            PrimitiveType primitiveType= (PrimitiveType) returnType;
+        if (methodDeclaration != null) {
+            Type returnType= methodDeclaration.getReturnType2();
 
-            if (PrimitiveType.BOOLEAN.equals(primitiveType.getPrimitiveTypeCode())) {
-                Boolean thenBoolean= ASTNodes.getBooleanLiteral(thenReturnStatement.getExpression());
-                Boolean elseBoolean= ASTNodes.getBooleanLiteral(elseReturnStatement.getExpression());
-                newReturnStatement= getReturnStatement(node, thenBoolean, elseBoolean, thenReturnStatement.getExpression(), elseReturnStatement.getExpression());
+            if (returnType != null && returnType.isPrimitiveType()) {
+                PrimitiveType primitiveType= (PrimitiveType) returnType;
 
-                if (newReturnStatement != null) {
-                    ASTRewrite rewrite= cuRewrite.getASTRewrite();
-                    TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
+                if (PrimitiveType.BOOLEAN.equals(primitiveType.getPrimitiveTypeCode())) {
+                    Boolean thenBoolean= ASTNodes.getBooleanLiteral(thenReturnStatement.getExpression());
+                    Boolean elseBoolean= ASTNodes.getBooleanLiteral(elseReturnStatement.getExpression());
+                    newReturnStatement= getReturnStatement(node, thenBoolean, elseBoolean, thenReturnStatement.getExpression(), elseReturnStatement.getExpression());
 
-                    ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
-                    rewrite.remove(elseReturnStatement, group);
-                    return false;
+                    if (newReturnStatement != null) {
+                        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+                        TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanCleanUp_description);
+
+                        ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
+                        rewrite.remove(elseReturnStatement, group);
+                        return false;
+                    }
                 }
             }
         }
@@ -412,11 +406,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 exprToReturn= negate(exprToReturn);
             }
 
-            MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
-            Expression returnExpression= getReturnExpression(methodDeclaration, exprToReturn);
+            MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
 
-            if (returnExpression != null) {
-                return ast.newReturnStatement(returnExpression);
+            if (methodDeclaration != null) {
+                Expression returnExpression= getReturnExpression(methodDeclaration, exprToReturn);
+
+                if (returnExpression != null) {
+                    return ast.newReturnStatement(returnExpression);
+                }
             }
         }
 
@@ -431,17 +428,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         }
 
         String qualifiedName= methodBinding.getReturnType().getQualifiedName();
-        Expression newExpression= getExpression(ifCondition, qualifiedName, getBooleanName(methodDeclaration));
-
-        if (newExpression != null) {
-            return newExpression;
-        }
-
-        // TODO JNR rejuggle exception messages like this:
-        // compilationUnit.java:line number: error message
-        throw new IllegalStateException(methodDeclaration,
-                "Did not expect any other return type than boolean or java.lang.Boolean for method " //$NON-NLS-1$
-                + methodDeclaration.getName().getIdentifier() + ", but found " + qualifiedName); //$NON-NLS-1$
+        return getExpression(ifCondition, qualifiedName, getBooleanName(methodDeclaration));
     }
 
     private Expression newExpressionOrNull(final ITypeBinding typeBinding, final Expression condition, final Expression thenExpression,
@@ -516,19 +503,17 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private Name getBooleanName(final ASTNode node) {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        if (!isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), ASTNodes.getTypedAncestorOrCrash(node, CompilationUnit.class))) {
+        CompilationUnit compilationUnit= ASTNodes.getTypedAncestor(node, CompilationUnit.class);
+
+		if (compilationUnit != null && !isSimpleNameAlreadyUsed(Boolean.class.getSimpleName(), compilationUnit)) {
             return ast.newSimpleName(Boolean.class.getSimpleName());
         }
 
         return ASTNodeFactory.newName(ast, Boolean.class.getCanonicalName());
     }
 
-    private boolean isSimpleNameAlreadyUsed(final String simpleName, final CompilationUnit cu) {
-        for (ImportDeclaration id : (List<ImportDeclaration>) cu.imports()) {
-            if (!(id.getName() instanceof QualifiedName)) {
-                throw new NotImplementedException(id.getName());
-            }
-
+    private boolean isSimpleNameAlreadyUsed(final String simpleName, final CompilationUnit compilationUnit) {
+        for (ImportDeclaration id : (List<ImportDeclaration>) compilationUnit.imports()) {
             QualifiedName f= (QualifiedName) id.getName();
 
             if (simpleName.equals(f.getName().getIdentifier())) {

@@ -68,12 +68,12 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final MethodInvocation node) {
 		if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ //$NON-NLS-2$
 			// Check whether it is being called in onDestroy()
-			MethodDeclaration enclosingMethod= ASTNodes.getTypedAncestorOrCrash(node, MethodDeclaration.class);
+			MethodDeclaration enclosingMethod= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
 			if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidWakeLockCleanUp_description);
 
-				TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(enclosingMethod, TypeDeclaration.class);
+				TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestor(enclosingMethod, TypeDeclaration.class);
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
 					rewrite.remove(node.getParent(), group);
@@ -89,7 +89,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidWakeLockCleanUp_description);
 
-			TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestorOrCrash(node, TypeDeclaration.class);
+			TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestor(node, TypeDeclaration.class);
 			ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
 			if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$

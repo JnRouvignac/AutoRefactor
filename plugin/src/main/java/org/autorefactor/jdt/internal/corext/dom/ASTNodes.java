@@ -644,28 +644,8 @@ public final class ASTNodes {
 	 * @param <T>           the required ancestor's type
 	 * @param node          the start node
 	 * @param ancestorClass the required ancestor's type
-	 * @return the first ancestor of the provided node which has the required type
-	 * @see #getTypedAncestor(ASTNode, Class)
-	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
-	 * @throws IllegalStateException if ancestor not found.
-	 */
-	public static <T extends ASTNode> T getTypedAncestorOrCrash(final ASTNode node, final Class<T> ancestorClass) {
-		T ancestor= getTypedAncestor(node, ancestorClass);
-		if (ancestor != null) {
-			return ancestor;
-		}
-		throw new IllegalStateException(node, "Could not find any ancestor for " + ancestorClass + "and node " + node); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * Returns the first ancestor of the provided node which has the required type.
-	 *
-	 * @param <T>           the required ancestor's type
-	 * @param node          the start node
-	 * @param ancestorClass the required ancestor's type
 	 * @return the first ancestor of the provided node which has the required type,
 	 *         {@code null} if no suitable ancestor can be found
-	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
 	 * @see #getFirstAncestorOrNull(ASTNode, Class...)
 	 */
 	public static <T extends ASTNode> T getTypedAncestor(final ASTNode node, final Class<T> ancestorClass) {

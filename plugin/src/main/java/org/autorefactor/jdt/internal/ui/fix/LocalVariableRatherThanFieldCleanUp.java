@@ -183,7 +183,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getTypedAncestorOrCrash(reassignmentAssignment, Statement.class),
+		ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getTypedAncestor(reassignmentAssignment, Statement.class),
 				newDeclareStatement, group);
 
 		if (isFieldKept) {
