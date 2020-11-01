@@ -541,7 +541,7 @@ public class BooleanSample {
 
     public boolean invertConditionalExpression(int i, boolean res1, boolean res2) {
         // Keep this comment
-        return !(i == 0 ? res1 : res2);
+        return i == 0 ? !res1 : !res2;
     }
 
     public boolean invertAssignment(boolean b1, boolean b2) {

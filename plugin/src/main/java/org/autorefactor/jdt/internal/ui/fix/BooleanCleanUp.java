@@ -57,7 +57,6 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -347,20 +346,20 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         if (thenBoolean == null && elseBoolean != null) {
-            Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())), !elseBoolean);
+            Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), !elseBoolean));
 
 			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(leftOp);
+			newInfixExpression.setLeftOperand(leftOperand);
 			newInfixExpression.setOperator(getConditionalOperator(elseBoolean));
 			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression)));
 			return ast.newReturnStatement(newInfixExpression);
         }
 
         if (thenBoolean != null && elseBoolean == null) {
-            Expression leftOp= signExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(node.getExpression())), thenBoolean);
+            Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), thenBoolean));
 
 			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(leftOp);
+			newInfixExpression.setLeftOperand(leftOperand);
 			newInfixExpression.setOperator(getConditionalOperator(thenBoolean));
 			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression)));
 			return ast.newReturnStatement(newInfixExpression);
@@ -374,11 +373,13 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression signExpression(final Expression infixExpression, final boolean isPositive) {
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
         if (isPositive) {
-            return infixExpression;
+            return ast.createCopyTarget(infixExpression);
         }
 
-        return negate(infixExpression);
+        return ast.negate(infixExpression, false);
     }
 
     private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
@@ -400,10 +401,12 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             final Expression elseExpression) {
         if (areNegatedBooleanValues(thenExpression, elseExpression)) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            Expression exprToReturn= ast.createCopyTarget(node.getExpression());
 
+            Expression exprToReturn;
             if (ASTNodes.getBooleanLiteral(elseExpression)) {
-                exprToReturn= negate(exprToReturn);
+                exprToReturn= ast.negate(node.getExpression(), false);
+            } else {
+            	exprToReturn= ast.createCopyTarget(node.getExpression());
             }
 
             MethodDeclaration methodDeclaration= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
@@ -576,19 +579,4 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
         return noThenReturnStatement(node);
     }
-
-	private Expression negate(final Expression expression) {
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
-
-		if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
-			PrefixExpression prefixExpression= (PrefixExpression) exprNoParen;
-
-			if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.NOT)) {
-				return prefixExpression.getOperand();
-			}
-		}
-
-		return ast.not(expression);
-	}
 }
