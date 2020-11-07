@@ -97,6 +97,26 @@ public class DoWhileRatherThanWhileSample {
         }
     }
 
+    public void doNotReplaceWithSwitchStatement(int aNumber, int discriminant) {
+        int isNotAlwaysPositive = -2;
+        switch (discriminant) {
+        case 0:
+            isNotAlwaysPositive = 2_000;
+            break;
+
+        default:
+            break;
+        }
+
+        while (isNotAlwaysPositive > 0) {
+            if (aNumber > 200) {
+                return;
+            }
+            aNumber *= 4;
+            isNotAlwaysPositive--;
+        }
+    }
+
     public void replaceWithInitedBooleanAndInteger(int i) {
         int j= 1_000;
         boolean isInitedToTrue= true;

@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperMethodReference;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -273,6 +274,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 				|| expression instanceof IfStatement
 				|| expression instanceof ConditionalExpression
 				|| expression instanceof EnhancedForStatement
+				|| expression instanceof SwitchStatement
 				|| expression instanceof WhileStatement
 				|| expression instanceof ForStatement
 				|| expression instanceof DoStatement
