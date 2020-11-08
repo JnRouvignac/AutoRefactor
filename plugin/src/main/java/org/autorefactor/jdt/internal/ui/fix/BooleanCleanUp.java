@@ -334,7 +334,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                 if (fragment != null) {
                     VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
-                            fragment.resolveBinding(), node.getExpression(), true).find();
+					fragment.resolveBinding(), node.getExpression(), true);
 
                     if (variableUseVisitor.getReads().isEmpty()) {
                         ITypeBinding typeBinding= variableDeclarationStatement.getType().resolveBinding();

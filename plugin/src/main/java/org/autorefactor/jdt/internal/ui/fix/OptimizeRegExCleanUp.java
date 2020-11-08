@@ -164,7 +164,7 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
                 && extraDimensions == 0
                 && initializer != null) {
             VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-                    initializer.getRoot(), true).find();
+			initializer.getRoot(), true);
 
             List<SimpleName> reads= varOccurrencesVisitor.getReads();
             List<SimpleName> writes= varOccurrencesVisitor.getWrites();

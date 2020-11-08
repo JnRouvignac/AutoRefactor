@@ -156,7 +156,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 				if (isAppendingFinished) {
 					VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) fragment.getName().resolveBinding(),
-							statement, true).find();
+					statement, true);
 
 					if (!varOccurrencesVisitor.getWrites().isEmpty()) {
 						return true;
@@ -177,7 +177,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			for (Pair<ITypeBinding, Expression> newAppendedString : allAppendedStrings) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) fragment.getName().resolveBinding(),
-						newAppendedString.getSecond(), true).find();
+				newAppendedString.getSecond(), true);
 
 				if (!ASTNodes.isPassive(newAppendedString.getSecond())
 						|| !varOccurrencesVisitor.getWrites().isEmpty()

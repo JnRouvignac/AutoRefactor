@@ -132,7 +132,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
 		private boolean maybeRefactorToTryWithResources(final TryStatement node, final List<Statement> tryStatements,
 				final VariableDeclarationStatement previousDeclStatement,
 				final VariableDeclarationFragment previousDeclFragment, final List<ASTNode> nodesToRemove) {
-			VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(previousDeclFragment).find();
+			VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(previousDeclFragment);
 			List<SimpleName> definitions= visitor.getWrites();
 
 			boolean hasAssignment= false;

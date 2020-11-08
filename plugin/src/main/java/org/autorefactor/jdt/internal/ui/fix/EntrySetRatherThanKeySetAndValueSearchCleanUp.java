@@ -231,8 +231,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.EntrySetRatherThanKeySetAndValueSearchCleanUp_description);
 
-		VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter);
-		enhancedFor.getBody().accept(keyUseVisitor);
+		VarDefinitionsUsesVisitor keyUseVisitor= new VarDefinitionsUsesVisitor(parameter.resolveBinding(), enhancedFor.getBody(), true);
 		int keyUses= keyUseVisitor.getReads().size();
 
 		int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;

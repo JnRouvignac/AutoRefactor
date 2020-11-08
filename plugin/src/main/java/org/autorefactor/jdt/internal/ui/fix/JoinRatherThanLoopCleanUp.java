@@ -331,7 +331,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			}
 
 			VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) builder.resolveBinding(),
-					startNode, true).find();
+			startNode, true);
 
 			List<SimpleName> reads= varOccurrencesVisitor.getReads();
 			List<SimpleName> writes= varOccurrencesVisitor.getWrites();
@@ -398,7 +398,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			}
 
 			VarDefinitionsUsesVisitor booleanOccurrencesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) booleanForInterval.resolveBinding(),
-					startNode, true).find();
+			startNode, true);
 
 			Set<SimpleName> actualBooleanOccurences= new HashSet<>(booleanOccurrencesVisitor.getReads());
 			actualBooleanOccurences.addAll(booleanOccurrencesVisitor.getWrites());

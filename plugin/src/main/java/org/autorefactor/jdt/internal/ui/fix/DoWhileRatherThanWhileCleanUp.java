@@ -124,7 +124,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 					return null;
 				}
 
-				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), precedingStatement, true).find();
+				VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor((IVariableBinding) variable.resolveBinding(), precedingStatement, true);
 
 				if (visitor.getWrites().size() > 1) {
 					return null;

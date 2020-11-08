@@ -201,7 +201,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
 		private boolean maybeExtractIncrement(final Expression node, final Expression variable, final Statement statement) {
 			SimpleName variableName= ASTNodes.as(variable, SimpleName.class);
-			VarDefinitionsUsesVisitor varDefinitionsUsesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) variableName.resolveBinding(), statement, true).find();
+			VarDefinitionsUsesVisitor varDefinitionsUsesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) variableName.resolveBinding(), statement, true);
 
 			if (varDefinitionsUsesVisitor.getWrites().isEmpty()
 					&& varDefinitionsUsesVisitor.getReads().size() == 1

@@ -122,7 +122,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
 			if (tryStatement.getFinally() != null) {
 				VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
-						varToSearch, tryStatement.getFinally(), true).find();
+				varToSearch, tryStatement.getFinally(), true);
 				if (!variableUseVisitor.getReads().isEmpty()) {
 					return true;
 				}

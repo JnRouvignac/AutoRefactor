@@ -146,7 +146,7 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					&& extraDimensions == 0
 					&& initializer != null) {
 				VarDefinitionsUsesVisitor varOccurrencesVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-						startNode, true).find();
+				startNode, true);
 
 				List<SimpleName> reads= varOccurrencesVisitor.getReads();
 				List<SimpleName> writes= varOccurrencesVisitor.getWrites();

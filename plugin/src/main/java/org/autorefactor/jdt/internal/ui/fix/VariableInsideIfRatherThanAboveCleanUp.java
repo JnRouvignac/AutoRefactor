@@ -98,7 +98,7 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 		}
 
 		private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
-			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true).find();
+			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true);
 			return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
 		}
 

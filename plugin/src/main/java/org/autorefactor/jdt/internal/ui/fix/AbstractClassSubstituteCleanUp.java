@@ -474,7 +474,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 		public boolean visit(final AnonymousClassDeclaration node) {
 			if (!canBeSharedInOtherThread()) {
 				VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(
-						varDecl.resolveBinding(), node, true).find();
+				varDecl.resolveBinding(), node, true);
 				if (!variableUseVisitor.getReads().isEmpty()) {
 					isUsedInAnnonymousClass= true;
 					return interruptVisit();
