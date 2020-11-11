@@ -165,7 +165,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 				Long constant= ASTNodes.getIntegerLiteral(args.get(0));
 
 				if (constant != null) {
-					return Long.valueOf(0).equals(constant);
+					return Long.valueOf(0L).equals(constant);
 				}
 
 				MethodInvocation methodInvocation= ASTNodes.as(args.get(0), MethodInvocation.class);

@@ -326,7 +326,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 	}
 
 	private boolean isOneLiteral(final Expression operand) {
-		return Long.valueOf(1).equals(ASTNodes.getIntegerLiteral(operand));
+		return Long.valueOf(1L).equals(ASTNodes.getIntegerLiteral(operand));
 	}
 
 	@Override
@@ -788,10 +788,10 @@ public class ASTSemanticMatcher extends ASTMatcher {
 					iterator.remove();
 				}
 			} else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.PLUS)) {
-				if (Long.valueOf(0).equals(numberLiteral)) {
+				if (Long.valueOf(0L).equals(numberLiteral)) {
 					iterator.remove();
 				}
-			} else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.TIMES) && Long.valueOf(1).equals(numberLiteral)) {
+			} else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.TIMES) && Long.valueOf(1L).equals(numberLiteral)) {
 				iterator.remove();
 			}
 		}

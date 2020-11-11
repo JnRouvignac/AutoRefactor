@@ -198,7 +198,7 @@ public final class ForLoops {
 				if (startValueMinusOne != null && !startValueMinusOne.hasExtendedOperands() && ASTNodes.hasOperator(startValueMinusOne, InfixExpression.Operator.MINUS)) {
 					Long one= ASTNodes.getIntegerLiteral(startValueMinusOne.getRightOperand());
 
-					if (Long.valueOf(1).equals(one)) {
+					if (Long.valueOf(1L).equals(one)) {
 						collectionOnSize= getCollectionOnSize(startValueMinusOne.getLeftOperand());
 						arrayOnLength= getArrayOnLength(startValueMinusOne.getLeftOperand());
 					}
@@ -206,7 +206,7 @@ public final class ForLoops {
 
 				Long zero= ASTNodes.getIntegerLiteral(startValue);
 				ForLoopContent forContent= getIndexOnIterable(condition, init, zero, collectionOnSize, arrayOnLength);
-				Name updater= getUpdaterOperand(updaters.get(0), Long.valueOf(0).equals(zero));
+				Name updater= getUpdaterOperand(updaters.get(0), Long.valueOf(0L).equals(zero));
 
 				if (forContent != null && ASTNodes.isSameVariable(init, forContent.loopVariable)
 						&& ASTNodes.isSameVariable(init, updater)) {
@@ -261,7 +261,7 @@ public final class ForLoops {
 				return null;
 			}
 
-			if (Long.valueOf(0).equals(zero)) {
+			if (Long.valueOf(0L).equals(zero)) {
 				if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.LESS, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
 					return buildForLoopContent((Name) loopVariable, rightOp, zero, collectionOnSize, arrayOnLength);
 				}
@@ -286,7 +286,7 @@ public final class ForLoops {
 		Expression collectionOnSize2= getCollectionOnSize(containerVar);
 		Expression arrayOnLength2= getArrayOnLength(containerVar);
 
-		if (Long.valueOf(0).equals(zero)) {
+		if (Long.valueOf(0L).equals(zero)) {
 			if (collectionOnSize2 != null) {
 				return ForLoopContent.indexedCollection(collectionOnSize2, loopVar, true);
 			}
@@ -294,7 +294,7 @@ public final class ForLoops {
 			if (arrayOnLength2 != null) {
 				return ForLoopContent.indexedArray(arrayOnLength2, loopVar, true);
 			}
-		} else if (Long.valueOf(0).equals(zero2)) {
+		} else if (Long.valueOf(0L).equals(zero2)) {
 			if (collectionOnSize != null) {
 				return ForLoopContent.indexedCollection(collectionOnSize, loopVar, false);
 			}

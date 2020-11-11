@@ -157,7 +157,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 					&& arrayCreation != null
 					&& (arrayCreation.getInitializer() != null
 							? arrayCreation.getInitializer().expressions().size() == 1
-							: arrayCreation.dimensions().size() == 1 && Long.valueOf(1).equals(ASTNodes.getIntegerLiteral((Expression) arrayCreation.dimensions().get(0))))
+							: arrayCreation.dimensions().size() == 1 && Long.valueOf(1L).equals(ASTNodes.getIntegerLiteral((Expression) arrayCreation.dimensions().get(0))))
 					&& (type.resolveBinding().isArray()
 							? variableDimensions.isEmpty() && type.resolveBinding().getDimensions() == 1 && Utils.equalNotNull(type.resolveBinding().getElementType(), arrayCreation.getType().getElementType().resolveBinding())
 									: variableDimensions.size() == 1 && Utils.equalNotNull(type.resolveBinding(), arrayCreation.getType().getElementType().resolveBinding()))
@@ -212,7 +212,7 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 					&& simpleName.getLocationInParent() == ArrayAccess.ARRAY_PROPERTY) {
 				ArrayAccess arrayAccess= (ArrayAccess) simpleName.getParent();
 
-				if (Long.valueOf(0).equals(ASTNodes.getIntegerLiteral(arrayAccess.getIndex()))) {
+				if (Long.valueOf(0L).equals(ASTNodes.getIntegerLiteral(arrayAccess.getIndex()))) {
 					if (arrayAccess.getParent() instanceof Assignment
 							&& arrayAccess.getLocationInParent() == Assignment.LEFT_HAND_SIDE_PROPERTY) {
 						Assignment assignment= (Assignment) arrayAccess.getParent();

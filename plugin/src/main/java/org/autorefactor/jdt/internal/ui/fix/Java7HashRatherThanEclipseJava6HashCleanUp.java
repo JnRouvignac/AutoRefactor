@@ -540,7 +540,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 				SimpleName againFieldName= getField(moveExpression.getLeftOperand());
 				Long hash= ASTNodes.getIntegerLiteral(moveExpression.getRightOperand());
 
-				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32).equals(hash)) {
+				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32L).equals(hash)) {
 					if (data.isTempValueUsed()) {
 						data.getFields().add(ASTNodes.getUnparenthesedExpression(againFieldName));
 						return true;
@@ -565,8 +565,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		if (booleanField != null && hashForTrue != null
 				&& hashForFalse != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
 				&& !ASTNodes.isSameVariable(booleanField, data.getPrimeId())
-				&& !ASTNodes.isSameVariable(booleanField, data.getResultId()) && Long.valueOf(1231).equals(hashForTrue)
-				&& Long.valueOf(1237).equals(hashForFalse)) {
+				&& !ASTNodes.isSameVariable(booleanField, data.getResultId()) && Long.valueOf(1231L).equals(hashForTrue)
+				&& Long.valueOf(1237L).equals(hashForFalse)) {
 			data.getFields().add(ASTNodes.getUnparenthesedExpression(booleanField));
 			return true;
 		}
@@ -593,7 +593,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					zero= ASTNodes.getIntegerLiteral(condition.getElseExpression());
 				}
 
-				if (Long.valueOf(0).equals(zero) && hashOnField != null && hashOnField.getExpression() != null
+				if (Long.valueOf(0L).equals(zero) && hashOnField != null && hashOnField.getExpression() != null
 						&& HASH_CODE_METHOD.equals(hashOnField.getName().getIdentifier())
 						&& Utils.isEmpty(hashOnField.arguments())) {
 					SimpleName fieldToHash= getField(hashOnField.getExpression());
