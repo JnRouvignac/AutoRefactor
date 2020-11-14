@@ -25,53 +25,58 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
 /**
- * The variable occurrence visitor.
+ * The variable conflict visitor.
  */
-public class VarOccurrenceVisitor extends InterruptibleVisitor {
-	private final Set<SimpleName> localVarIds;
-	private boolean varUsed;
+public class VarConflictVisitor extends InterruptibleVisitor {
+	private final Set<String> localVariableIds;
+	private boolean varConflicting;
 	private ASTNode startNode;
 	private final boolean includeInnerScopes;
+
+	/**
+	 * The constructor.
+	 *
+	 * @param localVariables The variables that may have the same name as others
+	 * @param includeInnerScopes True if the sub blocks should be analyzed
+	 */
+	public VarConflictVisitor(final Set<SimpleName> localVariables, final boolean includeInnerScopes) {
+		this.includeInnerScopes= includeInnerScopes;
+		this.localVariableIds= new HashSet<>(localVariables.size());
+
+		for (SimpleName localVariable : localVariables) {
+			this.localVariableIds.add(localVariable.getIdentifier());
+		}
+	}
 
 	/**
 	 * Returns true if at least one variable is used.
 	 *
 	 * @return True if at least one variable is used
 	 */
-	public boolean isVarUsed() {
-		return varUsed;
-	}
-
-	/**
-	 * The constructor.
-	 *
-	 * @param localVarIds The ids of the variable to search
-	 * @param includeInnerScopes True if the sub blocks should be analyzed
-	 */
-	public VarOccurrenceVisitor(final Set<SimpleName> localVarIds, final boolean includeInnerScopes) {
-		this.localVarIds= localVarIds;
-		this.includeInnerScopes= includeInnerScopes;
+	public boolean isVarConflicting() {
+		return varConflicting;
 	}
 
 	@Override
-	public void traverseNodeInterruptibly(final ASTNode startNode) {
-		this.startNode= startNode;
+	public void traverseNodeInterruptibly(final ASTNode aStartNode) {
+		this.startNode= aStartNode;
 		super.traverseNodeInterruptibly(this.startNode);
 	}
 
 	@Override
-	public boolean visit(final SimpleName aVariable) {
-		for (SimpleName localVarId : localVarIds) {
-			if (Utils.equalNotNull(localVarId.getIdentifier(), aVariable.getIdentifier())) {
-				varUsed= true;
+	public boolean visit(final SimpleName concurrentVariable) {
+		if (concurrentVariable.resolveBinding() == null || concurrentVariable.resolveBinding().getKind() == IBinding.VARIABLE) {
+			if (localVariableIds.contains(concurrentVariable.getIdentifier())) {
+				varConflicting= true;
 				return interruptVisit();
 			}
 		}

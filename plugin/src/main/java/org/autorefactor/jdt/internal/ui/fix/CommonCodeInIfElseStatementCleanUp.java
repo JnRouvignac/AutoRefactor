@@ -41,7 +41,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethod
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -355,10 +355,10 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (Statement statement : ASTNodes.getNextSiblings(node)) {
-			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames, true);
+			VarConflictVisitor varOccurrenceVisitor= new VarConflictVisitor(ifVariableNames, true);
 			varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
-			if (varOccurrenceVisitor.isVarUsed()) {
+			if (varOccurrenceVisitor.isVarConflicting()) {
 				return true;
 			}
 		}

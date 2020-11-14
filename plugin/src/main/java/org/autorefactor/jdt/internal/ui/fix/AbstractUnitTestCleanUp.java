@@ -34,7 +34,7 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -225,10 +225,10 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		VariableVisitor visitor= new VariableVisitor();
 		condition.accept(visitor);
 
-		VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(visitor.getVariables(), true);
+		VarConflictVisitor varOccurrenceVisitor= new VarConflictVisitor(visitor.getVariables(), true);
 		varOccurrenceVisitor.traverseNodeInterruptibly((Expression) originalMethod.arguments().get(0));
 
-		if (!varOccurrenceVisitor.isVarUsed()) {
+		if (!varOccurrenceVisitor.isVarConflicting()) {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
         		nodeToReplace, originalMethod, isAssertTrue,
         		condition, failureMessage, true);

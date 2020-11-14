@@ -2545,10 +2545,10 @@ public final class ASTNodes {
 		Set<SimpleName> existingVariableNames= getLocalVariableIdentifiers(statementInBlock, false);
 
 		for (Statement statement : getNextSiblings(node)) {
-			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(existingVariableNames, true);
+			VarConflictVisitor varOccurrenceVisitor= new VarConflictVisitor(existingVariableNames, true);
 			varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
-			if (varOccurrenceVisitor.isVarUsed()) {
+			if (varOccurrenceVisitor.isVarConflicting()) {
 				return true;
 			}
 		}

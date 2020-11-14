@@ -33,7 +33,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -267,10 +267,10 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 					&& ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
 					&& ASTNodes.isHardCoded(assignment.getRightHandSide())
 					&& ASTNodes.isPassive(assignment.getLeftHandSide())) {
-				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(allowedVars, true);
+				VarConflictVisitor varOccurrenceVisitor= new VarConflictVisitor(allowedVars, true);
 				varOccurrenceVisitor.traverseNodeInterruptibly(assignment.getLeftHandSide());
 
-				if (varOccurrenceVisitor.isVarUsed()) {
+				if (varOccurrenceVisitor.isVarConflicting()) {
 					return false;
 				}
 			} else {

@@ -33,7 +33,7 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
+import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -113,10 +113,10 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 				isPreviousStmtACase= true;
 			} else {
-				VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds, false);
+				VarConflictVisitor varOccurrenceVisitor= new VarConflictVisitor(previousVarIds, false);
 				varOccurrenceVisitor.traverseNodeInterruptibly(statement);
 
-				if (varOccurrenceVisitor.isVarUsed()) {
+				if (varOccurrenceVisitor.isVarConflicting()) {
 					return true;
 				}
 
