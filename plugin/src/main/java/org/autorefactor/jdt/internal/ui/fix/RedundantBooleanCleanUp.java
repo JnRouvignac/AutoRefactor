@@ -109,7 +109,7 @@ public class RedundantBooleanCleanUp extends AbstractCleanUpRule {
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(remainingOperands));
+			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), ASTNodes.createMoveTarget(rewrite, remainingOperands));
 			ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 		}
 	}

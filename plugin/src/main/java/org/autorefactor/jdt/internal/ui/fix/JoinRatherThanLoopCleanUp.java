@@ -620,7 +620,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			List<ASTNode> modifiers= ASTNodes.as(builderStatement, VariableDeclarationStatement.class).modifiers();
 
 			varModifiers.clear();
-			varModifiers.addAll(rewrite.createMoveTarget(modifiers));
+			varModifiers.addAll(ASTNodes.createMoveTarget(rewrite, modifiers));
 
 			if (!booleanUses.isEmpty()) {
 				rewrite.removeButKeepComment(booleanStatement, group);

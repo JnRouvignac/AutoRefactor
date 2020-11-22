@@ -113,8 +113,8 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ORConditionRatherThanRedundantClausesCleanUp_description);
 
-		List<Expression> copyOfOperands= rewrite.createMoveTarget(previousOperands);
-		copyOfOperands.addAll(rewrite.createMoveTarget(nextOperands));
+		List<Expression> copyOfOperands= ASTNodes.createMoveTarget(rewrite, previousOperands);
+		copyOfOperands.addAll(ASTNodes.createMoveTarget(rewrite, nextOperands));
 
 		if (copyOfOperands.size() == 1) {
 			ASTNodes.replaceButKeepComment(rewrite, operandWithRedundance, copyOfOperands.get(0), group);

@@ -406,7 +406,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		UnionType result= cuRewrite.getAST().newUnionType();
 		List<Type> unionedTypes= result.types();
-		unionedTypes.addAll(rewrite.createMoveTarget(allTypes));
+		unionedTypes.addAll(ASTNodes.createMoveTarget(rewrite, allTypes));
 		return result;
 	}
 

@@ -170,7 +170,7 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, reassignment), ASTNodes.createMoveTarget(rewrite, reassignmentAssignment.getRightHandSide()));
 		List<Dimension> extraDimensions= fragment.extraDimensions();
 		List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-		newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+		newExtraDimensions.addAll(ASTNodes.createMoveTarget(rewrite, extraDimensions));
 		VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(isFieldKept ? ASTNodes.createMoveTarget(rewrite, field.getType()) : ast.createCopyTarget(field.getType()), newFragment);
 		List<IExtendedModifier> modifiers= field.modifiers();
 		List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();

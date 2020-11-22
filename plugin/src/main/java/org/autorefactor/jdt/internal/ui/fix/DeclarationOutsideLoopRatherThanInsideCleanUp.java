@@ -161,7 +161,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(ast.createCopyTarget(name));
 			List<Dimension> extraDimensions= fragment.extraDimensions();
 			List<Dimension> newExtraDimensions= newFragment.extraDimensions();
-			newExtraDimensions.addAll(rewrite.createMoveTarget(extraDimensions));
+			newExtraDimensions.addAll(ASTNodes.createMoveTarget(rewrite, extraDimensions));
 			VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
 			List<IExtendedModifier> modifiers= varToMove.modifiers();
 			List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();

@@ -71,7 +71,7 @@ public class EqualsNullableCleanUp extends AbstractCleanUpRule {
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.EqualsNullableCleanUp_description);
 
-						InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), rewrite.createMoveTarget(operands));
+						InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), ASTNodes.createMoveTarget(rewrite, operands));
 						ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 						return false;
 					}

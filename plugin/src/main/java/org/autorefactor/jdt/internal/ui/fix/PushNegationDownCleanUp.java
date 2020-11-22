@@ -100,7 +100,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 						it.set(oppositeOperand != null ? oppositeOperand : ast.negate(anOperand, true));
 					}
 				} else {
-					allOperands= rewrite.createMoveTarget(allOperands);
+					allOperands= ASTNodes.createMoveTarget(rewrite, allOperands);
 				}
 
 				return ast.newParenthesizedExpression(ast.newInfixExpression(reverseOp, allOperands));

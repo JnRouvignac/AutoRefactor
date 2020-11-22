@@ -144,9 +144,9 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 		if (previousOperands.isEmpty() && nextOperands.isEmpty()) {
 			ASTNodes.replaceButKeepComment(rewrite, node, newConditionalExpression, group);
 		} else {
-			List<Expression> operands= rewrite.createMoveTarget(previousOperands);
+			List<Expression> operands= ASTNodes.createMoveTarget(rewrite, previousOperands);
 			operands.add(newConditionalExpression);
-			operands.addAll(rewrite.createMoveTarget(nextOperands));
+			operands.addAll(ASTNodes.createMoveTarget(rewrite, nextOperands));
 			ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(node.getOperator(), operands), group);
 		}
 	}

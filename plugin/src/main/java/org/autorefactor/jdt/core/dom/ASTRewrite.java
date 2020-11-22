@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.core.dom;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
 import org.autorefactor.jdt.internal.corext.dom.ASTCommentRewriter;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.jdt.internal.corext.dom.SourceRewriter;
 import org.autorefactor.util.Pair;
@@ -207,23 +205,6 @@ public class ASTRewrite {
 	 */
 	public <T extends ASTNode> T createMoveTarget(final T node) {
 		return (T) rewrite.createMoveTarget(node);
-	}
-
-	/**
-	 * Moves all the provided {@link ASTNode}s in place.
-	 *
-	 * @param <T>   the actual nodes type
-	 * @param nodes the nodes to move
-	 * @return the provided list with all nodes moved
-	 */
-	public <T extends ASTNode> List<T> createMoveTarget(final Collection<T> nodes) {
-		List<T> movedNodes= new ArrayList<>(nodes.size());
-
-		for (T astNode : nodes) {
-			movedNodes.add(ASTNodes.createMoveTarget(this, astNode));
-		}
-
-		return movedNodes;
 	}
 
 	/**
