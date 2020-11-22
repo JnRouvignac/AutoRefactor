@@ -587,7 +587,7 @@ public class JoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 				Boolean booleanInstantiation= ASTNodes.getBooleanLiteral(fragment.getInitializer());
 
 				if (booleanInstantiation != null) {
-					isInitedToTrue.set(booleanInstantiation);
+					isInitedToTrue.lazySet(booleanInstantiation);
 					return fragment.getName();
 				}
 			}

@@ -84,11 +84,11 @@ public class RedundantBooleanCleanUp extends AbstractCleanUpRule {
 			Object value= operand.resolveConstantExpressionValue();
 
 			if (neutralElement.equals(value)) {
-				hasUselessOperand.set(true);
+				hasUselessOperand.lazySet(true);
 				iterator.remove();
 			} else if (shortCircuitValue.equals(value)) {
 				while (iterator.hasNext()) {
-					hasUselessOperand.set(true);
+					hasUselessOperand.lazySet(true);
 					iterator.next();
 					iterator.remove();
 				}

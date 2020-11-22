@@ -394,15 +394,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 					if (ASTNodes.hasType(cic, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 							&& (ASTNodes.hasType(arg0, String.class.getCanonicalName()) || ASTNodes.instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
-						isInstanceCreationToRewrite.set(true);
+						isInstanceCreationToRewrite.lazySet(true);
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					}
 				} else if (cic.arguments().isEmpty() && !allOperands.isEmpty()
                 		&& (allOperands.get(0).getFirst() != null
                 				? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
                 				: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
-                	isInstanceCreationToRewrite.set(true);
-                	isRefactoringNeeded.set(true);
+                	isInstanceCreationToRewrite.lazySet(true);
+                	isRefactoringNeeded.lazySet(true);
                 }
 
 				return cic;
@@ -425,12 +425,12 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 				if (isValuedStringLiteralOrConstant(reversed.get(0)) && !results.isEmpty()
 						&& isValuedStringLiteralOrConstant(results.get(0).getSecond())) {
-					isRefactoringNeeded.set(true);
+					isRefactoringNeeded.lazySet(true);
 				}
 
 				for (Expression operand : reversed) {
 					if (!isValuedStringLiteralOrConstant(reversed.get(0))) {
-						isRefactoringNeeded.set(true);
+						isRefactoringNeeded.lazySet(true);
 					}
 					readSubExpressions(operand, results, new AtomicBoolean(false));
 				}
@@ -438,7 +438,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (!isValuedStringLiteralOrConstant(infixExpression.getRightOperand())
 					|| !isValuedStringLiteralOrConstant(infixExpression.getLeftOperand())) {
-				isRefactoringNeeded.set(true);
+				isRefactoringNeeded.lazySet(true);
 			}
 
 			readSubExpressions(infixExpression.getRightOperand(), results, new AtomicBoolean(false));
@@ -448,7 +448,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 		if (isValuedStringLiteralOrConstant(arg) && !results.isEmpty()
 				&& isValuedStringLiteralOrConstant(results.get(0).getSecond())) {
-			isRefactoringNeeded.set(true);
+			isRefactoringNeeded.lazySet(true);
 		}
 
 		results.add(0, Pair.<ITypeBinding, Expression>of(null, arg));
@@ -505,7 +505,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			if (expression.getFirst() == null && isEmptyString(expression.getSecond())) {
 				iter.remove();
-				isRefactoringNeeded.set(true);
+				isRefactoringNeeded.lazySet(true);
 			}
 		}
 	}
@@ -525,10 +525,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 						iter.set(Pair.<ITypeBinding, Expression>of(null, cuRewrite.getAST().newThisExpression()));
 					}
 
-					isRefactoringNeeded.set(true);
+					isRefactoringNeeded.lazySet(true);
 				} else if (isToString(methodInvocation) || isStringValueOf(methodInvocation)) {
 					iter.set(getTypeAndValue(methodInvocation));
-					isRefactoringNeeded.set(true);
+					isRefactoringNeeded.lazySet(true);
 				}
 			}
 		}
@@ -585,7 +585,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 						isFirst);
 
 				if (isFirst.get()) {
-					isFirst.set(false);
+					isFirst.lazySet(false);
 
 					if (!isInstanceCreationToRewrite) {
 						result= ASTNodes.createMoveTarget(rewrite, lastExpression);
@@ -629,7 +629,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (isFirst.get()) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				isFirst.set(false);
+				isFirst.lazySet(false);
 				if (isInstanceCreationToRewrite) {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 

@@ -339,7 +339,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		PrefixExpression negativeExpression= ASTNodes.as(returnExpression, PrefixExpression.class);
 
 		if (negativeExpression != null && ASTNodes.hasOperator(negativeExpression, PrefixExpression.Operator.MINUS)) {
-			isForward.set(!isForward.get());
+			isForward.lazySet(!isForward.get());
 			return isReturnedExpressionToRefactor(negativeExpression.getOperand(), criteria, isForward, name1, name2);
 		}
 
@@ -393,7 +393,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				if (ASTNodes.isSameVariable(objectExpr1, name2)
 						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
 					criteria.set(method1);
-					isForward.set(!isForward.get());
+					isForward.lazySet(!isForward.get());
 					return true;
 				}
 			}
@@ -414,7 +414,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				if (ASTNodes.isSameVariable(objectExpr1, name2)
 						&& ASTNodes.isSameVariable(objectExpr2, name1)) {
 					criteria.set(field1);
-					isForward.set(!isForward.get());
+					isForward.lazySet(!isForward.get());
 					return true;
 				}
 			}

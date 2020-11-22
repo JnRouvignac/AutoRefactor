@@ -181,7 +181,7 @@ public class ASTCommentRewriter {
 			@Override
 			public boolean visitNode(final TextEdit edit) {
 				if (!overlaps.get()) {
-					overlaps.set(range.overlapsWith(toSourceLoc(edit)));
+					overlaps.lazySet(range.overlapsWith(toSourceLoc(edit)));
 				}
 
 				return !overlaps.get();

@@ -184,7 +184,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 		if (casingInvocation != null && (ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
-			isRefactoringNeeded.set(true);
+			isRefactoringNeeded.lazySet(true);
 			return casingInvocation.getExpression();
 		}
 

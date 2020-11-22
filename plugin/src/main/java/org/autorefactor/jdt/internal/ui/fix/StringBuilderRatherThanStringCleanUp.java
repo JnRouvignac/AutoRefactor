@@ -312,7 +312,7 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 						finalRead);
 
 				if (foundVariables.contains(finalRead)) {
-					hasFinalReadBeenFound.set(true);
+					hasFinalReadBeenFound.lazySet(true);
 
 					if (!findVariables(statement, remainingReads, remainingWrites,
 							finalRead, false).contains(finalRead)) {

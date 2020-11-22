@@ -98,10 +98,10 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 
 		if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
 			basisExpression= negateExpression.getOperand();
-			isExprPositive.set(false);
+			isExprPositive.lazySet(false);
 		} else {
 			basisExpression= originalExpression;
-			isExprPositive.set(true);
+			isExprPositive.lazySet(true);
 		}
 
 		return basisExpression;

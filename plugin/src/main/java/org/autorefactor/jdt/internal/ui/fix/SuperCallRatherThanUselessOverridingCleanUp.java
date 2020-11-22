@@ -134,7 +134,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 		SearchRequestor requestor= new SearchRequestor() {
 			@Override
 			public void acceptSearchMatch(final SearchMatch match) {
-				methodIsUsedInPackage.set(true);
+				methodIsUsedInPackage.lazySet(true);
 			}
 		};
 
