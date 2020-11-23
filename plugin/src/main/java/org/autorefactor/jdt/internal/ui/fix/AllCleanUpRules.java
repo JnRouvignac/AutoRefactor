@@ -89,6 +89,7 @@ public final class AllCleanUpRules {
                 new BooleanConstantRatherThanValueOfCleanUp(), new BooleanEqualsRatherThanNullCheckCleanUp(),
                 new XORRatherThanDuplicateConditionsCleanUp(), new ORConditionRatherThanRedundantClausesCleanUp(),
                 new TernaryOperatorRatherThanDuplicateConditionsCleanUp(),
+                new OperandFactorizationCleanUp(),
                 // Must come after BooleanRefactoring, which may remove some targets
                 new InvertEqualsCleanUp(), new ComparisonCleanUp(),
                 new DoubleCompareRatherThanEqualityCleanUp(), new RemoveUnneededThisExpressionCleanUp(),

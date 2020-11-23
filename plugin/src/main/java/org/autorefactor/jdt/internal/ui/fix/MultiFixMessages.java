@@ -317,6 +317,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String OperandFactorizationCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String OperandFactorizationCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String OperandFactorizationCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String ORConditionRatherThanRedundantClausesCleanUp_name;
     /**
      * Automatically filled.
