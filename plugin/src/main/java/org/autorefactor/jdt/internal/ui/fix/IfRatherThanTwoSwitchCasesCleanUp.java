@@ -180,7 +180,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				List<Expression> equalities= new ArrayList<>();
 
 				for (Expression value : caseStructure.getFirst()) {
-					equalities.add(ast.parenthesizeIfNeeded(buildEquality(discriminant, value)));
+					equalities.add(ASTNodeFactory.parenthesizeIfNeeded(ast, buildEquality(discriminant, value)));
 				}
 				newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
 			}
@@ -228,7 +228,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			newInfixExpression.setRightOperand(ast.getAST().newQualifiedName(
 								ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
 		} else {
-			newInfixExpression.setLeftOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(discriminant)));
+			newInfixExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ast.createCopyTarget(discriminant)));
 			newInfixExpression.setRightOperand(ast.createCopyTarget(value));
 		}
 

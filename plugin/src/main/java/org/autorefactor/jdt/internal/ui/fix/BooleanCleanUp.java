@@ -298,22 +298,22 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             Boolean elseBoolean= ASTNodes.getBooleanLiteral(elseExpression);
 
             if (thenBoolean == null && elseBoolean != null) {
-                Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), !elseBoolean));
+                Expression leftOperand= ASTNodeFactory.parenthesizeIfNeeded(ast, signExpression(node.getExpression(), !elseBoolean));
 
     			InfixExpression newInfixExpression= ast.newInfixExpression();
     			newInfixExpression.setLeftOperand(leftOperand);
     			newInfixExpression.setOperator(getConditionalOperator(elseBoolean));
-    			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(thenExpression)));
+    			newInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ast.createCopyTarget(thenExpression)));
     			return ast.newReturnStatement(newInfixExpression);
             }
 
             if (thenBoolean != null && elseBoolean == null) {
-                Expression leftOperand= ast.parenthesizeIfNeeded(signExpression(node.getExpression(), thenBoolean));
+                Expression leftOperand= ASTNodeFactory.parenthesizeIfNeeded(ast, signExpression(node.getExpression(), thenBoolean));
 
     			InfixExpression newInfixExpression= ast.newInfixExpression();
     			newInfixExpression.setLeftOperand(leftOperand);
     			newInfixExpression.setOperator(getConditionalOperator(thenBoolean));
-    			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ast.createCopyTarget(elseExpression)));
+    			newInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ast.createCopyTarget(elseExpression)));
     			return ast.newReturnStatement(newInfixExpression);
             }
         }

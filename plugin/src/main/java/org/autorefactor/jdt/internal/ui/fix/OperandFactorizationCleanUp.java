@@ -111,8 +111,8 @@ public class OperandFactorizationCleanUp extends AbstractCleanUpRule {
 		InfixExpression newMainInfixExpression= ast.newInfixExpression();
 		newMainInfixExpression.setOperator(firstCondition.getOperator());
 		newMainInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, firstExpression));
-		newMainInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(newInnerInfixExpression));
+		newMainInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, newInnerInfixExpression));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, ast.parenthesizeIfNeeded(newMainInfixExpression), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodeFactory.parenthesizeIfNeeded(ast, newMainInfixExpression), group);
 	}
 }

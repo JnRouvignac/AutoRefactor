@@ -75,9 +75,9 @@ public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule 
 
 		if (node.getThenStatement() instanceof Block || innerIf.getThenStatement() instanceof Block) {
 			InfixExpression newInfixExpression= ast.newInfixExpression();
-			newInfixExpression.setLeftOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, node.getExpression())));
+			newInfixExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, node.getExpression())));
 			newInfixExpression.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
-			newInfixExpression.setRightOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
+			newInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
 
 			ASTNodes.replaceButKeepComment(rewrite, innerIf.getExpression(), newInfixExpression, group);
 	        ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, innerIf), group);

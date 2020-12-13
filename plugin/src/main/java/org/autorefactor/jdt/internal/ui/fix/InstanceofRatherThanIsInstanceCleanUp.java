@@ -71,9 +71,9 @@ public class InstanceofRatherThanIsInstanceCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.InstanceofRatherThanIsInstanceCleanUp_description);
 
 		InstanceofExpression newInstanceofExpression= ast.newInstanceofExpression();
-		newInstanceofExpression.setLeftOperand(ast.parenthesizeIfNeeded(ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))));
+		newInstanceofExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))));
 		newInstanceofExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, clazz.getType()));
 
-		ASTNodes.replaceButKeepComment(rewrite, node, ast.parenthesizeIfNeeded(newInstanceofExpression), group);
+		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodeFactory.parenthesizeIfNeeded(ast, newInstanceofExpression), group);
 	}
 }

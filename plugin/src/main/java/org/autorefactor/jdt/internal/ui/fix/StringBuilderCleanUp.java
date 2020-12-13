@@ -728,7 +728,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		if (typeAndValue.getFirst() != null) {
 			CastExpression newCastExpression= ast.newCastExpression();
 			newCastExpression.setType(ast.type(typeAndValue.getFirst().getQualifiedName()));
-			newCastExpression.setExpression(ast.parenthesizeIfNeeded(ast.createCopyTarget(typeAndValue.getSecond())));
+			newCastExpression.setExpression(ASTNodeFactory.parenthesizeIfNeeded(ast, ast.createCopyTarget(typeAndValue.getSecond())));
 			expression= newCastExpression;
 		} else if (typeAndValue.getFirst() == null) {
 			expression= ast.createCopyTarget(typeAndValue.getSecond());
@@ -804,7 +804,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(typeAndValue))); //$NON-NLS-1$
 					isFirstAndNotAString= false;
 				} else {
-					concatenateStrings.add(ast.parenthesizeIfNeeded(getTypedExpression(typeAndValue)));
+					concatenateStrings.add(ASTNodeFactory.parenthesizeIfNeeded(ast, getTypedExpression(typeAndValue)));
 				}
 			}
 

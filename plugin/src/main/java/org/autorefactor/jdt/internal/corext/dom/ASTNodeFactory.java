@@ -235,7 +235,7 @@ public class ASTNodeFactory {
 	public CastExpression newCastExpression(final Type type, final Expression expression) {
 		CastExpression newCastExpression= newCastExpression();
 		newCastExpression.setType(type);
-		newCastExpression.setExpression(parenthesizeIfNeeded(expression));
+		newCastExpression.setExpression(parenthesizeIfNeeded(this, expression));
 		return newCastExpression;
 	}
 
@@ -1048,7 +1048,7 @@ public class ASTNodeFactory {
 	 * @return a new prefix expression
 	 */
 	public Expression not(final Expression expression) {
-		return newPrefixExpression(PrefixExpression.Operator.NOT, parenthesizeIfNeeded(expression));
+		return newPrefixExpression(PrefixExpression.Operator.NOT, parenthesizeIfNeeded(this, expression));
 	}
 
 	/**
@@ -1393,11 +1393,12 @@ public class ASTNodeFactory {
 	/**
 	 * Parenthesizes the provided expression if its type requires it.
 	 *
+	 * @param ast The AST node factory
 	 * @param expression the expression to conditionally return parenthesized
 	 * @return the parenthesized expression of the provided expression to return or
 	 *         this expression itself
 	 */
-	public Expression parenthesizeIfNeeded(final Expression expression) {
+	public static Expression parenthesizeIfNeeded(final ASTNodeFactory ast, final Expression expression) {
 		switch (expression.getNodeType()) {
 		case ASTNode.ANNOTATION_TYPE_DECLARATION:
 		case ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION:
@@ -1432,7 +1433,7 @@ public class ASTNodeFactory {
 			return expression;
 
 		default:
-			return newParenthesizedExpression(expression);
+			return ast.newParenthesizedExpression(expression);
 		}
 	}
 }
