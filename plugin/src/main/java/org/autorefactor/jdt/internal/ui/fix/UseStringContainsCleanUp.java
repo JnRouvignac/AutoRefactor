@@ -54,8 +54,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		OrderedInfixExpression<MethodInvocation, Expression> orderedExpression= ASTNodes.orderedInfix(node, MethodInvocation.class, Expression.class);
+	public boolean visit(final InfixExpression visited) {
+		OrderedInfixExpression<MethodInvocation, Expression> orderedExpression= ASTNodes.orderedInfix(visited, MethodInvocation.class, Expression.class);
 
 		if (orderedExpression != null) {
 			MethodInvocation indexOf= orderedExpression.getFirstOperand();
@@ -67,13 +67,13 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
 				if (is(orderedExpression.getOperator(), InfixExpression.Operator.GREATER_EQUALS, value, 0)
 						|| is(orderedExpression.getOperator(), InfixExpression.Operator.NOT_EQUALS, value, -1)) {
-					replaceWithStringContains(node, indexOf, true);
+					replaceWithStringContains(visited, indexOf, true);
 					return false;
 				}
 
 				if (is(orderedExpression.getOperator(), InfixExpression.Operator.LESS, value, 0)
 						|| is(orderedExpression.getOperator(), InfixExpression.Operator.EQUALS, value, -1)) {
-					replaceWithStringContains(node, indexOf, false);
+					replaceWithStringContains(visited, indexOf, false);
 					return false;
 				}
 			}
@@ -87,7 +87,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 				&& (long) actualNumber == expectedNumber;
 	}
 
-	private void replaceWithStringContains(final InfixExpression node, final MethodInvocation method, final boolean isPositive) {
+	private void replaceWithStringContains(final InfixExpression visited, final MethodInvocation method, final boolean isPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseStringContainsCleanUp_description);
@@ -95,9 +95,9 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 		rewrite.set(method, MethodInvocation.NAME_PROPERTY, ast.newSimpleName("contains"), group); //$NON-NLS-1$
 
 		if (isPositive) {
-			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, method), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, method), group);
 		} else {
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.not(ASTNodes.createMoveTarget(rewrite, method)), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.not(ASTNodes.createMoveTarget(rewrite, method)), group);
 		}
 	}
 }

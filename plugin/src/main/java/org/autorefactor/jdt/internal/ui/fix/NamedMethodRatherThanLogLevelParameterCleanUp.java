@@ -55,9 +55,9 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		if (ASTNodes.usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-			List<Expression> args= node.arguments();
+	public boolean visit(final MethodInvocation visited) {
+		if (ASTNodes.usesGivenSignature(visited, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+			List<Expression> args= visited.arguments();
 
 			if (args != null && args.size() == 2) {
 				QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
@@ -81,7 +81,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 						return true;
 					}
 
-					replaceLevelByMethodName(node, methodName);
+					replaceLevelByMethodName(visited, methodName);
 					return false;
 				}
 			}
@@ -90,12 +90,12 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 		return true;
 	}
 
-	private void replaceLevelByMethodName(final MethodInvocation node, final String methodName) {
+	private void replaceLevelByMethodName(final MethodInvocation visited, final String methodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, node.getName(), ast.newSimpleName(methodName), group);
-		rewrite.remove((Expression) node.arguments().get(0), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited.getName(), ast.newSimpleName(methodName), group);
+		rewrite.remove((Expression) visited.arguments().get(0), group);
 	}
 }

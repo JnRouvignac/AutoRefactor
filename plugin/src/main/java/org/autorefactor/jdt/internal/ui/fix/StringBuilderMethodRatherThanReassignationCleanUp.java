@@ -55,17 +55,17 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 	}
 
 	@Override
-	public boolean visit(final Assignment node) {
-		Expression targetVar= node.getLeftHandSide();
-		Expression var= node.getRightHandSide();
-		if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+	public boolean visit(final Assignment visited) {
+		Expression targetVar= visited.getLeftHandSide();
+		Expression var= visited.getRightHandSide();
+		if (ASTNodes.hasOperator(visited, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 				&& var instanceof MethodInvocation) {
 			var= getVar(var);
 
 			if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderMethodRatherThanReassignationCleanUp_description);
-				ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getRightHandSide()), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, visited.getRightHandSide()), group);
 				return false;
 			}
 		}

@@ -64,28 +64,28 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-			boolean isThenEmpty= isEmptyCode(node.getThenStatement());
-			boolean isElseEmpty= isEmptyCode(node.getElseStatement());
+	public boolean visit(final IfStatement visited) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())) {
+			boolean isThenEmpty= isEmptyCode(visited.getThenStatement());
+			boolean isElseEmpty= isEmptyCode(visited.getElseStatement());
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
-			if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
-				if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-					rewrite.remove(node, group);
+			if (isThenEmpty && (isElseEmpty || visited.getElseStatement() == null)) {
+				if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+					rewrite.remove(visited, group);
 				} else {
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-					ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+					ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 				}
 
 				return false;
 			}
 			if (isElseEmpty) {
-				rewrite.remove(node.getElseStatement(), group);
+				rewrite.remove(visited.getElseStatement(), group);
 				return false;
 			}
 		}
@@ -94,53 +94,55 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final EnhancedForStatement node) {
-		if (node.getExpression().resolveTypeBinding() != null
-				&& node.getExpression().resolveTypeBinding().isArray()
-				&& ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+	public boolean visit(final EnhancedForStatement visited) {
+		if (visited.getExpression().resolveTypeBinding() != null
+				&& visited.getExpression().resolveTypeBinding().isArray()
+				&& ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())) {
+			return maybeRemoveStmtWithEmptyBody(visited, visited.getBody());
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean visit(final ForStatement node) {
-		if (node.getExpression() != null && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())
-				&& arePassive(node.initializers()) && ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())) {
-			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+	public boolean visit(final ForStatement visited) {
+		if (visited.getExpression() != null
+				&& !Boolean.TRUE.equals(visited.getExpression().resolveConstantExpressionValue())
+				&& arePassive(visited.initializers())
+				&& ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())) {
+			return maybeRemoveStmtWithEmptyBody(visited, visited.getBody());
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean visit(final WhileStatement node) {
-		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
-				&& !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+	public boolean visit(final WhileStatement visited) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())
+				&& !Boolean.TRUE.equals(visited.getExpression().resolveConstantExpressionValue())) {
+			return maybeRemoveStmtWithEmptyBody(visited, visited.getBody());
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean visit(final DoStatement node) {
-		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression())
-				&& !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-			return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+	public boolean visit(final DoStatement visited) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())
+				&& !Boolean.TRUE.equals(visited.getExpression().resolveConstantExpressionValue())) {
+			return maybeRemoveStmtWithEmptyBody(visited, visited.getBody());
 		}
 
 		return true;
 	}
 
 	@Override
-	public boolean visit(final Block node) {
-		if ((ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(node)) {
+	public boolean visit(final Block visited) {
+		if ((ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) && isEmptyCode(visited)) {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			rewrite.remove(node, group);
+			rewrite.remove(visited, group);
 			return false;
 		}
 
@@ -148,20 +150,20 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final EmptyStatement node) {
-		if (isEmptyCode(node)) {
+	public boolean visit(final EmptyStatement visited) {
+		if (isEmptyCode(visited)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
-			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(node, group);
+			if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(visited, group);
 				return false;
 			}
 
-			if (node instanceof EmptyStatement) {
+			if (visited instanceof EmptyStatement) {
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 				return false;
 			}
 		}
@@ -181,20 +183,20 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
+	private boolean maybeRemoveStmtWithEmptyBody(final Statement visited, final Statement emptyCode) {
 		if (isEmptyCode(emptyCode)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyStatementCleanUp_description);
 
-			if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-				rewrite.remove(node, group);
+			if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+				rewrite.remove(visited, group);
 				return false;
 			}
 
-			if (node instanceof EmptyStatement) {
+			if (visited instanceof EmptyStatement) {
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 				return false;
 			}
 		}

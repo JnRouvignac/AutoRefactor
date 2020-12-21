@@ -412,34 +412,34 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	}
 
 	@Override
-	public boolean visit(final CompilationUnit node) {
+	public boolean visit(final CompilationUnit visited) {
 		resetAllNames();
-		return super.visit(node);
+		return super.visit(visited);
 	}
 
-	private void readImport(final ImportDeclaration node) {
-		QName qname= QName.valueOf(node.getName().getFullyQualifiedName());
-		if (node.isStatic()) {
-			if (node.isOnDemand()) {
-				importStaticTypesAndMembersFromType(node);
+	private void readImport(final ImportDeclaration visited) {
+		QName qname= QName.valueOf(visited.getName().getFullyQualifiedName());
+		if (visited.isStatic()) {
+			if (visited.isOnDemand()) {
+				importStaticTypesAndMembersFromType(visited);
 			} else {
-				importStaticTypeOrMember(node, qname);
+				importStaticTypeOrMember(visited, qname);
 			}
-		} else if (node.isOnDemand()) {
-			String pkgName= node.getName().getFullyQualifiedName();
-			importTypesFromPackage(pkgName, node);
+		} else if (visited.isOnDemand()) {
+			String pkgName= visited.getName().getFullyQualifiedName();
+			importTypesFromPackage(pkgName, visited);
 		} else {
 			types.addName(FQN.fromImport(qname, false));
 		}
 	}
 
-	private void importStaticTypesAndMembersFromType(final ImportDeclaration node) {
-		IBinding binding= node.resolveBinding();
+	private void importStaticTypesAndMembersFromType(final ImportDeclaration visited) {
+		IBinding binding= visited.resolveBinding();
 		if (binding == null) {
 			return;
 		}
 		if (binding.getKind() != IBinding.TYPE) {
-			throw new NotImplementedException(node, "for a binding of kind " + binding.getKind()); //$NON-NLS-1$
+			throw new NotImplementedException(visited, "for a binding of kind " + binding.getKind()); //$NON-NLS-1$
 		}
 		ITypeBinding typeBinding= (ITypeBinding) binding;
 		String typeName= typeBinding.getQualifiedName();
@@ -467,8 +467,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		return Modifier.isStatic(modifiers) && !Modifier.isPrivate(modifiers) && !isSynthetic;
 	}
 
-	private void importStaticTypeOrMember(final ImportDeclaration node, final QName fullyQualifiedName) {
-		IBinding binding= node.resolveBinding();
+	private void importStaticTypeOrMember(final ImportDeclaration visited, final QName fullyQualifiedName) {
+		IBinding binding= visited.resolveBinding();
 
 		if (binding == null) {
 			return;
@@ -489,7 +489,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 	}
 
-	private void importTypesFromPackage(final String pkgName, final ASTNode node) {
+	private void importTypesFromPackage(final String pkgName, final ASTNode visited) {
 		TypeNameMatchRequestor importTypeCollector= new TypeNameMatchRequestor() {
 			@Override
 			public void acceptTypeNameMatch(final TypeNameMatch typeNameMatch) {
@@ -515,29 +515,29 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 					importTypeCollector, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, // wait in case the indexer is indexing
 					cuRewrite.getProgressMonitor());
 		} catch (JavaModelException e) {
-			throw new UnhandledException(node, e);
+			throw new UnhandledException(visited, e);
 		}
 	}
 
 	@Override
-	public boolean visit(final TypeDeclaration node) {
-		ITypeBinding typeBinding= node.resolveBinding();
-		if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
-			CompilationUnit compilationUnit= (CompilationUnit) node.getParent();
+	public boolean visit(final TypeDeclaration visited) {
+		ITypeBinding typeBinding= visited.resolveBinding();
+		if (typeBinding != null && !typeBinding.isNested() && visited.getParent() instanceof CompilationUnit) {
+			CompilationUnit compilationUnit= (CompilationUnit) visited.getParent();
 			for (ImportDeclaration importDecl : (List<ImportDeclaration>) compilationUnit.imports()) {
 				readImport(importDecl);
 			}
 			importTypesFromPackage("java.lang", compilationUnit); //$NON-NLS-1$
 
-			node.accept(new NamesCollector());
+			visited.accept(new NamesCollector());
 		}
 
 		return true;
 	}
 
 	@Override
-	public void endVisit(final TypeDeclaration node) {
-		ITypeBinding typeBinding= node.resolveBinding();
+	public void endVisit(final TypeDeclaration visited) {
+		ITypeBinding typeBinding= visited.resolveBinding();
 		if (typeBinding != null && !typeBinding.isNested()) {
 			resetAllNames();
 		}
@@ -545,31 +545,31 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 	private final class NamesCollector extends ASTVisitor {
 		@Override
-		public boolean visit(final TypeDeclaration node) {
-			return addTypeNames(node);
+		public boolean visit(final TypeDeclaration visited) {
+			return addTypeNames(visited);
 		}
 
 		@Override
-		public boolean visit(final EnumDeclaration node) {
-			return addTypeNames(node);
+		public boolean visit(final EnumDeclaration visited) {
+			return addTypeNames(visited);
 		}
 
-		private boolean addTypeNames(final AbstractTypeDeclaration node) {
-			ITypeBinding typeBinding= node.resolveBinding();
+		private boolean addTypeNames(final AbstractTypeDeclaration visited) {
+			ITypeBinding typeBinding= visited.resolveBinding();
 			if (typeBinding != null) {
 				types.addName(FQN.fromMember(QName.valueOf(typeBinding.getQualifiedName())));
 			} else {
 				// We cannot determine the FQN, so we cannot safely replace it
-				types.cannotReplaceSimpleName(node.getName().getIdentifier());
+				types.cannotReplaceSimpleName(visited.getName().getIdentifier());
 			}
 
 			return true;
 		}
 
 		@Override
-		public boolean visit(final MethodDeclaration node) {
-			String simpleName= node.getName().getIdentifier();
-			IMethodBinding methodBinding= node.resolveBinding();
+		public boolean visit(final MethodDeclaration visited) {
+			String simpleName= visited.getName().getIdentifier();
+			IMethodBinding methodBinding= visited.resolveBinding();
 			if (methodBinding != null) {
 				QName qname= QName.valueOf(methodBinding.getDeclaringClass().getQualifiedName(), simpleName);
 				methods.addName(FQN.fromMember(qname));
@@ -582,8 +582,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 
 		@Override
-		public boolean visit(final FieldDeclaration node) {
-			for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
+		public boolean visit(final FieldDeclaration visited) {
+			for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) visited.fragments()) {
 				String simpleName= fragment.getName().getIdentifier();
 				IVariableBinding variableBinding= fragment.resolveBinding();
 				if (variableBinding != null) {
@@ -599,8 +599,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 		}
 	}
 
-	private QName getFullyQualifiedNameOrNull(final QualifiedName node) {
-		IBinding binding= node.resolveBinding();
+	private QName getFullyQualifiedNameOrNull(final QualifiedName visited) {
+		IBinding binding= visited.resolveBinding();
 
 		if (binding != null) {
 			switch (binding.getKind()) {
@@ -610,7 +610,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 			case IBinding.VARIABLE:
 				IVariableBinding fieldBinding= (IVariableBinding) binding;
-				if (hasKind(node.getQualifier(), IBinding.TYPE)) {
+				if (hasKind(visited.getQualifier(), IBinding.TYPE)) {
 					return QName.valueOf(fieldBinding.getDeclaringClass().getQualifiedName(), fieldBinding.getName());
 				} // else this is a field access like other.fieldName
 			}
@@ -620,15 +620,15 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		Expression expression= node.getExpression();
-		IMethodBinding methodBinding= node.resolveMethodBinding();
+	public boolean visit(final MethodInvocation visited) {
+		Expression expression= visited.getExpression();
+		IMethodBinding methodBinding= visited.resolveMethodBinding();
 
 		if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, IBinding.TYPE)
-				&& node.typeArguments().isEmpty()) {
+				&& visited.typeArguments().isEmpty()) {
 			ITypeBinding declaringClass= methodBinding.getDeclaringClass();
 			QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
-			if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
+			if (methods.canReplaceFqnWithSimpleName(visited, qname, FqnType.METHOD)) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -646,47 +646,47 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 	}
 
 	@Override
-	public boolean visit(final FieldDeclaration node) {
-		return maybeReplaceFqnsWithSimpleNames(node);
+	public boolean visit(final FieldDeclaration visited) {
+		return maybeReplaceFqnsWithSimpleNames(visited);
 	}
 
 	@Override
-	public boolean visit(final Initializer node) {
-		Set<SimpleName> localVars= ASTNodes.getLocalVariableIdentifiers(node.getBody(), true);
-		return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
+	public boolean visit(final Initializer visited) {
+		Set<SimpleName> localVars= ASTNodes.getLocalVariableIdentifiers(visited.getBody(), true);
+		return maybeReplaceFqnsWithSimpleNames(visited.getBody(), localVars);
 	}
 
 	@Override
-	public boolean visit(final MethodDeclaration node) {
+	public boolean visit(final MethodDeclaration visited) {
 		// Method parameters
-		for (SingleVariableDeclaration parameter : (List<SingleVariableDeclaration>) node.parameters()) {
+		for (SingleVariableDeclaration parameter : (List<SingleVariableDeclaration>) visited.parameters()) {
 			if (!maybeReplaceFqnsWithSimpleNames(parameter)) {
 				return false;
 			}
 		}
 
 		// Method return value
-		if (!maybeReplaceFqnsWithSimpleNames(node.getReturnType2())) {
+		if (!maybeReplaceFqnsWithSimpleNames(visited.getReturnType2())) {
 			return false;
 		}
 
 		// Method body
 		Set<SimpleName> localIdentifiers= new HashSet<>();
-		for (SingleVariableDeclaration localParameter : (List<SingleVariableDeclaration>) node.parameters()) {
+		for (SingleVariableDeclaration localParameter : (List<SingleVariableDeclaration>) visited.parameters()) {
 			localIdentifiers.add(localParameter.getName());
 		}
-		localIdentifiers.addAll(ASTNodes.getLocalVariableIdentifiers(node.getBody(), true));
+		localIdentifiers.addAll(ASTNodes.getLocalVariableIdentifiers(visited.getBody(), true));
 
-		return maybeReplaceFqnsWithSimpleNames(node.getBody(), localIdentifiers);
+		return maybeReplaceFqnsWithSimpleNames(visited.getBody(), localIdentifiers);
 	}
 
-	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node) {
-		return maybeReplaceFqnsWithSimpleNames(node, Collections.<SimpleName>emptySet());
+	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode visited) {
+		return maybeReplaceFqnsWithSimpleNames(visited, Collections.<SimpleName>emptySet());
 	}
 
-	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<SimpleName> localIdentifiers) {
-		if (node != null) {
-			Iterable<QualifiedName> qualifiedNames= new QualifiedNamesCollector().collect(node);
+	private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode visited, final Set<SimpleName> localIdentifiers) {
+		if (visited != null) {
+			Iterable<QualifiedName> qualifiedNames= new QualifiedNamesCollector().collect(visited);
 			for (QualifiedName qualifiedName : qualifiedNames) {
 				if (!maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers)) {
 					return false;
@@ -699,26 +699,26 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 	private static final class QualifiedNamesCollector extends CollectorVisitor<QualifiedName> {
 		@Override
-		public boolean visit(final QualifiedName node) {
-			addResult(node);
+		public boolean visit(final QualifiedName visited) {
+			addResult(visited);
 			return true;
 		}
 	}
 
-	private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<SimpleName> localIdentifiers) {
-		ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
-		QName qname= getFullyQualifiedNameOrNull(node);
+	private boolean maybeReplaceFqnWithSimpleName(final QualifiedName visited, final Set<SimpleName> localIdentifiers) {
+		ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(visited, PackageDeclaration.class, ImportDeclaration.class);
+		QName qname= getFullyQualifiedNameOrNull(visited);
 
 		if (ancestor != null || qname == null) {
 			return true;
 		}
 
-		if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-				|| fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+		if (types.canReplaceFqnWithSimpleName(visited, qname, FqnType.TYPE)
+				|| fields.canReplaceFqnWithSimpleName(visited, qname, FqnType.FIELD)
 						&& !containsLocalName(localIdentifiers, qname)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.SimpleNameRatherThanQualifiedNameCleanUp_description);
-			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, node.getName()), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, visited.getName()), group);
 			return false;
 		}
 

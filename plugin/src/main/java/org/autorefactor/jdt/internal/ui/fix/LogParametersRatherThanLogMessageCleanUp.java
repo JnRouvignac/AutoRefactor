@@ -55,22 +55,22 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error") //$NON-NLS-1$ //$NON-NLS-2$
-				&& maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace") //$NON-NLS-1$ //$NON-NLS-2$
-				&& maybeRefactorMethod(node, "warn"); //$NON-NLS-1$
+	public boolean visit(final MethodInvocation visited) {
+		return maybeRefactorMethod(visited, "debug") && maybeRefactorMethod(visited, "error") //$NON-NLS-1$ //$NON-NLS-2$
+				&& maybeRefactorMethod(visited, "info") && maybeRefactorMethod(visited, "trace") //$NON-NLS-1$ //$NON-NLS-2$
+				&& maybeRefactorMethod(visited, "warn"); //$NON-NLS-1$
 	}
 
-	private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
-		if (ASTNodes.usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
-			List<Expression> args= node.arguments();
+	private boolean maybeRefactorMethod(final MethodInvocation visited, final String methodName) {
+		if (ASTNodes.usesGivenSignature(visited, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(visited, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
+			List<Expression> args= visited.arguments();
 
 			if (args != null && args.size() == 1) {
 				InfixExpression message= ASTNodes.as(args.get(0), InfixExpression.class);
 
 				if (message != null) {
-					return maybeReplaceConcatenation(node, methodName, message);
+					return maybeReplaceConcatenation(visited, methodName, message);
 				}
 			}
 		}
@@ -78,7 +78,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		return true;
 	}
 
-	private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
+	private boolean maybeReplaceConcatenation(final MethodInvocation visited, final String methodName,
 			final InfixExpression message) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -112,20 +112,20 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		}
 
 		if (hasLiteral && hasObjects) {
-			replaceConcatenation(node, methodName, messageBuilder, params);
+			replaceConcatenation(visited, methodName, messageBuilder, params);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void replaceConcatenation(final MethodInvocation node, final String methodName, final StringBuilder messageBuilder,
+	private void replaceConcatenation(final MethodInvocation visited, final String methodName, final StringBuilder messageBuilder,
 			final List<Expression> params) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LogParametersRatherThanLogMessageCleanUp_description);
 
 		params.add(0, ast.newStringLiteral(messageBuilder.toString()));
-		ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, node.getExpression()), methodName, params), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, visited.getExpression()), methodName, params), group);
 	}
 }

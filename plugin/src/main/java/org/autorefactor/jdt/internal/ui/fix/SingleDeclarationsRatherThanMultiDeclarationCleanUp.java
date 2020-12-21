@@ -58,19 +58,19 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 	}
 
 	@Override
-	public boolean visit(final FieldDeclaration node) {
-		return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), node.getJavadoc());
+	public boolean visit(final FieldDeclaration visited) {
+		return visitMultiDeclaration(visited, visited.modifiers(), visited.getType(), visited.fragments(), visited.getJavadoc());
 	}
 
 	@Override
-	public boolean visit(final VariableDeclarationStatement node) {
-		return visitMultiDeclaration(node, node.modifiers(), node.getType(), node.fragments(), null);
+	public boolean visit(final VariableDeclarationStatement visited) {
+		return visitMultiDeclaration(visited, visited.modifiers(), visited.getType(), visited.fragments(), null);
 	}
 
-	private boolean visitMultiDeclaration(final ASTNode node, final List<?> modifiers, final Type type,
+	private boolean visitMultiDeclaration(final ASTNode visited, final List<?> modifiers, final Type type,
 			final List<?> fragments, final Javadoc docComment) {
 		if (fragments != null && fragments.size() > 1) {
-			refactorMultiDeclaration(node, modifiers, type, fragments, docComment);
+			refactorMultiDeclaration(visited, modifiers, type, fragments, docComment);
 
 			return false;
 		}
@@ -78,7 +78,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		return true;
 	}
 
-	private void refactorMultiDeclaration(final ASTNode node, final List<?> modifiers, final Type type,
+	private void refactorMultiDeclaration(final ASTNode visited, final List<?> modifiers, final Type type,
 			final List<?> fragments, final Javadoc docComment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -98,7 +98,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 
 			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(copyOfFragment, copyOfInitializer);
 			ASTNode newNode;
-			if (node instanceof VariableDeclarationStatement) {
+			if (visited instanceof VariableDeclarationStatement) {
 				VariableDeclarationStatement newStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
 				updateModifiers(modifiers, newStatement.modifiers());
 				newNode= newStatement;
@@ -112,9 +112,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			}
 
 			if (i > 0) {
-				rewrite.insertAfter(newNode, node, group);
+				rewrite.insertAfter(newNode, visited, group);
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, node, newNode, group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, newNode, group);
 			}
 		}
 	}

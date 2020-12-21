@@ -54,15 +54,15 @@ public class RemoveOverriddenAssignmentCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final VariableDeclarationStatement node) {
-		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
+	public boolean visit(final VariableDeclarationStatement visited) {
+		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(visited);
 
 		if (fragment != null
 				&& fragment.getInitializer() != null
 				&& ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
 			SimpleName varName= fragment.getName();
 			IVariableBinding variable= fragment.resolveBinding();
-			Statement stmtToInspect= ASTNodes.getNextSibling(node);
+			Statement stmtToInspect= ASTNodes.getNextSibling(visited);
 			boolean isOverridden= false;
 
 			while (stmtToInspect != null) {

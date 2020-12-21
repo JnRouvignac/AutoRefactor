@@ -52,12 +52,12 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
+	public boolean visit(final IfStatement visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
 
-		Statement thenStatement= node.getThenStatement();
-		Statement elseStatement= node.getElseStatement();
+		Statement thenStatement= visited.getThenStatement();
+		Statement elseStatement= visited.getElseStatement();
 
 		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
 			rewrite.remove(elseStatement, group);
@@ -65,15 +65,15 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 		}
 
 		if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
-			Expression condition= node.getExpression();
+			Expression condition= visited.getExpression();
 
 			if (elseStatement != null) {
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 				ASTNodes.replaceButKeepComment(rewrite, condition, ast.negate(condition, true), group);
-				ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
 			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
-				removeBlock(node);
+				removeBlock(visited);
 				return false;
 			}
 		}
@@ -81,16 +81,16 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void removeBlock(final IfStatement node) {
+	private void removeBlock(final IfStatement visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
 
-		if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-			rewrite.remove(node, group);
+		if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+			rewrite.remove(visited, group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 		}
 	}
 }

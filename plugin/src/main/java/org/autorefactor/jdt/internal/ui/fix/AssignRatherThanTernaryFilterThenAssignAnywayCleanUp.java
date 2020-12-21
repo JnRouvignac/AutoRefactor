@@ -51,8 +51,8 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 	}
 
 	@Override
-	public boolean visit(final ConditionalExpression node) {
-		InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+	public boolean visit(final ConditionalExpression visited) {
+		InfixExpression condition= ASTNodes.as(visited.getExpression(), InfixExpression.class);
 
 		if (condition != null
 				&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
@@ -61,38 +61,38 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 			Expression valuedExpression;
 
 			if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
-				hardCodedExpression= node.getThenExpression();
-				valuedExpression= node.getElseExpression();
+				hardCodedExpression= visited.getThenExpression();
+				valuedExpression= visited.getElseExpression();
 			} else {
-				hardCodedExpression= node.getElseExpression();
-				valuedExpression= node.getThenExpression();
+				hardCodedExpression= visited.getElseExpression();
+				valuedExpression= visited.getThenExpression();
 			}
 
 			if (ASTNodes.isHardCoded(hardCodedExpression) && ASTNodes.isPassive(valuedExpression)) {
-				return maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getRightOperand(), condition.getLeftOperand())
-						&& maybeReplaceWithValue(node, hardCodedExpression, valuedExpression, condition.getLeftOperand(), condition.getRightOperand());
+				return maybeReplaceWithValue(visited, hardCodedExpression, valuedExpression, condition.getRightOperand(), condition.getLeftOperand())
+						&& maybeReplaceWithValue(visited, hardCodedExpression, valuedExpression, condition.getLeftOperand(), condition.getRightOperand());
 			}
 		}
 
 		return true;
 	}
 
-	private boolean maybeReplaceWithValue(final ConditionalExpression node, final Expression hardCodedExpression,
+	private boolean maybeReplaceWithValue(final ConditionalExpression visited, final Expression hardCodedExpression,
 			final Expression valuedExpression, final Expression hardCodedOperand, final Expression valuedOperand) {
 		if (ASTNodes.match(hardCodedOperand, hardCodedExpression)
 				&& ASTNodes.match(valuedOperand, valuedExpression)) {
-			replaceWithValue(node, valuedExpression);
+			replaceWithValue(visited, valuedExpression);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void replaceWithValue(final ConditionalExpression node, final Expression valuedExpression) {
+	private void replaceWithValue(final ConditionalExpression visited, final Expression valuedExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, valuedExpression)), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, valuedExpression)), group);
 	}
 }

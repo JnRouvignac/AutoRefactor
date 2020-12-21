@@ -68,55 +68,55 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		BlocksAndFollowingCodeVisitor blocksAndFollowingCodeVisitor= new BlocksAndFollowingCodeVisitor();
-		blocksAndFollowingCodeVisitor.visitNode(node);
+		blocksAndFollowingCodeVisitor.visitNode(visited);
 		return blocksAndFollowingCodeVisitor.result;
 	}
 
 	private final class BlocksAndFollowingCodeVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final TryStatement node) {
-			return visitStatement(node);
+		public boolean visit(final TryStatement visited) {
+			return visitStatement(visited);
 		}
 
 		@Override
-		public boolean visit(final IfStatement node) {
-			return visitStatement(node);
+		public boolean visit(final IfStatement visited) {
+			return visitStatement(visited);
 		}
 
-		private boolean visitStatement(final Statement node) {
+		private boolean visitStatement(final Statement visited) {
 			if (result) {
 				List<Statement> redundantStatements= new ArrayList<>();
-				collectStatements(node, redundantStatements);
-				return maybeRemoveRedundantCode(node, redundantStatements);
+				collectStatements(visited, redundantStatements);
+				return maybeRemoveRedundantCode(visited, redundantStatements);
 			}
 
 			return true;
 		}
 
-		private void collectStatements(final Statement node, final List<Statement> redundantStatements) {
-			if (node != null) {
-				TryStatement ts= ASTNodes.as(node, TryStatement.class);
-				IfStatement is= ASTNodes.as(node, IfStatement.class);
+		private void collectStatements(final Statement visited, final List<Statement> redundantStatements) {
+			if (visited != null) {
+				TryStatement tryStatement= ASTNodes.as(visited, TryStatement.class);
+				IfStatement ifStatement= ASTNodes.as(visited, IfStatement.class);
 
-				if (ts != null && ts.getFinally() == null) {
-					List<CatchClause> catchClauses= ts.catchClauses();
+				if (tryStatement != null && tryStatement.getFinally() == null) {
+					List<CatchClause> catchClauses= tryStatement.catchClauses();
 
 					for (CatchClause catchClause : catchClauses) {
 						doCollectStatements(catchClause.getBody(), redundantStatements);
 					}
-				} else if (is != null) {
-					doCollectStatements(is.getThenStatement(), redundantStatements);
-					doCollectStatements(is.getElseStatement(), redundantStatements);
+				} else if (ifStatement != null) {
+					doCollectStatements(ifStatement.getThenStatement(), redundantStatements);
+					doCollectStatements(ifStatement.getElseStatement(), redundantStatements);
 				}
 			}
 		}
 
-		private void doCollectStatements(final Statement node, final List<Statement> redundantStatements) {
-			if (node != null) {
-				redundantStatements.add(node);
-				List<Statement> statements= ASTNodes.asList(node);
+		private void doCollectStatements(final Statement visited, final List<Statement> redundantStatements) {
+			if (visited != null) {
+				redundantStatements.add(visited);
+				List<Statement> statements= ASTNodes.asList(visited);
 
 				if (!Utils.isEmpty(statements)) {
 					collectStatements(statements.get(statements.size() - 1), redundantStatements);
@@ -124,8 +124,8 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 			}
 		}
 
-		private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
-			List<Statement> referenceStatements= ASTNodes.getNextSiblings(node);
+		private boolean maybeRemoveRedundantCode(final Statement visited, final List<Statement> redundantStatements) {
+			List<Statement> referenceStatements= ASTNodes.getNextSiblings(visited);
 
 			if (redundantStatements.isEmpty() || Utils.isEmpty(referenceStatements)) {
 				return true;
@@ -165,10 +165,10 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 					ReturnStatement returnStatement= ASTNodes.as(lastStatement, ReturnStatement.class);
 					ContinueStatement continueStatement= ASTNodes.as(lastStatement, ContinueStatement.class);
 
-					if (isIn(node, MethodDeclaration.class)
+					if (isIn(visited, MethodDeclaration.class)
 							&& returnStatement != null
 							&& returnStatement.getExpression() == null
-							|| isIn(node, EnhancedForStatement.class, ForStatement.class, WhileStatement.class, DoStatement.class)
+							|| isIn(visited, EnhancedForStatement.class, ForStatement.class, WhileStatement.class, DoStatement.class)
 									&& continueStatement != null
 									&& continueStatement.getLabel() == null) {
 						if (statements.size() > referenceStatements.size() + 1) {

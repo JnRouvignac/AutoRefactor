@@ -51,16 +51,17 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 	}
 
 	@Override
-	public boolean visit(final QualifiedName node) {
-		ITypeBinding typeBinding= ASTNodes.getTargetType(node);
+	public boolean visit(final QualifiedName visited) {
+		ITypeBinding typeBinding= ASTNodes.getTargetType(visited);
 
 		if (typeBinding != null && typeBinding.isPrimitive()) {
-			if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
-				replaceWithBooleanLiteral(node, true);
+			if (ASTNodes.isField(visited, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
+				replaceWithBooleanLiteral(visited, true);
 				return false;
 			}
-			if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
-				replaceWithBooleanLiteral(node, false);
+
+			if (ASTNodes.isField(visited, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+				replaceWithBooleanLiteral(visited, false);
 				return false;
 			}
 		}
@@ -68,13 +69,12 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 		return true;
 	}
 
-	private void replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
+	private void replaceWithBooleanLiteral(final QualifiedName visited, final boolean val) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description);
 
 		BooleanLiteral booleanLiteral= ast.newBooleanLiteral(val);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.LiteralRatherThanBooleanConstantCleanUp_description);
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		ASTNodes.replaceButKeepComment(rewrite, node, booleanLiteral, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, booleanLiteral, group);
 	}
 }

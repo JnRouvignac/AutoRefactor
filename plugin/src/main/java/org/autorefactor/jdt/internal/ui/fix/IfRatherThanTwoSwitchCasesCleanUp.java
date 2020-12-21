@@ -65,12 +65,12 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean visit(final SwitchStatement node) {
-		if (!ASTNodes.isPassive(node.getExpression())) {
+	public boolean visit(final SwitchStatement visited) {
+		if (!ASTNodes.isPassive(visited.getExpression())) {
 			return true;
 		}
 
-		List<?> statements= node.statements();
+		List<?> statements= visited.statements();
 
 		if (statements.isEmpty()) {
 			return true;
@@ -153,19 +153,19 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		replaceSwitch(node, switchStructure, caseIndexWithDefault);
+		replaceSwitch(visited, switchStructure, caseIndexWithDefault);
 
 		return false;
 	}
 
-	private void replaceSwitch(final SwitchStatement node,
+	private void replaceSwitch(final SwitchStatement visited,
 			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.IfRatherThanTwoSwitchCasesCleanUp_description);
 
 		int localCaseIndexWithDefault= caseIndexWithDefault;
-		Expression discriminant= node.getExpression();
+		Expression discriminant= visited.getExpression();
 		Statement currentBlock= null;
 
 		for (int i= switchStructure.size() - 1; i >= 0; i--) {
@@ -209,7 +209,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, node, currentBlock, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, currentBlock, group);
 	}
 
 	private Expression buildEquality(final Expression discriminant, final Expression value) {

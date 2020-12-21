@@ -90,13 +90,13 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	};
 
 	@Override
-	public boolean visit(final ParenthesizedExpression node) {
-		Expression expressionWithoutParentheses= getExpressionWithoutParentheses(node);
+	public boolean visit(final ParenthesizedExpression visited) {
+		Expression expressionWithoutParentheses= getExpressionWithoutParentheses(visited);
 
 		if (expressionWithoutParentheses != null) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveParenthesisCleanUp_description);
-			ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, expressionWithoutParentheses), group);
 			return false;
 		}
 
@@ -104,9 +104,9 @@ public class RemoveParenthesisCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		if (shouldHaveParentheses(node)) {
-			addParentheses(node);
+	public boolean visit(final InfixExpression visited) {
+		if (shouldHaveParentheses(visited)) {
+			addParentheses(visited);
 			return false;
 		}
 

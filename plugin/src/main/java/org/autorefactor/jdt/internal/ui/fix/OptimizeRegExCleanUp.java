@@ -81,16 +81,16 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(final StringLiteral node) {
-        if (isRegEx(node)) {
-            return maybeRewriteRegEx(node);
+    public boolean visit(final StringLiteral visited) {
+        if (isRegEx(visited)) {
+            return maybeRewriteRegEx(visited);
         }
 
         return true;
     }
 
-    private boolean isRegEx(final ASTNode node) {
-        ASTNode parent= node.getParent();
+    private boolean isRegEx(final ASTNode visited) {
+        ASTNode parent= visited.getParent();
 
         switch (parent.getNodeType()) {
         case ASTNode.PARENTHESIZED_EXPRESSION:
@@ -99,9 +99,9 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         case ASTNode.METHOD_INVOCATION:
             MethodInvocation methodInvocation= (MethodInvocation) parent;
 
-            if (node.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY) {
+            if (visited.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY) {
                 if (!methodInvocation.arguments().isEmpty()
-                        && node.equals(methodInvocation.arguments().get(0))) {
+                        && visited.equals(methodInvocation.arguments().get(0))) {
                     if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), MATCHES_METHOD, String.class.getCanonicalName())
                             || ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_ALL_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())
                             || ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_FIRST_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())
@@ -125,7 +125,7 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         case ASTNode.SINGLE_VARIABLE_DECLARATION:
             SingleVariableDeclaration singleVariableDeclaration= (SingleVariableDeclaration) parent;
 
-            if (node.getLocationInParent() != SingleVariableDeclaration.INITIALIZER_PROPERTY) {
+            if (visited.getLocationInParent() != SingleVariableDeclaration.INITIALIZER_PROPERTY) {
                 return false;
             }
 
@@ -134,7 +134,7 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         case ASTNode.ASSIGNMENT:
             Assignment assignment= (Assignment) parent;
 
-            if (node.getLocationInParent() != Assignment.RIGHT_HAND_SIDE_PROPERTY
+            if (visited.getLocationInParent() != Assignment.RIGHT_HAND_SIDE_PROPERTY
                     || !ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
                     || !(assignment.getLeftHandSide() instanceof SimpleName)
                     || ((SimpleName) assignment.getLeftHandSide()).resolveTypeBinding().getKind() != IBinding.VARIABLE) {
@@ -146,7 +146,7 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             VariableDeclarationFragment fragment= (VariableDeclarationFragment) parent;
 
-            if (node.getLocationInParent() != VariableDeclarationFragment.INITIALIZER_PROPERTY
+            if (visited.getLocationInParent() != VariableDeclarationFragment.INITIALIZER_PROPERTY
                     || !(fragment.getParent() instanceof VariableDeclarationStatement)
                     || fragment.getLocationInParent() != VariableDeclarationStatement.FRAGMENTS_PROPERTY) {
                 return false;
@@ -191,8 +191,8 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean maybeRewriteRegEx(final StringLiteral node) {
-        String pattern= node.getLiteralValue();
+    private boolean maybeRewriteRegEx(final StringLiteral visited) {
+        String pattern= visited.getLiteralValue();
 
         if (COMMENT_PATTERN.matcher(pattern).find()) {
             return true;
@@ -237,21 +237,21 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
             break;
         }
 
-        if (!Utils.equalNotNull(node.getLiteralValue(), pattern)) {
-            rewriteRegEx(node, pattern);
+        if (!Utils.equalNotNull(visited.getLiteralValue(), pattern)) {
+            rewriteRegEx(visited, pattern);
             return false;
         }
 
         return true;
     }
 
-    private void rewriteRegEx(final StringLiteral node, String pattern) {
+    private void rewriteRegEx(final StringLiteral visited, String pattern) {
         TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
         ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
         ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-        ASTNodes.replaceButKeepComment(rewrite, node, ast.newStringLiteral(pattern), group);
+        ASTNodes.replaceButKeepComment(rewrite, visited, ast.newStringLiteral(pattern), group);
     }
 }

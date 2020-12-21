@@ -58,15 +58,15 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 	}
 
 	@Override
-	public boolean visit(final TypeDeclaration node) {
-		if (!node.isInterface()) {
+	public boolean visit(final TypeDeclaration visited) {
+		if (!visited.isInterface()) {
 			MethodDeclaration uniqueConstructor= null;
 			boolean isPublicClass= false;
 			boolean isProtectedClass= false;
 			boolean isPackageClass= true;
 			boolean isPrivateClass= false;
 
-			for (IExtendedModifier extendedModifier : (List<IExtendedModifier>) node.modifiers()) {
+			for (IExtendedModifier extendedModifier : (List<IExtendedModifier>) visited.modifiers()) {
 				if (extendedModifier.isModifier()) {
 					Modifier modifier= (Modifier) extendedModifier;
 					if (modifier.isPublic()) {
@@ -87,7 +87,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 				}
 			}
 
-			for (MethodDeclaration methodDeclaration : node.getMethods()) {
+			for (MethodDeclaration methodDeclaration : visited.getMethods()) {
 				if (methodDeclaration.isConstructor()) {
 					if (uniqueConstructor != null) {
 						// Too much constructors
@@ -98,8 +98,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 			}
 
 			if (uniqueConstructor != null
-					&& (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
-							|| ASTNodes.hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
+					&& (!isCheckedExceptionThrown(uniqueConstructor) || visited.getSuperclassType() == null
+							|| ASTNodes.hasType(visited.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
 					&& Utils.isEmpty(uniqueConstructor.parameters())
 					&& isDefaultStatements(uniqueConstructor)) {
 				if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {

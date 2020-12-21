@@ -57,11 +57,11 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 	}
 
 	@Override
-	public boolean visit(final FieldDeclaration node) {
-		if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
+	public boolean visit(final FieldDeclaration visited) {
+		if (visited.getType().isPrimitiveType() || ASTNodes.hasType(visited.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
 				Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
 			Modifier finalModifier= null;
-			Collection<IExtendedModifier> modifiers= node.modifiers();
+			Collection<IExtendedModifier> modifiers= visited.modifiers();
 
 			for (Modifier modifier : getModifiersOnly(modifiers)) {
 				if (modifier.isStatic()) {
@@ -72,8 +72,8 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 				}
 			}
 
-			if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
-				Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
+			if (finalModifier != null && visited.fragments() != null && visited.fragments().size() == 1) {
+				Expression initializer= ((VariableDeclarationFragment) visited.fragments().get(0)).getInitializer();
 
 				if (ASTNodes.isHardCoded(initializer)) {
 					addStaticModifier(finalModifier);

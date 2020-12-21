@@ -59,18 +59,21 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final FieldDeclaration node) {
-		if (!canRemoveFieldDefaultValue(node)) {
+	public boolean visit(final FieldDeclaration visited) {
+		if (!canRemoveFieldDefaultValue(visited)) {
 			return true;
 		}
-		ITypeBinding fieldType= node.getType().resolveBinding();
-		if (fieldType == null || Modifier.isFinal(node.getModifiers())) {
+
+		ITypeBinding fieldType= visited.getType().resolveBinding();
+
+		if (fieldType == null || Modifier.isFinal(visited.getModifiers())) {
 			return true;
 		}
 
 		boolean visitSubtree= true;
-		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) node.fragments()) {
+		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) visited.fragments()) {
 			Expression initializer= fragment.getInitializer();
+
 			if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
 					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
@@ -89,6 +92,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		// Do not remove default values from interface/annotation fields
 		// because they are final by default
 		ASTNode parent= node.getParent();
+
 		if (parent instanceof TypeDeclaration) {
 			return !((TypeDeclaration) parent).isInterface();
 		}
@@ -100,12 +104,15 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		if (val instanceof Short || val instanceof Integer || val instanceof Long) {
 			return ((Number) val).longValue() == 0;
 		}
+
 		if (val instanceof Double || val instanceof Float) {
 			return ((Number) val).doubleValue() == 0;
 		}
+
 		if (val instanceof Boolean) {
 			return Boolean.FALSE.equals(val);
 		}
+
 		return val instanceof Character && ((Character) val).charValue() == '\u0000';
 	}
 

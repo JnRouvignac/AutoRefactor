@@ -64,17 +64,17 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 	}
 
 	@Override
-	public boolean visit(final WhileStatement node) {
-		if (ASTNodes.fallsThrough(node.getBody())) {
-			ContinueVisitor continueVisitor= new ContinueVisitor(node);
-			continueVisitor.traverseNodeInterruptibly(node);
+	public boolean visit(final WhileStatement visited) {
+		if (ASTNodes.fallsThrough(visited.getBody())) {
+			ContinueVisitor continueVisitor= new ContinueVisitor(visited);
+			continueVisitor.traverseNodeInterruptibly(visited);
 
 			if (continueVisitor.canBeRefactored()) {
-				BreakVisitor breakVisitor= new BreakVisitor(node);
-				breakVisitor.traverseNodeInterruptibly(node);
+				BreakVisitor breakVisitor= new BreakVisitor(visited);
+				breakVisitor.traverseNodeInterruptibly(visited);
 
 				if (breakVisitor.canBeRefactored()) {
-					replaceByIf(node, breakVisitor);
+					replaceByIf(visited, breakVisitor);
 					return false;
 				}
 			}
@@ -83,7 +83,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 		return true;
 	}
 
-	private void replaceByIf(final WhileStatement node, final BreakVisitor breakVisitor) {
+	private void replaceByIf(final WhileStatement visited, final BreakVisitor breakVisitor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.IfRatherThanWhileAndFallsThroughCleanUp_description);
@@ -97,10 +97,10 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 		}
 
 		IfStatement newIfStatement= ast.newIfStatement();
-		newIfStatement.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())));
-		newIfStatement.setThenStatement(ASTNodes.createMoveTarget(rewrite, node.getBody()));
+		newIfStatement.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getExpression())));
+		newIfStatement.setThenStatement(ASTNodes.createMoveTarget(rewrite, visited.getBody()));
 
-		ASTNodes.replaceButKeepComment(rewrite, node, newIfStatement, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newIfStatement, group);
 	}
 
 	private static class BreakVisitor extends InterruptibleVisitor {
@@ -143,37 +143,37 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 		}
 
 		@Override
-		public boolean visit(final WhileStatement node) {
-			return root.equals(node);
+		public boolean visit(final WhileStatement visited) {
+			return root.equals(visited);
 		}
 
 		@Override
-		public boolean visit(final DoStatement node) {
+		public boolean visit(final DoStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final ForStatement node) {
+		public boolean visit(final ForStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final EnhancedForStatement node) {
+		public boolean visit(final EnhancedForStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final SwitchStatement node) {
+		public boolean visit(final SwitchStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final AnonymousClassDeclaration node) {
+		public boolean visit(final AnonymousClassDeclaration visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final LambdaExpression node) {
+		public boolean visit(final LambdaExpression visited) {
 			return false;
 		}
 	}
@@ -191,38 +191,38 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 		}
 
 		@Override
-		public boolean visit(final ContinueStatement node) {
+		public boolean visit(final ContinueStatement visited) {
 			canBeRefactored= false;
 			return interruptVisit();
 		}
 
 		@Override
-		public boolean visit(final WhileStatement node) {
-			return root.equals(node);
+		public boolean visit(final WhileStatement visited) {
+			return root.equals(visited);
 		}
 
 		@Override
-		public boolean visit(final DoStatement node) {
+		public boolean visit(final DoStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final ForStatement node) {
+		public boolean visit(final ForStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final EnhancedForStatement node) {
+		public boolean visit(final EnhancedForStatement visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final AnonymousClassDeclaration node) {
+		public boolean visit(final AnonymousClassDeclaration visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final LambdaExpression node) {
+		public boolean visit(final LambdaExpression visited) {
 			return false;
 		}
 	}

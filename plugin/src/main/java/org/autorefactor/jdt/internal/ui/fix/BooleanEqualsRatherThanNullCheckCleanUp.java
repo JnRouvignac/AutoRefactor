@@ -55,16 +55,16 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
-			Expression leftOperand= node.getLeftOperand();
-			Expression rightOperand= node.getRightOperand();
+	public boolean visit(final InfixExpression visited) {
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+			Expression leftOperand= visited.getLeftOperand();
+			Expression rightOperand= visited.getRightOperand();
 
 			InfixExpression condition= ASTNodes.as(leftOperand, InfixExpression.class);
 			boolean isNullCheck= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
-			boolean isAndExpression= ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND);
+			boolean isAndExpression= ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND);
 
-			if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
+			if (!visited.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
 				Expression firstExpression= null;
 				if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)) {
@@ -86,7 +86,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
 				if (firstExpression != null && ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpression)
 						&& ASTNodes.match(firstExpression, secondExpression)) {
-					replaceNullCheck(node, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
+					replaceNullCheck(visited, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
 					return false;
 				}
 			}
@@ -95,7 +95,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 		return true;
 	}
 
-	private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
+	private void replaceNullCheck(final InfixExpression visited, final Expression firstExpression, final boolean isNullCheck,
 			final boolean isAndExpression, final boolean isPositiveExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -111,6 +111,6 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 			newExpression= ast.not(equalsMethod);
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, node, newExpression, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newExpression, group);
 	}
 }

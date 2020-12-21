@@ -63,19 +63,19 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final Block node) {
-		List<Statement> statements= node.statements();
+	public boolean visit(final Block visited) {
+		List<Statement> statements= visited.statements();
 
 		if (statements.size() == 1 && statements.get(0) instanceof Block) {
 			replaceBlock((Block) statements.get(0));
 			return false;
 		}
 
-		if (node.getParent() instanceof Block) {
-			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
+		if (visited.getParent() instanceof Block) {
+			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(visited, false);
 			Set<SimpleName> followingVariableNames= new HashSet<>();
 
-			for (Statement statement : ASTNodes.getNextSiblings(node)) {
+			for (Statement statement : ASTNodes.getNextSiblings(visited)) {
 				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 			}
 
@@ -87,47 +87,47 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			replaceBlock(node);
+			replaceBlock(visited);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void replaceBlock(final Block node) {
+	private void replaceBlock(final Block visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUselessBlockCleanUp_description);
 
-		List<Statement> statements= node.statements();
-		List<String> extraLeadingComments = collectExtraLeadingComments(node, statements);
+		List<Statement> statements= visited.statements();
+		List<String> extraLeadingComments = collectExtraLeadingComments(visited, statements);
 
 		for (String comment : extraLeadingComments) {
-			rewrite.insertBefore(ast.rawComment(comment), node, group);
+			rewrite.insertBefore(ast.rawComment(comment), visited, group);
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, node, ast.copyRange(statements), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ast.copyRange(statements), group);
 	}
 
 	/**
 	 * If statements starts on different line than block and comment starts on same line then block
 	 * the comment has to be copied manually (see #396)
 	 */
-	private List<String> collectExtraLeadingComments(Block node, List<Statement> statements) {
+	private List<String> collectExtraLeadingComments(Block visited, List<Statement> statements) {
 		List<String> comments = new ArrayList<>();
-		CompilationUnit cu = node.getRoot() instanceof CompilationUnit ? (CompilationUnit) node.getRoot() : null;
+		CompilationUnit cu = visited.getRoot() instanceof CompilationUnit ? (CompilationUnit) visited.getRoot() : null;
 
 		if (cu != null) {
 			int stmtStartPosition = statements.isEmpty()
-					? SourceLocation.getEndPosition(node) - 1
+					? SourceLocation.getEndPosition(visited) - 1
 					: statements.get(0).getStartPosition();
 			List<Comment> leadingComments = ASTComments.filterCommentsInRange(
-					node.getStartPosition() + 1,
+					visited.getStartPosition() + 1,
 					stmtStartPosition, cu);
 
 			try {
 				if (!leadingComments.isEmpty()) {
-					int lineNumberBlockStart = cu.getLineNumber(node.getStartPosition());
+					int lineNumberBlockStart = cu.getLineNumber(visited.getStartPosition());
 					String source = cu.getTypeRoot().getSource();
 
 					for (Comment comment : leadingComments) {

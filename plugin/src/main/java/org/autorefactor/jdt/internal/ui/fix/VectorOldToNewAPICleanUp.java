@@ -61,23 +61,23 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-			replaceWith(node, "get"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			replaceWith(node, "add"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-			replaceWithAndSwapArguments(node, "add"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
-			replaceWith(node, "toArray"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
-			replaceWith(node, "clear"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			replaceWithSpecial(node, "remove"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
-			replaceWith(node, "remove"); //$NON-NLS-1$
-		} else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-			replaceWithAndSwapArguments(node, "set"); //$NON-NLS-1$
+	public boolean visit(final MethodInvocation visited) {
+		if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWith(visited, "get"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWith(visited, "add"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWithAndSwapArguments(visited, "add"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWith(visited, "toArray"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+			replaceWith(visited, "clear"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+			replaceWithSpecial(visited, "remove"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWith(visited, "remove"); //$NON-NLS-1$
+		} else if (ASTNodes.usesGivenSignature(visited, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+			replaceWithAndSwapArguments(visited, "set"); //$NON-NLS-1$
 		} else {
 			return true;
 		}
@@ -85,41 +85,40 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private void replaceWith(final MethodInvocation node, final String newMethodName) {
+	private void replaceWith(final MethodInvocation visited, final String newMethodName) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
+		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 	}
 
-	private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
+	private void replaceWithSpecial(final MethodInvocation visited, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		List<Expression> args= node.arguments();
+		List<Expression> args= visited.arguments();
 		assertSize(args, 1);
 		Expression arg0= args.get(0);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
+		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
+
 		if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
 			ASTNodes.replaceButKeepComment(rewrite, arg0, ast.newCastExpression(ast.type(Object.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		}
 	}
 
-	private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
+	private void replaceWithAndSwapArguments(final MethodInvocation visited, final String newMethodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.VectorOldToNewAPICleanUp_description);
 
-		List<Expression> args= node.arguments();
+		List<Expression> args= visited.arguments();
 		assertSize(args, 2);
 		Expression arg1= args.get(1);
 
-		rewrite.set(node, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
+		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(newMethodName), group);
 		rewrite.moveToIndex(arg1, 0, ASTNodes.createMoveTarget(rewrite, arg1), group);
 	}
 
@@ -127,6 +126,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 		if (args == null) {
 			throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		if (args.size() != expectedSize) {
 			Expression node= !args.isEmpty() ? args.get(0) : null;
 			throw new IllegalArgumentException(node,

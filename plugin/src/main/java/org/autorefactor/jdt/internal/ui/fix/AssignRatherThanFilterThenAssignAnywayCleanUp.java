@@ -59,18 +59,18 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor();
-		ifAndReturnVisitor.visitNode(node);
+		ifAndReturnVisitor.visitNode(visited);
 		return ifAndReturnVisitor.result;
 	}
 
 	private final class IfAndReturnVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final IfStatement node) {
-			InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
-			Statement thenStatement= getThenStatement(node);
-			Statement elseStatement= getElseStatement(node, thenStatement);
+		public boolean visit(final IfStatement visited) {
+			InfixExpression condition= ASTNodes.as(visited.getExpression(), InfixExpression.class);
+			Statement thenStatement= getThenStatement(visited);
+			Statement elseStatement= getElseStatement(visited, thenStatement);
 
 			if (result && condition != null && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && !condition.hasExtendedOperands() && thenStatement != null && elseStatement != null) {
 				Assignment thenAssignment= ASTNodes.asExpression(thenStatement, Assignment.class);
@@ -79,7 +79,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
 				if (ASTNodes.hasOperator(thenAssignment, Assignment.Operator.ASSIGN) && ASTNodes.hasOperator(elseAssignment, Assignment.Operator.ASSIGN)
 						&& ASTNodes.match(thenAssignment.getLeftHandSide(), elseAssignment.getLeftHandSide())) {
-					return maybeReplaceWithStraightAssign(node, condition, thenAssignment, elseAssignment, isEqual);
+					return maybeReplaceWithStraightAssign(visited, condition, thenAssignment, elseAssignment, isEqual);
 				}
 
 				ReturnStatement thenRS= ASTNodes.as(thenStatement, ReturnStatement.class);
@@ -87,17 +87,17 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 
 				if (thenRS != null && elseRS != null) {
 					if (isEqual) {
-						return maybeReplaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
+						return maybeReplaceWithStraightReturn(visited, condition, elseRS, thenRS, elseRS);
 					}
 
-					return maybeReplaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
+					return maybeReplaceWithStraightReturn(visited, condition, thenRS, elseRS, elseRS);
 				}
 			}
 
 			return true;
 		}
 
-		private boolean maybeReplaceWithStraightAssign(final IfStatement node, final InfixExpression condition,
+		private boolean maybeReplaceWithStraightAssign(final IfStatement visited, final InfixExpression condition,
 				final Assignment thenAssignment, final Assignment elseAssignment, final boolean isEqual) {
 			Expression hardCodedExpression;
 			Assignment valuedAssignment;
@@ -114,7 +114,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 				if (ASTNodes.isPassiveWithoutFallingThrough(condition.getLeftOperand())
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getLeftOperand(), valuedAssignment.getRightHandSide())) {
-					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
+					replaceWithStraightAssign(visited, valuedAssignment.getLeftHandSide(), condition.getLeftOperand());
 					result= false;
 					return false;
 				}
@@ -122,7 +122,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 				if (ASTNodes.isPassiveWithoutFallingThrough(condition.getRightOperand())
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedExpression)
 						&& ASTNodes.match(condition.getRightOperand(), valuedAssignment.getRightHandSide())) {
-					replaceWithStraightAssign(node, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
+					replaceWithStraightAssign(visited, valuedAssignment.getLeftHandSide(), condition.getRightOperand());
 					result= false;
 					return false;
 				}
@@ -131,8 +131,8 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			return true;
 		}
 
-		private Statement getThenStatement(final IfStatement node) {
-			List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+		private Statement getThenStatement(final IfStatement visited) {
+			List<Statement> thenStatements= ASTNodes.asList(visited.getThenStatement());
 
 			if (thenStatements.size() == 1) {
 				return thenStatements.get(0);
@@ -141,36 +141,36 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			return null;
 		}
 
-		private Statement getElseStatement(final IfStatement node, final Statement thenStatement) {
-			List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+		private Statement getElseStatement(final IfStatement visited, final Statement thenStatement) {
+			List<Statement> elseStatements= ASTNodes.asList(visited.getElseStatement());
 
 			if (elseStatements.size() == 1) {
 				return elseStatements.get(0);
 			}
 
 			if (ASTNodes.is(thenStatement, ReturnStatement.class)) {
-				return ASTNodes.getNextSibling(node);
+				return ASTNodes.getNextSibling(visited);
 			}
 
 			return null;
 		}
 
-		private void replaceWithStraightAssign(final IfStatement node, final Expression leftHandSide, final Expression rightHandSide) {
+		private void replaceWithStraightAssign(final IfStatement visited, final Expression leftHandSide, final Expression rightHandSide) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
-			ASTNodes.replaceButKeepComment(rewrite, node,
+			ASTNodes.replaceButKeepComment(rewrite, visited,
 					ast.newExpressionStatement(ast.newAssignment(ASTNodes.createMoveTarget(rewrite, leftHandSide), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, rightHandSide))), group);
 		}
 
-		private boolean maybeReplaceWithStraightReturn(final IfStatement node, final InfixExpression condition, final ReturnStatement valuedReturn,
+		private boolean maybeReplaceWithStraightReturn(final IfStatement visited, final InfixExpression condition, final ReturnStatement valuedReturn,
 				final ReturnStatement hardCodedReturn, final Statement toRemove) {
 			if (ASTNodes.isHardCoded(hardCodedReturn.getExpression())) {
 				if (ASTNodes.isPassiveWithoutFallingThrough(condition.getLeftOperand())
 						&& ASTNodes.match(condition.getRightOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getLeftOperand(), valuedReturn.getExpression())) {
-					replaceWithStraightReturn(node, condition.getLeftOperand(), toRemove);
+					replaceWithStraightReturn(visited, condition.getLeftOperand(), toRemove);
 					result= false;
 					return false;
 				}
@@ -178,7 +178,7 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 				if (ASTNodes.isPassiveWithoutFallingThrough(condition.getRightOperand())
 						&& ASTNodes.match(condition.getLeftOperand(), hardCodedReturn.getExpression())
 						&& ASTNodes.match(condition.getRightOperand(), valuedReturn.getExpression())) {
-					replaceWithStraightReturn(node, condition.getRightOperand(), toRemove);
+					replaceWithStraightReturn(visited, condition.getRightOperand(), toRemove);
 					result= false;
 					return false;
 				}
@@ -187,13 +187,13 @@ public class AssignRatherThanFilterThenAssignAnywayCleanUp extends AbstractClean
 			return true;
 		}
 
-		private void replaceWithStraightReturn(final IfStatement node, final Expression returnedExpression, final Statement toRemove) {
+		private void replaceWithStraightReturn(final IfStatement visited, final Expression returnedExpression, final Statement toRemove) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanFilterThenAssignAnywayCleanUp_description);
 
 			rewrite.remove(toRemove, group);
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnedExpression)), group);
 		}
 	}
 }

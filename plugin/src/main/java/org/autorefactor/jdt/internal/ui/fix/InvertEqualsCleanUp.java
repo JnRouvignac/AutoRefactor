@@ -57,18 +57,18 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		if (node.getExpression() == null || ASTNodes.is(node.getExpression(), ThisExpression.class)) {
+	public boolean visit(final MethodInvocation visited) {
+		if (visited.getExpression() == null || ASTNodes.is(visited.getExpression(), ThisExpression.class)) {
 			return true;
 		}
 
-		if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
-			Expression expression= node.getExpression();
-			Expression arg0= (Expression) node.arguments().get(0);
+		if (ASTNodes.usesGivenSignature(visited, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
+			Expression expression= visited.getExpression();
+			Expression arg0= (Expression) visited.arguments().get(0);
 
 			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
-				invertEqualsInvocation(node, expression, arg0);
+				invertEqualsInvocation(visited, expression, arg0);
 				return false;
 			}
 		}
@@ -76,12 +76,12 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void invertEqualsInvocation(final MethodInvocation node, final Expression expression, final Expression arg0) {
+	private void invertEqualsInvocation(final MethodInvocation visited, final Expression expression, final Expression arg0) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.InvertEqualsCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, arg0)), group);
 		ASTNodes.replaceButKeepComment(rewrite, arg0, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(expression)), group);
 	}
 }

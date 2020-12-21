@@ -152,13 +152,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		private Collection<String> collectDeclaredLocalVariableNames() {
 			return new CollectorVisitor<String>() {
 				@Override
-				public boolean preVisit2(final ASTNode node) {
-					return !isTypeDeclaration(node);
+				public boolean preVisit2(final ASTNode visited) {
+					return !isTypeDeclaration(visited);
 				}
 
 				@Override
-				public boolean visit(final SimpleName node) {
-					IBinding binding= node.resolveBinding();
+				public boolean visit(final SimpleName visited) {
+					IBinding binding= visited.resolveBinding();
 					if (binding != null && binding.getKind() == IBinding.VARIABLE) {
 						addResult(binding.getName());
 					}
@@ -171,13 +171,13 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		private List<String> collectVariableNamesUsedAfter() {
 			return new CollectorVisitor<String>() {
 				@Override
-				public boolean preVisit2(final ASTNode node) {
-					return node.getStartPosition() > insertionPoint && !isTypeDeclaration(node);
+				public boolean preVisit2(final ASTNode visited) {
+					return visited.getStartPosition() > insertionPoint && !isTypeDeclaration(visited);
 				}
 
 				@Override
-				public boolean visit(final SimpleName node) {
-					IBinding binding= node.resolveBinding();
+				public boolean visit(final SimpleName visited) {
+					IBinding binding= visited.resolveBinding();
 					if (binding != null && binding.getKind() == IBinding.VARIABLE) {
 						addResult(binding.getName());
 					}
@@ -391,25 +391,25 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		}
 
 		@Override
-		public boolean visit(final MethodInvocation node) {
-			if (isSameReference(node.getExpression(), mapExpression)
-					&& ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-					&& ASTNodes.isSameVariable((Expression) node.arguments().get(0), forEachParameter.getName())) {
-				addResult(node);
+		public boolean visit(final MethodInvocation visited) {
+			if (isSameReference(visited.getExpression(), mapExpression)
+					&& ASTNodes.usesGivenSignature(visited, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+					&& ASTNodes.isSameVariable((Expression) visited.arguments().get(0), forEachParameter.getName())) {
+				addResult(visited);
 			}
 
 			return true;
 		}
 
-		private boolean isSameReference(final Expression expr1, final Expression expr2) {
-			if (expr1 == null || expr2 == null) {
+		private boolean isSameReference(final Expression expression1, final Expression expression2) {
+			if (expression1 == null || expression2 == null) {
 				return false;
 			}
-			if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
-				return ASTNodes.isSameVariable(expr1, expr2);
+			if (expression1.getNodeType() != ASTNode.METHOD_INVOCATION || expression2.getNodeType() != ASTNode.METHOD_INVOCATION) {
+				return ASTNodes.isSameVariable(expression1, expression2);
 			}
-			MethodInvocation mi1= (MethodInvocation) expr1;
-			MethodInvocation mi2= (MethodInvocation) expr2;
+			MethodInvocation mi1= (MethodInvocation) expression1;
+			MethodInvocation mi2= (MethodInvocation) expression2;
 			return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
 					&& isSameReference(mi1.getExpression(), mi2.getExpression());
 		}

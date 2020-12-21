@@ -77,73 +77,73 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final AnnotationTypeDeclaration node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final AnnotationTypeDeclaration visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final EnumDeclaration node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final EnumDeclaration visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final FieldDeclaration node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final FieldDeclaration visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final Initializer node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final Initializer visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final MethodDeclaration node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final MethodDeclaration visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final TypeDeclaration node) {
-		return visit((BodyDeclaration) node);
+	public boolean visit(final TypeDeclaration visited) {
+		return visit((BodyDeclaration) visited);
 	}
 
-	private boolean visit(final BodyDeclaration node) {
-		BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
-		ASTNode parent= node.getParent();
+	private boolean visit(final BodyDeclaration visited) {
+		BodyDeclaration nextSibling= ASTNodes.getNextSibling(visited);
+		ASTNode parent= visited.getParent();
 
 		if (nextSibling != null) {
-			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
+			return maybeRemoveSuperfluousSemiColons(visited, SourceLocation.getEndPosition(visited), nextSibling.getStartPosition());
 		}
 
 		if (parent instanceof AbstractTypeDeclaration) {
 			AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
-			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
+			return maybeRemoveSuperfluousSemiColons(visited, SourceLocation.getEndPosition(visited), SourceLocation.getEndPosition(typeDecl) - 1);
 		}
 
 		if (parent instanceof AnonymousClassDeclaration) {
 			AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
-			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
+			return maybeRemoveSuperfluousSemiColons(visited, SourceLocation.getEndPosition(visited), SourceLocation.getEndPosition(classDecl) - 1);
 		}
 
 		if (parent instanceof CompilationUnit) {
 			CompilationUnit cu= (CompilationUnit) parent;
-			return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
+			return maybeRemoveSuperfluousSemiColons(visited, SourceLocation.getEndPosition(visited), SourceLocation.getEndPosition(cu) - 1);
 		}
 
 		if (parent instanceof TypeDeclarationStatement) {
 			return true;
 		}
 
-		throw new NotImplementedException(node,
+		throw new NotImplementedException(visited,
 				"for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
 	}
 
-	private boolean maybeRemoveSuperfluousSemiColons(final ASTNode node, final int start, final int end) {
+	private boolean maybeRemoveSuperfluousSemiColons(final ASTNode visited, final int start, final int end) {
 		if (end <= start) {
 			return true;
 		}
 
 		boolean result= true;
-		Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
+		Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(visited, start, end);
 
 		for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
 			String s= entry.getKey();
@@ -162,11 +162,12 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 		return result;
 	}
 
-	private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode node, final int start, final int end) {
-		List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
+	private Map<String, SourceLocation> getNonCommentsStrings(final ASTNode visited, final int start, final int end) {
+		List<Comment> comments= filterCommentsInRange(start, end, visited.getRoot());
 
-		String source= cuRewrite.getSource(node);
+		String source= cuRewrite.getSource(visited);
 		Map<String, SourceLocation> results= new LinkedHashMap<>();
+
 		if (comments.isEmpty()) {
 			putResult(source, start, end, results);
 		} else {
@@ -197,13 +198,15 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final TryStatement node) {
-		List<VariableDeclarationExpression> resources= node.resources();
+	public boolean visit(final TryStatement visited) {
+		List<VariableDeclarationExpression> resources= visited.resources();
+
 		if (resources.isEmpty()) {
 			return true;
 		}
+
 		VariableDeclarationExpression lastResource= resources.get(resources.size() - 1);
-		Block body= node.getBody();
-		return maybeRemoveSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
+		Block body= visited.getBody();
+		return maybeRemoveSuperfluousSemiColons(visited, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
 	}
 }

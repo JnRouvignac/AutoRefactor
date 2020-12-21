@@ -56,20 +56,20 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
-			Expression leftOperand= node.getLeftOperand();
-			Expression rightOperand= node.getRightOperand();
+	public boolean visit(final InfixExpression visited) {
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.PLUS)) {
+			Expression leftOperand= visited.getLeftOperand();
+			Expression rightOperand= visited.getRightOperand();
 
-			return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
+			return maybeReplaceStringConcatenation(visited, leftOperand, rightOperand)
 					// If not replaced then try the other way round
-					&& maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
+					&& maybeReplaceStringConcatenation(visited, rightOperand, leftOperand);
 		}
 
 		return true;
 	}
 
-	private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expression,
+	private boolean maybeReplaceStringConcatenation(final InfixExpression visited, final Expression expression,
 			final Expression variable) {
 		StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
 
@@ -81,15 +81,15 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
 			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
 
-			if (node.hasExtendedOperands()) {
-				List<Expression> extendedOperands= node.extendedOperands();
+			if (visited.hasExtendedOperands()) {
+				List<Expression> extendedOperands= visited.extendedOperands();
 				List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
 				newOperands.add(newInvoke);
 				newOperands.addAll(ASTNodes.createMoveTarget(rewrite, extendedOperands));
 
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newInfixExpression(InfixExpression.Operator.PLUS, newOperands), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newInfixExpression(InfixExpression.Operator.PLUS, newOperands), group);
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, node, newInvoke, group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, newInvoke, group);
 			}
 
 			return false;

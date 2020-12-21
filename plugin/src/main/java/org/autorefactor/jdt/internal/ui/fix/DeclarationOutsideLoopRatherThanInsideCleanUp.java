@@ -68,8 +68,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 	}
 
 	@Override
-	public boolean visit(final Block node) {
-		List<Statement> blockStatement= ASTNodes.asList(node);
+	public boolean visit(final Block visited) {
+		List<Statement> blockStatement= ASTNodes.asList(visited);
 		boolean result= true;
 
 		List<Statement> forStatements;

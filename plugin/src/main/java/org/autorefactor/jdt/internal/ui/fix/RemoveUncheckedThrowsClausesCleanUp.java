@@ -55,14 +55,15 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 	}
 
 	@Override
-	public boolean visit(final MethodDeclaration node) {
-		Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
+	public boolean visit(final MethodDeclaration visited) {
+		Collection<ASTNode> nodesToRemove= getUncheckedExceptions(visited);
+
 		if (!nodesToRemove.isEmpty()) {
-			for (ASTNode n : nodesToRemove) {
+			for (ASTNode node : nodesToRemove) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUncheckedThrowsClausesCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				ASTNodes.replaceButKeepComment(rewrite, n, null, group);
+				ASTNodes.replaceButKeepComment(rewrite, node, null, group);
 			}
 
 			return false;
@@ -80,9 +81,10 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 	 *                                          this method is replaced by
 	 *                                          {@link MethodDeclaration#thrownExceptionTypes}.
 	 */
-	private Collection<ASTNode> getUncheckedExceptions(final MethodDeclaration node) {
+	private Collection<ASTNode> getUncheckedExceptions(final MethodDeclaration visited) {
 		List<ASTNode> result= new ArrayList<>();
-		for (Type n : (List<Type>) node.thrownExceptionTypes()) {
+
+		for (Type n : (List<Type>) visited.thrownExceptionTypes()) {
 			if (isUnchecked(n)) {
 				result.add(n);
 			}

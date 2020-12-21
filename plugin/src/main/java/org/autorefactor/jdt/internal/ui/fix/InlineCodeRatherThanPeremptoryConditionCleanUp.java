@@ -63,35 +63,35 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor();
-		ifAndFollowingCodeVisitor.visitNode(node);
+		ifAndFollowingCodeVisitor.visitNode(visited);
 		return ifAndFollowingCodeVisitor.result;
 	}
 
 	private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final TryStatement node) {
-			if (result && node.resources().isEmpty()) {
-				List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+		public boolean visit(final TryStatement visited) {
+			if (result && visited.resources().isEmpty()) {
+				List<Statement> tryStatements= ASTNodes.asList(visited.getBody());
 
 				if (tryStatements.isEmpty()) {
-					List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
+					List<Statement> finallyStatements= ASTNodes.asList(visited.getFinally());
 
 					if (!finallyStatements.isEmpty()) {
-						return maybeInlineBlock(node, node.getFinally());
+						return maybeInlineBlock(visited, visited.getFinally());
 					}
 
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
-					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(node, group);
+					if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+						rewrite.remove(visited, group);
 					} else {
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-						ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+						ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 					}
 
 					result= false;
@@ -103,32 +103,32 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		}
 
 		@Override
-		public boolean visit(final IfStatement node) {
+		public boolean visit(final IfStatement visited) {
 			if (result) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 
-				Statement thenStatement= node.getThenStatement();
-				Statement elseStatement= node.getElseStatement();
-				Expression condition= node.getExpression();
+				Statement thenStatement= visited.getThenStatement();
+				Statement elseStatement= visited.getElseStatement();
+				Expression condition= visited.getExpression();
 
 				Object constantCondition= peremptoryValue(condition);
 
 				if (Boolean.TRUE.equals(constantCondition)) {
-					return maybeInlineBlock(node, thenStatement);
+					return maybeInlineBlock(visited, thenStatement);
 				}
 
 				if (Boolean.FALSE.equals(constantCondition)) {
 					if (elseStatement != null) {
-						return maybeInlineBlock(node, elseStatement);
+						return maybeInlineBlock(visited, elseStatement);
 					}
 
-					if (ASTNodes.canHaveSiblings(node) || node.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(node, group);
+					if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+						rewrite.remove(visited, group);
 					} else {
 						ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-						ASTNodes.replaceButKeepComment(rewrite, node, ast.newBlock(), group);
+						ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 					}
 
 					result= false;
@@ -139,10 +139,10 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			return true;
 		}
 
-		private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
+		private boolean maybeInlineBlock(final Statement visited, final Statement unconditionnalStatement) {
 			if (ASTNodes.fallsThrough(unconditionnalStatement)) {
-				replaceBlockByPlainCode(node, unconditionnalStatement);
-				removeForwardCode(node, unconditionnalStatement);
+				replaceBlockByPlainCode(visited, unconditionnalStatement);
+				removeForwardCode(visited, unconditionnalStatement);
 				result= false;
 				return false;
 			}
@@ -150,7 +150,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 			Set<SimpleName> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
 			Set<SimpleName> followingVariableNames= new HashSet<>();
 
-			for (Statement statement : ASTNodes.getNextSiblings(node)) {
+			for (Statement statement : ASTNodes.getNextSiblings(visited)) {
 				followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 			}
 
@@ -162,7 +162,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 				}
 			}
 
-			replaceBlockByPlainCode(node, unconditionnalStatement);
+			replaceBlockByPlainCode(visited, unconditionnalStatement);
 			result= false;
 			return false;
 		}

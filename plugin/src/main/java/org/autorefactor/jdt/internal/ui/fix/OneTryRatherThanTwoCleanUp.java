@@ -59,8 +59,8 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final TryStatement node) {
-		List<Statement> tryStatements= ASTNodes.asList(node.getBody());
+	public boolean visit(final TryStatement visited) {
+		List<Statement> tryStatements= ASTNodes.asList(visited.getBody());
 
 		if (!tryStatements.isEmpty()) {
 			TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
@@ -69,7 +69,7 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 					&& !innerTryStatement.resources().isEmpty()
 					&& innerTryStatement.getFinally() == null
 					&& innerTryStatement.catchClauses().isEmpty()) {
-				collapseTryStatements(node, innerTryStatement);
+				collapseTryStatements(visited, innerTryStatement);
 				return false;
 			}
 		}
@@ -78,12 +78,12 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void collapseTryStatements(final TryStatement node, final TryStatement innerTryStatement) {
+	private void collapseTryStatements(final TryStatement visited, final TryStatement innerTryStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.OneTryRatherThanTwoCleanUp_description);
 
-		rewrite.insertLast(node, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
+		rewrite.insertLast(visited, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
 		List<Statement> innerStatements= ASTNodes.asList(innerTryStatement.getBody());
 
 		if (innerStatements == null || innerStatements.isEmpty()) {

@@ -72,8 +72,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	// TODO also handle ternary operator, ConditionalExpression
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		if (node.getElseStatement() == null) {
+	public boolean visit(final IfStatement visited) {
+		if (visited.getElseStatement() == null) {
 			return true;
 		}
 
@@ -81,7 +81,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		List<List<Statement>> allCasesStatements= new ArrayList<>();
 
 		// Collect all the if / else if / else if / ... / else cases
-		if (collectAllCases(allCasesStatements, node, allCases)) {
+		if (collectAllCases(allCasesStatements, visited, allCases)) {
 			List<Statement>[] caseStmtsToRemove= new List[allCasesStatements.size()];
 
 			// Initialize caseStmtsToRemove list
@@ -107,8 +107,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				flagStmtsToRemove(allCasesStatements, stmtIndex, caseStmtsToRemove, casesToRefactor);
 			}
 
-			if (!hasVariableConflict(node, caseStmtsToRemove)) {
-				removeIdenticalTrailingCode(node, allCases, allCasesStatements, caseStmtsToRemove, casesToRefactor);
+			if (!hasVariableConflict(visited, caseStmtsToRemove)) {
+				removeIdenticalTrailingCode(visited, allCases, allCasesStatements, caseStmtsToRemove, casesToRefactor);
 				return false;
 			}
 		}
@@ -177,7 +177,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	private void removeIdenticalTrailingCode(final IfStatement node, final List<ASTNode> allCases,
+	private void removeIdenticalTrailingCode(final IfStatement visited, final List<ASTNode> allCases,
 			final List<List<Statement>> allCasesStatements, final List<Statement>[] caseStmtsToRemove, final List<Integer> casesToRefactor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -190,10 +190,10 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		List<Statement> oneCaseToRemove= caseStmtsToRemove[casesToRefactor.get(0)];
 
 		if (allRemovable(areCasesRemovable, 0)) {
-			if (ASTNodes.canHaveSiblings(node)) {
-				insertIdenticalCode(node, oneCaseToRemove);
+			if (ASTNodes.canHaveSiblings(visited)) {
+				insertIdenticalCode(visited, oneCaseToRemove);
 
-				rewrite.removeButKeepComment(node, group);
+				rewrite.removeButKeepComment(visited, group);
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
 				for (Statement stmtToRemove : oneCaseToRemove) {
@@ -201,7 +201,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				}
 				Block newBlock= ast.newBlock();
 				newBlock.statements().addAll(orderedStatements);
-				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 			}
 		} else {
 			// Remove empty cases
@@ -227,17 +227,17 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			if (ASTNodes.canHaveSiblings(node)) {
-				insertIdenticalCode(node, oneCaseToRemove);
+			if (ASTNodes.canHaveSiblings(visited)) {
+				insertIdenticalCode(visited, oneCaseToRemove);
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size() + 1);
 				for (Statement stmtToRemove : oneCaseToRemove) {
 					orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, stmtToRemove));
 				}
-				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+				orderedStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 				Block newBlock= ast.newBlock();
 				newBlock.statements().addAll(orderedStatements);
-				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 			}
 		}
 	}

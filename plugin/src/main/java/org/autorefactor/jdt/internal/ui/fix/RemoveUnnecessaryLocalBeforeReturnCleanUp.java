@@ -65,17 +65,17 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor();
-		returnStatementVisitor.visitNode(node);
+		returnStatementVisitor.visitNode(visited);
 		return returnStatementVisitor.result;
 	}
 
 	private final class ReturnStatementVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final ReturnStatement node) {
+		public boolean visit(final ReturnStatement visited) {
 			if (result) {
-				Statement previousSibling= ASTNodes.getPreviousSibling(node);
+				Statement previousSibling= ASTNodes.getPreviousSibling(visited);
 
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -84,26 +84,28 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 					VariableDeclarationStatement variableDeclarationStatement= (VariableDeclarationStatement) previousSibling;
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(variableDeclarationStatement);
 
-					if (fragment != null && ASTNodes.isSameLocalVariable(node.getExpression(), fragment.getName())) {
+					if (fragment != null && ASTNodes.isSameLocalVariable(visited.getExpression(), fragment.getName())) {
 						Expression returnExpression= fragment.getInitializer();
+
 						if (returnExpression instanceof ArrayInitializer) {
-							if (!removeArrayVariable(node, variableDeclarationStatement, (ArrayInitializer) returnExpression)) {
+							if (!removeArrayVariable(visited, variableDeclarationStatement, (ArrayInitializer) returnExpression)) {
 								return true;
 							}
 						} else {
-							replaceReturnStatement(node, variableDeclarationStatement, returnExpression);
+							replaceReturnStatement(visited, variableDeclarationStatement, returnExpression);
 						}
+
 						result= false;
 						return false;
 					}
 				} else {
-					Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
+					Assignment assignment= ASTNodes.asExpression(previousSibling, Assignment.class);
 
-					if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
-							&& as.getLeftHandSide() instanceof Name
-							&& !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
-									node)) {
-						replaceReturnStatement(node, previousSibling, as.getRightHandSide());
+					if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(visited.getExpression(), assignment.getLeftHandSide())
+							&& assignment.getLeftHandSide() instanceof Name
+							&& !isUsedAfterReturn((IVariableBinding) ((Name) assignment.getLeftHandSide()).resolveBinding(),
+									visited)) {
+						replaceReturnStatement(visited, previousSibling, assignment.getRightHandSide());
 						result= false;
 						return false;
 					}
@@ -131,7 +133,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 			return isUsedAfterReturn(varToSearch, tryStatement);
 		}
 
-		private boolean removeArrayVariable(final ReturnStatement node, final VariableDeclarationStatement variableDeclarationStatement, final ArrayInitializer returnExpression) {
+		private boolean removeArrayVariable(final ReturnStatement visited, final VariableDeclarationStatement variableDeclarationStatement, final ArrayInitializer returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
@@ -147,34 +149,34 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				// Java style array "Type[] var"
 				ReturnStatement newReturnStatement= ast
 						.newReturnStatement(ast.newArrayCreation(ast.createCopyTarget(arrayType), ASTNodes.createMoveTarget(rewrite, returnExpression)));
-				replaceReturnStatementForArray(node, variableDeclarationStatement, newReturnStatement);
+				replaceReturnStatementForArray(visited, variableDeclarationStatement, newReturnStatement);
 			} else {
 				// C style array "Type var[]"
-				ArrayType arrayType= node.getAST().newArrayType(ast.createCopyTarget(variableDeclarationStatement.getType()), varDeclFrag.getExtraDimensions());
+				ArrayType arrayType= visited.getAST().newArrayType(ast.createCopyTarget(variableDeclarationStatement.getType()), varDeclFrag.getExtraDimensions());
 				ReturnStatement newReturnStatement= ast
 						.newReturnStatement(ast.newArrayCreation(arrayType, ASTNodes.createMoveTarget(rewrite, returnExpression)));
-				replaceReturnStatementForArray(node, variableDeclarationStatement, newReturnStatement);
+				replaceReturnStatementForArray(visited, variableDeclarationStatement, newReturnStatement);
 			}
 
 			return true;
 		}
 
-		private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
+		private void replaceReturnStatementForArray(final ReturnStatement visited, final Statement previousSibling,
 				final ReturnStatement newReturnStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 			rewrite.remove(previousSibling, group);
-			ASTNodes.replaceButKeepComment(rewrite, node, newReturnStatement, group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, newReturnStatement, group);
 		}
 
-		private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
+		private void replaceReturnStatement(final ReturnStatement visited, final Statement previousSibling,
 				final Expression returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			rewrite.remove(previousSibling, group);
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);
 		}
 	}
 }

@@ -59,18 +59,18 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 	}
 
 	@Override
-	public boolean visit(final ExpressionStatement node) {
-		if (!(node.getExpression() instanceof MethodInvocation)) {
+	public boolean visit(final ExpressionStatement visited) {
+		if (!(visited.getExpression() instanceof MethodInvocation)) {
 			return true;
 		}
 
-		MethodInvocation originalMethod= (MethodInvocation) node.getExpression();
+		MethodInvocation originalMethod= (MethodInvocation) visited.getExpression();
 
-		return maybeRefactorAssertion(node, originalMethod, "assertTrue", InfixExpression.Operator.CONDITIONAL_AND) //$NON-NLS-1$
-				&& maybeRefactorAssertion(node, originalMethod, "assertFalse", InfixExpression.Operator.CONDITIONAL_OR); //$NON-NLS-1$
+		return maybeRefactorAssertion(visited, originalMethod, "assertTrue", InfixExpression.Operator.CONDITIONAL_AND) //$NON-NLS-1$
+				&& maybeRefactorAssertion(visited, originalMethod, "assertFalse", InfixExpression.Operator.CONDITIONAL_OR); //$NON-NLS-1$
 	}
 
-	private boolean maybeRefactorAssertion(final ExpressionStatement node, final MethodInvocation originalMethod,
+	private boolean maybeRefactorAssertion(final ExpressionStatement visited, final MethodInvocation originalMethod,
 			final String methodName, final InfixExpression.Operator operator) {
 		if (ASTNodes.usesGivenSignature(originalMethod, "org.junit.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "junit.framework.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
@@ -78,18 +78,18 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				|| ASTNodes.usesGivenSignature(originalMethod, "org.junit.jupiter.api.Assertions", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "org.testng.Assert", methodName, boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$
-			return maybeRefactorMethod(node, originalMethod, operator, 0);
+			return maybeRefactorMethod(visited, originalMethod, operator, 0);
 		}
 
 		if (ASTNodes.usesGivenSignature(originalMethod, "org.junit.Assert", methodName, String.class.getCanonicalName(), boolean.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(originalMethod, "junit.framework.Assert", methodName, String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
-			return maybeRefactorMethod(node, originalMethod, operator, 1);
+			return maybeRefactorMethod(visited, originalMethod, operator, 1);
 		}
 
 		return true;
 	}
 
-	private boolean maybeRefactorMethod(final ExpressionStatement node, final MethodInvocation originalMethod,
+	private boolean maybeRefactorMethod(final ExpressionStatement visited, final MethodInvocation originalMethod,
 			final InfixExpression.Operator operator, final int parameterIndex) {
 		InfixExpression booleanExpression= ASTNodes.as((Expression) originalMethod.arguments().get(parameterIndex), InfixExpression.class);
 
@@ -123,18 +123,18 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				expressionStatements.add(newStatement);
 			}
 
-			if (ASTNodes.canHaveSiblings(node)) {
+			if (ASTNodes.canHaveSiblings(visited)) {
 				Collections.reverse(expressionStatements);
 
 				for (Statement expressionStatement : expressionStatements) {
-					rewrite.insertAfter(expressionStatement, node, group);
+					rewrite.insertAfter(expressionStatement, visited, group);
 				}
 			} else {
-				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 				Block newBlock1= ast.newBlock();
 				newBlock1.statements().addAll((Collection<Statement>) expressionStatements);
 				Block newBlock= newBlock1;
-				ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 			}
 
 			return false;

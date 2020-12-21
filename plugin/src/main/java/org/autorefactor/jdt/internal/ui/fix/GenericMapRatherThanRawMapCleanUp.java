@@ -114,10 +114,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		keyType= null;
 		valueType= null;
-		return super.visit(node);
+		return super.visit(visited);
 	}
 
 	@Override

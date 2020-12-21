@@ -53,8 +53,8 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final WhileStatement node) {
-		List<Statement> whileStatements= ASTNodes.asList(node.getBody());
+	public boolean visit(final WhileStatement visited) {
+		List<Statement> whileStatements= ASTNodes.asList(visited.getBody());
 
 		if (whileStatements.isEmpty()) {
 			return true;
@@ -62,7 +62,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
 		List<Statement> previousStatements= new ArrayList<>(whileStatements.size());
 
-		Statement previousStatement= ASTNodes.getPreviousSibling(node);
+		Statement previousStatement= ASTNodes.getPreviousSibling(visited);
 		int i= whileStatements.size() - 1;
 		while (i >= 0) {
 			if (previousStatement == null || !ASTNodes.match(previousStatement, whileStatements.get(i))) {
@@ -73,17 +73,17 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 			previousStatement= ASTNodes.getPreviousSibling(previousStatement);
 		}
 
-		replaceWithDoWhile(node, previousStatements);
+		replaceWithDoWhile(visited, previousStatements);
 		return false;
 	}
 
-	private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
+	private void replaceWithDoWhile(final WhileStatement visited, final List<Statement> previousStatements) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoWhileRatherThanDuplicateCodeCleanUp_description);
 		rewrite.remove(previousStatements, group);
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		ASTNodes.replaceButKeepComment(rewrite, node, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getExpression())), ASTNodes.createMoveTarget(rewrite, visited.getBody())), group);
 	}
 }

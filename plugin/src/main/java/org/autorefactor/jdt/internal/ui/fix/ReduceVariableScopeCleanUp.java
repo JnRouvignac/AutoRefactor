@@ -190,82 +190,96 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 	private static final Pair<Integer, ASTNode> NULL_PAIR= Pair.of(0, null);
 
 	@Override
-	public boolean visit(final SimpleName node) {
-		findVariableAccesses(node);
+	public boolean visit(final SimpleName visited) {
+		findVariableAccesses(visited);
 		return true;
 	}
 
 	@Override
-	public boolean visit(final QualifiedName node) {
-		findVariableAccesses(node);
+	public boolean visit(final QualifiedName visited) {
+		findVariableAccesses(visited);
 		return true;
 	}
 
-	private void findVariableAccesses(final Name node) {
-		Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(node);
+	private void findVariableAccesses(final Name visited) {
+		Pair<Integer, ASTNode> accessTypeAndScope= getAccessTypeAndScope(visited);
+
 		if (accessTypeAndScope.getFirst().intValue() != 0) {
-			VariableName varName= new VariableName(node);
+			VariableName varName= new VariableName(visited);
 			List<VariableAccess> list= this.allVariableAccesses.get(varName);
+
 			if (list == null) {
 				list= new ArrayList<>();
 				this.allVariableAccesses.put(varName, list);
 			}
+
 			if (list.isEmpty() || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
 				// Only keep first write in scope
-				list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
+				list.add(new VariableAccess(visited, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
 			}
 		}
 	}
 
-	private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode node) {
-		ASTNode parent= node.getParent();
+	private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode visited) {
+		ASTNode parent= visited.getParent();
+
 		if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
 				|| parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
 				|| parent instanceof WhileStatement) {
 			return getAccessTypeAndScope(parent);
 		}
+
 		if (parent instanceof ImportDeclaration || parent instanceof MethodDeclaration
 				|| parent instanceof MethodInvocation || parent instanceof PackageDeclaration || parent instanceof Type
 				|| parent instanceof TypeDeclaration) {
 			return NULL_PAIR;
 		}
+
 		if (parent instanceof SingleVariableDeclaration) {
 			SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
 			return getAccessTypeAndScope(var.getParent());
 		}
+
 		if (parent instanceof VariableDeclarationFragment) {
 			VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
 			return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL, getScope(var));
 		}
+
 		if (parent instanceof Assignment) {
 			return Pair.of(WRITE, getScope(parent.getParent()));
 		}
+
 		if (parent instanceof InfixExpression) {
 			return Pair.of(READ, getScope(parent.getParent()));
 		}
+
 		if (parent instanceof PostfixExpression) {
 			return Pair.of(READ | WRITE, getScope(parent.getParent()));
 		}
+
 		throw new NotImplementedException(parent);
 	}
 
-	private ASTNode getScope(final ASTNode node) {
-		if (node instanceof Block || node instanceof EnhancedForStatement || node instanceof ForStatement
-				|| node instanceof IfStatement || node instanceof WhileStatement) {
-			return node;
+	private ASTNode getScope(final ASTNode visited) {
+		if (visited instanceof Block || visited instanceof EnhancedForStatement || visited instanceof ForStatement
+				|| visited instanceof IfStatement || visited instanceof WhileStatement) {
+			return visited;
 		}
-		if (node instanceof Expression || node instanceof Statement || node instanceof VariableDeclaration) {
-			return getScope(node.getParent());
+
+		if (visited instanceof Expression || visited instanceof Statement || visited instanceof VariableDeclaration) {
+			return getScope(visited.getParent());
 		}
-		throw new NotImplementedException(node);
+
+		throw new NotImplementedException(visited);
 	}
 
 	@Override
 	public ASTRewrite getRefactorings(final CompilationUnit astRoot) {
 		astRoot.accept(this);
 
-		for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
+		for (Entry<VariableName, List<VariableAccess>> entry : allVariableAccesses.entrySet()) {
 			List<VariableAccess> variableAccesses= entry.getValue();
+
 			if (canReduceVariableScope(variableAccesses)) {
 				VariableAccess varDecl= variableAccesses.get(0);
 				remove(varDecl.getVariableName());

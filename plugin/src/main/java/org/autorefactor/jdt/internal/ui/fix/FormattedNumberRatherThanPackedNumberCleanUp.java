@@ -65,47 +65,47 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 	}
 
 	@Override
-	public boolean visit(final NumberLiteral node) {
-		ASTNode parent= node.getParent();
-		String token= node.getToken();
+	public boolean visit(final NumberLiteral visited) {
+		ASTNode parent= visited.getParent();
+		String token= visited.getToken();
 
 		if (parent instanceof MethodInvocation && token.matches("^\\d{4,}[lLdDfF]?$")) { //$NON-NLS-1$
 			MethodInvocation methodInvocation= (MethodInvocation) parent;
 
-			if (isInSignature(0, node, methodInvocation, Thread.class, "join", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Thread.class, "join", long.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Thread.class, "sleep", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Thread.class, "sleep", long.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(3, node, methodInvocation, LocalTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalTime.class, "ofNanoOfDay", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(6, node, methodInvocation, LocalDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(1, node, methodInvocation, LocalDateTime.class, "ofEpochSecond", long.class.getCanonicalName(), int.class.getCanonicalName(), ZoneOffset.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LocalDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(5, node, methodInvocation, SimpleTimeZone.class, "getOffset", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, SimpleTimeZone.class, "setDSTSavings", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, SimpleTimeZone.class, "setRawOffset", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, TimeUnit.class, "sleep", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Instant.class, "minusMillis", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Instant.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Instant.class, "ofEpochMilli", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Instant.class, "plusMillis", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, Instant.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, OffsetDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(6, node, methodInvocation, OffsetDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(),   ZoneOffset.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, OffsetDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, OffsetDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, LogRecord.class, "setMillis", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, ZonedDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(6, node, methodInvocation, ZonedDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(),   ZoneId.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, ZonedDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, ZonedDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
-					|| isInSignature(0, node, methodInvocation, FileTime.class, "fromMillis", long.class.getCanonicalName())) { //$NON-NLS-1$
-				refactorNumber(node, token);
+			if (isInSignature(0, visited, methodInvocation, Thread.class, "join", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Thread.class, "join", long.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Thread.class, "sleep", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Thread.class, "sleep", long.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(3, visited, methodInvocation, LocalTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalTime.class, "ofNanoOfDay", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(6, visited, methodInvocation, LocalDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(1, visited, methodInvocation, LocalDateTime.class, "ofEpochSecond", long.class.getCanonicalName(), int.class.getCanonicalName(), ZoneOffset.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LocalDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(5, visited, methodInvocation, SimpleTimeZone.class, "getOffset", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, SimpleTimeZone.class, "setDSTSavings", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, SimpleTimeZone.class, "setRawOffset", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, TimeUnit.class, "sleep", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Instant.class, "minusMillis", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Instant.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Instant.class, "ofEpochMilli", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Instant.class, "plusMillis", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, Instant.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, OffsetDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(6, visited, methodInvocation, OffsetDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(),   ZoneOffset.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, OffsetDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, OffsetDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, LogRecord.class, "setMillis", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, ZonedDateTime.class, "minusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(6, visited, methodInvocation, ZonedDateTime.class, "of", int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(), int.class.getCanonicalName(),   ZoneId.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, ZonedDateTime.class, "plusNanos", long.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, ZonedDateTime.class, "withNano", int.class.getCanonicalName()) //$NON-NLS-1$
+					|| isInSignature(0, visited, methodInvocation, FileTime.class, "fromMillis", long.class.getCanonicalName())) { //$NON-NLS-1$
+				refactorNumber(visited, token);
 				return false;
 			}
 		}
@@ -113,7 +113,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		return true;
 	}
 
-	private void refactorNumber(final NumberLiteral node, final String token) {
+	private void refactorNumber(final NumberLiteral visited, final String token) {
 		StringBuilder integers= new StringBuilder(token.replaceFirst("^(\\d{4,})[lLdDfF]?$", "$1")); //$NON-NLS-1$ //$NON-NLS-2$
 		String suffix= token.replaceFirst("^\\d{4,}([lLdDfF]?)$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -129,14 +129,14 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		ASTNodes.replaceButKeepComment(rewrite, node, replacement, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, replacement, group);
 	}
 
-	private boolean isInSignature(final int position, final NumberLiteral node, final MethodInvocation methodInvocation,
+	private boolean isInSignature(final int position, final NumberLiteral visited, final MethodInvocation methodInvocation,
 			final Class<?> typeQualifiedName, final String methodName, final String... parameterTypesQualifiedNames) {
 		return ASTNodes.usesGivenSignature(methodInvocation, typeQualifiedName.getCanonicalName(), methodName, parameterTypesQualifiedNames)
-				&& node.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY
+				&& visited.getLocationInParent() == MethodInvocation.ARGUMENTS_PROPERTY
 				&& methodInvocation.arguments().size() > position
-				&& node.equals(methodInvocation.arguments().get(position));
+				&& visited.equals(methodInvocation.arguments().get(position));
 	}
 }

@@ -54,25 +54,25 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-			BooleanLiteral literal= ASTNodes.as((Expression) node.arguments().get(0), BooleanLiteral.class);
+	public boolean visit(final MethodInvocation visited) {
+		if (ASTNodes.usesGivenSignature(visited, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
+			BooleanLiteral literal= ASTNodes.as((Expression) visited.arguments().get(0), BooleanLiteral.class);
 
 			if (literal != null) {
-				replaceMethod(node, literal.booleanValue());
+				replaceMethod(visited, literal.booleanValue());
 				return false;
 			}
-		} else if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
-			StringLiteral literal= ASTNodes.as((Expression) node.arguments().get(0), StringLiteral.class);
+		} else if (ASTNodes.usesGivenSignature(visited, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
+			StringLiteral literal= ASTNodes.as((Expression) visited.arguments().get(0), StringLiteral.class);
 
 			if (literal != null) {
 				if ("true".equals(literal.getLiteralValue())) { //$NON-NLS-1$
-					replaceMethod(node, true);
+					replaceMethod(visited, true);
 					return false;
 				}
 
 				if ("false".equals(literal.getLiteralValue())) { //$NON-NLS-1$
-					replaceMethod(node, false);
+					replaceMethod(visited, false);
 					return false;
 				}
 			}
@@ -81,19 +81,19 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 		return true;
 	}
 
-	private void replaceMethod(final MethodInvocation node, final boolean literal) {
+	private void replaceMethod(final MethodInvocation visited, final boolean literal) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanConstantRatherThanValueOfCleanUp_description);
 
 		FieldAccess fieldAccess= ast.getAST().newFieldAccess();
-		Name expression= ASTNodes.as(node.getExpression(), Name.class);
+		Name expression= ASTNodes.as(visited.getExpression(), Name.class);
 
 		if (expression != null) {
 			fieldAccess.setExpression(ASTNodes.createMoveTarget(rewrite, expression));
 		}
 
 		fieldAccess.setName(ast.newSimpleName(literal ? "TRUE" : "FALSE")); //$NON-NLS-1$ //$NON-NLS-2$
-		ASTNodes.replaceButKeepComment(rewrite, node, fieldAccess, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, fieldAccess, group);
 	}
 }

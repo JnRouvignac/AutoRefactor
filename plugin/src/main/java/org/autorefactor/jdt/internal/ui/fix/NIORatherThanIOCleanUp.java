@@ -62,12 +62,12 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 
 	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
 		@Override
-		public boolean visit(final MethodInvocation node) {
-			return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+		public boolean visit(final MethodInvocation visited) {
+			return maybeRefactorMethodInvocation(visited, getClassesToUseWithImport(), getImportsToAdd());
 		}
 		@Override
-		public boolean visit(final Block node) {
-			return maybeRefactorBlock(node, getClassesToUseWithImport(), getImportsToAdd());
+		public boolean visit(final Block visited) {
+			return maybeRefactorBlock(visited, getClassesToUseWithImport(), getImportsToAdd());
 		}
 	}
 
@@ -102,27 +102,27 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	public boolean visit(final MethodInvocation visited) {
+		return maybeRefactorMethodInvocation(visited, getAlreadyImportedClasses(visited), new HashSet<String>());
 	}
 
-	private boolean maybeRefactorMethodInvocation(final MethodInvocation node,
+	private boolean maybeRefactorMethodInvocation(final MethodInvocation visited,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		if (isFileCreation(node.getExpression())
-				&& isFileUse(node.getExpression())) {
+		if (isFileCreation(visited.getExpression())
+				&& isFileUse(visited.getExpression())) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.NIORatherThanIOCleanUp_description);
 
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 
-			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) node.getExpression();
+			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) visited.getExpression();
 			Expression copyOfPathText= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
 
-			if (ASTNodes.usesGivenSignature(node, File.class.getCanonicalName(), TOPATH_METHOD)) {
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), group);
+			if (ASTNodes.usesGivenSignature(visited, File.class.getCanonicalName(), TOPATH_METHOD)) {
+				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), group);
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, node, ast.newMethodInvocation(ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
+				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
 			}
 
 			return false;
@@ -132,14 +132,14 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 	}
 
 	@Override
-	public boolean visit(final Block node) {
-		return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	public boolean visit(final Block visited) {
+		return maybeRefactorBlock(visited, getAlreadyImportedClasses(visited), new HashSet<String>());
 	}
 
-	private boolean maybeRefactorBlock(final Block node,
+	private boolean maybeRefactorBlock(final Block visited,
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		FileAndUsesVisitor fileAndUsesVisitor= new FileAndUsesVisitor(classesToUseWithImport, importsToAdd);
-		fileAndUsesVisitor.visitNode(node);
+		fileAndUsesVisitor.visitNode(visited);
 		return fileAndUsesVisitor.result;
 	}
 
@@ -153,28 +153,28 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		}
 
 		@Override
-		public boolean visit(final VariableDeclarationStatement node) {
-			if (node.fragments().size() != 1) {
+		public boolean visit(final VariableDeclarationStatement visited) {
+			if (visited.fragments().size() != 1) {
 				return true;
 			}
 
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getInitializer());
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) visited.fragments().get(0);
+			return visitVariable(visited.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getInitializer());
 		}
 
 		@Override
-		public boolean visit(final VariableDeclarationExpression node) {
-			if (node.fragments().size() != 1) {
+		public boolean visit(final VariableDeclarationExpression visited) {
+			if (visited.fragments().size() != 1) {
 				return true;
 			}
 
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getInitializer());
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) visited.fragments().get(0);
+			return visitVariable(visited.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getInitializer());
 		}
 
 		@Override
-		public boolean visit(final SingleVariableDeclaration node) {
-			return visitVariable(node.getType(), node.resolveBinding(), node.getExtraDimensions(), node.getInitializer());
+		public boolean visit(final SingleVariableDeclaration visited) {
+			return visitVariable(visited.getType(), visited.resolveBinding(), visited.getExtraDimensions(), visited.getInitializer());
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final Expression initializer) {

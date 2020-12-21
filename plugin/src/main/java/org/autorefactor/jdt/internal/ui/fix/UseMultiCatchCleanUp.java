@@ -204,6 +204,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 			List<VariableDeclarationFragment> fragments1= node.fragments();
 			List<VariableDeclarationFragment> fragments2= ((VariableDeclarationStatement) other).fragments();
+
 			if (fragments1.size() == fragments2.size()) {
 				Iterator<VariableDeclarationFragment> it1= fragments1.iterator();
 				Iterator<VariableDeclarationFragment> it2= fragments2.iterator();
@@ -295,19 +296,23 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final TryStatement node) {
-		List<CatchClause> catchClauses= node.catchClauses();
+	public boolean visit(final TryStatement visited) {
+		List<CatchClause> catchClauses= visited.catchClauses();
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
+
 		for (int i= 0; i < catchClauses.size(); i++) {
 			CatchClause catchClause1= catchClauses.get(i);
+
 			for (int j= i + 1; j < catchClauses.size(); j++) {
 				CatchClause catchClause2= catchClauses.get(j);
 				MergeDirection direction= mergeDirection(typeBindings, i, j);
+
 				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
 					UnionType ut= unionTypes(catchClause1.getException().getType(),
 							catchClause2.getException().getType());
+
 					if (MergeDirection.UP.equals(direction)) {
 						rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, group);
 						rewrite.remove(catchClause2, group);
@@ -345,6 +350,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		case ASTNode.UNION_TYPE:
 			List<Type> types= ((UnionType) type).types();
 			ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
+
 			for (int j= 0; j < types.size(); j++) {
 				typeBindings[j]= types.get(j).resolveBinding();
 			}
@@ -366,6 +372,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		if (canMergeTypesDown(typeBindings, start, end)) {
 			return MergeDirection.DOWN;
 		}
+
 		if (canMergeTypesUp(typeBindings, start, end)) {
 			return MergeDirection.UP;
 		}
@@ -375,6 +382,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 	private boolean canMergeTypesDown(final Binding[] types, final int start, final int end) {
 		Binding startType= types[start];
+
 		for (int i= start + 1; i < end; i++) {
 			Binding type= types[i];
 			if (Boolean.TRUE.equals(startType.isSubTypeCompatible(type))) {
@@ -387,6 +395,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 	private boolean canMergeTypesUp(final Binding[] types, final int start, final int end) {
 		Binding endType= types[end];
+
 		for (int i= start + 1; i < end; i++) {
 			Binding type= types[i];
 			if (Boolean.TRUE.equals(type.isSubTypeCompatible(endType))) {

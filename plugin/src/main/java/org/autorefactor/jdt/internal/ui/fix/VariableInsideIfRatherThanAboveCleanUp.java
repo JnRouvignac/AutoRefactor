@@ -58,39 +58,39 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		VariableAndIfVisitor newAndPutAllMethodVisitor= new VariableAndIfVisitor();
-		newAndPutAllMethodVisitor.visitNode(node);
+		newAndPutAllMethodVisitor.visitNode(visited);
 		return newAndPutAllMethodVisitor.result;
 	}
 
 	private final class VariableAndIfVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final IfStatement node) {
+		public boolean visit(final IfStatement visited) {
 			if (result) {
-				Statement variableAssignment= ASTNodes.getPreviousSibling(node);
+				Statement variableAssignment= ASTNodes.getPreviousSibling(visited);
 				VariableDeclarationFragment variable= getVariable(variableAssignment);
 
-				if (variable == null || isVarUsed(variable, node.getExpression())) {
+				if (variable == null || isVarUsed(variable, visited.getExpression())) {
 					return true;
 				}
 
-				for (Statement statement : ASTNodes.getNextSiblings(node)) {
+				for (Statement statement : ASTNodes.getNextSiblings(visited)) {
 					if (isVarUsed(variable, statement)) {
 						return true;
 					}
 				}
 
-				if (isVarUsed(variable, node.getThenStatement())) {
-					if (node.getElseStatement() != null && isVarUsed(variable, node.getElseStatement())) {
+				if (isVarUsed(variable, visited.getThenStatement())) {
+					if (visited.getElseStatement() != null && isVarUsed(variable, visited.getElseStatement())) {
 						return true;
 					}
 
-					return maybeMoveAssignment(variableAssignment, node.getThenStatement());
+					return maybeMoveAssignment(variableAssignment, visited.getThenStatement());
 				}
 
-				if (node.getElseStatement() != null) {
-					return !isVarUsed(variable, node.getElseStatement()) || maybeMoveAssignment(variableAssignment, node.getElseStatement());
+				if (visited.getElseStatement() != null) {
+					return !isVarUsed(variable, visited.getElseStatement()) || maybeMoveAssignment(variableAssignment, visited.getElseStatement());
 				}
 			}
 

@@ -80,28 +80,28 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		IfStatement thenInnerIfStatement= ASTNodes.as(node.getThenStatement(), IfStatement.class);
-		IfStatement elseInnerIfStatement= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+	public boolean visit(final IfStatement visited) {
+		IfStatement thenInnerIfStatement= ASTNodes.as(visited.getThenStatement(), IfStatement.class);
+		IfStatement elseInnerIfStatement= ASTNodes.as(visited.getElseStatement(), IfStatement.class);
 
 		if (thenInnerIfStatement != null && elseInnerIfStatement != null
 				&& thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
-				&& ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
+				&& ASTNodes.isPassive(visited.getExpression()) && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
 				&& ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
-			refactorIf(node, thenInnerIfStatement, elseInnerIfStatement);
+			refactorIf(visited, thenInnerIfStatement, elseInnerIfStatement);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void refactorIf(final IfStatement node, final IfStatement thenInnerIfStatement, final IfStatement elseInnerIfStatement) {
+	private void refactorIf(final IfStatement visited, final IfStatement thenInnerIfStatement, final IfStatement elseInnerIfStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonIfInIfElseCleanUp_description);
 
 		IfStatement newInnerIf= ast.newIfStatement();
-		newInnerIf.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())));
+		newInnerIf.setExpression(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getExpression())));
 		newInnerIf.setThenStatement(ASTNodes.createMoveTarget(rewrite, thenInnerIfStatement.getThenStatement()));
 		newInnerIf.setElseStatement(ASTNodes.createMoveTarget(rewrite, elseInnerIfStatement.getThenStatement()));
 
@@ -112,6 +112,6 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		newBlock.statements().add(newInnerIf);
 		newIfStatement.setThenStatement(newBlock);
 
-		ASTNodes.replaceButKeepComment(rewrite, node, newIfStatement, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newIfStatement, group);
 	}
 }

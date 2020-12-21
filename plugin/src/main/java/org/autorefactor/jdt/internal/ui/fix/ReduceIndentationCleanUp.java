@@ -54,63 +54,63 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 		}
 
 		@Override
-		public boolean visit(final IfStatement node) {
-			computeGreatestIndentation(node.getThenStatement());
+		public boolean visit(final IfStatement visited) {
+			computeGreatestIndentation(visited.getThenStatement());
 
-			if (node.getElseStatement() != null) {
-				computeGreatestIndentation(node.getElseStatement());
+			if (visited.getElseStatement() != null) {
+				computeGreatestIndentation(visited.getElseStatement());
 			}
 
 			return false;
 		}
 
 		@Override
-		public boolean visit(final WhileStatement node) {
-			computeGreatestIndentation(node.getBody());
+		public boolean visit(final WhileStatement visited) {
+			computeGreatestIndentation(visited.getBody());
 			return false;
 		}
 
 		@Override
-		public boolean visit(final DoStatement node) {
-			computeGreatestIndentation(node.getBody());
+		public boolean visit(final DoStatement visited) {
+			computeGreatestIndentation(visited.getBody());
 			return false;
 		}
 
 		@Override
-		public boolean visit(final ForStatement node) {
-			computeGreatestIndentation(node.getBody());
+		public boolean visit(final ForStatement visited) {
+			computeGreatestIndentation(visited.getBody());
 			return false;
 		}
 
 		@Override
-		public boolean visit(final EnhancedForStatement node) {
-			computeGreatestIndentation(node.getBody());
+		public boolean visit(final EnhancedForStatement visited) {
+			computeGreatestIndentation(visited.getBody());
 			return false;
 		}
 
 		@Override
-		public boolean visit(final TryStatement node) {
-			computeGreatestIndentation(node.getBody());
+		public boolean visit(final TryStatement visited) {
+			computeGreatestIndentation(visited.getBody());
 
-			for (Object object : node.catchClauses()) {
+			for (Object object : visited.catchClauses()) {
 				CatchClause clause= (CatchClause) object;
 				computeGreatestIndentation(clause.getBody());
 			}
 
-			if (node.getFinally() != null) {
-				computeGreatestIndentation(node.getFinally());
+			if (visited.getFinally() != null) {
+				computeGreatestIndentation(visited.getFinally());
 			}
 
-			if (node.getFinally() != null) {
-				computeGreatestIndentation(node.getFinally());
+			if (visited.getFinally() != null) {
+				computeGreatestIndentation(visited.getFinally());
 			}
 
 			return false;
 		}
 
 		@Override
-		public boolean visit(final Block node) {
-			computeGreatestIndentation(node);
+		public boolean visit(final Block visited) {
+			computeGreatestIndentation(visited);
 			return false;
 		}
 
@@ -141,28 +141,28 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		if (node.getElseStatement() != null && !ASTNodes.isInElse(node)) {
-			if (ASTNodes.fallsThrough(node.getThenStatement())) {
-				if (ASTNodes.fallsThrough(node.getElseStatement())) {
-					if (ASTNodes.getNextSiblings(node).isEmpty()) {
-						int thenIndentation= getIndentation(node.getThenStatement());
-						int elseIndentation= getIndentation(node.getElseStatement());
+	public boolean visit(final IfStatement visited) {
+		if (visited.getElseStatement() != null && !ASTNodes.isInElse(visited)) {
+			if (ASTNodes.fallsThrough(visited.getThenStatement())) {
+				if (ASTNodes.fallsThrough(visited.getElseStatement())) {
+					if (ASTNodes.getNextSiblings(visited).isEmpty()) {
+						int thenIndentation= getIndentation(visited.getThenStatement());
+						int elseIndentation= getIndentation(visited.getElseStatement());
 
-						if (thenIndentation <= elseIndentation || node.getElseStatement() instanceof IfStatement) {
-							moveElseStatement(node);
+						if (thenIndentation <= elseIndentation || visited.getElseStatement() instanceof IfStatement) {
+							moveElseStatement(visited);
 						} else {
-							moveThenStatement(node);
+							moveThenStatement(visited);
 						}
 
 						return false;
 					}
-				} else if (!ASTNodes.hasVariableConflict(node, node.getElseStatement())) {
-					moveElseStatement(node);
+				} else if (!ASTNodes.hasVariableConflict(visited, visited.getElseStatement())) {
+					moveElseStatement(visited);
 					return false;
 				}
-			} else if (ASTNodes.fallsThrough(node.getElseStatement()) && !ASTNodes.hasVariableConflict(node, node.getThenStatement()) && !(node.getElseStatement() instanceof IfStatement)) {
-				moveThenStatement(node);
+			} else if (ASTNodes.fallsThrough(visited.getElseStatement()) && !ASTNodes.hasVariableConflict(visited, visited.getThenStatement()) && !(visited.getElseStatement() instanceof IfStatement)) {
+				moveThenStatement(visited);
 				return false;
 			}
 		}
@@ -176,21 +176,21 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 		return visitor.getIndentation() + (statementInIf instanceof Block ? -1 : 0);
 	}
 
-	private void moveThenStatement(final IfStatement node) {
+	private void moveThenStatement(final IfStatement visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ReduceIndentationCleanUp_description);
 
-		List<Statement> statementsToMove= ASTNodes.asList(node.getThenStatement());
+		List<Statement> statementsToMove= ASTNodes.asList(visited.getThenStatement());
 
-		if (ASTNodes.canHaveSiblings(node)) {
+		if (ASTNodes.canHaveSiblings(visited)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, group);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), visited, group);
 			}
 
-			ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(node.getExpression(), true), group);
-			ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
-			rewrite.remove(node.getElseStatement(), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ast.negate(visited.getExpression(), true), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, visited.getElseStatement()), group);
+			rewrite.remove(visited.getElseStatement(), group);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -198,30 +198,29 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			ASTNodes.replaceButKeepComment(rewrite, node.getExpression(), ast.negate(node.getExpression(), true), group);
-			ASTNodes.replaceButKeepComment(rewrite, node.getThenStatement(), ASTNodes.createMoveTarget(rewrite, node.getElseStatement()), group);
-			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ast.negate(visited.getExpression(), true), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, visited.getElseStatement()), group);
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 			Block newBlock= ast.newBlock();
 			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
 
-			Block block= newBlock;
-			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 		}
 	}
 
-	private void moveElseStatement(final IfStatement node) {
+	private void moveElseStatement(final IfStatement visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ReduceIndentationCleanUp_description);
 
-		List<Statement> statementsToMove= ASTNodes.asList(node.getElseStatement());
+		List<Statement> statementsToMove= ASTNodes.asList(visited.getElseStatement());
 
-		if (ASTNodes.canHaveSiblings(node)) {
+		if (ASTNodes.canHaveSiblings(visited)) {
 			for (int i= statementsToMove.size() - 1; i >= 0; i--) {
-				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), node, group);
+				rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, statementsToMove.get(i)), visited, group);
 			}
 
-			rewrite.remove(node.getElseStatement(), group);
+			rewrite.remove(visited.getElseStatement(), group);
 		} else {
 			List<Statement> copyOfStatements= new ArrayList<>(statementsToMove.size() + 1);
 
@@ -229,13 +228,12 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 				copyOfStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 
-			rewrite.remove(node.getElseStatement(), group);
-			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, node));
+			rewrite.remove(visited.getElseStatement(), group);
+			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 			Block newBlock= ast.newBlock();
 			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
 
-			Block block= newBlock;
-			ASTNodes.replaceButKeepComment(rewrite, node, block, group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 		}
 	}
 }

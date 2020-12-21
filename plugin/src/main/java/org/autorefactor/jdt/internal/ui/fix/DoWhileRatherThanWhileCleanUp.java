@@ -86,20 +86,20 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final WhileStatement node) {
-		if (ASTNodes.isPassiveWithoutFallingThrough(node.getExpression()) && Boolean.TRUE.equals(peremptoryValue(node, node.getExpression()))) {
+	public boolean visit(final WhileStatement visited) {
+		if (ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression()) && Boolean.TRUE.equals(peremptoryValue(visited, visited.getExpression()))) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.DoWhileRatherThanWhileCleanUp_description);
 
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())), ASTNodes.createMoveTarget(rewrite, node.getBody())), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newDoStatement(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getExpression())), ASTNodes.createMoveTarget(rewrite, visited.getBody())), group);
 			return false;
 		}
 
 		return true;
 	}
 
-	private Object peremptoryValue(final ASTNode node, final Expression condition) {
+	private Object peremptoryValue(final ASTNode visited, final Expression condition) {
 		Object constantCondition= condition.resolveConstantExpressionValue();
 
 		if (constantCondition != null) {
@@ -115,7 +115,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 		SimpleName variable= ASTNodes.as(condition, SimpleName.class);
 
 		if (variable != null && variable.resolveBinding() != null && variable.resolveBinding().getKind() == IBinding.VARIABLE) {
-			List<ASTNode> precedingStatements= getPrecedingCode(node);
+			List<ASTNode> precedingStatements= getPrecedingCode(visited);
 
 			Collections.reverse(precedingStatements);
 
@@ -204,8 +204,8 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 							InfixExpression.Operator.GREATER_EQUALS,
 							InfixExpression.Operator.LESS,
 							InfixExpression.Operator.LESS_EQUALS)) {
-				Object leftOperand= peremptoryValue(node, infixExpression.getLeftOperand());
-				Object rightOperand= peremptoryValue(node, infixExpression.getRightOperand());
+				Object leftOperand= peremptoryValue(visited, infixExpression.getLeftOperand());
+				Object rightOperand= peremptoryValue(visited, infixExpression.getRightOperand());
 
 				if (leftOperand instanceof Number && rightOperand instanceof Number) {
 					Number leftNumber= (Number) leftOperand;
@@ -242,7 +242,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND,
 							InfixExpression.Operator.AND)) {
 				for (Expression operand : ASTNodes.allOperands(infixExpression)) {
-					final Object hasAlwaysValue= peremptoryValue(node, operand);
+					final Object hasAlwaysValue= peremptoryValue(visited, operand);
 
 					if (!Boolean.TRUE.equals(hasAlwaysValue)) {
 						return hasAlwaysValue;
@@ -255,7 +255,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 			if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_OR,
 							InfixExpression.Operator.OR)) {
 				for (Expression operand : ASTNodes.allOperands(infixExpression)) {
-					final Object hasAlwaysValue= peremptoryValue(node, operand);
+					final Object hasAlwaysValue= peremptoryValue(visited, operand);
 
 					if (!Boolean.FALSE.equals(hasAlwaysValue)) {
 						return hasAlwaysValue;

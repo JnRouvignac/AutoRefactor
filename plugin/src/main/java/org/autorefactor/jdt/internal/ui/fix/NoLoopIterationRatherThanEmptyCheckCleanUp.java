@@ -60,21 +60,21 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		if (node.getElseStatement() == null) {
-			List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+	public boolean visit(final IfStatement visited) {
+		if (visited.getElseStatement() == null) {
+			List<Statement> statements= ASTNodes.asList(visited.getThenStatement());
 
 			if (statements != null
 					&& statements.size() == 1) {
 				Expression container= getContainer(statements);
 
 				if (ASTNodes.isArray(container) && ASTNodes.isPassive(container)) {
-					InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+					InfixExpression condition= ASTNodes.as(visited.getExpression(), InfixExpression.class);
 
 					if (isConditionValid(condition, container)) {
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.NoLoopIterationRatherThanEmptyCheckCleanUp_description);
-						ASTNodes.replaceButKeepComment(rewrite, node, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
+						ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, statements.get(0)), group);
 						return false;
 					}
 

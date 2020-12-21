@@ -55,13 +55,13 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 	}
 
 	@Override
-	public boolean visit(final ArrayCreation node) {
-		if (node.getInitializer() != null || isVoid(node)) {
-			ITypeBinding arrayType= node.resolveTypeBinding();
-			ITypeBinding destinationType= ASTNodes.getTargetType(node);
+	public boolean visit(final ArrayCreation visited) {
+		if (visited.getInitializer() != null || isVoid(visited)) {
+			ITypeBinding arrayType= visited.resolveTypeBinding();
+			ITypeBinding destinationType= ASTNodes.getTargetType(visited);
 
-			if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
-				refactorWithInitializer(node);
+			if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(visited)) {
+				refactorWithInitializer(visited);
 				return false;
 			}
 		}
@@ -69,28 +69,28 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 		return true;
 	}
 
-	private void refactorWithInitializer(final ArrayCreation node) {
+	private void refactorWithInitializer(final ArrayCreation visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description);
 
-		if (node.getInitializer() != null) {
-			ASTNodes.replaceButKeepComment(rewrite, node, node.getInitializer(), group);
+		if (visited.getInitializer() != null) {
+			ASTNodes.replaceButKeepComment(rewrite, visited, visited.getInitializer(), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-			ASTNodes.replaceButKeepComment(rewrite, node, ast.createCopyTarget(ast.newArrayInitializer()), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.createCopyTarget(ast.newArrayInitializer()), group);
 		}
 	}
 
-	private boolean isDestinationAllowed(final ASTNode node) {
-		int parentType= node.getParent().getNodeType();
+	private boolean isDestinationAllowed(final ASTNode visited) {
+		int parentType= visited.getParent().getNodeType();
 
 		return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
 				|| parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
 	}
 
-	private boolean isVoid(final ArrayCreation node) {
-		List<Expression> dimensions= node.dimensions();
+	private boolean isVoid(final ArrayCreation visited) {
+		List<Expression> dimensions= visited.dimensions();
 
 		for (Expression dimension : dimensions) {
 			Object dimensionLiteral= dimension.resolveConstantExpressionValue();

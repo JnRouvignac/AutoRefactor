@@ -95,13 +95,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
 		@Override
-		public boolean visit(final ClassInstanceCreation node) {
-			return maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport());
+		public boolean visit(final ClassInstanceCreation visited) {
+			return maybeRefactorClassInstanceCreation(visited, getClassesToUseWithImport());
 		}
 
 		@Override
-		public boolean visit(final LambdaExpression node) {
-			return maybeRefactorLambdaExpression(node, getClassesToUseWithImport());
+		public boolean visit(final LambdaExpression visited) {
+			return maybeRefactorLambdaExpression(visited, getClassesToUseWithImport());
 		}
 	}
 
@@ -136,31 +136,31 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	@Override
-	public boolean visit(final LambdaExpression node) {
-		return maybeRefactorLambdaExpression(node, getAlreadyImportedClasses(node));
+	public boolean visit(final LambdaExpression visited) {
+		return maybeRefactorLambdaExpression(visited, getAlreadyImportedClasses(visited));
 	}
 
-	private boolean maybeRefactorLambdaExpression(final LambdaExpression node,
+	private boolean maybeRefactorLambdaExpression(final LambdaExpression visited,
 			final Set<String> classesToUseWithImport) {
-		ITypeBinding targetType= ASTNodes.getTargetType(node);
+		ITypeBinding targetType= ASTNodes.getTargetType(visited);
 
 		if (ASTNodes.hasType(targetType, Comparator.class.getCanonicalName())
 				&& targetType.getTypeArguments() != null
 				&& targetType.getTypeArguments().length == 1
-				&& node.parameters() != null
-				&& node.parameters().size() == 2) {
-			VariableDeclaration object1= (VariableDeclaration) node.parameters().get(0);
-			VariableDeclaration object2= (VariableDeclaration) node.parameters().get(1);
+				&& visited.parameters() != null
+				&& visited.parameters().size() == 2) {
+			VariableDeclaration object1= (VariableDeclaration) visited.parameters().get(0);
+			VariableDeclaration object2= (VariableDeclaration) visited.parameters().get(1);
 
-			if (node.getBody() instanceof Statement) {
-				return maybeRefactorBody(node, targetType.getTypeArguments()[0], classesToUseWithImport, object1, object2, ASTNodes.asList((Statement) node.getBody()));
+			if (visited.getBody() instanceof Statement) {
+				return maybeRefactorBody(visited, targetType.getTypeArguments()[0], classesToUseWithImport, object1, object2, ASTNodes.asList((Statement) visited.getBody()));
 			}
-            if (node.getBody() instanceof Expression) {
+            if (visited.getBody() instanceof Expression) {
 				SimpleName name1= object1.getName();
 				SimpleName name2= object2.getName();
 
-				return maybeRefactorExpression(node, targetType.getTypeArguments()[0], classesToUseWithImport, name1, name2,
-						(Expression) node.getBody());
+				return maybeRefactorExpression(visited, targetType.getTypeArguments()[0], classesToUseWithImport, name1, name2,
+						(Expression) visited.getBody());
 			}
 		}
 
@@ -168,20 +168,20 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 	}
 
 	@Override
-	public boolean visit(final ClassInstanceCreation node) {
-		return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node));
+	public boolean visit(final ClassInstanceCreation visited) {
+		return maybeRefactorClassInstanceCreation(visited, getAlreadyImportedClasses(visited));
 	}
 
-	private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
+	private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation visited,
 			final Set<String> classesToUseWithImport) {
-		AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
-		Type type= node.getType();
+		AnonymousClassDeclaration anonymousClassDecl= visited.getAnonymousClassDeclaration();
+		Type type= visited.getType();
 
 		if (type != null && type.resolveBinding() != null
 				&& type.resolveBinding().getTypeArguments() != null
 				&& type.resolveBinding().getTypeArguments().length == 1
 				&& ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName())
-				&& node.arguments().isEmpty()
+				&& visited.arguments().isEmpty()
 				&& anonymousClassDecl != null
 				&& anonymousClassDecl.bodyDeclarations() != null
 				&& anonymousClassDecl.bodyDeclarations().size() == 1) {
@@ -192,7 +192,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				BodyDeclaration body= bodies.get(0);
 
 				if (body instanceof MethodDeclaration) {
-					return maybeRefactorMethod(node, typeArgument, (MethodDeclaration) body, classesToUseWithImport);
+					return maybeRefactorMethod(visited, typeArgument, (MethodDeclaration) body, classesToUseWithImport);
 				}
 			}
 		}
@@ -200,7 +200,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return true;
 	}
 
-	private boolean maybeRefactorMethod(final ClassInstanceCreation node, final ITypeBinding typeArgument,
+	private boolean maybeRefactorMethod(final ClassInstanceCreation visited, final ITypeBinding typeArgument,
 			final MethodDeclaration methodDecl, final Set<String> classesToUseWithImport) {
 		Block methodBody= methodDecl.getBody();
 
@@ -211,19 +211,19 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 			List<Statement> statements= methodBody.statements();
 
-			return maybeRefactorBody(node, typeArgument, classesToUseWithImport, object1, object2, statements);
+			return maybeRefactorBody(visited, typeArgument, classesToUseWithImport, object1, object2, statements);
 		}
 
 		return true;
 	}
 
-	private boolean maybeRefactorBody(final Expression node, final ITypeBinding typeArgument,
+	private boolean maybeRefactorBody(final Expression visited, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final VariableDeclaration object1, final VariableDeclaration object2,
 			final List<Statement> statements) {
 		SimpleName name1= object1.getName();
 		SimpleName name2= object2.getName();
 
-		if (!maybeRefactorCompareToMethod(node, typeArgument, classesToUseWithImport, statements, name1, name2)) {
+		if (!maybeRefactorCompareToMethod(visited, typeArgument, classesToUseWithImport, statements, name1, name2)) {
 			return false;
 		}
 
@@ -284,7 +284,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				.addWorkflow(new ObjectNotNullMatcher(name1)).condition(new ObjectNotNullMatcher(name2).negate()).returnedValue(positiveMatcher);
 
 		if (runnableMatcher.isMatching(statements)) {
-			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.TRUE);
+			refactor(visited, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.TRUE);
 
 			return false;
 		}
@@ -295,7 +295,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				.addWorkflow(new ObjectNotNullMatcher(name1).negate()).condition(new ObjectNotNullMatcher(name2)).returnedValue(positiveMatcher);
 
 		if (runnableMatcher.isMatching(statements)) {
-			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.FALSE);
+			refactor(visited, typeArgument, classesToUseWithImport, name1, criteria, isForward, Boolean.FALSE);
 
 			return false;
 		}
@@ -303,14 +303,14 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return true;
 	}
 
-	private boolean maybeRefactorCompareToMethod(final Expression node, final ITypeBinding typeArgument,
+	private boolean maybeRefactorCompareToMethod(final Expression visited, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final List<Statement> statements,
 			final SimpleName name1, final SimpleName name2) {
 		if (statements != null && statements.size() == 1) {
 			ReturnStatement returnStatement= ASTNodes.as(statements.get(0), ReturnStatement.class);
 
 			if (returnStatement != null) {
-				return maybeRefactorExpression(node, typeArgument, classesToUseWithImport, name1, name2,
+				return maybeRefactorExpression(visited, typeArgument, classesToUseWithImport, name1, name2,
 						returnStatement.getExpression());
 			}
 		}
@@ -318,14 +318,14 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return true;
 	}
 
-	private boolean maybeRefactorExpression(final Expression node, final ITypeBinding typeArgument,
+	private boolean maybeRefactorExpression(final Expression visited, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final SimpleName name1, final SimpleName name2,
 			final Expression expression) {
 		AtomicReference<Expression> criteria= new AtomicReference<>();
 		AtomicBoolean isForward= new AtomicBoolean(true);
 
 		if (isReturnedExpressionToRefactor(expression, criteria, isForward, name1, name2)) {
-			refactor(node, typeArgument, classesToUseWithImport, name1, criteria, isForward, null);
+			refactor(visited, typeArgument, classesToUseWithImport, name1, criteria, isForward, null);
 
 			return false;
 		}
@@ -423,7 +423,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return false;
 	}
 
-	private void refactor(final Expression node, final ITypeBinding typeArgument,
+	private void refactor(final Expression visited, final ITypeBinding typeArgument,
 			final Set<String> classesToUseWithImport, final SimpleName name1, final AtomicReference<Expression> criteria,
 			final AtomicBoolean isForward, final Boolean isNullFirst) {
 		String comparatorClassName= addImport(Comparator.class, classesToUseWithImport, new HashSet<>());
@@ -432,7 +432,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		if (criteria.get() instanceof MethodInvocation) {
 			lambda= buildMethod(typeArgument, (MethodInvocation) criteria.get());
 		} else {
-			lambda= buildField(node, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), name1);
+			lambda= buildField(visited, typeArgument, isForward.get(), isNullFirst, (QualifiedName) criteria.get(), name1);
 		}
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -454,7 +454,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			}
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, node, comparingMethod, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, comparingMethod, group);
 	}
 
 	private TypeMethodReference buildMethod(final ITypeBinding type, final MethodInvocation method) {
@@ -469,7 +469,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		return typeMethodRef;
 	}
 
-	private LambdaExpression buildField(final Expression node, final ITypeBinding type, final boolean straightOrder,
+	private LambdaExpression buildField(final Expression visited, final ITypeBinding type, final boolean straightOrder,
 			final Boolean isNullFirst, final QualifiedName field, final SimpleName name1) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -477,7 +477,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
 		LambdaExpression lambdaExpression= ast.newLambdaExpression();
-		ITypeBinding destinationType= ASTNodes.getTargetType(node);
+		ITypeBinding destinationType= ASTNodes.getTargetType(visited);
 
 		boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
 				&& destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);

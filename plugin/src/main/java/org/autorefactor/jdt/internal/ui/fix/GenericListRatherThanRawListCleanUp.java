@@ -97,9 +97,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		elementType= null;
-		return super.visit(node);
+		return super.visit(visited);
 	}
 
 	@Override

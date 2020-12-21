@@ -95,9 +95,9 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 	}
 
 	@Override
-	public boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
+	public boolean maybeRefactorMethodInvocation(final MethodInvocation visited, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		MethodInvocation actual= ASTNodes.as(node.getExpression(), MethodInvocation.class);
+		MethodInvocation actual= ASTNodes.as(visited.getExpression(), MethodInvocation.class);
 		Expression message= null;
 
 		if (actual != null
@@ -114,24 +114,24 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				&& actual.arguments().size() == 1) {
 			Expression actualExpression= (Expression) actual.arguments().get(0);
 
-			if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_TRUE_METHOD)) {
+			if (ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_TRUE_METHOD)) {
 				return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-						node, actual, true,
+						visited, actual, true,
 						actualExpression, message, false);
 			}
 
-			if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_FALSE_METHOD)) {
+			if (ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_FALSE_METHOD)) {
 				return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-						node, actual, false,
+						visited, actual, false,
 						actualExpression, message, false);
 			}
 
-			if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
-				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) node.arguments().get(0));
+			if (ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
+				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) visited.arguments().get(0));
 
 				if (booleanConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-							node, actual, booleanConstant,
+							visited, actual, booleanConstant,
 							actualExpression, message, true);
 				}
 
@@ -139,15 +139,15 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 				if (actualConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-							node, actual, actualConstant,
-							(Expression) node.arguments().get(0), message, true);
+							visited, actual, actualConstant,
+							(Expression) visited.arguments().get(0), message, true);
 				}
-			} else if (ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
-				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) node.arguments().get(0));
+			} else if (ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())) {
+				final Boolean booleanConstant= ASTNodes.getBooleanLiteral((Expression) visited.arguments().get(0));
 
 				if (booleanConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-							node, actual, !booleanConstant,
+							visited, actual, !booleanConstant,
 							actualExpression, message, true);
 				}
 
@@ -155,36 +155,36 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 
 				if (actualConstant != null) {
 					return maybeRefactorStatement(classesToUseWithImport, importsToAdd,
-							node, actual, !actualConstant,
-							(Expression) node.arguments().get(0), message, true);
+							visited, actual, !actualConstant,
+							(Expression) visited.arguments().get(0), message, true);
 				}
 			}
 
-			if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, EQUALS_METHOD, Object.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_EQUAL_TO_METHOD, Object.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractFloatAssert", IS_EQUAL_TO_METHOD, float.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractShortAssert", IS_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractCharacterAssert", IS_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractByteAssert", IS_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node,
-						actual, true, actualExpression, (Expression) node.arguments().get(0), message);
+			if (ASTNodes.usesGivenSignature(visited, ABSTRACT_ASSERT_CLASS, EQUALS_METHOD, Object.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(visited, ABSTRACT_ASSERT_CLASS, IS_EQUAL_TO_METHOD, Object.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractIntegerAssert", IS_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractLongAssert", IS_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractDoubleAssert", IS_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractFloatAssert", IS_EQUAL_TO_METHOD, float.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractShortAssert", IS_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractCharacterAssert", IS_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractByteAssert", IS_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited,
+						actual, true, actualExpression, (Expression) visited.arguments().get(0), message);
 			}
 
-			if (ASTNodes.usesGivenSignature(node, ABSTRACT_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, Object.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(node, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractIntegerAssert", IS_NOT_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractLongAssert", IS_NOT_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractDoubleAssert", IS_NOT_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractFloatAssert", IS_NOT_EQUAL_TO_METHOD, float.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractShortAssert", IS_NOT_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractCharacterAssert", IS_NOT_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(node, "org.assertj.core.api.AbstractByteAssert", IS_NOT_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, node,
-						actual, false, actualExpression, (Expression) node.arguments().get(0), message);
+			if (ASTNodes.usesGivenSignature(visited, ABSTRACT_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, Object.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(visited, BOOLEAN_ASSERT_CLASS, IS_NOT_EQUAL_TO_METHOD, boolean.class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractIntegerAssert", IS_NOT_EQUAL_TO_METHOD, int.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractLongAssert", IS_NOT_EQUAL_TO_METHOD, long.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractDoubleAssert", IS_NOT_EQUAL_TO_METHOD, double.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractFloatAssert", IS_NOT_EQUAL_TO_METHOD, float.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractShortAssert", IS_NOT_EQUAL_TO_METHOD, short.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractCharacterAssert", IS_NOT_EQUAL_TO_METHOD, char.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, "org.assertj.core.api.AbstractByteAssert", IS_NOT_EQUAL_TO_METHOD, byte.class.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited,
+						actual, false, actualExpression, (Expression) visited.arguments().get(0), message);
 			}
 		}
 
@@ -192,11 +192,11 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 	}
 
 	@Override
-	public boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
+	public boolean maybeRefactorIfStatement(final IfStatement visited, final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
-		MethodInvocation methodInvocation= ASTNodes.asExpression(node.getThenStatement(), MethodInvocation.class);
+		MethodInvocation methodInvocation= ASTNodes.asExpression(visited.getThenStatement(), MethodInvocation.class);
 
-		if (node.getElseStatement() == null
+		if (visited.getElseStatement() == null
 				&& methodInvocation != null
 				&& (ASTNodes.usesGivenSignature(methodInvocation, ASSERTIONS_CLASS, FAIL_METHOD, String.class.getCanonicalName())
 						|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName())
@@ -204,10 +204,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 						|| ASTNodes.usesGivenSignature(methodInvocation, FAIL_CLASS, FAIL_METHOD, String.class.getCanonicalName(), Object[].class.getCanonicalName()))) {
 			if (methodInvocation.arguments() == null
 					|| methodInvocation.arguments().size() == 1 && ASTNodes.as((Expression) methodInvocation.arguments().get(0), NullLiteral.class) != null) {
-				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), null, true);
+				return maybeRefactorStatement(classesToUseWithImport, importsToAdd, visited, methodInvocation, false, visited.getExpression(), null, true);
 			}
 
-			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, node, methodInvocation, false, node.getExpression(), methodInvocation);
+			return maybeRefactorIfObjectsAreNotUsed(classesToUseWithImport, importsToAdd, visited, methodInvocation, false, visited.getExpression(), methodInvocation);
 		}
 
 		return true;

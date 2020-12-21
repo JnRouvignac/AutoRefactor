@@ -53,39 +53,39 @@ public class SerializeRatherThanBoxingAndSerializeCleanUp extends AbstractCleanU
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		if (node.getExpression() != null
-				&& node.arguments().isEmpty()) {
+	public boolean visit(final MethodInvocation visited) {
+		if (visited.getExpression() != null
+				&& visited.arguments().isEmpty()) {
 			Class<?>[] wrapperClasses= { Integer.class, Boolean.class, Long.class, Double.class, Character.class, Float.class, Short.class, Byte.class };
 
 			for (Class<?> wrapperClass : wrapperClasses) {
 				String canonicalName= wrapperClass.getCanonicalName();
 
-				if (ASTNodes.usesGivenSignature(node, canonicalName, "toString")) { //$NON-NLS-1$
-					MethodInvocation methodInvocation = ASTNodes.as(node.getExpression(), MethodInvocation.class);
+				if (ASTNodes.usesGivenSignature(visited, canonicalName, "toString")) { //$NON-NLS-1$
+					MethodInvocation methodInvocation = ASTNodes.as(visited.getExpression(), MethodInvocation.class);
 
 					if (methodInvocation != null
 							&& ASTNodes.usesGivenSignature(methodInvocation, canonicalName, "valueOf", Bindings.getUnboxedTypeName(canonicalName)) //$NON-NLS-1$
 							&& ASTNodes.isPrimitive((Expression) methodInvocation.arguments().get(0))) {
-						refactor(node, (Expression) methodInvocation.arguments().get(0), wrapperClass);
+						refactor(visited, (Expression) methodInvocation.arguments().get(0), wrapperClass);
 						return false;
 					}
 
-					ClassInstanceCreation classInstanceCreation = ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
+					ClassInstanceCreation classInstanceCreation = ASTNodes.as(visited.getExpression(), ClassInstanceCreation.class);
 
 					if (classInstanceCreation != null
 							&& ASTNodes.hasType(classInstanceCreation.getType().resolveBinding(), canonicalName)
 							&& ASTNodes.isPrimitive((Expression) classInstanceCreation.arguments().get(0))) {
-						refactor(node, (Expression) classInstanceCreation.arguments().get(0), wrapperClass);
+						refactor(visited, (Expression) classInstanceCreation.arguments().get(0), wrapperClass);
 						return false;
 					}
 
-					CastExpression castExpression = ASTNodes.as(node.getExpression(), CastExpression.class);
+					CastExpression castExpression = ASTNodes.as(visited.getExpression(), CastExpression.class);
 
 					if (castExpression != null
 							&& ASTNodes.hasType(castExpression.getType().resolveBinding(), canonicalName)
 							&& ASTNodes.isPrimitive(castExpression.getExpression())) {
-						refactor(node, castExpression.getExpression(), wrapperClass);
+						refactor(visited, castExpression.getExpression(), wrapperClass);
 						return false;
 					}
 
@@ -97,13 +97,13 @@ public class SerializeRatherThanBoxingAndSerializeCleanUp extends AbstractCleanU
 		return true;
 	}
 
-	private void refactor(final MethodInvocation node, final Expression primitiveValue, final Class<?> wrapperClass) {
+	private void refactor(final MethodInvocation visited, final Expression primitiveValue, final Class<?> wrapperClass) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SerializeRatherThanBoxingAndSerializeCleanUp_description);
 
 		MethodInvocation newMethodInvocation= ast.newMethodInvocation(ast.newSimpleName(wrapperClass.getSimpleName()), "toString", //$NON-NLS-1$
 				ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)));
-		ASTNodes.replaceButKeepComment(rewrite, node, newMethodInvocation, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 }

@@ -52,8 +52,8 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 
 	private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
 		@Override
-		public boolean visit(final MethodInvocation node) {
-			return maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
+		public boolean visit(final MethodInvocation visited) {
+			return maybeRefactorMethodInvocation(visited, getClassesToUseWithImport(), getImportsToAdd());
 		}
 	}
 
@@ -88,16 +88,16 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	}
 
 	@Override
-	public boolean visit(final MethodInvocation node) {
-		return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
+	public boolean visit(final MethodInvocation visited) {
+		return maybeRefactorMethodInvocation(visited, getAlreadyImportedClasses(visited), new HashSet<String>());
 	}
 
-	private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		if (node.getExpression() != null && !ASTNodes.is(node.getExpression(), ThisExpression.class) && ASTNodes.usesGivenSignature(node, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
-			MethodInvocation asListMethod= ASTNodes.as((Expression) node.arguments().get(0), MethodInvocation.class);
+	private boolean maybeRefactorMethodInvocation(final MethodInvocation visited, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		if (visited.getExpression() != null && !ASTNodes.is(visited.getExpression(), ThisExpression.class) && ASTNodes.usesGivenSignature(visited, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
+			MethodInvocation asListMethod= ASTNodes.as((Expression) visited.arguments().get(0), MethodInvocation.class);
 
-			if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || (usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(node.getExpression(), Set.class.getCanonicalName())))) {
-				refactorMethod(node, asListMethod, classesToUseWithImport, importsToAdd);
+			if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || (usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(visited.getExpression(), Set.class.getCanonicalName())))) {
+				refactorMethod(visited, asListMethod, classesToUseWithImport, importsToAdd);
 				return false;
 			}
 		}
@@ -110,7 +110,7 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 		return binding != null && ASTNodes.hasType(binding.getDeclaringClass(), className) && Utils.equalNotNull(methodName, actualMethod.getName().getIdentifier()) && binding.getParameterTypes() != null && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].isArray();
 	}
 
-	private void refactorMethod(final MethodInvocation node, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+	private void refactorMethod(final MethodInvocation visited, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CollectionsAddAllRatherThanAsListCleanUp_description);
@@ -118,13 +118,13 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 		String collectionsName= addImport(Collections.class, classesToUseWithImport, importsToAdd);
 
 		List<Expression> copyOfArguments= new ArrayList<>(asListMethod.arguments().size() + 1);
-		copyOfArguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(node.getExpression())));
+		copyOfArguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getExpression())));
 
 		for (Object argument : asListMethod.arguments()) {
 			copyOfArguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) argument)));
 		}
 
 		MethodInvocation newCollectionsAddAllMethod= ast.newMethodInvocation(ASTNodeFactory.newName(ast, collectionsName), ADD_ALL_METHOD, copyOfArguments);
-		ASTNodes.replaceButKeepComment(rewrite, node, newCollectionsAddAllMethod, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newCollectionsAddAllMethod, group);
 	}
 }

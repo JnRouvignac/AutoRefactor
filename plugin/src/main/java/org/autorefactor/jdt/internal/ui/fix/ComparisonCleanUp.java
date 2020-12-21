@@ -56,8 +56,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression node) {
-		OrderedInfixExpression<MethodInvocation, Expression> orderedCondition= ASTNodes.orderedInfix(node, MethodInvocation.class, Expression.class);
+	public boolean visit(final InfixExpression visited) {
+		OrderedInfixExpression<MethodInvocation, Expression> orderedCondition= ASTNodes.orderedInfix(visited, MethodInvocation.class, Expression.class);
 
 		if (orderedCondition != null
 				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
@@ -77,14 +77,14 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
 				if (literalValue.compareTo(0L) < 0) {
 					if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
-						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS);
+						refactorComparingToZero(visited, comparisonMI, InfixExpression.Operator.LESS);
 					} else {
-						refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER_EQUALS);
+						refactorComparingToZero(visited, comparisonMI, InfixExpression.Operator.GREATER_EQUALS);
 					}
 				} else if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
-					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.GREATER);
+					refactorComparingToZero(visited, comparisonMI, InfixExpression.Operator.GREATER);
 				} else {
-					refactorComparingToZero(node, comparisonMI, InfixExpression.Operator.LESS_EQUALS);
+					refactorComparingToZero(visited, comparisonMI, InfixExpression.Operator.LESS_EQUALS);
 				}
 
 				return false;
@@ -94,17 +94,17 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
+	private void refactorComparingToZero(final InfixExpression visited, final MethodInvocation comparisonMethod,
 			final InfixExpression.Operator operator) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ComparisonCleanUp_description);
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();
-		newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, comparisonMI));
+		newInfixExpression.setLeftOperand(ASTNodes.createMoveTarget(rewrite, comparisonMethod));
 		newInfixExpression.setOperator(operator);
 		newInfixExpression.setRightOperand(ast.newNumberLiteral("0")); //$NON-NLS-1$
 
-		ASTNodes.replaceButKeepComment(rewrite, node, newInfixExpression, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
 	}
 }

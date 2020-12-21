@@ -64,47 +64,47 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor();
-		newAndPutAllMethodVisitor.visitNode(node);
+		newAndPutAllMethodVisitor.visitNode(visited);
 		return newAndPutAllMethodVisitor.result;
 	}
 
 	private final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final PrefixExpression node) {
-			if (ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
-				return visitExpression(node, node.getOperand());
+		public boolean visit(final PrefixExpression visited) {
+			if (ASTNodes.hasOperator(visited, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
+				return visitExpression(visited, visited.getOperand());
 			}
 
 			return true;
 		}
 
 		@Override
-		public boolean visit(final PostfixExpression node) {
-			if (ASTNodes.hasOperator(node, PostfixExpression.Operator.INCREMENT, PostfixExpression.Operator.DECREMENT)) {
-				return visitExpression(node, node.getOperand());
+		public boolean visit(final PostfixExpression visited) {
+			if (ASTNodes.hasOperator(visited, PostfixExpression.Operator.INCREMENT, PostfixExpression.Operator.DECREMENT)) {
+				return visitExpression(visited, visited.getOperand());
 			}
 
 			return true;
 		}
 
-		public boolean visitExpression(final Expression node, final Expression variable) {
+		public boolean visitExpression(final Expression visited, final Expression variable) {
 			SimpleName variableName= ASTNodes.as(variable, SimpleName.class);
 
 			if (result
-					&& !(node.getParent() instanceof ExpressionStatement)
+					&& !(visited.getParent() instanceof ExpressionStatement)
 					&& variableName != null
 					&& variableName.resolveBinding() != null
 					&& variableName.resolveBinding().getKind() == IBinding.VARIABLE
 					&& ASTNodes.isLocalVariable(variableName.resolveBinding())) {
-				return visitParent(node, variable, node);
+				return visitParent(visited, variable, visited);
 			}
 
 			return true;
 		}
 
-		public boolean visitParent(final Expression node, final Expression variable, final ASTNode parent) {
+		public boolean visitParent(final Expression visited, final Expression variable, final ASTNode parent) {
 			ASTNode ancestor= parent.getParent();
 
 			if (ancestor != null) {
@@ -112,10 +112,10 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				case ASTNode.IF_STATEMENT:
 					IfStatement statement= (IfStatement) ancestor;
 
-					if (node instanceof PrefixExpression
+					if (visited instanceof PrefixExpression
 							&& parent.getLocationInParent() == IfStatement.EXPRESSION_PROPERTY
 							&& !ASTNodes.isInElse(statement)) {
-						return maybeExtractIncrement(node, variable, statement);
+						return maybeExtractIncrement(visited, variable, statement);
 					}
 
 					return true;
@@ -123,20 +123,20 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				case ASTNode.LABELED_STATEMENT:
 				case ASTNode.VARIABLE_DECLARATION_STATEMENT:
 				case ASTNode.EXPRESSION_STATEMENT:
-					return maybeExtractIncrement(node, variable, (Statement) ancestor);
+					return maybeExtractIncrement(visited, variable, (Statement) ancestor);
 
 				case ASTNode.THROW_STATEMENT:
 				case ASTNode.RETURN_STATEMENT:
-					if (node instanceof PrefixExpression) {
-						return maybeExtractIncrement(node, variable, (Statement) ancestor);
+					if (visited instanceof PrefixExpression) {
+						return maybeExtractIncrement(visited, variable, (Statement) ancestor);
 					}
 
 					return true;
 
 				case ASTNode.CONSTRUCTOR_INVOCATION:
 				case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
-					if (node instanceof PostfixExpression) {
-						return maybeExtractIncrement(node, variable, (Statement) ancestor);
+					if (visited instanceof PostfixExpression) {
+						return maybeExtractIncrement(visited, variable, (Statement) ancestor);
 					}
 
 					return true;
@@ -158,7 +158,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				case ASTNode.ARRAY_ACCESS:
 				case ASTNode.ARRAY_CREATION:
 				case ASTNode.ARRAY_INITIALIZER:
-					return visitParent(node, variable, ancestor);
+					return visitParent(visited, variable, ancestor);
 
 				case ASTNode.INFIX_EXPRESSION:
 					if (parent.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY
@@ -180,14 +180,14 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 							InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
 							InfixExpression.Operator.TIMES,
 							InfixExpression.Operator.XOR)) {
-						return visitParent(node, variable, ancestor);
+						return visitParent(visited, variable, ancestor);
 					}
 
 					return true;
 
 				case ASTNode.CONDITIONAL_EXPRESSION:
 					if (parent.getLocationInParent() == ConditionalExpression.EXPRESSION_PROPERTY) {
-						return visitParent(node, variable, ancestor);
+						return visitParent(visited, variable, ancestor);
 					}
 
 					return true;
@@ -199,14 +199,14 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 			return true;
 		}
 
-		private boolean maybeExtractIncrement(final Expression node, final Expression variable, final Statement statement) {
+		private boolean maybeExtractIncrement(final Expression visited, final Expression variable, final Statement statement) {
 			SimpleName variableName= ASTNodes.as(variable, SimpleName.class);
 			VarDefinitionsUsesVisitor varDefinitionsUsesVisitor= new VarDefinitionsUsesVisitor((IVariableBinding) variableName.resolveBinding(), statement, true);
 
 			if (varDefinitionsUsesVisitor.getWrites().isEmpty()
 					&& varDefinitionsUsesVisitor.getReads().size() == 1
-					&& (node instanceof PrefixExpression || !ASTNodes.fallsThrough(statement))) {
-				extractIncrement(node, variable, statement);
+					&& (visited instanceof PrefixExpression || !ASTNodes.fallsThrough(statement))) {
+				extractIncrement(visited, variable, statement);
 
 				result= false;
 				return false;
@@ -215,30 +215,28 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 			return true;
 		}
 
-		private void extractIncrement(final Expression node, final Expression variable,
+		private void extractIncrement(final Expression visited, final Expression variable,
 				final Statement statement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_description);
 
-			ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getMatchingParent(node, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
+			ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getMatchingParent(visited, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
 
-			if (node instanceof PostfixExpression) {
-				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, node));
+			if (visited instanceof PostfixExpression) {
+				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, visited));
 
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertAfter(newAssignment, statement, group);
 				} else {
-					Block newBlock1= ast.newBlock();
-					newBlock1.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
-					newBlock1.statements().add(newAssignment);
-					Block newBlock= newBlock1;
-
+					Block newBlock= ast.newBlock();
+					newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
+					newBlock.statements().add(newAssignment);
 					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}
 			} else {
 				Statement newAssignment;
-				if (ASTNodes.hasOperator((PrefixExpression) node, PrefixExpression.Operator.INCREMENT)) {
+				if (ASTNodes.hasOperator((PrefixExpression) visited, PrefixExpression.Operator.INCREMENT)) {
 					newAssignment= ast.newExpressionStatement(ast.newPostfixExpression(ASTNodes.createMoveTarget(rewrite, variable), PostfixExpression.Operator.INCREMENT));
 				} else {
 					newAssignment= ast.newExpressionStatement(ast.newPostfixExpression(ASTNodes.createMoveTarget(rewrite, variable), PostfixExpression.Operator.DECREMENT));
@@ -247,11 +245,9 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 				if (ASTNodes.canHaveSiblings(statement)) {
 					rewrite.insertBefore(newAssignment, statement, group);
 				} else {
-					Block newBlock1= ast.newBlock();
-					newBlock1.statements().add(newAssignment);
-					newBlock1.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
-					Block newBlock= newBlock1;
-
+					Block newBlock= ast.newBlock();
+					newBlock.statements().add(newAssignment);
+					newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, statement));
 					ASTNodes.replaceButKeepComment(rewrite, statement, newBlock, group);
 				}
 			}

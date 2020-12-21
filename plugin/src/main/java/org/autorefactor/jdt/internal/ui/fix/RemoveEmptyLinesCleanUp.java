@@ -62,16 +62,16 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 	private final TreeSet<Integer> lineEnds= new TreeSet<>();
 
 	@Override
-	public boolean visit(final CompilationUnit node) {
+	public boolean visit(final CompilationUnit visited) {
 		lineEnds.clear();
+		String source= cuRewrite.getSource(visited);
 
-		String source= cuRewrite.getSource(node);
 		if (source.isEmpty()) {
 			// Empty file, bail out
 			return true;
 		}
 
-		computeLineEnds(node);
+		computeLineEnds(visited);
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
@@ -81,8 +81,8 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 			return false;
 		}
 
-		if (node.getPackage() != null) {
-			int lastIndex= node.getPackage().getStartPosition();
+		if (visited.getPackage() != null) {
+			int lastIndex= visited.getPackage().getStartPosition();
 			int lastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, lastIndex - 1);
 			if (lastNonWsIndex != -1) {
 				int endOfLineIndex= beforeNewlineChars(source, lastNonWsIndex);
@@ -166,37 +166,40 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final AnnotationTypeDeclaration node) {
-		return visit((AbstractTypeDeclaration) node);
+	public boolean visit(final AnnotationTypeDeclaration visited) {
+		return visit((AbstractTypeDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final EnumDeclaration node) {
-		return visit((AbstractTypeDeclaration) node);
+	public boolean visit(final EnumDeclaration visited) {
+		return visit((AbstractTypeDeclaration) visited);
 	}
 
 	@Override
-	public boolean visit(final TypeDeclaration node) {
-		return visit((AbstractTypeDeclaration) node);
+	public boolean visit(final TypeDeclaration visited) {
+		return visit((AbstractTypeDeclaration) visited);
 	}
 
-	private boolean visit(final AbstractTypeDeclaration node) {
-		String source= cuRewrite.getSource(node);
-		int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
-		if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
+	private boolean visit(final AbstractTypeDeclaration visited) {
+		String source= cuRewrite.getSource(visited);
+		int openingCurlyIndex= findOpeningCurlyForTypeBody(visited, source);
+
+		if (openingCurlyOnSameLineAsEndOfNode(visited, openingCurlyIndex)) {
 			return true;
 		}
-		if (maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex)) {
+
+		if (maybeRemoveEmptyLinesAfterCurly(visited, openingCurlyIndex)) {
 			return false;
 		}
 
 		int lastNonWsIndex2= getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
 		int endOfLineIndex2= previousLineEnd(lastNonWsIndex2);
-		return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2) && visitNodeWithClosingCurly(node);
+		return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2) && visitNodeWithClosingCurly(visited);
 	}
 
-	private int findOpeningCurlyForTypeBody(final AbstractTypeDeclaration node, final String source) {
-		int pos= node.getStartPosition();
+	private int findOpeningCurlyForTypeBody(final AbstractTypeDeclaration visited, final String source) {
+		int pos= visited.getStartPosition();
+
 		do {
 			int firstCurly= source.indexOf('{', pos);
 			if (!cuRewrite.isInComment(firstCurly)) {
@@ -207,41 +210,45 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final MethodDeclaration node) {
-		Block body= node.getBody();
+	public boolean visit(final MethodDeclaration visited) {
+		Block body= visited.getBody();
+
 		if (body == null) {
 			return true;
 		}
+
 		int openingCurlyIndex= body.getStartPosition();
-		return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || !maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body);
+		return openingCurlyOnSameLineAsEndOfNode(visited, openingCurlyIndex) || !maybeRemoveEmptyLinesAfterCurly(visited, openingCurlyIndex) && visit(body);
 	}
 
 	@Override
-	public boolean visit(final Block node) {
-		String source= cuRewrite.getSource(node);
-		int openingCurlyIndex= node.getStartPosition();
-		if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
+	public boolean visit(final Block visited) {
+		String source= cuRewrite.getSource(visited);
+		int openingCurlyIndex= visited.getStartPosition();
+
+		if (openingCurlyOnSameLineAsEndOfNode(visited, openingCurlyIndex)) {
 			return true;
 		}
+
 		int lastNonWsIndex= getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
 		int endOfLineIndex= previousLineEnd(lastNonWsIndex);
-		return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex) && visitNodeWithClosingCurly(node);
+		return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex) && visitNodeWithClosingCurly(visited);
 	}
 
-	private boolean visitNodeWithClosingCurly(final ASTNode node) {
-		String source= cuRewrite.getSource(node);
-		int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
-		return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
+	private boolean visitNodeWithClosingCurly(final ASTNode visited) {
+		String source= cuRewrite.getSource(visited);
+		int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(visited));
+		return !maybeRemoveEmptyLinesAfterCurly(visited, closingCurlyIndex);
 	}
 
-	private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode node, final int openingCurlyIndex) {
+	private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode visited, final int openingCurlyIndex) {
 		int lineEndAfterCurly= nextLineEnd(openingCurlyIndex);
-		int lineEndAfterNode= nextLineEnd(SourceLocation.getEndPosition(node));
+		int lineEndAfterNode= nextLineEnd(SourceLocation.getEndPosition(visited));
 		return lineEndAfterCurly == lineEndAfterNode;
 	}
 
-	private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode node, final int curlyIndex) {
-		String source= cuRewrite.getSource(node);
+	private boolean maybeRemoveEmptyLinesAfterCurly(final ASTNode visited, final int curlyIndex) {
+		String source= cuRewrite.getSource(visited);
 		int newLineBeforeCurly= previousLineEnd(curlyIndex);
 		int lastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, curlyIndex - 1);
 		int endOfLineIndex= beforeNewlineChars(source, lastNonWsIndex);

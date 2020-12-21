@@ -102,32 +102,32 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 		}
 
 		@Override
-		public boolean visit(final ForStatement node) {
+		public boolean visit(final ForStatement visited) {
 			return hasToVisitLoops;
 		}
 
 		@Override
-		public boolean visit(final EnhancedForStatement node) {
+		public boolean visit(final EnhancedForStatement visited) {
 			return hasToVisitLoops;
 		}
 
 		@Override
-		public boolean visit(final WhileStatement node) {
+		public boolean visit(final WhileStatement visited) {
 			return hasToVisitLoops;
 		}
 
 		@Override
-		public boolean visit(final DoStatement node) {
+		public boolean visit(final DoStatement visited) {
 			return hasToVisitLoops;
 		}
 
 		@Override
-		public boolean visit(final TypeDeclaration node) {
+		public boolean visit(final TypeDeclaration visited) {
 			return false;
 		}
 
 		@Override
-		public boolean visit(final LambdaExpression node) {
+		public boolean visit(final LambdaExpression visited) {
 			return false;
 		}
 	}
@@ -148,36 +148,36 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final Block node) {
+	public boolean visit(final Block visited) {
 		StringOccurrencesVisitor stringOccurrencesVisitor= new StringOccurrencesVisitor();
-		stringOccurrencesVisitor.visitNode(node);
+		stringOccurrencesVisitor.visitNode(visited);
 		return stringOccurrencesVisitor.result;
 	}
 
 	private final class StringOccurrencesVisitor extends BlockSubVisitor {
 		@Override
-		public boolean visit(final VariableDeclarationStatement node) {
-			if (node.fragments().size() != 1) {
+		public boolean visit(final VariableDeclarationStatement visited) {
+			if (visited.fragments().size() != 1) {
 				return true;
 			}
 
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) visited.fragments().get(0);
+			return visitVariable(visited.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
 		}
 
 		@Override
-		public boolean visit(final VariableDeclarationExpression node) {
-			if (node.fragments().size() != 1) {
+		public boolean visit(final VariableDeclarationExpression visited) {
+			if (visited.fragments().size() != 1) {
 				return true;
 			}
 
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
-			return visitVariable(node.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
+			VariableDeclarationFragment fragment= (VariableDeclarationFragment) visited.fragments().get(0);
+			return visitVariable(visited.getType(), fragment.resolveBinding(), fragment.getExtraDimensions(), fragment.getName(), fragment.getInitializer());
 		}
 
 		@Override
-		public boolean visit(final SingleVariableDeclaration node) {
-			return visitVariable(node.getType(), node.resolveBinding(), node.getExtraDimensions(), node.getName(), node.getInitializer());
+		public boolean visit(final SingleVariableDeclaration visited) {
+			return visitVariable(visited.getType(), visited.resolveBinding(), visited.getExtraDimensions(), visited.getName(), visited.getInitializer());
 		}
 
 		private boolean visitVariable(final Type type, final IVariableBinding variableBinding, final int extraDimensions, final SimpleName declaration, final Expression initializer) {

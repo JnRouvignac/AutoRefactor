@@ -56,16 +56,16 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		Statement elseStatement= node.getElseStatement();
-		Statement thenStatement= node.getThenStatement();
-		PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
+	public boolean visit(final IfStatement visited) {
+		Statement elseStatement= visited.getElseStatement();
+		Statement thenStatement= visited.getThenStatement();
+		PrefixExpression prefixExpression= ASTNodes.as(visited.getExpression(), PrefixExpression.class);
 
-		if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-			return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
+		if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.NOT)) {
+			return maybeReplaceSetContains(visited, prefixExpression.getOperand(), thenStatement, elseStatement, false);
 		}
 
-		return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
+		return maybeReplaceSetContains(visited, visited.getExpression(), elseStatement, thenStatement, true);
 	}
 
 	private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,

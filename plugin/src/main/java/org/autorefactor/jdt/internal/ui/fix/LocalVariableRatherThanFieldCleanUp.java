@@ -92,9 +92,9 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final TypeDeclaration node) {
-		for (FieldDeclaration field : node.getFields()) {
-			if (!maybeReplaceFieldByLocalVariable(node, field)) {
+	public boolean visit(final TypeDeclaration visited) {
+		for (FieldDeclaration field : visited.getFields()) {
+			if (!maybeReplaceFieldByLocalVariable(visited, field)) {
 				return false;
 			}
 		}
@@ -102,12 +102,12 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration node, final FieldDeclaration field) {
+	private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration visited, final FieldDeclaration field) {
 		if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && !hasAnnotation(field) && field.getType().isPrimitiveType()) {
 			for (Object object : field.fragments()) {
 				VariableDeclarationFragment fragment= (VariableDeclarationFragment) object;
 
-				if (!maybeReplaceFragmentByLocalVariable(node, field, fragment)) {
+				if (!maybeReplaceFragmentByLocalVariable(visited, field, fragment)) {
 					return false;
 				}
 			}
@@ -116,14 +116,14 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private boolean maybeReplaceFragmentByLocalVariable(final TypeDeclaration node, final FieldDeclaration field,
+	private boolean maybeReplaceFragmentByLocalVariable(final TypeDeclaration visited, final FieldDeclaration field,
 			final VariableDeclarationFragment fragment) {
 		if (fragment.getInitializer() != null && !ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer())) {
 			return true;
 		}
 
 		FieldUseVisitor fieldUseVisitor= new FieldUseVisitor(fragment.getName());
-		node.accept(fieldUseVisitor);
+		visited.accept(fieldUseVisitor);
 		List<SimpleName> occurrences= fieldUseVisitor.getOccurrences();
 
 		MethodDeclaration oneMethodDeclaration= null;

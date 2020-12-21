@@ -74,33 +74,33 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 	}
 
 	@Override
-	public boolean visit(final MethodDeclaration node) {
-		if (node.getBody() == null) {
+	public boolean visit(final MethodDeclaration visited) {
+		if (visited.getBody() == null) {
 			return true;
 		}
 
-		List<Statement> bodyStatements= node.getBody().statements();
+		List<Statement> bodyStatements= visited.getBody().statements();
 
 		if (bodyStatements.size() == 1) {
 			SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
 
 			if (bodyMi != null) {
 				IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
-				IMethodBinding declMethodBinding= node.resolveBinding();
+				IMethodBinding declMethodBinding= visited.resolveBinding();
 
 				if (declMethodBinding != null && bodyMethodBinding != null
 						&& declMethodBinding.overrides(bodyMethodBinding)
 						&& !hasSignificantAnnotations(declMethodBinding)
 						&& haveSameModifiers(bodyMethodBinding, declMethodBinding)
-						&& haveSameParameters(node, bodyMi)) {
+						&& haveSameParameters(visited, bodyMi)) {
 					if (!Modifier.isProtected(declMethodBinding.getModifiers())
 							|| declaredInSamePackage(bodyMethodBinding, declMethodBinding)
 							// protected also means package visibility, so check if it is required
-							|| !isMethodUsedInItsPackage(declMethodBinding, node)) {
+							|| !isMethodUsedInItsPackage(declMethodBinding, visited)) {
 						TextEditGroup group= new TextEditGroup(MultiFixMessages.SuperCallRatherThanUselessOverridingCleanUp_description);
 						ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-						rewrite.remove(node, group);
+						rewrite.remove(visited, group);
 						return false;
 					}
 				}
@@ -110,10 +110,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 		return true;
 	}
 
-	private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
-		List<?> parameters= node.parameters();
+	private boolean haveSameParameters(final MethodDeclaration visited, final SuperMethodInvocation bodyMi) {
+		List<?> parameters= visited.parameters();
 
-		for (int i= 0; i < node.parameters().size(); i++) {
+		for (int i= 0; i < visited.parameters().size(); i++) {
 			SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
 			SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
 
@@ -127,7 +127,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 	}
 
 	/** This method is extremely expensive. */
-	private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration node) {
+	private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, final MethodDeclaration visited) {
 		IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
 
 		final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
@@ -146,7 +146,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 					requestor, cuRewrite.getProgressMonitor());
 			return methodIsUsedInPackage.get();
 		} catch (CoreException e) {
-			throw new UnhandledException(node, e);
+			throw new UnhandledException(visited, e);
 		}
 	}
 
