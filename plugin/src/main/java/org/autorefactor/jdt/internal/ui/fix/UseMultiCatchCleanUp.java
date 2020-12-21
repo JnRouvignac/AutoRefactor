@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -317,17 +316,25 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		List<CatchClause> catchClauses= visited.catchClauses();
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
 
-		for (int i= 0; i < catchClauses.size(); i++) {
-			CatchClause firstCatchClause= catchClauses.get(i);
+		for (int i= 0; i < catchClauses.size() - 1; i++) {
+			List<CatchClause> mergeableCatchClauses= new ArrayList<>(catchClauses.size());
+			mergeableCatchClauses.add(catchClauses.get(i));
+			MergeDirection direction= null;
 
 			for (int j= i + 1; j < catchClauses.size(); j++) {
-				CatchClause secondCatchClause= catchClauses.get(j);
-				MergeDirection direction= mergeDirection(typeBindings, i, j);
+				MergeDirection newDirection= mergeDirection(typeBindings, i, j);
 
-				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(firstCatchClause, secondCatchClause)) {
-					refactorCatches(firstCatchClause, secondCatchClause, direction);
-					return false;
+				if (!MergeDirection.NONE.equals(newDirection)
+						&& (direction == null || direction.equals(newDirection))
+						&& matchMultiCatch(catchClauses.get(i), catchClauses.get(j))) {
+					direction= newDirection;
+					mergeableCatchClauses.add(catchClauses.get(j));
 				}
+			}
+
+			if (mergeableCatchClauses.size() > 1) {
+				refactorCatches(mergeableCatchClauses, direction);
+				return false;
 			}
 		}
 
@@ -412,25 +419,37 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		return ASTNodes.match(matcher, firstCatchClause.getBody(), secondCatchClause.getBody());
 	}
 
-	private void refactorCatches(final CatchClause firstCatchClause, final CatchClause secondCatchClause, final MergeDirection direction) {
+	private void refactorCatches(final List<CatchClause> mergeableCatchClauses, final MergeDirection direction) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		AST ast= cuRewrite.getAST();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
 
+		List<Type> typesByClause= new ArrayList<>();
+
+		for (CatchClause mergeableCatchClause : mergeableCatchClauses) {
+			typesByClause.add(mergeableCatchClause.getException().getType());
+		}
+
 		List<Type> allTypes= new ArrayList<>();
-		collectAllUnionedTypes(Arrays.asList(firstCatchClause.getException().getType(), secondCatchClause.getException().getType()), allTypes);
+		collectAllUnionedTypes(typesByClause, allTypes);
 		removeSupersededAlternatives(allTypes);
 
 		UnionType unionType= ast.newUnionType();
 		List<Type> unionedTypes= unionType.types();
 		unionedTypes.addAll(ASTNodes.createMoveTarget(rewrite, allTypes));
 
+		List<CatchClause> removedClauses= new ArrayList<>(mergeableCatchClauses);
+		CatchClause mergedClause;
 		if (MergeDirection.UP.equals(direction)) {
-			rewrite.set(firstCatchClause.getException(), SingleVariableDeclaration.TYPE_PROPERTY, unionType, group);
-			rewrite.remove(secondCatchClause, group);
-		} else if (MergeDirection.DOWN.equals(direction)) {
-			rewrite.remove(firstCatchClause, group);
-			rewrite.set(secondCatchClause.getException(), SingleVariableDeclaration.TYPE_PROPERTY, unionType, group);
+			mergedClause= removedClauses.remove(0);
+		} else {
+			mergedClause= removedClauses.remove(removedClauses.size() - 1);
+		}
+
+		rewrite.set(mergedClause.getException(), SingleVariableDeclaration.TYPE_PROPERTY, unionType, group);
+
+		for (CatchClause mergeableCatchClause : removedClauses) {
+			rewrite.remove(mergeableCatchClause, group);
 		}
 	}
 
