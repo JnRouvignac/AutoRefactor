@@ -131,9 +131,8 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				}
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
-				Block newBlock1= ast.newBlock();
-				newBlock1.statements().addAll((Collection<Statement>) expressionStatements);
-				Block newBlock= newBlock1;
+				Block newBlock= ast.newBlock();
+				newBlock.statements().addAll((Collection<Statement>) expressionStatements);
 				ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 			}
 
