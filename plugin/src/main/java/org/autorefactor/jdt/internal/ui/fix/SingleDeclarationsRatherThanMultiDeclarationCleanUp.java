@@ -119,8 +119,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes" })
-	private void updateModifiers(final List<?> modifiers, final List newModifiers) {
+	private void updateModifiers(final List<?> modifiers, final List<ASTNode> newModifiers) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		newModifiers.clear();
