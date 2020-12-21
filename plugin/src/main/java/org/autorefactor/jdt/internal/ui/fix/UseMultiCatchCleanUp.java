@@ -42,6 +42,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -100,12 +101,15 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			if (typeBinding == null) {
 				return false;
 			}
+
 			if (other instanceof SingleBinding) {
 				SingleBinding o= (SingleBinding) other;
 				return typeBinding.isSubTypeCompatible(o.typeBinding);
 			}
+
 			if (other instanceof MultiBinding) {
 				MultiBinding o= (MultiBinding) other;
+
 				for (ITypeBinding otherTypeBinding : o.typeBindings) {
 					if (otherTypeBinding == null || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
 						return false;
@@ -114,6 +118,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 				return true;
 			}
+
 			throw new NotImplementedException(null, other);
 		}
 
@@ -134,14 +139,18 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		protected Boolean isSubTypeCompatible(final Binding other) {
 			if (other instanceof SingleBinding) {
 				SingleBinding o= (SingleBinding) other;
+
 				if (o.typeBinding == null) {
 					return null;
 				}
+
 				boolean anySubTypeCompatible= false;
+
 				for (ITypeBinding typeBinding : typeBindings) {
 					if (typeBinding == null) {
 						return null;
 					}
+
 					if (typeBinding.isSubTypeCompatible(o.typeBinding)) {
 						anySubTypeCompatible= true;
 					}
@@ -149,17 +158,21 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 				return anySubTypeCompatible;
 			}
+
 			if (other instanceof MultiBinding) {
 				MultiBinding o= (MultiBinding) other;
 				boolean anySubTypeCompatible= false;
+
 				for (ITypeBinding typeBinding : typeBindings) {
 					if (typeBinding == null) {
 						return null;
 					}
+
 					for (ITypeBinding otherTypeBinding : o.typeBindings) {
 						if (otherTypeBinding == null) {
 							return null;
 						}
+
 						if (typeBinding.isSubTypeCompatible(otherTypeBinding)) {
 							anySubTypeCompatible= true;
 						}
@@ -168,16 +181,19 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 				return anySubTypeCompatible;
 			}
+
 			throw new NotImplementedException(null, other);
 		}
 
 		@Override
 		public String toString() {
 			StringBuilder sb= new StringBuilder();
+
 			for (ITypeBinding typeBinding : typeBindings) {
 				if (sb.length() > 0) {
 					sb.append(" | "); //$NON-NLS-1$
 				}
+
 				sb.append(typeBinding.getName());
 			}
 
@@ -213,6 +229,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 				while (it1.hasNext() && it2.hasNext()) {
 					VariableDeclarationFragment f1= it1.next();
 					VariableDeclarationFragment f2= it2.next();
+
 					if (Utils.equalNotNull(ASTNodes.resolveTypeBinding(f1), ASTNodes.resolveTypeBinding(f2))
 							// This structural match is a bit dumb
 							// It cannot reconcile 1 with 1L, true with Boolean.TRUE, etc.
@@ -235,33 +252,33 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		}
 
 		@Override
-		public boolean match(final MethodInvocation mi1, final Object other) {
+		public boolean match(final MethodInvocation methodInvocation1, final Object other) {
 			if (other instanceof MethodInvocation) {
-				MethodInvocation mi2= (MethodInvocation) other;
-				return super.match(mi1, mi2)
-						&& isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
+				MethodInvocation methodInvocation2= (MethodInvocation) other;
+				return super.match(methodInvocation1, methodInvocation2)
+						&& isSameMethodBinding(methodInvocation1.resolveMethodBinding(), methodInvocation2.resolveMethodBinding());
 			}
 
 			return false;
 		}
 
 		@Override
-		public boolean match(final SuperMethodInvocation mi1, final Object other) {
+		public boolean match(final SuperMethodInvocation superMethodInvocation1, final Object other) {
 			if (other instanceof SuperMethodInvocation) {
-				SuperMethodInvocation mi2= (SuperMethodInvocation) other;
-				return super.match(mi1, mi2)
-						&& isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
+				SuperMethodInvocation superMethodInvocation2= (SuperMethodInvocation) other;
+				return super.match(superMethodInvocation1, superMethodInvocation2)
+						&& isSameMethodBinding(superMethodInvocation1.resolveMethodBinding(), superMethodInvocation2.resolveMethodBinding());
 			}
 
 			return false;
 		}
 
 		@Override
-		public boolean match(final ClassInstanceCreation cic1, final Object other) {
+		public boolean match(final ClassInstanceCreation classInstanceCreation1, final Object other) {
 			if (other instanceof ClassInstanceCreation) {
-				ClassInstanceCreation cic2= (ClassInstanceCreation) other;
-				return super.match(cic1, cic2)
-						&& isSameMethodBinding(cic1.resolveConstructorBinding(), cic2.resolveConstructorBinding());
+				ClassInstanceCreation classInstanceCreation2= (ClassInstanceCreation) other;
+				return super.match(classInstanceCreation1, classInstanceCreation2)
+						&& isSameMethodBinding(classInstanceCreation1.resolveConstructorBinding(), classInstanceCreation2.resolveConstructorBinding());
 			}
 
 			return false;
@@ -301,26 +318,14 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		Binding[] typeBindings= resolveTypeBindings(catchClauses);
 
 		for (int i= 0; i < catchClauses.size(); i++) {
-			CatchClause catchClause1= catchClauses.get(i);
+			CatchClause firstCatchClause= catchClauses.get(i);
 
 			for (int j= i + 1; j < catchClauses.size(); j++) {
-				CatchClause catchClause2= catchClauses.get(j);
+				CatchClause secondCatchClause= catchClauses.get(j);
 				MergeDirection direction= mergeDirection(typeBindings, i, j);
 
-				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(catchClause1, catchClause2)) {
-					ASTRewrite rewrite= cuRewrite.getASTRewrite();
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
-					UnionType ut= unionTypes(catchClause1.getException().getType(),
-							catchClause2.getException().getType());
-
-					if (MergeDirection.UP.equals(direction)) {
-						rewrite.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, group);
-						rewrite.remove(catchClause2, group);
-					} else if (MergeDirection.DOWN.equals(direction)) {
-						rewrite.remove(catchClause1, group);
-						rewrite.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut, group);
-					}
-
+				if (!MergeDirection.NONE.equals(direction) && matchMultiCatch(firstCatchClause, secondCatchClause)) {
+					refactorCatches(firstCatchClause, secondCatchClause, direction);
 					return false;
 				}
 			}
@@ -340,8 +345,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Binding resolveBinding(final CatchClause catchClause) {
-		SingleVariableDeclaration svd= catchClause.getException();
-		Type type= svd.getType();
+		SingleVariableDeclaration singleVariableDeclaration= catchClause.getException();
+		Type type= singleVariableDeclaration.getType();
 
 		switch (type.getNodeType()) {
 		case ASTNode.SIMPLE_TYPE:
@@ -351,21 +356,15 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 			List<Type> types= ((UnionType) type).types();
 			ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
 
-			for (int j= 0; j < types.size(); j++) {
-				typeBindings[j]= types.get(j).resolveBinding();
+			for (int i= 0; i < types.size(); i++) {
+				typeBindings[i]= types.get(i).resolveBinding();
 			}
 
 			return new MultiBinding(typeBindings);
 
 		default:
-			// TODO JNR throw
 			return null;
 		}
-	}
-
-	private boolean matchMultiCatch(final CatchClause catchClause1, final CatchClause catchClause2) {
-		MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(catchClause1, catchClause2);
-		return ASTNodes.match(matcher, catchClause1.getBody(), catchClause2.getBody());
 	}
 
 	private MergeDirection mergeDirection(final Binding[] typeBindings, final int start, final int end) {
@@ -385,6 +384,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		for (int i= start + 1; i < end; i++) {
 			Binding type= types[i];
+
 			if (Boolean.TRUE.equals(startType.isSubTypeCompatible(type))) {
 				return false;
 			}
@@ -398,6 +398,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
 		for (int i= start + 1; i < end; i++) {
 			Binding type= types[i];
+
 			if (Boolean.TRUE.equals(type.isSubTypeCompatible(endType))) {
 				return false;
 			}
@@ -406,26 +407,40 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private UnionType unionTypes(final Type... types) {
-		List<Type> allTypes= new ArrayList<>();
-		collectAllUnionedTypes(allTypes, Arrays.asList(types));
-		removeSupersededAlternatives(allTypes);
-
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		UnionType result= cuRewrite.getAST().newUnionType();
-		List<Type> unionedTypes= result.types();
-		unionedTypes.addAll(ASTNodes.createMoveTarget(rewrite, allTypes));
-		return result;
+	private boolean matchMultiCatch(final CatchClause firstCatchClause, final CatchClause secondCatchClause) {
+		MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(firstCatchClause, secondCatchClause);
+		return ASTNodes.match(matcher, firstCatchClause.getBody(), secondCatchClause.getBody());
 	}
 
-	private void collectAllUnionedTypes(final List<Type> results, final Collection<Type> types) {
-		for (Type type : types) {
+	private void refactorCatches(final CatchClause firstCatchClause, final CatchClause secondCatchClause, final MergeDirection direction) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		AST ast= cuRewrite.getAST();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.UseMultiCatchCleanUp_description);
+
+		List<Type> allTypes= new ArrayList<>();
+		collectAllUnionedTypes(Arrays.asList(firstCatchClause.getException().getType(), secondCatchClause.getException().getType()), allTypes);
+		removeSupersededAlternatives(allTypes);
+
+		UnionType unionType= ast.newUnionType();
+		List<Type> unionedTypes= unionType.types();
+		unionedTypes.addAll(ASTNodes.createMoveTarget(rewrite, allTypes));
+
+		if (MergeDirection.UP.equals(direction)) {
+			rewrite.set(firstCatchClause.getException(), SingleVariableDeclaration.TYPE_PROPERTY, unionType, group);
+			rewrite.remove(secondCatchClause, group);
+		} else if (MergeDirection.DOWN.equals(direction)) {
+			rewrite.remove(firstCatchClause, group);
+			rewrite.set(secondCatchClause.getException(), SingleVariableDeclaration.TYPE_PROPERTY, unionType, group);
+		}
+	}
+
+	private void collectAllUnionedTypes(final Collection<Type> inputTypes, final List<Type> outputTypes) {
+		for (Type type : inputTypes) {
 			if (type instanceof UnionType) {
-				UnionType ut= (UnionType) type;
-				collectAllUnionedTypes(results, ut.types());
+				UnionType unionType= (UnionType) type;
+				collectAllUnionedTypes(unionType.types(), outputTypes);
 			} else {
-				results.add(type);
+				outputTypes.add(type);
 			}
 		}
 	}
