@@ -609,6 +609,8 @@ public final class ASTNodes {
 			if (isField(booleanConstant, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
 				return Boolean.FALSE;
 			}
+
+			return getBooleanObject(booleanConstant);
 		}
 
 		return null;
@@ -626,9 +628,11 @@ public final class ASTNodes {
 	 */
 	public static Boolean getBooleanObject(final QualifiedName qualifiedName) {
 		String fqn= qualifiedName.getFullyQualifiedName();
+
 		if ("Boolean.TRUE".equals(fqn)) { //$NON-NLS-1$
 			return true;
 		}
+
 		if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
 			return false;
 		}
