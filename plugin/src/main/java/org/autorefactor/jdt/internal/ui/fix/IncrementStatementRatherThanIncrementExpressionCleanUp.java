@@ -65,12 +65,12 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 
 	@Override
 	public boolean visit(final Block visited) {
-		NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor();
-		newAndPutAllMethodVisitor.visitNode(visited);
-		return newAndPutAllMethodVisitor.result;
+		ExpressionVisitor expressionVisitor= new ExpressionVisitor();
+		expressionVisitor.visitNode(visited);
+		return expressionVisitor.result;
 	}
 
-	private final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
+	private final class ExpressionVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final PrefixExpression visited) {
 			if (ASTNodes.hasOperator(visited, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
