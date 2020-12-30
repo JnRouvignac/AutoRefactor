@@ -2466,7 +2466,7 @@ public final class ASTNodes {
 
 			if (tryStatement.catchClauses() != null) {
 				for (Object catchClause : tryStatement.catchClauses()) {
-					if (!fallsThrough((Statement) catchClause)) {
+					if (!fallsThrough(((CatchClause) catchClause).getBody())) {
 						return false;
 					}
 				}

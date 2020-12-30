@@ -64,6 +64,21 @@ public class ReduceIndentationSample {
         return i;
     }
 
+    public int refactorWithTryCatch(int i) {
+        // Keep this comment
+        if (i > 0) {
+            // Keep this comment too
+            return 0;
+        }
+        // Keep this comment also
+        try {
+            throw new Exception();
+        } catch(Exception e) {
+        }
+
+        return i;
+    }
+
     public int refactorThen(int i) {
         // Keep this comment
         if (i <= 0) {
