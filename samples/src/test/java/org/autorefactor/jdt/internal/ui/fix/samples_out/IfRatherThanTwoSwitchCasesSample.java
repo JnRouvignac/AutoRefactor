@@ -44,6 +44,29 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
+    public void replaceSwitchWithoutBreakAtTheEnd(int i1) {
+        int i = 0;
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
+            // Keep this comment too
+            i = 0;
+        } else {
+            if (i2 == 2) {
+                // Keep this comment also
+                i = 150;
+            }
+        }
+    }
+
+    public void replaceSwitchWithoutStatementsAtTheEnd(int i1) {
+        int i = 0;
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
+            // Keep this comment too
+            i = 0;
+        }
+    }
+
     public void replaceSwitchWithDefault(int i1) {
         int i = 0;
         // Keep this comment
@@ -161,6 +184,40 @@ public class IfRatherThanTwoSwitchCasesSample {
         return 10;
     }
 
+    public void replaceSwitchKeepExistingControlFlowBreaks(byte i1) {
+        byte j = 0;
+        loop: for (byte i = 0; i < 10; i++) {
+            if ((i1 == 0) || (i1 == 1)) {
+                j = 10;
+                continue;
+            } else if ((i1 == 2) || (i1 == 3) || (i1 == 4) || (i1 == 5) || (i1 == 6)) {
+                j = 20;
+                break loop;
+            }
+        }
+    }
+
+    public void replaceWithInnerLoopBreak(short i1) {
+        short j = 0;
+        if ((i1 == 0) || (i1 == 1)) {
+            j = 10;
+            short k = 0;
+            do {
+                if (j == i1) {
+                    break;
+                }
+                k++;
+            } while (k < j);
+        } else if ((i1 == 2) || (i1 == 3) || (i1 == 4)) {
+            j = 40;
+            for (short o : new short[] { 1, 2, 3 }) {
+                if (o == i1) {
+                    break;
+                }
+            }
+        }
+    }
+
     public void doNotReplaceSwitchCaseThatContinues(int i1) {
         int i = 0;
         switch (i1) {
@@ -197,40 +254,6 @@ public class IfRatherThanTwoSwitchCasesSample {
                 i = 150;
             }
             break;
-        }
-    }
-
-    public void replaceSwitchKeepExistingControlFlowBreaks(byte i1) {
-        byte j = 0;
-        loop: for (byte i = 0; i < 10; i++) {
-            if ((i1 == 0) || (i1 == 1)) {
-                j = 10;
-                continue;
-            } else if ((i1 == 2) || (i1 == 3) || (i1 == 4) || (i1 == 5) || (i1 == 6)) {
-                j = 20;
-                break loop;
-            }
-        }
-    }
-
-    public void replaceWithInnerLoopBreak(short i1) {
-        short j = 0;
-        if ((i1 == 0) || (i1 == 1)) {
-            j = 10;
-            short k = 0;
-            do {
-                if (j == i1) {
-                    break;
-                }
-                k++;
-            } while (k < j);
-        } else if ((i1 == 2) || (i1 == 3) || (i1 == 4)) {
-            j = 40;
-            for (short o : new short[] { 1, 2, 3 }) {
-                if (o == i1) {
-                    break;
-                }
-            }
         }
     }
 

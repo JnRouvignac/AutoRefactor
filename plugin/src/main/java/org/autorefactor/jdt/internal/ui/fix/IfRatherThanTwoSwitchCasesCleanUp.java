@@ -139,26 +139,31 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 			switchStructure.add(caseWithDefault);
 		}
 
-		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-			Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+		for (int i= 0; i < switchStructure.size(); i++) {
+			Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
-			if (!ASTNodes.fallsThrough(lastStatement)) {
+			if (!caseStructure.getSecond().isEmpty()) {
+				Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+
+				if (i < switchStructure.size() - 1 && !ASTNodes.fallsThrough(lastStatement)) {
+					return true;
+				}
+
+				BreakStatement breakStatement= ASTNodes.as(lastStatement, BreakStatement.class);
+
+				if (breakStatement != null && breakStatement.getLabel() == null) {
+					caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
+				}
+			} else if (i < switchStructure.size() - 1) {
 				return true;
-			}
-
-			BreakStatement bs= ASTNodes.as(lastStatement, BreakStatement.class);
-
-			if (bs != null && bs.getLabel() == null) {
-				caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
 			}
 		}
 
-		replaceSwitch(visited, switchStructure, caseIndexWithDefault);
-
+		replaceBySwitch(visited, switchStructure, caseIndexWithDefault);
 		return false;
 	}
 
-	private void replaceSwitch(final SwitchStatement visited,
+	private void replaceBySwitch(final SwitchStatement visited,
 			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -197,7 +202,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 				newIfStatement.setThenStatement(newBlock);
 				newIfStatement.setElseStatement(currentBlock);
 				currentBlock= newIfStatement;
-			} else if (caseStructure.getSecond().size() == 0) {
+			} else if (caseStructure.getSecond().isEmpty()) {
 				localCaseIndexWithDefault = -1;
 			} else if (localCaseIndexWithDefault == -1) {
 				IfStatement newIfStatement= ast.newIfStatement();

@@ -51,6 +51,42 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
+    public void replaceSwitchWithoutBreakAtTheEnd(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            // Keep this comment too
+            i = 0;
+            break;
+
+        case 3:
+        default:
+            if (i2 == 2) {
+                // Keep this comment also
+                i = 150;
+            }
+        }
+    }
+
+    public void replaceSwitchWithoutStatementsAtTheEnd(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            // Keep this comment too
+            i = 0;
+            break;
+
+        case 3:
+        default:
+        }
+    }
+
     public void replaceSwitchWithDefault(int i1) {
         int i = 0;
         // Keep this comment
@@ -225,45 +261,6 @@ public class IfRatherThanTwoSwitchCasesSample {
         return 10;
     }
 
-    public void doNotReplaceSwitchCaseThatContinues(int i1) {
-        int i = 0;
-        switch (i1) {
-        case 0:
-        case 1:
-        case 2:
-            i = 0;
-
-        case 3:
-        default:
-            if (i2 == 2) {
-                i = 150;
-            }
-            break;
-        }
-    }
-
-    public void doNotReplaceSwitchWithMoreThanTwoDistinctCases(int i1) {
-        int i = 0;
-        switch (i1) {
-        case 0:
-        case 1:
-        case 2:
-            i = 0;
-            break;
-
-        case 3:
-            i = 10;
-            break;
-
-        case 4:
-        default:
-            if (i2 == 2) {
-                i = 150;
-            }
-            break;
-        }
-    }
-
     public void replaceSwitchKeepExistingControlFlowBreaks(byte i1) {
         byte j = 0;
         loop: for (byte i = 0; i < 10; i++) {
@@ -307,6 +304,45 @@ public class IfRatherThanTwoSwitchCasesSample {
                 if (o == i1) {
                     break;
                 }
+            }
+            break;
+        }
+    }
+
+    public void doNotReplaceSwitchCaseThatContinues(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            i = 0;
+
+        case 3:
+        default:
+            if (i2 == 2) {
+                i = 150;
+            }
+            break;
+        }
+    }
+
+    public void doNotReplaceSwitchWithMoreThanTwoDistinctCases(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            i = 0;
+            break;
+
+        case 3:
+            i = 10;
+            break;
+
+        case 4:
+        default:
+            if (i2 == 2) {
+                i = 150;
             }
             break;
         }
