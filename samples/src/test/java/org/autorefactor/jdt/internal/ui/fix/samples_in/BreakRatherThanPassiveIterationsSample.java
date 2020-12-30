@@ -281,4 +281,11 @@ public class BreakRatherThanPassiveIterationsSample {
 
         return "The result: " + tenFactor;
     }
+
+    public void doNotRefactorInfiniteLoop(int[] array) {
+        int tenFactor = 0;
+
+        for (;;) {
+        }
+    }
 }

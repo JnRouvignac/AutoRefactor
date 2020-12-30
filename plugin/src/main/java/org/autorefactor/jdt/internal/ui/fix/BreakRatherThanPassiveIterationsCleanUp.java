@@ -196,7 +196,9 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 			vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
 		}
 
-		if (hasSideEffect(node.getExpression(), vars)) {
+		if (node.getExpression() == null
+				|| hasSideEffect(node.getExpression(), vars)
+				|| node.updaters().isEmpty()) {
 			return true;
 		}
 
