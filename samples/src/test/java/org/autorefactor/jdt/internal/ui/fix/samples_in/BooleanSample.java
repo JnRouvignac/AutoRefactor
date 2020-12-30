@@ -279,18 +279,6 @@ public class BooleanSample {
         return isValueValid;
     }
 
-    public Object doNotReplaceNonBooleanExpression(boolean isValid) {
-        Object anything = isValid ? true : "false";
-        return anything;
-    }
-
-    public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
-        Boolean isValueValid = bo1 ? bo2 : Boolean.FALSE;
-        isValueValid = bo1 ? Boolean.FALSE : bo2;
-        isValueValid = bo1 ? Boolean.TRUE : bo2;
-        isValueValid = bo1 ? bo2 : Boolean.TRUE;
-    }
-
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression(int number1, int number2) {
         // Keep this comment
         Boolean isValueValid = (number1 == 1) ? (number2 == 2) : Boolean.FALSE;
@@ -313,15 +301,6 @@ public class BooleanSample {
         // Keep this comment
         Boolean isValueValid = (number1 == 1) ? (number2 == 2) : Boolean.TRUE;
         return isValueValid;
-    }
-
-    public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean isValid) {
-        boolean isValueValid = true;
-        if (isValid) {
-            isValueValid = false;
-        } else {
-            System.out.println();
-        }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment1(boolean isValid) {
@@ -370,13 +349,6 @@ public class BooleanSample {
         // Keep this comment
         isValueValid = false;
         if (isValid) {
-            isValueValid = true;
-        }
-    }
-
-    public void doNotInlineAlreadyUsedVariable(boolean isValid) {
-        boolean isValueValid = false;
-        if (isValid || isValueValid) {
             isValueValid = true;
         }
     }
@@ -559,16 +531,6 @@ public class BooleanSample {
         }
     }
 
-    public void doNotDuplicateExpression(int i) {
-        if (i > 0) {
-            aMethodThatAcceptsABoolean(true);
-            aMethodThatAcceptsABoolean(true);
-        } else {
-            aMethodThatAcceptsABoolean(false);
-            aMethodThatAcceptsABoolean(false);
-        }
-    }
-
     public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean isValid) {
         // Keep this comment
         if (isValid) {
@@ -662,27 +624,11 @@ public class BooleanSample {
         return 42;
     }
 
-    public int doNotRefactorWithNameConflict(boolean isValid) {
+    public int removeUselessCondition(boolean isValid) {
         if (isValid) {
-            boolean isValueValid = true;
-            aMethodThatAcceptsABoolean(isValueValid);
         } else {
-            boolean isValueValid = false;
-            aMethodThatAcceptsABoolean(isValueValid);
         }
-
-        int isValueValid = 42;
-        return isValueValid;
-    }
-
-    public void doNotMoveActiveExpression(List<Integer> modifiableList) {
-        if (modifiableList.add(1)) {
-            aMethodThatAcceptsABoolean(modifiableList.contains(1));
-            aMethodThatAcceptsABoolean(true);
-        } else {
-            aMethodThatAcceptsABoolean(modifiableList.contains(1));
-            aMethodThatAcceptsABoolean(false);
-        }
+        return 42;
     }
 
     public void removeUselessIfInBooleanPrimitiveExpression12(boolean isValid) {
@@ -743,6 +689,67 @@ public class BooleanSample {
             return false;
         }
         return true;
+    }
+
+    public Object doNotReplaceNonBooleanExpression(boolean isValid) {
+        Object anything = isValid ? true : "false";
+        return anything;
+    }
+
+    public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
+        Boolean isValueValid = bo1 ? bo2 : Boolean.FALSE;
+        isValueValid = bo1 ? Boolean.FALSE : bo2;
+        isValueValid = bo1 ? Boolean.TRUE : bo2;
+        isValueValid = bo1 ? bo2 : Boolean.TRUE;
+    }
+
+    public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean isValid) {
+        boolean isValueValid = true;
+        if (isValid) {
+            isValueValid = false;
+        } else {
+            System.out.println();
+        }
+    }
+
+    public void doNotInlineAlreadyUsedVariable(boolean isValid) {
+        boolean isValueValid = false;
+        if (isValid || isValueValid) {
+            isValueValid = true;
+        }
+    }
+
+    public void doNotDuplicateExpression(int i) {
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
+    public int doNotRefactorWithNameConflict(boolean isValid) {
+        if (isValid) {
+            boolean isValueValid = true;
+            aMethodThatAcceptsABoolean(isValueValid);
+        } else {
+            boolean isValueValid = false;
+            aMethodThatAcceptsABoolean(isValueValid);
+        }
+
+        int isValueValid = 42;
+        return isValueValid;
+    }
+
+    public void doNotMoveActiveExpression(List<Integer> modifiableList) {
+        if (modifiableList.add(1)) {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(false);
+        }
     }
 
     public boolean doNotRefactor(Object o) {

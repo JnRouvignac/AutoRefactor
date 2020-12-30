@@ -162,11 +162,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 		if (!ASTNodes.hasVariableConflict(visited, visited.getThenStatement())) {
                 			List<Statement> statementsToMove= ASTNodes.asList(copyStatement);
 
-                			for (int i= statementsToMove.size() - 1; i > 0; i--) {
-                				rewrite.insertAfter(statementsToMove.get(i), visited, group);
-                			}
+                			if (statementsToMove.isEmpty()) {
+                				rewrite.remove(visited, group);
+                			} else {
+                    			for (int i= statementsToMove.size() - 1; i > 0; i--) {
+                    				rewrite.insertAfter(statementsToMove.get(i), visited, group);
+                    			}
 
-                			ASTNodes.replaceButKeepComment(rewrite, visited, statementsToMove.get(0), group);
+                    			ASTNodes.replaceButKeepComment(rewrite, visited, statementsToMove.get(0), group);
+                			}
                         	result= false;
                 			return false;
                 		}
