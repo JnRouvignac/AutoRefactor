@@ -227,16 +227,6 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         multiReassignedBoolean = Boolean.TRUE;
     }
 
-    public void doNotReplaceNullWrapper() {
-        Boolean reassignedBoolean = Boolean.TRUE;
-        reassignedBoolean = null;
-    }
-
-    public void doNotReplaceWrapperPassedAsObject(Map<Boolean, Observable> obsByBoolean) {
-        Boolean reassignedBoolean = Boolean.TRUE;
-        obsByBoolean.get(reassignedBoolean).notifyObservers();
-    }
-
     public void replaceAssignedWrapper() {
         // Keep this comment
         boolean assignedBoolean = Boolean.TRUE;
@@ -255,6 +245,25 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         wrapperField = assignedBoolean;
     }
 
+    public void replaceBitAssignedWrapper(Boolean aBoolean, Boolean anotherBoolean,
+            Boolean yetAnotherBoolean) {
+        // Keep this comment
+        boolean assignedBoolean = Boolean.TRUE;
+        aBoolean &= assignedBoolean;
+        anotherBoolean |= assignedBoolean;
+        yetAnotherBoolean ^= assignedBoolean;
+    }
+
+    public void doNotReplaceNullWrapper() {
+        Boolean reassignedBoolean = Boolean.TRUE;
+        reassignedBoolean = null;
+    }
+
+    public void doNotReplaceWrapperPassedAsObject(Map<Boolean, Observable> obsByBoolean) {
+        Boolean reassignedBoolean = Boolean.TRUE;
+        obsByBoolean.get(reassignedBoolean).notifyObservers();
+    }
+
     public void doNotReplaceWrapperAssignedOnObjectField() {
         Boolean assignedBoolean = Boolean.TRUE;
         objectField = assignedBoolean;
@@ -264,15 +273,6 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         Boolean assignedBoolean = Boolean.TRUE;
         Boolean anotherBoolean = assignedBoolean;
         Boolean yetAnotherBoolean = assignedBoolean;
-    }
-
-    public void replaceBitAssignedWrapper(Boolean aBoolean, Boolean anotherBoolean,
-            Boolean yetAnotherBoolean) {
-        // Keep this comment
-        boolean assignedBoolean = Boolean.TRUE;
-        aBoolean &= assignedBoolean;
-        anotherBoolean |= assignedBoolean;
-        yetAnotherBoolean ^= assignedBoolean;
     }
 
     public Boolean doNotReplaceMultiAutoBoxedWrapper() {
@@ -299,5 +299,12 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         Boolean returnedObject = Boolean.FALSE;
         returnedObject = b;
         return returnedObject;
+    }
+
+    public void doNotRefactorMultiDeclaration(boolean isValid) {
+        Boolean alwaysInitializedVar = Boolean.TRUE, otherVar;
+        if (alwaysInitializedVar && isValid) {
+            System.out.println("True!");
+        }
     }
 }

@@ -167,9 +167,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	public boolean visit(final VariableDeclarationStatement node) {
 		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
 
-		if (fragment.resolveBinding() != null
-				&& ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
-				&& fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
+		if (fragment != null
+				&& (fragment.resolveBinding() != null && ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
+						|| node.getType() != null && node.getType().resolveBinding() != null && ASTNodes.hasType(node.getType().resolveBinding(), getWrapperFullyQualifiedName()))
+				&& fragment.getInitializer() != null
+				&& isNotNull(fragment.getInitializer())) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
 			Block parentBlock= ASTNodes.getTypedAncestor(fragment, Block.class);
 
@@ -250,11 +252,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 	private class VarOccurrenceVisitor extends InterruptibleVisitor {
 		private final VariableDeclarationFragment varDecl;
-
 		private boolean isPrimitiveAllowed= true;
-
 		private boolean isVarReturned;
-
 		private int autoBoxingCount;
 
 		public VarOccurrenceVisitor(final VariableDeclarationFragment var) {
@@ -334,6 +333,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
 							return true;
 						}
+
 						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
 							if (!isVarReturned) {
 								isVarReturned= true;
@@ -369,6 +369,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			if (ASTNodes.hasType(resolveTypeBinding, getPrimitiveTypeName())) {
 				return true;
 			}
+
 			if (ASTNodes.hasType(resolveTypeBinding, getWrapperFullyQualifiedName())) {
 				autoBoxingCount++;
 				return true;
