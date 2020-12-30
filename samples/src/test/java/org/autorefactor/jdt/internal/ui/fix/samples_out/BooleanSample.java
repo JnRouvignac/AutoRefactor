@@ -31,13 +31,17 @@ public class BooleanSample {
     public boolean booleanPrimitive;
     public Boolean booleanWrapper;
 
+    protected boolean aMethodThatReturnsBoolean() {
+        return false;
+    }
+
     public void replaceIfByAssignment(boolean isValueValid) {
         boolean varToAssign;
         // Keep this comment
         varToAssign = isValueValid;
     }
 
-    public void replaceIfByOppositeAssignment(boolean isValueValid) {
+    public void replaceIfByNegativeAssignment(boolean isValueValid) {
         boolean varToAssign;
         // Keep this comment
         varToAssign = !isValueValid;
@@ -416,7 +420,7 @@ public class BooleanSample {
         return i;
     }
 
-    public int directlyPassOppositeBoolean(boolean isValid) {
+    public int directlyPassNegativeBoolean(boolean isValid) {
         // Keep this comment
         aMethodThatAcceptsABoolean(isValid);
         aMethodThatAcceptsABoolean(!isValid);
@@ -426,7 +430,7 @@ public class BooleanSample {
             return 10;
     }
 
-    public int directlyPassOppositeBoolean() {
+    public int directlyPassNegativeBoolean() {
         // Keep this comment
         aMethodThatAcceptsABoolean(this.booleanPrimitive);
         aMethodThatAcceptsABoolean(!this.booleanPrimitive);
@@ -495,6 +499,9 @@ public class BooleanSample {
     public boolean invertCast(Object o) {
         // Keep this comment
         return !((Boolean) o);
+    }
+
+    protected void aMethodThatAcceptsABoolean(boolean isValueValid) {
     }
 
     public Object doNotReplaceNonBooleanExpression(boolean isValid) {
@@ -573,12 +580,5 @@ public class BooleanSample {
         }
         ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
         return isValid ? objWithBooleanField.isValueValid : Boolean.TRUE;
-    }
-
-    protected boolean aMethodThatReturnsBoolean() {
-        return false;
-    }
-
-    protected void aMethodThatAcceptsABoolean(boolean isValueValid) {
     }
 }

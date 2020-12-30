@@ -171,6 +171,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
                     			ASTNodes.replaceButKeepComment(rewrite, visited, statementsToMove.get(0), group);
                 			}
+
                         	result= false;
                 			return false;
                 		}
