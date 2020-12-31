@@ -58,6 +58,78 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
+	public boolean visit(final ClassInstanceCreation visited) {
+		ITypeBinding typeBinding= visited.getType().resolveBinding();
+		List<Expression> args= visited.arguments();
+
+		if (getJavaMinorVersion() >= 5 && args.size() == 1) {
+			Expression arg0= args.get(0);
+
+			if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
+				if (ASTNodes.hasType(arg0, double.class.getSimpleName())) {
+					replaceFloatWithValueOf(visited, typeBinding, arg0);
+					return false;
+				}
+
+				if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
+					replaceFloatWithFloatValue(visited, arg0);
+					return false;
+				}
+			}
+
+			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Double.class.getCanonicalName(),
+					Short.class.getCanonicalName(), Float.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName())) {
+				ITypeBinding destinationTypeBinding= ASTNodes.getTargetType(visited);
+
+				if (destinationTypeBinding != null
+						&& destinationTypeBinding.isPrimitive()) {
+					replaceWithTheSingleArgument(visited);
+					return false;
+				}
+
+				replaceWithValueOf(visited, typeBinding, arg0);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private void replaceFloatWithValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding, final Expression arg0) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
+
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))); //$NON-NLS-1$
+		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+	}
+
+	private void replaceFloatWithFloatValue(final ClassInstanceCreation visited, final Expression arg0) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
+
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"); //$NON-NLS-1$
+		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+	}
+
+	private void replaceWithTheSingleArgument(final ClassInstanceCreation visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
+
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0)), group);
+	}
+
+	private void replaceWithValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding, final Expression arg0) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
+
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0))); //$NON-NLS-1$
+		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+	}
+
+	@Override
 	public boolean visit(final MethodInvocation visited) {
 		if (visited.getExpression() == null) {
 			return true;
@@ -65,7 +137,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
 		ITypeBinding destinationTypeBinding= ASTNodes.getTargetType(visited);
 
-		if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
+		if (destinationTypeBinding != null
+				&& destinationTypeBinding.isPrimitive()
 				&& "valueOf".equals(visited.getName().getIdentifier())) { //$NON-NLS-1$
 			if (ASTNodes.usesGivenSignature(visited, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(visited, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
@@ -129,11 +202,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 							visited.getName().getIdentifier());
 
 					if (methodName != null) {
-						TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-						ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-						ASTNodes.replaceButKeepComment(rewrite, visited,
-								newMethodInvocation(typeBinding.getName(), methodName, arg0), group);
+						replaceInstanceCreation(visited, typeBinding, methodName, arg0);
 						return false;
 					}
 				}
@@ -147,22 +216,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		return ASTNodes.usesGivenSignature(visited, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(visited, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
 						&& Objects.equals(10, ((Expression) visited.arguments().get(1)).resolveConstantExpressionValue());
-	}
-
-	private void replaceMethodName(final MethodInvocation visited, final String methodName) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-		SimpleName name= ast.newSimpleName(methodName);
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, name, group);
-	}
-
-	private void replaceWithTheSingleArgument(final MethodInvocation visited) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0)), group);
 	}
 
 	private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -197,57 +250,30 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
-	@Override
-	public boolean visit(final ClassInstanceCreation visited) {
-		ITypeBinding typeBinding= visited.getType().resolveBinding();
-		List<Expression> args= visited.arguments();
+	private void replaceWithTheSingleArgument(final MethodInvocation visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
-		if (getJavaMinorVersion() >= 5 && args.size() == 1) {
-			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Double.class.getCanonicalName(),
-					Short.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName())) {
-				replaceWithValueOf(visited, typeBinding);
-				return false;
-			}
-
-			if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
-				replaceFloatInstanceWithValueOf(visited, typeBinding, args);
-				return false;
-			}
-		}
-
-		return true;
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0)), group);
 	}
 
-	private void replaceFloatInstanceWithValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding,
-			final List<Expression> args) {
+	private void replaceMethodName(final MethodInvocation visited, final String methodName) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
-		Expression arg0= args.get(0);
+		SimpleName name= ast.newSimpleName(methodName);
 
-		if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
-			ASTNodes.replaceButKeepComment(rewrite, visited,
-					ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))), group); //$NON-NLS-1$
-		} else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
-			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"), group); //$NON-NLS-1$
-		} else {
-			replaceWithValueOf(visited, typeBinding);
-		}
+		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, name, group);
 	}
 
-	private void replaceWithValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding) {
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		ASTNodes.replaceButKeepComment(rewrite, visited,
-				newMethodInvocation(typeBinding.getName(), "valueOf", (Expression) visited.arguments().get(0)), group); //$NON-NLS-1$
-	}
-
-	private MethodInvocation newMethodInvocation(final String typeName, final String methodName, final Expression arg) {
+	private void replaceInstanceCreation(final MethodInvocation visited, final ITypeBinding typeBinding, final String methodName,
+			final Expression arg0) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveWrapperCreationCleanUp_description);
 
-		return ast.newMethodInvocation(typeName, methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg)));
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)));
+		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 }
