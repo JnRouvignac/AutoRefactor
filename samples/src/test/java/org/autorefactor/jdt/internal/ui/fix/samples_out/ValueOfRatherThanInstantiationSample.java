@@ -2,8 +2,8 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - #199 Replace unnecessary Boolean constant on boolean assignment
- *                                        #200 Compile error when Float myFloat = new Float(doubleObject);
+ * Copyright (C) 2016-2021 Fabrice Tiercelin - #199 Replace unnecessary Boolean constant on boolean assignment
+ *                                             #200 Compile error when Float myFloat = new Float(doubleObject);
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-public class PrimitiveWrapperCreationSample {
+public class ValueOfRatherThanInstantiationSample {
     public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte byPrimitive = 4;
@@ -67,100 +67,14 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryObjectCreation() {
-        Byte.parseByte("0");
-        Boolean.valueOf("true");
-        Integer.parseInt("42");
-        Short.parseShort("42");
-        Long.parseLong("42");
-        Float.parseFloat("42.42");
-        Double.parseDouble("42.42");
-    }
-
-    public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
         // Keep this comment
-        byte by1 = Byte.parseByte("0");
-        byte by2 = Byte.parseByte("0", 10);
-        boolean bo = Boolean.parseBoolean("true");
-        int i1 = Integer.parseInt("42");
-        int i2 = Integer.parseInt("42", 10);
-        long l1 = Long.parseLong("42");
-        long l2 = Long.parseLong("42", 10);
-        short s1 = Short.parseShort("42");
-        short s2 = Short.parseShort("42", 10);
-        float f = Float.parseFloat("42.42");
-        double d = Double.parseDouble("42.42");
-    }
-
-    public static void removeUnnecessaryValueOfCallsInPrimitiveDeclaration() {
-        // Keep this comment
-        char c = '&';
-        byte by = (byte) 0;
-        boolean bo = true;
-        int i = 42;
-        long l = 42;
-        short s = (short) 42;
-        float f = 42.42F;
-        double d = 42.42;
-    }
-
-    public static void removeUnnecessaryValueOfCallsInPrimitiveAssignment() {
-        // Keep this comment
-        char c;
-        c = '&';
-        byte by;
-        by = (byte) 0;
-        boolean bo1;
-        bo1 = true;
-        int i;
-        i = 42;
-        long l;
-        l = 42;
-        short s;
-        s = (short) 42;
-        float f;
-        f = 42.42F;
-        double d;
-        d = 42.42;
-    }
-
-    public static char removeUnnecessaryValueOfCallsInCharacterPrimitive() {
-        // Keep this comment
-        return '&';
-    }
-
-    public static byte removeUnnecessaryValueOfCallsInBytePrimitive() {
-        // Keep this comment
-        return (byte) 0;
-    }
-
-    public static boolean removeUnnecessaryValueOfCallsInBooleanPrimitive() {
-        // Keep this comment
-        return true;
-    }
-
-    public static int removeUnnecessaryValueOfCallsInIntegerPrimitive() {
-        // Keep this comment
-        return 42;
-    }
-
-    public static long removeUnnecessaryValueOfCallsInLongPrimitive() {
-        // Keep this comment
-        return 42;
-    }
-
-    public static short removeUnnecessaryValueOfCallsInShortPrimitive() {
-        // Keep this comment
-        return (short) 42;
-    }
-
-    public static float removeUnnecessaryValueOfCallsInFloatPrimitive() {
-        // Keep this comment
-        return 42.42F;
-    }
-
-    public static double removeUnnecessaryValueOfCallsInDoublePrimitive() {
-        // Keep this comment
-        return 42.42;
+        Byte.valueOf("0").byteValue();
+        Boolean.valueOf("true").booleanValue();
+        Integer.valueOf("42").intValue();
+        Short.valueOf("42").shortValue();
+        Long.valueOf("42").longValue();
+        Float.valueOf("42.42").floatValue();
+        Double.valueOf("42.42").doubleValue();
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {

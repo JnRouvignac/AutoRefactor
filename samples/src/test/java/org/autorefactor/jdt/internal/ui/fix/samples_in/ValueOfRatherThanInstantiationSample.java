@@ -2,8 +2,8 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - #199 Replace unnecessary Boolean constant on boolean assignment
- *                                        #200 Compile error when Float myFloat = new Float(doubleObject);
+ * Copyright (C) 2016-2021 Fabrice Tiercelin - #199 Replace unnecessary Boolean constant on boolean assignment
+ *                                             #200 Compile error when Float myFloat = new Float(doubleObject);
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
-public class PrimitiveWrapperCreationSample {
+public class ValueOfRatherThanInstantiationSample {
     public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte byPrimitive = 4;
@@ -67,6 +67,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryObjectCreation() {
+        // Keep this comment
         new Byte("0").byteValue();
         new Boolean("true").booleanValue();
         new Integer("42").intValue();
@@ -74,93 +75,6 @@ public class PrimitiveWrapperCreationSample {
         new Long("42").longValue();
         new Float("42.42").floatValue();
         new Double("42.42").doubleValue();
-    }
-
-    public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
-        // Keep this comment
-        byte by1 = Byte.valueOf("0");
-        byte by2 = Byte.valueOf("0", 10);
-        boolean bo = Boolean.valueOf("true");
-        int i1 = Integer.valueOf("42");
-        int i2 = Integer.valueOf("42", 10);
-        long l1 = Long.valueOf("42");
-        long l2 = Long.valueOf("42", 10);
-        short s1 = Short.valueOf("42");
-        short s2 = Short.valueOf("42", 10);
-        float f = Float.valueOf("42.42");
-        double d = Double.valueOf("42.42");
-    }
-
-    public static void removeUnnecessaryValueOfCallsInPrimitiveDeclaration() {
-        // Keep this comment
-        char c = Character.valueOf('&');
-        byte by = Byte.valueOf((byte) 0);
-        boolean bo = Boolean.valueOf(true);
-        int i = Integer.valueOf(42);
-        long l = Long.valueOf(42);
-        short s = Short.valueOf((short) 42);
-        float f = Float.valueOf(42.42F);
-        double d = Double.valueOf(42.42);
-    }
-
-    public static void removeUnnecessaryValueOfCallsInPrimitiveAssignment() {
-        // Keep this comment
-        char c;
-        c = Character.valueOf('&');
-        byte by;
-        by = Byte.valueOf((byte) 0);
-        boolean bo1;
-        bo1 = Boolean.valueOf(true);
-        int i;
-        i = Integer.valueOf(42);
-        long l;
-        l = Long.valueOf(42);
-        short s;
-        s = Short.valueOf((short) 42);
-        float f;
-        f = Float.valueOf(42.42F);
-        double d;
-        d = Double.valueOf(42.42);
-    }
-
-    public static char removeUnnecessaryValueOfCallsInCharacterPrimitive() {
-        // Keep this comment
-        return Character.valueOf('&');
-    }
-
-    public static byte removeUnnecessaryValueOfCallsInBytePrimitive() {
-        // Keep this comment
-        return Byte.valueOf((byte) 0);
-    }
-
-    public static boolean removeUnnecessaryValueOfCallsInBooleanPrimitive() {
-        // Keep this comment
-        return Boolean.valueOf(true);
-    }
-
-    public static int removeUnnecessaryValueOfCallsInIntegerPrimitive() {
-        // Keep this comment
-        return Integer.valueOf(42);
-    }
-
-    public static long removeUnnecessaryValueOfCallsInLongPrimitive() {
-        // Keep this comment
-        return Long.valueOf(42);
-    }
-
-    public static short removeUnnecessaryValueOfCallsInShortPrimitive() {
-        // Keep this comment
-        return Short.valueOf((short) 42);
-    }
-
-    public static float removeUnnecessaryValueOfCallsInFloatPrimitive() {
-        // Keep this comment
-        return Float.valueOf(42.42F);
-    }
-
-    public static double removeUnnecessaryValueOfCallsInDoublePrimitive() {
-        // Keep this comment
-        return Double.valueOf(42.42);
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {

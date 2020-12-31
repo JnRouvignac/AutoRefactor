@@ -161,15 +161,27 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
-    public static String PrimitiveWrapperCreationCleanUp_name;
+    public static String ParsingRatherThanValueOfCleanUp_name;
     /**
      * Automatically filled.
      */
-    public static String PrimitiveWrapperCreationCleanUp_description;
+    public static String ParsingRatherThanValueOfCleanUp_description;
     /**
      * Automatically filled.
      */
-    public static String PrimitiveWrapperCreationCleanUp_reason;
+    public static String ParsingRatherThanValueOfCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
+    public static String ValueOfRatherThanInstantiationCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String ValueOfRatherThanInstantiationCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String ValueOfRatherThanInstantiationCleanUp_reason;
     /**
      * Automatically filled.
      */

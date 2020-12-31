@@ -41,7 +41,7 @@ public final class Bindings {
 	/**
 	 * Get the type of the associated primitive wrapper.
 	 *
-	 * @param wrapperName wrapper name
+	 * @param wrapperName wrapper fully qualified name
 	 * @return The type of the associated primitive wrapper.
 	 */
 	public static String getUnboxedTypeName(final String wrapperName) {
