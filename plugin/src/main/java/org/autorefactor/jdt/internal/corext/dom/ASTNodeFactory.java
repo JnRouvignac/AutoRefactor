@@ -995,10 +995,10 @@ public class ASTNodeFactory {
 	 * @return a new class instance creation
 	 */
 	public ClassInstanceCreation newClassInstanceCreation(final String typeName, final Expression... arguments) {
-		ClassInstanceCreation cic= ast.newClassInstanceCreation();
-		cic.setType(simpleType(typeName));
-		addAll(cic.arguments(), arguments);
-		return cic;
+		ClassInstanceCreation classInstanceCreation= ast.newClassInstanceCreation();
+		classInstanceCreation.setType(simpleType(typeName));
+		addAll(classInstanceCreation.arguments(), arguments);
+		return classInstanceCreation;
 	}
 
 	/**
@@ -1009,10 +1009,10 @@ public class ASTNodeFactory {
 	 * @return a new class instance creation
 	 */
 	public ClassInstanceCreation newClassInstanceCreation(final Type type, final Expression... arguments) {
-		ClassInstanceCreation cic= ast.newClassInstanceCreation();
-		cic.setType(type);
-		addAll(cic.arguments(), arguments);
-		return cic;
+		ClassInstanceCreation classInstanceCreation= ast.newClassInstanceCreation();
+		classInstanceCreation.setType(type);
+		addAll(classInstanceCreation.arguments(), arguments);
+		return classInstanceCreation;
 	}
 
 	private <T extends ASTNode> void addAll(final List<T> whereToAdd, final T... toAdd) {

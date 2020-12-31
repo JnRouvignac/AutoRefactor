@@ -89,7 +89,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 	 * @see {@link java.util.HashMap#HashMap(java.util.Map)}
 	 */
 	@Override
-	boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+	boolean maybeReplace(final ClassInstanceCreation classInstanceCreation, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
 			final Type... types) {
 		if (types == null || types.length < 2) {
 			return true;
@@ -97,19 +97,19 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		Type keyType= types[0];
 		Type valueType= types[1];
-		List<Expression> arguments= cic.arguments();
+		List<Expression> arguments= classInstanceCreation.arguments();
 
 		if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
 				&& !ASTNodes.hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
 			return true;
 		}
 
-		replace(cic, alreadyImportedClasses, keyType, valueType, arguments);
+		replace(classInstanceCreation, alreadyImportedClasses, keyType, valueType, arguments);
 		importsToAdd.add(EnumMap.class.getCanonicalName());
 		return false;
 	}
 
-	private void replace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Type keyType,
+	private void replace(final ClassInstanceCreation classInstanceCreation, final Set<String> alreadyImportedClasses, final Type keyType,
 			final Type valueType, final List<Expression> arguments) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
@@ -120,7 +120,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		// If there were no type args in original creation (diamond operator),
 		// remove them from replacement
-		if (typeArgs(cic.getType()).isEmpty()) {
+		if (typeArgs(classInstanceCreation.getType()).isEmpty()) {
 			typeArgs(newType).clear();
 		}
 
@@ -128,7 +128,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		ASTNodes.replaceButKeepComment(rewrite, cic, ast.newClassInstanceCreation(newType, newParam), group);
+		ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newClassInstanceCreation(newType, newParam), group);
 	}
 
 	/**

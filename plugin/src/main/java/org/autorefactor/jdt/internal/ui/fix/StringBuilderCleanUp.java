@@ -387,17 +387,17 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 							isInstanceCreationToRewrite);
 				}
 			} else if (exp instanceof ClassInstanceCreation) {
-				ClassInstanceCreation cic= (ClassInstanceCreation) exp;
+				ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) exp;
 
-				if (cic.arguments().size() == 1) {
-					Expression arg0= (Expression) cic.arguments().get(0);
+				if (classInstanceCreation.arguments().size() == 1) {
+					Expression arg0= (Expression) classInstanceCreation.arguments().get(0);
 
-					if (ASTNodes.hasType(cic, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+					if (ASTNodes.hasType(classInstanceCreation, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 							&& (ASTNodes.hasType(arg0, String.class.getCanonicalName()) || ASTNodes.instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
 						isInstanceCreationToRewrite.lazySet(true);
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
 					}
-				} else if (cic.arguments().isEmpty() && !allOperands.isEmpty()
+				} else if (classInstanceCreation.arguments().isEmpty() && !allOperands.isEmpty()
                 		&& (allOperands.get(0).getFirst() != null
                 				? ASTNodes.hasType(allOperands.get(0).getFirst(), String.class.getCanonicalName())
                 				: ASTNodes.hasType(allOperands.get(0).getSecond(), String.class.getCanonicalName()))) {
@@ -405,7 +405,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 	isRefactoringNeeded.lazySet(true);
                 }
 
-				return cic;
+				return classInstanceCreation;
 			} else {
 				return expression;
 			}

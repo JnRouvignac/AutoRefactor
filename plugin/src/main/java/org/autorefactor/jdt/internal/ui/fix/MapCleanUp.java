@@ -107,13 +107,13 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
 		private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
 				final ExpressionStatement nodeToRemove) {
-			ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
-			if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
+			ClassInstanceCreation classInstanceCreation= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+			if (canReplaceInitializer(classInstanceCreation, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				ASTNodeFactory ast= cuRewrite.getASTBuilder();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.MapCleanUp_description);
 
-				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, cic.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
+				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, classInstanceCreation.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
 				rewrite.remove(nodeToRemove, group);
 				result= false;
 				return false;
@@ -122,18 +122,18 @@ public class MapCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceMap) {
-			if (cic == null || cic.getAnonymousClassDeclaration() != null) {
+		private boolean canReplaceInitializer(final ClassInstanceCreation classInstanceCreation, final Expression sourceMap) {
+			if (classInstanceCreation == null || classInstanceCreation.getAnonymousClassDeclaration() != null) {
 				return false;
 			}
-			List<Expression> args= cic.arguments();
+			List<Expression> args= classInstanceCreation.arguments();
 			boolean noArgsCtor= args.isEmpty();
 			boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-			return noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+			return noArgsCtor && ASTNodes.hasType(classInstanceCreation, ConcurrentHashMap.class.getCanonicalName(),
 					ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
 					IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
 					WeakHashMap.class.getCanonicalName())
-					|| mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+					|| mapCapacityCtor && ASTNodes.hasType(classInstanceCreation, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
 							HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
 							WeakHashMap.class.getCanonicalName());
 		}

@@ -88,12 +88,12 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 	 * method. <br>
 	 * <br>
 	 *
-	 * @param cic  - class instance creation node to be replaced
+	 * @param classInstanceCreation  - class instance creation node to be replaced
 	 * @param type - type argument of the declaration
 	 * @see java.util.EnumSet#noneOf(Class) <br>
 	 */
 	@Override
-	boolean maybeReplace(final ClassInstanceCreation cic, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
+	boolean maybeReplace(final ClassInstanceCreation classInstanceCreation, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
 			final Type... types) {
 		if (types == null || types.length < 1) {
 			return true;
@@ -102,7 +102,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 		Type type= types[0];
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		List<Expression> arguments= cic.arguments();
+		List<Expression> arguments= classInstanceCreation.arguments();
 		MethodInvocation invocation;
 		Name newClassName= ASTNodeFactory.newName(ast, alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
 
@@ -122,7 +122,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		ASTNodes.replaceButKeepComment(rewrite, cic, invocation, group);
+		ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());
 		return false;
 	}

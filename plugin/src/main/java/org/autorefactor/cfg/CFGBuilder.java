@@ -297,14 +297,14 @@ public class CFGBuilder {
 			return addVariableAccess(basicBlock, cae.getExpression(), flags, throwers);
 
 		case ASTNode.CLASS_INSTANCE_CREATION:
-			ClassInstanceCreation cic= (ClassInstanceCreation) node;
-			addVariableAccess(basicBlock, cic.getExpression(), flags, throwers);
-			addVariableAccesses(basicBlock, cic.arguments(), flags, throwers);
-			IMethodBinding cicBinding= cic.resolveConstructorBinding();
+			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) node;
+			addVariableAccess(basicBlock, classInstanceCreation.getExpression(), flags, throwers);
+			addVariableAccesses(basicBlock, classInstanceCreation.arguments(), flags, throwers);
+			IMethodBinding cicBinding= classInstanceCreation.resolveConstructorBinding();
 
 			if (cicBinding != null) {
 				ITypeBinding[] declaredThrows= cicBinding.getExceptionTypes();
-				throwers.addThrow(cic, declaredThrows);
+				throwers.addThrow(classInstanceCreation, declaredThrows);
 				return declaredThrows.length > 0;
 			}
 
