@@ -56,7 +56,8 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 	public boolean visit(final NumberLiteral node) {
 		String token= node.getToken();
 
-		if (token.endsWith("l") || token.endsWith("f")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (token.endsWith("l") //$NON-NLS-1$
+				|| token.endsWith("f") && !token.startsWith("0x") && !token.startsWith("0X")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			useUppercase(node, token);
 			return false;
 		}
@@ -65,8 +66,8 @@ public class UppercaseNumberSuffixRatherThanLowercaseCleanUp extends AbstractCle
 	}
 
 	private void useUppercase(final NumberLiteral node, final String token) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.UppercaseNumberSuffixRatherThanLowercaseCleanUp_description);
 
 		String newToken= token.substring(0, token.length() - 1) + token.substring(token.length() - 1).toUpperCase();

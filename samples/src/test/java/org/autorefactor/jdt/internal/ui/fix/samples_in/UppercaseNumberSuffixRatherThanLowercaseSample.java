@@ -42,6 +42,8 @@ public class UppercaseNumberSuffixRatherThanLowercaseSample {
     }
 
     public float doNotRefactor() {
+        int hexadecimalNumber = 0xff;
+        int hexadecimalNumberInUppercase = 0Xff;
         long l = 11L;
         float f = 11F;
         return l + 101L + f + 11F;
