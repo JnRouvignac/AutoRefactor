@@ -69,37 +69,36 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 		return true;
 	}
 
-	private void refactorWithInitializer(final ArrayCreation visited) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description);
-
-		if (visited.getInitializer() != null) {
-			ASTNodes.replaceButKeepComment(rewrite, visited, visited.getInitializer(), group);
-		} else {
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-			ASTNodes.replaceButKeepComment(rewrite, visited, ast.createCopyTarget(ast.newArrayInitializer()), group);
-		}
-	}
-
-	private boolean isDestinationAllowed(final ASTNode visited) {
-		int parentType= visited.getParent().getNodeType();
-
-		return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
-				|| parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
-	}
-
 	private boolean isVoid(final ArrayCreation visited) {
 		List<Expression> dimensions= visited.dimensions();
 
 		for (Expression dimension : dimensions) {
-			Object dimensionLiteral= dimension.resolveConstantExpressionValue();
-
-			if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {
+			if (!Long.valueOf(0L).equals(ASTNodes.getIntegerLiteral(dimension))) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	private boolean isDestinationAllowed(final ASTNode visited) {
+		int parentType= visited.getParent().getNodeType();
+
+		return parentType == ASTNode.FIELD_DECLARATION
+				|| parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION
+				|| parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
+				|| parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
+	}
+
+	private void refactorWithInitializer(final ArrayCreation visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BracketsRatherThanArrayInstantiationCleanUp_description);
+
+		if (visited.getInitializer() != null) {
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, visited.getInitializer()), group);
+		} else {
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newArrayInitializer(), group);
+		}
 	}
 }
