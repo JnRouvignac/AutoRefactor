@@ -227,22 +227,22 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
         }
 
         private void replaceLoopByIf(final Statement forNode, final Expression iterable, final List<Statement> thenStatements,
-                final Expression toFind, final BreakStatement bs) {
+                final Expression toFind, final BreakStatement breakStatement) {
+            ASTRewrite rewrite= cuRewrite.getASTRewrite();
+            ASTNodeFactory ast= cuRewrite.getASTBuilder();
+            TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
+
             thenStatements.remove(thenStatements.size() - 1);
 
-            ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			IfStatement replacement= ast.newIfStatement();
 			replacement.setExpression(newMethod(iterable, toFind, true, classesToUseWithImport, importsToAdd));
 			Block newBlock= ast.newBlock();
 			newBlock.statements().add(ast.copyRange(thenStatements));
 			replacement.setThenStatement(newBlock);
 
-            ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-            TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
             ASTNodes.replaceButKeepComment(rewrite, forNode, replacement, group);
 
-            thenStatements.add(bs);
+            thenStatements.add(breakStatement);
         }
 
         private void replaceLoopAndReturn(final Statement forNode, final Expression iterable, final Expression toFind,
@@ -265,8 +265,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
             if (previousStatement != null) {
                 boolean previousStmtIsPreviousSibling= previousStatement.equals(ASTNodes.getPreviousSibling(forNode));
-                Assignment as= ASTNodes.asExpression(uniqueThenStatement, Assignment.class);
-                Pair<Expression, Expression> innerInit= ASTNodes.decomposeInitializer(as);
+                Assignment assignment= ASTNodes.asExpression(uniqueThenStatement, Assignment.class);
+                Pair<Expression, Expression> innerInit= ASTNodes.decomposeInitializer(assignment);
                 Expression initName= innerInit.getFirst();
                 Expression init2= innerInit.getSecond();
                 Pair<Expression, Expression> outerInit= getInitializer(previousStatement);
