@@ -219,22 +219,26 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			Expression arg0= (Expression) methodInvocation.arguments().get(0);
 
 			if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
-
-				if (isInStringAppend(methodInvocation.getParent())) {
-					ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-					ASTNodes.replaceButKeepComment(rewrite, visited, ast.newParenthesizedExpression(getCompareToNode(isPositive, methodInvocation)), group);
-				} else {
-					ASTNodes.replaceButKeepComment(rewrite, visited, getCompareToNode(isPositive, methodInvocation), group);
-				}
-
+				replaceEquals(isPositive, visited, methodInvocation);
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	private void replaceEquals(final boolean isPositive, final Expression visited,
+			final MethodInvocation methodInvocation) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
+
+		if (isInStringAppend(methodInvocation.getParent())) {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newParenthesizedExpression(getCompareToNode(isPositive, methodInvocation)), group);
+		} else {
+			ASTNodes.replaceButKeepComment(rewrite, visited, getCompareToNode(isPositive, methodInvocation), group);
+		}
 	}
 
 	private boolean isInStringAppend(final ASTNode visited) {

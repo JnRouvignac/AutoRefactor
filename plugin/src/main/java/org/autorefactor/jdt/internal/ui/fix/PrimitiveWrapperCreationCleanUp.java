@@ -68,43 +68,50 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
 				&& "valueOf".equals(visited.getName().getIdentifier())) { //$NON-NLS-1$
 			if (ASTNodes.usesGivenSignature(visited, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(visited, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(visited, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(visited, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(visited, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(visited, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(visited, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-					|| ASTNodes.usesGivenSignature(visited, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(visited, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName())) { //$NON-NLS-1$
 				replaceWithTheSingleArgument(visited);
 				return false;
 			}
 
-			if (is(visited, Byte.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseByte"); //$NON-NLS-1$
-			}
-
-			if (is(visited, Short.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseShort"); //$NON-NLS-1$
-			}
-
 			if (is(visited, Integer.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseInt"); //$NON-NLS-1$
+				replaceMethodName(visited, "parseInt"); //$NON-NLS-1$
+				return false;
 			}
 
 			if (is(visited, Long.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseLong"); //$NON-NLS-1$
+				replaceMethodName(visited, "parseLong"); //$NON-NLS-1$
+				return false;
 			}
 
 			if (ASTNodes.usesGivenSignature(visited, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
-				return replaceMethodName(visited, "parseBoolean"); //$NON-NLS-1$
+				replaceMethodName(visited, "parseBoolean"); //$NON-NLS-1$
+				return false;
 			}
 
 			if (is(visited, Float.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseFloat"); //$NON-NLS-1$
+				replaceMethodName(visited, "parseFloat"); //$NON-NLS-1$
+				return false;
 			}
 
 			if (is(visited, Double.class.getCanonicalName())) {
-				return replaceMethodName(visited, "parseDouble"); //$NON-NLS-1$
+				replaceMethodName(visited, "parseDouble"); //$NON-NLS-1$
+				return false;
+			}
+
+			if (is(visited, Byte.class.getCanonicalName())) {
+				replaceMethodName(visited, "parseByte"); //$NON-NLS-1$
+				return false;
+			}
+
+			if (is(visited, Short.class.getCanonicalName())) {
+				replaceMethodName(visited, "parseShort"); //$NON-NLS-1$
+				return false;
 			}
 		}
 
@@ -112,10 +119,10 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		ClassInstanceCreation classInstanceCreation= ASTNodes.as(visited.getExpression(), ClassInstanceCreation.class);
 
 		if (typeBinding != null && classInstanceCreation != null) {
-			List<?> cicArgs= classInstanceCreation.arguments();
+			List<Expression> classInstanceCreationArguments= classInstanceCreation.arguments();
 
-			if (cicArgs.size() == 1) {
-				Expression arg0= (Expression) cicArgs.get(0);
+			if (classInstanceCreationArguments.size() == 1) {
+				Expression arg0= classInstanceCreationArguments.get(0);
 
 				if (visited.arguments().isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
 					String methodName= getMethodName(typeBinding.getQualifiedName(),
@@ -142,7 +149,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 						&& Objects.equals(10, ((Expression) visited.arguments().get(1)).resolveConstantExpressionValue());
 	}
 
-	private boolean replaceMethodName(final MethodInvocation visited, final String methodName) {
+	private void replaceMethodName(final MethodInvocation visited, final String methodName) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		SimpleName name= ast.newSimpleName(methodName);
@@ -150,7 +157,6 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
 		rewrite.set(visited, MethodInvocation.NAME_PROPERTY, name, group);
-		return false;
 	}
 
 	private void replaceWithTheSingleArgument(final MethodInvocation visited) {
@@ -164,8 +170,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 			return "valueOf"; //$NON-NLS-1$
 		}
 
-		if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
-			return "parseByte"; //$NON-NLS-1$
+		if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseInt"; //$NON-NLS-1$
+		}
+
+		if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseLong"; //$NON-NLS-1$
 		}
 
 		if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
@@ -176,16 +186,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 			return "parseFloat"; //$NON-NLS-1$
 		}
 
-		if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
-			return "parseLong"; //$NON-NLS-1$
-		}
-
 		if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
 			return "parseShort"; //$NON-NLS-1$
 		}
 
-		if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
-			return "parseInt"; //$NON-NLS-1$
+		if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
+			return "parseByte"; //$NON-NLS-1$
 		}
 
 		return null;
@@ -197,8 +203,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 		List<Expression> args= visited.arguments();
 
 		if (getJavaMinorVersion() >= 5 && args.size() == 1) {
-			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
-					Long.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName())) {
+			if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Double.class.getCanonicalName(),
+					Short.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName())) {
 				replaceWithValueOf(visited, typeBinding);
 				return false;
 			}
