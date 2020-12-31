@@ -290,7 +290,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		if (visited.getExpression() != null && "append".equals(visited.getName().getIdentifier()) //$NON-NLS-1$
 				&& visited.arguments().size() == 1
 				// Most expensive check comes last
-				&& ASTNodes.hasType(visited.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())) {
+				&& ASTNodes.hasType(visited.getExpression(), StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())) {
 			MethodInvocation embeddedMI= ASTNodes.as((Expression) visited.arguments().get(0), MethodInvocation.class);
 
 			if (ASTNodes.usesGivenSignature(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
@@ -376,7 +376,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			final AtomicBoolean isInstanceCreationToRewrite) {
 		Expression exp= ASTNodes.getUnparenthesedExpression(expression);
 
-		if (ASTNodes.hasType(exp, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())) {
+		if (ASTNodes.hasType(exp, StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())) {
 			if (exp instanceof MethodInvocation) {
 				MethodInvocation methodInvocation= (MethodInvocation) exp;
 
@@ -392,7 +392,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				if (classInstanceCreation.arguments().size() == 1) {
 					Expression arg0= (Expression) classInstanceCreation.arguments().get(0);
 
-					if (ASTNodes.hasType(classInstanceCreation, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+					if (ASTNodes.hasType(classInstanceCreation, StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())
 							&& (ASTNodes.hasType(arg0, String.class.getCanonicalName()) || ASTNodes.instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
 						isInstanceCreationToRewrite.lazySet(true);
 						readSubExpressions(arg0, allOperands, isRefactoringNeeded);
@@ -612,7 +612,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (result == null) {
 				result= finalString;
 			} else {
-				result= ast.newMethodInvocation(result, "append", ASTNodes.getUnparenthesedExpression(finalString)); //$NON-NLS-1$
+				result= ast.newMethodInvocation(result, "append", finalString); //$NON-NLS-1$
 			}
 		}
 

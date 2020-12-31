@@ -41,6 +41,11 @@ public class StringBuilderSample {
         sbui.append("foo").append(0).append("bar").append(1);
     }
 
+    public void replaceWithParenthesis(StringBuffer sbuf, StringBuilder sbui, String s) {
+        // Keep this comment
+        sbuf.append("foo " + "bar ").append((0)).append((1));
+    }
+
     public void refactorOnExpression(Object sbuf, Object sbui, String s) {
         // Keep this comment
         ((StringBuffer) sbuf).append("foo " + "bar ").append(0).append(1);
