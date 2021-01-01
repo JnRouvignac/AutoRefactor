@@ -222,20 +222,24 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
             pattern= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1){2}"); //$NON-NLS-1$
         }
 
-        while (DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).find()) {
-            MatchResult matchResult= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).toMatchResult();
-            // TODO Correctly handle repetition enclosing
-            String pattern2;
+        try {
+			while (DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).find()) {
+			    MatchResult matchResult= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).toMatchResult();
+			    // TODO Correctly handle repetition enclosing
+			    String pattern2;
 
-            if ("*".equals(matchResult.group(2))) { //$NON-NLS-1$
-                pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1)+"); //$NON-NLS-1$
-            } else if ("+".equals(matchResult.group(2))) { //$NON-NLS-1$
-                pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1){2,}"); //$NON-NLS-1$
-            } else if ("?".equals(matchResult.group(2))) { //$NON-NLS-1$
-                pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1){1,2}"); //$NON-NLS-1$
-            }
-            break;
-        }
+			    if ("*".equals(matchResult.group(2))) { //$NON-NLS-1$
+			        pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1)+"); //$NON-NLS-1$
+			    } else if ("+".equals(matchResult.group(2))) { //$NON-NLS-1$
+			        pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1){2,}"); //$NON-NLS-1$
+			    } else if ("?".equals(matchResult.group(2))) { //$NON-NLS-1$
+			        pattern2= DUPLICATE_WITHOUT_REPETITOR_PATTERN.matcher(pattern).replaceAll("(?:$1){1,2}"); //$NON-NLS-1$
+			    }
+			    break;
+			}
+		} catch (Exception e) {
+			e.getMessage();
+		}
 
         if (!Utils.equalNotNull(visited.getLiteralValue(), pattern)) {
             rewriteRegEx(visited, pattern);
@@ -245,12 +249,11 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void rewriteRegEx(final StringLiteral visited, String pattern) {
+    private void rewriteRegEx(final StringLiteral visited, final String pattern) {
+        ASTRewrite rewrite= cuRewrite.getASTRewrite();
+        ASTNodeFactory ast= cuRewrite.getASTBuilder();
         TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-        ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
         ASTNodes.replaceButKeepComment(rewrite, visited, ast.newStringLiteral(pattern), group);
     }
