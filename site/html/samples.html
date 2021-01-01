@@ -113,7 +113,7 @@
 
 
     <script type="text/javascript">
-      var base_dir = "https://api.github.com/repos/JnRouvignac/AutoRefactor/contents/samples/src/test/java/org/autorefactor/jdt/internal/ui/fix/";
+      var base_dir = "https://api.github.com/repos/JnRouvignac/AutoRefactor/contents/samples/src/test/java/org/autorefactor/refactoring/rules/";
       var sample_in;
       var sample_out;
 
@@ -172,8 +172,8 @@
                       sample_in = fileContent;
                   } else {
                       sample_out = fileContent.replace(
-                          "package org.autorefactor.jdt.internal.ui.fix.samples_out",
-                          "package org.autorefactor.jdt.internal.ui.fix.samples_in"
+                          "package org.autorefactor.refactoring.rules.samples_out",
+                          "package org.autorefactor.refactoring.rules.samples_in"
                       );
                   }
 
