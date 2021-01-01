@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
+
 import java.util.List;
 
 public class BooleanSample {
@@ -77,7 +80,17 @@ public class BooleanSample {
         return (/* do not lose me */o instanceof String);
     }
 
+    public Boolean returnIfConditionStaticConstants(boolean isValueValid) {
+        // Keep this comment
+        return Boolean.valueOf(isValueValid);
+    }
+
     public Boolean returnIfConditionBooleanObject(boolean isValueValid) {
+        // Keep this comment
+        return Boolean.valueOf(isValueValid);
+    }
+
+    public Boolean returnIfConditionFullyQualifiedConstants(boolean isValueValid) {
         // Keep this comment
         return Boolean.valueOf(isValueValid);
     }

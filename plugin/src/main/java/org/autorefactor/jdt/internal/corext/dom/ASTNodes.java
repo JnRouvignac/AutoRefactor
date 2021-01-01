@@ -613,6 +613,29 @@ public final class ASTNodes {
 			return getBooleanObject(booleanConstant);
 		}
 
+		SimpleName staticConstant= as(expression, SimpleName.class);
+
+		if (staticConstant != null) {
+			IBinding iBinding= staticConstant.resolveBinding();
+
+			if (iBinding != null
+					&& iBinding.getKind() == IBinding.VARIABLE) {
+				IVariableBinding iVariableBinding= (IVariableBinding) iBinding;
+
+				if (hasType(iVariableBinding.getDeclaringClass(), Boolean.class.getCanonicalName())) {
+					String fqn= staticConstant.getIdentifier();
+
+					if ("TRUE".equals(fqn)) { //$NON-NLS-1$
+						return true;
+					}
+
+					if ("FALSE".equals(fqn)) { //$NON-NLS-1$
+						return false;
+					}
+				}
+			}
+		}
+
 		return null;
 	}
 
@@ -629,11 +652,11 @@ public final class ASTNodes {
 	public static Boolean getBooleanObject(final QualifiedName qualifiedName) {
 		String fqn= qualifiedName.getFullyQualifiedName();
 
-		if ("Boolean.TRUE".equals(fqn)) { //$NON-NLS-1$
+		if ("Boolean.TRUE".equals(fqn) || "java.lang.Boolean.TRUE".equals(fqn)) { //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
 		}
 
-		if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
+		if ("Boolean.FALSE".equals(fqn) || "java.lang.Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 
