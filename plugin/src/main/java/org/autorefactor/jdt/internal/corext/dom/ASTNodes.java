@@ -383,6 +383,7 @@ public final class ASTNodes {
 			if (exprClass.isAssignableFrom(expression.getClass())) {
 				return (T) expression;
 			}
+
 			if (expression instanceof ParenthesizedExpression) {
 				return as(((ParenthesizedExpression) expression).getExpression(), exprClass);
 			}
@@ -679,7 +680,9 @@ public final class ASTNodes {
 		if (node == null || node.getParent() == null) {
 			return null;
 		}
+
 		ASTNode parent= node.getParent();
+
 		if (ancestorClass.isAssignableFrom(parent.getClass())) {
 			return (T) parent;
 		}
@@ -698,18 +701,19 @@ public final class ASTNodes {
 	 * @see #getTypedAncestorOrCrash(ASTNode, Class)
 	 * @see #getTypedAncestor(ASTNode, Class)
 	 */
-	public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<?>... ancestorClasses) {
+	public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<? extends ASTNode>... ancestorClasses) {
 		if (ancestorClasses.length == 1) {
 			throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
 		}
+
 		if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
 			return null;
 		}
+
 		ASTNode parent= node.getParent();
-		for (Class<?> ancestorClass : ancestorClasses) {
-			if (ancestorClass.isAssignableFrom(parent.getClass())) {
-				return parent;
-			}
+
+		if (instanceOf(parent, ancestorClasses)) {
+			return parent;
 		}
 
 		return getFirstAncestorOrNull(parent, ancestorClasses);
@@ -747,7 +751,7 @@ public final class ASTNodes {
 	 * @return the enclosing type of the provided node, or {@code null}
 	 */
 	public static ASTNode getEnclosingType(final ASTNode node) {
-		Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
+		Class<? extends ASTNode>[] ancestorClasses= new Class[] { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
 		ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
 		if (ancestor == null) {
 			throw new IllegalStateException(node,
@@ -2331,22 +2335,22 @@ public final class ASTNodes {
 	 * @return the last parent node of the provided classes, or the current node
 	 *         otherwise
 	 */
-	public static ASTNode getMatchingParent(final ASTNode node, final Class<?>... includedClasses) {
+	public static ASTNode getHighestCompatibleNode(final ASTNode node, final Class<? extends ASTNode>... includedClasses) {
 		ASTNode parent= node.getParent();
 
 		if (instanceOf(parent, includedClasses)) {
-			return getMatchingParent(parent, includedClasses);
+			return getHighestCompatibleNode(parent, includedClasses);
 		}
 
 		return node;
 	}
 
-	private static boolean instanceOf(final ASTNode node, final Class<?>... clazzes) {
+	private static boolean instanceOf(final ASTNode node, final Class<? extends ASTNode>... clazzes) {
 		if (node == null) {
 			return false;
 		}
 
-		for (Class<?> clazz : clazzes) {
+		for (Class<? extends ASTNode> clazz : clazzes) {
 			if (clazz.isAssignableFrom(node.getClass())) {
 				return true;
 			}

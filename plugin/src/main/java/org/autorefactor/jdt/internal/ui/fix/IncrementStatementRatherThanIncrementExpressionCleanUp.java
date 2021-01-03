@@ -221,7 +221,7 @@ public class IncrementStatementRatherThanIncrementExpressionCleanUp extends Abst
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.IncrementStatementRatherThanIncrementExpressionCleanUp_description);
 
-			ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getMatchingParent(visited, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
+			ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getHighestCompatibleNode(visited, ParenthesizedExpression.class), ast.createCopyTarget(variable), group);
 
 			if (visited instanceof PostfixExpression) {
 				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, visited));

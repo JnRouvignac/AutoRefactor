@@ -285,7 +285,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
 		private ITypeBinding getDeclaringTypeInTopLevelHierarchy(final String simpleName, final FqnType fqnType,
 				final ASTNode node) {
-			Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
+			Class<? extends ASTNode>[] ancestorClasses= new Class[] { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
 			ASTNode enclosingType= ASTNodes.getFirstAncestorOrNull(node, ancestorClasses);
 
 			while (enclosingType != null) {
