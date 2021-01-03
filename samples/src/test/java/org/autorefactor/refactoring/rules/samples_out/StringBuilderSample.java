@@ -382,19 +382,6 @@ public class StringBuilderSample {
         sb.append(iObject);
     }
 
-    public void removeSubstringDoubleArgsCallsWithAppend(String s) {
-        // Keep this comment
-        new StringBuilder().append(s, 0, 1);
-        new StringBuffer().append(s, 0, 1);
-        new StringBuilder().append(s, 0, 1);
-        new StringBuffer().append(s, 0, 1);
-    }
-
-    public void doNotRemoveSubstringSingleArgCallsWithAppend(String s, StringBuilder builder, StringBuffer buffer) {
-        builder.append(s.substring(1));
-        buffer.append(s.substring(1));
-    }
-
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
     }
 
