@@ -142,4 +142,12 @@ abstract public interface RedundantModifiersSample {
 
         protected final void doIt(){}
     }
+
+    default void doNotRemoveFinalModifierOnDefaultMethod(final String doNotRemoveFinalModifier) {
+        System.out.println(doNotRemoveFinalModifier);
+    }
+
+    static void doNotRemoveFinalModifierOnStaticMethod(final String doNotRemoveFinalModifier) {
+        System.out.println(doNotRemoveFinalModifier);
+    }
 }
