@@ -509,6 +509,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String ComparisonRatherThanEqualsCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String ComparisonRatherThanEqualsCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String ComparisonRatherThanEqualsCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
     /**
      * Automatically filled.

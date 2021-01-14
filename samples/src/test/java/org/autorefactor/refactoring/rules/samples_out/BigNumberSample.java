@@ -40,36 +40,6 @@ public class BigNumberSample {
         return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6;
     }
 
-    public static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
-        // Keep this comment
-        boolean result1 = bd1.compareTo(bd2) != 0;
-        boolean result2 = bd1.compareTo(bd2) == 0;
-        return result1 && result2;
-    }
-
-    public static boolean refactorToCompareToEqualsZero(BigInteger bd1, BigInteger bd2) {
-        // Keep this comment
-        boolean result1 = bd1.compareTo(bd2) != 0;
-        boolean result2 = bd1.compareTo(bd2) == 0;
-        return result1 && result2;
-    }
-
-    public static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {
-        // Keep this comment
-        String s = "" + (bd1.compareTo(bd2) == 0);
-        String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
-        String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
-        return s + s2 + s3;
-    }
-
-    public static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigInteger bd1, BigInteger bd2) {
-        // Keep this comment
-        String s = "" + (bd1.compareTo(bd2) == 0);
-        String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
-        String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
-        return s + s2 + s3;
-    }
-
     public static String useBigDecimalConstants() {
         // Keep this comment
         BigDecimal bd1 = BigDecimal.ZERO;

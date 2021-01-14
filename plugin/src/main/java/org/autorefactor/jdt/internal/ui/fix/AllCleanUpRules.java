@@ -102,6 +102,7 @@ public final class AllCleanUpRules {
                 new SubstringWithOneParameterRatherThanTwoCleanUp(),
                 new TruncatingAppendingRatherThanSubCharactersCleanUp(),
                 new BigNumberCleanUp(),
+                new ComparisonRatherThanEqualsCleanUp(),
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
                 new PrimitiveComparisonRatherThanWrapperComparisonCleanUp(),
                 new SerializeRatherThanBoxingAndSerializeCleanUp(),
