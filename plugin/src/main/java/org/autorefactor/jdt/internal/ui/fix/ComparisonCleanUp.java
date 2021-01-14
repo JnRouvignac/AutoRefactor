@@ -65,16 +65,13 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 			Long literalValue= ASTNodes.getIntegerLiteral(orderedCondition.getSecondOperand());
 
 			if (literalValue != null
+					&& literalValue.compareTo(0L) != 0
 					&& comparisonMI.getExpression() != null
 					&& !ASTNodes.is(comparisonMI.getExpression(), ThisExpression.class)
 					&& (ASTNodes.usesGivenSignature(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
 					|| getJavaMinorVersion() >= 2
 					&& ASTNodes.usesGivenSignature(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
-				if (literalValue.compareTo(0L) == 0) {
-					return true;
-				}
-
 				if (literalValue.compareTo(0L) < 0) {
 					if (InfixExpression.Operator.EQUALS.equals(orderedCondition.getOperator())) {
 						refactorComparingToZero(visited, comparisonMI, InfixExpression.Operator.LESS);

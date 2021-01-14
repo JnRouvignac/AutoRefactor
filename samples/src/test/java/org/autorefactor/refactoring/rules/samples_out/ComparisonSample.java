@@ -27,23 +27,11 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.Comparator;
 
-import com.google.common.primitives.Doubles;
-
 public class ComparisonSample implements Comparator<Double> {
     public boolean refactorComparableComparingToZero() {
         boolean b = true;
         final String s = "";
 
-        // Valid, do no change these ones
-        b &= s.compareTo("smaller") < 0;
-        b &= s.compareTo("smaller") <= 0;
-        b &= s.compareTo("equal") == 0;
-        b &= s.compareTo("different") != 0;
-        b &= s.compareTo("greater") >= 0;
-        b &= s.compareTo("greater") > 0;
-        b &= s.compareToIgnoreCase("equal") == 0;
-
-        // Invalid, refactor them
         b &= s.compareTo("smaller") < 0;
         b &= s.compareTo("greater") >= 0;
         b &= s.compareTo("smaller") <= 0;
@@ -62,22 +50,42 @@ public class ComparisonSample implements Comparator<Double> {
         boolean b = true;
         final String s = "";
 
-        // Valid, do no change these ones
+        b &= comparator.compare(s, "smaller") < 0;
+        b &= comparator.compare(s, "greater") >= 0;
+        b &= comparator.compare(s, "smaller") <= 0;
+        b &= comparator.compare(s, "greater") > 0;
+        b &= comparator.compare(s, "smaller") < 0;
+        b &= comparator.compare(s, "greater") >= 0;
+        b &= comparator.compare(s, "smaller") <= 0;
+        b &= comparator.compare(s, "greater") > 0;
+
+        return b;
+    }
+
+    public boolean doNotRefactorValidCases() {
+        boolean b = true;
+        final String s = "";
+
+        b &= s.compareTo("smaller") < 0;
+        b &= s.compareTo("smaller") <= 0;
+        b &= s.compareTo("equal") == 0;
+        b &= s.compareTo("different") != 0;
+        b &= s.compareTo("greater") >= 0;
+        b &= s.compareTo("greater") > 0;
+        b &= s.compareToIgnoreCase("equal") == 0;
+
+        return b;
+    }
+
+    public boolean doNotRefactorValidCases(Comparator<String> comparator) {
+        boolean b = true;
+        final String s = "";
+
         b &= comparator.compare(s, "smaller") < 0;
         b &= comparator.compare(s, "smaller") <= 0;
         b &= comparator.compare(s, "equal") == 0;
         b &= comparator.compare(s, "different") != 0;
         b &= comparator.compare(s, "greater") >= 0;
-        b &= comparator.compare(s, "greater") > 0;
-
-        // Invalid, refactor them
-        b &= comparator.compare(s, "smaller") < 0;
-        b &= comparator.compare(s, "greater") >= 0;
-        b &= comparator.compare(s, "smaller") <= 0;
-        b &= comparator.compare(s, "greater") > 0;
-        b &= comparator.compare(s, "smaller") < 0;
-        b &= comparator.compare(s, "greater") >= 0;
-        b &= comparator.compare(s, "smaller") <= 0;
         b &= comparator.compare(s, "greater") > 0;
 
         return b;
@@ -108,6 +116,6 @@ public class ComparisonSample implements Comparator<Double> {
 
     @Override
     public int compare(Double o1, Double o2) {
-        return Doubles.compare(o1, o2) + 100;
+        return Double.compare(o1, o2) + 100;
     }
 }
