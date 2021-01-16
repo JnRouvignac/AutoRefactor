@@ -818,7 +818,11 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public MethodInvocation newMethodInvocation(final String expression, final String methodName, final Expression... arguments) {
-		return newMethodInvocation(newName(this, expression), methodName, arguments);
+		MethodInvocation methodInvocation= newMethodInvocation();
+		methodInvocation.setExpression(newName(this, expression));
+		methodInvocation.setName(ast.newSimpleName(methodName));
+		methodInvocation.arguments().addAll(Arrays.asList(arguments));
+		return methodInvocation;
 	}
 
 	/**
@@ -830,23 +834,20 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final Expression... arguments) {
-		MethodInvocation methodInvocation= newMethodInvocation(methodName, arguments);
+		MethodInvocation methodInvocation= newMethodInvocation();
 		methodInvocation.setExpression(expression);
+		methodInvocation.setName(ast.newSimpleName(methodName));
+		methodInvocation.arguments().addAll(Arrays.asList(arguments));
 		return methodInvocation;
 	}
 
 	/**
 	 * Builds a new {@link MethodInvocation} instance.
 	 *
-	 * @param methodName the name of the invoked method
-	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public MethodInvocation newMethodInvocation(final String methodName, final Expression... arguments) {
-		MethodInvocation methodInvocation= ast.newMethodInvocation();
-		methodInvocation.setName(ast.newSimpleName(methodName));
-		addAll(methodInvocation.arguments(), arguments);
-		return methodInvocation;
+	public MethodInvocation newMethodInvocation() {
+		return ast.newMethodInvocation();
 	}
 
 	/**

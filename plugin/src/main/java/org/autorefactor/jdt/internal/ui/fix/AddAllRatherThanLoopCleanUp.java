@@ -260,7 +260,10 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		if (affectedCollection != null) {
 			newMethod= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, affectedCollection), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
 		} else {
-			newMethod= ast.newMethodInvocation(methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
+			MethodInvocation methodInvocation= ast.newMethodInvocation();
+			methodInvocation.setName(ast.newSimpleName(methodName));
+			methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
+			newMethod= methodInvocation;
 		}
 
 		ASTNodes.replaceButKeepComment(rewrite, toReplace, ast.newExpressionStatement(newMethod), group);
