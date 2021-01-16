@@ -234,7 +234,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			@Override
 			public Boolean isMatching(final Expression node) {
 				if (isReturnedExpressionToRefactor(node, criteria, isForward, name1, name2)) {
-					return true;
+					return Boolean.TRUE;
 				}
 
 				return null;
@@ -245,7 +245,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			@Override
 			public Boolean isMatching(final Expression node) {
 				if (Long.valueOf(0L).equals(ASTNodes.getIntegerLiteral(node))) {
-					return true;
+					return Boolean.TRUE;
 				}
 
 				return null;
@@ -258,7 +258,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				Long value= ASTNodes.getIntegerLiteral(node);
 
 				if (value != null && value > 0L) {
-					return true;
+					return Boolean.TRUE;
 				}
 
 				return null;
@@ -271,7 +271,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				Long value= ASTNodes.getIntegerLiteral(node);
 
 				if (value != null && value < 0L) {
-					return true;
+					return Boolean.TRUE;
 				}
 
 				return null;
@@ -375,7 +375,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		QualifiedName field1= ASTNodes.as(expr1, QualifiedName.class);
 		QualifiedName field2= ASTNodes.as(expr2, QualifiedName.class);
 
-		if (method1 != null && Utils.isEmpty(method1.arguments()) && method2 != null
+		if (method1 != null
+				&& Utils.isEmpty(method1.arguments())
+				&& method2 != null
 				&& Utils.isEmpty(method2.arguments())) {
 			String methodName1= method1.getName().getIdentifier();
 			String methodName2= method2.getName().getIdentifier();
@@ -383,7 +385,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			SimpleName objectExpr1= ASTNodes.as(method1.getExpression(), SimpleName.class);
 			SimpleName objectExpr2= ASTNodes.as(method2.getExpression(), SimpleName.class);
 
-			if (Utils.equalNotNull(methodName1, methodName2) && objectExpr1 != null && objectExpr2 != null) {
+			if (Utils.equalNotNull(methodName1, methodName2)
+					&& objectExpr1 != null
+					&& objectExpr2 != null) {
 				if (ASTNodes.isSameVariable(objectExpr1, name1)
 						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
 					criteria.set(method1);
@@ -404,7 +408,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			SimpleName objectExpr1= ASTNodes.as(field1.getQualifier(), SimpleName.class);
 			SimpleName objectExpr2= ASTNodes.as(field2.getQualifier(), SimpleName.class);
 
-			if (ASTNodes.isSameVariable(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
+			if (ASTNodes.isSameVariable(fieldName1, fieldName2)
+					&& objectExpr1 != null
+					&& objectExpr2 != null) {
 				if (ASTNodes.isSameVariable(objectExpr1, name1)
 						&& ASTNodes.isSameVariable(objectExpr2, name2)) {
 					criteria.set(field1);
@@ -479,8 +485,11 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		LambdaExpression lambdaExpression= ast.newLambdaExpression();
 		ITypeBinding destinationType= ASTNodes.getTargetType(visited);
 
-		boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
-				&& destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
+		boolean isTypeKnown= destinationType != null
+				&& ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
+				&& destinationType.getTypeArguments() != null
+				&& destinationType.getTypeArguments().length == 1
+				&& Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
 		if (isTypeKnown && straightOrder && isNullFirst == null) {
 			lambdaExpression.parameters().add(ast.newVariableDeclarationFragment(ast.createCopyTarget(name1)));

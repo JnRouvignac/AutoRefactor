@@ -78,6 +78,91 @@ public class LambdaExpressionRatherThanComparatorSample {
         return listToSort;
     }
 
+    public List<File> useTypedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
+        Comparator<File> comparator = new Comparator<File>() {
+
+            @Override
+            public int compare(File f1, File f2) {
+                return f1.separator.compareTo(f2.separator);
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<File> useUntypedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
+        Comparator comparator = new Comparator<File>() {
+
+            @Override
+            public int compare(File f1, File f2) {
+                return f1.separator.compareTo(f2.separator);
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<File> useReversedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
+        Comparator<File> comparator = new Comparator<File>() {
+
+            @Override
+            public int compare(File f1, File f2) {
+                return f2.separator.compareTo(f1.separator);
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> replaceLambdaByMethodRef(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = (o1, o2) -> o1.toString().compareTo(o2.toString());
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> replaceLambdaByReversedMethodRef(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = (o1, o2) -> o2.toString().compareTo(o1.toString());
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> replaceLambdaByNegatedMethodRef(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = (o1, o2) -> -o1.toString().compareTo(o2.toString());
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<File> replaceLambdaByTypedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
+        Comparator<File> comparator = (f1, f2) -> f1.separator.compareTo(f2.separator);
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<File> replaceLambdaByReversedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
+        Comparator<File> comparator = (f1, f2) -> f2.separator.compareTo(f1.separator);
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
     public List<Date> useMethodRefNullFirst(List<Date> listToSort) {
         // Keep this comment
         Comparator<Date> comparator = new Comparator<Date>() {
@@ -219,140 +304,6 @@ public class LambdaExpressionRatherThanComparatorSample {
         return listToSort;
     }
 
-    public List<Date> doNotUseMethodRefWithWeirdBehavior(List<Date> listToSort) {
-        Comparator<Date> comparator = new Comparator<Date>() {
-
-            @Override
-            public int compare(Date o1, Date o2) {
-                if (o1 != null) {
-                    if (o2 != null) {
-                        return o1.toString().compareTo(o2.toString());
-                    } else {
-                        return 1;
-                    }
-                } else if (o2 != null) {
-                    return -1;
-                } else {
-                    return 100;
-                }
-            }
-
-        };
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<String> doNotUseMethodRef(List<String> listToSort) {
-        Comparator<String> comparator = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.toLowerCase(Locale.ENGLISH).compareTo(o2.toLowerCase(Locale.ENGLISH));
-            }
-        };
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<File> useTypedLambdaExpression(List<File> listToSort) {
-        // Keep this comment
-        Comparator<File> comparator = new Comparator<File>() {
-
-            @Override
-            public int compare(File f1, File f2) {
-                return f1.separator.compareTo(f2.separator);
-            }
-
-        };
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<File> useUntypedLambdaExpression(List<File> listToSort) {
-        // Keep this comment
-        Comparator comparator = new Comparator<File>() {
-
-            @Override
-            public int compare(File f1, File f2) {
-                return f1.separator.compareTo(f2.separator);
-            }
-
-        };
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<File> useReversedLambdaExpression(List<File> listToSort) {
-        // Keep this comment
-        Comparator<File> comparator = new Comparator<File>() {
-
-            @Override
-            public int compare(File f1, File f2) {
-                return f2.separator.compareTo(f1.separator);
-            }
-
-        };
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public Comparator<Date> doNotRefactorComparisonWithoutCompareToMethod(List<Date> listToSort) {
-        Comparator<Date> comparator = new Comparator<Date>() {
-
-            @Override
-            public int compare(Date o1, Date o2) {
-                return (int) (o1.getTime() - o2.getTime());
-            }
-        };
-
-        return comparator;
-    }
-
-    public Comparator<Date> doNotRemoveSecondaryMethod(List<Date> listToSort) {
-        Comparator<Date> comparator = new Comparator<Date>() {
-
-            @Override
-            public int compare(Date o1, Date o2) {
-                return o1.toString().compareTo(o2.toString());
-            }
-
-            @Override
-            public String toString() {
-                return "Compare formatted dates";
-            }
-        };
-
-        return comparator;
-    }
-
-    public List<Date> replaceLambdaByMethodRef(List<Date> listToSort) {
-        // Keep this comment
-        Comparator<Date> comparator = (o1, o2) -> o1.toString().compareTo(o2.toString());
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<Date> replaceLambdaByReversedMethodRef(List<Date> listToSort) {
-        // Keep this comment
-        Comparator<Date> comparator = (o1, o2) -> o2.toString().compareTo(o1.toString());
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<Date> replaceLambdaByNegatedMethodRef(List<Date> listToSort) {
-        // Keep this comment
-        Comparator<Date> comparator = (o1, o2) -> -o1.toString().compareTo(o2.toString());
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
     public List<Date> replaceLambdaByMethodRefNullFirst(List<Date> listToSort) {
         // Keep this comment
         Comparator<Date> comparator = (o1, o2) -> {
@@ -467,6 +418,71 @@ public class LambdaExpressionRatherThanComparatorSample {
         return listToSort;
     }
 
+    public List<Date> doNotUseMethodRefWithWeirdBehavior(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+                if (o1 != null) {
+                    if (o2 != null) {
+                        return o1.toString().compareTo(o2.toString());
+                    } else {
+                        return 1;
+                    }
+                } else if (o2 != null) {
+                    return -1;
+                } else {
+                    return 100;
+                }
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<String> doNotUseMethodRef(List<String> listToSort) {
+        Comparator<String> comparator = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.toLowerCase(Locale.ENGLISH).compareTo(o2.toLowerCase(Locale.ENGLISH));
+            }
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public Comparator<Date> doNotRefactorComparisonWithoutCompareToMethod(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+                return (int) (o1.getTime() - o2.getTime());
+            }
+        };
+
+        return comparator;
+    }
+
+    public Comparator<Date> doNotRemoveSecondaryMethod(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+
+            @Override
+            public String toString() {
+                return "Compare formatted dates";
+            }
+        };
+
+        return comparator;
+    }
+
     public List<Date> doNotReplaceLambdaByUseMethodRefWithWeirdBehavior(List<Date> listToSort) {
         Comparator<Date> comparator = (o1, o2) -> {
             if (o1 != null) {
@@ -488,22 +504,6 @@ public class LambdaExpressionRatherThanComparatorSample {
 
     public List<String> doNotReplaceLambdaByUseMethodRef(List<String> listToSort) {
         Comparator<String> comparator = (o1, o2) -> o1.toLowerCase(Locale.ENGLISH).compareTo(o2.toLowerCase(Locale.ENGLISH));
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<File> replaceLambdaByTypedLambdaExpression(List<File> listToSort) {
-        // Keep this comment
-        Comparator<File> comparator = (f1, f2) -> f1.separator.compareTo(f2.separator);
-        Collections.sort(listToSort, comparator);
-
-        return listToSort;
-    }
-
-    public List<File> replaceLambdaByReversedLambdaExpression(List<File> listToSort) {
-        // Keep this comment
-        Comparator<File> comparator = (f1, f2) -> f2.separator.compareTo(f1.separator);
         Collections.sort(listToSort, comparator);
 
         return listToSort;
