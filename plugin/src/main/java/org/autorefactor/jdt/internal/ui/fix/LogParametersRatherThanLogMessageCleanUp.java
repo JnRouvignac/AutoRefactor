@@ -104,7 +104,12 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 				messageBuilder.append("{}"); //$NON-NLS-1$
 
 				if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-					params.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)))); //$NON-NLS-1$
+					MethodInvocation methodInvocation= ast.newMethodInvocation();
+					methodInvocation.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+					methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+					methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)));
+					MethodInvocation newMethodInvocation= methodInvocation;
+					params.add(newMethodInvocation);
 				} else {
 					params.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)));
 				}

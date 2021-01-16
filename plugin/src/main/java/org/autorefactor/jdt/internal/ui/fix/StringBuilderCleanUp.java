@@ -757,7 +757,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				return ASTNodes.createMoveTarget(rewrite, expression.getSecond());
 			}
 
-			return ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(expression)); //$NON-NLS-1$
+			MethodInvocation methodInvocation= ast.newMethodInvocation();
+			methodInvocation.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+			methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+			methodInvocation.arguments().add(getTypedExpression(expression));
+			return methodInvocation;
 
 		default: // >= 2
 			boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
@@ -765,7 +769,12 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
 			for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
 				if (isFirstAndNotAString) {
-					concatenateStrings.add(ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", getTypedExpression(typeAndValue))); //$NON-NLS-1$
+					MethodInvocation methodInvocation1= ast.newMethodInvocation();
+					methodInvocation1.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+					methodInvocation1.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+					methodInvocation1.arguments().add(getTypedExpression(typeAndValue));
+					MethodInvocation newMethodInvocation= methodInvocation1;
+					concatenateStrings.add(newMethodInvocation);
 					isFirstAndNotAString= false;
 				} else {
 					concatenateStrings.add(ASTNodeFactory.parenthesizeIfNeeded(ast, getTypedExpression(typeAndValue)));

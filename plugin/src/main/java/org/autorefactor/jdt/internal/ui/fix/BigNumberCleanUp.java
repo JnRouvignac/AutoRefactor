@@ -203,7 +203,11 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
-		ASTNode valueOf= ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newNumberLiteral(numberText)); //$NON-NLS-1$
+		MethodInvocation valueOf= ast.newMethodInvocation();
+		valueOf.setExpression(ASTNodeFactory.newName(ast, typeBinding.getName()));
+		valueOf.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+		valueOf.arguments().add(ast.newNumberLiteral(numberText));
+
 		ASTNodes.replaceButKeepComment(rewrite, visited, valueOf, group);
 	}
 

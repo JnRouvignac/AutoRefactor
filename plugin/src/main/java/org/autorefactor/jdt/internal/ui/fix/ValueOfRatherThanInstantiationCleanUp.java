@@ -101,7 +101,11 @@ public class ValueOfRatherThanInstantiationCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ValueOfRatherThanInstantiationCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), "valueOf", ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)))); //$NON-NLS-1$
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, typeBinding.getName()));
+		newMethodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+		newMethodInvocation.arguments().add(ast.newCastExpression(ast.type(float.class.getSimpleName()), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0))));
+
 		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 
@@ -126,7 +130,11 @@ public class ValueOfRatherThanInstantiationCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ValueOfRatherThanInstantiationCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0))); //$NON-NLS-1$
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, typeBinding.getName()));
+		newMethodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)));
+
 		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 }

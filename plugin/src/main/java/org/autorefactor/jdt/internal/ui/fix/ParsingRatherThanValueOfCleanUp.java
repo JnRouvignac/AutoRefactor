@@ -193,8 +193,12 @@ public class ParsingRatherThanValueOfCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ParsingRatherThanValueOfCleanUp_description);
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setExpression(ASTNodeFactory.newName(ast, typeBinding.getName()));
+		methodInvocation.setName(ast.newSimpleName(methodName));
+		methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)));
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation(typeBinding.getName(), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)));
+		MethodInvocation newMethodInvocation= methodInvocation;
 		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 }

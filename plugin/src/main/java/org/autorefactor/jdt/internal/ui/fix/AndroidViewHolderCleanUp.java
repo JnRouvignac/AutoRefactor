@@ -178,11 +178,18 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 						// Replace previous findViewById with accesses to viewHolderItem
 						ASTNodes.replaceButKeepComment(rewrite, item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), group);
 					}
+					MethodInvocation setTagMethod= ast.newMethodInvocation();
+					setTagMethod.setExpression(ASTNodeFactory.newName(ast, "convertView")); //$NON-NLS-1$
+					setTagMethod.setName(ast.newSimpleName("setTag")); //$NON-NLS-1$
+					setTagMethod.arguments().add(viewHolderItemVar.varName());
 					// Store viewHolderItem in convertView
-					thenStatements.add(ast.newExpressionStatement(ast.newMethodInvocation("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ //$NON-NLS-2$
+					thenStatements.add(ast.newExpressionStatement(setTagMethod));
 					Block newBlock= ast.newBlock();
+					MethodInvocation getTagMethod= ast.newMethodInvocation();
+					getTagMethod.setExpression(ASTNodeFactory.newName(ast, "convertView")); //$NON-NLS-1$
+					getTagMethod.setName(ast.newSimpleName("getTag")); //$NON-NLS-1$
 					newBlock.statements().add(ast.newExpressionStatement(ast.newAssignment(viewHolderItemVar.varName(), Assignment.Operator.ASSIGN,
-							ast.newCastExpression(viewHolderItemVar.type(), ast.newMethodInvocation("convertView", "getTag"))))); //$NON-NLS-1$ //$NON-NLS-2$
+							ast.newCastExpression(viewHolderItemVar.type(), getTagMethod))));
 
 					// Retrieve viewHolderItem from convertView
 					newIfStatement.setElseStatement(newBlock);

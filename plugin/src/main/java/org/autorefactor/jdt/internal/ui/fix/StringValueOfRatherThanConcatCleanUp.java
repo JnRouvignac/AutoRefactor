@@ -79,7 +79,12 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringValueOfRatherThanConcatCleanUp_description);
 
-			MethodInvocation newInvoke= ast.newMethodInvocation(String.class.getSimpleName(), "valueOf", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable))); //$NON-NLS-1$
+			MethodInvocation newInvoke= ast.newMethodInvocation();
+			newInvoke.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+			newInvoke.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+			newInvoke.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable)));
+
+			 //$NON-NLS-1$
 
 			if (visited.hasExtendedOperands()) {
 				List<Expression> extendedOperands= visited.extendedOperands();
