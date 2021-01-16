@@ -73,33 +73,35 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 			final Expression variable) {
 		StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
 
-		if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
+		if (stringLiteral != null
+				&& stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
 				&& !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.StringValueOfRatherThanConcatCleanUp_description);
-
-			MethodInvocation newInvoke= ast.newMethodInvocation();
-			newInvoke.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
-			newInvoke.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
-			newInvoke.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable)));
-
-			 //$NON-NLS-1$
-
-			if (visited.hasExtendedOperands()) {
-				List<Expression> extendedOperands= visited.extendedOperands();
-				List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
-				newOperands.add(newInvoke);
-				newOperands.addAll(ASTNodes.createMoveTarget(rewrite, extendedOperands));
-
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newInfixExpression(InfixExpression.Operator.PLUS, newOperands), group);
-			} else {
-				ASTNodes.replaceButKeepComment(rewrite, visited, newInvoke, group);
-			}
-
+			replaceStringConcatenation(visited, variable);
 			return false;
 		}
 
 		return true;
+	}
+
+	private void replaceStringConcatenation(final InfixExpression visited, final Expression variable) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringValueOfRatherThanConcatCleanUp_description);
+
+		MethodInvocation newInvoke= ast.newMethodInvocation();
+		newInvoke.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+		newInvoke.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+		newInvoke.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(variable)));
+
+		if (visited.hasExtendedOperands()) {
+			List<Expression> extendedOperands= visited.extendedOperands();
+			List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
+			newOperands.add(newInvoke);
+			newOperands.addAll(ASTNodes.createMoveTarget(rewrite, extendedOperands));
+
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newInfixExpression(InfixExpression.Operator.PLUS, newOperands), group);
+		} else {
+			ASTNodes.replaceButKeepComment(rewrite, visited, newInvoke, group);
+		}
 	}
 }
