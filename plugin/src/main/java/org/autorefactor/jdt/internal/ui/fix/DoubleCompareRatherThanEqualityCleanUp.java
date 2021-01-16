@@ -29,6 +29,7 @@ import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -66,8 +67,14 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_description);
 
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, Double.class.getSimpleName()));
+		newMethodInvocation.setName(ast.newSimpleName("compare")); //$NON-NLS-1$
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getLeftOperand())));
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getRightOperand())));
+
 		InfixExpression newInfixExpression= ast.newInfixExpression();
-		newInfixExpression.setLeftOperand(ast.newMethodInvocation(Double.class.getSimpleName(), "compare", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getLeftOperand())), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getRightOperand())))); //$NON-NLS-1$
+		newInfixExpression.setLeftOperand(newMethodInvocation);
 		newInfixExpression.setOperator(visited.getOperator());
 		newInfixExpression.setRightOperand(ast.newNumberLiteral("0")); //$NON-NLS-1$
 
