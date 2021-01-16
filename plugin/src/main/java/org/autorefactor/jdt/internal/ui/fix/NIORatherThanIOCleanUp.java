@@ -110,25 +110,38 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		if (isFileCreation(visited.getExpression())
 				&& isFileUse(visited.getExpression())) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.NIORatherThanIOCleanUp_description);
-
-			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
-
-			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) visited.getExpression();
-			Expression copyOfPathText= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
-
-			if (ASTNodes.usesGivenSignature(visited, File.class.getCanonicalName(), TOPATH_METHOD)) {
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), group);
-			} else {
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, copyOfPathText), TOURI_METHOD), group);
-			}
-
+			refactorMethodInvocation(visited, classesToUseWithImport, importsToAdd);
 			return false;
 		}
 
 		return true;
+	}
+
+	private void refactorMethodInvocation(final MethodInvocation visited, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.NIORatherThanIOCleanUp_description);
+
+		String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
+
+		ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) visited.getExpression();
+		Expression copyOfPathText= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)));
+
+		MethodInvocation getMethod= ast.newMethodInvocation();
+		getMethod.setExpression(ASTNodeFactory.newName(ast, pathsName));
+		getMethod.setName(ast.newSimpleName(GET_METHOD));
+		getMethod.arguments().add(copyOfPathText);
+
+		if (ASTNodes.usesGivenSignature(visited, File.class.getCanonicalName(), TOPATH_METHOD)) {
+			ASTNodes.replaceButKeepComment(rewrite, visited, getMethod, group);
+		} else {
+			MethodInvocation methodInvocation= ast.newMethodInvocation();
+			methodInvocation.setExpression(getMethod);
+			methodInvocation.setName(ast.newSimpleName(TOURI_METHOD));
+			MethodInvocation newMethodInvocation= methodInvocation;
+			ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+		}
 	}
 
 	@Override
@@ -224,7 +237,10 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 				if (ASTNodes.usesGivenSignature(methodInvocation, File.class.getCanonicalName(), TOPATH_METHOD)) {
 					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, ASTNodes.createMoveTarget(rewrite, fileUse), group);
 				} else {
-					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, fileUse), TOURI_METHOD), group);
+					MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+					newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, fileUse));
+					newMethodInvocation.setName(ast.newSimpleName(TOURI_METHOD));
+					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, newMethodInvocation, group);
 				}
 			}
 		}

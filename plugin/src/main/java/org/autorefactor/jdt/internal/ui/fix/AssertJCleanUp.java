@@ -303,7 +303,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected);
 		}
 
-		return ast.newMethodInvocation(assertionMethod, finalMethodName);
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setExpression(assertionMethod);
+		methodInvocation.setName(ast.newSimpleName(finalMethodName));
+		return methodInvocation;
 	}
 
 	private String getFinalMethodName(final String methodName) {

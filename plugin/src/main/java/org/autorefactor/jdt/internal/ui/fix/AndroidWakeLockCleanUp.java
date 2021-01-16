@@ -111,9 +111,18 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		IfStatement newIfStatement= ast.newIfStatement();
-		newIfStatement.setExpression(ast.not(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "isHeld"))); //$NON-NLS-1$
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ast.copyExpression(methodInvocation));
+		newMethodInvocation.setName(ast.newSimpleName("isHeld")); //$NON-NLS-1$
+
+		newIfStatement.setExpression(ast.not(newMethodInvocation));
 		Block newBlock= ast.newBlock();
-		newBlock.statements().add(ast.newExpressionStatement(ast.newMethodInvocation(ast.copyExpression(methodInvocation), "release"))); //$NON-NLS-1$
+
+		MethodInvocation releaseMethod= ast.newMethodInvocation();
+		releaseMethod.setExpression(ast.copyExpression(methodInvocation));
+		releaseMethod.setName(ast.newSimpleName("release")); //$NON-NLS-1$
+
+		newBlock.statements().add(ast.newExpressionStatement(releaseMethod));
 		newIfStatement.setThenStatement(newBlock);
 		return newIfStatement;
 	}

@@ -449,7 +449,10 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		Expression comparingMethod= ast.newMethodInvocation(ASTNodeFactory.newName(ast, comparatorClassName), "comparing", lambda); //$NON-NLS-1$
 
 		if (!isForward.get()) {
-			comparingMethod= ast.newMethodInvocation(comparingMethod, "reversed"); //$NON-NLS-1$
+			MethodInvocation methodInvocation= ast.newMethodInvocation();
+			methodInvocation.setExpression(comparingMethod);
+			methodInvocation.setName(ast.newSimpleName("reversed")); //$NON-NLS-1$
+			comparingMethod= methodInvocation;
 		}
 
 		if (isNullFirst != null) {

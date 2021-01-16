@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -287,7 +288,10 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			ASTNodes.replaceButKeepComment(rewrite, type, atomicType, group);
 
 			for (ArrayAccess accessRead : accessReads) {
-				ASTNodes.replaceButKeepComment(rewrite, accessRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()), "get"), group); //$NON-NLS-1$
+				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()));
+				newMethodInvocation.setName(ast.newSimpleName("get")); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, accessRead, newMethodInvocation, group);
 			}
 
 			for (Assignment assignmentRead : assignmentReads) {

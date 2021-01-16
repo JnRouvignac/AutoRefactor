@@ -114,7 +114,10 @@ public class ValueOfRatherThanInstantiationCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ValueOfRatherThanInstantiationCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, arg0), "floatValue"); //$NON-NLS-1$
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, arg0));
+		newMethodInvocation.setName(ast.newSimpleName("floatValue")); //$NON-NLS-1$
+
 		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 	}
 

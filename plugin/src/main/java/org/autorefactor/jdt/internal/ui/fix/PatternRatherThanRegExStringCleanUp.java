@@ -208,7 +208,9 @@ public class PatternRatherThanRegExStringCleanUp extends NewClassImportCleanUp {
 					MethodInvocation matcherExpression= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, regExUse), MATCHER_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression())));
 
 					if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), MATCHES_METHOD, String.class.getCanonicalName())) {
-						newExpression= ast.newMethodInvocation(matcherExpression, MATCHES_METHOD);
+						newExpression= ast.newMethodInvocation();
+						newExpression.setExpression(matcherExpression);
+						newExpression.setName(ast.newSimpleName(MATCHES_METHOD));
 					} else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_ALL_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
 						newExpression= ast.newMethodInvocation(matcherExpression, REPLACE_ALL_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) methodInvocation.arguments().get(1))));
 					} else if (ASTNodes.usesGivenSignature(methodInvocation, String.class.getCanonicalName(), REPLACE_FIRST_METHOD, String.class.getCanonicalName(), String.class.getCanonicalName())) {
