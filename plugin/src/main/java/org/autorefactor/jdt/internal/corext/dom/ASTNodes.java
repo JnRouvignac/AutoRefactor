@@ -1451,6 +1451,36 @@ public final class ASTNodes {
 	}
 
 	/**
+	 * Returns a peremptory value, if any.
+	 *
+	 * @param peremptoryExpression A possible peremptory expression
+	 * @return A peremptory value, if any
+	 */
+	public static Object peremptoryValue(final Expression peremptoryExpression) {
+		Object constantExpression= peremptoryExpression.resolveConstantExpressionValue();
+
+		if (constantExpression != null) {
+			return constantExpression;
+		}
+
+		InfixExpression infixExpression= as(peremptoryExpression, InfixExpression.class);
+
+		if (infixExpression != null
+				&& !infixExpression.hasExtendedOperands()
+				&& hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
+			if (match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+				return hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
+			}
+
+			if (ASTSemanticMatcher.INSTANCE.matchNegative(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
+				return hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns whether the provided binding represents a local variable.
 	 *
 	 * @param binding the binding to analyze

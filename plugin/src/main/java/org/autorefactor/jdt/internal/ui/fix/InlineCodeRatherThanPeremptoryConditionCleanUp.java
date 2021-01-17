@@ -33,13 +33,10 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -82,18 +79,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 						return maybeInlineBlock(visited, visited.getFinally());
 					}
 
-					ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
-
-					if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(visited, group);
-					} else {
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-						ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
-					}
-
+					remove(visited);
 					result= false;
 					return false;
 				}
@@ -104,33 +90,19 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
 		@Override
 		public boolean visit(final IfStatement visited) {
-			if (result) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
-
-				Statement thenStatement= visited.getThenStatement();
-				Statement elseStatement= visited.getElseStatement();
-				Expression condition= visited.getExpression();
-
-				Object constantCondition= peremptoryValue(condition);
+			if (result && ASTNodes.isPassiveWithoutFallingThrough(visited.getExpression())) {
+				Object constantCondition= ASTNodes.peremptoryValue(visited.getExpression());
 
 				if (Boolean.TRUE.equals(constantCondition)) {
-					return maybeInlineBlock(visited, thenStatement);
+					return maybeInlineBlock(visited, visited.getThenStatement());
 				}
 
 				if (Boolean.FALSE.equals(constantCondition)) {
-					if (elseStatement != null) {
-						return maybeInlineBlock(visited, elseStatement);
+					if (visited.getElseStatement() != null) {
+						return maybeInlineBlock(visited, visited.getElseStatement());
 					}
 
-					if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
-						rewrite.remove(visited, group);
-					} else {
-						ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-						ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
-					}
-
+					remove(visited);
 					result= false;
 					return false;
 				}
@@ -168,31 +140,6 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		}
 	}
 
-	private Object peremptoryValue(final Expression condition) {
-		Object constantCondition= condition.resolveConstantExpressionValue();
-
-		if (constantCondition != null) {
-			return constantCondition;
-		}
-
-		InfixExpression infixExpression= ASTNodes.as(condition, InfixExpression.class);
-
-		if (infixExpression != null
-				&& !infixExpression.hasExtendedOperands()
-				&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-				&& ASTNodes.isPassiveWithoutFallingThrough(infixExpression.getLeftOperand())) {
-			if (ASTNodes.match(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
-				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.EQUALS);
-			}
-
-			if (ASTSemanticMatcher.INSTANCE.matchNegative(infixExpression.getLeftOperand(), infixExpression.getRightOperand())) {
-				return ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.NOT_EQUALS);
-			}
-		}
-
-		return null;
-	}
-
 	private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
@@ -205,15 +152,28 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 		}
 	}
 
-	private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
-		if (ASTNodes.canHaveSiblings(astNode)) {
+	private void removeForwardCode(final Statement statement, final Statement unconditionnalStatement) {
+		if (ASTNodes.canHaveSiblings(statement)) {
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			rewrite.remove(ASTNodes.getNextSiblings(astNode), group);
-			removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
-		} else if (astNode.getParent() instanceof TryStatement) {
-			removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);
+			rewrite.remove(ASTNodes.getNextSiblings(statement), group);
+			removeForwardCode((Block) statement.getParent(), unconditionnalStatement);
+		} else if (statement.getParent() instanceof TryStatement) {
+			removeForwardCode((TryStatement) statement.getParent(), unconditionnalStatement);
+		}
+	}
+
+	private void remove(final Statement visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.InlineCodeRatherThanPeremptoryConditionCleanUp_description);
+
+		if (ASTNodes.canHaveSiblings(visited) || visited.getLocationInParent() == IfStatement.ELSE_STATEMENT_PROPERTY) {
+			rewrite.remove(visited, group);
+		} else {
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
+			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newBlock(), group);
 		}
 	}
 }
