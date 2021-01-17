@@ -110,7 +110,9 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 					VariableDeclarationStatement declaration= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(declaration);
 
-					if (fragment != null && !Modifier.isFinal(declaration.getModifiers()) && !hasAnnotation(declaration.modifiers())) {
+					if (fragment != null
+							&& !Modifier.isFinal(declaration.getModifiers())
+							&& !hasAnnotation(declaration.modifiers())) {
 						SimpleName name= fragment.getName();
 						boolean isFound= false;
 

@@ -106,7 +106,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 					IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
 					if (extendedModifier.isModifier()) {
 						Modifier modifier= (Modifier) extendedModifier;
-						if (modifier.isPublic() && isPublicClass || modifier.isProtected() && isProtectedClass
+						if (modifier.isPublic() && isPublicClass
+								|| modifier.isProtected() && isProtectedClass
 								|| modifier.isPrivate() && isPrivateClass) {
 							TextEditGroup group= new TextEditGroup(MultiFixMessages.ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description);
 							ASTRewrite rewrite= cuRewrite.getASTRewrite();

@@ -70,7 +70,9 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 			final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		Type type= node.getType();
 
-		if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
+		if (isEnabled()
+				&& type.isParameterizedType()
+				&& creates(node, getImplType())) {
 			ASTNode parent= ASTNodes.getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
 					VariableDeclarationStatement.class);
 			if (parent != null) {
@@ -200,7 +202,9 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 	}
 
 	private boolean isTargetType(final Type type) {
-		return type != null && type.isParameterizedType() && isTargetType(type.resolveBinding());
+		return type != null
+				&& type.isParameterizedType()
+				&& isTargetType(type.resolveBinding());
 	}
 
 	private boolean isEnabled() {

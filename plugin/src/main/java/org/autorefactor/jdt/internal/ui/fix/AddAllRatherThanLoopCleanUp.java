@@ -108,7 +108,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		// As we replace only one, there should be no more than one occurrence
 		if (methodInvocation != null
 				&& getVariableUseCount(foreachVariable, node.getBody()) == 1
-				&& methodInvocation != null && methodInvocation.arguments().size() == 1) {
+				&& methodInvocation != null
+				&& methodInvocation.arguments().size() == 1) {
 			if (ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
 				if (ASTNodes.isSameLocalVariable(node.getParameter(), (Expression) methodInvocation.arguments().get(0))) {
 					return maybeReplaceForCollection(node, methodInvocation, iterable);
@@ -139,15 +140,20 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
 			// We should remove all the loop variable occurrences
 			// As we replace only one, there should be no more than one occurrence
-			if (methodInvocation != null && methodInvocation.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1
-					&& (loopContent.isLoopingForward() || methodInvocation.resolveMethodBinding() != null && ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
+			if (methodInvocation != null
+					&& methodInvocation.arguments().size() == 1
+					&& getVariableUseCount(loopVariableName, node.getBody()) == 1
+					&& (loopContent.isLoopingForward() || methodInvocation.resolveMethodBinding() != null
+					&& ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Set.class.getCanonicalName()))) {
 				Expression addArg0= (Expression) methodInvocation.arguments().get(0);
 
 				switch (loopContent.getContainerType()) {
 				case COLLECTION:
 					MethodInvocation getMI= ASTNodes.as(addArg0, MethodInvocation.class);
 
-					if (getMI != null && getMI.arguments().size() == 1 && isSameVariable(loopContent, getMI)) {
+					if (getMI != null
+							&& getMI.arguments().size() == 1
+							&& isSameVariable(loopContent, getMI)) {
 						return maybeReplaceForCollection(node, methodInvocation, getMI.getExpression());
 					}
 					break;

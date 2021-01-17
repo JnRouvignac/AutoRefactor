@@ -312,7 +312,9 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 					AtomicBoolean hasFinalReadBeenFound= new AtomicBoolean(false);
 
 					if (isOccurrenceValid(statements, remainingWrites, remainingReads, finalRead, hasFinalReadBeenFound)) {
-						return hasFinalReadBeenFound.get() && remainingReads.isEmpty() && remainingWrites.isEmpty();
+						return hasFinalReadBeenFound.get()
+								&& remainingReads.isEmpty()
+								&& remainingWrites.isEmpty();
 					}
 				}
 			}

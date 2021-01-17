@@ -274,7 +274,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 	}
 
 	private boolean isParameterizedTypeWithOneArgument(final ITypeBinding typeBinding) {
-		return typeBinding != null && typeBinding.isParameterizedType() && typeBinding.getTypeArguments().length == 1;
+		return typeBinding != null
+				&& typeBinding.isParameterizedType()
+				&& typeBinding.getTypeArguments().length == 1;
 	}
 
 	private boolean isExprReceived(final ASTNode node) {

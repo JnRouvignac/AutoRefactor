@@ -90,7 +90,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 				&& secondIf.getElseStatement() != null
 				&& !firstCondition.hasExtendedOperands()
 				&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
-				&& ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())) {
+				&& ASTNodes.isPassive(firstCondition.getLeftOperand())
+				&& ASTNodes.isPassive(firstCondition.getRightOperand())) {
 			return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
 					firstCondition.getRightOperand())
 					&& maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),

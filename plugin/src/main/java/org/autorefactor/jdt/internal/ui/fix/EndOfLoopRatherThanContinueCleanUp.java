@@ -68,7 +68,9 @@ public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 	private final class ContinueInBlockVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ContinueStatement node) {
-			if (result && node.getLabel() == null && isLastStatementInLoop(node)) {
+			if (result
+					&& node.getLabel() == null
+					&& isLastStatementInLoop(node)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.EndOfLoopRatherThanContinueCleanUp_description);
 

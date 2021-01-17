@@ -72,7 +72,9 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 				}
 			}
 
-			if (finalModifier != null && visited.fragments() != null && visited.fragments().size() == 1) {
+			if (finalModifier != null
+					&& visited.fragments() != null
+					&& visited.fragments().size() == 1) {
 				Expression initializer= ((VariableDeclarationFragment) visited.fragments().get(0)).getInitializer();
 
 				if (ASTNodes.isHardCoded(initializer)) {

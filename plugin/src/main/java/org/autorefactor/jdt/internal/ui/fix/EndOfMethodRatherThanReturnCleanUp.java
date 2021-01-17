@@ -68,7 +68,9 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
 	private final class ReturnInBlockVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final ReturnStatement node) {
-			if (result && node.getExpression() == null && isLastStatement(node)) {
+			if (result
+					&& node.getExpression() == null
+					&& isLastStatement(node)) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.EndOfMethodRatherThanReturnCleanUp_description);
 

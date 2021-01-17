@@ -114,7 +114,9 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
 
 		SimpleName variable= ASTNodes.as(condition, SimpleName.class);
 
-		if (variable != null && variable.resolveBinding() != null && variable.resolveBinding().getKind() == IBinding.VARIABLE) {
+		if (variable != null
+				&& variable.resolveBinding() != null
+				&& variable.resolveBinding().getKind() == IBinding.VARIABLE) {
 			List<ASTNode> precedingStatements= getPrecedingCode(visited);
 
 			Collections.reverse(precedingStatements);

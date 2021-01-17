@@ -58,17 +58,19 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 	public boolean visit(final MethodInvocation node) {
 		MethodInvocation miExpression= ASTNodes.as(node.getExpression(), MethodInvocation.class);
 
-		if (miExpression != null && miExpression.getExpression() != null && !ASTNodes.is(miExpression.getExpression(), ThisExpression.class)
+		if (miExpression != null
+				&& miExpression.getExpression() != null
+				&& !ASTNodes.is(miExpression.getExpression(), ThisExpression.class)
 				&& ASTNodes.usesGivenSignature(miExpression, Map.class.getCanonicalName(), "keySet")) { //$NON-NLS-1$
 			if (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "clear") //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "size") //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
-					|| (ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(node, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
 							// If parent is not an expression statement, the MethodInvocation must return a
 							// boolean.
 							// In that case, we cannot replace because `Map.removeKey(key) != null`
 							// is not strictly equivalent to `Map.keySet().remove(key)`
-							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT)) {
+							&& node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.MethodOnMapRatherThanMethodOnKeySetCleanUp_description);
 

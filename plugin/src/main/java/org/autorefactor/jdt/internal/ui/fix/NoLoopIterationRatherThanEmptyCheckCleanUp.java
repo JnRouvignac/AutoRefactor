@@ -97,7 +97,8 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 	private boolean isConditionValid(final Expression expression, final Expression container) {
 		InfixExpression condition= ASTNodes.as(expression, InfixExpression.class);
 		return condition != null
-				&& !condition.hasExtendedOperands() && ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
+				&& !condition.hasExtendedOperands()
+				&& ASTNodes.hasOperator(condition, InfixExpression.Operator.NOT_EQUALS,
 						InfixExpression.Operator.GREATER,
 						InfixExpression.Operator.GREATER_EQUALS,
 						InfixExpression.Operator.LESS,
@@ -143,7 +144,9 @@ public class NoLoopIterationRatherThanEmptyCheckCleanUp extends AbstractCleanUpR
 			if (ASTNodes.isSameVariable(fieldAccess.getExpression(), container) && "length".equals(fieldAccess.getName().getIdentifier())) { //$NON-NLS-1$
 				return fieldAccess.getExpression();
 			}
-		} else if (name != null && ASTNodes.isSameVariable(name.getQualifier(), container) && "length".equals(name.getName().getIdentifier())) { //$NON-NLS-1$
+		} else if (name != null
+				&& ASTNodes.isSameVariable(name.getQualifier(), container)
+				&& "length".equals(name.getName().getIdentifier())) { //$NON-NLS-1$
 			return name.getQualifier();
 		}
 

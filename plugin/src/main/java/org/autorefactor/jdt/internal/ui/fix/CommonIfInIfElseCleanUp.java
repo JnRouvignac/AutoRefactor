@@ -85,8 +85,10 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 		IfStatement elseInnerIfStatement= ASTNodes.as(visited.getElseStatement(), IfStatement.class);
 
 		if (thenInnerIfStatement != null && elseInnerIfStatement != null
-				&& thenInnerIfStatement.getElseStatement() == null && elseInnerIfStatement.getElseStatement() == null
-				&& ASTNodes.isPassive(visited.getExpression()) && ASTNodes.isPassive(thenInnerIfStatement.getExpression())
+				&& thenInnerIfStatement.getElseStatement() == null
+				&& elseInnerIfStatement.getElseStatement() == null
+				&& ASTNodes.isPassive(visited.getExpression())
+				&& ASTNodes.isPassive(thenInnerIfStatement.getExpression())
 				&& ASTNodes.match(thenInnerIfStatement.getExpression(), elseInnerIfStatement.getExpression())) {
 			refactorIf(visited, thenInnerIfStatement, elseInnerIfStatement);
 			return false;

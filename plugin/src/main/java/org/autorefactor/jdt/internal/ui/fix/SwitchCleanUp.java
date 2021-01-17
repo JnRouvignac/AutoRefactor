@@ -284,7 +284,11 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 				ifStatements.add(ifStatement);
 				ifStatement= ASTNodes.as(ASTNodes.getNextSibling(ifStatement), IfStatement.class);
 				variable= extractVariableAndValues(ifStatement);
-			} while (isFallingThrough && ifStatement != null && remainingStatement == null && variable != null && ASTNodes.isSameVariable(switchExpression, variable.name));
+			} while (isFallingThrough
+					&& ifStatement != null
+					&& remainingStatement == null
+					&& variable != null
+					&& ASTNodes.isSameVariable(switchExpression, variable.name));
 
 			List<SwitchCaseSection> filteredCases= filterDuplicateCaseValues(cases);
 			return maybeReplaceWithSwitchStatement(ifStatements, switchExpression, filteredCases, remainingStatement);

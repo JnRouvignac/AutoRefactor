@@ -359,7 +359,9 @@ public abstract class AbstractUnitTestCleanUp extends NewClassImportCleanUp {
 		Pair<Expression, Expression> actualAndExpected= getActualAndExpected(infixExpression.getLeftOperand(),
 				infixExpression.getRightOperand());
 
-		if (isComparingObjects(infixExpression) && !ASTNodes.is(infixExpression.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(infixExpression.getRightOperand(), NullLiteral.class)) {
+		if (isComparingObjects(infixExpression)
+				&& !ASTNodes.is(infixExpression.getLeftOperand(), NullLiteral.class)
+				&& !ASTNodes.is(infixExpression.getRightOperand(), NullLiteral.class)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 

@@ -351,7 +351,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 				ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
 				return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
-						&& resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(methodInvocation);
+						&& resolveValueTypeCompatible(newValueType)
+						&& resolveDestinationTypeCompatibleWithValue(methodInvocation);
 			}
 		} else if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(), //$NON-NLS-1$
 				Function.class.getCanonicalName())) {
@@ -361,7 +362,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 				ITypeBinding newValueType= paramType.getTypeArguments()[1];
 
 				return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
-						&& resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(methodInvocation);
+						&& resolveValueTypeCompatible(newValueType)
+						&& resolveDestinationTypeCompatibleWithValue(methodInvocation);
 			}
 		} else if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
 				BiFunction.class.getCanonicalName())) {
@@ -372,7 +374,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
 				return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
 						&& resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
-						&& resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(methodInvocation);
+						&& resolveValueTypeCompatible(newValueType)
+						&& resolveDestinationTypeCompatibleWithValue(methodInvocation);
 			}
 		} else if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "replaceAll", BiFunction.class.getCanonicalName())) { //$NON-NLS-1$
 			ITypeBinding paramType= arguments.get(0).resolveTypeBinding();

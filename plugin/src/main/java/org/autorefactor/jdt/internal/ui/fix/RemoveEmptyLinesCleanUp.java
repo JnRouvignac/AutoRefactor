@@ -98,7 +98,9 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 				.matcher(source);
 		while (m.find()) {
 			String matchedString= m.group(0);
-			if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (!"\r\n\r\n".equals(matchedString) //$NON-NLS-1$
+					&& !"\n\n".equals(matchedString) //$NON-NLS-1$
+					&& !"\r\r".equals(matchedString)) { //$NON-NLS-1$
 				rewrite.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
 				result= false;
 			}
@@ -260,7 +262,9 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 			Matcher matcher= NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
 			boolean isEqualToNewline= matcher.matches();
 
-			if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
+			if (!isEqualToNewline
+					&& matcher.find()
+					&& matcher.end() < newLineIndex) {
 				SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 

@@ -143,7 +143,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
 
         private boolean maybeReplaceWithCollectionContains(final Statement forNode, final Expression iterable,
                 final Expression loopElement, final IfStatement ifStatement) {
-            if (result && ifStatement != null && ifStatement.getElseStatement() == null && ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
+            if (result
+            		&& ifStatement != null
+            		&& ifStatement.getElseStatement() == null
+            		&& ASTNodes.instanceOf(iterable, Collection.class.getCanonicalName())) {
                 MethodInvocation condition= getMethodToReplace(ifStatement.getExpression());
                 List<Statement> thenStatements= ASTNodes.asList(ifStatement.getThenStatement());
 
@@ -311,7 +314,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
         }
 
         private Boolean signCollectionContains(final BooleanLiteral innerBl, final BooleanLiteral outerBl) {
-            if (innerBl != null && outerBl != null && innerBl.booleanValue() != outerBl.booleanValue()) {
+            if (innerBl != null
+            		&& outerBl != null
+            		&& innerBl.booleanValue() != outerBl.booleanValue()) {
                 return innerBl.booleanValue();
             }
 
@@ -356,7 +361,9 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
         public boolean visit(final ForStatement node) {
             ForLoopContent loopContent= ForLoops.iterateOverContainer(node);
 
-            if (result && loopContent != null && ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
+            if (result
+            		&& loopContent != null
+            		&& ContainerType.COLLECTION.equals(loopContent.getContainerType())) {
                 if (IterationType.INDEX.equals(loopContent.getIterationType())) {
                     return maybeReplace(node, loopContent, collectionGet(loopContent), loopContent.getContainerVariable());
                 }

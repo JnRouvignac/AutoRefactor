@@ -172,9 +172,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
 	private boolean isFinalClassWithoutInheritance(final ASTNode visited) {
 		if (visited instanceof TypeDeclaration) {
-			TypeDeclaration clazz= (TypeDeclaration) visited;
-			return isFinalClass(clazz) && clazz.superInterfaceTypes().isEmpty() && (clazz.getSuperclassType() == null
-					|| ASTNodes.hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
+			TypeDeclaration klass= (TypeDeclaration) visited;
+			return isFinalClass(klass)
+					&& klass.superInterfaceTypes().isEmpty()
+					&& (klass.getSuperclassType() == null || ASTNodes.hasType(klass.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
 		}
 
 		return false;

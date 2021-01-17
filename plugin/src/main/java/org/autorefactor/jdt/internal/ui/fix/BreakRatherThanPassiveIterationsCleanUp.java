@@ -144,7 +144,9 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 		private boolean mayCallImplicitToString(final Expression expression) {
 			return !ASTNodes.hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
 					Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
-					Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
+					Double.class.getCanonicalName())
+					&& !(expression instanceof PrefixExpression)
+					&& !(expression instanceof InfixExpression)
 					&& !(expression instanceof PostfixExpression);
 		}
 
@@ -240,7 +242,9 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
 		IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
 
-		if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
+		if (ifStatement != null
+				&& ifStatement.getElseStatement() == null
+				&& !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
 			List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
 			if (areAssignmentsValid(allowedVars, assignments)) {

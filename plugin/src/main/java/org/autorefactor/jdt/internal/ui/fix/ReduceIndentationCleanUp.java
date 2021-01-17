@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -161,7 +160,9 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 					moveElseStatement(visited);
 					return false;
 				}
-			} else if (ASTNodes.fallsThrough(visited.getElseStatement()) && !ASTNodes.hasVariableConflict(visited, visited.getThenStatement()) && !(visited.getElseStatement() instanceof IfStatement)) {
+			} else if (ASTNodes.fallsThrough(visited.getElseStatement())
+					&& !ASTNodes.hasVariableConflict(visited, visited.getThenStatement())
+					&& !(visited.getElseStatement() instanceof IfStatement)) {
 				moveThenStatement(visited);
 				return false;
 			}
@@ -202,7 +203,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, visited.getElseStatement()), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 			Block newBlock= ast.newBlock();
-			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
+			newBlock.statements().addAll(copyOfStatements);
 
 			ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 		}
@@ -231,7 +232,7 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
 			rewrite.remove(visited.getElseStatement(), group);
 			copyOfStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 			Block newBlock= ast.newBlock();
-			newBlock.statements().addAll((Collection<Statement>) copyOfStatements);
+			newBlock.statements().addAll(copyOfStatements);
 
 			ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 		}

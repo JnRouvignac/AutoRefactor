@@ -275,16 +275,20 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	private boolean isPrimitiveTypeNarrowing(final CastExpression node) {
 		ITypeBinding castTypeBinding= node.getType().resolveBinding();
 		ITypeBinding exprTypeBinding= node.getExpression().resolveTypeBinding();
-		return ASTNodes.isPrimitive(castTypeBinding) && ASTNodes.isPrimitive(exprTypeBinding)
+		return ASTNodes.isPrimitive(castTypeBinding)
+				&& ASTNodes.isPrimitive(exprTypeBinding)
 				&& isAssignmentCompatible(exprTypeBinding, castTypeBinding);
 	}
 
 	private boolean isAssignmentCompatible(final Expression expression, final ITypeBinding typeBinding) {
-		return expression != null && typeBinding != null && isAssignmentCompatible(typeBinding, expression.resolveTypeBinding());
+		return expression != null
+				&& typeBinding != null
+				&& isAssignmentCompatible(typeBinding, expression.resolveTypeBinding());
 	}
 
 	private boolean isAssignmentCompatible(final Expression expression1, final Expression expression2) {
-		return expression1 != null && expression2 != null
+		return expression1 != null
+				&& expression2 != null
 				&& isAssignmentCompatible(expression1.resolveTypeBinding(), expression2.resolveTypeBinding());
 	}
 

@@ -67,7 +67,9 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 			Expression expression= visited.getExpression();
 			Expression arg0= (Expression) visited.arguments().get(0);
 
-			if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
+			if (!ASTNodes.isConstant(expression)
+					&& ASTNodes.isConstant(arg0)
+					&& !ASTNodes.isPrimitive(arg0)) {
 				invertEqualsInvocation(visited, expression, arg0);
 				return false;
 			}

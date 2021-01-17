@@ -67,12 +67,12 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 				InfixExpression secondCondition= ASTNodes.as(operands.get(i), InfixExpression.class);
 				List<Expression> nextOperands= operands.subList(i + 1, operands.size());
 
-				if (firstCondition != null && !firstCondition.hasExtendedOperands()
-						&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND,
-								InfixExpression.Operator.AND)
-						&& secondCondition != null && !secondCondition.hasExtendedOperands()
-						&& ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND,
-								InfixExpression.Operator.AND)
+				if (firstCondition != null
+						&& !firstCondition.hasExtendedOperands()
+						&& ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
+						&& secondCondition != null
+						&& !secondCondition.hasExtendedOperands()
+						&& ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
 						&& isBooleanAndPassive(firstCondition.getLeftOperand())
 						&& isBooleanAndPassive(firstCondition.getRightOperand())
 						&& isBooleanAndPassive(secondCondition.getLeftOperand())

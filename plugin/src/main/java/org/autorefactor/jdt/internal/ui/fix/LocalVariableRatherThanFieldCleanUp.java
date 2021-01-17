@@ -103,7 +103,10 @@ public class LocalVariableRatherThanFieldCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean maybeReplaceFieldByLocalVariable(final TypeDeclaration visited, final FieldDeclaration field) {
-		if (Modifier.isPrivate(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && !hasAnnotation(field) && field.getType().isPrimitiveType()) {
+		if (Modifier.isPrivate(field.getModifiers())
+				&& !Modifier.isFinal(field.getModifiers())
+				&& !hasAnnotation(field)
+				&& field.getType().isPrimitiveType()) {
 			for (Object object : field.fragments()) {
 				VariableDeclarationFragment fragment= (VariableDeclarationFragment) object;
 

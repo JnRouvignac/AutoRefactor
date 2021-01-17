@@ -93,10 +93,13 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 	}
 
 	private boolean maybeRefactorMethodInvocation(final MethodInvocation visited, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-		if (visited.getExpression() != null && !ASTNodes.is(visited.getExpression(), ThisExpression.class) && ASTNodes.usesGivenSignature(visited, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
+		if (visited.getExpression() != null
+				&& !ASTNodes.is(visited.getExpression(), ThisExpression.class)
+				&& ASTNodes.usesGivenSignature(visited, Collection.class.getCanonicalName(), ADD_ALL_METHOD, Collection.class.getCanonicalName())) {
 			MethodInvocation asListMethod= ASTNodes.as((Expression) visited.arguments().get(0), MethodInvocation.class);
 
-			if (asListMethod != null && (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || (usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(visited.getExpression(), Set.class.getCanonicalName())))) {
+			if (asListMethod != null
+					&& (usesGivenVarArgSignature(asListMethod, Arrays.class.getCanonicalName(), AS_LIST_METHOD) || usesGivenVarArgSignature(asListMethod, Set.class.getCanonicalName(), OF_METHOD) && ASTNodes.hasType(visited.getExpression(), Set.class.getCanonicalName()))) {
 				refactorMethod(visited, asListMethod, classesToUseWithImport, importsToAdd);
 				return false;
 			}
@@ -107,7 +110,12 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 
 	private boolean usesGivenVarArgSignature(final MethodInvocation actualMethod, final String className, final String methodName) {
 		IMethodBinding binding= actualMethod.resolveMethodBinding();
-		return binding != null && ASTNodes.hasType(binding.getDeclaringClass(), className) && Utils.equalNotNull(methodName, actualMethod.getName().getIdentifier()) && binding.getParameterTypes() != null && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].isArray();
+		return binding != null
+				&& ASTNodes.hasType(binding.getDeclaringClass(), className)
+				&& Utils.equalNotNull(methodName, actualMethod.getName().getIdentifier())
+				&& binding.getParameterTypes() != null
+				&& binding.getParameterTypes().length == 1
+				&& binding.getParameterTypes()[0].isArray();
 	}
 
 	private void refactorMethod(final MethodInvocation visited, final MethodInvocation asListMethod, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {

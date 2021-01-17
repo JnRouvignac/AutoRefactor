@@ -177,7 +177,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		AnonymousClassDeclaration anonymousClassDecl= visited.getAnonymousClassDeclaration();
 		Type type= visited.getType();
 
-		if (type != null && type.resolveBinding() != null
+		if (type != null
+				&& type.resolveBinding() != null
 				&& type.resolveBinding().getTypeArguments() != null
 				&& type.resolveBinding().getTypeArguments().length == 1
 				&& ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName())
@@ -188,7 +189,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 			List<BodyDeclaration> bodies= anonymousClassDecl.bodyDeclarations();
 			ITypeBinding typeArgument= type.resolveBinding().getTypeArguments()[0];
 
-			if (bodies != null && bodies.size() == 1 && typeArgument != null) {
+			if (bodies != null
+					&& bodies.size() == 1
+					&& typeArgument != null) {
 				BodyDeclaration body= bodies.get(0);
 
 				if (body instanceof MethodDeclaration) {
@@ -504,7 +507,9 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 				&& destinationType.getTypeArguments().length == 1
 				&& Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
-		if (isTypeKnown && straightOrder && isNullFirst == null) {
+		if (isTypeKnown
+				&& straightOrder
+				&& isNullFirst == null) {
 			lambdaExpression.parameters().add(ast.newVariableDeclarationFragment(ast.createCopyTarget(name1)));
 		} else {
 			lambdaExpression.parameters().add(ast.newSingleVariableDeclaration(name1.getIdentifier(), ast.toType(type, typeNameDecider)));

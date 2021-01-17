@@ -156,8 +156,12 @@ public class CFGDotPrinter {
 		}
 		CFGSubGraph subGraph= subGraphs.get(node);
 		if (subGraph == null) {
-			if (!ASTNodes.isLoop(node) && !(node instanceof IfStatement) && !(node instanceof SwitchStatement)
-					&& !(node instanceof MethodDeclaration) && !(node instanceof TryStatement) && !(node instanceof CatchClause)) {
+			if (!ASTNodes.isLoop(node)
+					&& !(node instanceof IfStatement)
+					&& !(node instanceof SwitchStatement)
+					&& !(node instanceof MethodDeclaration)
+					&& !(node instanceof TryStatement)
+					&& !(node instanceof CatchClause)) {
 				return getSubGraph(subGraphs, node.getParent());
 			}
 			// Such statements need their own subgraph to ease reading the CFG

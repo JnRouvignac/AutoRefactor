@@ -227,7 +227,9 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 				data.setPrimeId(isVariableValid(data, 31));
 				data.setResultId(isVariableValid(data, 1));
 
-				if (data.getPrimeId() != null && data.getResultId() != null && data.getStmtIterator().hasNext()) {
+				if (data.getPrimeId() != null
+						&& data.getResultId() != null
+						&& data.getStmtIterator().hasNext()) {
 					while (!data.isHasReturnStatement() && data.getStmtIterator().hasNext()) {
 						if (!isStmtValid(data)) {
 							return true;
@@ -359,8 +361,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			InfixExpression primeTimesResult= ASTNodes.as(hashAddition.getLeftOperand(), InfixExpression.class);
 			Expression newHash= hashAddition.getRightOperand();
 
-			if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
-					&& primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
+			if (!hashAddition.hasExtendedOperands()
+					&& ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
+					&& primeTimesResult != null
+					&& !primeTimesResult.hasExtendedOperands()
 					&& ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
 					&& (isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
 							&& isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId())
@@ -444,7 +448,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			for (MethodDeclaration innerMethod : innerClass.getMethods()) {
 				if ("getEnclosingInstance".equals(innerMethod.getName().getIdentifier()) //$NON-NLS-1$
 						&& Utils.isEmpty(innerMethod.parameters())
-						&& !innerMethod.isConstructor() && innerMethod.resolveBinding() != null
+						&& !innerMethod.isConstructor()
+						&& innerMethod.resolveBinding() != null
 						&& ASTNodes.hasType(innerMethod.resolveBinding().getReturnType(), topLevelClass.resolveBinding().getQualifiedName())) {
 					getEnclosingInstanceDeclaration= innerMethod;
 					break;
@@ -535,12 +540,17 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			SimpleName field= getField(orderedBitwise.getFirstOperand());
 			InfixExpression moveExpression= orderedBitwise.getSecondOperand();
 
-			if (field != null && moveExpression != null && !ASTNodes.isSameVariable(field, data.getPrimeId())
-					&& !ASTNodes.isSameVariable(field, data.getResultId()) && ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
+			if (field != null
+					&& moveExpression != null
+					&& !ASTNodes.isSameVariable(field, data.getPrimeId())
+					&& !ASTNodes.isSameVariable(field, data.getResultId())
+					&& ASTNodes.hasOperator(moveExpression, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
 				SimpleName againFieldName= getField(moveExpression.getLeftOperand());
 				Long hash= ASTNodes.getIntegerLiteral(moveExpression.getRightOperand());
 
-				if (againFieldName != null && ASTNodes.isSameVariable(againFieldName, field) && Long.valueOf(32L).equals(hash)) {
+				if (againFieldName != null
+						&& ASTNodes.isSameVariable(againFieldName, field)
+						&& Long.valueOf(32L).equals(hash)) {
 					if (data.isTempValueUsed()) {
 						data.getFields().add(ASTNodes.getUnparenthesedExpression(againFieldName));
 						return true;
@@ -562,10 +572,13 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		Long hashForTrue= ASTNodes.getIntegerLiteral(newHash.getThenExpression());
 		Long hashForFalse= ASTNodes.getIntegerLiteral(newHash.getElseExpression());
 
-		if (booleanField != null && hashForTrue != null
-				&& hashForFalse != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
+		if (booleanField != null
+				&& hashForTrue != null
+				&& hashForFalse != null
+				&& ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
 				&& !ASTNodes.isSameVariable(booleanField, data.getPrimeId())
-				&& !ASTNodes.isSameVariable(booleanField, data.getResultId()) && Long.valueOf(1231L).equals(hashForTrue)
+				&& !ASTNodes.isSameVariable(booleanField, data.getResultId())
+				&& Long.valueOf(1231L).equals(hashForTrue)
 				&& Long.valueOf(1237L).equals(hashForFalse)) {
 			data.getFields().add(ASTNodes.getUnparenthesedExpression(booleanField));
 			return true;
@@ -593,7 +606,9 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					zero= ASTNodes.getIntegerLiteral(condition.getElseExpression());
 				}
 
-				if (Long.valueOf(0L).equals(zero) && hashOnField != null && hashOnField.getExpression() != null
+				if (Long.valueOf(0L).equals(zero)
+						&& hashOnField != null
+						&& hashOnField.getExpression() != null
 						&& HASH_CODE_METHOD.equals(hashOnField.getName().getIdentifier())
 						&& Utils.isEmpty(hashOnField.arguments())) {
 					SimpleName fieldToHash= getField(hashOnField.getExpression());

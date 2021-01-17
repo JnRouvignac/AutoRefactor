@@ -64,7 +64,9 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 			boolean isNullCheck= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
 			boolean isAndExpression= ASTNodes.hasOperator(visited, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND);
 
-			if (!visited.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
+			if (!visited.hasExtendedOperands()
+					&& isNullCheck ^ isAndExpression
+					&& condition != null
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
 				Expression firstExpression= null;
 
