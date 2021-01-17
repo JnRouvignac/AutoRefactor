@@ -299,11 +299,16 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				importsToAdd.add(OFFSET_CLASS);
 				String offsetClassname= classesToUseWithImport.contains(OFFSET_CLASS) ? "Offset" : OFFSET_CLASS; //$NON-NLS-1$
 
+				MethodInvocation offsetMethod= ast.newMethodInvocation();
+				offsetMethod.setExpression(ASTNodeFactory.newName(ast, offsetClassname));
+				offsetMethod.setName(ast.newSimpleName("offset")); //$NON-NLS-1$
+				offsetMethod.arguments().add(delta);
 				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, offsetClassname));
-				newMethodInvocation.setName(ast.newSimpleName("offset")); //$NON-NLS-1$
-				newMethodInvocation.arguments().add(delta);
-				return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected, newMethodInvocation);
+				newMethodInvocation.setExpression(assertionMethod);
+				newMethodInvocation.setName(ast.newSimpleName(finalMethodName));
+				newMethodInvocation.arguments().add(copyOfExpected);
+				newMethodInvocation.arguments().add(offsetMethod);
+				return newMethodInvocation;
 			}
 
 			MethodInvocation newMethodInvocation= ast.newMethodInvocation();

@@ -194,13 +194,17 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description);
 
-		String classname= addImport(Objects.class, classesToUseWithImport, importsToAdd);
+		String classnameText= addImport(Objects.class, classesToUseWithImport, importsToAdd);
 
 		ReturnStatement copyOfReturnStatement= ASTNodes.createMoveTarget(rewrite, returnStatement);
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, classnameText));
+		newMethodInvocation.setName(ast.newSimpleName(EQUALS_METHOD));
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)));
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)));
 
 		ASTNodes.replaceButKeepComment(rewrite, node.getExpression(),
-				ast.not(ast.newMethodInvocation(ASTNodeFactory.newName(ast, classname),
-						EQUALS_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstField)), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(secondField)))), group);
+				ast.not(newMethodInvocation), group);
 
 		if (node.getThenStatement() instanceof Block) {
 			ASTNodes.replaceButKeepComment(rewrite, (ASTNode) ((Block) node.getThenStatement()).statements().get(0), copyOfReturnStatement, group);

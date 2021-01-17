@@ -827,11 +827,11 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public MethodInvocation newMethodInvocation(Expression expression, String methodName, Expression[] arguments) {
-		MethodInvocation methodInvocation= newMethodInvocation();
-		methodInvocation.setExpression(expression);
-		methodInvocation.setName(ast.newSimpleName(methodName));
-		methodInvocation.arguments().addAll(Arrays.asList(arguments));
-		return methodInvocation;
+		MethodInvocation newMethodInvocation= newMethodInvocation();
+		newMethodInvocation.setExpression(expression);
+		newMethodInvocation.setName(ast.newSimpleName(methodName));
+		newMethodInvocation.arguments().addAll(Arrays.asList(arguments));
+		return newMethodInvocation;
 	}
 
 	/**
@@ -841,17 +841,19 @@ public class ASTNodeFactory {
 	 * @param methodName the name of the invoked method
 	 * @param argument  the arguments for the method invocation
 	 * @param argument2  the arguments for the method invocation
+	 * @param argument3  the arguments for the method invocation
 	 * @param arguments  the arguments for the method invocation
 	 * @return a new method invocation
 	 */
-	public MethodInvocation newMethodInvocation(Expression expression, String methodName, Expression argument, Expression argument2, Expression... arguments) {
-		MethodInvocation methodInvocation= newMethodInvocation();
-		methodInvocation.setExpression(expression);
-		methodInvocation.setName(ast.newSimpleName(methodName));
-		methodInvocation.arguments().add(argument);
-		methodInvocation.arguments().add(argument2);
-		methodInvocation.arguments().addAll(Arrays.asList(arguments));
-		return methodInvocation;
+	public MethodInvocation newMethodInvocation(Expression expression, String methodName, Expression argument, Expression argument2, Expression argument3, Expression... arguments) {
+		MethodInvocation newMethodInvocation= newMethodInvocation();
+		newMethodInvocation.setExpression(expression);
+		newMethodInvocation.setName(ast.newSimpleName(methodName));
+		newMethodInvocation.arguments().add(argument);
+		newMethodInvocation.arguments().add(argument2);
+		newMethodInvocation.arguments().add(argument3);
+		newMethodInvocation.arguments().addAll(Arrays.asList(arguments));
+		return newMethodInvocation;
 	}
 
 	/**
@@ -864,11 +866,11 @@ public class ASTNodeFactory {
 	 * @return a new method invocation
 	 */
 	public <E extends Expression> MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final List<E> arguments) {
-		MethodInvocation methodInvocation= ast.newMethodInvocation();
-		methodInvocation.setExpression(expression);
-		methodInvocation.setName(ast.newSimpleName(methodName));
-		addAll(methodInvocation, arguments);
-		return methodInvocation;
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(expression);
+		newMethodInvocation.setName(ast.newSimpleName(methodName));
+		addAll(newMethodInvocation, arguments);
+		return newMethodInvocation;
 	}
 
 	private boolean isEmptyRangeCopy(final ASTNode... nodes) {

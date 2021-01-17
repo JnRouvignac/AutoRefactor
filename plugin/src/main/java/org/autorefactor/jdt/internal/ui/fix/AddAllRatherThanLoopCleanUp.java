@@ -186,10 +186,14 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, classname));
+		newMethodInvocation.setName(ast.newSimpleName("addAll")); //$NON-NLS-1$
+		newMethodInvocation.arguments().add(addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression());
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)));
+
 		ASTNodes.replaceButKeepComment(rewrite, node,
-				ast.newExpressionStatement(ast.newMethodInvocation(ASTNodeFactory.newName(ast, classname),
-						"addAll", addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression(), //$NON-NLS-1$
-						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)))), group);
+				ast.newExpressionStatement(newMethodInvocation), group);
 	}
 
 	private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {
@@ -203,7 +207,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 	}
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
-		return arrayAccess != null && ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
+		return arrayAccess != null
+				&& ASTNodes.isSameVariable(arrayAccess.getArray(), loopContent.getContainerVariable())
 				&& ASTNodes.isSameLocalVariable(arrayAccess.getIndex(), loopContent.getLoopVariable());
 	}
 

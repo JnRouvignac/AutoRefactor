@@ -39,6 +39,7 @@ import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -116,10 +117,13 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FillRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, classname));
+		newMethodInvocation.setName(ast.newSimpleName("fill")); //$NON-NLS-1$
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())));
+		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())));
 		ASTNodes.replaceButKeepComment(rewrite, node,
-				ast.newExpressionStatement(ast.newMethodInvocation(ASTNodeFactory.newName(ast, classname),
-						"fill", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())), //$NON-NLS-1$
-						ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())))), group);
+				ast.newExpressionStatement(newMethodInvocation), group);
 	}
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {
