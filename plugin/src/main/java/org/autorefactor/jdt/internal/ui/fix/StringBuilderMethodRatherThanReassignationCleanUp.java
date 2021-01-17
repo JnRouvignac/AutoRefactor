@@ -58,7 +58,8 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 	public boolean visit(final Assignment visited) {
 		Expression targetVar= visited.getLeftHandSide();
 		Expression var= visited.getRightHandSide();
-		if (ASTNodes.hasOperator(visited, Assignment.Operator.ASSIGN) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+		if (ASTNodes.hasOperator(visited, Assignment.Operator.ASSIGN)
+				&& ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 				&& var instanceof MethodInvocation) {
 			var= getVar(var);
 
@@ -74,13 +75,16 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 	}
 
 	private Expression getVar(final Expression var) {
-		if (var instanceof Name || var instanceof FieldAccess || var instanceof SuperFieldAccess) {
+		if (var instanceof Name
+				|| var instanceof FieldAccess
+				|| var instanceof SuperFieldAccess) {
 			return var;
 		}
 
 		MethodInvocation methodInvocation= ASTNodes.as(var, MethodInvocation.class);
 
-		if (methodInvocation != null && ASTNodes.hasType(methodInvocation.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+		if (methodInvocation != null
+				&& ASTNodes.hasType(methodInvocation.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
 				&& Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 						.contains(methodInvocation.getName().getIdentifier())) {
 			return getVar(methodInvocation.getExpression());

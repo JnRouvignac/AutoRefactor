@@ -403,7 +403,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
-				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
+				if (fieldName != null
+						&& !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
 						&& !ASTNodes.isSameVariable(fieldName, data.getResultId())) {
 					data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldName));
 					return true;

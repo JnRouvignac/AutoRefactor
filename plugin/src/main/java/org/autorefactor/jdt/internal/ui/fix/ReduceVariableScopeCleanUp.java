@@ -223,14 +223,21 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 	private Pair<Integer, ASTNode> getAccessTypeAndScope(final ASTNode visited) {
 		ASTNode parent= visited.getParent();
 
-		if (parent instanceof Block || parent instanceof InfixExpression || parent instanceof EnhancedForStatement
-				|| parent instanceof ExpressionStatement || parent instanceof ForStatement || parent instanceof Name
+		if (parent instanceof Block
+				|| parent instanceof InfixExpression
+				|| parent instanceof EnhancedForStatement
+				|| parent instanceof ExpressionStatement
+				|| parent instanceof ForStatement
+				|| parent instanceof Name
 				|| parent instanceof WhileStatement) {
 			return getAccessTypeAndScope(parent);
 		}
 
-		if (parent instanceof ImportDeclaration || parent instanceof MethodDeclaration
-				|| parent instanceof MethodInvocation || parent instanceof PackageDeclaration || parent instanceof Type
+		if (parent instanceof ImportDeclaration
+				|| parent instanceof MethodDeclaration
+				|| parent instanceof MethodInvocation
+				|| parent instanceof PackageDeclaration
+				|| parent instanceof Type
 				|| parent instanceof TypeDeclaration) {
 			return NULL_PAIR;
 		}
@@ -261,12 +268,17 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 	}
 
 	private ASTNode getScope(final ASTNode visited) {
-		if (visited instanceof Block || visited instanceof EnhancedForStatement || visited instanceof ForStatement
-				|| visited instanceof IfStatement || visited instanceof WhileStatement) {
+		if (visited instanceof Block
+				|| visited instanceof EnhancedForStatement
+				|| visited instanceof ForStatement
+				|| visited instanceof IfStatement
+				|| visited instanceof WhileStatement) {
 			return visited;
 		}
 
-		if (visited instanceof Expression || visited instanceof Statement || visited instanceof VariableDeclaration) {
+		if (visited instanceof Expression
+				|| visited instanceof Statement
+				|| visited instanceof VariableDeclaration) {
 			return getScope(visited.getParent());
 		}
 

@@ -177,22 +177,28 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 	@Override
 	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		if (methodInvocation.getExpression() == null || methodInvocation.getExpression().resolveTypeBinding() == null || methodInvocation.getExpression().resolveTypeBinding().isParameterizedType()) {
+		if (methodInvocation.getExpression() == null
+				|| methodInvocation.getExpression().resolveTypeBinding() == null
+				|| methodInvocation.getExpression().resolveTypeBinding().isParameterizedType()) {
 			return false;
 		}
 
 		List<Expression> arguments= methodInvocation.arguments();
 		if (ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "size") || ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "size") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) || ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$ //$NON-NLS-2$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "forEach", BiConsumer.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ //$NON-NLS-2$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "hashCode") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "size") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
 			return true;
@@ -225,9 +231,12 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 			return resolveDestinationParamTypeCompatibleWithKey(methodInvocation);
 		} else if (ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "values")) { //$NON-NLS-1$
 			return resolveDestinationParamTypeCompatibleWithValue(methodInvocation);
-		} else if (ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "descendingMap") || ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "firstEntry") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "lastEntry") || ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "pollFirstEntry") //$NON-NLS-1$ //$NON-NLS-2$
-				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "pollLastEntry") || ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "of")) { //$NON-NLS-1$ //$NON-NLS-2$
+		} else if (ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "descendingMap") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "firstEntry") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "lastEntry") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "pollFirstEntry") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "pollLastEntry") //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Map.class.getCanonicalName(), "of")) { //$NON-NLS-1$
 			return resolveDestinationParamTypeCompatibleWithKeyValue(methodInvocation);
 		} else if (ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "ceilingEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, TreeMap.class.getCanonicalName(), "floorEntry", Object.class.getCanonicalName()) //$NON-NLS-1$

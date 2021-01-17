@@ -101,8 +101,10 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
 					return true;
 				}
 
-				if (node.getParent() instanceof WhileStatement || node.getParent() instanceof EnhancedForStatement
-						|| node.getParent() instanceof ForStatement || node.getParent() instanceof DoStatement) {
+				if (node.getParent() instanceof WhileStatement
+						|| node.getParent() instanceof EnhancedForStatement
+						|| node.getParent() instanceof ForStatement
+						|| node.getParent() instanceof DoStatement) {
 					return false;
 				}
 

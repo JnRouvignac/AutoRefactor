@@ -356,6 +356,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		while (it.hasNext()) {
 			ITypeBinding typeN= it.next().resolveTypeBinding();
+
 			if (!areSameTypeBindings(type0, typeN)) {
 				return false;
 			}
@@ -365,8 +366,9 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 	}
 
 	private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-		return type1 == null || type2 == null || type1.isParameterizedType() == type2.isParameterizedType()
-				&& areSameParameterizedTypeBindings(type1, type2);
+		return type1 == null
+				|| type2 == null
+				|| type1.isParameterizedType() == type2.isParameterizedType() && areSameParameterizedTypeBindings(type1, type2);
 	}
 
 	/** Special handling because of captures. */
@@ -379,6 +381,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		if (types1.length != types2.length) {
 			return false;
 		}
+
 		for (int i= 0; i < types1.length; i++) {
 			if (!areSameTypeBindings(types1[i], types2[i])) {
 				return false;

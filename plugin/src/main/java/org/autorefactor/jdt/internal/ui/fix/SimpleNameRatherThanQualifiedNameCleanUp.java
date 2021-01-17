@@ -284,8 +284,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 			do {
 				for (IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
 					if (binding.getName().equals(simpleName) && (Modifier.isPublic(binding.getModifiers())
-							|| Modifier.isProtected(binding.getModifiers()) || !Modifier.isPrivate(binding.getModifiers())
-									&& superTypeBinding.getPackage().equals(typeBinding.getPackage()))) {
+							|| Modifier.isProtected(binding.getModifiers())
+							|| !Modifier.isPrivate(binding.getModifiers()) && superTypeBinding.getPackage().equals(typeBinding.getPackage()))) {
 						return superTypeBinding;
 					}
 				}

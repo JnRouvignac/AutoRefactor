@@ -143,8 +143,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 						}
 
 						for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
-							if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && ASTNodes.usesGivenSignature(methodBinding,
-									calledType.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
+							if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
+									&& ASTNodes.usesGivenSignature(methodBinding, calledType.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
 								return true;
 							}
 						}
@@ -154,7 +154,9 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 					return false;
 				}
 
-				if (calledExpression == null || calledExpression instanceof StringLiteral || calledExpression instanceof NumberLiteral
+				if (calledExpression == null
+						|| calledExpression instanceof StringLiteral
+						|| calledExpression instanceof NumberLiteral
 						|| calledExpression instanceof ThisExpression) {
 					replaceByMethodReference(node, methodInvocation);
 					return false;

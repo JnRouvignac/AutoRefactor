@@ -465,7 +465,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 	}
 
 	private Variable extractVariableWithConstantValue(final Expression variable, final Expression constant) {
-		if ((variable instanceof Name || variable instanceof FieldAccess || variable instanceof SuperFieldAccess) && ASTNodes.hasType(variable, char.class.getCanonicalName(), byte.class.getCanonicalName(), short.class.getCanonicalName(), int.class.getCanonicalName())
+		if ((variable instanceof Name || variable instanceof FieldAccess || variable instanceof SuperFieldAccess)
+				&& ASTNodes.hasType(variable, char.class.getCanonicalName(), byte.class.getCanonicalName(), short.class.getCanonicalName(), int.class.getCanonicalName())
 				&& (constant instanceof NumberLiteral || constant instanceof CharacterLiteral)) {
 			return new Variable(variable, Arrays.asList(constant));
 		}

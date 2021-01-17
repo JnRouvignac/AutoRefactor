@@ -125,7 +125,9 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 		List<IExtendedModifier> modifiers= visited.modifiers();
 
 		for (Modifier modifier : getModifiersOnly(modifiers)) {
-			if (modifier.isPublic() || modifier.isStatic() || modifier.isFinal()) {
+			if (modifier.isPublic()
+					|| modifier.isStatic()
+					|| modifier.isFinal()) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantModifiersCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 

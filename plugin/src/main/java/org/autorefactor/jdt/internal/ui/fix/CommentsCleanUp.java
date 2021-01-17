@@ -397,14 +397,20 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 				// || TAG_LINK.equals(tagName)
 				// || TAG_LINKPLAIN.equals(tagName)
 				// || TAG_LITERAL.equals(tagName)
-				|| TagElement.TAG_RETURN.equals(tagName) || TagElement.TAG_SEE.equals(tagName) || TagElement.TAG_SERIAL.equals(tagName)
-				|| TagElement.TAG_SERIALDATA.equals(tagName) || TagElement.TAG_SERIALFIELD.equals(tagName) || TagElement.TAG_SINCE.equals(tagName)
+				|| TagElement.TAG_RETURN.equals(tagName)
+				|| TagElement.TAG_SEE.equals(tagName)
+				|| TagElement.TAG_SERIAL.equals(tagName)
+				|| TagElement.TAG_SERIALDATA.equals(tagName)
+				|| TagElement.TAG_SERIALFIELD.equals(tagName)
+				|| TagElement.TAG_SINCE.equals(tagName)
 				// || TAG_VALUE.equals(tagName)
 				|| TagElement.TAG_VERSION.equals(tagName)) {
 			// TODO JNR a return tag repeating the return type of the method is useless
 			return anyTextElementNotEmpty(tag.fragments(), throwIfUnknown);
 		}
-		if (TagElement.TAG_EXCEPTION.equals(tagName) || TagElement.TAG_PARAM.equals(tagName) || TagElement.TAG_THROWS.equals(tagName)) {
+		if (TagElement.TAG_EXCEPTION.equals(tagName)
+				|| TagElement.TAG_PARAM.equals(tagName)
+				|| TagElement.TAG_THROWS.equals(tagName)) {
 			// TODO JNR a @throws tag repeating the checked exceptions of the method is
 			// useless
 			return !isTagEmptyOrWithSimpleNameOnly(tag);

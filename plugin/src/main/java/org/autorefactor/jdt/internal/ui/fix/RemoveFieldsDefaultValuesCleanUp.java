@@ -74,7 +74,8 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 		for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) visited.fragments()) {
 			Expression initializer= fragment.getInitializer();
 
-			if (initializer != null && (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
+			if (initializer != null
+					&& (!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class)
 					|| fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
 							&& isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue()))) {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveFieldsDefaultValuesCleanUp_description);
@@ -101,7 +102,9 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean isPrimitiveDefaultValue(final Object val) {
-		if (val instanceof Short || val instanceof Integer || val instanceof Long) {
+		if (val instanceof Short
+				|| val instanceof Integer
+				|| val instanceof Long) {
 			return ((Number) val).longValue() == 0;
 		}
 

@@ -97,8 +97,10 @@ public class EndOfLoopRatherThanContinueCleanUp extends AbstractCleanUpRule {
 			Statement nextStatement= ASTNodes.getNextStatement(node);
 
 			if (nextStatement == null) {
-				if (node.getParent() instanceof WhileStatement || node.getParent() instanceof EnhancedForStatement
-						|| node.getParent() instanceof ForStatement || node.getParent() instanceof DoStatement) {
+				if (node.getParent() instanceof WhileStatement
+						|| node.getParent() instanceof EnhancedForStatement
+						|| node.getParent() instanceof ForStatement
+						|| node.getParent() instanceof DoStatement) {
 					return true;
 				}
 
