@@ -135,7 +135,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			MethodInvocation leftInvocation= ASTNodes.as(visited.getExpression(), MethodInvocation.class);
 			MethodInvocation rightInvocation= ASTNodes.as((Expression) visited.arguments().get(0), MethodInvocation.class);
 
-			if (leftInvocation != null && rightInvocation != null
+			if (leftInvocation != null
+					&& rightInvocation != null
 					&& (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
 							&& ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
 							|| ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
@@ -155,7 +156,11 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			Expression rightExpression= getReducedStringExpression((Expression) visited.arguments().get(0), isRefactoringNeeded);
 
 			if (isRefactoringNeeded.get()) {
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, leftExpression), "equalsIgnoreCase", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression))), group); //$NON-NLS-1$
+				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, leftExpression));
+				newMethodInvocation.setName(ast.newSimpleName("equalsIgnoreCase")); //$NON-NLS-1$
+				newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)));
+				ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$

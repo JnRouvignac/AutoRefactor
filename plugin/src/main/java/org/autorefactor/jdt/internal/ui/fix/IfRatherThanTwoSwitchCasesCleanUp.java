@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -222,7 +223,11 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
 				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-			return ast.newMethodInvocation(ast.createCopyTarget(value), "equals", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant))); //$NON-NLS-1$
+			MethodInvocation methodInvocation= ast.newMethodInvocation();
+			methodInvocation.setExpression(ast.createCopyTarget(value));
+			methodInvocation.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
+			methodInvocation.arguments().add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant)));
+			return methodInvocation;
 		}
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();

@@ -587,7 +587,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (result == null) {
 				result= finalString;
 			} else {
-				result= ast.newMethodInvocation(result, "append", finalString); //$NON-NLS-1$
+				MethodInvocation methodInvocation= ast.newMethodInvocation();
+				methodInvocation.setExpression(result);
+				methodInvocation.setName(ast.newSimpleName("append")); //$NON-NLS-1$
+				methodInvocation.arguments().add(finalString);
+				result= methodInvocation;
 			}
 		}
 

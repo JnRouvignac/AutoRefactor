@@ -295,8 +295,11 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			}
 
 			for (Assignment assignmentRead : assignmentReads) {
-				ASTNodes.replaceButKeepComment(rewrite, assignmentRead, ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()),
-						"set", ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide())), group); //$NON-NLS-1$
+				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()));
+				newMethodInvocation.setName(ast.newSimpleName("set")); //$NON-NLS-1$
+				newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide()));
+				ASTNodes.replaceButKeepComment(rewrite, assignmentRead, newMethodInvocation, group);
 			}
 		}
 	}

@@ -261,7 +261,11 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
 		}
 
-		return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, ast.newNullLiteral());
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setExpression(qualifiedClass);
+		methodInvocation.setName(ast.newSimpleName(FAIL_METHOD));
+		methodInvocation.arguments().add(ast.newNullLiteral());
+		return methodInvocation;
 	}
 
 	@Override
@@ -271,8 +275,10 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		String finalMethodName= getFinalMethodName(methodName);
-
-		Expression assertionMethod= ast.newMethodInvocation(copyOfClass, ASSERT_THAT_METHOD, copyOfActual);
+		MethodInvocation assertionMethod= ast.newMethodInvocation();
+		assertionMethod.setExpression(copyOfClass);
+		assertionMethod.setName(ast.newSimpleName(ASSERT_THAT_METHOD));
+		assertionMethod.arguments().add(copyOfActual);
 
 		if (failureMessage != null) {
 			MethodInvocation failureMethod= (MethodInvocation) failureMessage;
@@ -300,7 +306,11 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected, newMethodInvocation);
 			}
 
-			return ast.newMethodInvocation(assertionMethod, finalMethodName, copyOfExpected);
+			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+			newMethodInvocation.setExpression(assertionMethod);
+			newMethodInvocation.setName(ast.newSimpleName(finalMethodName));
+			newMethodInvocation.arguments().add(copyOfExpected);
+			return newMethodInvocation;
 		}
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation();

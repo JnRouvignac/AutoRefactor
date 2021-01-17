@@ -95,7 +95,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 	@Override
 	boolean maybeReplace(final ClassInstanceCreation classInstanceCreation, final Set<String> alreadyImportedClasses, final Set<String> importsToAdd,
 			final Type... types) {
-		if (types == null || types.length < 1) {
+		if (types == null || types.length == 0) {
 			return true;
 		}
 
@@ -108,19 +108,26 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
 		if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
 			Expression typeArg= arguments.get(0);
+
 			if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
 				return true;
 			}
-			invocation= ast.newMethodInvocation(newClassName, "copyOf", ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(typeArg))); //$NON-NLS-1$
+
+			invocation= ast.newMethodInvocation();
+			invocation.setExpression(newClassName);
+			invocation.setName(ast.newSimpleName("copyOf")); //$NON-NLS-1$
+			invocation.arguments().add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(typeArg)));
 		} else {
 			TypeLiteral newTypeLiteral= cuRewrite.getAST().newTypeLiteral();
 			newTypeLiteral.setType(ast.createCopyTarget(type));
-			invocation= ast.newMethodInvocation(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
+			invocation= ast.newMethodInvocation();
+			invocation.setExpression(newClassName);
+			invocation.setName(ast.newSimpleName("noneOf")); //$NON-NLS-1$
+			invocation.arguments().add(newTypeLiteral);
 		}
 
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description);
-
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.EnumSetRatherThanHashSetCleanUp_description);
 
 		ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, invocation, group);
 		importsToAdd.add(EnumSet.class.getCanonicalName());

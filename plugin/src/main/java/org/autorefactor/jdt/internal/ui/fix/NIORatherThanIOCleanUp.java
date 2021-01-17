@@ -229,7 +229,13 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			String pathsName= addImport(Paths.class, classesToUseWithImport, importsToAdd);
 			String pathName= addImport(Path.class, classesToUseWithImport, importsToAdd);
 			ASTNodes.replaceButKeepComment(rewrite, type, ast.type(pathName), group);
-			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newMethodInvocation(ASTNodeFactory.newName(ast, pathsName), GET_METHOD, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0)))), group);
+
+			MethodInvocation getMethod= ast.newMethodInvocation();
+			getMethod.setExpression(ASTNodeFactory.newName(ast, pathsName));
+			getMethod.setName(ast.newSimpleName(GET_METHOD));
+			getMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0))));
+
+			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, getMethod, group);
 
 			for (SimpleName fileUse : fileUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();

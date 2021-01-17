@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -494,7 +495,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (getJavaMinorVersion() >= 4) {
-                return ast.newMethodInvocation(newBooleanName, "valueOf", condition); //$NON-NLS-1$
+                MethodInvocation methodInvocation= ast.newMethodInvocation();
+				methodInvocation.setExpression(newBooleanName);
+				methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+				methodInvocation.arguments().add(condition);
+				return methodInvocation;
             }
 
             return ast.newClassInstanceCreation(expressionTypeName, condition);

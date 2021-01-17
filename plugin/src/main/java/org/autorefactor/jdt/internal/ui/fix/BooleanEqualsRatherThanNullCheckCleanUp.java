@@ -67,6 +67,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 			if (!visited.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
 					&& ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
 				Expression firstExpression= null;
+
 				if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)) {
 					firstExpression= condition.getRightOperand();
 				} else if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)) {
@@ -75,6 +76,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
 				Expression secondExpression= null;
 				PrefixExpression negateSecondExpression= ASTNodes.as(rightOperand, PrefixExpression.class);
+
 				boolean isPositiveExpression;
 				if (negateSecondExpression != null && ASTNodes.hasOperator(negateSecondExpression, PrefixExpression.Operator.NOT)) {
 					secondExpression= negateSecondExpression.getOperand();
@@ -84,7 +86,9 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 					isPositiveExpression= true;
 				}
 
-				if (firstExpression != null && ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpression)
+				if (firstExpression != null
+						&& ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName())
+						&& ASTNodes.isPassive(firstExpression)
 						&& ASTNodes.match(firstExpression, secondExpression)) {
 					replaceNullCheck(visited, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
 					return false;
@@ -102,9 +106,13 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BooleanEqualsRatherThanNullCheckCleanUp_description);
 
 		Name booleanConstant= ASTNodeFactory.newName(ast, Boolean.class.getSimpleName(), isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ //$NON-NLS-2$
-		MethodInvocation equalsMethod= ast.newMethodInvocation(booleanConstant, "equals", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstExpression))); //$NON-NLS-1$
 
-		Expression newExpression= null;
+		MethodInvocation equalsMethod= ast.newMethodInvocation();
+		equalsMethod.setExpression(booleanConstant);
+		equalsMethod.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
+		equalsMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(firstExpression)));
+
+		Expression newExpression;
 		if (!isNullCheck || isAndExpression) {
 			newExpression= equalsMethod;
 		} else {

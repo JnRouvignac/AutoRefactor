@@ -445,8 +445,10 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaExpressionRatherThanComparatorCleanUp_description);
-
-		Expression comparingMethod= ast.newMethodInvocation(ASTNodeFactory.newName(ast, comparatorClassName), "comparing", lambda); //$NON-NLS-1$
+		MethodInvocation comparingMethod= ast.newMethodInvocation();
+		comparingMethod.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
+		comparingMethod.setName(ast.newSimpleName("comparing")); //$NON-NLS-1$
+		comparingMethod.arguments().add(lambda);
 
 		if (!isForward.get()) {
 			MethodInvocation methodInvocation= ast.newMethodInvocation();
@@ -457,9 +459,17 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
 		if (isNullFirst != null) {
 			if (isNullFirst) {
-				comparingMethod= ast.newMethodInvocation(ASTNodeFactory.newName(ast, comparatorClassName), "nullsFirst", comparingMethod); //$NON-NLS-1$
+				MethodInvocation methodInvocation= ast.newMethodInvocation();
+				methodInvocation.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
+				methodInvocation.setName(ast.newSimpleName("nullsFirst")); //$NON-NLS-1$
+				methodInvocation.arguments().add(comparingMethod);
+				comparingMethod= methodInvocation;
 			} else {
-				comparingMethod= ast.newMethodInvocation(ASTNodeFactory.newName(ast, comparatorClassName), "nullsLast", comparingMethod); //$NON-NLS-1$
+				MethodInvocation methodInvocation= ast.newMethodInvocation();
+				methodInvocation.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
+				methodInvocation.setName(ast.newSimpleName("nullsLast")); //$NON-NLS-1$
+				methodInvocation.arguments().add(comparingMethod);
+				comparingMethod= methodInvocation;
 			}
 		}
 

@@ -256,14 +256,12 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
-		MethodInvocation newMethod;
+		MethodInvocation newMethod= ast.newMethodInvocation();
+		newMethod.setName(ast.newSimpleName(methodName));
+		newMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
+
 		if (affectedCollection != null) {
-			newMethod= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, affectedCollection), methodName, ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
-		} else {
-			MethodInvocation methodInvocation= ast.newMethodInvocation();
-			methodInvocation.setName(ast.newSimpleName(methodName));
-			methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(data)));
-			newMethod= methodInvocation;
+			newMethod.setExpression(ASTNodes.createMoveTarget(rewrite, affectedCollection));
 		}
 
 		ASTNodes.replaceButKeepComment(rewrite, toReplace, ast.newExpressionStatement(newMethod), group);

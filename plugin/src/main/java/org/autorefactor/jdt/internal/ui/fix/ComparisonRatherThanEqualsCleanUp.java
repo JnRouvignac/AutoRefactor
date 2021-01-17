@@ -127,7 +127,10 @@ public class ComparisonRatherThanEqualsCleanUp extends AbstractCleanUpRule {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-		MethodInvocation methodInvocation= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, visited.getExpression()), "compareTo", ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0))); //$NON-NLS-1$
+		MethodInvocation methodInvocation= ast.newMethodInvocation();
+		methodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, visited.getExpression()));
+		methodInvocation.setName(ast.newSimpleName("compareTo")); //$NON-NLS-1$
+		methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0)));
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();
 		newInfixExpression.setLeftOperand(methodInvocation);

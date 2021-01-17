@@ -95,8 +95,11 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 	protected Expression newMethod(final Expression iterable, final Expression toFind, final boolean isPositive, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		MethodInvocation invoke= ast.newMethodInvocation();
 
-		MethodInvocation invoke= ast.newMethodInvocation(ASTNodes.createMoveTarget(rewrite, iterable), "contains", ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(toFind))); //$NON-NLS-1$
+		invoke.setExpression(ASTNodes.createMoveTarget(rewrite, iterable));
+		invoke.setName(ast.newSimpleName("contains")); //$NON-NLS-1$
+		invoke.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(toFind)));
 
 		if (isPositive) {
 			return invoke;
