@@ -134,20 +134,20 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 			}
 		}
 
-		for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
-			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+		for (Class<?> klass : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
+			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertEquals", klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, true, args.get(0), args.get(1), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertEquals", klass.getCanonicalName(), klass.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, true, args.get(0), args.get(1), args.get(2));
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertNotEquals", klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, false, args.get(0), args.get(1), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, TESTNG_CLASS, "assertNotEquals", klass.getCanonicalName(), klass.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, false, args.get(0), args.get(1), args.get(2));
 			}
 		}

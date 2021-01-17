@@ -53,26 +53,26 @@ public class InstanceofRatherThanIsInstanceCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final MethodInvocation node) {
-		TypeLiteral clazz= ASTNodes.as(node.getExpression(), TypeLiteral.class);
+		TypeLiteral klass= ASTNodes.as(node.getExpression(), TypeLiteral.class);
 
-		if (clazz != null
-				&& !clazz.getType().resolveBinding().isPrimitive()
+		if (klass != null
+				&& !klass.getType().resolveBinding().isPrimitive()
 				&& ASTNodes.usesGivenSignature(node, Class.class.getCanonicalName(), "isInstance", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			replace(node, clazz);
+			replace(node, klass);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void replace(final MethodInvocation node, final TypeLiteral clazz) {
+	private void replace(final MethodInvocation node, final TypeLiteral klass) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.InstanceofRatherThanIsInstanceCleanUp_description);
 
 		InstanceofExpression newInstanceofExpression= ast.newInstanceofExpression();
 		newInstanceofExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) node.arguments().get(0))));
-		newInstanceofExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, clazz.getType()));
+		newInstanceofExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, klass.getType()));
 
 		ASTNodes.replaceButKeepComment(rewrite, node, ASTNodeFactory.parenthesizeIfNeeded(ast, newInstanceofExpression), group);
 	}

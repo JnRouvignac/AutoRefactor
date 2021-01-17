@@ -189,14 +189,14 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 						}
 					}
 
-					ITypeBinding clazz= calledExpression.resolveTypeBinding();
+					ITypeBinding klass= calledExpression.resolveTypeBinding();
 
-					if (clazz == null) {
+					if (klass == null) {
 						return true;
 					}
 
 					String[] remainingParams= new String[arguments.size() + 1];
-					remainingParams[0]= clazz.getQualifiedName();
+					remainingParams[0]= klass.getQualifiedName();
 
 					for (int i= 0; i < arguments.size(); i++) {
 						ITypeBinding argumentBinding= arguments.get(i).resolveTypeBinding();
@@ -208,9 +208,9 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 						remainingParams[i + 1]= argumentBinding.getQualifiedName();
 					}
 
-					for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
+					for (IMethodBinding methodBinding : klass.getDeclaredMethods()) {
 						if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && ASTNodes.usesGivenSignature(methodBinding,
-								clazz.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
+								klass.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
 							return true;
 						}
 					}

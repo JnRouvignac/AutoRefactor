@@ -124,20 +124,20 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 			return maybeRefactorStatement(classesToUseWithImport, importsToAdd, visited, visited, false, args.get(1), args.get(0), false);
 		}
 
-		for (Class<?> clazz : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
-			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+		for (Class<?> klass : new Class<?>[]{boolean.class, int.class, long.class, double.class, float.class, short.class, char.class, byte.class, String.class, Object.class}) {
+			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertEquals", klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, true, args.get(1), args.get(0), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertEquals", String.class.getCanonicalName(), klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, true, args.get(2), args.get(1), args.get(0));
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertNotEquals", clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertNotEquals", klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, false, args.get(1), args.get(0), null);
 			}
 
-			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertNotEquals", String.class.getCanonicalName(), clazz.getCanonicalName(), clazz.getCanonicalName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(visited, jUnitClass, "assertNotEquals", String.class.getCanonicalName(), klass.getCanonicalName(), klass.getCanonicalName())) { //$NON-NLS-1$
 				return maybeRefactorToEquality(classesToUseWithImport, importsToAdd, visited, visited, false, args.get(2), args.get(1), args.get(0));
 			}
 		}

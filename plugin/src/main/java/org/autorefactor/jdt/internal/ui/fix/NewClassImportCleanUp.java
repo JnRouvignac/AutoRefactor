@@ -123,8 +123,8 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 		Set<String> classesToUse= getClassesToImport();
 		Map<String, String> importsByPackage= new HashMap<>();
 
-		for (String clazz : classesToUse) {
-			importsByPackage.put(getPackageName(clazz), clazz);
+		for (String klass : classesToUse) {
+			importsByPackage.put(getPackageName(klass), klass);
 		}
 
 		for (Object anObject : cu.imports()) {
@@ -159,9 +159,9 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 		Map<String, String> importsByClassname= new HashMap<>();
 		Map<String, String> importsByPackage= new HashMap<>();
 
-		for (String clazz : classesToUse) {
-			importsByClassname.put(getSimpleName(clazz), clazz);
-			importsByPackage.put(getPackageName(clazz), clazz);
+		for (String klass : classesToUse) {
+			importsByClassname.put(getSimpleName(klass), klass);
+			importsByPackage.put(getPackageName(klass), klass);
 		}
 
 		Set<String> alreadyImportedClasses= new HashSet<>();
