@@ -82,7 +82,13 @@ public class TruncatingAppendingRatherThanSubCharactersCleanUp extends AbstractC
 		Expression arg0= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(args.get(0)));
 		Expression arg1= ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(args.get(1)));
 
-		MethodInvocation newAppendSubstring= ast.newMethodInvocation(builder, "append", stringVar, arg0, arg1); //$NON-NLS-1$
-		ASTNodes.replaceButKeepComment(rewrite, visited, newAppendSubstring, group);
+		MethodInvocation appendMethod= ast.newMethodInvocation();
+		appendMethod.setExpression(builder);
+		appendMethod.setName(ast.newSimpleName("append")); //$NON-NLS-1$
+		appendMethod.arguments().add(stringVar);
+		appendMethod.arguments().add(arg0);
+		appendMethod.arguments().add(arg1);
+
+		ASTNodes.replaceButKeepComment(rewrite, visited, appendMethod, group);
 	}
 }

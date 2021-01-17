@@ -203,6 +203,10 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 			arguments.add(delta);
 		}
 
-		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[arguments.size()]));
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(copyOfExpression);
+		newMethodInvocation.setName(ast.newSimpleName(methodName));
+		newMethodInvocation.arguments().addAll(arguments);
+		return newMethodInvocation;
 	}
 }

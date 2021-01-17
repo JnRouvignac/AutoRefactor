@@ -167,6 +167,10 @@ public class JupiterAssertCleanUp extends AbstractUnitTestCleanUp {
 			arguments.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(failureMessage)));
 		}
 
-		return ast.newMethodInvocation(copyOfExpression, methodName, arguments.toArray(new Expression[0]));
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(copyOfExpression);
+		newMethodInvocation.setName(ast.newSimpleName(methodName));
+		newMethodInvocation.arguments().addAll(arguments);
+		return newMethodInvocation;
 	}
 }

@@ -821,44 +821,6 @@ public class ASTNodeFactory {
 	/**
 	 * Builds a new {@link MethodInvocation} instance.
 	 *
-	 * @param expression the method invocation expression
-	 * @param methodName the name of the invoked method
-	 * @param arguments  the arguments for the method invocation
-	 * @return a new method invocation
-	 */
-	public MethodInvocation newMethodInvocation(Expression expression, String methodName, Expression[] arguments) {
-		MethodInvocation newMethodInvocation= newMethodInvocation();
-		newMethodInvocation.setExpression(expression);
-		newMethodInvocation.setName(ast.newSimpleName(methodName));
-		newMethodInvocation.arguments().addAll(Arrays.asList(arguments));
-		return newMethodInvocation;
-	}
-
-	/**
-	 * Builds a new {@link MethodInvocation} instance.
-	 *
-	 * @param expression the method invocation expression
-	 * @param methodName the name of the invoked method
-	 * @param argument  the arguments for the method invocation
-	 * @param argument2  the arguments for the method invocation
-	 * @param argument3  the arguments for the method invocation
-	 * @param arguments  the arguments for the method invocation
-	 * @return a new method invocation
-	 */
-	public MethodInvocation newMethodInvocation(Expression expression, String methodName, Expression argument, Expression argument2, Expression argument3, Expression... arguments) {
-		MethodInvocation newMethodInvocation= newMethodInvocation();
-		newMethodInvocation.setExpression(expression);
-		newMethodInvocation.setName(ast.newSimpleName(methodName));
-		newMethodInvocation.arguments().add(argument);
-		newMethodInvocation.arguments().add(argument2);
-		newMethodInvocation.arguments().add(argument3);
-		newMethodInvocation.arguments().addAll(Arrays.asList(arguments));
-		return newMethodInvocation;
-	}
-
-	/**
-	 * Builds a new {@link MethodInvocation} instance.
-	 *
 	 * @param <E>        the arguments type
 	 * @param expression the method invocation expression
 	 * @param methodName the name of the invoked method
