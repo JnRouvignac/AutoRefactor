@@ -138,7 +138,11 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(visited)), group); //$NON-NLS-1$
+			MethodInvocation hashMethod= ast.newMethodInvocation();
+			hashMethod.setExpression(javaUtilObjects);
+			hashMethod.setName(ast.newSimpleName("hash")); //$NON-NLS-1$
+			hashMethod.arguments().addAll(copyArguments(visited));
+			ASTNodes.replaceButKeepComment(rewrite, visited, hashMethod, group);
 			return false;
 		}
 
@@ -151,7 +155,11 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), javaUtilObjects, group);
 				ASTNodes.replaceButKeepComment(rewrite, visited.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
 			} else {
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(javaUtilObjects, "hash", copyArguments(visited)), group); //$NON-NLS-1$
+				MethodInvocation hashMethod= ast.newMethodInvocation();
+				hashMethod.setExpression(javaUtilObjects);
+				hashMethod.setName(ast.newSimpleName("hash")); //$NON-NLS-1$
+				hashMethod.arguments().addAll(copyArguments(visited));
+				ASTNodes.replaceButKeepComment(rewrite, visited, hashMethod, group);
 			}
 
 			return false;
@@ -172,11 +180,19 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 
 			if (copyOfArgs.size() <= 2) {
-				ASTNodes.replaceButKeepComment(rewrite, visited, ast.newMethodInvocation(javaUtilObjects, "requireNonNull", copyOfArgs), group); //$NON-NLS-1$
+				MethodInvocation requireNonNullMethod= ast.newMethodInvocation();
+				requireNonNullMethod.setExpression(javaUtilObjects);
+				requireNonNullMethod.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$
+				requireNonNullMethod.arguments().addAll(copyOfArgs);
+				ASTNodes.replaceButKeepComment(rewrite, visited, requireNonNullMethod, group);
 			} else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
 				LambdaExpression messageSupplier= ast.newLambdaExpression();
+				MethodInvocation formatMethod= ast.newMethodInvocation();
+				formatMethod.setExpression(ast.newSimpleName(String.class.getSimpleName()));
+				formatMethod.setName(ast.newSimpleName("format")); //$NON-NLS-1$
+				formatMethod.arguments().addAll(copyOfArgs.subList(1, copyOfArgs.size()));
 				messageSupplier
-						.setBody(ast.newMethodInvocation(ast.newSimpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
+						.setBody(formatMethod);
 				MethodInvocation requireNonNullMethod= ast.newMethodInvocation();
 				requireNonNullMethod.setExpression(javaUtilObjects);
 				requireNonNullMethod.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$

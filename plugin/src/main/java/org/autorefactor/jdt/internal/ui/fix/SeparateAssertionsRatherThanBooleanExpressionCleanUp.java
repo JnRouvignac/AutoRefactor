@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -113,9 +112,17 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 				MethodInvocation newMethod;
 
 				if (originalMethod.getExpression() != null) {
-					newMethod= ast.newMethodInvocation(rewrite.createCopyTarget(originalMethod.getExpression()), originalMethod.getName().getIdentifier(), newArguments);
+					MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+					newMethodInvocation.setExpression(rewrite.createCopyTarget(originalMethod.getExpression()));
+					newMethodInvocation.setName(ast.newSimpleName(originalMethod.getName().getIdentifier()));
+					newMethodInvocation.arguments().addAll(newArguments);
+					newMethod= newMethodInvocation;
 				} else {
-					newMethod= ast.newMethodInvocation(null, originalMethod.getName().getIdentifier(), newArguments);
+					MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+					newMethodInvocation.setExpression(null);
+					newMethodInvocation.setName(ast.newSimpleName(originalMethod.getName().getIdentifier()));
+					newMethodInvocation.arguments().addAll(newArguments);
+					newMethod= newMethodInvocation;
 				}
 
 				ExpressionStatement newStatement= ast.newExpressionStatement(newMethod);
@@ -132,7 +139,7 @@ public class SeparateAssertionsRatherThanBooleanExpressionCleanUp extends Abstra
 			} else {
 				expressionStatements.add(0, ASTNodes.createMoveTarget(rewrite, visited));
 				Block newBlock= ast.newBlock();
-				newBlock.statements().addAll((Collection<Statement>) expressionStatements);
+				newBlock.statements().addAll(expressionStatements);
 				ASTNodes.replaceButKeepComment(rewrite, visited, newBlock, group);
 			}
 

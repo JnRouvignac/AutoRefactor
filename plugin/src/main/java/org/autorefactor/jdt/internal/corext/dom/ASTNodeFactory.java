@@ -818,29 +818,8 @@ public class ASTNodeFactory {
 		return ast.newMethodInvocation();
 	}
 
-	/**
-	 * Builds a new {@link MethodInvocation} instance.
-	 *
-	 * @param <E>        the arguments type
-	 * @param expression the method invocation expression
-	 * @param methodName the name of the invoked method
-	 * @param arguments  the arguments for the method invocation
-	 * @return a new method invocation
-	 */
-	public <E extends Expression> MethodInvocation newMethodInvocation(final Expression expression, final String methodName, final List<E> arguments) {
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(expression);
-		newMethodInvocation.setName(ast.newSimpleName(methodName));
-		addAll(newMethodInvocation, arguments);
-		return newMethodInvocation;
-	}
-
 	private boolean isEmptyRangeCopy(final ASTNode... nodes) {
 		return nodes.length == 1 && nodes[0] == null;
-	}
-
-	private <E extends ASTNode> boolean isEmptyRangeCopy(final List<E> nodes) {
-		return nodes.size() == 1 && nodes.get(0) == null;
 	}
 
 	/**
@@ -987,12 +966,6 @@ public class ASTNodeFactory {
 	private <T extends ASTNode> void addAll(final List<T> whereToAdd, final T... toAdd) {
 		if (!isEmptyRangeCopy(toAdd)) {
 			Collections.addAll(whereToAdd, toAdd);
-		}
-	}
-
-	private <E extends Expression> void addAll(final MethodInvocation methodInvocation, final List<E> arguments) {
-		if (!isEmptyRangeCopy(arguments)) {
-			methodInvocation.arguments().addAll(arguments);
 		}
 	}
 

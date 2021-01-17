@@ -258,7 +258,11 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				copyOfMessages.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
-			return ast.newMethodInvocation(qualifiedClass, FAIL_METHOD, copyOfMessages);
+			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+			newMethodInvocation.setExpression(qualifiedClass);
+			newMethodInvocation.setName(ast.newSimpleName(FAIL_METHOD));
+			newMethodInvocation.arguments().addAll(copyOfMessages);
+			return newMethodInvocation;
 		}
 
 		MethodInvocation methodInvocation= ast.newMethodInvocation();
@@ -291,7 +295,12 @@ public class AssertJCleanUp extends AbstractUnitTestCleanUp {
 				copyOfMessages.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) message)));
 			}
 
-			assertionMethod= ast.newMethodInvocation(assertionMethod, DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD, copyOfMessages);
+			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+			newMethodInvocation.setExpression(assertionMethod);
+			newMethodInvocation.setName(ast.newSimpleName(DESCRIBED_AS_METHOD.equals(method) ? method : AS_METHOD));
+			newMethodInvocation.arguments().addAll(copyOfMessages);
+
+			assertionMethod= newMethodInvocation;
 		}
 
 		if (copyOfExpected != null) {
