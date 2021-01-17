@@ -495,11 +495,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
             if (getJavaMinorVersion() >= 4) {
-                MethodInvocation methodInvocation= ast.newMethodInvocation();
-				methodInvocation.setExpression(newBooleanName);
-				methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
-				methodInvocation.arguments().add(condition);
-				return methodInvocation;
+                MethodInvocation valueOfMethod= ast.newMethodInvocation();
+				valueOfMethod.setExpression(newBooleanName);
+				valueOfMethod.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+				valueOfMethod.arguments().add(condition);
+				return valueOfMethod;
             }
 
             return ast.newClassInstanceCreation(expressionTypeName, condition);

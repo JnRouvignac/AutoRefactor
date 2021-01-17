@@ -400,20 +400,20 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-			newMethodInvocation.setExpression(ast.copySubtree(loopContent.getIteratorVariable()));
-			newMethodInvocation.setName(ast.newSimpleName("next")); //$NON-NLS-1$
-			return newMethodInvocation;
+            MethodInvocation nextMethod= ast.newMethodInvocation();
+			nextMethod.setExpression(ast.copySubtree(loopContent.getIteratorVariable()));
+			nextMethod.setName(ast.newSimpleName("next")); //$NON-NLS-1$
+			return nextMethod;
         }
 
         private MethodInvocation collectionGet(final ForLoopContent loopContent) {
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
-            MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-			newMethodInvocation.setExpression(ast.copySubtree(loopContent.getContainerVariable()));
-			newMethodInvocation.setName(ast.newSimpleName("get")); //$NON-NLS-1$
-			newMethodInvocation.arguments().add(ast.copySubtree(ASTNodes.getUnparenthesedExpression(loopContent.getLoopVariable())));
-			return newMethodInvocation;
+            MethodInvocation getMethod= ast.newMethodInvocation();
+			getMethod.setExpression(ast.copySubtree(loopContent.getContainerVariable()));
+			getMethod.setName(ast.newSimpleName("get")); //$NON-NLS-1$
+			getMethod.arguments().add(ast.copySubtree(ASTNodes.getUnparenthesedExpression(loopContent.getLoopVariable())));
+			return getMethod;
         }
 
         private Pair<Expression, Expression> uniqueVariableDeclarationFragmentName(final Statement statement) {

@@ -451,25 +451,25 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 		comparingMethod.arguments().add(lambda);
 
 		if (!isForward.get()) {
-			MethodInvocation methodInvocation= ast.newMethodInvocation();
-			methodInvocation.setExpression(comparingMethod);
-			methodInvocation.setName(ast.newSimpleName("reversed")); //$NON-NLS-1$
-			comparingMethod= methodInvocation;
+			MethodInvocation reversedMethod= ast.newMethodInvocation();
+			reversedMethod.setExpression(comparingMethod);
+			reversedMethod.setName(ast.newSimpleName("reversed")); //$NON-NLS-1$
+			comparingMethod= reversedMethod;
 		}
 
 		if (isNullFirst != null) {
 			if (isNullFirst) {
-				MethodInvocation methodInvocation= ast.newMethodInvocation();
-				methodInvocation.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
-				methodInvocation.setName(ast.newSimpleName("nullsFirst")); //$NON-NLS-1$
-				methodInvocation.arguments().add(comparingMethod);
-				comparingMethod= methodInvocation;
+				MethodInvocation nullsFirstMethod= ast.newMethodInvocation();
+				nullsFirstMethod.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
+				nullsFirstMethod.setName(ast.newSimpleName("nullsFirst")); //$NON-NLS-1$
+				nullsFirstMethod.arguments().add(comparingMethod);
+				comparingMethod= nullsFirstMethod;
 			} else {
-				MethodInvocation methodInvocation= ast.newMethodInvocation();
-				methodInvocation.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
-				methodInvocation.setName(ast.newSimpleName("nullsLast")); //$NON-NLS-1$
-				methodInvocation.arguments().add(comparingMethod);
-				comparingMethod= methodInvocation;
+				MethodInvocation nullsLastMethod= ast.newMethodInvocation();
+				nullsLastMethod.setExpression(ASTNodeFactory.newName(ast, comparatorClassName));
+				nullsLastMethod.setName(ast.newSimpleName("nullsLast")); //$NON-NLS-1$
+				nullsLastMethod.arguments().add(comparingMethod);
+				comparingMethod= nullsLastMethod;
 			}
 		}
 

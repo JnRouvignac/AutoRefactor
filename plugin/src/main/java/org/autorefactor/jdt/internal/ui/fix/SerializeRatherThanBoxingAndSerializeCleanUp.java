@@ -102,11 +102,11 @@ public class SerializeRatherThanBoxingAndSerializeCleanUp extends AbstractCleanU
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SerializeRatherThanBoxingAndSerializeCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ast.newSimpleName(wrapperClass.getSimpleName()));
-		newMethodInvocation.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)));
+		MethodInvocation toStringMethod= ast.newMethodInvocation();
+		toStringMethod.setExpression(ast.newSimpleName(wrapperClass.getSimpleName()));
+		toStringMethod.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
+		toStringMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, toStringMethod, group);
 	}
 }

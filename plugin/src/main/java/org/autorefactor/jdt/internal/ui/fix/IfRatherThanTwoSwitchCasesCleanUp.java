@@ -223,11 +223,11 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
 				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-			MethodInvocation methodInvocation= ast.newMethodInvocation();
-			methodInvocation.setExpression(ast.createCopyTarget(value));
-			methodInvocation.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
-			methodInvocation.arguments().add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant)));
-			return methodInvocation;
+			MethodInvocation equalsMethod= ast.newMethodInvocation();
+			equalsMethod.setExpression(ast.createCopyTarget(value));
+			equalsMethod.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
+			equalsMethod.arguments().add(ast.createCopyTarget(ASTNodes.getUnparenthesedExpression(discriminant)));
+			return equalsMethod;
 		}
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();

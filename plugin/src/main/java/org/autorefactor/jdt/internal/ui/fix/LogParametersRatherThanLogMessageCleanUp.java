@@ -56,8 +56,10 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
 	@Override
 	public boolean visit(final MethodInvocation visited) {
-		return maybeRefactorMethod(visited, "debug") && maybeRefactorMethod(visited, "error") //$NON-NLS-1$ //$NON-NLS-2$
-				&& maybeRefactorMethod(visited, "info") && maybeRefactorMethod(visited, "trace") //$NON-NLS-1$ //$NON-NLS-2$
+		return maybeRefactorMethod(visited, "debug") //$NON-NLS-1$
+				&& maybeRefactorMethod(visited, "error") //$NON-NLS-1$
+				&& maybeRefactorMethod(visited, "info") //$NON-NLS-1$
+				&& maybeRefactorMethod(visited, "trace") //$NON-NLS-1$
 				&& maybeRefactorMethod(visited, "warn"); //$NON-NLS-1$
 	}
 
@@ -104,11 +106,11 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 				messageBuilder.append("{}"); //$NON-NLS-1$
 
 				if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
-					MethodInvocation methodInvocation= ast.newMethodInvocation();
-					methodInvocation.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
-					methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
-					methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)));
-					MethodInvocation newMethodInvocation= methodInvocation;
+					MethodInvocation valueOfMethod= ast.newMethodInvocation();
+					valueOfMethod.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+					valueOfMethod.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+					valueOfMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)));
+					MethodInvocation newMethodInvocation= valueOfMethod;
 					params.add(newMethodInvocation);
 				} else {
 					params.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(string)));

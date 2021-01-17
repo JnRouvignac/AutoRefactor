@@ -69,12 +69,14 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 		if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ //$NON-NLS-2$
 			// Check whether it is being called in onDestroy()
 			MethodDeclaration enclosingMethod= ASTNodes.getTypedAncestor(node, MethodDeclaration.class);
+
 			if (ASTNodes.usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ //$NON-NLS-2$
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.AndroidWakeLockCleanUp_description);
 
 				TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestor(enclosingMethod, TypeDeclaration.class);
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
+
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
 					rewrite.remove(node.getParent(), group);
 					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), group);
@@ -91,8 +93,10 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
 			TypeDeclaration typeDeclaration= ASTNodes.getTypedAncestor(node, TypeDeclaration.class);
 			ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
+
 			if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
 				MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
+
 				if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
 					rewrite.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node), group);
 				} else {
@@ -111,11 +115,11 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		IfStatement newIfStatement= ast.newIfStatement();
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ast.copyExpression(methodInvocation));
-		newMethodInvocation.setName(ast.newSimpleName("isHeld")); //$NON-NLS-1$
+		MethodInvocation isHeldMethod= ast.newMethodInvocation();
+		isHeldMethod.setExpression(ast.copyExpression(methodInvocation));
+		isHeldMethod.setName(ast.newSimpleName("isHeld")); //$NON-NLS-1$
 
-		newIfStatement.setExpression(ast.not(newMethodInvocation));
+		newIfStatement.setExpression(ast.not(isHeldMethod));
 		Block newBlock= ast.newBlock();
 
 		MethodInvocation releaseMethod= ast.newMethodInvocation();
@@ -129,6 +133,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
 	private MethodDeclaration createOnPauseMethodDeclaration() {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+
 		Block newBlock= ast.newBlock();
 		newBlock.statements().add(ast.newExpressionStatement(ast.newSuperMethodInvocation("onPause"))); //$NON-NLS-1$
 
@@ -140,7 +145,9 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 		if (typeDeclaration != null) {
 			for (MethodDeclaration method : typeDeclaration.getMethods()) {
 				IMethodBinding methodBinding= method.resolveBinding();
-				if (methodBinding != null && methodToFind.equals(methodBinding.getName())
+
+				if (methodBinding != null
+						&& methodToFind.equals(methodBinding.getName())
 						&& method.parameters().isEmpty()) {
 					return method;
 				}

@@ -156,11 +156,11 @@ public class StringCleanUp extends AbstractCleanUpRule {
 			Expression rightExpression= getReducedStringExpression((Expression) visited.arguments().get(0), isRefactoringNeeded);
 
 			if (isRefactoringNeeded.get()) {
-				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, leftExpression));
-				newMethodInvocation.setName(ast.newSimpleName("equalsIgnoreCase")); //$NON-NLS-1$
-				newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)));
-				ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+				MethodInvocation equalsIgnoreCaseMethod= ast.newMethodInvocation();
+				equalsIgnoreCaseMethod.setExpression(ASTNodes.createMoveTarget(rewrite, leftExpression));
+				equalsIgnoreCaseMethod.setName(ast.newSimpleName("equalsIgnoreCase")); //$NON-NLS-1$
+				equalsIgnoreCaseMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)));
+				ASTNodes.replaceButKeepComment(rewrite, visited, equalsIgnoreCaseMethod, group);
 				return false;
 			}
 		} else if (ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$

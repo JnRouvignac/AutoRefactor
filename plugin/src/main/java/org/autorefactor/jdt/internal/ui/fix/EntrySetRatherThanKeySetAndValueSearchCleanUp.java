@@ -295,10 +295,10 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
 		// Replace all occurrences of map.get(key) => mapEntry.getValue()
 		for (MethodInvocation getValueMi : getValueMis) {
-			MethodInvocation methodInvocation= ast.newMethodInvocation();
-			methodInvocation.setExpression(entryVar.varName());
-			methodInvocation.setName(ast.newSimpleName("getValue")); //$NON-NLS-1$
-			MethodInvocation newMethodInvocation= methodInvocation;
+			MethodInvocation getValueMethod= ast.newMethodInvocation();
+			getValueMethod.setExpression(entryVar.varName());
+			getValueMethod.setName(ast.newSimpleName("getValue")); //$NON-NLS-1$
+			MethodInvocation newMethodInvocation= getValueMethod;
 			ASTNodes.replaceButKeepComment(rewrite, getValueMi, newMethodInvocation, group);
 		}
 	}

@@ -288,18 +288,18 @@ public class AtomicObjectRatherThanMonoIndexArrayCleanUp extends NewClassImportC
 			ASTNodes.replaceButKeepComment(rewrite, type, atomicType, group);
 
 			for (ArrayAccess accessRead : accessReads) {
-				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()));
-				newMethodInvocation.setName(ast.newSimpleName("get")); //$NON-NLS-1$
-				ASTNodes.replaceButKeepComment(rewrite, accessRead, newMethodInvocation, group);
+				MethodInvocation getMethod= ast.newMethodInvocation();
+				getMethod.setExpression(ASTNodes.createMoveTarget(rewrite, accessRead.getArray()));
+				getMethod.setName(ast.newSimpleName("get")); //$NON-NLS-1$
+				ASTNodes.replaceButKeepComment(rewrite, accessRead, getMethod, group);
 			}
 
 			for (Assignment assignmentRead : assignmentReads) {
-				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()));
-				newMethodInvocation.setName(ast.newSimpleName("set")); //$NON-NLS-1$
-				newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide()));
-				ASTNodes.replaceButKeepComment(rewrite, assignmentRead, newMethodInvocation, group);
+				MethodInvocation setMethod= ast.newMethodInvocation();
+				setMethod.setExpression(ASTNodes.createMoveTarget(rewrite, ((ArrayAccess) assignmentRead.getLeftHandSide()).getArray()));
+				setMethod.setName(ast.newSimpleName("set")); //$NON-NLS-1$
+				setMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, assignmentRead.getRightHandSide()));
+				ASTNodes.replaceButKeepComment(rewrite, assignmentRead, setMethod, group);
 			}
 		}
 	}

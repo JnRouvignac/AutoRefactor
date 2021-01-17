@@ -260,11 +260,11 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 				Expression newExpression= ASTNodes.createMoveTarget(rewrite, assignment.getLeftHandSide());
 
 				for (Object operand : operands) {
-					MethodInvocation methodInvocation= ast.newMethodInvocation();
-					methodInvocation.setExpression(newExpression);
-					methodInvocation.setName(ast.newSimpleName("append")); //$NON-NLS-1$
-					methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand)));
-					newExpression= methodInvocation;
+					MethodInvocation appendMethod= ast.newMethodInvocation();
+					appendMethod.setExpression(newExpression);
+					appendMethod.setName(ast.newSimpleName("append")); //$NON-NLS-1$
+					appendMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand)));
+					newExpression= appendMethod;
 				}
 
 				ASTNodes.replaceButKeepComment(rewrite, assignment, newExpression, group);
@@ -273,31 +273,29 @@ public class StringBuilderRatherThanStringCleanUp extends AbstractCleanUpRule {
 			for (SimpleName simpleName : concatenationWrites) {
 				Assignment assignment= (Assignment) simpleName.getParent();
 				InfixExpression concatenation= (InfixExpression) assignment.getRightHandSide();
-				MethodInvocation methodInvocation= ast.newMethodInvocation();
-				methodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, assignment.getLeftHandSide()));
-				methodInvocation.setName(ast.newSimpleName("append")); //$NON-NLS-1$
-				methodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(concatenation.getRightOperand())));
-
-				Expression newExpression= methodInvocation;
+				MethodInvocation appendMethod= ast.newMethodInvocation();
+				appendMethod.setExpression(ASTNodes.createMoveTarget(rewrite, assignment.getLeftHandSide()));
+				appendMethod.setName(ast.newSimpleName("append")); //$NON-NLS-1$
+				appendMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(concatenation.getRightOperand())));
 
 				if (concatenation.hasExtendedOperands()) {
 					for (Object operand : concatenation.extendedOperands()) {
 						MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-						newMethodInvocation.setExpression(newExpression);
+						newMethodInvocation.setExpression(appendMethod);
 						newMethodInvocation.setName(ast.newSimpleName("append")); //$NON-NLS-1$
 						newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) operand)));
-						newExpression= newMethodInvocation;
+						appendMethod= newMethodInvocation;
 					}
 				}
 
-				ASTNodes.replaceButKeepComment(rewrite, assignment, newExpression, group);
+				ASTNodes.replaceButKeepComment(rewrite, assignment, appendMethod, group);
 			}
 
-			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-			newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, finalRead));
-			newMethodInvocation.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
+			MethodInvocation toStringMethod= ast.newMethodInvocation();
+			toStringMethod.setExpression(ASTNodes.createMoveTarget(rewrite, finalRead));
+			toStringMethod.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
 
-			ASTNodes.replaceButKeepComment(rewrite, finalRead, newMethodInvocation, group);
+			ASTNodes.replaceButKeepComment(rewrite, finalRead, toStringMethod, group);
 		}
 
 		private boolean isOccurrencesValid(final Statement declaration, final List<SimpleName> reads, final List<SimpleName> writes,

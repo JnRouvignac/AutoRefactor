@@ -103,12 +103,12 @@ public class PrimitiveComparisonRatherThanWrapperComparisonCleanUp extends Abstr
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ast.newSimpleName(wrapperClass.getSimpleName()));
-		newMethodInvocation.setName(ast.newSimpleName("compare")); //$NON-NLS-1$
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)));
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
+		MethodInvocation compareMethod= ast.newMethodInvocation();
+		compareMethod.setExpression(ast.newSimpleName(wrapperClass.getSimpleName()));
+		compareMethod.setName(ast.newSimpleName("compare")); //$NON-NLS-1$
+		compareMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(primitiveValue)));
+		compareMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, compareMethod, group);
 	}
 }

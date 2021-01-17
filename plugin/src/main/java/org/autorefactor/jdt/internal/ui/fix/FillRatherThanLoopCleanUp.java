@@ -117,13 +117,13 @@ public class FillRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FillRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Arrays.class, classesToUseWithImport, importsToAdd);
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, classname));
-		newMethodInvocation.setName(ast.newSimpleName("fill")); //$NON-NLS-1$
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())));
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())));
+		MethodInvocation fillMethod= ast.newMethodInvocation();
+		fillMethod.setExpression(ASTNodeFactory.newName(ast, classname));
+		fillMethod.setName(ast.newSimpleName("fill")); //$NON-NLS-1$
+		fillMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arrayAccess.getArray())));
+		fillMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(assignment.getRightHandSide())));
 		ASTNodes.replaceButKeepComment(rewrite, node,
-				ast.newExpressionStatement(newMethodInvocation), group);
+				ast.newExpressionStatement(fillMethod), group);
 	}
 
 	private boolean isSameVariable(final ForLoopContent loopContent, final ArrayAccess arrayAccess) {

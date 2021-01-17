@@ -587,11 +587,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			if (result == null) {
 				result= finalString;
 			} else {
-				MethodInvocation methodInvocation= ast.newMethodInvocation();
-				methodInvocation.setExpression(result);
-				methodInvocation.setName(ast.newSimpleName("append")); //$NON-NLS-1$
-				methodInvocation.arguments().add(finalString);
-				result= methodInvocation;
+				MethodInvocation appendMethod= ast.newMethodInvocation();
+				appendMethod.setExpression(result);
+				appendMethod.setName(ast.newSimpleName("append")); //$NON-NLS-1$
+				appendMethod.arguments().add(finalString);
+				result= appendMethod;
 			}
 		}
 
@@ -761,11 +761,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				return ASTNodes.createMoveTarget(rewrite, expression.getSecond());
 			}
 
-			MethodInvocation methodInvocation= ast.newMethodInvocation();
-			methodInvocation.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
-			methodInvocation.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
-			methodInvocation.arguments().add(getTypedExpression(expression));
-			return methodInvocation;
+			MethodInvocation valueOfMethod= ast.newMethodInvocation();
+			valueOfMethod.setExpression(ASTNodeFactory.newName(ast, String.class.getSimpleName()));
+			valueOfMethod.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
+			valueOfMethod.arguments().add(getTypedExpression(expression));
+			return valueOfMethod;
 
 		default: // >= 2
 			boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);

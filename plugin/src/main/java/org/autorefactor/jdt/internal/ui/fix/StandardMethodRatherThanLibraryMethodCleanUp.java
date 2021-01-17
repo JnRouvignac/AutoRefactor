@@ -108,12 +108,12 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-			newMethodInvocation.setExpression(javaUtilObjects);
-			newMethodInvocation.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
-			newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
-			newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(1)));
-			ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+			MethodInvocation equalsMethod= ast.newMethodInvocation();
+			equalsMethod.setExpression(javaUtilObjects);
+			equalsMethod.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
+			equalsMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
+			equalsMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(1)));
+			ASTNodes.replaceButKeepComment(rewrite, visited, equalsMethod, group);
 			return false;
 		}
 
@@ -122,13 +122,13 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
 			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
-			MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-			newMethodInvocation.setExpression(javaUtilObjects);
-			newMethodInvocation.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
-			newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
-			newMethodInvocation.arguments().add(ast.newStringLiteral("")); //$NON-NLS-1$
+			MethodInvocation toStringMethod= ast.newMethodInvocation();
+			toStringMethod.setExpression(javaUtilObjects);
+			toStringMethod.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
+			toStringMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
+			toStringMethod.arguments().add(ast.newStringLiteral("")); //$NON-NLS-1$
 			ASTNodes.replaceButKeepComment(rewrite, visited,
-					newMethodInvocation, group);
+					toStringMethod, group);
 			return false;
 		}
 
@@ -177,12 +177,12 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				LambdaExpression messageSupplier= ast.newLambdaExpression();
 				messageSupplier
 						.setBody(ast.newMethodInvocation(ast.newSimpleName(String.class.getSimpleName()), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$
-				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(javaUtilObjects);
-				newMethodInvocation.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$
-				newMethodInvocation.arguments().add(copyOfArgs.get(0));
-				newMethodInvocation.arguments().add(messageSupplier);
-				ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+				MethodInvocation requireNonNullMethod= ast.newMethodInvocation();
+				requireNonNullMethod.setExpression(javaUtilObjects);
+				requireNonNullMethod.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$
+				requireNonNullMethod.arguments().add(copyOfArgs.get(0));
+				requireNonNullMethod.arguments().add(messageSupplier);
+				ASTNodes.replaceButKeepComment(rewrite, visited, requireNonNullMethod, group);
 			} else {
 				return true;
 			}

@@ -186,14 +186,14 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AddAllRatherThanLoopCleanUp_description);
 
 		String classname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, classname));
-		newMethodInvocation.setName(ast.newSimpleName("addAll")); //$NON-NLS-1$
-		newMethodInvocation.arguments().add(addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression());
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)));
+		MethodInvocation addAllMethod= ast.newMethodInvocation();
+		addAllMethod.setExpression(ASTNodeFactory.newName(ast, classname));
+		addAllMethod.setName(ast.newSimpleName("addAll")); //$NON-NLS-1$
+		addAllMethod.arguments().add(addMethod.getExpression() != null ? ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(addMethod.getExpression())) : ast.newThisExpression());
+		addAllMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(iterable)));
 
 		ASTNodes.replaceButKeepComment(rewrite, node,
-				ast.newExpressionStatement(newMethodInvocation), group);
+				ast.newExpressionStatement(addAllMethod), group);
 	}
 
 	private int getVariableUseCount(final IVariableBinding variableBinding, final Statement toVisit) {

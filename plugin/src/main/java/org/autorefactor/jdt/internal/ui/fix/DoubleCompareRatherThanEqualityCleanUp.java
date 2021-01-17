@@ -67,14 +67,14 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleCompareRatherThanEqualityCleanUp_description);
 
-		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-		newMethodInvocation.setExpression(ASTNodeFactory.newName(ast, Double.class.getSimpleName()));
-		newMethodInvocation.setName(ast.newSimpleName("compare")); //$NON-NLS-1$
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getLeftOperand())));
-		newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getRightOperand())));
+		MethodInvocation compareMethod= ast.newMethodInvocation();
+		compareMethod.setExpression(ASTNodeFactory.newName(ast, Double.class.getSimpleName()));
+		compareMethod.setName(ast.newSimpleName("compare")); //$NON-NLS-1$
+		compareMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getLeftOperand())));
+		compareMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(visited.getRightOperand())));
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();
-		newInfixExpression.setLeftOperand(newMethodInvocation);
+		newInfixExpression.setLeftOperand(compareMethod);
 		newInfixExpression.setOperator(visited.getOperator());
 		newInfixExpression.setRightOperand(ast.newNumberLiteral("0")); //$NON-NLS-1$
 
