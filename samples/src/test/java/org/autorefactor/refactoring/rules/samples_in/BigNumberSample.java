@@ -100,6 +100,10 @@ public class BigNumberSample {
         return "" + bd1 + bd2 + bd3 + bd4 + bi1;
     }
 
+    public static BigDecimal removeUnderscoreFromLiterals() {
+        return BigDecimal.valueOf(1_000.0);
+    }
+
     public static BigDecimal doNotRefactorCorrectUseOfBigDecimalValueOf() {
         return BigDecimal.valueOf(5);
     }
@@ -110,10 +114,6 @@ public class BigNumberSample {
 
     public static BigDecimal doNotRefactorCorrectUseOfBigDecimalCtorWithStringArg() {
         return new BigDecimal("5.4");
-    }
-
-    public static BigDecimal removeUnderscoreFromLiterals() {
-        return BigDecimal.valueOf(1_000.0);
     }
 
     public static BigDecimal doNotReplaceAnonymousBigDecimal() {
