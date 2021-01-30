@@ -216,4 +216,10 @@ public class RemoveUnnecessaryCastSampleTest {
         assertEquals(sampleIn.doNotRemoveCastsFromPrimitiveDeclarations(),
                 sampleOut.doNotRemoveCastsFromPrimitiveDeclarations());
     }
+
+    @Test
+    public void doNotRemoveCastsFromPrimitiveWrapperSuperClassDeclarations() throws Exception {
+        assertEquals(sampleIn.doNotRemoveCastsFromPrimitiveWrapperSuperClassDeclarations(),
+                sampleOut.doNotRemoveCastsFromPrimitiveWrapperSuperClassDeclarations());
+    }
 }
