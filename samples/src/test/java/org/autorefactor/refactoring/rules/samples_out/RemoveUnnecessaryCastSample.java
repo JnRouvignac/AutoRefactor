@@ -325,4 +325,19 @@ public class RemoveUnnecessaryCastSample {
         short s2 = (short) -32769;
         return b1 + b2 + c1 + c2 + s1 + s2;
     }
+
+    public String doNotRemoveCastsFromPrimitiveWrapperSuperClassDeclarations() {
+        Object b1 = (byte) 128;
+        Object b2 = (byte) -129;
+        Object c1 = (char) -1;
+        Object c2 = (char) 65536;
+        Object s1 = (short) 32768;
+        Object s2 = (short) -32769;
+        Number s3 = (short) -32769;
+        Object l1 = (long) 32768;
+        Object l2 = (long) -32769;
+        Number l3 = (long) 32768;
+        return "" + b1.getClass() + b2.getClass() + c1.getClass() + c2.getClass() + s1.getClass() + s2.getClass()
+                + s3.getClass() + l1.getClass() + l2.getClass() + l3.getClass();
+    }
 }
