@@ -6,10 +6,55 @@
   
   <!--
   
-      SUPPRESSION FILTERS
+      CHECKS
       
   -->
+
+  <!-- Require a new line at the end of all source files. This was more of a
+       requirement from CVS, but since some editors add one automatically we
+       should require it anyway in order to avoid obfuscated diffs -->
+  <module name="NewlineAtEndOfFile" />
+
+  <!-- Disallow trailing white space since some editors remove it automatically
+       resulting in obfuscated diffs -->
+  <module name="RegexpSingleline">
+    <property name="format" value="\s+$" />
+    <property name="message" value="Line has trailing spaces." />
+  </module>
   
+  <!-- Require package-info.java for all packages -->
+  <module name="JavadocPackage" />
+
+  <!--  Use header file template passed in from Maven -->
+  <!--module name="RegexpHeader">
+    <property name="headerFile" value="${checkstyle.header.file}" />
+    <property name="multiLines" value="1,2,3" />
+  </module-->
+
+  <!--  Unlike Sun conventions, align length with LineLength -->
+  <!--
+  TODO: needs many changes to make it work.
+  Previous configuration may have been ignored.
+  <module name="LineLength">
+    <property name="max" value="120"/>
+  </module>
+  -->
+
+  <!-- TODO: check if SuppressWithNearbyCommentFilter did the same before -->
+  <module name="SuppressionFilter">
+    <property name="file" value="suppressions.xml" />
+  </module>
+
+  <module name="TreeWalker">
+ 
+    <!-- Enable result caching -->
+    <!--property name="cacheFile" value="${checkstyle.cache.file}" /-->
+
+  <!--
+
+      SUPPRESSION FILTERS
+
+  -->
   <!-- Toggle Checkstyle on/off
   
       // @Checkstyle:off
@@ -21,7 +66,7 @@
     <property name="offCommentFormat" value="@Checkstyle:off" />
     <property name="onCommentFormat" value="@Checkstyle:on" />
   </module>
-  
+
   <!--  Instruct Checkstyle to ignore a specific check for a whole file
   
       // @Checkstyle:ignore AvoidNestedBlocks
@@ -32,7 +77,7 @@
     <property name="checkFormat" value="$1"/>
     <property name="influenceFormat" value="1000000" />
   </module>
-  
+
   <!--  Instruct Checkstyle to ignore next line
   
       // @Checkstyle:ignore
@@ -57,41 +102,6 @@
     <property name="commentFormat" value="@Checkstyle:ignoreFor (\d+)" />
     <property name="influenceFormat" value="$1" />
   </module>
-  
-  <!--
-  
-      CHECKS
-      
-  -->
-
-  <!-- Require a new line at the end of all source files. This was more of a
-       requirement from CVS, but since some editors add one automatically we
-       should require it anyway in order to avoid obfuscated diffs -->
-  <module name="NewlineAtEndOfFile" />
-  
-  <!-- Disallow trailing white space since some editors remove it automatically
-       resulting in obfuscated diffs -->
-  <module name="RegexpSingleline">
-    <property name="format" value="\s+$" />
-    <property name="message" value="Line has trailing spaces." />
-  </module>
-  
-  <!-- Require package-info.java for all packages -->
-  <module name="JavadocPackage" />
-
-  <!--  Use header file template passed in from Maven -->
-  <!--module name="RegexpHeader">
-    <property name="headerFile" value="${checkstyle.header.file}" />
-    <property name="multiLines" value="1,2,3" />
-  </module-->
-
-  <module name="TreeWalker">
-  
-    <!-- Enable result caching -->
-    <!--property name="cacheFile" value="${checkstyle.cache.file}" /-->
-
-    <!-- Required for suppressions -->
-    <module name="FileContentsHolder" />
 
     <!-- 
     
@@ -107,8 +117,6 @@
     <!--  Require valid Javadoc for all protected and public members -->
     <module name="JavadocMethod">
       <property name="scope" value="protected" />
-      <property name="allowUndeclaredRTE" value="true" />
-      <property name="allowThrowsTagsForSubclasses" value="true" />
     </module>
     <module name="JavadocVariable">
       <property name="scope" value="protected" />
@@ -199,9 +207,6 @@
     <module name="NoWhitespaceAfter">
       <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS" />
     </module>
-    <module name="NoWhitespaceBefore">
-      <property name="tokens" value="EQUAL" />
-    </module>
     <module name="OperatorWrap" />
     <module name="ParenPad" />
     <module name="TypecastParenPad" />
@@ -224,11 +229,6 @@
         BLOCKS
     
     -->
-
-    <!--  Unlike Sun conventions, align length with LineLength -->
-    <module name="LeftCurly">
-      <property name="maxLineLength" value="120" />
-    </module>
     
     <!--  Unlike Sun conventions, allow nested blocks in switch statements
           since these allow developers to declare case-scope local variables -->
@@ -256,9 +256,6 @@
     <module name="EmptyStatement" />
     <module name="EqualsHashCode" />    
     <module name="IllegalInstantiation" />
-    <module name="RedundantThrows">
-      <property name="allowSubclasses" value="true" />
-    </module>
     <module name="SimplifyBooleanExpression" />
     <module name="SimplifyBooleanReturn" />
     
