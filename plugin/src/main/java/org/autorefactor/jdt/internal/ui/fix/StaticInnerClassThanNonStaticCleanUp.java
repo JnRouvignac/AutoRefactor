@@ -131,22 +131,20 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.StaticInnerClassThanNonStaticCleanUp_description);
 
-		List<?> modifiers= node.modifiers();
+		List<IExtendedModifier> modifiers= node.modifiers();
 		Modifier static0= ast.static0();
 
 		if (modifiers.isEmpty()) {
 			rewrite.insertBefore(static0, node, group);
 		} else {
-			IExtendedModifier lastModifier= (IExtendedModifier) modifiers.get(modifiers.size() - 1);
+			IExtendedModifier lastModifier= modifiers.get(modifiers.size() - 1);
 
-			if (lastModifier.isModifier()) {
-				if (((Modifier) lastModifier).isFinal()) {
-					rewrite.insertBefore(static0, (Modifier) lastModifier, group);
-				} else {
-					rewrite.insertAfter(static0, (Modifier) lastModifier, group);
-				}
-			} else {
+			if (!lastModifier.isModifier()) {
 				rewrite.insertAfter(static0, (Annotation) lastModifier, group);
+			} else if (((Modifier) lastModifier).isFinal()) {
+				rewrite.insertBefore(static0, (Modifier) lastModifier, group);
+			} else {
+				rewrite.insertAfter(static0, (Modifier) lastModifier, group);
 			}
 		}
 	}
