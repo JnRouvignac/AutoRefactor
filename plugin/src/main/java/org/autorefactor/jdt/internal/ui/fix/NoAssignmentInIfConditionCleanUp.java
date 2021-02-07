@@ -201,7 +201,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				} else {
 					Block newBlock= ast.newBlock();
 					newBlock.statements().add(newAssignment);
-					newBlock.statements().add((Statement) ASTNodes.createMoveTarget(rewrite, node));
+					newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, node));
 					ASTNodes.replaceButKeepComment(rewrite, node, newBlock, group);
 				}
 
