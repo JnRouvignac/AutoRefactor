@@ -213,7 +213,8 @@ public enum OperatorEnum {
 		this.reverseBooleanOperator= null;
 	}
 
-	OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final Object reverseBooleanOperator) {
+	OperatorEnum(final Object operator, final int precedence, final boolean isAssociative,
+			final Object reverseBooleanOperator) {
 		this.operator= operator;
 		this.precedence= precedence;
 		this.isAssociative= isAssociative;
