@@ -45,7 +45,7 @@ public class DisplayEventLoop implements EventLoop {
 	 *           then thrown
 	 */
 	public <E extends Exception> void syncExec(final Callable<E> call) throws E {
-		final FutureTask<E> future= new FutureTask<E>(call);
+		final FutureTask<E> future= new FutureTask<>(call);
 		Display.getDefault().syncExec(future);
 		final E ex;
 		try {
