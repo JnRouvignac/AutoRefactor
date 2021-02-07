@@ -69,7 +69,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ITypeBinding typeBinding= visited.getType().resolveBinding();
 
 		if (visited.getAnonymousClassDeclaration() == null
-				&& ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())
+				&& ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(),
+						BigInteger.class.getCanonicalName())
 				&& visited.arguments().size() == 1) {
 			Expression arg0= (Expression) visited.arguments().get(0);
 
@@ -135,9 +136,12 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(visited, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(visited, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(visited, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
+		if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(visited, BigInteger.class.getCanonicalName(),
+				"valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(visited, BigDecimal.class.getCanonicalName(), "valueOf", //$NON-NLS-1$
+						long.class.getSimpleName())
+				|| ASTNodes.usesGivenSignature(visited, BigDecimal.class.getCanonicalName(), "valueOf", //$NON-NLS-1$
+						double.class.getSimpleName()))) {
 			ITypeBinding typeBinding= visited.getExpression().resolveTypeBinding();
 			Expression arg0= (Expression) visited.arguments().get(0);
 
@@ -190,7 +194,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTNodes.replaceButKeepComment(rewrite, arg0, getStringLiteral(numberText), group);
 	}
 
-	private void replaceByValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding, final String numberText) {
+	private void replaceByValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding,
+			final String numberText) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
@@ -208,6 +213,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodeFactory.newName(ast, typeBinding.getName(), field), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodeFactory.newName(ast, typeBinding.getName(), field),
+				group);
 	}
 }

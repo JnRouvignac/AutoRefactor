@@ -69,7 +69,8 @@ public class StaticInnerClassThanNonStaticCleanUp extends AbstractCleanUpRule {
 				return interruptVisit();
 			}
 
-			if (!Modifier.isStatic(binding.getModifiers()) && (binding.getKind() == IBinding.VARIABLE || binding.getKind() == IBinding.METHOD)) {
+			if (!Modifier.isStatic(binding.getModifiers())
+					&& (binding.getKind() == IBinding.VARIABLE || binding.getKind() == IBinding.METHOD)) {
 				ASTNode declaration= ((CompilationUnit) root).findDeclaringNode(binding);
 
 				if (!ASTNodes.isParent(declaration, innerClass)) {
