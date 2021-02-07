@@ -205,7 +205,7 @@ public enum OperatorEnum {
 	private final boolean isBoolean;
 	private final Object reverseBooleanOperator;
 
-	private OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final boolean isBoolean) {
+	OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final boolean isBoolean) {
 		this.operator= operator;
 		this.precedence= precedence;
 		this.isAssociative= isAssociative;
@@ -213,7 +213,7 @@ public enum OperatorEnum {
 		this.reverseBooleanOperator= null;
 	}
 
-	private OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final Object reverseBooleanOperator) {
+	OperatorEnum(final Object operator, final int precedence, final boolean isAssociative, final Object reverseBooleanOperator) {
 		this.operator= operator;
 		this.precedence= precedence;
 		this.isAssociative= isAssociative;
