@@ -232,6 +232,26 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 					</execution>
 				</executions>
 			</plugin>
+			<!-- formatter - https://github.com/diffplug/spotless/tree/main/plugin-maven -->
+			<!-- run formatter with: mvn -Dtycho.mode=maven spotless:apply -->
+			<!-- Dtycho.mode=maven disables p2 dependency resolution for speed up -->
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>2.7.0</version>
+				<configuration>
+					<!-- optional: limit format enforcement to just the files changed by this git ref -->
+					<ratchetFrom>d137806a55d49614ec59828984e4b0e57001c058</ratchetFrom>
+					<java>
+						<removeUnusedImports />
+						<lineEndings>WINDOWS</lineEndings>
+						<eclipse>
+							<version>4.18.0</version>
+							<file>${maven.multiModuleProjectDirectory}/autorefactor-eclipse-format.xml</file>
+						</eclipse>
+					</java>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
