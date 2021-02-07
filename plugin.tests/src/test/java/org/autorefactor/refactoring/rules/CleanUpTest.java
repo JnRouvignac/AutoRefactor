@@ -60,7 +60,7 @@ import org.junit.runners.Parameterized.Parameters;
  * Tests all cleanup rules at the same time. This test verifies that all the
  * cleanup rules work together and do not introduce problems.
  */
-@RunWith(value= Parameterized.class)
+@RunWith(Parameterized.class)
 public class CleanUpTest {
 	private static final String SAMPLES_ALL_BASE_DIR= "../samples/src/test/java/org/autorefactor/refactoring/rules/all"; //$NON-NLS-1$
 	private static final String PACKAGE_NAME= "org.autorefactor.refactoring.rules.all.samples_in"; //$NON-NLS-1$

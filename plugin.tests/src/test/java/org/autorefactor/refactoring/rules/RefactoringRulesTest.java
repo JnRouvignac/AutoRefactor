@@ -62,7 +62,7 @@ import org.junit.runners.Parameterized.Parameters;
  * Tests each refactoring rule in isolation. Each cleanup rule is run in a
  * loop until it cannot apply any more changes to the sample file.
  */
-@RunWith(value= Parameterized.class)
+@RunWith(Parameterized.class)
 public class RefactoringRulesTest {
 	private static final String SAMPLES_BASE_DIR= "../samples/src/test/java/org/autorefactor/refactoring/rules/"; //$NON-NLS-1$
 	private static final String PACKAGE_NAME= "org.autorefactor.refactoring.rules.samples_in"; //$NON-NLS-1$

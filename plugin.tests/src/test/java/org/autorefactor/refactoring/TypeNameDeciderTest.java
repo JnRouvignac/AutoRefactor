@@ -42,7 +42,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(value= Parameterized.class)
+@RunWith(Parameterized.class)
 public class TypeNameDeciderTest {
 	private String qualifiedName;
 	private TreeSet<String> imports;
