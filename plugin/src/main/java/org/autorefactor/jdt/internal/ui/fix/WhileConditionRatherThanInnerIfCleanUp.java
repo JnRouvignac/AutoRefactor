@@ -134,7 +134,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 				newStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
 			Block newBlock= ast.newBlock();
-			newBlock.statements().addAll((Collection<Statement>) newStatements);
+			newBlock.statements().addAll(newStatements);
 
 			ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), newBlock, group);
 		}
