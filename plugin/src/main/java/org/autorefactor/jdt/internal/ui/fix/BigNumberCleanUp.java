@@ -44,7 +44,10 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.text.edits.TextEditGroup;
 
-/** See {@link #getDescription()} method. */
+/**
+ * Some actions of this rule follow the Sonar recommendations:
+ * https://rules.sonarsource.com/java/RSPEC-2111
+ */
 public class BigNumberCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
@@ -100,29 +103,18 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			} else if (arg0 instanceof StringLiteral && getJavaMinorVersion() >= 5) {
 				String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
-				if (literalValue.contains(".") && literalValue.contains("_")) { //$NON-NLS-1$ //$NON-NLS-2$
-					String numberText= literalValue.replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$
-					replaceWithNumberText(arg0, numberText);
-					return false;
-				}
-
 				if (literalValue.matches("0+")) { //$NON-NLS-1$
 					replaceWithQualifiedName(visited, typeBinding, "ZERO"); //$NON-NLS-1$
 					return false;
 				}
 
-				if (literalValue.matches("0+1")) { //$NON-NLS-1$
+				if (literalValue.matches("0*1")) { //$NON-NLS-1$
 					replaceWithQualifiedName(visited, typeBinding, "ONE"); //$NON-NLS-1$
 					return false;
 				}
 
-				if (literalValue.matches("0+10")) { //$NON-NLS-1$
+				if (literalValue.matches("0*10")) { //$NON-NLS-1$
 					replaceWithQualifiedName(visited, typeBinding, "TEN"); //$NON-NLS-1$
-					return false;
-				}
-
-				if (literalValue.matches("\\d+")) { //$NON-NLS-1$
-					replaceByValueOf(visited, typeBinding, literalValue);
 					return false;
 				}
 			}
@@ -150,7 +142,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 			Expression arg0= (Expression) visited.arguments().get(0);
 
 			if (arg0 instanceof NumberLiteral) {
-				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+				String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "").replace("_", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 				if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);

@@ -94,14 +94,19 @@ public class BigNumberSample {
         BigDecimal bd1 = BigDecimal.valueOf(5);
         BigDecimal bd2 = BigDecimal.valueOf(5);
         BigDecimal bd3 = BigDecimal.valueOf(5);
-        BigDecimal bd4 = BigDecimal.valueOf(5);
-        BigInteger bi1 = BigInteger.valueOf(5);
 
-        return "" + bd1 + bd2 + bd3 + bd4 + bi1;
+        return "" + bd1 + bd2 + bd3;
     }
 
     public static BigDecimal removeUnderscoreFromLiterals() {
         return new BigDecimal("1000.0");
+    }
+
+    public static String doNotUseValueOfOnString() {
+        BigDecimal bd1 = new BigDecimal("5");
+        BigInteger bi1 = new BigInteger("5");
+
+        return "" + bd1 + bi1;
     }
 
     public static BigDecimal doNotRefactorCorrectUseOfBigDecimalValueOf() {
