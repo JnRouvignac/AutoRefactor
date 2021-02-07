@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -90,7 +89,8 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 				}
 
 				if (visited.getElseStatement() != null) {
-					return !isVarUsed(variable, visited.getElseStatement()) || maybeMoveAssignment(variableAssignment, visited.getElseStatement());
+					return !isVarUsed(variable, visited.getElseStatement())
+							|| maybeMoveAssignment(variableAssignment, visited.getElseStatement());
 				}
 			}
 
@@ -98,14 +98,16 @@ public class VariableInsideIfRatherThanAboveCleanUp extends AbstractCleanUpRule 
 		}
 
 		private boolean isVarUsed(final VariableDeclarationFragment variable, final ASTNode astNode) {
-			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(), astNode, true);
+			VarDefinitionsUsesVisitor varOccurrenceVisitor= new VarDefinitionsUsesVisitor(variable.resolveBinding(),
+					astNode, true);
 			return !varOccurrenceVisitor.getWrites().isEmpty() || !varOccurrenceVisitor.getReads().isEmpty();
 		}
 
 		private VariableDeclarationFragment getVariable(final Statement variableAssignment) {
 			VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(variableAssignment);
 
-			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer()))) {
+			if (fragment != null && (fragment.getInitializer() == null
+					|| ASTNodes.isPassiveWithoutFallingThrough(fragment.getInitializer()))) {
 				return fragment;
 			}
 

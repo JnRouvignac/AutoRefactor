@@ -81,10 +81,12 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 	private final class IfWithAssignmentVisitor extends BlockSubVisitor {
 		@Override
 		public boolean visit(final IfStatement node) {
-			return !result || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(), new ArrayList<Expression>());
+			return !result || moveAssignmentBeforeIfStatementIfPossible(node, node.getExpression(),
+					new ArrayList<Expression>());
 		}
 
-		private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression, final List<Expression> evaluatedExpression) {
+		private boolean moveAssignmentBeforeIfStatementIfPossible(final IfStatement node, final Expression expression,
+				final List<Expression> evaluatedExpression) {
 			Assignment assignment= ASTNodes.as(expression, Assignment.class);
 
 			if (assignment != null) {
@@ -98,7 +100,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 					PrefixExpression.Operator.COMPLEMENT,
 					PrefixExpression.Operator.MINUS,
 					PrefixExpression.Operator.PLUS)) {
-				return moveAssignmentBeforeIfStatementIfPossible(node, prefixExpression.getOperand(), evaluatedExpression);
+				return moveAssignmentBeforeIfStatementIfPossible(node, prefixExpression.getOperand(),
+						evaluatedExpression);
 			}
 
 			InfixExpression infixExpression= ASTNodes.as(expression, InfixExpression.class);
@@ -139,10 +142,12 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
 			ConditionalExpression conditionalExpression= ASTNodes.as(expression, ConditionalExpression.class);
 
-			return conditionalExpression == null || moveAssignmentBeforeIfStatementIfPossible(node, conditionalExpression.getExpression(), evaluatedExpression);
+			return conditionalExpression == null || moveAssignmentBeforeIfStatementIfPossible(node,
+					conditionalExpression.getExpression(), evaluatedExpression);
 		}
 
-		private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment, final List<Expression> evaluatedExpression) {
+		private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment assignment,
+				final List<Expression> evaluatedExpression) {
 			Expression lhs= ASTNodes.getUnparenthesedExpression(assignment.getLeftHandSide());
 
 			if (!evaluatedExpression.isEmpty()) {
@@ -169,7 +174,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
 				for (Expression expression : evaluatedExpression) {
 					VarDefinitionsUsesVisitor variableUseVisitor= new VarDefinitionsUsesVisitor(variableBinding,
-					expression, true);
+							expression, true);
 
 					if (!variableUseVisitor.getReads().isEmpty()) {
 						return true;
@@ -177,7 +182,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 				}
 			}
 
-			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
+			VariableDeclarationStatement variableDeclarationStatement= ASTNodes.as(ASTNodes.getPreviousSibling(node),
+					VariableDeclarationStatement.class);
 			VariableDeclarationFragment fragment= findVariableDeclarationFragment(variableDeclarationStatement, lhs);
 
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
@@ -185,15 +191,21 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.NoAssignmentInIfConditionCleanUp_description);
 
-			if (fragment != null && (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
-				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(), group);
-				ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getHighestCompatibleNode(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
+			if (fragment != null
+					&& (fragment.getInitializer() == null || ASTNodes.isPassive(fragment.getInitializer()))) {
+				rewrite.set(fragment, VariableDeclarationFragment.INITIALIZER_PROPERTY, assignment.getRightHandSide(),
+						group);
+				ASTNodes.replaceButKeepComment(rewrite,
+						ASTNodes.getHighestCompatibleNode(assignment, ParenthesizedExpression.class),
+						ast.createCopyTarget(lhs), group);
 				result= false;
 				return false;
 			}
 
 			if (!ASTNodes.isInElse(node)) {
-				ASTNodes.replaceButKeepComment(rewrite, ASTNodes.getHighestCompatibleNode(assignment, ParenthesizedExpression.class), ast.createCopyTarget(lhs), group);
+				ASTNodes.replaceButKeepComment(rewrite,
+						ASTNodes.getHighestCompatibleNode(assignment, ParenthesizedExpression.class),
+						ast.createCopyTarget(lhs), group);
 				Statement newAssignment= ast.newExpressionStatement(ASTNodes.createMoveTarget(rewrite, assignment));
 
 				if (ASTNodes.canHaveSiblings(node)) {
@@ -212,10 +224,12 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement variableDeclarationStatement,
+		private VariableDeclarationFragment findVariableDeclarationFragment(
+				final VariableDeclarationStatement variableDeclarationStatement,
 				final Expression expression) {
 			if (variableDeclarationStatement != null && expression instanceof SimpleName) {
-				for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) variableDeclarationStatement.fragments()) {
+				for (VariableDeclarationFragment fragment : (List<VariableDeclarationFragment>) variableDeclarationStatement
+						.fragments()) {
 					if (ASTNodes.isSameVariable(expression, fragment)) {
 						return fragment;
 					}

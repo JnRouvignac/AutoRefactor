@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
@@ -70,15 +69,18 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			IfStatement ifStatement= ASTNodes.as(statements.get(0), IfStatement.class);
 
 			if (ifStatement != null) {
-				return maybeRefactorWhile(visited, ifStatement, ifStatement.getThenStatement(), ifStatement.getElseStatement(), true)
-						&& maybeRefactorWhile(visited, ifStatement, ifStatement.getElseStatement(), ifStatement.getThenStatement(), false);
+				return maybeRefactorWhile(visited, ifStatement, ifStatement.getThenStatement(),
+						ifStatement.getElseStatement(), true)
+						&& maybeRefactorWhile(visited, ifStatement, ifStatement.getElseStatement(),
+								ifStatement.getThenStatement(), false);
 			}
 		}
 
 		return true;
 	}
 
-	private boolean maybeRefactorWhile(final WhileStatement visited, final IfStatement ifStatement, final Statement breakingStatement,
+	private boolean maybeRefactorWhile(final WhileStatement visited, final IfStatement ifStatement,
+			final Statement breakingStatement,
 			final Statement otherStatement, final boolean isPositive) {
 		BreakStatement breakStatement= ASTNodes.as(breakingStatement, BreakStatement.class);
 
@@ -90,12 +92,14 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		return true;
 	}
 
-	private void refactorWhileCondition(final WhileStatement visited, final IfStatement ifStatement, final Statement otherStatement,
+	private void refactorWhileCondition(final WhileStatement visited, final IfStatement ifStatement,
+			final Statement otherStatement,
 			final boolean isPositive) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.WhileConditionRatherThanInnerIfCleanUp_description);
-		Expression originalCondition= ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, visited.getExpression()));
+		Expression originalCondition= ASTNodeFactory.parenthesizeIfNeeded(ast,
+				ASTNodes.createMoveTarget(rewrite, visited.getExpression()));
 		Expression ifCondition= ifStatement.getExpression();
 
 		if (isPositive) {
@@ -119,14 +123,16 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 					rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, otherStatements.get(i)), ifStatement, group);
 				}
 
-				ASTNodes.replaceButKeepComment(rewrite, ifStatement, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
+				ASTNodes.replaceButKeepComment(rewrite, ifStatement,
+						ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 			} else {
 				rewrite.remove(ifStatement, group);
 			}
 		} else if (otherStatement == null || otherStatements.isEmpty()) {
 			ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), ast.newBlock(), group);
 		} else if (otherStatements.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, originalCondition, ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
+			ASTNodes.replaceButKeepComment(rewrite, originalCondition,
+					ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 		} else {
 			List<Statement> newStatements= new ArrayList<>(otherStatements.size());
 
