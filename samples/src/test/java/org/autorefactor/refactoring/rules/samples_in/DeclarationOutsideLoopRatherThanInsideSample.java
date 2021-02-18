@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class DeclarationOutsideLoopRatherThanInsideSample {
     public String moveObjectDecl(int count) {
@@ -165,6 +166,23 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         return concat.toString();
     }
 
+    public String moveWhenNoConflictsBefore(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
+
+        {
+            String theNumber = "10 and ";
+            System.out.println(theNumber);
+        }
+
+        for (Integer number : myList) {
+            // Keep this comment
+            String theNumber = String.valueOf(number);
+            concat.append(theNumber);
+        }
+
+        return concat.toString();
+    }
+
     public String doNotMoveFinalDecl(List<Integer> myList) {
         StringBuilder concat = new StringBuilder();
 
@@ -174,6 +192,27 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         }
 
         return concat.toString();
+    }
+
+    public void doNotMoveEffectivelyFinalDeclaration(List<Integer> myList, List<String> texts) {
+        for (Integer number : myList) {
+            String newNumber = String.valueOf(number);
+            texts.removeIf(e -> newNumber.equals(e + "0"));
+        }
+    }
+
+    public void doNotMoveEffectivelyFinalDeclarationInAnonymousClass(List<Integer> myList, List<String> texts) {
+        for (Integer number : myList) {
+            String newNumber = String.valueOf(number);
+            final Predicate<? super String> filter = new Predicate<String>() {
+
+                @Override
+                public boolean test(String e) {
+                    return newNumber.equals(e + "0");
+                }
+            };
+            texts.removeIf(filter);
+        }
     }
 
     public String doNotMoveMultiFragments(List<Integer> myList) {
@@ -213,23 +252,6 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
 
         for (Integer myNumber : myList) {
             concat.append(myNumber);
-        }
-
-        return concat.toString();
-    }
-
-    public String moveWhenNoConflictsBefore(List<Integer> myList) {
-        StringBuilder concat = new StringBuilder();
-
-        {
-            String theNumber = "10 and ";
-            System.out.println(theNumber);
-        }
-
-        for (Integer number : myList) {
-            // Keep this comment
-            String theNumber = String.valueOf(number);
-            concat.append(theNumber);
         }
 
         return concat.toString();

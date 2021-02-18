@@ -33,7 +33,10 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.VarDefinitionsUsesVisitor;
 import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Dimension;
@@ -41,6 +44,7 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -111,7 +115,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(declaration);
 
 					if (fragment != null
-							&& !Modifier.isFinal(declaration.getModifiers())
+							&& !isEffectivelyFinalRequired(declaration, fragment)
 							&& !hasAnnotation(declaration.modifiers())) {
 						SimpleName name= fragment.getName();
 						boolean isFound= false;
@@ -140,9 +144,28 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		return result;
 	}
 
+	private boolean isEffectivelyFinalRequired(final VariableDeclarationStatement declaration, final VariableDeclarationFragment fragment) {
+		if (Modifier.isFinal(declaration.getModifiers())) {
+			return true;
+		}
+
+		VarDefinitionsUsesVisitor visitor= new VarDefinitionsUsesVisitor(fragment);
+		List<SimpleName> reads= visitor.getReads();
+
+		for (SimpleName read : reads) {
+			ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(read, AnonymousClassDeclaration.class, LambdaExpression.class);
+
+			if (ancestor != null && !ASTNodes.isParent(fragment, ancestor)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private boolean hasAnnotation(final List<?> modifiers) {
-		for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
-			if (em.isAnnotation()) {
+		for (IExtendedModifier extendedModifier : (List<IExtendedModifier>) modifiers) {
+			if (extendedModifier.isAnnotation()) {
 				return true;
 			}
 		}
