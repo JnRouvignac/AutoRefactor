@@ -33,6 +33,8 @@ public class OneTryRatherThanTwoSample {
         try {
             try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
                 System.out.println(inputStream.read());
+
+                System.out.println("Another statement");
             }
         } catch (Exception e) {
             throw e;
