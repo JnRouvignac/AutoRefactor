@@ -62,7 +62,7 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 	public boolean visit(final TryStatement visited) {
 		List<Statement> tryStatements= ASTNodes.asList(visited.getBody());
 
-		if (!tryStatements.isEmpty()) {
+		if (tryStatements.size() == 1) {
 			TryStatement innerTryStatement= ASTNodes.as(tryStatements.get(0), TryStatement.class);
 
 			if (innerTryStatement != null
