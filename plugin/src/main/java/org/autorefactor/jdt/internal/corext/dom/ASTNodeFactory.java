@@ -1036,10 +1036,9 @@ public class ASTNodeFactory {
 		} else if (unparenthesedExpression instanceof ConditionalExpression) {
 			ConditionalExpression aConditionalExpression= (ConditionalExpression) unparenthesedExpression;
 
-			ConditionalExpression newConditionalExpression= newConditionalExpression(isMove ? createMoveTarget(aConditionalExpression.getExpression()) : createCopyTarget(aConditionalExpression.getExpression()),
+			return newConditionalExpression(isMove ? createMoveTarget(aConditionalExpression.getExpression()) : createCopyTarget(aConditionalExpression.getExpression()),
 					negate(aConditionalExpression.getThenExpression(), isMove),
 					negate(aConditionalExpression.getElseExpression(), isMove));
-			return newConditionalExpression;
 		} else {
 			Boolean constant= ASTNodes.getBooleanLiteral(unparenthesedExpression);
 
