@@ -109,6 +109,15 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		ITypeBinding targetType= ASTNodes.getTargetType(visited);
 
+		if (ASTNodes.isPrimitive(visited)
+				&& ASTNodes.isPrimitive(visited.getExpression())
+				&& (visited.resolveTypeBinding() == null || !visited.resolveTypeBinding().equals(visited.getExpression().resolveTypeBinding()))
+				// TODO Write it this way
+//				&& !ASTNodes.hasType(targetType, int.class.getCanonicalName(), Integer.class.getCanonicalName(), long.class.getCanonicalName(), Long.class.getCanonicalName(), double.class.getCanonicalName(), Double.class.getCanonicalName(), float.class.getCanonicalName(), Float.class.getCanonicalName(), char.class.getCanonicalName(), Character.class.getCanonicalName(), byte.class.getCanonicalName(), Byte.class.getCanonicalName(), short.class.getCanonicalName(), Short.class.getCanonicalName(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())
+				&& ASTNodes.hasType(targetType, Object.class.getCanonicalName(), Number.class.getCanonicalName())) {
+			return false;
+		}
+
 		if (isAssignmentCompatible(visited.getExpression(), targetType)) {
 			return true;
 		}
@@ -126,7 +135,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 				Expression leftOperand= infixExpression.getLeftOperand();
 				Expression rightOperand= infixExpression.getRightOperand();
 
-				if (visited.equals(leftOperand)) {
+				if (visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
 					return (isStringConcat(infixExpression) || isAssignmentCompatible(rightOperand, visited.getExpression()))
 							&& !ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
 				}
