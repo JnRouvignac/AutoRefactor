@@ -167,7 +167,8 @@ public class ASTNodeFactory {
 	 * @param rightHandSide      the right hand side expression
 	 * @return a new Assignment
 	 */
-	public Assignment newAssignment(final Expression leftHandSide, final Assignment.Operator operator, final Expression rightHandSide) {
+	public Assignment newAssignment(final Expression leftHandSide, final Assignment.Operator operator,
+			final Expression rightHandSide) {
 		Assignment newAssignment= newAssignment();
 		newAssignment.setLeftHandSide(leftHandSide);
 		newAssignment.setOperator(operator);
@@ -329,7 +330,8 @@ public class ASTNodeFactory {
 	 * @param statements          the statements to add to the catch clause
 	 * @return a new catch clause
 	 */
-	public CatchClause newCatchClause(final String exceptionTypeName, final String caughtExceptionName, final Statement... statements) {
+	public CatchClause newCatchClause(final String exceptionTypeName, final String caughtExceptionName,
+			final Statement... statements) {
 		CatchClause cc= ast.newCatchClause();
 		SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
 		svd.setType(simpleType(exceptionTypeName));
@@ -405,8 +407,8 @@ public class ASTNodeFactory {
 			if (typeBinding.getTypeBounds().length > 1) {
 				throw new NotImplementedException(null,
 						"because it violates the javadoc of `ITypeBinding.getTypeBounds()`: " //$NON-NLS-1$
-						+ "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
-						+ "at most, and then it is located in first position.\""); //$NON-NLS-1$
+								+ "\"Note that per construction, it can only contain one class or array type, " //$NON-NLS-1$
+								+ "at most, and then it is located in first position.\""); //$NON-NLS-1$
 			}
 
 			return toType(typeBinding.getWildcard(), typeNameDecider);
@@ -544,7 +546,8 @@ public class ASTNodeFactory {
 	 * @param initializer the variable initializer, can be null
 	 * @return a new variable declaration statement
 	 */
-	public VariableDeclarationStatement declareStatement(final Type type, final SimpleName varName, final Expression initializer) {
+	public VariableDeclarationStatement declareStatement(final Type type, final SimpleName varName,
+			final Expression initializer) {
 		VariableDeclarationFragment fragment= newVariableDeclarationFragment(varName, initializer);
 		return newVariableDeclarationStatement(type, fragment);
 	}
@@ -556,7 +559,8 @@ public class ASTNodeFactory {
 	 * @param fragment the fragment being declared
 	 * @return a new variable declaration statement
 	 */
-	public VariableDeclarationStatement newVariableDeclarationStatement(final Type type, final VariableDeclarationFragment fragment) {
+	public VariableDeclarationStatement newVariableDeclarationStatement(final Type type,
+			final VariableDeclarationFragment fragment) {
 		VariableDeclarationStatement variableDeclarationStatement= ast.newVariableDeclarationStatement(fragment);
 		variableDeclarationStatement.setType(type);
 		return variableDeclarationStatement;
@@ -570,7 +574,8 @@ public class ASTNodeFactory {
 	 * @param initializer the variable initializer, can be null
 	 * @return a new variable declaration expression
 	 */
-	public VariableDeclarationExpression newVariableDeclarationExpression(final Type type, final SimpleName varName, final Expression initializer) {
+	public VariableDeclarationExpression newVariableDeclarationExpression(final Type type, final SimpleName varName,
+			final Expression initializer) {
 		VariableDeclarationFragment fragment= newVariableDeclarationFragment(varName, initializer);
 		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
 		variableDeclarationExpression.modifiers().add(final0());
@@ -585,7 +590,8 @@ public class ASTNodeFactory {
 	 * @param fragment the variable declaration fragment
 	 * @return a new variable declaration expression
 	 */
-	public VariableDeclarationExpression newVariableDeclarationExpression(final Type type, final VariableDeclarationFragment fragment) {
+	public VariableDeclarationExpression newVariableDeclarationExpression(final Type type,
+			final VariableDeclarationFragment fragment) {
 		VariableDeclarationExpression variableDeclarationExpression= ast.newVariableDeclarationExpression(fragment);
 		variableDeclarationExpression.setType(type);
 		return variableDeclarationExpression;
@@ -623,7 +629,8 @@ public class ASTNodeFactory {
 	 * @param initializer the variable initializer
 	 * @return a new variable declaration fragment
 	 */
-	public VariableDeclarationFragment newVariableDeclarationFragment(final SimpleName varName, final Expression initializer) {
+	public VariableDeclarationFragment newVariableDeclarationFragment(final SimpleName varName,
+			final Expression initializer) {
 		VariableDeclarationFragment fragment= ast.newVariableDeclarationFragment();
 		fragment.setName(varName);
 		fragment.setInitializer(initializer);
@@ -738,7 +745,8 @@ public class ASTNodeFactory {
 	 *                       false
 	 * @return a new conditional expression
 	 */
-	public ConditionalExpression newConditionalExpression(final Expression mainExpression, final Expression thenExpression,
+	public ConditionalExpression newConditionalExpression(final Expression mainExpression,
+			final Expression thenExpression,
 			final Expression elseExpression) {
 		ConditionalExpression ce= ast.newConditionalExpression();
 		ce.setExpression(mainExpression);
@@ -765,7 +773,8 @@ public class ASTNodeFactory {
 	 * @param extendedOperands the extended operands
 	 * @return a new infix expression
 	 */
-	public InfixExpression newInfixExpression(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand,
+	public InfixExpression newInfixExpression(Expression leftOperand, InfixExpression.Operator operator,
+			Expression rightOperand,
 			Expression... extendedOperands) {
 		InfixExpression newInfixExpression= newInfixExpression();
 		newInfixExpression.setLeftOperand(leftOperand);
@@ -782,7 +791,8 @@ public class ASTNodeFactory {
 	 * @param allOperands the operands
 	 * @return a new infix expression
 	 */
-	public InfixExpression newInfixExpression(final InfixExpression.Operator operator, final Collection<? extends Expression> allOperands) {
+	public InfixExpression newInfixExpression(final InfixExpression.Operator operator,
+			final Collection<? extends Expression> allOperands) {
 		if (allOperands.size() < 2) {
 			throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
 					+ "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
@@ -1020,7 +1030,8 @@ public class ASTNodeFactory {
 				Expression otherExpression= prefixExpression.getOperand();
 				PrefixExpression otherPrefixExpression= ASTNodes.as(otherExpression, PrefixExpression.class);
 
-				if (otherPrefixExpression != null && ASTNodes.hasOperator(otherPrefixExpression, PrefixExpression.Operator.NOT)) {
+				if (otherPrefixExpression != null
+						&& ASTNodes.hasOperator(otherPrefixExpression, PrefixExpression.Operator.NOT)) {
 					return negate(otherPrefixExpression.getOperand(), isMove);
 				}
 
@@ -1036,7 +1047,9 @@ public class ASTNodeFactory {
 		} else if (unparenthesedExpression instanceof ConditionalExpression) {
 			ConditionalExpression aConditionalExpression= (ConditionalExpression) unparenthesedExpression;
 
-			return newConditionalExpression(isMove ? createMoveTarget(aConditionalExpression.getExpression()) : createCopyTarget(aConditionalExpression.getExpression()),
+			return newConditionalExpression(
+					isMove ? createMoveTarget(aConditionalExpression.getExpression())
+							: createCopyTarget(aConditionalExpression.getExpression()),
 					negate(aConditionalExpression.getThenExpression(), isMove),
 					negate(aConditionalExpression.getElseExpression(), isMove));
 		} else {
@@ -1054,11 +1067,13 @@ public class ASTNodeFactory {
 		return not(createCopyTarget(unparenthesedExpression));
 	}
 
-	private Expression getNegatedOperation(final InfixExpression booleanOperation, final InfixExpression.Operator negatedOperator, final boolean isMove) {
+	private Expression getNegatedOperation(final InfixExpression booleanOperation,
+			final InfixExpression.Operator negatedOperator, final boolean isMove) {
 		List<Expression> allOperands= ASTNodes.allOperands(booleanOperation);
 		List<Expression> allTargetOperands;
 
-		if (ASTNodes.hasOperator(booleanOperation, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND,
+		if (ASTNodes.hasOperator(booleanOperation, InfixExpression.Operator.CONDITIONAL_AND,
+				InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND,
 				InfixExpression.Operator.OR)) {
 			allTargetOperands= new ArrayList<>(allOperands.size());
 
@@ -1068,7 +1083,8 @@ public class ASTNodeFactory {
 				if (negatedOperand != null) {
 					allTargetOperands.add(negatedOperand);
 				} else {
-					PrefixExpression prefixExpression= newPrefixExpression(PrefixExpression.Operator.NOT, isMove ? createMoveTarget(booleanOperand) : createCopyTarget(booleanOperand));
+					PrefixExpression prefixExpression= newPrefixExpression(PrefixExpression.Operator.NOT,
+							isMove ? createMoveTarget(booleanOperand) : createCopyTarget(booleanOperand));
 
 					allTargetOperands.add(prefixExpression);
 				}
