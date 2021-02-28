@@ -111,7 +111,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 				List<VariableDeclarationStatement> candidates= new ArrayList<>();
 
 				for (Statement declarationStatement : forStatements) {
-					VariableDeclarationStatement declaration= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
+					VariableDeclarationStatement declaration= ASTNodes.as(declarationStatement,
+							VariableDeclarationStatement.class);
 					VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(declaration);
 
 					if (fragment != null
@@ -144,7 +145,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		return result;
 	}
 
-	private boolean isEffectivelyFinalRequired(final VariableDeclarationStatement declaration, final VariableDeclarationFragment fragment) {
+	private boolean isEffectivelyFinalRequired(final VariableDeclarationStatement declaration,
+			final VariableDeclarationFragment fragment) {
 		if (Modifier.isFinal(declaration.getModifiers())) {
 			return true;
 		}
@@ -153,7 +155,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		List<SimpleName> reads= visitor.getReads();
 
 		for (SimpleName read : reads) {
-			ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(read, AnonymousClassDeclaration.class, LambdaExpression.class);
+			ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(read, AnonymousClassDeclaration.class,
+					LambdaExpression.class);
 
 			if (ancestor != null && !ASTNodes.isParent(fragment, ancestor)) {
 				return true;
@@ -176,7 +179,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 	private void moveDeclaration(final Statement statement, final VariableDeclarationStatement varToMove) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_description);
+		TextEditGroup group= new TextEditGroup(
+				MultiFixMessages.DeclarationOutsideLoopRatherThanInsideCleanUp_description);
 
 		VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
@@ -187,7 +191,8 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			List<Dimension> extraDimensions= fragment.extraDimensions();
 			List<Dimension> newExtraDimensions= newFragment.extraDimensions();
 			newExtraDimensions.addAll(ASTNodes.createMoveTarget(rewrite, extraDimensions));
-			VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
+			VariableDeclarationStatement newDeclareStatement= ast.newVariableDeclarationStatement(copyOfType,
+					newFragment);
 			List<IExtendedModifier> modifiers= varToMove.modifiers();
 			List<IExtendedModifier> newModifiers= newDeclareStatement.modifiers();
 
@@ -201,7 +206,9 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
 			rewrite.insertBefore(newDeclareStatement, statement, group);
 			ASTNodes.replaceButKeepComment(rewrite, varToMove,
-					ast.newExpressionStatement(ast.newAssignment(ast.createCopyTarget(name), Assignment.Operator.ASSIGN, ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))), group);
+					ast.newExpressionStatement(ast.newAssignment(ast.createCopyTarget(name), Assignment.Operator.ASSIGN,
+							ASTNodes.createMoveTarget(rewrite, fragment.getInitializer()))),
+					group);
 		} else {
 			rewrite.insertBefore(ASTNodes.createMoveTarget(rewrite, varToMove), statement, group);
 			rewrite.remove(varToMove, group);

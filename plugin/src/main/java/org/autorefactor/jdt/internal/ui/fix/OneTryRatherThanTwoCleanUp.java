@@ -83,7 +83,9 @@ public class OneTryRatherThanTwoCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.OneTryRatherThanTwoCleanUp_description);
 
-		rewrite.insertLast(visited, TryStatement.RESOURCES_PROPERTY, ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
-		ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
+		rewrite.insertLast(visited, TryStatement.RESOURCES_PROPERTY,
+				ast.copyRange((List<VariableDeclarationExpression>) innerTryStatement.resources()), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited.getBody(),
+				ASTNodes.createMoveTarget(rewrite, innerTryStatement.getBody()), group);
 	}
 }
