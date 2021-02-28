@@ -154,7 +154,8 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 	protected void initFields(final List<RefactoringRule> allRefactoringRules) {
 		fields= new ArrayList<>(1 + allRefactoringRules.size());
 
-		fields.add(new BooleanFieldEditor(PreferenceConstants.DEBUG_MODE_ON.getName(), PreferenceConstants.DEBUG_MODE_ON.getDescription(), fieldEditorParent));
+		fields.add(new BooleanFieldEditor(PreferenceConstants.DEBUG_MODE_ON.getName(),
+				PreferenceConstants.DEBUG_MODE_ON.getDescription(), fieldEditorParent));
 	}
 
 	private void invalidateToggleRules(final Composite ruleGroup) {
