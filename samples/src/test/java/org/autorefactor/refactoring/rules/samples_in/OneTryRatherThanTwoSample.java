@@ -28,51 +28,51 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.io.FileInputStream;
 
 public class OneTryRatherThanTwoSample {
-    public void removeInnerTry() throws Exception {
-        // Keep this comment
-        try {
-            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-                System.out.println(inputStream.read());
+	public void removeInnerTry() throws Exception {
+		// Keep this comment
+		try {
+			try (final FileInputStream inputStream= new FileInputStream("out.txt")) {
+				System.out.println(inputStream.read());
 
-                System.out.println("Another statement");
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+				System.out.println("Another statement");
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
-    public void doNotRemoveInnerTryWithFinally() throws Exception {
-        try {
-            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-                System.out.println(inputStream.read());
-            } finally {
-                System.out.println("Do not lose me!");
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+	public void doNotRemoveInnerTryWithFinally() throws Exception {
+		try {
+			try (final FileInputStream inputStream= new FileInputStream("out.txt")) {
+				System.out.println(inputStream.read());
+			} finally {
+				System.out.println("Do not lose me!");
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
-    public void doNotRemoveInnerTryWithCatchClause() throws Exception {
-        try {
-            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-                System.out.println(inputStream.read());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+	public void doNotRemoveInnerTryWithCatchClause() throws Exception {
+		try {
+			try (final FileInputStream inputStream= new FileInputStream("out.txt")) {
+				System.out.println(inputStream.read());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
-    public void doNotRemoveInnerTryWithOtherStatements() throws Exception {
-        try {
-            try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
-                System.out.println(inputStream.read());
-            }
-            System.out.println("Do not lose me!");
-        } catch (Exception e) {
-            throw e;
-        }
-    }
+	public void doNotRemoveInnerTryWithOtherStatements() throws Exception {
+		try {
+			try (final FileInputStream inputStream= new FileInputStream("out.txt")) {
+				System.out.println(inputStream.read());
+			}
+			System.out.println("Do not lose me!");
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 }
