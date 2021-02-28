@@ -242,7 +242,8 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 		visitors.add(value);
 	}
 
-	private List<ASTVisitor> getVisitors(final Map<Class<?>, List<ASTVisitor>> map, final Class<? extends ASTNode> clazzKey) {
+	private List<ASTVisitor> getVisitors(final Map<Class<?>, List<ASTVisitor>> map,
+			final Class<? extends ASTNode> clazzKey) {
 		List<ASTVisitor> result= map.get(clazzKey);
 		if (result != null) {
 			return result;
