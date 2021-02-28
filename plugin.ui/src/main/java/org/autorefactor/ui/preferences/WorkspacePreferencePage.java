@@ -92,20 +92,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 	@Override
 	protected Control createContents(Composite parent) {
 		final List<RefactoringRule> allRefactoringRules= AllCleanUpRules.getAllCleanUpRules();
-		Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
-			/**
-			 * Compare objects.
-			 *
-			 * @param o1 First item
-			 * @param o2 Second item
-			 *
-			 * @return -1, 0 or 1
-			 */
-			@Override
-			public int compare(final RefactoringRule o1, final RefactoringRule o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+		Collections.sort(allRefactoringRules, Comparator.comparing(RefactoringRule::getName));
 
 		final Group ruleGroup= createControls(parent, allRefactoringRules);
 

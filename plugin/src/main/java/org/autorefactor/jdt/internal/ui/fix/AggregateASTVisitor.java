@@ -347,12 +347,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 	 */
 	public static void main(final String[] args) {
 		Method[] mm= ASTVisitor.class.getDeclaredMethods();
-		Arrays.sort(mm, new Comparator<Method>() {
-			@Override
-			public int compare(final Method o1, final Method o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+		Arrays.sort(mm, Comparator.comparing(Method::getName));
 		for (Method m : mm) {
 			System.out.println("@Override"); //$NON-NLS-1$
 			System.out.print("public " + m.getReturnType() + " "); //$NON-NLS-1$ //$NON-NLS-2$
