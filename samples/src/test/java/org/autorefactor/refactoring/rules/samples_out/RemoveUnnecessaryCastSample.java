@@ -334,10 +334,7 @@ public class RemoveUnnecessaryCastSample {
         Object s1 = (short) 32768;
         Object s2 = (short) -32769;
         Number s3 = (short) -32769;
-        Object l1 = (long) 32768;
-        Object l2 = (long) -32769;
-        Number l3 = (long) 32768;
         return "" + b1.getClass() + b2.getClass() + c1.getClass() + c2.getClass() + s1.getClass() + s2.getClass()
-                + s3.getClass() + l1.getClass() + l2.getClass() + l3.getClass();
+                + s3.getClass();
     }
 }
