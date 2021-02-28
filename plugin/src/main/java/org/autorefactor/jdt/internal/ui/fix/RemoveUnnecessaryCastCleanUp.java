@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /**
@@ -63,21 +64,36 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final CastExpression visited) {
-		NumberLiteral literal= ASTNodes.as(visited.getExpression(), NumberLiteral.class);
+		Expression expression= visited.getExpression();
+		PrefixExpression prefixExpression= ASTNodes.as(expression, PrefixExpression.class);
+		NumberLiteral literal= ASTNodes.as(expression, NumberLiteral.class);
+		PrefixExpression.Operator prefixOperator= null;
+
+		if (prefixExpression != null) {
+			if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.MINUS)) {
+				prefixOperator= PrefixExpression.Operator.MINUS;
+				literal= ASTNodes.as(prefixExpression.getOperand(), NumberLiteral.class);
+			} else if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.PLUS)) {
+				prefixOperator= PrefixExpression.Operator.PLUS;
+				literal= ASTNodes.as(prefixExpression.getOperand(), NumberLiteral.class);
+			} else {
+				literal= null;
+			}
+		}
 
 		if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (ASTNodes.hasType(visited.getType().resolveBinding(), long.class.getSimpleName())) {
-				createPrimitive(visited, literal, 'L');
+				createPrimitive(visited, prefixOperator, literal, 'L');
 				return false;
 			}
 
 			if (ASTNodes.hasType(visited.getType().resolveBinding(), float.class.getSimpleName())) {
-				createPrimitive(visited, literal, 'F');
+				createPrimitive(visited, prefixOperator, literal, 'F');
 				return false;
 			}
 
 			if (ASTNodes.hasType(visited.getType().resolveBinding(), double.class.getSimpleName())) {
-				createPrimitive(visited, literal, 'D');
+				createPrimitive(visited, prefixOperator, literal, 'D');
 				return false;
 			}
 		}
@@ -92,13 +108,22 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void createPrimitive(final CastExpression visited, final NumberLiteral literal, final char postfix) {
+	private void createPrimitive(final CastExpression visited, final PrefixExpression.Operator prefixOperator, final NumberLiteral literal, final char postfix) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
 
 		NumberLiteral numberLiteral= ast.newNumberLiteral(literal.getToken() + postfix);
-		ASTNodes.replaceButKeepComment(rewrite, visited, numberLiteral, group);
+
+		if (prefixOperator != null) {
+			PrefixExpression prefixExpression= ast.newPrefixExpression();
+			prefixExpression.setOperator(prefixOperator);
+			prefixExpression.setOperand(numberLiteral);
+
+			ASTNodes.replaceButKeepComment(rewrite, visited, prefixExpression, group);
+		} else {
+			ASTNodes.replaceButKeepComment(rewrite, visited, numberLiteral, group);
+		}
 	}
 
 	private boolean canRemoveCast(final CastExpression visited) {

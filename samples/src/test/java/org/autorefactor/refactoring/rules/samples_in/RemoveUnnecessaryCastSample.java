@@ -35,6 +35,8 @@ public class RemoveUnnecessaryCastSample {
     private short s;
 
     private Long usual = (long) 101;
+    private Long negative = (long) -101;
+    private Long positive = (long) +101;
     private Long octal = (long) 0121;
     private Long hex = (long) 0xdafdaf;
     private Long binary = (long) 0b1110010111;
