@@ -725,6 +725,18 @@ public final class MultiFixMessages extends NLS {
     /**
      * Automatically filled.
      */
+    public static String DuplicateAlternativeCleanUp_name;
+    /**
+     * Automatically filled.
+     */
+    public static String DuplicateAlternativeCleanUp_description;
+    /**
+     * Automatically filled.
+     */
+    public static String DuplicateAlternativeCleanUp_reason;
+    /**
+     * Automatically filled.
+     */
     public static String CommonCodeInIfElseStatementCleanUp_name;
     /**
      * Automatically filled.
