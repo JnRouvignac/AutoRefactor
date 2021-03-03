@@ -69,12 +69,12 @@ public final class ForLoops {
 
 	/** The content of the for loop. */
 	public static final class ForLoopContent {
-		private IterationType iterationType;
-		private ContainerType containerType;
-		private Expression containerVariable;
-		private Expression iteratorVariable;
-		private Name loopVariable;
-		private boolean isLoopingForward;
+		private final IterationType iterationType;
+		private final ContainerType containerType;
+		private final Expression containerVariable;
+		private final Expression iteratorVariable;
+		private final Name loopVariable;
+		private final boolean isLoopingForward;
 
 		private ForLoopContent(final IterationType iterationType, final ContainerType containerType, final Expression containerVariable,
 				final Expression iteratorVariable, final Name loopVariable, final boolean isLoopingForward) {

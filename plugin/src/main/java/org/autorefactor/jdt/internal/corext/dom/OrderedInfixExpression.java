@@ -35,9 +35,9 @@ import org.eclipse.jdt.core.dom.InfixExpression;
  * @param <S> Second operand
  */
 public class OrderedInfixExpression<F extends Expression, S extends Expression> {
-	private F firstOperand;
-	private InfixExpression.Operator operator;
-	private S secondOperand;
+	private final F firstOperand;
+	private final InfixExpression.Operator operator;
+	private final S secondOperand;
 
 	/**
 	 * Ordered infix expression.
