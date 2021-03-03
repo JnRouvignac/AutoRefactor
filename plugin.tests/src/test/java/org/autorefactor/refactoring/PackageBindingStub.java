@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 
 class PackageBindingStub implements IPackageBinding {
-	private String packageName;
+	private final String packageName;
 
 	PackageBindingStub(String packageName) {
 		this.packageName= packageName;

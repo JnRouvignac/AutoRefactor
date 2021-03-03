@@ -56,8 +56,8 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class CFGBuilderTest {
-	private String testName;
-	private int methodDeclarationNb;
+	private final String testName;
+	private final int methodDeclarationNb;
 
 	public CFGBuilderTest(String testName, int methodDeclarationNb) {
 		this.testName= testName;

@@ -67,7 +67,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	private static final String HASH_CODE_METHOD= "hashCode"; //$NON-NLS-1$
 
 	private static final class CollectedData {
-		private List<Expression> fields= new ArrayList<>();
+		private final List<Expression> fields= new ArrayList<>();
 		private SimpleName primeId;
 		private SimpleName resultId;
 		private Iterator<Statement> stmtIterator;

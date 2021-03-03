@@ -43,9 +43,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TypeNameDeciderTest {
-	private String qualifiedName;
-	private TreeSet<String> imports;
-	private String expectedResult;
+	private final String qualifiedName;
+	private final TreeSet<String> imports;
+	private final String expectedResult;
 
 	public TypeNameDeciderTest(String qualifiedName, TreeSet<String> imports, String expectedResult) {
 		this.qualifiedName= qualifiedName;

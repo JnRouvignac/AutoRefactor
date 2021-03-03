@@ -351,8 +351,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		private List<FindViewByIdItem> items= new ArrayList<>();
-		private SimpleName viewVariableName;
+		private final List<FindViewByIdItem> items= new ArrayList<>();
+		private final SimpleName viewVariableName;
 
 		private FindViewByIdVisitor(final SimpleName viewVariableName) {
 			this.viewVariableName= viewVariableName;

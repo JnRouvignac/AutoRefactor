@@ -151,9 +151,9 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 	private int nbWorkflow;
 
-	private List<List<NodeMatcher<Expression>>> conditionsByWorkflow= new ArrayList<>();
-	private List<List<NodeMatcher<Statement>>> statementsByWorkflow= new ArrayList<>();
-	private List<NodeMatcher<Expression>> returnedValuesByWorkflow= new ArrayList<>();
+	private final List<List<NodeMatcher<Expression>>> conditionsByWorkflow= new ArrayList<>();
+	private final List<List<NodeMatcher<Statement>>> statementsByWorkflow= new ArrayList<>();
+	private final List<NodeMatcher<Expression>> returnedValuesByWorkflow= new ArrayList<>();
 
 	private ControlWorkflowMatcher() {
 		// Forbidden
