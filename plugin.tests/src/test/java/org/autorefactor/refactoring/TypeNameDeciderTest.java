@@ -72,7 +72,7 @@ public class TypeNameDeciderTest {
 	}
 
 	private String useSimplestPossibleName(String qualifiedName) {
-		return new TypeNameDecider(fullyQualifiedName -> new TypeBindingStub(fullyQualifiedName), imports)
+		return new TypeNameDecider(TypeBindingStub::new, imports)
 				.useSimplestPossibleName(qualifiedName);
 	}
 
