@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
 import org.autorefactor.jdt.internal.corext.dom.ASTCommentRewriter;
@@ -526,16 +525,13 @@ public class ASTRewrite {
 		// Call this operation on the SWT Display Thread with syncExec(),
 		// because it changes or adds something to the GUI.
 		// Otherwise it would throw an Invalid thread access Exception.
-		eventLoop.syncExec(new Callable<BadLocationException>() {
-			@Override
-			public BadLocationException call() throws Exception {
-				try {
-					edits.apply(document, TextEdit.UPDATE_REGIONS);
-					importEdits.apply(document);
-					return null;
-				} catch (BadLocationException e) {
-					return e;
-				}
+		eventLoop.syncExec(() -> {
+			try {
+				edits.apply(document, TextEdit.UPDATE_REGIONS);
+				importEdits.apply(document);
+				return null;
+			} catch (BadLocationException e) {
+				return e;
 			}
 		});
 	}

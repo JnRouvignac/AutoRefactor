@@ -36,7 +36,6 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -73,18 +72,7 @@ public class TypeNameDeciderTest {
 	}
 
 	private String useSimplestPossibleName(String qualifiedName) {
-		return new TypeNameDecider(new TypeNameDecider.ResolveTypeBindingStrategy() {
-			/**
-			 * Get the type binding.
-			 *
-			 * @param fullyQualifiedName fullyQualifiedName.
-			 *
-			 * @return the type binding.
-			 */
-			public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
-				return new TypeBindingStub(fullyQualifiedName);
-			}
-		}, imports).useSimplestPossibleName(qualifiedName);
+		return new TypeNameDecider(fullyQualifiedName -> new TypeBindingStub(fullyQualifiedName), imports).useSimplestPossibleName(qualifiedName);
 	}
 
 	private static TreeSet<String> imports(String... imports) {

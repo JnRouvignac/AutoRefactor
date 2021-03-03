@@ -39,7 +39,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 import org.autorefactor.jdt.internal.corext.dom.ApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
@@ -95,16 +94,9 @@ public class RefactoringRulesTest {
 	@Test
 	public void testRefactoring() throws Exception {
 		try {
-			runTest(new Callable<Void>() {
-				/**
-				 * Call.
-				 *
-				 * @return the void.
-				 */
-				public Void call() throws Exception {
-					testRefactoring0();
-					return null;
-				}
+			runTest(() -> {
+				testRefactoring0();
+				return null;
 			});
 		} catch (Exception e) {
 			// Log stacktrace here because otherwise useful details are missing.
