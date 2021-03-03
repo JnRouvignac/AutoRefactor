@@ -65,18 +65,12 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
 			final WizardDialog dialog= new WizardDialog(shell, wizard);
 			dialog.open();
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(new Runnable() {
-				/**
-				 * Run.
-				 */
-				@Override
-				public void run() {
-					final StringWriter sw= new StringWriter();
-					final PrintWriter pw= new PrintWriter(sw);
-					e.printStackTrace(pw);
+			Display.getDefault().asyncExec(() -> {
+				final StringWriter sw= new StringWriter();
+				final PrintWriter pw= new PrintWriter(sw);
+				e.printStackTrace(pw);
 
-					MessageDialog.openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				MessageDialog.openInformation(shell, "Info", "An error has occurred:\n\n" + sw); //$NON-NLS-1$ //$NON-NLS-2$
 			});
 		}
 

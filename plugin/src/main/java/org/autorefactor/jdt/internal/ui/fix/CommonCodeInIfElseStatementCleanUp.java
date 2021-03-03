@@ -30,7 +30,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -143,12 +142,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			return null;
 		}
 
-		Collections.sort(matchingCases, new Comparator<Pair<Statement, List<Integer>>>() {
-			@Override
-			public int compare(final Pair<Statement, List<Integer>> o1, final Pair<Statement, List<Integer>> o2) {
-				return Integer.compare(o2.getSecond().size(), o1.getSecond().size());
-			}
-		});
+		Collections.sort(matchingCases, (o1, o2) -> Integer.compare(o2.getSecond().size(), o1.getSecond().size()));
 		Pair<Statement, List<Integer>> notFallingThroughCase= null;
 
 		for (Pair<Statement, List<Integer>> matchingCase : matchingCases) {

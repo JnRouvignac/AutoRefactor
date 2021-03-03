@@ -168,14 +168,6 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	private static void showMessage(final Shell shell, final String message) {
-		Display.getDefault().asyncExec(new Runnable() {
-			/**
-			 * Run.
-			 */
-			@Override
-			public void run() {
-				MessageDialog.openInformation(shell, "Info", message); //$NON-NLS-1$
-			}
-		});
+		Display.getDefault().asyncExec(() -> MessageDialog.openInformation(shell, "Info", message));
 	}
 }
