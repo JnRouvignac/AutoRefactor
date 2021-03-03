@@ -232,7 +232,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 		}
 	}
 
-	private boolean doMatching(final ControlWorkflowNode actualNode, final int i, final Set<Integer> actualLastNodes, final boolean isPassive) {
+	private boolean doMatching(final ControlWorkflowNode actualNode, final int i, final Set<Integer> actualLastNodes,
+			final boolean isPassive) {
 		ControlWorkflowNode currentActualNode= actualNode;
 		List<NodeMatcher<Expression>> remainingConditions= new ArrayList<>(conditionsByWorkflow.get(i));
 
@@ -276,7 +277,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 		if (!Utils.isEmpty(statementsByWorkflow.get(i))) {
 			// TODO Handle several final statements
-			if (Boolean.TRUE.equals(statementsByWorkflow.get(i).get(0).isMatching(currentActualNode.getFinalStatement()))
+			if (Boolean.TRUE
+					.equals(statementsByWorkflow.get(i).get(0).isMatching(currentActualNode.getFinalStatement()))
 					&& actualLastNodes.contains(currentActualNode.getId())) {
 				actualLastNodes.remove(currentActualNode.getId());
 				return true;
@@ -293,13 +295,15 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 	private void collectActualLastNodes(final ControlWorkflowNode actualNode, final Set<Integer> actualLastNodes) {
 		if (actualNode.getCondition() == null) {
-			if (actualNode.getThenNode() != null || actualNode.getElseNode() != null || (actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null)) {
+			if (actualNode.getThenNode() != null || actualNode.getElseNode() != null
+					|| (actualNode.getReturnedValue() == null && actualNode.getFinalStatement() == null)) {
 				throw new AbortSearchException();
 			}
 
 			actualLastNodes.add(actualNode.getId());
 		} else {
-			if (actualNode.getThenNode() == null || actualNode.getElseNode() == null || actualNode.getReturnedValue() != null || actualNode.getFinalStatement() != null) {
+			if (actualNode.getThenNode() == null || actualNode.getElseNode() == null
+					|| actualNode.getReturnedValue() != null || actualNode.getFinalStatement() != null) {
 				throw new AbortSearchException();
 			}
 
@@ -309,7 +313,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 	}
 
 	private boolean isPassive(final ControlWorkflowNode actualNode) {
-		return actualNode.getCondition() == null || (ASTNodes.isPassive(actualNode.getCondition()) && isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode()));
+		return actualNode.getCondition() == null || (ASTNodes.isPassive(actualNode.getCondition())
+				&& isPassive(actualNode.getThenNode()) && isPassive(actualNode.getElseNode()));
 	}
 
 	private void expandActualNode(final ControlWorkflowNode actualNode) {
@@ -348,7 +353,9 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 			expandActualNode(actualNode);
 			return;
-		} else if (infixExpression != null && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
+		} else if (infixExpression != null && ASTNodes.hasOperator(infixExpression,
+				InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND,
+				InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR)) {
 			List<Expression> allOperands= ASTNodes.allOperands(infixExpression);
 			Expression firstOperand= allOperands.remove(0);
 			ControlWorkflowNode currentNode= actualNode;
@@ -360,7 +367,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 				subNode.setElseNode(cloneNode(currentNode.getElseNode()));
 				currentNode.setCondition(firstOperand);
 
-				if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
+				if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.CONDITIONAL_AND,
+						InfixExpression.Operator.AND)) {
 					currentNode.setThenNode(subNode);
 				} else {
 					currentNode.setElseNode(subNode);
@@ -371,7 +379,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 
 			expandActualNode(actualNode);
 			return;
-		} else if (infixExpression != null && !infixExpression.hasExtendedOperands() && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.XOR)) {
+		} else if (infixExpression != null && !infixExpression.hasExtendedOperands()
+				&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.XOR)) {
 			ControlWorkflowNode subNode1= new ControlWorkflowNode();
 			subNode1.setCondition(infixExpression.getRightOperand());
 			subNode1.setThenNode(cloneNode(actualNode.getElseNode()));
@@ -435,7 +444,8 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 				return node;
 			}
 
-			if (ifStatement.getElseStatement() != null || actualStatements.size() == 1 || !ASTNodes.fallsThrough(ifStatement.getThenStatement())) {
+			if (ifStatement.getElseStatement() != null || actualStatements.size() == 1
+					|| !ASTNodes.fallsThrough(ifStatement.getThenStatement())) {
 				throw new AbortSearchException();
 			}
 
