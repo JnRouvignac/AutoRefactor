@@ -101,14 +101,16 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		if (canRemoveCast(visited)) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
-			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, visited.getExpression()), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited,
+					ASTNodes.createMoveTarget(rewrite, visited.getExpression()), group);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void createPrimitive(final CastExpression visited, final PrefixExpression.Operator prefixOperator, final NumberLiteral literal, final char postfix) {
+	private void createPrimitive(final CastExpression visited, final PrefixExpression.Operator prefixOperator,
+			final NumberLiteral literal, final char postfix) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryCastCleanUp_description);
@@ -127,8 +129,10 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean canRemoveCast(final CastExpression visited) {
-		if (ASTNodes.hasType(visited.getExpression(), char.class.getCanonicalName()) && ASTNodes.hasType(visited, int.class.getCanonicalName())
-				|| ASTNodes.hasType(visited.getExpression(), byte.class.getCanonicalName()) && ASTNodes.hasType(visited, char.class.getCanonicalName())) {
+		if (ASTNodes.hasType(visited.getExpression(), char.class.getCanonicalName())
+				&& ASTNodes.hasType(visited, int.class.getCanonicalName())
+				|| ASTNodes.hasType(visited.getExpression(), byte.class.getCanonicalName())
+						&& ASTNodes.hasType(visited, char.class.getCanonicalName())) {
 			return false;
 		}
 
@@ -136,9 +140,10 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
 		if (ASTNodes.isPrimitive(visited)
 				&& ASTNodes.isPrimitive(visited.getExpression())
-				&& (visited.resolveTypeBinding() == null || !visited.resolveTypeBinding().equals(visited.getExpression().resolveTypeBinding()))
+				&& (visited.resolveTypeBinding() == null
+						|| !visited.resolveTypeBinding().equals(visited.getExpression().resolveTypeBinding()))
 				// TODO Write it this way
-//				&& !ASTNodes.hasType(targetType, int.class.getCanonicalName(), Integer.class.getCanonicalName(), long.class.getCanonicalName(), Long.class.getCanonicalName(), double.class.getCanonicalName(), Double.class.getCanonicalName(), float.class.getCanonicalName(), Float.class.getCanonicalName(), char.class.getCanonicalName(), Character.class.getCanonicalName(), byte.class.getCanonicalName(), Byte.class.getCanonicalName(), short.class.getCanonicalName(), Short.class.getCanonicalName(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())
+				//				&& !ASTNodes.hasType(targetType, int.class.getCanonicalName(), Integer.class.getCanonicalName(), long.class.getCanonicalName(), Long.class.getCanonicalName(), double.class.getCanonicalName(), Double.class.getCanonicalName(), float.class.getCanonicalName(), Float.class.getCanonicalName(), char.class.getCanonicalName(), Character.class.getCanonicalName(), byte.class.getCanonicalName(), Byte.class.getCanonicalName(), short.class.getCanonicalName(), Short.class.getCanonicalName(), boolean.class.getCanonicalName(), Boolean.class.getCanonicalName())
 				&& ASTNodes.hasType(targetType, Object.class.getCanonicalName(), Number.class.getCanonicalName())) {
 			return false;
 		}
@@ -161,12 +166,15 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 				Expression rightOperand= infixExpression.getRightOperand();
 
 				if (visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
-					return (isStringConcat(infixExpression) || isAssignmentCompatible(rightOperand, visited.getExpression()))
-							&& !ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
+					return (isStringConcat(infixExpression)
+							|| isAssignmentCompatible(rightOperand, visited.getExpression()))
+							&& !ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE,
+									InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS);
 				}
 
 				return (isNotRefactored(leftOperand) && isStringConcat(infixExpression)
-						|| (isIntegralDivision(infixExpression) ? canRemoveCastInIntegralDivision(visited, infixExpression)
+						|| (isIntegralDivision(infixExpression)
+								? canRemoveCastInIntegralDivision(visited, infixExpression)
 								: isAssignmentCompatibleInInfixExpression(visited, infixExpression)))
 						&& !isIntegralDividedByFloatingPoint(visited, infixExpression);
 			}
@@ -175,7 +183,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private boolean canRemoveCastInIntegralDivision(final CastExpression visited, final InfixExpression infixExpression) {
+	private boolean canRemoveCastInIntegralDivision(final CastExpression visited,
+			final InfixExpression infixExpression) {
 		ITypeBinding leftOperandType= getLeftOperandType(infixExpression, visited);
 		return isIntegralDivision(infixExpression) // safety check
 				&& isAssignmentCompatible(leftOperandType, visited.getExpression().resolveTypeBinding())
@@ -183,10 +192,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean isIntegralDivision(final InfixExpression infixExpression) {
-		return isIntegralType(infixExpression) && ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE);
+		return isIntegralType(infixExpression)
+				&& ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.DIVIDE);
 	}
 
-	private boolean isAssignmentCompatibleInInfixExpression(final CastExpression visited, final InfixExpression infixExpression) {
+	private boolean isAssignmentCompatibleInInfixExpression(final CastExpression visited,
+			final InfixExpression infixExpression) {
 		ITypeBinding leftOpType= getLeftOperandType(infixExpression, visited);
 		return isAssignmentCompatible(leftOpType, visited.getExpression().resolveTypeBinding())
 				&& isAssignmentCompatible(leftOpType, visited.resolveTypeBinding());
@@ -281,7 +292,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 	}
 
 	private boolean isIntegralType(final Expression expression) {
-		return ASTNodes.hasType(expression, byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName());
+		return ASTNodes.hasType(expression, byte.class.getSimpleName(), char.class.getSimpleName(),
+				short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName());
 	}
 
 	private boolean isFloatingPointType(final Expression expression) {
@@ -295,7 +307,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 		if (value != null) {
 			long val= value;
 			return ASTNodes.hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE
-					|| ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE
+					|| ASTNodes.hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val
+							&& val <= Short.MAX_VALUE
 					|| ASTNodes.hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535;
 		}
 

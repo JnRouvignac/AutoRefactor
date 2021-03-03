@@ -156,11 +156,11 @@ public class RemoveUnnecessaryCastSample {
     public boolean removeCasts(Integer oi, int pi, long l) {
         // Keep this comment
         return oi != pi
-            && pi != oi
-            && oi != pi
-            && pi != oi
-            && l != pi
-            && pi != l;
+                && pi != oi
+                && oi != pi
+                && pi != oi
+                && l != pi
+                && pi != l;
     }
 
     public boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
@@ -178,11 +178,11 @@ public class RemoveUnnecessaryCastSample {
 
     public boolean doNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
         return (byte) i == 0
-            && 0 == (byte) i
-            && (char) i == 0
-            && 0 == (char) i
-            && (short) i == 0
-            && 0 == (short) i;
+                && 0 == (byte) i
+                && (char) i == 0
+                && 0 == (char) i
+                && (short) i == 0
+                && 0 == (short) i;
     }
 
     public long doNotRemoveWideningCast(int i, int j) {
