@@ -46,7 +46,8 @@ public class OrderedInfixExpression<F extends Expression, S extends Expression> 
 	 * @param operator operator
 	 * @param secondOperand second operand
 	 */
-	public OrderedInfixExpression(final F firstOperand, final InfixExpression.Operator operator, final S secondOperand) {
+	public OrderedInfixExpression(final F firstOperand, final InfixExpression.Operator operator,
+			final S secondOperand) {
 		this.firstOperand= firstOperand;
 		this.operator= operator;
 		this.secondOperand= secondOperand;

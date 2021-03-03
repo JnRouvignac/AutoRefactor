@@ -275,7 +275,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			data.setHasReturnStatement(true);
 			Expression expression= returnStatement.getExpression();
 
-			return returnStatement != null && (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
+			return returnStatement != null
+					&& (isGivenVariable(expression, data.getResultId()) || isHashValid(data, expression));
 		}
 
 		VariableDeclarationStatement varStatement= ASTNodes.as(statement, VariableDeclarationStatement.class);
@@ -283,7 +284,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		if (varStatement != null && data.getTempVar() == null) {
 			VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(varStatement);
 
-			if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName()) && fragment != null) {
+			if (ASTNodes.hasType(varStatement.getType().resolveBinding(), long.class.getSimpleName())
+					&& fragment != null) {
 				data.setTempVar(fragment.getName());
 				Expression initializer= fragment.getInitializer();
 
@@ -342,7 +344,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 		SimpleName fieldToFind= null;
 		MethodInvocation doubleToLongBits= ASTNodes.as(initializer, MethodInvocation.class);
 
-		if (doubleToLongBits != null && ASTNodes.usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
+		if (doubleToLongBits != null && ASTNodes.usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(),
+				"doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
 			SimpleName fieldName= ASTNodes.as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
 			if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
@@ -384,7 +387,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			return isNewHashValid(data, newHashWithoutBrackets.getExpression());
 		}
 
-		if ((newHash instanceof Name || newHash instanceof FieldAccess || newHash instanceof SuperFieldAccess) && data.isTempValueUsed()) {
+		if ((newHash instanceof Name || newHash instanceof FieldAccess || newHash instanceof SuperFieldAccess)
+				&& data.isTempValueUsed()) {
 			SimpleName fieldName= getField(newHash);
 
 			if (!ASTNodes.isSameVariable(data.getPrimeId(), fieldName)
@@ -400,7 +404,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 			TypeDeclaration innerClass= ASTNodes.getTypedAncestor(newHash, TypeDeclaration.class);
 			TypeDeclaration topLevelClass= ASTNodes.getTypedAncestor(innerClass, TypeDeclaration.class);
 
-			if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
+			if (ASTNodes.usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", //$NON-NLS-1$
+					float.class.getSimpleName())) {
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
 				if (fieldName != null
@@ -409,15 +414,24 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					data.getFields().add(ASTNodes.getUnparenthesedExpression(fieldName));
 					return true;
 				}
-			} else if (ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, boolean[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, byte[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, char[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, double[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, float[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, int[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, Object[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, long[].class.getCanonicalName())
-					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD, short[].class.getCanonicalName())) {
+			} else if (ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+					boolean[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							byte[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							char[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							double[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							float[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							int[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							Object[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							long[].class.getCanonicalName())
+					|| ASTNodes.usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), HASH_CODE_METHOD,
+							short[].class.getCanonicalName())) {
 				SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
 				if (fieldName != null && !ASTNodes.isSameVariable(fieldName, data.getPrimeId())
@@ -429,7 +443,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 					&& innerClass.resolveBinding() != null
 					&& topLevelClass != null
 					&& topLevelClass.resolveBinding() != null
-							&& ASTNodes.usesGivenSignature(specificMethod, topLevelClass.resolveBinding().getQualifiedName(), HASH_CODE_METHOD)) {
+					&& ASTNodes.usesGivenSignature(specificMethod, topLevelClass.resolveBinding().getQualifiedName(),
+							HASH_CODE_METHOD)) {
 				return isEnclosingHashCode(data, specificMethod, innerClass, topLevelClass);
 			}
 		} else if (newHash instanceof CastExpression) {
@@ -441,9 +456,11 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
 	private boolean isEnclosingHashCode(final CollectedData data, final MethodInvocation specificMethod,
 			final TypeDeclaration innerClass, final TypeDeclaration topLevelClass) {
-		MethodInvocation getEnclosingInstanceMethod= ASTNodes.as(specificMethod.getExpression(), MethodInvocation.class);
+		MethodInvocation getEnclosingInstanceMethod= ASTNodes.as(specificMethod.getExpression(),
+				MethodInvocation.class);
 
-		if (ASTNodes.usesGivenSignature(getEnclosingInstanceMethod, innerClass.resolveBinding().getQualifiedName(), "getEnclosingInstance")) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(getEnclosingInstanceMethod, innerClass.resolveBinding().getQualifiedName(),
+				"getEnclosingInstance")) { //$NON-NLS-1$
 			MethodDeclaration getEnclosingInstanceDeclaration= null;
 
 			for (MethodDeclaration innerMethod : innerClass.getMethods()) {
@@ -451,14 +468,16 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 						&& Utils.isEmpty(innerMethod.parameters())
 						&& !innerMethod.isConstructor()
 						&& innerMethod.resolveBinding() != null
-						&& ASTNodes.hasType(innerMethod.resolveBinding().getReturnType(), topLevelClass.resolveBinding().getQualifiedName())) {
+						&& ASTNodes.hasType(innerMethod.resolveBinding().getReturnType(),
+								topLevelClass.resolveBinding().getQualifiedName())) {
 					getEnclosingInstanceDeclaration= innerMethod;
 					break;
 				}
 			}
 
 			if (getEnclosingInstanceDeclaration != null) {
-				ReturnStatement returnStatement= ASTNodes.as(getEnclosingInstanceDeclaration.getBody(), ReturnStatement.class);
+				ReturnStatement returnStatement= ASTNodes.as(getEnclosingInstanceDeclaration.getBody(),
+						ReturnStatement.class);
 
 				if (returnStatement != null) {
 					ThisExpression thisExpression= ASTNodes.as(returnStatement.getExpression(),
@@ -469,7 +488,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 								SimpleName.class);
 
 						if (topLevelClassReference != null
-								&& topLevelClass.getName().getIdentifier().equals(topLevelClassReference.getIdentifier())) {
+								&& topLevelClass.getName().getIdentifier()
+										.equals(topLevelClassReference.getIdentifier())) {
 							data.getFields().add(ASTNodes.getUnparenthesedExpression(specificMethod));
 							return true;
 						}
@@ -532,7 +552,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isGreatNumberValid(final CollectedData data, final CastExpression newHash) {
-		OrderedInfixExpression<Expression, InfixExpression> orderedBitwise= ASTNodes.orderedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
+		OrderedInfixExpression<Expression, InfixExpression> orderedBitwise= ASTNodes
+				.orderedInfix(newHash.getExpression(), Expression.class, InfixExpression.class);
 
 		if (ASTNodes.hasType(newHash, int.class.getSimpleName())
 				&& orderedBitwise != null
@@ -589,10 +610,12 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 	}
 
 	private boolean isObjectValid(final CollectedData data, final ConditionalExpression condition) {
-		OrderedInfixExpression<Expression, NullLiteral> orderedIsFieldNull= ASTNodes.orderedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
+		OrderedInfixExpression<Expression, NullLiteral> orderedIsFieldNull= ASTNodes
+				.orderedInfix(condition.getExpression(), Expression.class, NullLiteral.class);
 
 		if (orderedIsFieldNull != null
-				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(orderedIsFieldNull.getOperator())) {
+				&& Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+						.contains(orderedIsFieldNull.getOperator())) {
 			SimpleName field= getField(orderedIsFieldNull.getFirstOperand());
 
 			if (field != null) {
