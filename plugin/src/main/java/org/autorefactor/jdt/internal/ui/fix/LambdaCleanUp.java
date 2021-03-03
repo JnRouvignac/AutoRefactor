@@ -144,7 +144,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
 						for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
 							if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
-									&& ASTNodes.usesGivenSignature(methodBinding, calledType.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
+									&& ASTNodes.usesGivenSignature(methodBinding, calledType.getQualifiedName(),
+											methodInvocation.getName().getIdentifier(), remainingParams)) {
 								return true;
 							}
 						}
@@ -209,8 +210,10 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 					}
 
 					for (IMethodBinding methodBinding : klass.getDeclaredMethods()) {
-						if ((methodBinding.getModifiers() & Modifier.STATIC) != 0 && ASTNodes.usesGivenSignature(methodBinding,
-								klass.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
+						if ((methodBinding.getModifiers() & Modifier.STATIC) != 0
+								&& ASTNodes.usesGivenSignature(methodBinding,
+										klass.getQualifiedName(), methodInvocation.getName().getIdentifier(),
+										remainingParams)) {
 							return true;
 						}
 					}
@@ -228,7 +231,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		Expression calledExpression= methodInvocation.getExpression();
 
 		if (calledExpression == null) {
-			return methodInvocation.resolveMethodBinding() != null && (methodInvocation.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
+			return methodInvocation.resolveMethodBinding() != null
+					&& (methodInvocation.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
 		}
 
 		Name typeName= ASTNodes.as(calledExpression, Name.class);
@@ -283,7 +287,8 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.LambdaCleanUp_description);
 
 		ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
-		ASTNodes.replaceButKeepComment(rewrite, node.getBody(), ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), group);
+		ASTNodes.replaceButKeepComment(rewrite, node.getBody(), ASTNodeFactory.parenthesizeIfNeeded(ast,
+				ASTNodes.createMoveTarget(rewrite, returnStatement.getExpression())), group);
 	}
 
 	private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
