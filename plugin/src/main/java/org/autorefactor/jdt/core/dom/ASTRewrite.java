@@ -390,7 +390,8 @@ public class ASTRewrite {
 	 * @param editGroup        The edit group
 	 * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
 	 */
-	public void insertAt(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert,
+	public void insertAt(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent,
+			final ASTNode nodeToInsert,
 			final int index, final TextEditGroup editGroup) {
 		getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, editGroup);
 		addRefactoredNodes(listHolder);
@@ -433,7 +434,8 @@ public class ASTRewrite {
 	 * @param editGroup        The edit group
 	 * @see ListRewrite#insertFirst(ASTNode, org.eclipse.text.edits.TextEditGroup)
 	 */
-	public void insertFirst(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert, final TextEditGroup editGroup) {
+	public void insertFirst(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent,
+			final ASTNode nodeToInsert, final TextEditGroup editGroup) {
 		getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, editGroup);
 		addRefactoredNodes(listHolder);
 	}
@@ -447,7 +449,8 @@ public class ASTRewrite {
 	 * @param editGroup        The edit group
 	 * @see ListRewrite#insertLast(ASTNode, org.eclipse.text.edits.TextEditGroup)
 	 */
-	public void insertLast(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent, final ASTNode nodeToInsert, final TextEditGroup editGroup) {
+	public void insertLast(final ASTNode listHolder, final StructuralPropertyDescriptor locationInParent,
+			final ASTNode nodeToInsert, final TextEditGroup editGroup) {
 		getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, editGroup);
 		addRefactoredNodes(listHolder);
 	}
@@ -461,7 +464,8 @@ public class ASTRewrite {
 	 *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#createMoveTarget(ASTNode)}
 	 * @param editGroup The edit group
 	 */
-	public void moveToIndex(final ASTNode oldNode, final int newIndex, final ASTNode movedNode, final TextEditGroup editGroup) {
+	public void moveToIndex(final ASTNode oldNode, final int newIndex, final ASTNode movedNode,
+			final TextEditGroup editGroup) {
 		insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex, editGroup);
 	}
 
@@ -496,7 +500,8 @@ public class ASTRewrite {
 	 * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object,
 	 *      org.eclipse.text.edits.TextEditGroup)
 	 */
-	public void set(final ASTNode node, final StructuralPropertyDescriptor property, final Object value, final TextEditGroup editGroup) {
+	public void set(final ASTNode node, final StructuralPropertyDescriptor property, final Object value,
+			final TextEditGroup editGroup) {
 		rewrite.set(node, property, value, editGroup);
 		addRefactoredNodes(node);
 	}

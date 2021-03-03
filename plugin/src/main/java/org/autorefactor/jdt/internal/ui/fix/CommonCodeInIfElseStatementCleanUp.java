@@ -132,7 +132,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 			}
 
 			if (!isMatching) {
-				Pair<Statement, List<Integer>> newPair= Pair.<Statement, List<Integer>>of(currentStatement, new ArrayList<>());
+				Pair<Statement, List<Integer>> newPair= Pair.<Statement, List<Integer>>of(currentStatement,
+						new ArrayList<>());
 				newPair.getSecond().add(i);
 				matchingCases.add(newPair);
 			}
@@ -172,7 +173,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void removeIdenticalTrailingCode(final IfStatement visited, final List<ASTNode> allCases,
-			final List<List<Statement>> allCasesStatements, final List<Statement>[] caseStmtsToRemove, final List<Integer> casesToRefactor) {
+			final List<List<Statement>> allCasesStatements, final List<Statement>[] caseStmtsToRemove,
+			final List<Integer> casesToRefactor) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
@@ -208,7 +210,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 						// => revert if statement
 						IfStatement newIfStatement= ast.newIfStatement();
 						newIfStatement.setExpression(ast.negate(((IfStatement) parent).getExpression(), true));
-						newIfStatement.setThenStatement(ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement()));
+						newIfStatement.setThenStatement(
+								ASTNodes.createMoveTarget(rewrite, ((IfStatement) parent).getElseStatement()));
 						ASTNodes.replaceButKeepComment(rewrite, parent, newIfStatement, group);
 						break;
 					}
@@ -217,7 +220,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 						rewrite.remove(parent, group);
 						break;
 					}
-					ASTNodes.replaceButKeepComment(rewrite, ((IfStatement) parent).getThenStatement(), ast.newBlock(), group);
+					ASTNodes.replaceButKeepComment(rewrite, ((IfStatement) parent).getThenStatement(), ast.newBlock(),
+							group);
 				}
 			}
 
@@ -256,13 +260,15 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	}
 
 	private void removeStmtsFromCases(final List<ASTNode> allCases, final List<List<Statement>> allCasesStatements,
-			final List<Statement>[] caseStmtsToRemove, final boolean[] areCasesRemovable, final List<Integer> casesToRefactor) {
+			final List<Statement>[] caseStmtsToRemove, final boolean[] areCasesRemovable,
+			final List<Integer> casesToRefactor) {
 		for (int i : casesToRefactor) {
 			List<Statement> removedStatements= caseStmtsToRemove[i];
 			ASTNode parent= allCases.get(i);
 
 			if (removedStatements.containsAll(allCasesStatements.get(i))
-					&& (!(parent instanceof IfStatement) || ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
+					&& (!(parent instanceof IfStatement)
+							|| ASTNodes.isPassiveWithoutFallingThrough(((IfStatement) parent).getExpression()))) {
 				areCasesRemovable[i]= true;
 			} else {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.CommonCodeInIfElseStatementCleanUp_description);
@@ -273,7 +279,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 		}
 	}
 
-	private boolean match(final ASTSemanticMatcher matcher, final List<List<Statement>> allCasesStatements, final int stmtIndex, final List<Integer> casesToRefactor) {
+	private boolean match(final ASTSemanticMatcher matcher, final List<List<Statement>> allCasesStatements,
+			final int stmtIndex, final List<Integer> casesToRefactor) {
 		List<Statement> firstCaseToRefactor= allCasesStatements.get(casesToRefactor.get(0));
 
 		for (int i= 1; i < casesToRefactor.size(); i++) {
@@ -313,7 +320,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 	 * @return true if all cases (if/else, if/else if/else, etc.) are covered, false
 	 *         otherwise
 	 */
-	private boolean collectAllCases(final List<List<Statement>> allCasesStatements, final IfStatement node, final List<ASTNode> allCases) {
+	private boolean collectAllCases(final List<List<Statement>> allCasesStatements, final IfStatement node,
+			final List<ASTNode> allCases) {
 		List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
 		List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
 
