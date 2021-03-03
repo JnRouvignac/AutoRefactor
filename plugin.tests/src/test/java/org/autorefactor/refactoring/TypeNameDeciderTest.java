@@ -72,7 +72,8 @@ public class TypeNameDeciderTest {
 	}
 
 	private String useSimplestPossibleName(String qualifiedName) {
-		return new TypeNameDecider(fullyQualifiedName -> new TypeBindingStub(fullyQualifiedName), imports).useSimplestPossibleName(qualifiedName);
+		return new TypeNameDecider(fullyQualifiedName -> new TypeBindingStub(fullyQualifiedName), imports)
+				.useSimplestPossibleName(qualifiedName);
 	}
 
 	private static TreeSet<String> imports(String... imports) {

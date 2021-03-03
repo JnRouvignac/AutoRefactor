@@ -210,7 +210,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 	}
 
 	private void createRefactoringsTable(Composite parent) {
-		tableViewer= CheckboxTableViewer.newCheckList(parent, SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
+		tableViewer= CheckboxTableViewer.newCheckList(parent,
+				SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
 		createColumns(tableViewer);
 		tableViewer.setContentProvider(new ArrayContentProvider());
 		final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
