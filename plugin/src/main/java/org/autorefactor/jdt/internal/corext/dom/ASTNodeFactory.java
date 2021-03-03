@@ -1134,8 +1134,7 @@ public class ASTNodeFactory {
 	 * @return a new prefix expression
 	 */
 	public PrefixExpression newPrefixExpression() {
-		PrefixExpression prefixExpression= ast.newPrefixExpression();
-		return prefixExpression;
+		return ast.newPrefixExpression();
 	}
 
 	private PrefixExpression newPrefixExpression(final PrefixExpression.Operator operator, final Expression operand) {
