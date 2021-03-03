@@ -49,7 +49,7 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         String newNumber[];
         for (int i = 0; i < count; i++) {
             // Keep this comment
-            newNumber = new String[]{String.valueOf(i)};
+            newNumber = new String[] { String.valueOf(i) };
             concat.append(newNumber);
             concat.append(";");
         }

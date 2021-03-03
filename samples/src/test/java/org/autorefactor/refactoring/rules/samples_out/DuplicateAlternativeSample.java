@@ -77,7 +77,8 @@ public class DuplicateAlternativeSample {
         }
     }
 
-    public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean isActive, boolean isValid, boolean isEditMode) {
+    public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean isActive, boolean isValid,
+            boolean isEditMode) {
         // Keep this comment
         // Keep this comment too
         if (isActive && (isValid || isEditMode)) {

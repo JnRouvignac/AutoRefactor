@@ -37,40 +37,43 @@ import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class DuplicateAlternativeCleanUp extends AbstractCleanUpRule {
-    @Override
-    public String getName() {
-        return MultiFixMessages.DuplicateAlternativeCleanUp_name;
-    }
+	@Override
+	public String getName() {
+		return MultiFixMessages.DuplicateAlternativeCleanUp_name;
+	}
 
-    @Override
-    public String getDescription() {
-        return MultiFixMessages.DuplicateAlternativeCleanUp_description;
-    }
+	@Override
+	public String getDescription() {
+		return MultiFixMessages.DuplicateAlternativeCleanUp_description;
+	}
 
-    @Override
-    public String getReason() {
-        return MultiFixMessages.DuplicateAlternativeCleanUp_reason;
-    }
+	@Override
+	public String getReason() {
+		return MultiFixMessages.DuplicateAlternativeCleanUp_reason;
+	}
 
-    @Override
-    public boolean visit(final IfStatement visited) {
+	@Override
+	public boolean visit(final IfStatement visited) {
 		if (visited.getElseStatement() != null) {
-	        IfStatement innerIf= ASTNodes.as(visited.getThenStatement(), IfStatement.class);
+			IfStatement innerIf= ASTNodes.as(visited.getThenStatement(), IfStatement.class);
 
 			if (innerIf != null && innerIf.getElseStatement() != null) {
 				return maybeMergeInnerIf(visited, innerIf, innerIf.getThenStatement(), innerIf.getElseStatement(), true)
-			    		&& maybeMergeInnerIf(visited, innerIf, innerIf.getElseStatement(), innerIf.getThenStatement(), false);
+						&& maybeMergeInnerIf(visited, innerIf, innerIf.getElseStatement(), innerIf.getThenStatement(),
+								false);
 			}
-        }
+		}
 
-        return true;
-    }
+		return true;
+	}
 
 	private boolean maybeMergeInnerIf(final IfStatement visited, final IfStatement innerIf,
-			final Statement innerMainStatement, final Statement innerDuplicateStatement, final boolean isInnerMainFirst) {
+			final Statement innerMainStatement, final Statement innerDuplicateStatement,
+			final boolean isInnerMainFirst) {
 		if (!ASTNodes.asList(visited.getElseStatement()).isEmpty()
 				&& ASTNodes.match(visited.getElseStatement(), innerDuplicateStatement)
-				&& ASTNodes.getNbOperands(visited.getExpression()) + ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+				&& ASTNodes.getNbOperands(visited.getExpression())
+						+ ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
 			replaceIfNoElseStatement(visited, innerIf, innerMainStatement, isInnerMainFirst);
 			return false;
 		}
@@ -78,11 +81,11 @@ public class DuplicateAlternativeCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-    private void replaceIfNoElseStatement(final IfStatement visited, final IfStatement innerIf,
+	private void replaceIfNoElseStatement(final IfStatement visited, final IfStatement innerIf,
 			final Statement innerMainStatement, final boolean isInnerMainFirst) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-        ASTNodeFactory ast= cuRewrite.getASTBuilder();
-        TextEditGroup group= new TextEditGroup(MultiFixMessages.DuplicateAlternativeCleanUp_description);
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.DuplicateAlternativeCleanUp_description);
 
 		if (visited.getThenStatement() instanceof Block || innerMainStatement instanceof Block) {
 			InfixExpression newInfixExpression= ast.newInfixExpression();
@@ -95,11 +98,13 @@ public class DuplicateAlternativeCleanUp extends AbstractCleanUpRule {
 			}
 
 			newInfixExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, outerCondition));
-			newInfixExpression.setOperator(isInnerMainFirst ? InfixExpression.Operator.CONDITIONAL_AND : InfixExpression.Operator.CONDITIONAL_OR);
-			newInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
+			newInfixExpression.setOperator(isInnerMainFirst ? InfixExpression.Operator.CONDITIONAL_AND
+					: InfixExpression.Operator.CONDITIONAL_OR);
+			newInfixExpression.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast,
+					ASTNodes.createMoveTarget(rewrite, innerIf.getExpression())));
 
 			ASTNodes.replaceButKeepComment(rewrite, innerIf.getExpression(), newInfixExpression, group);
-	        ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, innerIf), group);
+			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, innerIf), group);
 		} else {
 			// Workaround: Do not do the cleanup
 			// Prepare the code for the next pass

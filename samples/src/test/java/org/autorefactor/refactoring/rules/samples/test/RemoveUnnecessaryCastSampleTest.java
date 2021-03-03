@@ -91,7 +91,8 @@ public class RemoveUnnecessaryCastSampleTest {
         int i = Integer.MAX_VALUE;
         int j = Integer.MAX_VALUE;
         int k = Integer.MAX_VALUE;
-        assertEquals(sampleIn.doNotRemoveWideningCastsWithExtendedOperands(i, j, k), sampleOut.doNotRemoveWideningCastsWithExtendedOperands(i, j, k));
+        assertEquals(sampleIn.doNotRemoveWideningCastsWithExtendedOperands(i, j, k),
+                sampleOut.doNotRemoveWideningCastsWithExtendedOperands(i, j, k));
     }
 
     @Test
