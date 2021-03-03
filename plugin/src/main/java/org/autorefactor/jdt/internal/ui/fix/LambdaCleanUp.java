@@ -209,7 +209,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 					}
 
 					for (IMethodBinding methodBinding : klass.getDeclaredMethods()) {
-						if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && ASTNodes.usesGivenSignature(methodBinding,
+						if ((methodBinding.getModifiers() & Modifier.STATIC) != 0 && ASTNodes.usesGivenSignature(methodBinding,
 								klass.getQualifiedName(), methodInvocation.getName().getIdentifier(), remainingParams)) {
 							return true;
 						}
