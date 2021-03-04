@@ -1056,7 +1056,7 @@ public class ASTNodeFactory {
 			Boolean constant= ASTNodes.getBooleanLiteral(unparenthesedExpression);
 
 			if (constant != null) {
-				return newBooleanLiteral(!constant.booleanValue());
+				return newBooleanLiteral(!constant);
 			}
 		}
 
