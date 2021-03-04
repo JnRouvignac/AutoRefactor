@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.List;
 
 public class SubstringWithOneParameterRatherThanTwoSample {
-	private String textInInstance = "foo";
+    private String textInInstance = "foo";
 
     public String reduceSubstring(String text) {
         // Keep this comment
