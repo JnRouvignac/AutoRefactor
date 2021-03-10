@@ -389,6 +389,18 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
+	public static String RedundantComparatorCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String RedundantComparatorCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String RedundantComparatorCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
 	public static String DoubleCompareRatherThanEqualityCleanUp_name;
 	/**
 	 * Automatically filled.
