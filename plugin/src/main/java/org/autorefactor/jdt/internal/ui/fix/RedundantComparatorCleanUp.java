@@ -90,129 +90,135 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 				if (typeArguments != null
 						&& typeArguments.length == 1
 								&& isComparable(typeArguments[0])) {
-					String elementClass= typeArguments[0].isWildcardType() ? Comparable.class.getCanonicalName() : typeArguments[0].getQualifiedName();
-					MethodReference methodReference= ASTNodes.as(comparator, MethodReference.class);
-					LambdaExpression lambdaExpression= ASTNodes.as(comparator, LambdaExpression.class);
-					MethodInvocation methodInvocation= ASTNodes.as(comparator, MethodInvocation.class);
-					ClassInstanceCreation classInstanceCreation= ASTNodes.as(comparator, ClassInstanceCreation.class);
-
-					if (methodReference != null) {
-						if (ASTNodes.usesGivenSignature(methodReference.resolveMethodBinding(), elementClass, "compareTo", Object.class.getCanonicalName())) { //$NON-NLS-1$
-							removeComparator(comparator);
-							return false;
-						}
-					} else if (methodInvocation != null) {
-						if (ASTNodes.usesGivenSignature(methodInvocation, Comparator.class.getCanonicalName(), "naturalOrder")) { //$NON-NLS-1$
-							removeComparator(comparator);
-							return false;
-						}
-
-						if ("comparing".equals(methodInvocation.getName().getIdentifier()) //$NON-NLS-1$
-								&& methodInvocation.resolveMethodBinding() != null
-								&& methodInvocation.resolveMethodBinding().getParameterTypes().length == 1
-								&& ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Comparator.class.getCanonicalName())
-								&& ASTNodes.hasType(methodInvocation.resolveMethodBinding().getParameterTypes()[0], Function.class.getCanonicalName())) {
-							List<Expression> comparingMethodArgs= methodInvocation.arguments();
-							Expression criteria= comparingMethodArgs.get(0);
-							LambdaExpression comparingMethodLambdaExpression= ASTNodes.as(criteria, LambdaExpression.class);
-							MethodInvocation identityMethod= ASTNodes.as(criteria, MethodInvocation.class);
-
-							if (comparingMethodLambdaExpression != null) {
-								if (comparingMethodLambdaExpression.parameters().size() == 1) {
-									List<ASTNode> parameters= comparingMethodLambdaExpression.parameters();
-									ASTNode item= parameters.get(0);
-
-									SimpleName variable;
-									if (item instanceof SingleVariableDeclaration) {
-										variable= ((SingleVariableDeclaration) item).getName();
-									} else if (item instanceof VariableDeclarationFragment) {
-										variable= ((VariableDeclarationFragment) item).getName();
-									} else {
-										return true;
-									}
-
-									Expression bodyExpression= null;
-
-									if (comparingMethodLambdaExpression.getBody() instanceof Block) {
-										ReturnStatement returnStatement= ASTNodes.as((Block) comparingMethodLambdaExpression.getBody(), ReturnStatement.class);
-
-										if (returnStatement == null) {
-											return true;
-										}
-
-										bodyExpression= returnStatement.getExpression();
-									} else if (comparingMethodLambdaExpression.getBody() instanceof Expression) {
-										bodyExpression= (Expression) comparingMethodLambdaExpression.getBody();
-									} else {
-										return true;
-									}
-
-									if (ASTNodes.areSameVariables(variable, bodyExpression)) {
-										removeComparator(comparator);
-										return false;
-									}
-								}
-							} else if (identityMethod != null
-									&& "identity".equals(identityMethod.getName().getIdentifier()) //$NON-NLS-1$
-									&& identityMethod.resolveMethodBinding() != null
-									&& identityMethod.resolveMethodBinding().getParameterTypes().length == 0
-									&& ASTNodes.hasType(identityMethod.resolveMethodBinding().getDeclaringClass(), Function.class.getCanonicalName())) {
-								removeComparator(comparator);
-								return false;
-							}
-						}
-					} else if (lambdaExpression != null) {
-						if (lambdaExpression.parameters().size() == 2) {
-							List<ASTNode> parameters= lambdaExpression.parameters();
-							ASTNode parameter1= parameters.get(0);
-							ASTNode parameter2= parameters.get(1);
-
-							SimpleName variable1;
-							if (parameter1 instanceof SingleVariableDeclaration) {
-								variable1= ((SingleVariableDeclaration) parameter1).getName();
-							} else if (parameter1 instanceof VariableDeclarationFragment) {
-								variable1= ((VariableDeclarationFragment) parameter1).getName();
-							} else {
-								return true;
-							}
-
-							SimpleName variable2;
-							if (parameter2 instanceof SingleVariableDeclaration) {
-								variable2= ((SingleVariableDeclaration) parameter2).getName();
-							} else if (parameter2 instanceof VariableDeclarationFragment) {
-								variable2= ((VariableDeclarationFragment) parameter2).getName();
-							} else {
-								return true;
-							}
-
-							Expression bodyExpression= null;
-
-							if (lambdaExpression.getBody() instanceof Block) {
-								ReturnStatement returnStatement= ASTNodes.as((Block) lambdaExpression.getBody(), ReturnStatement.class);
-
-								if (returnStatement == null) {
-									return true;
-								}
-
-								bodyExpression= returnStatement.getExpression();
-							} else if (lambdaExpression.getBody() instanceof Expression) {
-								bodyExpression= (Expression) lambdaExpression.getBody();
-							} else {
-								return true;
-							}
-
-							if (isReturnedExpressionToRemove(variable1, variable2, bodyExpression, true)) {
-								removeComparator(comparator);
-								return false;
-							}
-						}
-					} else if (classInstanceCreation != null
-							&& isClassToRemove(classInstanceCreation)) {
-						removeComparator(comparator);
-						return false;
-					}
+					return maybeRefactorCode(comparator, comparator, typeArguments, true);
 				}
 			}
+		}
+
+		return true;
+	}
+
+	private boolean maybeRefactorCode(final Expression comparatorToRemove, final Expression comparatorToAnalyze, final ITypeBinding[] typeArguments, final boolean isForward) {
+		MethodReference methodReference= ASTNodes.as(comparatorToAnalyze, MethodReference.class);
+		LambdaExpression lambdaExpression= ASTNodes.as(comparatorToAnalyze, LambdaExpression.class);
+		MethodInvocation methodInvocation= ASTNodes.as(comparatorToAnalyze, MethodInvocation.class);
+		ClassInstanceCreation classInstanceCreation= ASTNodes.as(comparatorToAnalyze, ClassInstanceCreation.class);
+
+		if (methodReference != null) {
+			String elementClass= typeArguments[0].isWildcardType() ? Comparable.class.getCanonicalName() : typeArguments[0].getQualifiedName();
+
+			if (ASTNodes.usesGivenSignature(methodReference.resolveMethodBinding(), elementClass, "compareTo", Object.class.getCanonicalName())) { //$NON-NLS-1$
+				return maybeRemoveComparator(comparatorToRemove, isForward);
+			}
+		} else if (methodInvocation != null) {
+			if (ASTNodes.usesGivenSignature(methodInvocation, Comparator.class.getCanonicalName(), "reversed") //$NON-NLS-1$
+					&& methodInvocation.getExpression() != null) {
+				return maybeRefactorCode(comparatorToRemove, methodInvocation.getExpression(), typeArguments, !isForward);
+			}
+
+			if (ASTNodes.usesGivenSignature(methodInvocation, Comparator.class.getCanonicalName(), "naturalOrder")) { //$NON-NLS-1$
+				return maybeRemoveComparator(comparatorToRemove, isForward);
+			}
+
+			if ("comparing".equals(methodInvocation.getName().getIdentifier()) //$NON-NLS-1$
+					&& methodInvocation.resolveMethodBinding() != null
+					&& methodInvocation.resolveMethodBinding().getParameterTypes().length == 1
+					&& ASTNodes.hasType(methodInvocation.resolveMethodBinding().getDeclaringClass(), Comparator.class.getCanonicalName())
+					&& ASTNodes.hasType(methodInvocation.resolveMethodBinding().getParameterTypes()[0], Function.class.getCanonicalName())) {
+				List<Expression> comparingMethodArgs= methodInvocation.arguments();
+				Expression criteria= comparingMethodArgs.get(0);
+				LambdaExpression comparingMethodLambdaExpression= ASTNodes.as(criteria, LambdaExpression.class);
+				MethodInvocation identityMethod= ASTNodes.as(criteria, MethodInvocation.class);
+
+				if (comparingMethodLambdaExpression != null) {
+					if (comparingMethodLambdaExpression.parameters().size() == 1) {
+						List<ASTNode> parameters= comparingMethodLambdaExpression.parameters();
+						ASTNode item= parameters.get(0);
+
+						SimpleName variable;
+						if (item instanceof SingleVariableDeclaration) {
+							variable= ((SingleVariableDeclaration) item).getName();
+						} else if (item instanceof VariableDeclarationFragment) {
+							variable= ((VariableDeclarationFragment) item).getName();
+						} else {
+							return true;
+						}
+
+						Expression bodyExpression= null;
+
+						if (comparingMethodLambdaExpression.getBody() instanceof Block) {
+							ReturnStatement returnStatement= ASTNodes.as((Block) comparingMethodLambdaExpression.getBody(), ReturnStatement.class);
+
+							if (returnStatement == null) {
+								return true;
+							}
+
+							bodyExpression= returnStatement.getExpression();
+						} else if (comparingMethodLambdaExpression.getBody() instanceof Expression) {
+							bodyExpression= (Expression) comparingMethodLambdaExpression.getBody();
+						} else {
+							return true;
+						}
+
+						if (ASTNodes.areSameVariables(variable, bodyExpression)) {
+							return maybeRemoveComparator(comparatorToRemove, isForward);
+						}
+					}
+				} else if (identityMethod != null
+						&& "identity".equals(identityMethod.getName().getIdentifier()) //$NON-NLS-1$
+						&& identityMethod.resolveMethodBinding() != null
+						&& identityMethod.resolveMethodBinding().getParameterTypes().length == 0
+						&& ASTNodes.hasType(identityMethod.resolveMethodBinding().getDeclaringClass(), Function.class.getCanonicalName())) {
+					return maybeRemoveComparator(comparatorToRemove, isForward);
+				}
+			}
+		} else if (lambdaExpression != null) {
+			if (lambdaExpression.parameters().size() == 2) {
+				List<ASTNode> parameters= lambdaExpression.parameters();
+				ASTNode parameter1= parameters.get(0);
+				ASTNode parameter2= parameters.get(1);
+
+				SimpleName variable1;
+				if (parameter1 instanceof SingleVariableDeclaration) {
+					variable1= ((SingleVariableDeclaration) parameter1).getName();
+				} else if (parameter1 instanceof VariableDeclarationFragment) {
+					variable1= ((VariableDeclarationFragment) parameter1).getName();
+				} else {
+					return true;
+				}
+
+				SimpleName variable2;
+				if (parameter2 instanceof SingleVariableDeclaration) {
+					variable2= ((SingleVariableDeclaration) parameter2).getName();
+				} else if (parameter2 instanceof VariableDeclarationFragment) {
+					variable2= ((VariableDeclarationFragment) parameter2).getName();
+				} else {
+					return true;
+				}
+
+				Expression bodyExpression= null;
+
+				if (lambdaExpression.getBody() instanceof Block) {
+					ReturnStatement returnStatement= ASTNodes.as((Block) lambdaExpression.getBody(), ReturnStatement.class);
+
+					if (returnStatement == null) {
+						return true;
+					}
+
+					bodyExpression= returnStatement.getExpression();
+				} else if (lambdaExpression.getBody() instanceof Expression) {
+					bodyExpression= (Expression) lambdaExpression.getBody();
+				} else {
+					return true;
+				}
+
+				if (isReturnedExpressionToRemove(variable1, variable2, bodyExpression, isForward)) {
+					return maybeRemoveComparator(comparatorToRemove, true);
+				}
+			}
+		} else if (classInstanceCreation != null
+				&& isClassToRemove(classInstanceCreation, isForward)) {
+			return maybeRemoveComparator(comparatorToRemove, true);
 		}
 
 		return true;
@@ -238,7 +244,7 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private boolean isClassToRemove(final ClassInstanceCreation classInstanceCreation) {
+	private boolean isClassToRemove(final ClassInstanceCreation classInstanceCreation, final boolean isForward) {
 		AnonymousClassDeclaration anonymousClassDecl= classInstanceCreation.getAnonymousClassDeclaration();
 		Type type= classInstanceCreation.getType();
 
@@ -269,7 +275,7 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 						VariableDeclaration object2= (VariableDeclaration) methodDecl.parameters().get(1);
 
 						return isReturnedExpressionToRemove(object1.getName(), object2.getName(),
-								returnStatement.getExpression(), true);
+								returnStatement.getExpression(), isForward);
 					}
 				}
 			}
@@ -326,6 +332,15 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 		}
 
 		return false;
+	}
+
+	private boolean maybeRemoveComparator(final Expression comparatorToRemove, final boolean isForward) {
+		if (isForward) {
+			removeComparator(comparatorToRemove);
+			return false;
+		}
+
+		return true;
 	}
 
 	private void removeComparator(final Expression comparator) {

@@ -150,6 +150,19 @@ public class RedundantComparatorSample {
         return listToSort;
     }
 
+    public List<Date> removeTwiceReversedComparatorClass(List<Date> listToSort) {
+        // Keep this comment
+        Collections.sort(listToSort, new Comparator<Date>() {
+            @Override
+            public int compare(Date o1, Date o2) {
+                return o2.compareTo(o1);
+            }
+
+        }.reversed());
+
+        return listToSort;
+    }
+
     public List<String> doNotRemoveComparatorWithoutCompareToMethod(List<String> listToSort) {
         Collections.sort(listToSort, new Comparator<String>() {
             @Override
