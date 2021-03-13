@@ -29,10 +29,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -41,6 +44,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -56,7 +60,15 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
+public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
+	private final class RefactoringWithCollectionsClass extends CleanUpWithNewClassImport {
+		@Override
+		public boolean visit(final MethodInvocation visited) {
+			return maybeRefactorForStatement(visited,
+					getClassesToUseWithImport(), getImportsToAdd());
+		}
+	}
+
 	@Override
 	public String getName() {
 		return MultiFixMessages.RedundantComparatorCleanUp_name;
@@ -73,32 +85,70 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
+	public RefactoringWithCollectionsClass getRefactoringClassInstance() {
+		return new RefactoringWithCollectionsClass();
+	}
+
+	@Override
+	public Set<String> getClassesToImport() {
+		return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
+	}
+
+	@Override
 	public boolean visit(final MethodInvocation visited) {
-		if (visited.resolveMethodBinding() != null
-				&& visited.resolveMethodBinding().getParameterTypes().length == 2
-				&& ASTNodes.hasType(visited.resolveMethodBinding().getDeclaringClass(), Collections.class.getCanonicalName())
-				&& ("sort".equals(visited.getName().getIdentifier()) && ASTNodes.hasType(visited.resolveMethodBinding().getParameterTypes()[0], List.class.getCanonicalName()) //$NON-NLS-1$
-						|| Arrays.asList("max", "min").contains(visited.getName().getIdentifier()) && ASTNodes.hasType(visited.resolveMethodBinding().getParameterTypes()[0], Collection.class.getCanonicalName())) //$NON-NLS-1$ //$NON-NLS-2$
-				&& ASTNodes.hasType(visited.resolveMethodBinding().getParameterTypes()[1], Comparator.class.getCanonicalName())) {
-			List<Expression> args= visited.arguments();
-			Expression list= args.get(0);
-			Expression comparator= args.get(1);
+		return maybeRefactorForStatement(visited, getAlreadyImportedClasses(visited), new HashSet<String>());
+	}
 
-			if (list.resolveTypeBinding() != null) {
-				ITypeBinding[] typeArguments= list.resolveTypeBinding().getTypeArguments();
+	private boolean maybeRefactorForStatement(final MethodInvocation visited, final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
+		IMethodBinding methodBinding= visited.resolveMethodBinding();
 
-				if (typeArguments != null
-						&& typeArguments.length == 1
-								&& isComparable(typeArguments[0])) {
-					return maybeRefactorCode(comparator, comparator, typeArguments, true);
-				}
+		if (methodBinding != null) {
+			if (methodBinding.getParameterTypes().length == 2
+					&& ASTNodes.hasType(methodBinding.getDeclaringClass(), Collections.class.getCanonicalName())
+					&& ("sort".equals(visited.getName().getIdentifier()) && ASTNodes.hasType(methodBinding.getParameterTypes()[0], List.class.getCanonicalName()) //$NON-NLS-1$
+							|| Arrays.asList("max", "min").contains(visited.getName().getIdentifier()) && ASTNodes.hasType(methodBinding.getParameterTypes()[0], Collection.class.getCanonicalName())) //$NON-NLS-1$ //$NON-NLS-2$
+					&& ASTNodes.hasType(methodBinding.getParameterTypes()[1], Comparator.class.getCanonicalName())) {
+				List<Expression> args= visited.arguments();
+				return maybeRefactorCode(null, args.get(0), args.get(1), classesToUseWithImport, importsToAdd);
+			}
+
+			if (visited.getExpression() != null
+					&& methodBinding.getParameterTypes().length == 1
+					&& "sort".equals(visited.getName().getIdentifier()) //$NON-NLS-1$
+					&& ASTNodes.hasType(methodBinding.getDeclaringClass(), List.class.getCanonicalName())
+					&& ASTNodes.hasType(methodBinding.getParameterTypes()[0], Comparator.class.getCanonicalName())) {
+				List<Expression> args= visited.arguments();
+				return maybeRefactorCode(visited, visited.getExpression(), args.get(0), classesToUseWithImport, importsToAdd);
 			}
 		}
 
 		return true;
 	}
 
-	private boolean maybeRefactorCode(final Expression comparatorToRemove, final Expression comparatorToAnalyze, final ITypeBinding[] typeArguments, final boolean isForward) {
+	private boolean maybeRefactorCode(final MethodInvocation visitedIfRefactoringNeeded, final Expression list, final Expression comparator, final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+		if (list.resolveTypeBinding() != null) {
+			ITypeBinding[] typeArguments= list.resolveTypeBinding().getTypeArguments();
+
+			if (typeArguments != null
+					&& typeArguments.length == 1
+					&& isComparable(typeArguments[0])) {
+				return maybeRefactorTypedCode(visitedIfRefactoringNeeded, list, comparator, comparator, typeArguments, true, classesToUseWithImport, importsToAdd);
+			}
+		}
+
+		return true;
+	}
+
+	private boolean maybeRefactorTypedCode(
+			final MethodInvocation visitedIfRefactoringNeeded,
+			final Expression list,
+			final Expression comparatorToRemove,
+			final Expression comparatorToAnalyze,
+			final ITypeBinding[] typeArguments,
+			final boolean isForward,
+			final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
 		MethodReference methodReference= ASTNodes.as(comparatorToAnalyze, MethodReference.class);
 		LambdaExpression lambdaExpression= ASTNodes.as(comparatorToAnalyze, LambdaExpression.class);
 		MethodInvocation methodInvocation= ASTNodes.as(comparatorToAnalyze, MethodInvocation.class);
@@ -108,16 +158,16 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 			String elementClass= typeArguments[0].isWildcardType() ? Comparable.class.getCanonicalName() : typeArguments[0].getQualifiedName();
 
 			if (ASTNodes.usesGivenSignature(methodReference.resolveMethodBinding(), elementClass, "compareTo", Object.class.getCanonicalName())) { //$NON-NLS-1$
-				return maybeRemoveComparator(comparatorToRemove, isForward);
+				return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, isForward, classesToUseWithImport, importsToAdd);
 			}
 		} else if (methodInvocation != null) {
 			if (ASTNodes.usesGivenSignature(methodInvocation, Comparator.class.getCanonicalName(), "reversed") //$NON-NLS-1$
 					&& methodInvocation.getExpression() != null) {
-				return maybeRefactorCode(comparatorToRemove, methodInvocation.getExpression(), typeArguments, !isForward);
+				return maybeRefactorTypedCode(visitedIfRefactoringNeeded, list, comparatorToRemove, methodInvocation.getExpression(), typeArguments, !isForward, classesToUseWithImport, importsToAdd);
 			}
 
 			if (ASTNodes.usesGivenSignature(methodInvocation, Comparator.class.getCanonicalName(), "naturalOrder")) { //$NON-NLS-1$
-				return maybeRemoveComparator(comparatorToRemove, isForward);
+				return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, isForward, classesToUseWithImport, importsToAdd);
 			}
 
 			if ("comparing".equals(methodInvocation.getName().getIdentifier()) //$NON-NLS-1$
@@ -132,17 +182,8 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 
 				if (comparingMethodLambdaExpression != null) {
 					if (comparingMethodLambdaExpression.parameters().size() == 1) {
-						List<ASTNode> parameters= comparingMethodLambdaExpression.parameters();
-						ASTNode item= parameters.get(0);
-
-						SimpleName variable;
-						if (item instanceof SingleVariableDeclaration) {
-							variable= ((SingleVariableDeclaration) item).getName();
-						} else if (item instanceof VariableDeclarationFragment) {
-							variable= ((VariableDeclarationFragment) item).getName();
-						} else {
-							return true;
-						}
+						List<VariableDeclaration> parameters= comparingMethodLambdaExpression.parameters();
+						SimpleName variable= parameters.get(0).getName();
 
 						Expression bodyExpression= null;
 
@@ -161,7 +202,7 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 						}
 
 						if (ASTNodes.areSameVariables(variable, bodyExpression)) {
-							return maybeRemoveComparator(comparatorToRemove, isForward);
+							return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, isForward, classesToUseWithImport, importsToAdd);
 						}
 					}
 				} else if (identityMethod != null
@@ -169,7 +210,7 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 						&& identityMethod.resolveMethodBinding() != null
 						&& identityMethod.resolveMethodBinding().getParameterTypes().length == 0
 						&& ASTNodes.hasType(identityMethod.resolveMethodBinding().getDeclaringClass(), Function.class.getCanonicalName())) {
-					return maybeRemoveComparator(comparatorToRemove, isForward);
+					return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, isForward, classesToUseWithImport, importsToAdd);
 				}
 			}
 		} else if (lambdaExpression != null) {
@@ -213,18 +254,18 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 				}
 
 				if (isReturnedExpressionToRemove(variable1, variable2, bodyExpression, isForward)) {
-					return maybeRemoveComparator(comparatorToRemove, true);
+					return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, true, classesToUseWithImport, importsToAdd);
 				}
 			}
 		} else if (classInstanceCreation != null
 				&& isClassToRemove(classInstanceCreation, isForward)) {
-			return maybeRemoveComparator(comparatorToRemove, true);
+			return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, true, classesToUseWithImport, importsToAdd);
 		}
 
 		return true;
 	}
 
-	private boolean isComparable(ITypeBinding classBinding) {
+	private boolean isComparable(final ITypeBinding classBinding) {
 		if ("java.lang.Comparable".equals(classBinding.getErasure().getQualifiedName())) { //$NON-NLS-1$
 			return true;
 		}
@@ -334,19 +375,42 @@ public class RedundantComparatorCleanUp extends AbstractCleanUpRule {
 		return false;
 	}
 
-	private boolean maybeRemoveComparator(final Expression comparatorToRemove, final boolean isForward) {
+	private boolean maybeRemoveComparator(
+			final MethodInvocation visitedIfRefactoringNeeded,
+			final Expression list,
+			final Expression comparatorToRemove,
+			final boolean isForward,
+			final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
 		if (isForward) {
-			removeComparator(comparatorToRemove);
+			removeComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, classesToUseWithImport, importsToAdd);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void removeComparator(final Expression comparator) {
+	private void removeComparator(
+			final MethodInvocation visitedIfRefactoringNeeded,
+			final Expression list,
+			final Expression comparator,
+			final Set<String> classesToUseWithImport,
+			final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantComparatorCleanUp_description);
 
-		rewrite.removeButKeepComment(comparator, group);
+		if (visitedIfRefactoringNeeded != null) {
+			String collectionsClassname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
+
+			MethodInvocation sortMethod= ast.newMethodInvocation();
+			sortMethod.setExpression(ASTNodeFactory.newName(ast, collectionsClassname));
+			sortMethod.setName(ast.newSimpleName("sort")); //$NON-NLS-1$
+			sortMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(list)));
+
+			ASTNodes.replaceButKeepComment(rewrite, visitedIfRefactoringNeeded, sortMethod, group);
+		} else {
+			rewrite.removeButKeepComment(comparator, group);
+		}
 	}
 }
