@@ -137,6 +137,13 @@ public class RedundantComparatorSample {
         return listToSort;
     }
 
+    public List<Date> removeNullComparator(List<Date> listToSort) {
+        // Keep this comment
+        Collections.sort(listToSort, null);
+
+        return listToSort;
+    }
+
     public List<BigDecimal> removeOpposedComparatorClass(List<BigDecimal> listToSort) {
         // Keep this comment
         Collections.sort(listToSort, new Comparator<BigDecimal>() {

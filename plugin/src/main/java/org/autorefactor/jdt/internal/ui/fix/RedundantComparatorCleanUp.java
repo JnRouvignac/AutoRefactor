@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.MethodReference;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -149,10 +150,22 @@ public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
 			final boolean isForward,
 			final Set<String> classesToUseWithImport,
 			final Set<String> importsToAdd) {
+		NullLiteral nullLiteral= ASTNodes.as(comparatorToAnalyze, NullLiteral.class);
+
+		if (nullLiteral != null) {
+			return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, isForward, classesToUseWithImport, importsToAdd);
+		}
+
+		ClassInstanceCreation classInstanceCreation= ASTNodes.as(comparatorToAnalyze, ClassInstanceCreation.class);
+
+		if (classInstanceCreation != null
+				&& isClassToRemove(classInstanceCreation, isForward)) {
+			return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, true, classesToUseWithImport, importsToAdd);
+		}
+
 		MethodReference methodReference= ASTNodes.as(comparatorToAnalyze, MethodReference.class);
 		LambdaExpression lambdaExpression= ASTNodes.as(comparatorToAnalyze, LambdaExpression.class);
 		MethodInvocation methodInvocation= ASTNodes.as(comparatorToAnalyze, MethodInvocation.class);
-		ClassInstanceCreation classInstanceCreation= ASTNodes.as(comparatorToAnalyze, ClassInstanceCreation.class);
 
 		if (methodReference != null) {
 			String elementClass= typeArguments[0].isWildcardType() ? Comparable.class.getCanonicalName() : typeArguments[0].getQualifiedName();
@@ -257,9 +270,6 @@ public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
 					return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, true, classesToUseWithImport, importsToAdd);
 				}
 			}
-		} else if (classInstanceCreation != null
-				&& isClassToRemove(classInstanceCreation, isForward)) {
-			return maybeRemoveComparator(visitedIfRefactoringNeeded, list, comparatorToRemove, true, classesToUseWithImport, importsToAdd);
 		}
 
 		return true;
