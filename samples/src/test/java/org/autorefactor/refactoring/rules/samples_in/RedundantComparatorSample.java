@@ -118,14 +118,18 @@ public class RedundantComparatorSample {
 
     public List<Date> removeComparingBody(List<Date> listToSort) {
         // Keep this comment
-        Collections.sort(listToSort, Comparator.comparing((Date d) -> {return d;}));
+        Collections.sort(listToSort, Comparator.comparing((Date d) -> {
+            return d;
+        }));
 
         return listToSort;
     }
 
     public List<Date> removeUntypedParameter(List<Date> listToSort) {
         // Keep this comment
-        Collections.sort(listToSort, Comparator.comparing(d -> {return d;}));
+        Collections.sort(listToSort, Comparator.comparing(d -> {
+            return d;
+        }));
 
         return listToSort;
     }
