@@ -65,14 +65,30 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 
 	static {
 		CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(List.class.getCanonicalName(), new String[] { List.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(AbstractList.class.getCanonicalName(), new String[] { AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(LinkedList.class.getCanonicalName(), new String[] { LinkedList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-		CAN_BE_CASTED_TO.put(ArrayList.class.getCanonicalName(), new String[] { ArrayList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(),
+				new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(),
+				new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(),
+				new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(List.class.getCanonicalName(),
+				new String[] { List.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(AbstractList.class.getCanonicalName(),
+				new String[] { AbstractList.class.getCanonicalName(), List.class.getCanonicalName(),
+						Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(),
+				new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(),
+						Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(LinkedList.class.getCanonicalName(),
+				new String[] { LinkedList.class.getCanonicalName(), AbstractList.class.getCanonicalName(),
+						List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(),
+						Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(),
+						Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+		CAN_BE_CASTED_TO.put(ArrayList.class.getCanonicalName(),
+				new String[] { ArrayList.class.getCanonicalName(), AbstractList.class.getCanonicalName(),
+						List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(),
+						Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(),
+						Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
 	}
 
 	private boolean isContainsMethodUsed;
@@ -110,10 +126,12 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 
 	@Override
 	protected String getSubstitutingClassName(final String origRawType) {
-		if (ArrayList.class.getCanonicalName().equals(origRawType) || LinkedList.class.getCanonicalName().equals(origRawType)) {
+		if (ArrayList.class.getCanonicalName().equals(origRawType)
+				|| LinkedList.class.getCanonicalName().equals(origRawType)) {
 			return HashSet.class.getCanonicalName();
 		}
-		if (AbstractList.class.getCanonicalName().equals(origRawType) || List.class.getCanonicalName().equals(origRawType)) {
+		if (AbstractList.class.getCanonicalName().equals(origRawType)
+				|| List.class.getCanonicalName().equals(origRawType)) {
 			return Set.class.getCanonicalName();
 		}
 
@@ -133,33 +151,43 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 	@Override
 	protected boolean canMethodBeRefactored(final MethodInvocation methodInvocation,
 			final List<MethodInvocation> methodCallsToRefactor) {
-		if (ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", //$NON-NLS-1$
+				Object.class.getCanonicalName())) {
 			isContainsMethodUsed= true;
 		}
 
-		if (ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "add", //$NON-NLS-1$
+				int.class.getSimpleName(), Object.class.getCanonicalName())
+				|| ASTNodes.usesGivenSignature(methodInvocation, List.class.getCanonicalName(), "addAll", //$NON-NLS-1$
+						int.class.getSimpleName(), Collection.class.getCanonicalName())) {
 			methodCallsToRefactor.add(methodInvocation);
 			return true;
 		}
 
-		return ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+		return ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "add", //$NON-NLS-1$
+				Object.class.getCanonicalName())
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "addAll", //$NON-NLS-1$
+						Collection.class.getCanonicalName())
 				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "contains", //$NON-NLS-1$
+						Object.class.getCanonicalName())
 				|| ASTNodes.usesGivenSignature(methodInvocation, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$
 				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", //$NON-NLS-1$
+						long.class.getSimpleName())
+				|| ASTNodes.usesGivenSignature(methodInvocation, Object.class.getCanonicalName(), "wait", //$NON-NLS-1$
+						long.class.getSimpleName(), int.class.getSimpleName());
 	}
 
 	@Override
 	protected void refactorMethod(final MethodInvocation originalMi, final MethodInvocation refactoredMi) {
-		if (ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) { //$NON-NLS-1$
+		if (ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), //$NON-NLS-1$
+				Object.class.getCanonicalName())
+				|| ASTNodes.usesGivenSignature(originalMi, List.class.getCanonicalName(), "addAll", //$NON-NLS-1$
+						int.class.getSimpleName(), Collection.class.getCanonicalName())) {
 			List<Expression> args= refactoredMi.arguments();
 			Expression item= args.get(1);
 			args.clear();
