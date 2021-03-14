@@ -51,7 +51,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 		@Override
 		public boolean visit(final Block visited) {
 			isContainsMethodUsed= false;
-			return SetRatherThanListCleanUp.this.maybeRefactorBlock(visited,
+			return maybeRefactorBlock(visited,
 					getClassesToUseWithImport(), getImportsToAdd());
 		}
 	}
