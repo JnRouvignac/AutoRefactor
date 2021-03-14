@@ -132,7 +132,7 @@ public class RefactoringRulesTest {
 	}
 
 	private void given(final String sampleInSource, final String sampleOutSource) {
-		String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		String actual= normalizeJavaSourceCode(sampleInSource.replace("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
 		String expected= normalizeJavaSourceCode(sampleOutSource);
 		assertNotEquals(testName + ": verify nothing;", expected, actual); //$NON-NLS-1$
 	}
@@ -152,7 +152,7 @@ public class RefactoringRulesTest {
 	}
 
 	private void then(final String sampleOutSource, final IDocument doc) {
-		String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		String actual= normalizeJavaSourceCode(doc.get().replace("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
 		String expected= normalizeJavaSourceCode(sampleOutSource);
 		assertEquals(testName + ": wrong output;", expected, actual); //$NON-NLS-1$
 	}

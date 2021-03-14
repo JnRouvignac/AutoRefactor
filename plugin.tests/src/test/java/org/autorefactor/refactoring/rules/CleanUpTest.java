@@ -109,7 +109,7 @@ public class CleanUpTest {
 	}
 
 	private void given(final String sampleInSource, final String sampleOutSource) {
-		final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String actual= normalizeJavaSourceCode(sampleInSource.replace("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
 		final String expected= normalizeJavaSourceCode(sampleOutSource);
 		assertNotEquals(sampleName + ": verify nothing;", expected, actual); //$NON-NLS-1$
 	}
@@ -128,7 +128,7 @@ public class CleanUpTest {
 	}
 
 	private void then(final String sampleOutSource, final IDocument doc) {
-		final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
+		final String actual= normalizeJavaSourceCode(doc.get().replace("samples_in", "samples_out")); //$NON-NLS-1$ //$NON-NLS-2$
 		final String expected= normalizeJavaSourceCode(sampleOutSource);
 		assertEquals(sampleName + ": wrong output;", expected, actual); //$NON-NLS-1$
 	}
