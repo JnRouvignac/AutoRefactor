@@ -57,25 +57,20 @@ public class DuplicateAlternativeCleanUp extends AbstractCleanUpRule {
 		if (visited.getElseStatement() != null) {
 			IfStatement innerIf= ASTNodes.as(visited.getThenStatement(), IfStatement.class);
 
-			if (innerIf != null && innerIf.getElseStatement() != null) {
-				return maybeMergeInnerIf(visited, innerIf, innerIf.getThenStatement(), innerIf.getElseStatement(), true)
-						&& maybeMergeInnerIf(visited, innerIf, innerIf.getElseStatement(), innerIf.getThenStatement(),
-								false);
+			if (innerIf != null
+					&& innerIf.getElseStatement() != null
+					&& !ASTNodes.asList(visited.getElseStatement()).isEmpty()
+					&& ASTNodes.getNbOperands(visited.getExpression()) + ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
+				if (ASTNodes.match(visited.getElseStatement(), innerIf.getElseStatement())) {
+					replaceIfNoElseStatement(visited, innerIf, innerIf.getThenStatement(), true);
+					return false;
+				}
+
+				if (ASTNodes.match(visited.getElseStatement(), innerIf.getThenStatement())) {
+					replaceIfNoElseStatement(visited, innerIf, innerIf.getElseStatement(), false);
+					return false;
+				}
 			}
-		}
-
-		return true;
-	}
-
-	private boolean maybeMergeInnerIf(final IfStatement visited, final IfStatement innerIf,
-			final Statement innerMainStatement, final Statement innerDuplicateStatement,
-			final boolean isInnerMainFirst) {
-		if (!ASTNodes.asList(visited.getElseStatement()).isEmpty()
-				&& ASTNodes.match(visited.getElseStatement(), innerDuplicateStatement)
-				&& ASTNodes.getNbOperands(visited.getExpression())
-						+ ASTNodes.getNbOperands(innerIf.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER) {
-			replaceIfNoElseStatement(visited, innerIf, innerMainStatement, isInnerMainFirst);
-			return false;
 		}
 
 		return true;
