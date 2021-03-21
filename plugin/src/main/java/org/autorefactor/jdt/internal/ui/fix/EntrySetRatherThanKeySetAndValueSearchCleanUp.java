@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -245,13 +246,14 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 		entrySetMethod.setExpression(ASTNodes.createMoveTarget(rewrite, mapExpression));
 		entrySetMethod.setName(ast.newSimpleName("entrySet")); //$NON-NLS-1$
 
+		rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, entrySetMethod, group);
+
 		MethodInvocation getKeyMethod= ast.newMethodInvocation();
 		getKeyMethod.setExpression(entryVar.varName());
 		getKeyMethod.setName(ast.newSimpleName("getKey")); //$NON-NLS-1$
 
 		if (typeBinding != null && typeBinding.isRawType()) {
 			// for (Object key : map.keySet()) => for (Object key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, entrySetMethod, group);
 			Type objectType= ast.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
 			Variable objectVar= new Variable(
 					new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), ast); //$NON-NLS-1$
@@ -262,21 +264,20 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			// Object key = mapEntry.getKey(); // <--- add this statement
 
 			Type mapKeyType= ast.createCopyTarget(parameter.getType());
-			VariableDeclarationStatement newKeyDecl= ast.declareStatement(mapKeyType, ASTNodes.createMoveTarget(rewrite, parameter.getName()),
-					getKeyMethod);
+			VariableDeclarationFragment newVariableDeclarationFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, parameter.getName()));
+			newVariableDeclarationFragment.setInitializer(getKeyMethod);
+			VariableDeclarationStatement newKeyDecl= ast.newVariableDeclarationStatement(mapKeyType, newVariableDeclarationFragment);
 
 			rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl, group);
 
 			if (keyUses > getValueMis.size()) {
 				String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-				VariableDeclarationStatement newEntryDecl= ast.declareStatement(ast.type(mapEntryTypeName),
-						entryVar.varName(), ast.newCastExpression(ast.type(mapEntryTypeName), objectVar.varName()));
+				VariableDeclarationStatement newEntryDecl= ast.newVariableDeclarationStatement(ast.type(mapEntryTypeName), ast.newVariableDeclarationFragment(entryVar.varName(), ast.newCastExpression(ast.type(mapEntryTypeName), objectVar.varName())));
 				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl, group);
 			}
 		} else {
 			// for (K key : map.keySet()) => for (K key : map.entrySet())
-			rewrite.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, entrySetMethod, group);
 			// for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
 			// map.entrySet())
 			Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
@@ -287,8 +288,9 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 				// K key = mapEntry.getKey(); // <--- add this statement
 				Type mapKeyType= ast.createCopyTarget(parameter.getType());
 
-				VariableDeclarationStatement newKeyDeclaration= ast.declareStatement(mapKeyType,
-						ASTNodes.createMoveTarget(rewrite, parameter.getName()), getKeyMethod);
+				VariableDeclarationFragment newVariableDeclarationFragment= ast.newVariableDeclarationFragment(ASTNodes.createMoveTarget(rewrite, parameter.getName()));
+				newVariableDeclarationFragment.setInitializer(getKeyMethod);
+				VariableDeclarationStatement newKeyDeclaration= ast.newVariableDeclarationStatement(mapKeyType, newVariableDeclarationFragment);
 				rewrite.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration, group);
 			}
 		}
