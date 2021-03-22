@@ -98,8 +98,6 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.WhileConditionRatherThanInnerIfCleanUp_description);
-		Expression originalCondition= ASTNodeFactory.parenthesizeIfNeeded(ast,
-				ASTNodes.createMoveTarget(rewrite, visited.getExpression()));
 		Expression ifCondition= ifStatement.getExpression();
 
 		if (isPositive) {
@@ -108,12 +106,17 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			ifCondition= ASTNodes.createMoveTarget(rewrite, ifCondition);
 		}
 
-		InfixExpression newCondition= ast.newInfixExpression();
-		newCondition.setLeftOperand(originalCondition);
-		newCondition.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
-		newCondition.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ifCondition));
+		if (Boolean.TRUE.equals(visited.getExpression().resolveConstantExpressionValue())) {
+			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ASTNodes.getUnparenthesedExpression(ifCondition), group);
+		} else {
+			InfixExpression newCondition= ast.newInfixExpression();
+			newCondition.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast,
+					ASTNodes.createMoveTarget(rewrite, visited.getExpression())));
+			newCondition.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
+			newCondition.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ifCondition));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), newCondition, group);
+			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), newCondition, group);
+		}
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);
 

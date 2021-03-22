@@ -41,6 +41,16 @@ public class WhileConditionRatherThanInnerIfSample {
         }
     }
 
+    public void moveConditionInInfiniteLoop(int i) {
+        // Keep this comment
+        while (true) {
+            if (i < 10) {
+                break;
+            }
+            i--;
+        }
+    }
+
     public void moveOppositeConditionIntoWhileCondition(int i, boolean isEnabled) {
         // Keep this comment
         while (i < 10) {
