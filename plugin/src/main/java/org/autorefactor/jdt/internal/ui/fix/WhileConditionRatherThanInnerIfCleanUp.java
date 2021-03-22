@@ -25,12 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEditGroup;
 
 /**
@@ -121,15 +122,12 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);
 
 		if (ASTNodes.canHaveSiblings(ifStatement)) {
-			if (otherStatement != null && !otherStatements.isEmpty()) {
-				for (int i= otherStatements.size() - 1; 0 < i; i--) {
-					rewrite.insertAfter(ASTNodes.createMoveTarget(rewrite, otherStatements.get(i)), ifStatement, group);
-				}
-
-				ASTNodes.replaceButKeepComment(rewrite, ifStatement,
-						ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
-			} else {
+			if (otherStatement == null || otherStatements.isEmpty()) {
 				rewrite.remove(ifStatement, group);
+			} else {
+				ListRewrite listRewrite= rewrite.getListRewrite(otherStatement, Block.STATEMENTS_PROPERTY);
+				ASTNode moveTarget= listRewrite.createMoveTarget(otherStatements.get(0), otherStatements.get(otherStatements.size() - 1));
+				ASTNodes.replaceButKeepComment(rewrite, ifStatement, moveTarget, group);
 			}
 		} else if (otherStatement == null || otherStatements.isEmpty()) {
 			ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), ast.newBlock(), group);
@@ -137,14 +135,11 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			ASTNodes.replaceButKeepComment(rewrite, ifStatement,
 					ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 		} else {
-			List<Statement> newStatements= new ArrayList<>(otherStatements.size());
-
-			for (Statement statement : otherStatements) {
-				newStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
-			}
+			ListRewrite listRewrite= rewrite.getListRewrite(otherStatement, Block.STATEMENTS_PROPERTY);
+			ASTNode moveTarget= listRewrite.createMoveTarget(otherStatements.get(0), otherStatements.get(otherStatements.size() - 1));
 
 			Block newBlock= ast.newBlock();
-			newBlock.statements().addAll(newStatements);
+			newBlock.statements().add(moveTarget);
 
 			ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), newBlock, group);
 		}

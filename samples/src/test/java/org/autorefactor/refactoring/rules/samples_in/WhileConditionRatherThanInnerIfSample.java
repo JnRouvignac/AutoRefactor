@@ -82,6 +82,7 @@ public class WhileConditionRatherThanInnerIfSample {
                 break;
             } else {
                 System.out.println("Keep this code");
+
                 System.out.println("And this code too!");
             }
             i++;
@@ -132,6 +133,7 @@ public class WhileConditionRatherThanInnerIfSample {
                 break;
             } else {
                 System.out.println("Keep this code");
+
                 System.out.println("And this code too!");
             }
     }

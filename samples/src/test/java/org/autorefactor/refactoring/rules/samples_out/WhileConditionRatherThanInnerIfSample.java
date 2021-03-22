@@ -65,6 +65,7 @@ public class WhileConditionRatherThanInnerIfSample {
         // Keep this comment
         while ((i < 10) && !isEnabled) {
             System.out.println("Keep this code");
+
             System.out.println("And this code too!");
             i++;
         }
@@ -100,6 +101,7 @@ public class WhileConditionRatherThanInnerIfSample {
         // Keep this comment
         while ((i < 10) && !isEnabled) {
             System.out.println("Keep this code");
+
             System.out.println("And this code too!");
         }
     }

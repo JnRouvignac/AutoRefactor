@@ -176,7 +176,14 @@ public class ASTRewrite {
 		return getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
 	}
 
-	private ListRewrite getListRewrite(final ASTNode node, final ChildListPropertyDescriptor listProperty) {
+	/**
+	 * Get the list rewrite.
+	 *
+	 * @param node The node
+	 * @param listProperty The list property
+	 * @return the list rewrite.
+	 */
+	public ListRewrite getListRewrite(final ASTNode node, final ChildListPropertyDescriptor listProperty) {
 		Pair<ASTNode, ChildListPropertyDescriptor> key= Pair.of(node, listProperty);
 		ListRewrite listRewrite= listRewriteCache.get(key);
 		if (listRewrite == null) {
