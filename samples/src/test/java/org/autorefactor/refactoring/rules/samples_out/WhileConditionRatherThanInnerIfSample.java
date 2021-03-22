@@ -85,6 +85,12 @@ public class WhileConditionRatherThanInnerIfSample {
 
     public void moveConditionIntoUnbrackettedWhileConditionAndMoveCode(int i, boolean isEnabled) {
         // Keep this comment
+        while ((i < 10) && !isEnabled)
+            System.out.println("Keep this code");
+    }
+
+    public void moveConditionIntoUnbrackettedWhileConditionAndMoveSeveralStatements(int i, boolean isEnabled) {
+        // Keep this comment
         while ((i < 10) && !isEnabled) {
             System.out.println("Keep this code");
             System.out.println("And this code too!");

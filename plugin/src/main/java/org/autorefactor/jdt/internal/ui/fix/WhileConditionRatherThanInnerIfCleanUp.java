@@ -131,7 +131,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		} else if (otherStatement == null || otherStatements.isEmpty()) {
 			ASTNodes.replaceButKeepComment(rewrite, visited.getBody(), ast.newBlock(), group);
 		} else if (otherStatements.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, originalCondition,
+			ASTNodes.replaceButKeepComment(rewrite, ifStatement,
 					ASTNodes.createMoveTarget(rewrite, otherStatements.get(0)), group);
 		} else {
 			List<Statement> newStatements= new ArrayList<>(otherStatements.size());
@@ -139,6 +139,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			for (Statement statement : otherStatements) {
 				newStatements.add(ASTNodes.createMoveTarget(rewrite, statement));
 			}
+
 			Block newBlock= ast.newBlock();
 			newBlock.statements().addAll(newStatements);
 
