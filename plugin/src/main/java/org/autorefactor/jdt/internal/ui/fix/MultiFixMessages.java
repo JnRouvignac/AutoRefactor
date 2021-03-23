@@ -125,15 +125,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String AssignRatherThanFilterThenAssignAnywayCleanUp_name;
+	public static String ObsoleteAssignRatherThanFilterThenAssignAnywayCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AssignRatherThanFilterThenAssignAnywayCleanUp_description;
+	public static String ObsoleteAssignRatherThanFilterThenAssignAnywayCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AssignRatherThanFilterThenAssignAnywayCleanUp_reason;
+	public static String ObsoleteAssignRatherThanFilterThenAssignAnywayCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -161,99 +161,99 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ParsingRatherThanValueOfCleanUp_name;
+	public static String ObsoleteParsingRatherThanValueOfCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ParsingRatherThanValueOfCleanUp_description;
+	public static String ObsoleteParsingRatherThanValueOfCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ParsingRatherThanValueOfCleanUp_reason;
+	public static String ObsoleteParsingRatherThanValueOfCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ValueOfRatherThanInstantiationCleanUp_name;
+	public static String ObsoleteValueOfRatherThanInstantiationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ValueOfRatherThanInstantiationCleanUp_description;
+	public static String ObsoleteValueOfRatherThanInstantiationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ValueOfRatherThanInstantiationCleanUp_reason;
+	public static String ObsoleteValueOfRatherThanInstantiationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AutoBoxingRatherThanExplicitMethodCleanUp_name;
+	public static String ObsoleteAutoBoxingRatherThanExplicitMethodCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AutoBoxingRatherThanExplicitMethodCleanUp_description;
+	public static String ObsoleteAutoBoxingRatherThanExplicitMethodCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AutoBoxingRatherThanExplicitMethodCleanUp_reason;
+	public static String ObsoleteAutoBoxingRatherThanExplicitMethodCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UnboxingRatherThanExplicitMethodCleanUp_name;
+	public static String ObsoleteUnboxingRatherThanExplicitMethodCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UnboxingRatherThanExplicitMethodCleanUp_description;
+	public static String ObsoleteUnboxingRatherThanExplicitMethodCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UnboxingRatherThanExplicitMethodCleanUp_reason;
+	public static String ObsoleteUnboxingRatherThanExplicitMethodCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BracketsRatherThanArrayInstantiationCleanUp_name;
+	public static String ObsoleteBracketsRatherThanArrayInstantiationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BracketsRatherThanArrayInstantiationCleanUp_description;
+	public static String ObsoleteBracketsRatherThanArrayInstantiationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BracketsRatherThanArrayInstantiationCleanUp_reason;
+	public static String ObsoleteBracketsRatherThanArrayInstantiationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaExpressionRatherThanComparatorCleanUp_name;
+	public static String ObsoleteLambdaExpressionRatherThanComparatorCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaExpressionRatherThanComparatorCleanUp_description;
+	public static String ObsoleteLambdaExpressionRatherThanComparatorCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaExpressionRatherThanComparatorCleanUp_reason;
+	public static String ObsoleteLambdaExpressionRatherThanComparatorCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaCleanUp_name;
+	public static String ObsoleteLambdaCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaCleanUp_description;
+	public static String ObsoleteLambdaCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LambdaCleanUp_reason;
+	public static String ObsoleteLambdaCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LiteralRatherThanBooleanConstantCleanUp_name;
+	public static String ObsoleteLiteralRatherThanBooleanConstantCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LiteralRatherThanBooleanConstantCleanUp_description;
+	public static String ObsoleteLiteralRatherThanBooleanConstantCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LiteralRatherThanBooleanConstantCleanUp_reason;
+	public static String ObsoleteLiteralRatherThanBooleanConstantCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -281,15 +281,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String LazyLogicalRatherThanEagerCleanUp_name;
+	public static String ObsoleteLazyLogicalRatherThanEagerCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LazyLogicalRatherThanEagerCleanUp_description;
+	public static String ObsoleteLazyLogicalRatherThanEagerCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LazyLogicalRatherThanEagerCleanUp_reason;
+	public static String ObsoleteLazyLogicalRatherThanEagerCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -317,27 +317,27 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String XORRatherThanDuplicateConditionsCleanUp_name;
+	public static String ObsoleteXORRatherThanDuplicateConditionsCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String XORRatherThanDuplicateConditionsCleanUp_description;
+	public static String ObsoleteXORRatherThanDuplicateConditionsCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String XORRatherThanDuplicateConditionsCleanUp_reason;
+	public static String ObsoleteXORRatherThanDuplicateConditionsCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OperandFactorizationCleanUp_name;
+	public static String ObsoleteOperandFactorizationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OperandFactorizationCleanUp_description;
+	public static String ObsoleteOperandFactorizationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OperandFactorizationCleanUp_reason;
+	public static String ObsoleteOperandFactorizationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -353,39 +353,39 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
+	public static String ObsoleteTernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
+	public static String ObsoleteTernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
+	public static String ObsoleteTernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String InvertEqualsCleanUp_name;
+	public static String ObsoleteInvertEqualsCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String InvertEqualsCleanUp_description;
+	public static String ObsoleteInvertEqualsCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String InvertEqualsCleanUp_reason;
+	public static String ObsoleteInvertEqualsCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonCleanUp_name;
+	public static String ObsoleteComparisonCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonCleanUp_description;
+	public static String ObsoleteComparisonCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonCleanUp_reason;
+	public static String ObsoleteComparisonCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -401,15 +401,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleCompareRatherThanEqualityCleanUp_name;
+	public static String ObsoleteDoubleCompareRatherThanEqualityCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleCompareRatherThanEqualityCleanUp_description;
+	public static String ObsoleteDoubleCompareRatherThanEqualityCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleCompareRatherThanEqualityCleanUp_reason;
+	public static String ObsoleteDoubleCompareRatherThanEqualityCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -449,27 +449,27 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String InstanceofRatherThanIsInstanceCleanUp_name;
+	public static String ObsoleteInstanceofRatherThanIsInstanceCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String InstanceofRatherThanIsInstanceCleanUp_description;
+	public static String ObsoleteInstanceofRatherThanIsInstanceCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String InstanceofRatherThanIsInstanceCleanUp_reason;
+	public static String ObsoleteInstanceofRatherThanIsInstanceCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringRatherThanNewStringCleanUp_name;
+	public static String ObsoleteStringRatherThanNewStringCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringRatherThanNewStringCleanUp_description;
+	public static String ObsoleteStringRatherThanNewStringCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringRatherThanNewStringCleanUp_reason;
+	public static String ObsoleteStringRatherThanNewStringCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -497,15 +497,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String SubstringWithOneParameterRatherThanTwoCleanUp_name;
+	public static String ObsoleteSubstringWithOneParameterRatherThanTwoCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SubstringWithOneParameterRatherThanTwoCleanUp_description;
+	public static String ObsoleteSubstringWithOneParameterRatherThanTwoCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SubstringWithOneParameterRatherThanTwoCleanUp_reason;
+	public static String ObsoleteSubstringWithOneParameterRatherThanTwoCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -521,15 +521,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonRatherThanEqualsCleanUp_name;
+	public static String ObsoleteComparisonRatherThanEqualsCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonRatherThanEqualsCleanUp_description;
+	public static String ObsoleteComparisonRatherThanEqualsCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ComparisonRatherThanEqualsCleanUp_reason;
+	public static String ObsoleteComparisonRatherThanEqualsCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -557,15 +557,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String SerializeRatherThanBoxingAndSerializeCleanUp_name;
+	public static String ObsoleteSerializeRatherThanBoxingAndSerializeCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SerializeRatherThanBoxingAndSerializeCleanUp_description;
+	public static String ObsoleteSerializeRatherThanBoxingAndSerializeCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SerializeRatherThanBoxingAndSerializeCleanUp_reason;
+	public static String ObsoleteSerializeRatherThanBoxingAndSerializeCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -641,27 +641,27 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfMethodRatherThanReturnCleanUp_name;
+	public static String ObsoleteEndOfMethodRatherThanReturnCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfMethodRatherThanReturnCleanUp_description;
+	public static String ObsoleteEndOfMethodRatherThanReturnCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfMethodRatherThanReturnCleanUp_reason;
+	public static String ObsoleteEndOfMethodRatherThanReturnCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfLoopRatherThanContinueCleanUp_name;
+	public static String ObsoleteEndOfLoopRatherThanContinueCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfLoopRatherThanContinueCleanUp_description;
+	public static String ObsoleteEndOfLoopRatherThanContinueCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EndOfLoopRatherThanContinueCleanUp_reason;
+	public static String ObsoleteEndOfLoopRatherThanContinueCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -701,15 +701,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanWhileAndFallsThroughCleanUp_name;
+	public static String ObsoleteIfRatherThanWhileAndFallsThroughCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanWhileAndFallsThroughCleanUp_description;
+	public static String ObsoleteIfRatherThanWhileAndFallsThroughCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanWhileAndFallsThroughCleanUp_reason;
+	public static String ObsoleteIfRatherThanWhileAndFallsThroughCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -725,87 +725,87 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String AndConditionRatherThanEmbededIfCleanUp_name;
+	public static String ObsoleteAndConditionRatherThanEmbededIfCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AndConditionRatherThanEmbededIfCleanUp_description;
+	public static String ObsoleteAndConditionRatherThanEmbededIfCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AndConditionRatherThanEmbededIfCleanUp_reason;
+	public static String ObsoleteAndConditionRatherThanEmbededIfCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DuplicateAlternativeCleanUp_name;
+	public static String ObsoleteDuplicateAlternativeCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DuplicateAlternativeCleanUp_description;
+	public static String ObsoleteDuplicateAlternativeCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DuplicateAlternativeCleanUp_reason;
+	public static String ObsoleteDuplicateAlternativeCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CommonCodeInIfElseStatementCleanUp_name;
+	public static String ObsoleteCommonCodeInIfElseStatementCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CommonCodeInIfElseStatementCleanUp_description;
+	public static String ObsoleteCommonCodeInIfElseStatementCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CommonCodeInIfElseStatementCleanUp_reason;
+	public static String ObsoleteCommonCodeInIfElseStatementCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OppositeConditionRatherThanDuplicateConditionCleanUp_name;
+	public static String ObsoleteOppositeConditionRatherThanDuplicateConditionCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OppositeConditionRatherThanDuplicateConditionCleanUp_description;
+	public static String ObsoleteOppositeConditionRatherThanDuplicateConditionCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
+	public static String ObsoleteOppositeConditionRatherThanDuplicateConditionCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneConditionRatherThanUnreachableBlockCleanUp_name;
+	public static String ObsoleteOneConditionRatherThanUnreachableBlockCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneConditionRatherThanUnreachableBlockCleanUp_description;
+	public static String ObsoleteOneConditionRatherThanUnreachableBlockCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneConditionRatherThanUnreachableBlockCleanUp_reason;
+	public static String ObsoleteOneConditionRatherThanUnreachableBlockCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String MergeConditionalBlocksCleanUp_name;
+	public static String ObsoleteMergeConditionalBlocksCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String MergeConditionalBlocksCleanUp_description;
+	public static String ObsoleteMergeConditionalBlocksCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String MergeConditionalBlocksCleanUp_reason;
+	public static String ObsoleteMergeConditionalBlocksCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -833,35 +833,35 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericMapRatherThanRawMapCleanUp_name;
+	public static String ObsoleteGenericMapRatherThanRawMapCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericMapRatherThanRawMapCleanUp_description;
+	public static String ObsoleteGenericMapRatherThanRawMapCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericMapRatherThanRawMapCleanUp_reason;
+	public static String ObsoleteGenericMapRatherThanRawMapCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericListRatherThanRawListCleanUp_name;
+	public static String ObsoleteGenericListRatherThanRawListCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericListRatherThanRawListCleanUp_description;
+	public static String ObsoleteGenericListRatherThanRawListCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String GenericListRatherThanRawListCleanUp_reason;
+	public static String ObsoleteGenericListRatherThanRawListCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseDiamondOperatorCleanUp_name;
+	public static String ObsoleteUseDiamondOperatorCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseDiamondOperatorCleanUp_description;
+	public static String ObsoleteUseDiamondOperatorCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
@@ -877,19 +877,19 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseDiamondOperatorCleanUp_reason;
+	public static String ObsoleteUseDiamondOperatorCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseMultiCatchCleanUp_name;
+	public static String ObsoleteUseMultiCatchCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseMultiCatchCleanUp_description;
+	public static String ObsoleteUseMultiCatchCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UseMultiCatchCleanUp_reason;
+	public static String ObsoleteUseMultiCatchCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -929,75 +929,75 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String CollectionCleanUp_name;
+	public static String ObsoleteCollectionCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CollectionCleanUp_description;
+	public static String ObsoleteCollectionCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CollectionCleanUp_reason;
+	public static String ObsoleteCollectionCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddAllRatherThanLoopCleanUp_name;
+	public static String ObsoleteAddAllRatherThanLoopCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddAllRatherThanLoopCleanUp_description;
+	public static String ObsoleteAddAllRatherThanLoopCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddAllRatherThanLoopCleanUp_reason;
+	public static String ObsoleteAddAllRatherThanLoopCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FillRatherThanLoopCleanUp_name;
+	public static String ObsoleteFillRatherThanLoopCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FillRatherThanLoopCleanUp_description;
+	public static String ObsoleteFillRatherThanLoopCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FillRatherThanLoopCleanUp_reason;
+	public static String ObsoleteFillRatherThanLoopCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String JoinRatherThanLoopCleanUp_name;
+	public static String ObsoleteJoinRatherThanLoopCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String JoinRatherThanLoopCleanUp_description;
+	public static String ObsoleteJoinRatherThanLoopCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String JoinRatherThanLoopCleanUp_reason;
+	public static String ObsoleteJoinRatherThanLoopCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
+	public static String ObsoleteObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
+	public static String ObsoleteObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
+	public static String ObsoleteObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BreakRatherThanPassiveIterationsCleanUp_name;
+	public static String ObsoleteBreakRatherThanPassiveIterationsCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BreakRatherThanPassiveIterationsCleanUp_description;
+	public static String ObsoleteBreakRatherThanPassiveIterationsCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BreakRatherThanPassiveIterationsCleanUp_reason;
+	public static String ObsoleteBreakRatherThanPassiveIterationsCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1025,15 +1025,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ReduceIndentationCleanUp_name;
+	public static String ObsoleteReduceIndentationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ReduceIndentationCleanUp_description;
+	public static String ObsoleteReduceIndentationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ReduceIndentationCleanUp_reason;
+	public static String ObsoleteReduceIndentationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1049,15 +1049,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String MapCleanUp_name;
+	public static String ObsoleteMapCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String MapCleanUp_description;
+	public static String ObsoleteMapCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String MapCleanUp_reason;
+	public static String ObsoleteMapCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1085,27 +1085,27 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String NoAssignmentInIfConditionCleanUp_name;
+	public static String ObsoleteNoAssignmentInIfConditionCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String NoAssignmentInIfConditionCleanUp_description;
+	public static String ObsoleteNoAssignmentInIfConditionCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String NoAssignmentInIfConditionCleanUp_reason;
+	public static String ObsoleteNoAssignmentInIfConditionCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IncrementStatementRatherThanIncrementExpressionCleanUp_name;
+	public static String ObsoleteIncrementStatementRatherThanIncrementExpressionCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IncrementStatementRatherThanIncrementExpressionCleanUp_description;
+	public static String ObsoleteIncrementStatementRatherThanIncrementExpressionCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IncrementStatementRatherThanIncrementExpressionCleanUp_reason;
+	public static String ObsoleteIncrementStatementRatherThanIncrementExpressionCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1121,15 +1121,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfElseIfCleanUp_name;
+	public static String ObsoleteIfElseIfCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfElseIfCleanUp_description;
+	public static String ObsoleteIfElseIfCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfElseIfCleanUp_reason;
+	public static String ObsoleteIfElseIfCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1193,39 +1193,39 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringBuilderRatherThanStringCleanUp_name;
+	public static String ObsoleteStringBuilderRatherThanStringCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringBuilderRatherThanStringCleanUp_description;
+	public static String ObsoleteStringBuilderRatherThanStringCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StringBuilderRatherThanStringCleanUp_reason;
+	public static String ObsoleteStringBuilderRatherThanStringCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_name;
+	public static String ObsoleteAtomicObjectRatherThanMonoIndexArrayCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_description;
+	public static String ObsoleteAtomicObjectRatherThanMonoIndexArrayCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
+	public static String ObsoleteAtomicObjectRatherThanMonoIndexArrayCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PatternRatherThanRegExStringCleanUp_name;
+	public static String ObsoletePatternRatherThanRegExStringCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PatternRatherThanRegExStringCleanUp_description;
+	public static String ObsoletePatternRatherThanRegExStringCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PatternRatherThanRegExStringCleanUp_reason;
+	public static String ObsoletePatternRatherThanRegExStringCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1397,27 +1397,27 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveOverriddenAssignmentCleanUp_name;
+	public static String ObsoleteRemoveOverriddenAssignmentCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveOverriddenAssignmentCleanUp_description;
+	public static String ObsoleteRemoveOverriddenAssignmentCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveOverriddenAssignmentCleanUp_reason;
+	public static String ObsoleteRemoveOverriddenAssignmentCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String Java7HashRatherThanEclipseJava6HashCleanUp_name;
+	public static String ObsoleteJava7HashRatherThanEclipseJava6HashCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String Java7HashRatherThanEclipseJava6HashCleanUp_description;
+	public static String ObsoleteJava7HashRatherThanEclipseJava6HashCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String Java7HashRatherThanEclipseJava6HashCleanUp_reason;
+	public static String ObsoleteJava7HashRatherThanEclipseJava6HashCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1433,15 +1433,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String TryWithResourceCleanUp_name;
+	public static String ObsoleteTryWithResourceCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String TryWithResourceCleanUp_description;
+	public static String ObsoleteTryWithResourceCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String TryWithResourceCleanUp_reason;
+	public static String ObsoleteTryWithResourceCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1529,15 +1529,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveEmptySuperConstrInvocationCleanUp_name;
+	public static String ObsoleteRemoveEmptySuperConstrInvocationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveEmptySuperConstrInvocationCleanUp_description;
+	public static String ObsoleteRemoveEmptySuperConstrInvocationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveEmptySuperConstrInvocationCleanUp_reason;
+	public static String ObsoleteRemoveEmptySuperConstrInvocationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1637,15 +1637,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
+	public static String ObsoleteUppercaseNumberSuffixRatherThanLowercaseCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
+	public static String ObsoleteUppercaseNumberSuffixRatherThanLowercaseCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String UppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
+	public static String ObsoleteUppercaseNumberSuffixRatherThanLowercaseCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1661,51 +1661,51 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String SwitchCleanUp_name;
+	public static String ObsoleteSwitchCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SwitchCleanUp_description;
+	public static String ObsoleteSwitchCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SwitchCleanUp_reason;
+	public static String ObsoleteSwitchCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanTwoSwitchCasesCleanUp_name;
+	public static String ObsoleteIfRatherThanTwoSwitchCasesCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanTwoSwitchCasesCleanUp_description;
+	public static String ObsoleteIfRatherThanTwoSwitchCasesCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IfRatherThanTwoSwitchCasesCleanUp_reason;
+	public static String ObsoleteIfRatherThanTwoSwitchCasesCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveSemiColonCleanUp_name;
+	public static String ObsoleteRemoveSemiColonCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveSemiColonCleanUp_description;
+	public static String ObsoleteRemoveSemiColonCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveSemiColonCleanUp_reason;
+	public static String ObsoleteRemoveSemiColonCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddBracketsToControlStatementCleanUp_name;
+	public static String ObsoleteAddBracketsToControlStatementCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddBracketsToControlStatementCleanUp_description;
+	public static String ObsoleteAddBracketsToControlStatementCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String AddBracketsToControlStatementCleanUp_reason;
+	public static String ObsoleteAddBracketsToControlStatementCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1721,75 +1721,75 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantModifiersCleanUp_name;
+	public static String ObsoleteRedundantModifiersCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantModifiersCleanUp_description;
+	public static String ObsoleteRedundantModifiersCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantModifiersCleanUp_reason;
+	public static String ObsoleteRedundantModifiersCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StaticInnerClassThanNonStaticCleanUp_name;
+	public static String ObsoleteStaticInnerClassThanNonStaticCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StaticInnerClassThanNonStaticCleanUp_description;
+	public static String ObsoleteStaticInnerClassThanNonStaticCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String StaticInnerClassThanNonStaticCleanUp_reason;
+	public static String ObsoleteStaticInnerClassThanNonStaticCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryCastCleanUp_name;
+	public static String ObsoleteRemoveUnnecessaryCastCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryCastCleanUp_description;
+	public static String ObsoleteRemoveUnnecessaryCastCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryCastCleanUp_reason;
+	public static String ObsoleteRemoveUnnecessaryCastCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PushNegationDownCleanUp_name;
+	public static String ObsoletePushNegationDownCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PushNegationDownCleanUp_description;
+	public static String ObsoletePushNegationDownCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PushNegationDownCleanUp_reason;
+	public static String ObsoletePushNegationDownCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LocalVariableRatherThanFieldCleanUp_name;
+	public static String ObsoleteLocalVariableRatherThanFieldCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LocalVariableRatherThanFieldCleanUp_description;
+	public static String ObsoleteLocalVariableRatherThanFieldCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LocalVariableRatherThanFieldCleanUp_reason;
+	public static String ObsoleteLocalVariableRatherThanFieldCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SimpleNameRatherThanQualifiedNameCleanUp_name;
+	public static String ObsoleteSimpleNameRatherThanQualifiedNameCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SimpleNameRatherThanQualifiedNameCleanUp_description;
+	public static String ObsoleteSimpleNameRatherThanQualifiedNameCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String SimpleNameRatherThanQualifiedNameCleanUp_reason;
+	public static String ObsoleteSimpleNameRatherThanQualifiedNameCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1829,15 +1829,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String EqualsNullableCleanUp_name;
+	public static String ObsoleteEqualsNullableCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EqualsNullableCleanUp_description;
+	public static String ObsoleteEqualsNullableCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String EqualsNullableCleanUp_reason;
+	public static String ObsoleteEqualsNullableCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

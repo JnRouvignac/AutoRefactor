@@ -32,13 +32,13 @@ import static org.junit.Assert.*;
 
 @SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastSampleTest {
-    private org.autorefactor.refactoring.rules.samples_in.RemoveUnnecessaryCastSample sampleIn;
-    private org.autorefactor.refactoring.rules.samples_out.RemoveUnnecessaryCastSample sampleOut;
+    private org.autorefactor.refactoring.rules.samples_in.ObsoleteRemoveUnnecessaryCastSample sampleIn;
+    private org.autorefactor.refactoring.rules.samples_out.ObsoleteRemoveUnnecessaryCastSample sampleOut;
 
     @Before
     public void setUp() {
-        sampleIn = new org.autorefactor.refactoring.rules.samples_in.RemoveUnnecessaryCastSample();
-        sampleOut = new org.autorefactor.refactoring.rules.samples_out.RemoveUnnecessaryCastSample();
+        sampleIn = new org.autorefactor.refactoring.rules.samples_in.ObsoleteRemoveUnnecessaryCastSample();
+        sampleOut = new org.autorefactor.refactoring.rules.samples_out.ObsoleteRemoveUnnecessaryCastSample();
     }
 
     @Test
