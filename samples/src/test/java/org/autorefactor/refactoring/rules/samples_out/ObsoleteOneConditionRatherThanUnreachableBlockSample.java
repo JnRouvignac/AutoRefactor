@@ -58,6 +58,30 @@ public class ObsoleteOneConditionRatherThanUnreachableBlockSample {
         return 2;
     }
 
+    public int removeUncaughtCode(boolean b1, boolean b2) throws IOException {
+        try {
+            // Keep this comment
+            if (b1 && b2) {
+                return 0;
+            }
+        } catch (NullPointerException e) {
+            System.out.println("I should be reachable");
+        }
+
+        return 2;
+    }
+
+    public void removeDuplicateConditionOnFallingThrough(int aNumber, int anotherNumber) {
+        // Keep this comment
+        if (aNumber < anotherNumber) {
+            System.out.println("Do something");
+            return;
+        } else {
+            System.out.println("Do something else");
+            return;
+        }
+    }
+
     public String doNotCreateUnreachable(int i1, int i2) {
         if (i1 < i2) {
             return "Falls through";
@@ -98,19 +122,6 @@ public class ObsoleteOneConditionRatherThanUnreachableBlockSample {
                 throw new IOException();
             }
         } catch (IOException e) {
-            System.out.println("I should be reachable");
-        }
-
-        return 2;
-    }
-
-    public int removeUncaughtCode(boolean b1, boolean b2) throws IOException {
-        try {
-            // Keep this comment
-            if (b1 && b2) {
-                return 0;
-            }
-        } catch (NullPointerException e) {
             System.out.println("I should be reachable");
         }
 

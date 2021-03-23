@@ -48,15 +48,15 @@ public class ObsoleteOneConditionRatherThanUnreachableBlockCleanUp extends Abstr
 	}
 
 	@Override
-	public boolean visit(final IfStatement node) {
-		IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
+	public boolean visit(final IfStatement visited) {
+		IfStatement secondIf= ASTNodes.as(visited.getElseStatement(), IfStatement.class);
 
 		if (secondIf != null
-				&& !ASTNodes.isExceptionExpected(node)
-				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement()) || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))
-				&& ASTNodes.isPassive(node.getExpression())
+				&& !ASTNodes.isExceptionExpected(visited)
+				&& (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(visited.getThenStatement()) || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()) || ASTNodes.getNextStatement(visited) == null)
+				&& ASTNodes.isPassive(visited.getExpression())
 				&& ASTNodes.isPassive(secondIf.getExpression())
-				&& ASTNodes.match(node.getExpression(), secondIf.getExpression())) {
+				&& ASTNodes.match(visited.getExpression(), secondIf.getExpression())) {
 			refactorCondition(secondIf);
 
 			return false;
