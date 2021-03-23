@@ -821,15 +821,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ElseRatherThanOppositeConditionCleanUp_name;
+	public static String ElseRatherThanNegatedConditionCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ElseRatherThanOppositeConditionCleanUp_description;
+	public static String ElseRatherThanNegatedConditionCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ElseRatherThanOppositeConditionCleanUp_reason;
+	public static String ElseRatherThanNegatedConditionCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

@@ -23,46 +23,44 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_in;
+package org.autorefactor.refactoring.rules.samples_out;
 
 import java.io.IOException;
 import java.util.List;
 
-public class ElseRatherThanOppositeConditionSample {
-    public int removeOppositeCondition(boolean b1, boolean b2) {
+public class ElseRatherThanNegatedConditionSample {
+    public int removeNegatedCondition(boolean isActive, boolean isEnabled) {
         int i = -1;
         // Keep this comment
-        if (b1 && b2) {
+        if (isActive && isEnabled) {
             i = 0;
-        } else if (!b2 || !b1) {
+        } else {
             i = 1;
         }
 
         return i;
     }
 
-    public int removeOppositeConditionWithElse(int i1, int i2) {
+    public int removeNegatedConditionWithElse(int i1, int i2) {
         int i = -1;
         // Keep this comment
         if (i1 < i2) {
             i = 0;
-        } else if (i2 <= i1) {
-            i = 1;
         } else {
-            i = 2;
+            i = 1;
         }
 
         return i;
     }
 
-    public int removeOppositeConditionAmongOthers(int i1, int i2) {
+    public int removeNegatedConditionAmongOthers(int i1, int i2) {
         int i = -1;
         // Keep this comment
         if (i1 == 0) {
             i = -1;
         } else if (i1 < i2 + 1) {
             i = 0;
-        } else if (1 + i2 <= i1) {
+        } else {
             i = 1;
         }
 
@@ -75,7 +73,7 @@ public class ElseRatherThanOppositeConditionSample {
             // Keep this comment
             if (b1 && b2) {
                 i = 0;
-            } else if (!b2 || !b1) {
+            } else {
                 throw new IOException();
             }
         } catch (IOException e) {
@@ -91,10 +89,8 @@ public class ElseRatherThanOppositeConditionSample {
             // Keep this comment
             if (b1 && b2) {
                 i = 0;
-            } else if (!b2 || !b1) {
-                i = 1;
             } else {
-                throw new NullPointerException();
+                i = 1;
             }
         } finally {
             System.out.println("I should be reachable");
@@ -107,7 +103,7 @@ public class ElseRatherThanOppositeConditionSample {
         if (number > 123) {
             System.out.println("Do something");
             return;
-        } else if (number <= 123) {
+        } else {
             System.out.println("Do something else");
             return;
         }

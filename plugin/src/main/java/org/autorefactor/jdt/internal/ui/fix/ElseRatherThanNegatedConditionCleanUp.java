@@ -32,20 +32,20 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule {
+public class ElseRatherThanNegatedConditionCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_name;
+		return MultiFixMessages.ElseRatherThanNegatedConditionCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_description;
+		return MultiFixMessages.ElseRatherThanNegatedConditionCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_reason;
+		return MultiFixMessages.ElseRatherThanNegatedConditionCleanUp_reason;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 
 	private void removeCondition(final IfStatement secondIf) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.ElseRatherThanOppositeConditionCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ElseRatherThanNegatedConditionCleanUp_description);
 
 		ASTNodes.replaceButKeepComment(rewrite, secondIf, ASTNodes.createMoveTarget(rewrite, secondIf.getThenStatement()), group);
 	}
