@@ -67,6 +67,48 @@ public class ElseRatherThanOppositeConditionSample {
         return i;
     }
 
+    public int refactorCaughtCode(boolean b1, boolean b2) {
+        int i = -1;
+        try {
+            // Keep this comment
+            if (b1 && b2) {
+                i = 0;
+            } else {
+                throw new IOException();
+            }
+        } catch (IOException e) {
+            System.out.println("I should be reachable");
+        }
+
+        return i;
+    }
+
+    public int removeUncaughtCode(boolean b1, boolean b2) {
+        int i = -1;
+        try {
+            // Keep this comment
+            if (b1 && b2) {
+                i = 0;
+            } else {
+                i = 1;
+            }
+        } finally {
+            System.out.println("I should be reachable");
+        }
+
+        return i;
+    }
+
+    public void removeConditionWithFallingThroughBlocksWithoutSiblingStatements(int number) {
+        if (number > 123) {
+            System.out.println("Do something");
+            return;
+        } else {
+            System.out.println("Do something else");
+            return;
+        }
+    }
+
     public int doNotRemoveDifferentCondition(boolean b1, boolean b2) {
         int i = -1;
         if (b1 && b2) {
@@ -100,22 +142,6 @@ public class ElseRatherThanOppositeConditionSample {
         return i;
     }
 
-    public int refactorCaughtCode(boolean b1, boolean b2) {
-        int i = -1;
-        try {
-            // Keep this comment
-            if (b1 && b2) {
-                i = 0;
-            } else {
-                throw new IOException();
-            }
-        } catch (IOException e) {
-            System.out.println("I should be reachable");
-        }
-
-        return i;
-    }
-
     public int doNotRemoveCaughtCode(boolean b1, boolean b2) {
         int i = -1;
         try {
@@ -133,22 +159,6 @@ public class ElseRatherThanOppositeConditionSample {
         return i;
     }
 
-    public int removeUncaughtCode(boolean b1, boolean b2) {
-        int i = -1;
-        try {
-            // Keep this comment
-            if (b1 && b2) {
-                i = 0;
-            } else {
-                i = 1;
-            }
-        } finally {
-            System.out.println("I should be reachable");
-        }
-
-        return i;
-    }
-
     public int doNotRefactorFallThroughBlocks(boolean b1, boolean b2) {
         if (b1 && b2) {
             return 0;
@@ -156,6 +166,17 @@ public class ElseRatherThanOppositeConditionSample {
             return 1;
         }
 
+        return 2;
+    }
+
+    public int doNotRefactorFallThroughBlocksInBlock(boolean b1, boolean b2) {
+        {
+            if (b1 && b2) {
+                return 0;
+            } else if (!b2 || !b1) {
+                return 1;
+            }
+        }
         return 2;
     }
 }
