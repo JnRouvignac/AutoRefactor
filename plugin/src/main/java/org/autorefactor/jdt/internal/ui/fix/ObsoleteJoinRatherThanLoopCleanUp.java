@@ -632,10 +632,10 @@ public class ObsoleteJoinRatherThanLoopCleanUp extends AbstractCleanUpRule {
 			varModifiers.addAll(ASTNodes.createMoveTarget(rewrite, modifiers));
 
 			if (!booleanUses.isEmpty()) {
-				rewrite.removeButKeepComment(booleanStatement, group);
+				ASTNodes.removeButKeepComment(rewrite, booleanStatement, group);
 			}
 
-			rewrite.removeButKeepComment(builderStatement, group);
+			ASTNodes.removeButKeepComment(rewrite, builderStatement, group);
 			ASTNodes.replaceButKeepComment(rewrite, node, joinStatement, group);
 
 			for (SimpleName readToRefactor : readsToRefactor) {

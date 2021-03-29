@@ -2701,4 +2701,17 @@ public final class ASTNodes {
 	public static void replaceButKeepComment(final ASTRewrite rewrite, final ASTNode node, final ASTNode replacement, final TextEditGroup editGroup) {
 		rewrite.replace(node, replacement, editGroup);
 	}
+
+	/**
+	 * Removes the provided node from the AST.
+	 *
+	 * @param rewrite     The AST rewrite
+	 * @param node        The node to remove
+	 * @param editGroup   The edit group
+	 * @see ASTRewrite#removeButKeepComment(ASTNode, ASTNode,
+	 *      org.eclipse.text.edits.TextEditGroup)
+	 */
+	public static void removeButKeepComment(final ASTRewrite rewrite, final ASTNode node, final TextEditGroup editGroup) {
+		rewrite.removeButKeepComment(node, editGroup);
+	}
 }

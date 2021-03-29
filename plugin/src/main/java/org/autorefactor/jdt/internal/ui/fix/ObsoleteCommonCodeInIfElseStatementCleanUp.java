@@ -189,7 +189,7 @@ public class ObsoleteCommonCodeInIfElseStatementCleanUp extends AbstractCleanUpR
 			if (ASTNodes.canHaveSiblings(visited)) {
 				insertIdenticalCode(visited, oneCaseToRemove);
 
-				rewrite.removeButKeepComment(visited, group);
+				ASTNodes.removeButKeepComment(rewrite, visited, group);
 			} else {
 				List<Statement> orderedStatements= new ArrayList<>(oneCaseToRemove.size());
 				for (Statement stmtToRemove : oneCaseToRemove) {

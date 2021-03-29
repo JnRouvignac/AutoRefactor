@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.core.dom.ASTRewrite;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -52,7 +53,7 @@ public class ObsoleteRemoveEmptySuperConstrInvocationCleanUp extends AbstractCle
 			TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteRemoveEmptySuperConstrInvocationCleanUp_description);
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-			rewrite.removeButKeepComment(node, group);
+			ASTNodes.removeButKeepComment(rewrite, node, group);
 			return false;
 		}
 

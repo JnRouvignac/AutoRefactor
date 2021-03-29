@@ -309,7 +309,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends NewC
             ASTNodes.replaceButKeepComment(rewrite, forNode, replacement, group);
 
             if (previousStmtIsPreviousSibling) {
-                rewrite.removeButKeepComment(previousStatement, group);
+                ASTNodes.removeButKeepComment(rewrite, previousStatement, group);
             }
         }
 

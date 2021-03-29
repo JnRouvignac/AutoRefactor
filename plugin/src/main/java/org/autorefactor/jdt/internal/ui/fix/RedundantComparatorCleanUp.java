@@ -447,7 +447,7 @@ public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
 
 			ASTNodes.replaceButKeepComment(rewrite, visitedIfRefactoringNeeded, sortMethod, group);
 		} else {
-			rewrite.removeButKeepComment(comparator, group);
+			ASTNodes.removeButKeepComment(rewrite, comparator, group);
 		}
 	}
 }

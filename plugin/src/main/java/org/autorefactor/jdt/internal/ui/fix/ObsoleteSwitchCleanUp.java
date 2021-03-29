@@ -375,7 +375,7 @@ public class ObsoleteSwitchCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (int i= 0; i < ifStatements.size() - 1; i++) {
-			rewrite.removeButKeepComment(ifStatements.get(i), group);
+			ASTNodes.removeButKeepComment(rewrite, ifStatements.get(i), group);
 		}
 
 		ASTNodes.replaceButKeepComment(rewrite, ifStatements.get(ifStatements.size() - 1), switchStatement, group);

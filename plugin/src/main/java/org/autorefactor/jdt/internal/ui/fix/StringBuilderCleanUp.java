@@ -807,7 +807,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		ASTNodes.replaceButKeepComment(rewrite, type, ast.type(String.class.getSimpleName()), group);
 
 		for (Statement statementToRemove : statementsToRemove) {
-			rewrite.removeButKeepComment(statementToRemove, group);
+			ASTNodes.removeButKeepComment(rewrite, statementToRemove, group);
 		}
 
 		for (MethodInvocation readToRefactor : toStringToRefactor) {

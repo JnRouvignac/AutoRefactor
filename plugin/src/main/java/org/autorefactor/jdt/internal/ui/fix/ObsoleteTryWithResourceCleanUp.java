@@ -206,7 +206,7 @@ public class ObsoleteTryWithResourceCleanUp extends AbstractCleanUpRule {
 			rewrite.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource, group);
 
 			for (ASTNode nodeToRemove : nodesToRemove) {
-				rewrite.removeButKeepComment(nodeToRemove, group);
+				ASTNodes.removeButKeepComment(rewrite, nodeToRemove, group);
 			}
 		}
 	}
