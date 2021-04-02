@@ -53,11 +53,6 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 	}
 
 	@Override
-	public String getWrapperFullyQualifiedName() {
-		return Byte.class.getCanonicalName();
-	}
-
-	@Override
 	public String getPrimitiveTypeName() {
 		return byte.class.getSimpleName();
 	}

@@ -53,11 +53,6 @@ public class LongPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 	}
 
 	@Override
-	public String getWrapperFullyQualifiedName() {
-		return Long.class.getCanonicalName();
-	}
-
-	@Override
 	public String getPrimitiveTypeName() {
 		return long.class.getSimpleName();
 	}

@@ -32,6 +32,7 @@ import java.util.List;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -60,13 +61,6 @@ import org.eclipse.text.edits.TextEditGroup;
 /** See {@link #getDescription()} method. */
 public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends AbstractCleanUpRule {
 	/**
-	 * Get the wrapper fully qualified name.
-	 *
-	 * @return the wrapper fully qualified name.
-	 */
-	public abstract String getWrapperFullyQualifiedName();
-
-	/**
 	 * Get the primitive type name.
 	 *
 	 * @return the primitive type name.
@@ -79,6 +73,15 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	 * @return the literal class.
 	 */
 	public abstract Class<? extends Expression> getLiteralClass();
+
+	/**
+	 * Get the wrapper fully qualified name.
+	 *
+	 * @return the wrapper fully qualified name.
+	 */
+	public String getWrapperFullyQualifiedName() {
+		return Bindings.getBoxedTypeName(getPrimitiveTypeName());
+	}
 
 	/**
 	 * Get the prefix in safe operators.
@@ -322,12 +325,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 			case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
 				VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
-				return fragment.getInitializer().equals(node) && isOfType(fragment.getName().resolveTypeBinding());
+				return node.getLocationInParent() == VariableDeclarationFragment.INITIALIZER_PROPERTY && isOfType(fragment.getName().resolveTypeBinding());
 
 			case ASTNode.RETURN_STATEMENT:
-				ReturnStatement returnStatement= (ReturnStatement) parentNode;
-				if (returnStatement.getExpression().equals(node)) {
-					MethodDeclaration method= ASTNodes.getTypedAncestor(returnStatement, MethodDeclaration.class);
+				if (node.getLocationInParent() == ReturnStatement.EXPRESSION_PROPERTY) {
+					MethodDeclaration method= ASTNodes.getTypedAncestor(parentNode, MethodDeclaration.class);
 
 					if (method != null && method.getReturnType2() != null) {
 						if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
@@ -348,8 +350,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 				return false;
 
 			case ASTNode.CONDITIONAL_EXPRESSION:
-				ConditionalExpression conditionalExpression= (ConditionalExpression) parentNode;
-				return conditionalExpression.getExpression().equals(node);
+				return node.getLocationInParent() == ConditionalExpression.EXPRESSION_PROPERTY;
 
 			case ASTNode.PREFIX_EXPRESSION:
 				return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());
