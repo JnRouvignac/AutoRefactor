@@ -67,8 +67,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
     private final class SuccessiveIfVisitor extends BlockSubVisitor {
         @Override
         public boolean visit(final IfStatement visited) {
-            if (result
-                    && ASTNodes.fallsThrough(visited.getThenStatement())) {
+            if (result && ASTNodes.fallsThrough(visited.getThenStatement())) {
                 List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
                 AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(visited.getExpression()));
                 duplicateIfBlocks.add(visited);
@@ -93,11 +92,9 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             if (lastBlock.getElseStatement() == null) {
                 IfStatement nextSibling= ASTNodes.as(ASTNodes.getNextSibling(lastBlock), IfStatement.class);
 
-                ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-                if (nextSibling != null && nextSibling.getElseStatement() == null
+                if (nextSibling != null
+                		&& nextSibling.getElseStatement() == null
                         && operandCount.get() + ASTNodes.getNbOperands(nextSibling.getExpression()) < ASTNodes.EXCESSIVE_OPERAND_NUMBER
-                        && !rewrite.hasBeenRefactored(nextSibling)
                         && ASTNodes.match(lastBlock.getThenStatement(), nextSibling.getThenStatement())) {
                     operandCount.addAndGet(ASTNodes.getNbOperands(nextSibling.getExpression()));
                     duplicateIfBlocks.add(nextSibling);
