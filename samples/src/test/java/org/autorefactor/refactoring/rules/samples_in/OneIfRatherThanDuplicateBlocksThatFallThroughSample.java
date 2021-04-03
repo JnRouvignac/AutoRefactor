@@ -32,6 +32,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
             System.out.println("The same code");
             return;
         }
+        // Keep this comment too
         if (i1 == 1) {
             System.out.println("The same code");
             return;
@@ -46,6 +47,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
             i1--;
             throw new Exception();
         }
+        // Keep this comment too
         if (i1 == 1) {
             System.out.println("The same code");
             --i1;
@@ -62,6 +64,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
                 i1++;
                 continue;
             }
+            // Keep this comment too
             if (i1 == 1) {
                 System.out.println("The same code");
                 ++i1;
@@ -80,6 +83,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
                 i1++;
                 break;
             }
+            // Keep this comment too
             if (i1 == 1) {
                 System.out.println("The same code");
                 i1 = i1 + 1;

@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -123,13 +122,12 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             }
 
             InfixExpression newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);
-            Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
-            IfStatement oldIf= iterator.next();
-            ASTNodes.replaceButKeepComment(rewrite, oldIf.getExpression(), newCondition, group);
 
-            while (iterator.hasNext()) {
-                rewrite.remove(iterator.next(), group);
-            }
+            for (int i= 0; i < duplicateIfBlocks.size() - 1; i++) {
+                ASTNodes.removeButKeepComment(rewrite, duplicateIfBlocks.get(i), group);
+			}
+
+            ASTNodes.replaceButKeepComment(rewrite, duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getExpression(), newCondition, group);
         }
     }
 }

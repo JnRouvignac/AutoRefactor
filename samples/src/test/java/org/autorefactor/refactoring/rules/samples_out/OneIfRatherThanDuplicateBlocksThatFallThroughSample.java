@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithReturn(int i1) {
         // Keep this comment
+        // Keep this comment too
         if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
             return;
@@ -37,9 +38,10 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeConditionsWithThrow(int i1) throws Exception {
         // Keep this comment
+        // Keep this comment too
         if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
-            i1--;
+            --i1;
             throw new Exception();
         }
         System.out.println("Next code");
@@ -48,9 +50,10 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithContinue() {
         for (int i1 = 0; i1 < 10; i1++) {
             // Keep this comment
+            // Keep this comment too
             if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
-                i1++;
+                ++i1;
                 continue;
             }
             System.out.println("Next code");
@@ -61,9 +64,10 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithBreak() {
         for (int i1 = 0; i1 < 10; i1++) {
             // Keep this comment
+            // Keep this comment too
             if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
-                i1++;
+                i1 = i1 + 1;
                 break;
             }
             System.out.println("Next code");
