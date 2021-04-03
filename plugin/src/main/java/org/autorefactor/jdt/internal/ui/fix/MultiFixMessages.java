@@ -797,15 +797,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

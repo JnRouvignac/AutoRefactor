@@ -124,7 +124,7 @@ public final class AllCleanUpRules {
 				new ObsoleteStaticInnerClassThanNonStaticCleanUp(),
 				new ObsoleteOppositeConditionRatherThanDuplicateConditionCleanUp(),
 				new ObsoleteOneConditionRatherThanUnreachableBlockCleanUp(), new ObsoleteMergeConditionalBlocksCleanUp(),
-				new ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
+				new OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
 				new ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp(),
 				new ElseRatherThanNegatedConditionCleanUp(), new ObsoleteGenericMapRatherThanRawMapCleanUp(),
 				new ObsoleteGenericListRatherThanRawListCleanUp(), new ObsoleteUseDiamondOperatorCleanUp(),

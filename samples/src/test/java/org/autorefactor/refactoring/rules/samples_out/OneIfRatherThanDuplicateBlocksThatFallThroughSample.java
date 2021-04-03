@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
-public class ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughSample {
+public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithReturn(int i1) {
         // Keep this comment
         if ((i1 == 0) || (i1 == 1)) {
