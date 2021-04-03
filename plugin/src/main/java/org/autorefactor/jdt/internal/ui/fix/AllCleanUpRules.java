@@ -107,7 +107,7 @@ public final class AllCleanUpRules {
 				new BigNumberCleanUp(),
 				new ObsoleteComparisonRatherThanEqualsCleanUp(),
 				new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
-				new PrimitiveComparisonRatherThanWrapperComparisonCleanUp(),
+				new ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp(),
 				new ObsoleteSerializeRatherThanBoxingAndSerializeCleanUp(),
 				new RemoveEmptyIfCleanUp(),
 				new NoLoopIterationRatherThanEmptyCheckCleanUp(),

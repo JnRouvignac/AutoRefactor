@@ -36,20 +36,20 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class PrimitiveComparisonRatherThanWrapperComparisonCleanUp extends AbstractCleanUpRule {
+public class ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_name;
+		return MultiFixMessages.ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description;
+		return MultiFixMessages.ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_reason;
+		return MultiFixMessages.ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_reason;
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class PrimitiveComparisonRatherThanWrapperComparisonCleanUp extends Abstr
 	private void refactor(final MethodInvocation visited, final Expression primitiveValue, final Class<?> wrapperClass) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_description);
 
 		MethodInvocation compareMethod= ast.newMethodInvocation();
 		compareMethod.setExpression(ast.newSimpleName(wrapperClass.getSimpleName()));

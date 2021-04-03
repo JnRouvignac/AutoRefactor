@@ -545,15 +545,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_name;
+	public static String ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_description;
+	public static String ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String PrimitiveComparisonRatherThanWrapperComparisonCleanUp_reason;
+	public static String ObsoletePrimitiveComparisonRatherThanWrapperComparisonCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

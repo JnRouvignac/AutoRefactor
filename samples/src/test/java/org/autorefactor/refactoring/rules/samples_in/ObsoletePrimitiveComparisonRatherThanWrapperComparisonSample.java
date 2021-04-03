@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-public class PrimitiveComparisonRatherThanWrapperComparisonSample {
+public class ObsoletePrimitiveComparisonRatherThanWrapperComparisonSample {
     public int simplifyIntegerComparison(int number, int anotherNumber) {
         // Keep this comment
         return Integer.valueOf(number).compareTo(anotherNumber);
