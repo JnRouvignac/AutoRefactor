@@ -45,7 +45,6 @@ import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
-import org.autorefactor.jdt.internal.ui.fix.ReduceVariableScopeCleanUp;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -72,7 +71,7 @@ public class RefactoringRulesTest {
 	 * When {@link #WHITELIST} is empty, the cleanups present in this collection
 	 * will never be run.
 	 */
-	private static final Collection<Class<?>> BLACKLIST= Arrays.asList(ReduceVariableScopeCleanUp.class);
+	private static final Collection<Class<?>> BLACKLIST= Arrays.asList();
 
 	private final String testName;
 
