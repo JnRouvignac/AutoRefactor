@@ -68,7 +68,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         @Override
         public boolean visit(final IfStatement visited) {
             if (result && ASTNodes.fallsThrough(visited.getThenStatement())) {
-                List<IfStatement> duplicateIfBlocks= new ArrayList<>(4);
+                List<IfStatement> duplicateIfBlocks= new ArrayList<>(ASTNodes.EXCESSIVE_OPERAND_NUMBER - 1);
                 AtomicInteger operandCount= new AtomicInteger(ASTNodes.getNbOperands(visited.getExpression()));
                 duplicateIfBlocks.add(visited);
 
@@ -113,7 +113,13 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 
             for (IfStatement ifStatement : duplicateIfBlocks) {
-                newConditions.add(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, ifStatement.getExpression())));
+            	InfixExpression oneOriginalCondition= ASTNodes.as(ifStatement.getExpression(), InfixExpression.class);
+
+            	if (ASTNodes.hasOperator(oneOriginalCondition, InfixExpression.Operator.CONDITIONAL_OR)) {
+                    newConditions.add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(ifStatement.getExpression())));
+            	} else {
+                    newConditions.add(ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, ifStatement.getExpression())));
+            	}
             }
 
             InfixExpression newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, newConditions);

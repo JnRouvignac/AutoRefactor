@@ -111,22 +111,6 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
         System.out.println("Next code");
     }
 
-    public void doNotMergeConditionsWithConditionalReturn(int i1, int i2) {
-        if (i1 == 0) {
-            System.out.println("The same code");
-            if (i2 == 0) {
-                return;
-            }
-        }
-        if (i1 == 1) {
-            System.out.println("The same code");
-            if (i2 == 0) {
-                return;
-            }
-        }
-        System.out.println("Next code");
-    }
-
     public void mergeSeveralConditions(int i1) {
         // Keep this comment
         if (i1 == 0) {
@@ -144,6 +128,35 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
         if (i1 == 3) {
             System.out.println("The same code");
             return;
+        }
+        System.out.println("Next code");
+    }
+
+    public void mergeORConditions(boolean isValid, boolean isActive, boolean isEnabled, boolean isFound) {
+        // Keep this comment
+        if (isValid || isActive) {
+            System.out.println("The same code");
+            return;
+        }
+        if (isEnabled || isFound) {
+            System.out.println("The same code");
+            return;
+        }
+        System.out.println("Next code");
+    }
+
+    public void doNotMergeConditionsWithConditionalReturn(int i1, int i2) {
+        if (i1 == 0) {
+            System.out.println("The same code");
+            if (i2 == 0) {
+                return;
+            }
+        }
+        if (i1 == 1) {
+            System.out.println("The same code");
+            if (i2 == 0) {
+                return;
+            }
         }
         System.out.println("Next code");
     }
