@@ -32,7 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
-public class RedundantComparatorSample {
+public class ObsoleteRedundantComparatorSample {
     public List<Date> removeComparatorClass(List<Date> listToSort) {
         // Keep this comment
         Collections.sort(listToSort);

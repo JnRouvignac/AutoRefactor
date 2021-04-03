@@ -389,15 +389,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantComparatorCleanUp_name;
+	public static String ObsoleteRedundantComparatorCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantComparatorCleanUp_description;
+	public static String ObsoleteRedundantComparatorCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantComparatorCleanUp_reason;
+	public static String ObsoleteRedundantComparatorCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -809,15 +809,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
+	public static String ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
+	public static String ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
+	public static String ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

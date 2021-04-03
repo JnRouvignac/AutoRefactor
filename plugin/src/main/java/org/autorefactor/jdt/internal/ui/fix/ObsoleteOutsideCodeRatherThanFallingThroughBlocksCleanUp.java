@@ -51,20 +51,20 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
+public class ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
+		return MultiFixMessages.ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
+		return MultiFixMessages.ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
+		return MultiFixMessages.ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_reason;
 	}
 
 	@Override
@@ -185,7 +185,7 @@ public class OutsideCodeRatherThanFallingThroughBlocksCleanUp extends AbstractCl
 				if (match) {
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 					ASTNodeFactory ast= cuRewrite.getASTBuilder();
-					TextEditGroup group= new TextEditGroup(MultiFixMessages.OutsideCodeRatherThanFallingThroughBlocksCleanUp_description);
+					TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteOutsideCodeRatherThanFallingThroughBlocksCleanUp_description);
 
 					if (redundantStatement instanceof Block) {
 						rewrite.remove(stmtsToCompare, group);

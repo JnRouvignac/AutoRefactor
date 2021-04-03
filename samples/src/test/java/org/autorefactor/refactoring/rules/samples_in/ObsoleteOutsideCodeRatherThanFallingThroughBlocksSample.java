@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.List;
 
-public class OutsideCodeRatherThanFallingThroughBlocksSample {
+public class ObsoleteOutsideCodeRatherThanFallingThroughBlocksSample {
     private boolean b= true;
 
     public void mergeIfBlocksIntoFollowingCode(int i) {

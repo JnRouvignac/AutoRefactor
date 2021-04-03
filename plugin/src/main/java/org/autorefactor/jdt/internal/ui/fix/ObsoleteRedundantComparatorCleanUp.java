@@ -61,7 +61,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
+public class ObsoleteRedundantComparatorCleanUp extends NewClassImportCleanUp {
 	private final class RefactoringWithCollectionsClass extends CleanUpWithNewClassImport {
 		@Override
 		public boolean visit(final MethodInvocation visited) {
@@ -72,17 +72,17 @@ public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
 
 	@Override
 	public String getName() {
-		return MultiFixMessages.RedundantComparatorCleanUp_name;
+		return MultiFixMessages.ObsoleteRedundantComparatorCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.RedundantComparatorCleanUp_description;
+		return MultiFixMessages.ObsoleteRedundantComparatorCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.RedundantComparatorCleanUp_reason;
+		return MultiFixMessages.ObsoleteRedundantComparatorCleanUp_reason;
 	}
 
 	@Override
@@ -435,7 +435,7 @@ public class RedundantComparatorCleanUp extends NewClassImportCleanUp {
 			final Set<String> importsToAdd) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantComparatorCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteRedundantComparatorCleanUp_description);
 
 		if (visitedIfRefactoringNeeded != null) {
 			String collectionsClassname= addImport(Collections.class, classesToUseWithImport, importsToAdd);
