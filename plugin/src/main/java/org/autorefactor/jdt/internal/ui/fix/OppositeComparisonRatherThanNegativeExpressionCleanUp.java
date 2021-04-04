@@ -87,6 +87,6 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 		compareToMethod.setName(ast.newSimpleName("compareTo")); //$NON-NLS-1$
 		compareToMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(methodInvocation.getExpression())));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, compareToMethod, group);
+		rewrite.replace(visited, compareToMethod, group);
 	}
 }

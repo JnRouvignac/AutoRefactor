@@ -138,6 +138,6 @@ public class CollectionsAddAllRatherThanAsListCleanUp extends NewClassImportClea
 		newMethodInvocation.arguments().addAll(copyOfArguments);
 
 		MethodInvocation newCollectionsAddAllMethod= newMethodInvocation;
-		ASTNodes.replaceButKeepComment(rewrite, visited, newCollectionsAddAllMethod, group);
+		rewrite.replace(visited, newCollectionsAddAllMethod, group);
 	}
 }

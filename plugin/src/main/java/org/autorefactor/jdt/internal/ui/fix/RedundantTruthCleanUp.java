@@ -94,6 +94,6 @@ public class RedundantTruthCleanUp extends AbstractCleanUpRule {
 			operand= ast.negate(expressionToCopy, true);
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, operand, group);
+		rewrite.replace(visited, operand, group);
 	}
 }

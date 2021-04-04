@@ -127,7 +127,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
                 ASTNodes.removeButKeepComment(rewrite, duplicateIfBlocks.get(i), group);
 			}
 
-            ASTNodes.replaceButKeepComment(rewrite, duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getExpression(), newCondition, group);
+            rewrite.replace(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getExpression(), newCondition, group);
         }
     }
 }

@@ -129,7 +129,7 @@ public class FormattedNumberRatherThanPackedNumberCleanUp extends AbstractCleanU
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.FormattedNumberRatherThanPackedNumberCleanUp_description);
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, replacement, group);
+		rewrite.replace(visited, replacement, group);
 	}
 
 	private boolean isInSignature(final int position, final NumberLiteral visited, final MethodInvocation methodInvocation,

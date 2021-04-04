@@ -279,7 +279,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				ASTNodes.replaceButKeepComment(rewrite, visited, createStringConcats(allAppendedStrings), group);
+				rewrite.replace(visited, createStringConcats(allAppendedStrings), group);
 				return false;
 			}
 		}
@@ -595,7 +595,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 			}
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, result, group);
+		rewrite.replace(visited, result, group);
 		return false;
 	}
 
@@ -704,7 +704,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 				TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 				ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-				ASTNodes.replaceButKeepComment(rewrite, visited, createStringConcats(allOperands), group);
+				rewrite.replace(visited, createStringConcats(allOperands), group);
 				return false;
 			}
 		}
@@ -803,7 +803,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringBuilderCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, initializer, createStringConcats(allAppendedStrings), group);
+		rewrite.replace(initializer, createStringConcats(allAppendedStrings), group);
 		ASTNodes.replaceButKeepComment(rewrite, type, ast.type(String.class.getSimpleName()), group);
 
 		for (Statement statementToRemove : statementsToRemove) {
@@ -811,7 +811,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 		}
 
 		for (MethodInvocation readToRefactor : toStringToRefactor) {
-			ASTNodes.replaceButKeepComment(rewrite, readToRefactor, ASTNodes.createMoveTarget(rewrite, readToRefactor.getExpression()), group);
+			rewrite.replace(readToRefactor, ASTNodes.createMoveTarget(rewrite, readToRefactor.getExpression()), group);
 		}
 	}
 }

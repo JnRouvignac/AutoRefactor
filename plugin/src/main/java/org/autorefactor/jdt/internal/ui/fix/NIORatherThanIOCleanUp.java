@@ -134,13 +134,13 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 		getMethod.arguments().add(copyOfPathText);
 
 		if (ASTNodes.usesGivenSignature(visited, File.class.getCanonicalName(), TOPATH_METHOD)) {
-			ASTNodes.replaceButKeepComment(rewrite, visited, getMethod, group);
+			rewrite.replace(visited, getMethod, group);
 		} else {
 			MethodInvocation methodInvocation= ast.newMethodInvocation();
 			methodInvocation.setExpression(getMethod);
 			methodInvocation.setName(ast.newSimpleName(TOURI_METHOD));
 			MethodInvocation newMethodInvocation= methodInvocation;
-			ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+			rewrite.replace(visited, newMethodInvocation, group);
 		}
 	}
 
@@ -235,18 +235,18 @@ public class NIORatherThanIOCleanUp extends NewClassImportCleanUp {
 			getMethod.setName(ast.newSimpleName(GET_METHOD));
 			getMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) classInstanceCreation.arguments().get(0))));
 
-			ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, getMethod, group);
+			rewrite.replace(classInstanceCreation, getMethod, group);
 
 			for (SimpleName fileUse : fileUses) {
 				MethodInvocation methodInvocation= (MethodInvocation) fileUse.getParent();
 
 				if (ASTNodes.usesGivenSignature(methodInvocation, File.class.getCanonicalName(), TOPATH_METHOD)) {
-					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, ASTNodes.createMoveTarget(rewrite, fileUse), group);
+					rewrite.replace(methodInvocation, ASTNodes.createMoveTarget(rewrite, fileUse), group);
 				} else {
 					MethodInvocation newMethodInvocation= ast.newMethodInvocation();
 					newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, fileUse));
 					newMethodInvocation.setName(ast.newSimpleName(TOURI_METHOD));
-					ASTNodes.replaceButKeepComment(rewrite, methodInvocation, newMethodInvocation, group);
+					rewrite.replace(methodInvocation, newMethodInvocation, group);
 				}
 			}
 		}

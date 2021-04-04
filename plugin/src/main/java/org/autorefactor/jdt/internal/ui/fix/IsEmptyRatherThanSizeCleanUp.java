@@ -84,22 +84,22 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
 				if (Long.valueOf(0L).equals(literalSize)) {
 					if (Arrays.asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
-						ASTNodes.replaceButKeepComment(rewrite, visited, ast.not(newMethodInvocation), group);
+						rewrite.replace(visited, ast.not(newMethodInvocation), group);
 						return false;
 					}
 
 					if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.LESS_EQUALS).contains(orderedCondition.getOperator())) {
-						ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+						rewrite.replace(visited, newMethodInvocation, group);
 						return false;
 					}
 				} else if (Long.valueOf(1L).equals(literalSize)) {
 					if (InfixExpression.Operator.GREATER_EQUALS.equals(orderedCondition.getOperator())) {
-						ASTNodes.replaceButKeepComment(rewrite, visited, ast.not(newMethodInvocation), group);
+						rewrite.replace(visited, ast.not(newMethodInvocation), group);
 						return false;
 					}
 
 					if (InfixExpression.Operator.LESS.equals(orderedCondition.getOperator())) {
-						ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+						rewrite.replace(visited, newMethodInvocation, group);
 						return false;
 					}
 				}

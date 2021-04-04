@@ -322,7 +322,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 		for (MethodInvocation methodCall : methodCallsToRefactor) {
 			MethodInvocation copyOfMethodCall= ast.copySubtree(methodCall);
 			refactorMethod(methodCall, copyOfMethodCall);
-			ASTNodes.replaceButKeepComment(rewrite, methodCall, copyOfMethodCall, group);
+			rewrite.replace(methodCall, copyOfMethodCall, group);
 		}
 
 		for (VariableDeclaration variableDecl : variableDecls) {

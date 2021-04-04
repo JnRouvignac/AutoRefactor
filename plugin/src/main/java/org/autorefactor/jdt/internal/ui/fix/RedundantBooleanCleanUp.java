@@ -105,12 +105,12 @@ public class RedundantBooleanCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantBooleanCleanUp_description);
 
 		if (remainingOperands.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
+			rewrite.replace(visited, ASTNodes.createMoveTarget(rewrite, remainingOperands.get(0)), group);
 		} else {
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 			InfixExpression newInfixExpression= ast.newInfixExpression(visited.getOperator(), ASTNodes.createMoveTarget(rewrite, remainingOperands));
-			ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
+			rewrite.replace(visited, newInfixExpression, group);
 		}
 	}
 }

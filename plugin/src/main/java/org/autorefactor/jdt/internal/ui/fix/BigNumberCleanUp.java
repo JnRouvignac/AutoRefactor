@@ -152,8 +152,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 					TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 					ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-					ASTNodes.replaceButKeepComment(rewrite, visited,
-							getClassInstanceCreatorNode(visited.getExpression(), token), group);
+					rewrite.replace(visited, getClassInstanceCreatorNode(visited.getExpression(), token), group);
 				} else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
 					replaceWithQualifiedName(visited, typeBinding, "ZERO"); //$NON-NLS-1$
 				} else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -191,7 +190,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.BigNumberCleanUp_description);
 
 		// Only instantiation from double, not from integer
-		ASTNodes.replaceButKeepComment(rewrite, arg0, getStringLiteral(numberText), group);
+		rewrite.replace(arg0, getStringLiteral(numberText), group);
 	}
 
 	private void replaceByValueOf(final ClassInstanceCreation visited, final ITypeBinding typeBinding,
@@ -205,7 +204,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 		valueOf.setName(ast.newSimpleName("valueOf")); //$NON-NLS-1$
 		valueOf.arguments().add(ast.newNumberLiteral(numberText));
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, valueOf, group);
+		rewrite.replace(visited, valueOf, group);
 	}
 
 	private void replaceWithQualifiedName(final ASTNode visited, final ITypeBinding typeBinding, final String field) {

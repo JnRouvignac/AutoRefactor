@@ -95,7 +95,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.NamedMethodRatherThanLogLevelParameterCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, visited.getName(), ast.newSimpleName(methodName), group);
+		rewrite.replace(visited.getName(), ast.newSimpleName(methodName), group);
 		rewrite.remove((Expression) visited.arguments().get(0), group);
 	}
 }

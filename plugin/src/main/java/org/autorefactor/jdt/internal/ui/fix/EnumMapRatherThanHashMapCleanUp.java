@@ -128,7 +128,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 
-		ASTNodes.replaceButKeepComment(rewrite, classInstanceCreation, ast.newClassInstanceCreation(newType, newParam), group);
+		rewrite.replace(classInstanceCreation, ast.newClassInstanceCreation(newType, newParam), group);
 	}
 
 	/**

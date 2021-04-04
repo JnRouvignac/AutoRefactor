@@ -117,9 +117,9 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 		copyOfOperands.addAll(ASTNodes.createMoveTarget(rewrite, nextOperands));
 
 		if (copyOfOperands.size() == 1) {
-			ASTNodes.replaceButKeepComment(rewrite, operandWithRedundance, copyOfOperands.get(0), group);
+			rewrite.replace(operandWithRedundance, copyOfOperands.get(0), group);
 		} else {
-			ASTNodes.replaceButKeepComment(rewrite, operandWithRedundance, ast.newInfixExpression(operator, copyOfOperands), group);
+			rewrite.replace(operandWithRedundance, ast.newInfixExpression(operator, copyOfOperands), group);
 		}
 	}
 }

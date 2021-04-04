@@ -89,6 +89,6 @@ public class TruncatingAppendingRatherThanSubCharactersCleanUp extends AbstractC
 		appendMethod.arguments().add(arg0);
 		appendMethod.arguments().add(arg1);
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, appendMethod, group);
+		rewrite.replace(visited, appendMethod, group);
 	}
 }

@@ -113,7 +113,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			equalsMethod.setName(ast.newSimpleName("equals")); //$NON-NLS-1$
 			equalsMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
 			equalsMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(1)));
-			ASTNodes.replaceButKeepComment(rewrite, visited, equalsMethod, group);
+			rewrite.replace(visited, equalsMethod, group);
 			return false;
 		}
 
@@ -127,8 +127,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			toStringMethod.setName(ast.newSimpleName("toString")); //$NON-NLS-1$
 			toStringMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression((Expression) visited.arguments().get(0))));
 			toStringMethod.arguments().add(ast.newStringLiteral("")); //$NON-NLS-1$
-			ASTNodes.replaceButKeepComment(rewrite, visited,
-					toStringMethod, group);
+			rewrite.replace(visited, toStringMethod, group);
 			return false;
 		}
 
@@ -142,7 +141,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 			hashMethod.setExpression(javaUtilObjects);
 			hashMethod.setName(ast.newSimpleName("hash")); //$NON-NLS-1$
 			hashMethod.arguments().addAll(copyArguments(visited));
-			ASTNodes.replaceButKeepComment(rewrite, visited, hashMethod, group);
+			rewrite.replace(visited, hashMethod, group);
 			return false;
 		}
 
@@ -152,14 +151,14 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
 			Name javaUtilObjects= ASTNodeFactory.newName(ast, addImport(Objects.class, classesToUseWithImport, importsToAdd));
 			if (visited.getExpression() != null) {
-				ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), javaUtilObjects, group);
-				ASTNodes.replaceButKeepComment(rewrite, visited.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
+				rewrite.replace(visited.getExpression(), javaUtilObjects, group);
+				rewrite.replace(visited.getName(), ast.newSimpleName("hash"), group); //$NON-NLS-1$
 			} else {
 				MethodInvocation hashMethod= ast.newMethodInvocation();
 				hashMethod.setExpression(javaUtilObjects);
 				hashMethod.setName(ast.newSimpleName("hash")); //$NON-NLS-1$
 				hashMethod.arguments().addAll(copyArguments(visited));
-				ASTNodes.replaceButKeepComment(rewrite, visited, hashMethod, group);
+				rewrite.replace(visited, hashMethod, group);
 			}
 
 			return false;
@@ -184,7 +183,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				requireNonNullMethod.setExpression(javaUtilObjects);
 				requireNonNullMethod.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$
 				requireNonNullMethod.arguments().addAll(copyOfArgs);
-				ASTNodes.replaceButKeepComment(rewrite, visited, requireNonNullMethod, group);
+				rewrite.replace(visited, requireNonNullMethod, group);
 			} else if (cuRewrite.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
 				LambdaExpression messageSupplier= ast.newLambdaExpression();
 				MethodInvocation formatMethod= ast.newMethodInvocation();
@@ -198,7 +197,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 				requireNonNullMethod.setName(ast.newSimpleName("requireNonNull")); //$NON-NLS-1$
 				requireNonNullMethod.arguments().add(copyOfArgs.get(0));
 				requireNonNullMethod.arguments().add(messageSupplier);
-				ASTNodes.replaceButKeepComment(rewrite, visited, requireNonNullMethod, group);
+				rewrite.replace(visited, requireNonNullMethod, group);
 			} else {
 				return true;
 			}
@@ -225,6 +224,6 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.StandardMethodRatherThanLibraryMethodCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), javaUtilObjects, group);
+		rewrite.replace(visited.getExpression(), javaUtilObjects, group);
 	}
 }

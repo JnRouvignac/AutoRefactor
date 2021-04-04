@@ -255,6 +255,6 @@ public class OptimizeRegExCleanUp extends AbstractCleanUpRule {
         TextEditGroup group= new TextEditGroup(MultiFixMessages.OptimizeRegExCleanUp_description);
 
 
-        ASTNodes.replaceButKeepComment(rewrite, visited, ast.newStringLiteral(pattern), group);
+        rewrite.replace(visited, ast.newStringLiteral(pattern), group);
     }
 }

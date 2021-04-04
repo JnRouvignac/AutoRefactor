@@ -93,6 +93,6 @@ public class AssignRatherThanTernaryFilterThenAssignAnywayCleanUp extends Abstra
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.AssignRatherThanTernaryFilterThenAssignAnywayCleanUp_description);
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, valuedExpression)), group);
+		rewrite.replace(visited, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, valuedExpression)), group);
 	}
 }

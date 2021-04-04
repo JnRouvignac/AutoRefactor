@@ -185,8 +185,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 								Assignment.Operator.ASSIGN, ast.copySubtree(item.findViewByIdExpression))));
 
 						// Replace previous findViewById with accesses to viewHolderItem
-						ASTNodes.replaceButKeepComment(rewrite, item.findViewByIdExpression,
-								ast.createCopyTarget(fieldAccess), group);
+						rewrite.replace(item.findViewByIdExpression, ast.createCopyTarget(fieldAccess), group);
 					}
 					MethodInvocation setTagMethod= ast.newMethodInvocation();
 					setTagMethod.setExpression(ASTNodeFactory.newName(ast, "convertView")); //$NON-NLS-1$

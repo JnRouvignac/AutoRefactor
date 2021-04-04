@@ -137,6 +137,6 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 		newMethodInvocation.setExpression(ASTNodes.createMoveTarget(rewrite, visited.getExpression()));
 		newMethodInvocation.setName(ast.newSimpleName(methodName));
 		newMethodInvocation.arguments().addAll(params);
-		ASTNodes.replaceButKeepComment(rewrite, visited, newMethodInvocation, group);
+		rewrite.replace(visited, newMethodInvocation, group);
 	}
 }

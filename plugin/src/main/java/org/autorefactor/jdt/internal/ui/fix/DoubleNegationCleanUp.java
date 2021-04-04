@@ -103,7 +103,7 @@ public class DoubleNegationCleanUp extends AbstractCleanUpRule {
 			newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, rightNegatedExpression));
 		}
 
-		ASTNodes.replaceButKeepComment(rewrite, visited, newInfixExpression, group);
+		rewrite.replace(visited, newInfixExpression, group);
 	}
 
 	private InfixExpression.Operator getAppropriateOperator(final InfixExpression visited) {

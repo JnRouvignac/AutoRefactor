@@ -108,7 +108,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 		}
 
 		if (Boolean.TRUE.equals(visited.getExpression().resolveConstantExpressionValue())) {
-			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ASTNodes.getUnparenthesedExpression(ifCondition), group);
+			rewrite.replace(visited.getExpression(), ASTNodes.getUnparenthesedExpression(ifCondition), group);
 		} else {
 			InfixExpression newCondition= ast.newInfixExpression();
 			newCondition.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast,
@@ -116,7 +116,7 @@ public class WhileConditionRatherThanInnerIfCleanUp extends AbstractCleanUpRule 
 			newCondition.setOperator(InfixExpression.Operator.CONDITIONAL_AND);
 			newCondition.setRightOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ifCondition));
 
-			ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), newCondition, group);
+			rewrite.replace(visited.getExpression(), newCondition, group);
 		}
 
 		List<Statement> otherStatements= ASTNodes.asList(otherStatement);

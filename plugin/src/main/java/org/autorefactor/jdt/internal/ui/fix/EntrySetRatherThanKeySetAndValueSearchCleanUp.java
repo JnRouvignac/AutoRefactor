@@ -268,7 +268,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 			getValueMethod.setExpression(ast.newSimpleName(entryVar));
 			getValueMethod.setName(ast.newSimpleName("getValue")); //$NON-NLS-1$
 			MethodInvocation newMethodInvocation= getValueMethod;
-			ASTNodes.replaceButKeepComment(rewrite, getValueMi, newMethodInvocation, group);
+			rewrite.replace(getValueMi, newMethodInvocation, group);
 		}
 	}
 
