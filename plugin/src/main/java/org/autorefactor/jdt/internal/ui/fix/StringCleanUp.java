@@ -26,6 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.List;
+
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -69,7 +71,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				return false;
 			}
 
-			if (parent instanceof InfixExpression) {
+			if (parent instanceof InfixExpression && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS)) {
 				// If node is in a String context, no need to call toString()
 				InfixExpression infixExpression= (InfixExpression) parent;
 				Expression leftOperand= infixExpression.getLeftOperand();
@@ -97,33 +99,40 @@ public class StringCleanUp extends AbstractCleanUpRule {
 					return false;
 				}
 			}
-		} else if (isStringValueOf && ASTNodes.hasType((Expression) visited.arguments().get(0), String.class.getCanonicalName())) {
-			if (visited.arguments().get(0) instanceof StringLiteral || visited.arguments().get(0) instanceof InfixExpression) {
-				removeValueOf(visited);
-				return false;
-			}
-		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(visited))) {
-			// If node is in a String context, no need to call toString()
-			InfixExpression infixExpression= (InfixExpression) parent;
-			Expression leftOperand= infixExpression.getLeftOperand();
-			Expression rightOperand= infixExpression.getRightOperand();
+		} else if (isStringValueOf
+				&& ASTNodes.hasType((Expression) visited.arguments().get(0), String.class.getCanonicalName())
+				&& (visited.arguments().get(0) instanceof StringLiteral || visited.arguments().get(0) instanceof InfixExpression)) {
+			removeValueOf(visited);
+			return false;
+		}
 
-			if (visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
-				if (ASTNodes.hasType(rightOperand, String.class.getCanonicalName())) {
-					return maybeReplaceStringValueOfByArg0(leftOperand, visited);
-				}
-			} else if (visited.getLocationInParent() == InfixExpression.RIGHT_OPERAND_PROPERTY) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		return true;
+	}
 
-				if (ASTNodes.hasType(leftOperand, String.class.getCanonicalName())
-						// Do not refactor left and right operand at the same time
-						// to avoid compilation errors post cleanup
-						&& !rewrite.hasBeenRefactored(leftOperand)) {
-					return maybeReplaceStringValueOfByArg0(rightOperand, visited);
+	@Override
+	public boolean visit(final InfixExpression visited) {
+		if (ASTNodes.hasOperator(visited, InfixExpression.Operator.PLUS)) {
+			List<Expression> allOperands= ASTNodes.allOperands(visited);
+
+			for (int i= 0; i < allOperands.size(); i++) {
+				Expression operand= allOperands.get(i);
+				MethodInvocation valueOfMethod= ASTNodes.as(operand, MethodInvocation.class);
+
+				if (valueOfMethod != null && (isStringValueOf(valueOfMethod) || isToStringForPrimitive(valueOfMethod))) {
+					// If node is in a String context, no need to call toString()
+					if (i == 0) {
+						if (ASTNodes.hasType(visited.getRightOperand(), String.class.getCanonicalName()) && !maybeReplaceStringValueOfByArg0(visited.getLeftOperand(), valueOfMethod)) {
+							return false;
+						}
+					} else if (i == 1) {
+						if (ASTNodes.hasType(visited.getLeftOperand(), String.class.getCanonicalName()) && !maybeReplaceStringValueOfByArg0(visited.getRightOperand(), valueOfMethod)) {
+							return false;
+						}
+					} else if (!maybeReplaceStringValueOfByArg0(valueOfMethod, valueOfMethod)) {
+						// Left or right operation is necessarily a string, so just replace
+						return false;
+					}
 				}
-			} else {
-				// Left or right operation is necessarily a string, so just replace
-				return maybeReplaceStringValueOfByArg0(visited, visited);
 			}
 		}
 
@@ -163,7 +172,6 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		}
 
 		replaceStringValueOfByArg0(toReplace, methodInvocation, expectedType);
-
 		return false;
 	}
 
