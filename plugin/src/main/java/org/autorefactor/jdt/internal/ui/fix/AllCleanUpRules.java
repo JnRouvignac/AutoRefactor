@@ -102,6 +102,7 @@ public final class AllCleanUpRules {
 				new ObsoleteInstanceofRatherThanIsInstanceCleanUp(),
 				new ObsoleteStringRatherThanNewStringCleanUp(),
 				new StringCleanUp(),
+				new EqualsIgnoreCaseRatherThanCaseShiftCleanUp(),
 				new CharacterParameterRatherThanStringCleanUp(),
 				new StringValueOfRatherThanConcatCleanUp(),
 				new ObsoleteSubstringWithOneParameterRatherThanTwoCleanUp(),

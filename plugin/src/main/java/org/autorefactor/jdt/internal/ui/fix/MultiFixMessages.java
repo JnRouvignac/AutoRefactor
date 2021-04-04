@@ -485,6 +485,18 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
+	public static String EqualsIgnoreCaseRatherThanCaseShiftCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String EqualsIgnoreCaseRatherThanCaseShiftCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String EqualsIgnoreCaseRatherThanCaseShiftCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
 	public static String CharacterParameterRatherThanStringCleanUp_name;
 	/**
 	 * Automatically filled.

@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -130,53 +128,9 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				// Left or right operation is necessarily a string, so just replace
 				return maybeReplaceStringValueOfByArg0(visited, visited);
 			}
-		} else if (ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-			MethodInvocation leftInvocation= ASTNodes.as(visited.getExpression(), MethodInvocation.class);
-			MethodInvocation rightInvocation= ASTNodes.as((Expression) visited.arguments().get(0), MethodInvocation.class);
-
-			if (leftInvocation != null
-					&& rightInvocation != null
-					&& (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-							&& ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-							|| ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
-									&& ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
-				Expression leftExpression= leftInvocation.getExpression();
-				Expression rightExpression= rightInvocation.getExpression();
-
-				ASTNodes.replaceButKeepComment(rewrite, visited.getExpression(), ASTNodes.createMoveTarget(rewrite, leftExpression), group);
-				ASTNodes.replaceButKeepComment(rewrite, visited.getName(), ast.newSimpleName("equalsIgnoreCase"), group); //$NON-NLS-1$
-				ASTNodes.replaceButKeepComment(rewrite, (Expression) visited.arguments().get(0), ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)), group);
-				return false;
-			}
-		} else if (ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
-			AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
-
-			Expression leftExpression= getReducedStringExpression(visited.getExpression(), isRefactoringNeeded);
-			Expression rightExpression= getReducedStringExpression((Expression) visited.arguments().get(0), isRefactoringNeeded);
-
-			if (isRefactoringNeeded.get()) {
-				MethodInvocation equalsIgnoreCaseMethod= ast.newMethodInvocation();
-				equalsIgnoreCaseMethod.setExpression(ASTNodes.createMoveTarget(rewrite, leftExpression));
-				equalsIgnoreCaseMethod.setName(ast.newSimpleName("equalsIgnoreCase")); //$NON-NLS-1$
-				equalsIgnoreCaseMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)));
-				ASTNodes.replaceButKeepComment(rewrite, visited, equalsIgnoreCaseMethod, group);
-				return false;
-			}
 		}
 
 		return true;
-	}
-
-	private Expression getReducedStringExpression(final Expression stringExpression, final AtomicBoolean isRefactoringNeeded) {
-		MethodInvocation casingInvocation= ASTNodes.as(stringExpression, MethodInvocation.class);
-
-		if (casingInvocation != null && (ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
-			isRefactoringNeeded.lazySet(true);
-			return casingInvocation.getExpression();
-		}
-
-		return stringExpression;
 	}
 
 	private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation methodInvocation) {
