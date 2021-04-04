@@ -34,20 +34,20 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class DoubleNegationCleanUp extends AbstractCleanUpRule {
+public class ObsoleteDoubleNegationCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.DoubleNegationCleanUp_name;
+		return MultiFixMessages.ObsoleteDoubleNegationCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.DoubleNegationCleanUp_description;
+		return MultiFixMessages.ObsoleteDoubleNegationCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.DoubleNegationCleanUp_reason;
+		return MultiFixMessages.ObsoleteDoubleNegationCleanUp_reason;
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class DoubleNegationCleanUp extends AbstractCleanUpRule {
 			final Expression rightExpression, final Expression leftNegatedExpression, final Expression rightNegatedExpression) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.DoubleNegationCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteDoubleNegationCleanUp_description);
 
 		InfixExpression newInfixExpression= ast.newInfixExpression();
 

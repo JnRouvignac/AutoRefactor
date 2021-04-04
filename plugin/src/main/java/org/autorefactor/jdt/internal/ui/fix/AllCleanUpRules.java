@@ -70,7 +70,7 @@ public final class AllCleanUpRules {
 				new ObsoleteRemoveSemiColonCleanUp(), new RemoveUnnecessaryLocalBeforeReturnCleanUp(),
 				new ObsoleteRedundantModifiersCleanUp(),
 				new ObsoleteRemoveUnnecessaryCastCleanUp(), new ObsoletePushNegationDownCleanUp(),
-				new ObsoleteSimpleNameRatherThanQualifiedNameCleanUp(), new DoubleNegationCleanUp(),
+				new ObsoleteSimpleNameRatherThanQualifiedNameCleanUp(), new ObsoleteDoubleNegationCleanUp(),
 				new RemoveParenthesisCleanUp(),
 				// The previous cleanups should run first as they make the code more standard and avoid weird code
 				new RedundantTruthCleanUp(),

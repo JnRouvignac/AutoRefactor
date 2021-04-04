@@ -1817,15 +1817,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleNegationCleanUp_name;
+	public static String ObsoleteDoubleNegationCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleNegationCleanUp_description;
+	public static String ObsoleteDoubleNegationCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoubleNegationCleanUp_reason;
+	public static String ObsoleteDoubleNegationCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
