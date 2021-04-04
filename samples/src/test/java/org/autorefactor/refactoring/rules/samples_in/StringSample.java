@@ -219,35 +219,4 @@ public class StringSample {
         s1.equalsIgnoreCase(s2.toLowerCase());
         s1.equalsIgnoreCase(s2.toUpperCase());
     }
-
-    public void refactorIndexOf(){
-        String b = "b";
-        "a".indexOf("a", 0);
-        b.indexOf("a");
-        b.trim().indexOf("\t", 0);
-        "a".indexOf("\n");
-    }
-
-    public void refactorlastIndexOfCases(){
-        String b = "b";
-        "a".lastIndexOf("a", 0);
-        b.lastIndexOf("a");
-        b.toLowerCase().lastIndexOf("\t", 0);
-        "a".lastIndexOf("\n");
-    }
-
-    public void doNotRefactorInvocationsOtherThanOneChar(){
-        "a".indexOf(1);
-        "a".indexOf(1, 0);
-        "a".indexOf("as", 0);
-        "a".indexOf("\\t", 0);
-        "a".indexOf("as");
-        "a".indexOf("\\b");
-        "a".lastIndexOf(1);
-        "a".lastIndexOf(1, 0);
-        "a".lastIndexOf("as", 0);
-        "a".lastIndexOf("\\t", 0);
-        "a".lastIndexOf("as");
-        "a".lastIndexOf("\\b");
-    }
 }

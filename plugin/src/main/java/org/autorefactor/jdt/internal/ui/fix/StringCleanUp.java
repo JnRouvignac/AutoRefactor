@@ -33,7 +33,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -162,22 +161,6 @@ public class StringCleanUp extends AbstractCleanUpRule {
 				equalsIgnoreCaseMethod.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(rightExpression)));
 				ASTNodes.replaceButKeepComment(rewrite, visited, equalsIgnoreCaseMethod, group);
 				return false;
-			}
-		} else if (ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
-				|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
-			StringLiteral stringLiteral= ASTNodes.as((Expression) visited.arguments().get(0), StringLiteral.class);
-
-			if (stringLiteral != null) {
-				String value= stringLiteral.getLiteralValue();
-
-				if (value.length() == 1) {
-					CharacterLiteral replacement= ast.newCharacterLiteral();
-					replacement.setCharValue(value.charAt(0));
-					ASTNodes.replaceButKeepComment(rewrite, stringLiteral, replacement, group);
-					return false;
-				}
 			}
 		}
 
