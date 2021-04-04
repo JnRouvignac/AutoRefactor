@@ -60,69 +60,66 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		ASTNode parent= visited.getParent();
 		boolean isStringValueOf= isStringValueOf(visited);
 
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
-
 		if (ASTNodes.usesGivenSignature(visited, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
 			Expression stringExpression= visited.getExpression();
 
 			if (ASTNodes.hasType(stringExpression, String.class.getCanonicalName())) {
 				// If node is already a String, no need to call toString()
-				rewrite.replace(visited, ASTNodes.createMoveTarget(rewrite, stringExpression), group);
+				removeToString(visited);
 				return false;
 			}
 
 			if (parent instanceof InfixExpression) {
 				// If node is in a String context, no need to call toString()
 				InfixExpression infixExpression= (InfixExpression) parent;
-				Expression leftOp= infixExpression.getLeftOperand();
-				Expression rightOp= infixExpression.getRightOperand();
-				boolean leftOpIsString= ASTNodes.hasType(leftOp, String.class.getCanonicalName());
-				boolean rightOpIsString= ASTNodes.hasType(rightOp, String.class.getCanonicalName());
-				MethodInvocation lmi= ASTNodes.as(leftOp, MethodInvocation.class);
-				MethodInvocation rmi= ASTNodes.as(rightOp, MethodInvocation.class);
+				Expression leftOperand= infixExpression.getLeftOperand();
+				Expression rightOperand= infixExpression.getRightOperand();
+				boolean leftOperandIsString= ASTNodes.hasType(leftOperand, String.class.getCanonicalName());
+				boolean rightOperandIsString= ASTNodes.hasType(rightOperand, String.class.getCanonicalName());
+				MethodInvocation lmi= ASTNodes.as(leftOperand, MethodInvocation.class);
+				MethodInvocation rmi= ASTNodes.as(rightOperand, MethodInvocation.class);
 
-				if ((leftOpIsString || rightOpIsString)
+				if ((leftOperandIsString || rightOperandIsString)
 						&& visited.getLocationInParent() != InfixExpression.LEFT_OPERAND_PROPERTY
 						&& visited.getLocationInParent() != InfixExpression.RIGHT_OPERAND_PROPERTY) {
 					// Node is in the extended operands
-					rewrite.replace(visited, replaceToString(visited.getExpression()), group);
+					removeToString(visited);
 					return false;
 				}
 
-				if (leftOpIsString && ASTNodes.usesGivenSignature(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
-					rewrite.replace(rmi, replaceToString(rmi.getExpression()), group);
+				if (leftOperandIsString && ASTNodes.usesGivenSignature(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+					removeToString(rmi);
 					return false;
 				}
 
-				if (rightOpIsString && visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
-					rewrite.replace(lmi, replaceToString(lmi.getExpression()), group);
+				if (rightOperandIsString && visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
+					removeToString(lmi);
 					return false;
 				}
 			}
 		} else if (isStringValueOf && ASTNodes.hasType((Expression) visited.arguments().get(0), String.class.getCanonicalName())) {
-			if ((Expression) visited.arguments().get(0) instanceof StringLiteral || (Expression) visited.arguments().get(0) instanceof InfixExpression) {
-				rewrite.replace(visited, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0))), group);
+			if (visited.arguments().get(0) instanceof StringLiteral || visited.arguments().get(0) instanceof InfixExpression) {
+				removeValueOf(visited);
 				return false;
 			}
 		} else if (parent instanceof InfixExpression && (isStringValueOf || isToStringForPrimitive(visited))) {
 			// If node is in a String context, no need to call toString()
 			InfixExpression infixExpression= (InfixExpression) parent;
-			Expression lo= infixExpression.getLeftOperand();
-			Expression ro= infixExpression.getRightOperand();
+			Expression leftOperand= infixExpression.getLeftOperand();
+			Expression rightOperand= infixExpression.getRightOperand();
 
-			if (visited.equals(lo)) {
-				if (ASTNodes.hasType(ro, String.class.getCanonicalName())) {
-					return maybeReplaceStringValueOfByArg0(lo, visited);
+			if (visited.getLocationInParent() == InfixExpression.LEFT_OPERAND_PROPERTY) {
+				if (ASTNodes.hasType(rightOperand, String.class.getCanonicalName())) {
+					return maybeReplaceStringValueOfByArg0(leftOperand, visited);
 				}
-			} else if (visited.equals(ro)) {
-				if (ASTNodes.hasType(lo, String.class.getCanonicalName())
+			} else if (visited.getLocationInParent() == InfixExpression.RIGHT_OPERAND_PROPERTY) {
+				ASTRewrite rewrite= cuRewrite.getASTRewrite();
+
+				if (ASTNodes.hasType(leftOperand, String.class.getCanonicalName())
 						// Do not refactor left and right operand at the same time
 						// to avoid compilation errors post cleanup
-						&& !rewrite.hasBeenRefactored(lo)) {
-					return maybeReplaceStringValueOfByArg0(ro, visited);
+						&& !rewrite.hasBeenRefactored(leftOperand)) {
+					return maybeReplaceStringValueOfByArg0(rightOperand, visited);
 				}
 			} else {
 				// Left or right operation is necessarily a string, so just replace
@@ -131,39 +128,6 @@ public class StringCleanUp extends AbstractCleanUpRule {
 		}
 
 		return true;
-	}
-
-	private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation methodInvocation) {
-		ITypeBinding expectedType= methodInvocation.resolveMethodBinding().getParameterTypes()[0];
-
-		if (expectedType == null) {
-			return true;
-		}
-
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
-
-		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
-
-		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
-			rewrite.replace(toReplace, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
-		} else {
-			rewrite.replace(toReplace, ast.newCastExpression(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
-		}
-
-		return false;
-	}
-
-	private Expression replaceToString(final Expression expression) {
-		if (expression != null) {
-			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			return ASTNodes.createMoveTarget(rewrite, expression);
-		}
-
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-		return ast.newThisExpression();
 	}
 
 	private boolean isToStringForPrimitive(final MethodInvocation visited) {
@@ -189,5 +153,52 @@ public class StringCleanUp extends AbstractCleanUpRule {
 						|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
 						|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
 						|| ASTNodes.usesGivenSignature(visited, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())); //$NON-NLS-1$
+	}
+
+	private boolean maybeReplaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation methodInvocation) {
+		ITypeBinding expectedType= methodInvocation.resolveMethodBinding().getParameterTypes()[0];
+
+		if (expectedType == null) {
+			return true;
+		}
+
+		replaceStringValueOfByArg0(toReplace, methodInvocation, expectedType);
+
+		return false;
+	}
+
+	private void replaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation methodInvocation,
+			final ITypeBinding expectedType) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
+
+		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
+
+		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
+			rewrite.replace(toReplace, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
+		} else {
+			rewrite.replace(toReplace, ast.newCastExpression(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
+		}
+	}
+
+	private void removeToString(final MethodInvocation visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
+
+		if (visited.getExpression() != null) {
+			rewrite.replace(visited, ASTNodes.createMoveTarget(rewrite, visited.getExpression()), group);
+		} else {
+			rewrite.replace(visited, ast.newThisExpression(), group);
+		}
+	}
+
+	private void removeValueOf(final MethodInvocation visited) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.StringCleanUp_description);
+
+		rewrite.replace(visited, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) visited.arguments().get(0))), group);
 	}
 }
