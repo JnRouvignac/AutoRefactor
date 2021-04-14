@@ -23,17 +23,13 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_in;
+package org.autorefactor.refactoring.rules.samples_out;
 
-public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
+public class ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithReturn(int i1) {
         // Keep this comment
-        if (i1 == 0) {
-            System.out.println("The same code");
-            return;
-        }
         // Keep this comment too
-        if (i1 == 1) {
+        if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
             return;
         }
@@ -42,13 +38,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeConditionsWithThrow(int i1) throws Exception {
         // Keep this comment
-        if (i1 == 0) {
-            System.out.println("The same code");
-            i1--;
-            throw new Exception();
-        }
         // Keep this comment too
-        if (i1 == 1) {
+        if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
             --i1;
             throw new Exception();
@@ -59,13 +50,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithContinue() {
         for (int i1 = 0; i1 < 10; i1++) {
             // Keep this comment
-            if (i1 == 0) {
-                System.out.println("The same code");
-                i1++;
-                continue;
-            }
             // Keep this comment too
-            if (i1 == 1) {
+            if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
                 ++i1;
                 continue;
@@ -78,13 +64,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
     public void mergeConditionsWithBreak() {
         for (int i1 = 0; i1 < 10; i1++) {
             // Keep this comment
-            if (i1 == 0) {
-                System.out.println("The same code");
-                i1++;
-                break;
-            }
             // Keep this comment too
-            if (i1 == 1) {
+            if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
                 i1 = i1 + 1;
                 break;
@@ -96,15 +77,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeConditionsWithReturnAndThrow(int i1, int i2) throws Exception {
         // Keep this comment
-        if (i1 == 0) {
-            System.out.println("The same code");
-            if (i2 == 0) {
-                return;
-            } else {
-                throw new Exception("Error #" + i1++);
-            }
-        }
-        if (i1 == 1) {
+        if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
             if (i2 == 0) {
                 return;
@@ -117,19 +90,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeSeveralConditions(int i1) {
         // Keep this comment
-        if (i1 == 0) {
-            System.out.println("The same code");
-            return;
-        }
-        if (i1 == 1) {
-            System.out.println("The same code");
-            return;
-        }
-        if (i1 == 2) {
-            System.out.println("The same code");
-            return;
-        }
-        if (i1 == 3) {
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2) || (i1 == 3)) {
             System.out.println("The same code");
             return;
         }
@@ -138,11 +99,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeORConditions(boolean isValid, boolean isActive, boolean isEnabled, boolean isFound) {
         // Keep this comment
-        if (isValid || isActive) {
-            System.out.println("The same code");
-            return;
-        }
-        if (isEnabled || isFound) {
+        if (isValid || isActive || isEnabled || isFound) {
             System.out.println("The same code");
             return;
         }

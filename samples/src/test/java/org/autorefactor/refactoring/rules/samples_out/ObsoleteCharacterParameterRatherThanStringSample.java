@@ -24,23 +24,23 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_in;
+package org.autorefactor.refactoring.rules.samples_out;
 
-public class CharacterParameterRatherThanStringSample {
+public class ObsoleteCharacterParameterRatherThanStringSample {
     public void refactorIndexOf() {
         String b = "b";
-        "a".indexOf("a", 0);
-        b.indexOf("a");
-        b.trim().indexOf("\t", 0);
-        "a".indexOf("\n");
+        "a".indexOf('a', 0);
+        b.indexOf('a');
+        b.trim().indexOf('\t', 0);
+        "a".indexOf('\n');
     }
 
     public void refactorlastIndexOfCases() {
         String b = "b";
-        "a".lastIndexOf("a", 0);
-        b.lastIndexOf("a");
-        b.toLowerCase().lastIndexOf("\t", 0);
-        "a".lastIndexOf("\n");
+        "a".lastIndexOf('a', 0);
+        b.lastIndexOf('a');
+        b.toLowerCase().lastIndexOf('\t', 0);
+        "a".lastIndexOf('\n');
     }
 
     public void doNotRefactorInvocationsOtherThanOneChar() {

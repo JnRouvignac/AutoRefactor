@@ -41,15 +41,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String IntPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteIntPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IntPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteIntPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String IntPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteIntPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -497,15 +497,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharacterParameterRatherThanStringCleanUp_name;
+	public static String ObsoleteCharacterParameterRatherThanStringCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharacterParameterRatherThanStringCleanUp_description;
+	public static String ObsoleteCharacterParameterRatherThanStringCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharacterParameterRatherThanStringCleanUp_reason;
+	public static String ObsoleteCharacterParameterRatherThanStringCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -821,15 +821,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+	public static String ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1733,15 +1733,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
+	public static String ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
+	public static String ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
+	public static String ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

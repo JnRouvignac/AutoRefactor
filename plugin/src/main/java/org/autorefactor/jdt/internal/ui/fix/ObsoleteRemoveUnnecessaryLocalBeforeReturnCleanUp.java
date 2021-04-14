@@ -48,20 +48,20 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRule {
+public class ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
+		return MultiFixMessages.ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
+		return MultiFixMessages.ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
+		return MultiFixMessages.ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 		private void replaceReturnStatementForArray(final ReturnStatement visited, final Statement previousSibling,
 				final ReturnStatement newReturnStatement) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 			rewrite.remove(previousSibling, group);
 			ASTNodes.replaceButKeepComment(rewrite, visited, newReturnStatement, group);
 		}
@@ -173,7 +173,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 				final Expression returnExpression) {
 			ASTRewrite rewrite= cuRewrite.getASTRewrite();
 			ASTNodeFactory ast= cuRewrite.getASTBuilder();
-			TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveUnnecessaryLocalBeforeReturnCleanUp_description);
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteRemoveUnnecessaryLocalBeforeReturnCleanUp_description);
 
 			rewrite.remove(previousSibling, group);
 			ASTNodes.replaceButKeepComment(rewrite, visited, ast.newReturnStatement(ASTNodes.createMoveTarget(rewrite, returnExpression)), group);

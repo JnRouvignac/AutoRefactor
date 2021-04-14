@@ -40,20 +40,20 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends AbstractCleanUpRule {
+public class ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends AbstractCleanUpRule {
     @Override
     public String getName() {
-        return MultiFixMessages.OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
+        return MultiFixMessages.ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
     }
 
     @Override
     public String getDescription() {
-        return MultiFixMessages.OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
+        return MultiFixMessages.ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
     }
 
     @Override
     public String getReason() {
-        return MultiFixMessages.OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
+        return MultiFixMessages.ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
             ASTRewrite rewrite= cuRewrite.getASTRewrite();
             ASTNodeFactory ast= cuRewrite.getASTBuilder();
-            TextEditGroup group= new TextEditGroup(MultiFixMessages.OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description);
+            TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteOneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description);
 
             List<Expression> newConditions= new ArrayList<>(duplicateIfBlocks.size());
 

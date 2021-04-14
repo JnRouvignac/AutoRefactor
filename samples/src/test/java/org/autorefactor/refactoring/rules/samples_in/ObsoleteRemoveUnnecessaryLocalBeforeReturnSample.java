@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-public class RemoveUnnecessaryLocalBeforeReturnSample {
+public class ObsoleteRemoveUnnecessaryLocalBeforeReturnSample {
     private int i;
 
     private double[] arrayField = new double[] { 42.42 };

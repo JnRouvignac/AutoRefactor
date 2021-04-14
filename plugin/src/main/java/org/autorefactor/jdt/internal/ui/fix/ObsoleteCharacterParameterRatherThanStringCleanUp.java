@@ -35,20 +35,20 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class CharacterParameterRatherThanStringCleanUp extends AbstractCleanUpRule {
+public class ObsoleteCharacterParameterRatherThanStringCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CharacterParameterRatherThanStringCleanUp_name;
+		return MultiFixMessages.ObsoleteCharacterParameterRatherThanStringCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CharacterParameterRatherThanStringCleanUp_description;
+		return MultiFixMessages.ObsoleteCharacterParameterRatherThanStringCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CharacterParameterRatherThanStringCleanUp_reason;
+		return MultiFixMessages.ObsoleteCharacterParameterRatherThanStringCleanUp_reason;
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class CharacterParameterRatherThanStringCleanUp extends AbstractCleanUpRu
 	private void refactorWithCharacter(final StringLiteral stringLiteral, final String value) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.CharacterParameterRatherThanStringCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteCharacterParameterRatherThanStringCleanUp_description);
 
 		CharacterLiteral replacement= ast.newCharacterLiteral();
 		replacement.setCharValue(value.charAt(0));
