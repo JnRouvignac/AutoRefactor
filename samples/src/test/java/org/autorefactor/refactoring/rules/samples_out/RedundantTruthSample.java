@@ -30,25 +30,66 @@ public class RedundantTruthSample {
         if (isValid) {
             int i = 0;
         }
+
         if (isValid) {
             int i = 0;
         }
+
         if (!isValid) {
             int i = 0;
         }
+
         if (!isValid) {
             int i = 0;
         }
+
         if (isValid) {
             int i = 0;
         }
+
         if (isValid) {
             int i = 0;
         }
+
         if (!isValid) {
             int i = 0;
         }
+
         if (!isValid) {
+            int i = 0;
+        }
+    }
+
+    public void removeParenthesis(boolean isValid, boolean isActive) {
+        if (isValid == isActive) {
+            int i = 0;
+        }
+
+        if (isActive == isValid) {
+            int i = 0;
+        }
+
+        if (isValid != isActive) {
+            int i = 0;
+        }
+
+        if (isActive != isValid) {
+            int i = 0;
+        }
+
+        if (!isValid == isActive) {
+            int i = 0;
+        }
+
+        if (isActive == !isValid) {
+            int i = 0;
+        }
+
+        if (!isValid != isActive) {
+            int i = 0;
+        }
+
+        if (isActive != !isValid) {
             int i = 0;
         }
     }
@@ -57,12 +98,15 @@ public class RedundantTruthSample {
         if (isValid) {
             int i = 0;
         }
+
         if (isValid) {
             int i = 0;
         }
+
         if (!isValid) {
             int i = 0;
         }
+
         if (!isValid) {
             int i = 0;
         }

@@ -30,25 +30,66 @@ public class RedundantTruthSample {
         if (isValid == true) {
             int i = 0;
         }
+
         if (isValid != false) {
             int i = 0;
         }
+
         if (isValid == false) {
             int i = 0;
         }
+
         if (isValid != true) {
             int i = 0;
         }
+
         if (isValid == Boolean.TRUE) {
             int i = 0;
         }
+
         if (isValid != Boolean.FALSE) {
             int i = 0;
         }
+
         if (isValid == Boolean.FALSE) {
             int i = 0;
         }
+
         if (isValid != Boolean.TRUE) {
+            int i = 0;
+        }
+    }
+
+    public void removeParenthesis(boolean isValid, boolean isActive) {
+        if ((isValid == true) == isActive) {
+            int i = 0;
+        }
+
+        if (isActive == (isValid == true)) {
+            int i = 0;
+        }
+
+        if ((isValid == true) != isActive) {
+            int i = 0;
+        }
+
+        if (isActive != (isValid == true)) {
+            int i = 0;
+        }
+
+        if ((isValid == false) == isActive) {
+            int i = 0;
+        }
+
+        if (isActive == (isValid == false)) {
+            int i = 0;
+        }
+
+        if ((isValid == false) != isActive) {
+            int i = 0;
+        }
+
+        if (isActive != (isValid == false)) {
             int i = 0;
         }
     }
@@ -57,12 +98,15 @@ public class RedundantTruthSample {
         if (isValid == true) {
             int i = 0;
         }
+
         if (isValid != false) {
             int i = 0;
         }
+
         if (isValid == false) {
             int i = 0;
         }
+
         if (isValid != true) {
             int i = 0;
         }

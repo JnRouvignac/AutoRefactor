@@ -28,8 +28,10 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -50,50 +52,66 @@ public class RedundantTruthCleanUp extends AbstractCleanUpRule {
 	}
 
 	@Override
-	public boolean visit(final InfixExpression visited) {
-		if (!visited.hasExtendedOperands()
-				&& ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
-				// Either:
-				// - Two boolean primitives: no possible NPE
-				// - One boolean primitive and one Boolean object, this code already run
-				// the risk of an NPE, so we can replace the infix expression without
-				// fearing we would introduce a previously non existing NPE.
-				&& (ASTNodes.isPrimitive(visited.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.isPrimitive(visited.getRightOperand(), boolean.class.getSimpleName()))) {
-			Expression leftExpression= visited.getLeftOperand();
-			Expression rightExpression= visited.getRightOperand();
+	public boolean visit(final ParenthesizedExpression visited) {
+		InfixExpression originalCondition= ASTNodes.as(visited, InfixExpression.class);
 
-			return maybeRemoveConstantOperand(visited, leftExpression, rightExpression)
-					&& maybeRemoveConstantOperand(visited, rightExpression, leftExpression);
+		if (originalCondition != null) {
+			return maybeRefactorInfixExpression(visited, originalCondition);
 		}
 
 		return true;
 	}
 
-	private boolean maybeRemoveConstantOperand(final InfixExpression visited, final Expression dynamicOperand,
-			final Expression hardCodedOperand) {
+	@Override
+	public boolean visit(final InfixExpression visited) {
+		return maybeRefactorInfixExpression(visited, visited);
+	}
+
+	private boolean maybeRefactorInfixExpression(final ASTNode visited, final InfixExpression originalCondition) {
+		if (!originalCondition.hasExtendedOperands()
+				&& ASTNodes.hasOperator(originalCondition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR)
+				// Either:
+				// - Two boolean primitives: no possible NPE
+				// - One boolean primitive and one Boolean object, this code already run
+				// the risk of an NPE, so we can replace the infix expression without
+				// fearing we would introduce a previously non existing NPE.
+				&& (ASTNodes.isPrimitive(originalCondition.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.isPrimitive(originalCondition.getRightOperand(), boolean.class.getSimpleName()))) {
+			Expression leftExpression= originalCondition.getLeftOperand();
+			Expression rightExpression= originalCondition.getRightOperand();
+			boolean isEquals= ASTNodes.hasOperator(originalCondition, InfixExpression.Operator.EQUALS);
+
+			return maybeRemoveConstantOperand(visited, leftExpression, rightExpression, isEquals)
+					&& maybeRemoveConstantOperand(visited, rightExpression, leftExpression, isEquals);
+		}
+
+		return true;
+	}
+
+	private boolean maybeRemoveConstantOperand(final ASTNode visited, final Expression dynamicOperand,
+			final Expression hardCodedOperand, final boolean isEquals) {
 		Boolean booleanLiteral= ASTNodes.getBooleanLiteral(hardCodedOperand);
 
 		if (booleanLiteral != null) {
-			removeBooleanConstant(visited, dynamicOperand, booleanLiteral);
+			removeBooleanConstant(visited, dynamicOperand, booleanLiteral, isEquals);
 			return false;
 		}
 
 		return true;
 	}
 
-	private void removeBooleanConstant(final InfixExpression visited, final Expression expressionToCopy,
-			final boolean isTrue) {
+	private void removeBooleanConstant(final ASTNode visited, final Expression expressionToCopy,
+			final boolean isTrue, final boolean isEquals) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantTruthCleanUp_description);
 
 		Expression operand;
-		if (isTrue == ASTNodes.hasOperator(visited, InfixExpression.Operator.EQUALS)) {
+		if (isTrue == isEquals) {
 			operand= ASTNodes.createMoveTarget(rewrite, expressionToCopy);
 		} else {
 			operand= ast.negate(expressionToCopy, true);
 		}
 
-		rewrite.replace(visited, operand, group);
+		rewrite.replace(visited, ASTNodeFactory.parenthesizeIfNeeded(ast, operand), group);
 	}
 }
