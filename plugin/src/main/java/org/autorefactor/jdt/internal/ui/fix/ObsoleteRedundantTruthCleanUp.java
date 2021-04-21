@@ -35,20 +35,20 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
-public class RedundantTruthCleanUp extends AbstractCleanUpRule {
+public class ObsoleteRedundantTruthCleanUp extends AbstractCleanUpRule {
 	@Override
 	public String getName() {
-		return MultiFixMessages.RedundantTruthCleanUp_name;
+		return MultiFixMessages.ObsoleteRedundantTruthCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.RedundantTruthCleanUp_description;
+		return MultiFixMessages.ObsoleteRedundantTruthCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.RedundantTruthCleanUp_reason;
+		return MultiFixMessages.ObsoleteRedundantTruthCleanUp_reason;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class RedundantTruthCleanUp extends AbstractCleanUpRule {
 			final boolean isTrue, final boolean isEquals) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.RedundantTruthCleanUp_description);
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteRedundantTruthCleanUp_description);
 
 		Expression operand;
 		if (isTrue == isEquals) {

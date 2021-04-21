@@ -65,15 +65,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String LongPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteLongPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LongPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteLongPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String LongPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteLongPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -1829,15 +1829,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantTruthCleanUp_name;
+	public static String ObsoleteRedundantTruthCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantTruthCleanUp_description;
+	public static String ObsoleteRedundantTruthCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String RedundantTruthCleanUp_reason;
+	public static String ObsoleteRedundantTruthCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */

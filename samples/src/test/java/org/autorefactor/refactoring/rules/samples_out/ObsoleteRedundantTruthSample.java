@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
-public class RedundantTruthSample {
+public class ObsoleteRedundantTruthSample {
     public void simplifyPrimitiveBooleanExpression(boolean isValid) {
         if (isValid) {
             int i = 0;
