@@ -172,21 +172,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteIfRatherThanTwoSwitchCasesCleanUp_description);
 
-		List<Block> newBlocks= new ArrayList<>(switchStructure.size());
-
-		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-			Block newBlock= ast.newBlock();
-
-			if (caseStructure.getSecond().size() == 1) {
-				newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, caseStructure.getSecond().get(0)));
-			} else if (!caseStructure.getSecond().isEmpty()) {
-				ListRewrite listRewrite= rewrite.getListRewrite(caseStructure.getSecond().get(0).getParent(), SwitchStatement.STATEMENTS_PROPERTY);
-				ASTNode moveTarget= listRewrite.createMoveTarget(caseStructure.getSecond().get(0), caseStructure.getSecond().get(caseStructure.getSecond().size() - 1));
-				newBlock.statements().add(moveTarget);
-			}
-
-			newBlocks.add(newBlock);
-		}
+		List<Block> newBlocks= prepareNewBlocks(rewrite, ast, switchStructure);
 
 		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= visited.getExpression();
@@ -195,20 +181,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		for (int i= switchStructure.size() - 1; i >= 0; i--) {
 			Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
-			Expression newCondition;
-			if (caseStructure.getFirst().isEmpty()) {
-				newCondition= null;
-			} else if (caseStructure.getFirst().size() == 1) {
-				newCondition= buildEquality(discriminant, caseStructure.getFirst().get(0));
-			} else {
-				List<Expression> equalities= new ArrayList<>();
-
-				for (Expression value : caseStructure.getFirst()) {
-					equalities.add(ASTNodeFactory.parenthesizeIfNeeded(ast, buildEquality(discriminant, value)));
-				}
-
-				newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
-			}
+			Expression newCondition= buildNewCondition(rewrite, ast, discriminant, caseStructure);
 
 			if (currentBlock != null) {
 				IfStatement newIfStatement= ast.newIfStatement();
@@ -231,9 +204,47 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		ASTNodes.replaceButKeepComment(rewrite, visited, currentBlock, group);
 	}
 
-	private Expression buildEquality(final Expression discriminant, final Expression value) {
-		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+	private List<Block> prepareNewBlocks(final ASTRewrite rewrite,
+			final ASTNodeFactory ast, final List<Pair<List<Expression>, List<Statement>>> switchStructure) {
+		List<Block> newBlocks= new ArrayList<>(switchStructure.size());
 
+		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+			Block newBlock= ast.newBlock();
+
+			if (!caseStructure.getSecond().isEmpty()) {
+				ListRewrite listRewrite= rewrite.getListRewrite(caseStructure.getSecond().get(0).getParent(), SwitchStatement.STATEMENTS_PROPERTY);
+				ASTNode moveTarget= listRewrite.createMoveTarget(caseStructure.getSecond().get(0), caseStructure.getSecond().get(caseStructure.getSecond().size() - 1));
+				newBlock.statements().add(moveTarget);
+			}
+
+			newBlocks.add(newBlock);
+		}
+
+		return newBlocks;
+	}
+
+	private Expression buildNewCondition(final ASTRewrite rewrite,
+			final ASTNodeFactory ast, final Expression discriminant,
+			final Pair<List<Expression>, List<Statement>> caseStructure) {
+		if (caseStructure.getFirst().isEmpty()) {
+			return null;
+		}
+
+		if (caseStructure.getFirst().size() == 1) {
+			return buildEquality(rewrite, ast, discriminant, caseStructure.getFirst().get(0));
+		}
+
+		List<Expression> equalities= new ArrayList<>();
+
+		for (Expression value : caseStructure.getFirst()) {
+			equalities.add(ASTNodeFactory.parenthesizeIfNeeded(ast, buildEquality(rewrite, ast, discriminant, value)));
+		}
+
+		return ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
+	}
+
+	private Expression buildEquality(final ASTRewrite rewrite,
+			ASTNodeFactory ast, final Expression discriminant, final Expression value) {
 		if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
 				Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
 			MethodInvocation equalsMethod= ast.newMethodInvocation();
@@ -249,10 +260,10 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
 			newInfixExpression.setLeftOperand(ast.createCopyTarget(discriminant));
 			newInfixExpression.setRightOperand(ast.getAST().newQualifiedName(
-								ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ast.createCopyTarget((SimpleName) value)));
+								ASTNodeFactory.newName(ast, value.resolveTypeBinding().getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (SimpleName) value)));
 		} else {
 			newInfixExpression.setLeftOperand(ASTNodeFactory.parenthesizeIfNeeded(ast, ast.createCopyTarget(discriminant)));
-			newInfixExpression.setRightOperand(ast.createCopyTarget(value));
+			newInfixExpression.setRightOperand(ASTNodes.createMoveTarget(rewrite, value));
 		}
 
 		return newInfixExpression;
