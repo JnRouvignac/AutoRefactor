@@ -33,24 +33,106 @@ import java.util.Set;
 import org.autorefactor.jdt.core.dom.ASTRewrite;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
+	private static class BreakVisitor extends InterruptibleVisitor {
+		private final SwitchStatement root;
+		private final List<BreakStatement> breaks= new ArrayList<>();
+		private boolean canBeRefactored= true;
+
+		public BreakVisitor(final SwitchStatement root) {
+			this.root= root;
+		}
+
+		public List<BreakStatement> getBreaks() {
+			return breaks;
+		}
+
+		public boolean canBeRefactored() {
+			return canBeRefactored;
+		}
+
+		@Override
+		public boolean visit(final BreakStatement aBreak) {
+			if (aBreak.getLabel() != null) {
+				return false;
+			}
+
+			Statement parent= aBreak;
+			do {
+				parent= ASTNodes.getTypedAncestor(parent, Statement.class);
+			} while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
+
+			if (parent != root) {
+				canBeRefactored= false;
+				return interruptVisit();
+			}
+
+			breaks.add(aBreak);
+
+			return true;
+		}
+
+		@Override
+		public boolean visit(final WhileStatement visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final DoStatement visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final ForStatement visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final EnhancedForStatement visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final SwitchStatement visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final AnonymousClassDeclaration visited) {
+			return false;
+		}
+
+		@Override
+		public boolean visit(final LambdaExpression visited) {
+			return false;
+		}
+	}
+
 	@Override
 	public String getName() {
 		return MultiFixMessages.ObsoleteIfRatherThanTwoSwitchCasesCleanUp_name;
@@ -142,6 +224,8 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 			switchStructure.add(caseWithDefault);
 		}
 
+		List<BreakStatement> overBreaks= new ArrayList<>();
+
 		for (int i= 0; i < switchStructure.size(); i++) {
 			Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
@@ -162,17 +246,34 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 			}
 		}
 
-		replaceBySwitch(visited, switchStructure, caseIndexWithDefault);
+		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+			for (Statement oneStatement : caseStructure.getSecond()) {
+				BreakVisitor breakVisitor= new BreakVisitor(visited);
+				breakVisitor.traverseNodeInterruptibly(oneStatement);
+
+				if (!breakVisitor.canBeRefactored()) {
+					return true;
+				}
+
+				overBreaks.addAll(breakVisitor.getBreaks());
+			}
+		}
+
+		replaceBySwitch(visited, switchStructure, caseIndexWithDefault, overBreaks);
 		return false;
 	}
 
 	private void replaceBySwitch(final SwitchStatement visited,
-			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault) {
+			final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault, final List<BreakStatement> overBreaks) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteIfRatherThanTwoSwitchCasesCleanUp_description);
 
 		List<Block> newBlocks= prepareNewBlocks(rewrite, ast, switchStructure);
+
+		for (BreakStatement breakStatement : overBreaks) {
+			rewrite.remove(breakStatement, group);
+		}
 
 		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= visited.getExpression();
