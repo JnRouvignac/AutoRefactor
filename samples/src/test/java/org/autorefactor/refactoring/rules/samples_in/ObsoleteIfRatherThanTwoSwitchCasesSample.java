@@ -287,6 +287,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
         case 0:
         case 1:
             j = 10;
+
             short k = 0;
             do {
                 if (j == i1) {
@@ -300,6 +301,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
         case 3:
         case 4:
             j = 40;
+
             for (short o : new short[] { 1, 2, 3 }) {
                 if (o == i1) {
                     break;

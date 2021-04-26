@@ -35,6 +35,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -45,6 +46,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
@@ -170,6 +172,22 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteIfRatherThanTwoSwitchCasesCleanUp_description);
 
+		List<Block> newBlocks= new ArrayList<>(switchStructure.size());
+
+		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+			Block newBlock= ast.newBlock();
+
+			if (caseStructure.getSecond().size() == 1) {
+				newBlock.statements().add(ASTNodes.createMoveTarget(rewrite, caseStructure.getSecond().get(0)));
+			} else if (!caseStructure.getSecond().isEmpty()) {
+				ListRewrite listRewrite= rewrite.getListRewrite(caseStructure.getSecond().get(0).getParent(), SwitchStatement.STATEMENTS_PROPERTY);
+				ASTNode moveTarget= listRewrite.createMoveTarget(caseStructure.getSecond().get(0), caseStructure.getSecond().get(caseStructure.getSecond().size() - 1));
+				newBlock.statements().add(moveTarget);
+			}
+
+			newBlocks.add(newBlock);
+		}
+
 		int localCaseIndexWithDefault= caseIndexWithDefault;
 		Expression discriminant= visited.getExpression();
 		Statement currentBlock= null;
@@ -188,19 +206,14 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 				for (Expression value : caseStructure.getFirst()) {
 					equalities.add(ASTNodeFactory.parenthesizeIfNeeded(ast, buildEquality(discriminant, value)));
 				}
+
 				newCondition= ast.newInfixExpression(InfixExpression.Operator.CONDITIONAL_OR, equalities);
-			}
-
-			Block newBlock= ast.newBlock();
-
-			for (Statement statement : caseStructure.getSecond()) {
-				newBlock.statements().add(ast.createCopyTarget(statement));
 			}
 
 			if (currentBlock != null) {
 				IfStatement newIfStatement= ast.newIfStatement();
 				newIfStatement.setExpression(newCondition);
-				newIfStatement.setThenStatement(newBlock);
+				newIfStatement.setThenStatement(newBlocks.get(i));
 				newIfStatement.setElseStatement(currentBlock);
 				currentBlock= newIfStatement;
 			} else if (caseStructure.getSecond().isEmpty()) {
@@ -208,10 +221,10 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 			} else if (localCaseIndexWithDefault == -1) {
 				IfStatement newIfStatement= ast.newIfStatement();
 				newIfStatement.setExpression(newCondition);
-				newIfStatement.setThenStatement(newBlock);
+				newIfStatement.setThenStatement(newBlocks.get(i));
 				currentBlock= newIfStatement;
 			} else {
-				currentBlock= newBlock;
+				currentBlock= newBlocks.get(i);
 			}
 		}
 
