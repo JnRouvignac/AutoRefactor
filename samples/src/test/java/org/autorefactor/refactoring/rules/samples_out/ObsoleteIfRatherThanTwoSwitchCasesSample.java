@@ -220,7 +220,38 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
         }
     }
 
+    public void replaceSwitchWithBlock(int i1) {
+        int i = 0;
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
+            {
+                // Keep this comment too
+                i = 0;
+            }
+        } else {
+            // Keep this comment also
+            i = 150;
+        }
+    }
+
     public void replaceSwitchWithMidCodeBreak(int i1) {
+        int i = 0;
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
+            if (i2 == 2) {
+                // Keep this comment too
+                i = 0;
+            } else {
+                // Keep this comment again
+                i = 160;
+            }
+        } else {
+            // Keep this comment also
+            i = 150;
+        }
+    }
+
+    public void replaceSwitchWithMidCodeBreakAtTheEnd(int i1) {
         int i = 0;
         // Keep this comment
         if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {

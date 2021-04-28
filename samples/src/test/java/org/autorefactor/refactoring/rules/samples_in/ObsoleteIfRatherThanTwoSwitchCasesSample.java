@@ -311,7 +311,53 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
         }
     }
 
+    public void replaceSwitchWithBlock(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+        {
+            // Keep this comment too
+            i = 0;
+            break;
+        }
+
+        case 3:
+        default:
+            // Keep this comment also
+            i = 150;
+            break;
+        }
+    }
+
     public void replaceSwitchWithMidCodeBreak(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            if (i2 == 2) {
+                // Keep this comment too
+                i = 0;
+                break;
+            } else {
+                // Keep this comment again
+                i = 160;
+                break;
+            }
+
+        case 3:
+        default:
+            // Keep this comment also
+            i = 150;
+            break;
+        }
+    }
+
+    public void replaceSwitchWithMidCodeBreakAtTheEnd(int i1) {
         int i = 0;
         // Keep this comment
         switch (i1) {

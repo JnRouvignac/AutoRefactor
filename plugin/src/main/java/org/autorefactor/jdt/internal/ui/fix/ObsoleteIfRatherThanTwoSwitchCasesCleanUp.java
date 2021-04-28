@@ -36,7 +36,6 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.VarConflictVisitor;
 import org.autorefactor.util.Pair;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
@@ -60,13 +59,8 @@ import org.eclipse.text.edits.TextEditGroup;
 /** See {@link #getDescription()} method. */
 public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 	private static class BreakVisitor extends InterruptibleVisitor {
-		private final SwitchStatement root;
 		private final List<BreakStatement> breaks= new ArrayList<>();
 		private boolean canBeRefactored= true;
-
-		public BreakVisitor(final SwitchStatement root) {
-			this.root= root;
-		}
 
 		public List<BreakStatement> getBreaks() {
 			return breaks;
@@ -79,22 +73,18 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		@Override
 		public boolean visit(final BreakStatement aBreak) {
 			if (aBreak.getLabel() != null) {
+				return true;
+			}
+
+			Statement nextStatement= ASTNodes.getNextStatement(aBreak);
+
+			if (nextStatement == null || nextStatement instanceof SwitchCase) {
+				breaks.add(aBreak);
 				return false;
 			}
 
-			Statement parent= aBreak;
-			do {
-				parent= ASTNodes.getTypedAncestor(parent, Statement.class);
-			} while (parent != root && Utils.isEmpty(ASTNodes.getNextSiblings(parent)));
-
-			if (parent != root) {
-				canBeRefactored= false;
-				return interruptVisit();
-			}
-
-			breaks.add(aBreak);
-
-			return true;
+			canBeRefactored= false;
+			return interruptVisit();
 		}
 
 		@Override
@@ -248,7 +238,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 
 		for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
 			for (Statement oneStatement : caseStructure.getSecond()) {
-				BreakVisitor breakVisitor= new BreakVisitor(visited);
+				BreakVisitor breakVisitor= new BreakVisitor();
 				breakVisitor.traverseNodeInterruptibly(oneStatement);
 
 				if (!breakVisitor.canBeRefactored()) {
