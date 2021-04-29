@@ -32,7 +32,6 @@ public class CharPrimitiveRatherThanWrapperSample {
     public Character doNotRefactorFields = Character.MIN_VALUE;
 
     public char charField;
-
     public Character wrapperField;
 
     public Object objectField;
@@ -148,11 +147,6 @@ public class CharPrimitiveRatherThanWrapperSample {
         return returnedCharacter;
     }
 
-    public Object doNotBreakAutoboxing() {
-        Character returnedObject = Character.MIN_VALUE;
-        return returnedObject;
-    }
-
     public char replaceMultiReturnedWrapper(char c) {
         // Keep this comment
         Character returnedCharacter = Character.MIN_VALUE;
@@ -190,16 +184,6 @@ public class CharPrimitiveRatherThanWrapperSample {
         multiReassignedCharacter = 456;
     }
 
-    public void doNotReplaceNullWrapper() {
-        Character reassignedCharacter = Character.MIN_VALUE;
-        reassignedCharacter = null;
-    }
-
-    public void doNotReplaceWrapperPassedAsObject(Map<Character, Observable> obsByCharacter) {
-        Character reassignedCharacter = Character.MIN_VALUE;
-        obsByCharacter.get(reassignedCharacter).notifyObservers();
-    }
-
     public void replaceAssignedWrapper() {
         // Keep this comment
         Character assignedCharacter = Character.MIN_VALUE;
@@ -218,6 +202,30 @@ public class CharPrimitiveRatherThanWrapperSample {
         wrapperField = assignedCharacter;
     }
 
+    public void replaceBitAssignedWrapper(int anInteger, int anotherInteger,
+            int yetAnotherInteger) {
+        // Keep this comment
+        Character assignedCharacter = Character.MIN_VALUE;
+        anInteger &= assignedCharacter;
+        anotherInteger += assignedCharacter;
+        yetAnotherInteger ^= assignedCharacter;
+    }
+
+    public Object doNotBreakAutoboxing() {
+        Character returnedObject = Character.MIN_VALUE;
+        return returnedObject;
+    }
+
+    public void doNotReplaceNullWrapper() {
+        Character reassignedCharacter = Character.MIN_VALUE;
+        reassignedCharacter = null;
+    }
+
+    public void doNotReplaceWrapperPassedAsObject(Map<Character, Observable> obsByCharacter) {
+        Character reassignedCharacter = Character.MIN_VALUE;
+        obsByCharacter.get(reassignedCharacter).notifyObservers();
+    }
+
     public void doNotReplaceWrapperAssignedOnObjectField() {
         Character assignedCharacter = Character.MIN_VALUE;
         objectField = assignedCharacter;
@@ -227,15 +235,6 @@ public class CharPrimitiveRatherThanWrapperSample {
         Character assignedCharacter = Character.MIN_VALUE;
         Character anotherCharacter = assignedCharacter;
         Character yetAnotherCharacter = assignedCharacter;
-    }
-
-    public void replaceBitAssignedWrapper(int anInteger, int anotherInteger,
-            int yetAnotherInteger) {
-        // Keep this comment
-        Character assignedCharacter = Character.MIN_VALUE;
-        anInteger &= assignedCharacter;
-        anotherInteger += assignedCharacter;
-        yetAnotherInteger ^= assignedCharacter;
     }
 
     public Character doNotReplaceMultiAutoBoxedWrapper() {

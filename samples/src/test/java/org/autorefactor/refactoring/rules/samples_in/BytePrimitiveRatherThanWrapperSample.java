@@ -32,7 +32,6 @@ public class BytePrimitiveRatherThanWrapperSample {
     public Byte doNotRefactorFields = Byte.MIN_VALUE;
 
     public byte byteField;
-
     public Byte wrapperField;
 
     public Object objectField;
@@ -154,11 +153,6 @@ public class BytePrimitiveRatherThanWrapperSample {
         return returnedByte;
     }
 
-    public Object doNotBreakAutoboxing() {
-        Byte returnedObject = Byte.MIN_VALUE;
-        return returnedObject;
-    }
-
     public byte replaceMultiReturnedWrapper(byte b) {
         // Keep this comment
         Byte returnedByte = Byte.MIN_VALUE;
@@ -196,16 +190,6 @@ public class BytePrimitiveRatherThanWrapperSample {
         multiReassignedByte = 2;
     }
 
-    public void doNotReplaceNullWrapper() {
-        Byte reassignedByte = Byte.MIN_VALUE;
-        reassignedByte = null;
-    }
-
-    public void doNotReplaceWrapperPassedAsObject(Map<Byte, Observable> obsByByte) {
-        Byte reassignedByte = Byte.MIN_VALUE;
-        obsByByte.get(reassignedByte).notifyObservers();
-    }
-
     public void replaceAssignedWrapper() {
         // Keep this comment
         Byte assignedByte = Byte.MIN_VALUE;
@@ -222,6 +206,21 @@ public class BytePrimitiveRatherThanWrapperSample {
         // Keep this comment
         Byte assignedByte = Byte.MIN_VALUE;
         wrapperField = assignedByte;
+    }
+
+    public Object doNotBreakAutoboxing() {
+        Byte returnedObject = Byte.MIN_VALUE;
+        return returnedObject;
+    }
+
+    public void doNotReplaceNullWrapper() {
+        Byte reassignedByte = Byte.MIN_VALUE;
+        reassignedByte = null;
+    }
+
+    public void doNotReplaceWrapperPassedAsObject(Map<Byte, Observable> obsByByte) {
+        Byte reassignedByte = Byte.MIN_VALUE;
+        obsByByte.get(reassignedByte).notifyObservers();
     }
 
     public void doNotReplaceWrapperAssignedOnObjectField() {
