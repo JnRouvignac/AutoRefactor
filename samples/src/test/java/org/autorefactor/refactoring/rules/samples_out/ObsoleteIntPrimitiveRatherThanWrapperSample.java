@@ -130,7 +130,7 @@ public class ObsoleteIntPrimitiveRatherThanWrapperSample {
 
     public int replaceWrapperFromValueOf(int i1) {
         // Keep this comment
-        int varFromValueOf = Integer.valueOf(i1);
+        int varFromValueOf = i1;
         return varFromValueOf++;
     }
 

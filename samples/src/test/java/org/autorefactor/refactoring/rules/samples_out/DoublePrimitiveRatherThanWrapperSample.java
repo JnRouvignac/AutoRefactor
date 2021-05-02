@@ -112,7 +112,7 @@ public class DoublePrimitiveRatherThanWrapperSample {
 
     public double replaceWrapperFromValueOf(double d1) {
         // Keep this comment
-        double varFromValueOf = Double.valueOf(d1);
+        double varFromValueOf = d1;
         return varFromValueOf++;
     }
 

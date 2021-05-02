@@ -112,7 +112,7 @@ public class FloatPrimitiveRatherThanWrapperSample {
 
     public float replaceWrapperFromValueOf(float f1) {
         // Keep this comment
-        float varFromValueOf = Float.valueOf(f1);
+        float varFromValueOf = f1;
         return varFromValueOf++;
     }
 

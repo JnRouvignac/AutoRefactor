@@ -78,7 +78,7 @@ public class CharPrimitiveRatherThanWrapperSample {
 
     public int replaceWrapperFromValueOf(char c1) {
         // Keep this comment
-        char varFromValueOf = Character.valueOf(c1);
+        char varFromValueOf = c1;
         return +varFromValueOf;
     }
 

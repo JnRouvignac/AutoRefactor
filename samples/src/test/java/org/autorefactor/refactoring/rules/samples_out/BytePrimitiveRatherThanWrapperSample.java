@@ -78,7 +78,7 @@ public class BytePrimitiveRatherThanWrapperSample {
 
     public byte replaceWrapperFromValueOf(byte b1) {
         // Keep this comment
-        byte varFromValueOf = Byte.valueOf(b1);
+        byte varFromValueOf = b1;
         return varFromValueOf++;
     }
 

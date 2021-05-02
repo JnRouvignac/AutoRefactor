@@ -82,7 +82,7 @@ public class ShortPrimitiveRatherThanWrapperSample {
 
     public short replaceWrapperFromValueOf(short s1) {
         // Keep this comment
-        short varFromValueOf = Short.valueOf(s1);
+        short varFromValueOf = s1;
         return varFromValueOf++;
     }
 

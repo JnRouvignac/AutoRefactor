@@ -130,7 +130,7 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
 
     public long replaceWrapperFromValueOf(long l1) {
         // Keep this comment
-        long varFromValueOf = Long.valueOf(l1);
+        long varFromValueOf = l1;
         return varFromValueOf++;
     }
 

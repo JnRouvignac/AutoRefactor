@@ -167,12 +167,12 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	}
 
 	@Override
-	public boolean visit(final VariableDeclarationStatement node) {
-		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(node);
+	public boolean visit(final VariableDeclarationStatement visited) {
+		VariableDeclarationFragment fragment= ASTNodes.getUniqueFragment(visited);
 
 		if (fragment != null
 				&& (fragment.resolveBinding() != null && ASTNodes.hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
-						|| node.getType() != null && node.getType().resolveBinding() != null && ASTNodes.hasType(node.getType().resolveBinding(), getWrapperFullyQualifiedName()))
+						|| visited.getType() != null && visited.getType().resolveBinding() != null && ASTNodes.hasType(visited.getType().resolveBinding(), getWrapperFullyQualifiedName()))
 				&& fragment.getInitializer() != null
 				&& isNotNull(fragment.getInitializer())) {
 			VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
@@ -182,7 +182,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 				varOccurrenceVisitor.traverseNodeInterruptibly(parentBlock);
 
 				if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-					refactorWrapper(node, varOccurrenceVisitor.getToStringMethods(), varOccurrenceVisitor.getCompareToMethods(), varOccurrenceVisitor.getPrimitiveValueMethods());
+					refactorWrapper(visited, fragment.getInitializer(), varOccurrenceVisitor.getToStringMethods(), varOccurrenceVisitor.getCompareToMethods(), varOccurrenceVisitor.getPrimitiveValueMethods());
 					return false;
 				}
 			}
@@ -192,7 +192,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 	}
 
 	private void refactorWrapper(
-			final VariableDeclarationStatement node,
+			final VariableDeclarationStatement visited,
+			final Expression initializer,
 			final List<MethodInvocation> toStringMethods,
 			final List<MethodInvocation> compareToMethods,
 			final List<MethodInvocation> primitiveValueMethods) {
@@ -200,19 +201,27 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
+		if (initializer instanceof MethodInvocation) {
+			MethodInvocation methodInvocation= (MethodInvocation) initializer;
+
+			if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName())) { //$NON-NLS-1$
+				rewrite.replace(methodInvocation, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0)), group);
+			}
+		}
+
 		for (MethodInvocation primitiveValueMethod : primitiveValueMethods) {
 			rewrite.replace(primitiveValueMethod, ASTNodes.createMoveTarget(rewrite, primitiveValueMethod.getExpression()), group);
 		}
 
 		for (MethodInvocation toStringMethod : toStringMethods) {
-			Type wrapperType= rewrite.createCopyTarget(node.getType());
+			Type wrapperType= rewrite.createCopyTarget(visited.getType());
 
 			rewrite.insertFirst(toStringMethod, MethodInvocation.ARGUMENTS_PROPERTY, ASTNodes.createMoveTarget(rewrite, toStringMethod.getExpression()), group);
 			rewrite.set(toStringMethod, MethodInvocation.EXPRESSION_PROPERTY, wrapperType, group);
 		}
 
 		for (MethodInvocation compareToMethod : compareToMethods) {
-			Type wrapperType= rewrite.createCopyTarget(node.getType());
+			Type wrapperType= rewrite.createCopyTarget(visited.getType());
 
 			rewrite.insertFirst(compareToMethod, MethodInvocation.ARGUMENTS_PROPERTY, ASTNodes.createMoveTarget(rewrite, compareToMethod.getExpression()), group);
 			rewrite.set(compareToMethod, MethodInvocation.EXPRESSION_PROPERTY, wrapperType, group);
@@ -221,7 +230,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 		Type primitiveType= ast.type(getPrimitiveTypeName());
 
-		ASTNodes.replaceButKeepComment(rewrite, node.getType(), primitiveType, group);
+		ASTNodes.replaceButKeepComment(rewrite, visited.getType(), primitiveType, group);
 	}
 
 	private boolean isNotNull(final Expression expression) {

@@ -111,7 +111,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperFromValueOf(boolean b1) {
         // Keep this comment
-        boolean varFromValueOf = Boolean.valueOf(b1);
+        boolean varFromValueOf = b1;
         if (varFromValueOf) {
             System.out.println("True!");
         }
