@@ -294,6 +294,17 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         return Long.compare(alwaysInitializedVar, l);
     }
 
+    public long replaceWrapperAndPrimitiveValueMethod(long l) {
+        // Keep this comment
+        long alwaysInitializedVar = Long.MIN_VALUE;
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar;
+    }
+
     public Long doNotReplaceMultiAutoBoxedWrapper() {
         Long assignedLong = Long.MIN_VALUE;
         Long anotherLong = assignedLong;

@@ -230,6 +230,17 @@ public class BytePrimitiveRatherThanWrapperSample {
         return alwaysInitializedVar.compareTo(b);
     }
 
+    public byte replaceWrapperAndPrimitiveValueMethod(byte s) {
+        // Keep this comment
+        Byte alwaysInitializedVar = Byte.MIN_VALUE;
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.byteValue();
+    }
+
     public Object doNotBreakAutoboxing() {
         Byte returnedObject = Byte.MIN_VALUE;
         return returnedObject;

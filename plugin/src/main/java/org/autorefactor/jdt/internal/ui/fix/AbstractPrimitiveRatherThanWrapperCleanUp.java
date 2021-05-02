@@ -182,7 +182,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 				varOccurrenceVisitor.traverseNodeInterruptibly(parentBlock);
 
 				if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-					refactorWrapper(node, varOccurrenceVisitor.getToStringMethods(), varOccurrenceVisitor.getCompareToMethods());
+					refactorWrapper(node, varOccurrenceVisitor.getToStringMethods(), varOccurrenceVisitor.getCompareToMethods(), varOccurrenceVisitor.getPrimitiveValueMethods());
 					return false;
 				}
 			}
@@ -191,10 +191,18 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		return true;
 	}
 
-	private void refactorWrapper(final VariableDeclarationStatement node, final List<MethodInvocation> toStringMethods, final List<MethodInvocation> compareToMethods) {
+	private void refactorWrapper(
+			final VariableDeclarationStatement node,
+			final List<MethodInvocation> toStringMethods,
+			final List<MethodInvocation> compareToMethods,
+			final List<MethodInvocation> primitiveValueMethods) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
+
+		for (MethodInvocation primitiveValueMethod : primitiveValueMethods) {
+			rewrite.replace(primitiveValueMethod, ASTNodes.createMoveTarget(rewrite, primitiveValueMethod.getExpression()), group);
+		}
 
 		for (MethodInvocation toStringMethod : toStringMethods) {
 			Type wrapperType= rewrite.createCopyTarget(node.getType());
@@ -272,6 +280,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		private final VariableDeclarationFragment varDecl;
 		private final List<MethodInvocation> toStringMethods = new ArrayList<>();
 		private final List<MethodInvocation> compareToMethods = new ArrayList<>();
+		private final List<MethodInvocation> primitiveValueMethods = new ArrayList<>();
 		private boolean isPrimitiveAllowed= true;
 		private boolean isVarReturned;
 		private int autoBoxingCount;
@@ -294,6 +303,10 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 		public List<MethodInvocation> getCompareToMethods() {
 			return compareToMethods;
+		}
+
+		public List<MethodInvocation> getPrimitiveValueMethods() {
+			return primitiveValueMethods;
 		}
 
 		@Override
@@ -391,6 +404,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 				MethodInvocation methodInvocation= (MethodInvocation) parentNode;
 
 				if (node.getLocationInParent() == MethodInvocation.EXPRESSION_PROPERTY) {
+					if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), getPrimitiveTypeName() + "Value")) { //$NON-NLS-1$
+						primitiveValueMethods.add(methodInvocation);
+						return true;
+					}
+
 					if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "toString")) { //$NON-NLS-1$
 						toStringMethods.add(methodInvocation);
 						return true;

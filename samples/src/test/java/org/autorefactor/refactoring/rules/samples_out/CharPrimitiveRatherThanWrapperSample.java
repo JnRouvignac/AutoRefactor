@@ -233,6 +233,17 @@ public class CharPrimitiveRatherThanWrapperSample {
         return Character.compare(alwaysInitializedVar, c);
     }
 
+    public char replaceWrapperAndPrimitiveValueMethod(char c) {
+        // Keep this comment
+        char alwaysInitializedVar = Character.MIN_VALUE;
+        if (alwaysInitializedVar > c) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar;
+    }
+
     public Object doNotBreakAutoboxing() {
         Character returnedObject = Character.MIN_VALUE;
         return returnedObject;

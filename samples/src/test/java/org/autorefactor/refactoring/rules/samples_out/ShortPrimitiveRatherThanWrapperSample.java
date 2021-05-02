@@ -263,6 +263,17 @@ public class ShortPrimitiveRatherThanWrapperSample {
         return Short.compare(alwaysInitializedVar, s);
     }
 
+    public short replaceWrapperAndPrimitiveValueMethod(short s) {
+        // Keep this comment
+        short alwaysInitializedVar = Short.MIN_VALUE;
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar;
+    }
+
     public Short doNotReplaceMultiAutoBoxedWrapper() {
         Short assignedShort = Short.MIN_VALUE;
         Short anotherShort = assignedShort;

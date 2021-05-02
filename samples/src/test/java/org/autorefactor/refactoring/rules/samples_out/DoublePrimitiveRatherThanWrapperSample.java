@@ -262,6 +262,17 @@ public class DoublePrimitiveRatherThanWrapperSample {
         return Double.compare(alwaysInitializedVar, d);
     }
 
+    public double replaceWrapperAndPrimitiveValueMethod(double d) {
+        // Keep this comment
+        double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar;
+    }
+
     public Object doNotBreakAutoboxing() {
         Double returnedObject = Double.MIN_VALUE;
         return returnedObject;
