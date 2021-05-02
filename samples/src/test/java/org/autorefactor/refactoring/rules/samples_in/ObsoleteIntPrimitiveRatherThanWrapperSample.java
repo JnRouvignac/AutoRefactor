@@ -295,6 +295,28 @@ public class ObsoleteIntPrimitiveRatherThanWrapperSample {
         yetAnotherInteger ^= assignedInteger;
     }
 
+    public String replaceWrapperAndToStringMethod(int i) {
+        // Keep this comment
+        Integer alwaysInitializedVar = Integer.MIN_VALUE;
+        if (alwaysInitializedVar > i) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.toString();
+    }
+
+    public int replaceWrapperAndCompareToMethod(int i) {
+        // Keep this comment
+        Integer alwaysInitializedVar = Integer.MIN_VALUE;
+        if (alwaysInitializedVar > i) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.compareTo(i);
+    }
+
     public Integer doNotReplaceMultiAutoBoxedWrapper() {
         Integer assignedInteger = Integer.MIN_VALUE;
         Integer anotherInteger = assignedInteger;

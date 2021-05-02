@@ -164,11 +164,6 @@ public class DoublePrimitiveRatherThanWrapperSample {
         return returnedDouble;
     }
 
-    public Object doNotBreakAutoboxing() {
-        Double returnedObject = Double.MIN_VALUE;
-        return returnedObject;
-    }
-
     public double replaceMultiReturnedWrapper(double d) {
         // Keep this comment
         double returnedDouble = Double.MIN_VALUE;
@@ -206,16 +201,6 @@ public class DoublePrimitiveRatherThanWrapperSample {
         multiReassignedDouble = 456.0;
     }
 
-    public void doNotReplaceNullWrapper() {
-        Double reassignedDouble = Double.MIN_VALUE;
-        reassignedDouble = null;
-    }
-
-    public void doNotReplaceWrapperPassedAsObject(Map<Double, Observable> obsByDouble) {
-        Double reassignedDouble = Double.MIN_VALUE;
-        obsByDouble.get(reassignedDouble).notifyObservers();
-    }
-
     public void replaceAssignedWrapper() {
         // Keep this comment
         double assignedDouble = Double.MIN_VALUE;
@@ -246,6 +231,52 @@ public class DoublePrimitiveRatherThanWrapperSample {
         this.wrapperField = assignedDouble;
     }
 
+    public void replaceBitAssignedWrapper(Double aDouble, Double anotherDouble,
+            Double yetAnotherDouble) {
+        // Keep this comment
+        double assignedDouble = Double.MIN_VALUE;
+        aDouble -= assignedDouble;
+        anotherDouble += assignedDouble;
+        yetAnotherDouble *= assignedDouble;
+    }
+
+    public String replaceWrapperAndToStringMethod(double d) {
+        // Keep this comment
+        double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Double.toString(alwaysInitializedVar);
+    }
+
+    public int replaceWrapperAndCompareToMethod(double d) {
+        // Keep this comment
+        double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Double.compare(alwaysInitializedVar, d);
+    }
+
+    public Object doNotBreakAutoboxing() {
+        Double returnedObject = Double.MIN_VALUE;
+        return returnedObject;
+    }
+
+    public void doNotReplaceNullWrapper() {
+        Double reassignedDouble = Double.MIN_VALUE;
+        reassignedDouble = null;
+    }
+
+    public void doNotReplaceWrapperPassedAsObject(Map<Double, Observable> obsByDouble) {
+        Double reassignedDouble = Double.MIN_VALUE;
+        obsByDouble.get(reassignedDouble).notifyObservers();
+    }
+
     public void doNotReplaceWrapperAssignedOnObjectField() {
         Double assignedDouble = Double.MIN_VALUE;
         objectField = assignedDouble;
@@ -255,15 +286,6 @@ public class DoublePrimitiveRatherThanWrapperSample {
         Double assignedDouble = Double.MIN_VALUE;
         Double anotherDouble = assignedDouble;
         Double yetAnotherDouble = assignedDouble;
-    }
-
-    public void replaceBitAssignedWrapper(Double aDouble, Double anotherDouble,
-            Double yetAnotherDouble) {
-        // Keep this comment
-        double assignedDouble = Double.MIN_VALUE;
-        aDouble -= assignedDouble;
-        anotherDouble += assignedDouble;
-        yetAnotherDouble *= assignedDouble;
     }
 
     public Double doNotReplaceMultiAutoBoxedWrapper() {

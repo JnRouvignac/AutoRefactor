@@ -255,6 +255,28 @@ public class FloatPrimitiveRatherThanWrapperSample {
         evenAnotherFloat /= assignedFloat;
     }
 
+    public String replaceWrapperAndToStringMethod(float f) {
+        // Keep this comment
+        float alwaysInitializedVar = Float.MIN_VALUE;
+        if (alwaysInitializedVar > f) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Float.toString(alwaysInitializedVar);
+    }
+
+    public int replaceWrapperAndCompareToMethod(float f) {
+        // Keep this comment
+        float alwaysInitializedVar = Float.MIN_VALUE;
+        if (alwaysInitializedVar > f) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Float.compare(alwaysInitializedVar, f);
+    }
+
     public Float doNotReplaceMultiAutoBoxedWrapper() {
         Float assignedFloat = Float.MIN_VALUE;
         Float anotherFloat = assignedFloat;

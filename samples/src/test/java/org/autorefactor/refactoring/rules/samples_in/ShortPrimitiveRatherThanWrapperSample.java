@@ -241,6 +241,28 @@ public class ShortPrimitiveRatherThanWrapperSample {
         yetAnotherInteger ^= assignedShort;
     }
 
+    public String replaceWrapperAndToStringMethod(short s) {
+        // Keep this comment
+        Short alwaysInitializedVar = Short.MIN_VALUE;
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.toString();
+    }
+
+    public int replaceWrapperAndCompareToMethod(short s) {
+        // Keep this comment
+        Short alwaysInitializedVar = Short.MIN_VALUE;
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.compareTo(s);
+    }
+
     public Short doNotReplaceMultiAutoBoxedWrapper() {
         Short assignedShort = Short.MIN_VALUE;
         Short anotherShort = assignedShort;

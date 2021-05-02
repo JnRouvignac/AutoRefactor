@@ -182,7 +182,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 				varOccurrenceVisitor.traverseNodeInterruptibly(parentBlock);
 
 				if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-					refactorWrapper(node);
+					refactorWrapper(node, varOccurrenceVisitor.getToStringMethods(), varOccurrenceVisitor.getCompareToMethods());
 					return false;
 				}
 			}
@@ -191,10 +191,25 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		return true;
 	}
 
-	private void refactorWrapper(final VariableDeclarationStatement node) {
+	private void refactorWrapper(final VariableDeclarationStatement node, final List<MethodInvocation> toStringMethods, final List<MethodInvocation> compareToMethods) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
+
+		for (MethodInvocation toStringMethod : toStringMethods) {
+			Type wrapperType= rewrite.createCopyTarget(node.getType());
+
+			rewrite.insertFirst(toStringMethod, MethodInvocation.ARGUMENTS_PROPERTY, ASTNodes.createMoveTarget(rewrite, toStringMethod.getExpression()), group);
+			rewrite.set(toStringMethod, MethodInvocation.EXPRESSION_PROPERTY, wrapperType, group);
+		}
+
+		for (MethodInvocation compareToMethod : compareToMethods) {
+			Type wrapperType= rewrite.createCopyTarget(node.getType());
+
+			rewrite.insertFirst(compareToMethod, MethodInvocation.ARGUMENTS_PROPERTY, ASTNodes.createMoveTarget(rewrite, compareToMethod.getExpression()), group);
+			rewrite.set(compareToMethod, MethodInvocation.EXPRESSION_PROPERTY, wrapperType, group);
+			rewrite.replace(compareToMethod.getName(), ast.newSimpleName("compare"), group); //$NON-NLS-1$
+		}
 
 		Type primitiveType= ast.type(getPrimitiveTypeName());
 
@@ -255,6 +270,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 	private class VarOccurrenceVisitor extends InterruptibleVisitor {
 		private final VariableDeclarationFragment varDecl;
+		private final List<MethodInvocation> toStringMethods = new ArrayList<>();
+		private final List<MethodInvocation> compareToMethods = new ArrayList<>();
 		private boolean isPrimitiveAllowed= true;
 		private boolean isVarReturned;
 		private int autoBoxingCount;
@@ -271,9 +288,18 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			return autoBoxingCount;
 		}
 
+		public List<MethodInvocation> getToStringMethods() {
+			return toStringMethods;
+		}
+
+		public List<MethodInvocation> getCompareToMethods() {
+			return compareToMethods;
+		}
+
 		@Override
 		public boolean visit(final SimpleName aVar) {
-			if (isPrimitiveAllowed && ASTNodes.isSameVariable(aVar, varDecl.getName())
+			if (isPrimitiveAllowed
+					&& ASTNodes.isSameVariable(aVar, varDecl.getName())
 					&& !aVar.getParent().equals(varDecl)) {
 				isPrimitiveAllowed= isPrimitiveAllowed(aVar);
 
@@ -361,9 +387,31 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			case ASTNode.POSTFIX_EXPRESSION:
 				return getPostfixOutSafeOperators().contains(((PostfixExpression) parentNode).getOperator());
 
+			case ASTNode.METHOD_INVOCATION:
+				MethodInvocation methodInvocation= (MethodInvocation) parentNode;
+
+				if (node.getLocationInParent() == MethodInvocation.EXPRESSION_PROPERTY) {
+					if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "toString")) { //$NON-NLS-1$
+						toStringMethods.add(methodInvocation);
+						return true;
+					}
+
+					if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "compareTo", getWrapperFullyQualifiedName())) { //$NON-NLS-1$
+						if (ASTNodes.hasType((Expression) methodInvocation.arguments().get(0), getWrapperFullyQualifiedName())) {
+							autoBoxingCount++;
+						}
+
+						compareToMethods.add(methodInvocation);
+						return true;
+					}
+				}
+
+				break;
+
 			default:
-				return isSpecificPrimitiveAllowed(node);
 			}
+
+			return isSpecificPrimitiveAllowed(node);
 		}
 
 		private boolean isOfType(final ITypeBinding resolveTypeBinding) {

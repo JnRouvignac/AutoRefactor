@@ -254,6 +254,28 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         yetAnotherBoolean ^= assignedBoolean;
     }
 
+    public String replaceWrapperAndToStringMethod(boolean b) {
+        // Keep this comment
+        boolean alwaysInitializedVar = Boolean.TRUE;
+        if (alwaysInitializedVar) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Boolean.toString(alwaysInitializedVar);
+    }
+
+    public int replaceWrapperAndCompareToMethod(boolean b) {
+        // Keep this comment
+        boolean alwaysInitializedVar = Boolean.TRUE;
+        if (alwaysInitializedVar) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return Boolean.compare(alwaysInitializedVar, b);
+    }
+
     public void doNotReplaceNullWrapper() {
         Boolean reassignedBoolean = Boolean.TRUE;
         reassignedBoolean = null;
