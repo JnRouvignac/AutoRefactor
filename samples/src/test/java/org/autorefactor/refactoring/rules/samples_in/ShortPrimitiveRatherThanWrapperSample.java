@@ -53,6 +53,14 @@ public class ShortPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndConstructor(short s) {
+        // Keep this comment
+        Short alwaysInitializedVar = new Short("0");
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(short s) {
         // Keep this comment
         java.lang.Short alwaysInitializedVar = Short.MIN_VALUE;

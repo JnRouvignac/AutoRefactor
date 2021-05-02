@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -52,6 +53,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -201,6 +203,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(""); //$NON-NLS-1$
 
+		String parsingMethodName= getParsingMethodName(getWrapperFullyQualifiedName());
+
 		if (initializer instanceof MethodInvocation) {
 			MethodInvocation methodInvocation= (MethodInvocation) initializer;
 
@@ -210,7 +214,26 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 			if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
 					|| ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
-				rewrite.set(methodInvocation, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(getParsingMethodName(getWrapperFullyQualifiedName())), group);
+				rewrite.set(methodInvocation, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(parsingMethodName), group);
+			}
+		} else if (initializer instanceof ClassInstanceCreation) {
+			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) initializer;
+			List<Expression> classInstanceCreationArguments= classInstanceCreation.arguments();
+
+			if (classInstanceCreationArguments.size() == 1
+					&& parsingMethodName != null
+					&& !Character.class.getCanonicalName().equals(getWrapperFullyQualifiedName())
+					&& ASTNodes.hasType(classInstanceCreation, getWrapperFullyQualifiedName())) {
+				Expression arg0= classInstanceCreationArguments.get(0);
+
+				if (ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
+					MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+					newMethodInvocation.setExpression(rewrite.createCopyTarget(((SimpleType) visited.getType()).getName()));
+					newMethodInvocation.setName(ast.newSimpleName(parsingMethodName));
+					newMethodInvocation.arguments().add(ASTNodes.createMoveTarget(rewrite, ASTNodes.getUnparenthesedExpression(arg0)));
+
+					ASTNodes.replaceButKeepComment(rewrite, initializer, newMethodInvocation, group);
+				}
 			}
 		}
 
@@ -290,6 +313,17 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 							ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
 							|| ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
 							);
+		}
+
+		if (expression instanceof ClassInstanceCreation) {
+			ClassInstanceCreation classInstanceCreation= (ClassInstanceCreation) expression;
+			List<Expression> classInstanceCreationArguments= classInstanceCreation.arguments();
+
+			if (classInstanceCreationArguments.size() == 1) {
+				Expression arg0= classInstanceCreationArguments.get(0);
+
+				return ASTNodes.hasType(arg0, String.class.getCanonicalName());
+			}
 		}
 
 		return false;
