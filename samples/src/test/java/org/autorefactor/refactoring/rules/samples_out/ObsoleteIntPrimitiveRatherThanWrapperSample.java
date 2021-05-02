@@ -45,6 +45,22 @@ public class ObsoleteIntPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(int i) {
+        // Keep this comment
+        int alwaysInitializedVar = Integer.parseInt("0");
+        if (alwaysInitializedVar > i) {
+            System.out.println("True!");
+        }
+    }
+
+    public void replaceWrapperAndUseParsingWithRadix(int i) {
+        // Keep this comment
+        int alwaysInitializedVar = Integer.parseInt("0", 10);
+        if (alwaysInitializedVar > i) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(int i) {
         // Keep this comment
         int alwaysInitializedVar = Integer.MIN_VALUE;

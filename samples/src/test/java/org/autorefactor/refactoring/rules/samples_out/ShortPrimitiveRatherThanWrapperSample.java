@@ -45,6 +45,14 @@ public class ShortPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(short s) {
+        // Keep this comment
+        short alwaysInitializedVar = Short.parseShort("0");
+        if (alwaysInitializedVar > s) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(short s) {
         // Keep this comment
         short alwaysInitializedVar = Short.MIN_VALUE;

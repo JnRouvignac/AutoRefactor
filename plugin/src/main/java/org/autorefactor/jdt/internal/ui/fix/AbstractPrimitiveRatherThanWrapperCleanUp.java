@@ -207,6 +207,11 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 			if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName())) { //$NON-NLS-1$
 				rewrite.replace(methodInvocation, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0)), group);
 			}
+
+			if (ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+					|| ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+				rewrite.set(methodInvocation, MethodInvocation.NAME_PROPERTY, ast.newSimpleName(getParsingMethodName(getWrapperFullyQualifiedName())), group);
+			}
 		}
 
 		for (MethodInvocation primitiveValueMethod : primitiveValueMethods) {
@@ -279,10 +284,47 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
 		if (expression instanceof MethodInvocation) {
 			MethodInvocation methodInvocation= (MethodInvocation) expression;
-			return ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
+			return ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()) //$NON-NLS-1$
+					|| getParsingMethodName(getWrapperFullyQualifiedName()) != null
+					&& (
+							ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+							|| ASTNodes.usesGivenSignature(methodInvocation, getWrapperFullyQualifiedName(), "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
+							);
 		}
 
 		return false;
+	}
+
+	private String getParsingMethodName(final String wrapperFullyQualifiedName) {
+		if (Boolean.class.getCanonicalName().equals(wrapperFullyQualifiedName) && getJavaMinorVersion() >= 5) {
+			return "parseBoolean"; //$NON-NLS-1$
+		}
+
+		if (Integer.class.getCanonicalName().equals(wrapperFullyQualifiedName)) {
+			return "parseInt"; //$NON-NLS-1$
+		}
+
+		if (Long.class.getCanonicalName().equals(wrapperFullyQualifiedName)) {
+			return "parseLong"; //$NON-NLS-1$
+		}
+
+		if (Double.class.getCanonicalName().equals(wrapperFullyQualifiedName) && getJavaMinorVersion() >= 2) {
+			return "parseDouble"; //$NON-NLS-1$
+		}
+
+		if (Float.class.getCanonicalName().equals(wrapperFullyQualifiedName) && getJavaMinorVersion() >= 2) {
+			return "parseFloat"; //$NON-NLS-1$
+		}
+
+		if (Short.class.getCanonicalName().equals(wrapperFullyQualifiedName)) {
+			return "parseShort"; //$NON-NLS-1$
+		}
+
+		if (Byte.class.getCanonicalName().equals(wrapperFullyQualifiedName)) {
+			return "parseByte"; //$NON-NLS-1$
+		}
+
+		return null;
 	}
 
 	private class VarOccurrenceVisitor extends InterruptibleVisitor {

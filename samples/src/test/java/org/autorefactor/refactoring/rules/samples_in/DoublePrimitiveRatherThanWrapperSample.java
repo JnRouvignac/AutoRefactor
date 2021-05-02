@@ -45,6 +45,14 @@ public class DoublePrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(double d) {
+        // Keep this comment
+        Double alwaysInitializedVar = Double.valueOf("0");
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(double d) {
         // Keep this comment
         java.lang.Double alwaysInitializedVar = Double.MIN_VALUE;

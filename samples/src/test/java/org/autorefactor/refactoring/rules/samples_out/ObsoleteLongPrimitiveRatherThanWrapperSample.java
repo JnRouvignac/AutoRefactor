@@ -45,6 +45,14 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(long l) {
+        // Keep this comment
+        long alwaysInitializedVar = Long.parseLong("0");
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(long l) {
         // Keep this comment
         long alwaysInitializedVar = Long.MIN_VALUE;

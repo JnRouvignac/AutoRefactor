@@ -45,6 +45,14 @@ public class FloatPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(float f) {
+        // Keep this comment
+        Float alwaysInitializedVar = Float.valueOf("0");
+        if (alwaysInitializedVar > f) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(float f) {
         // Keep this comment
         java.lang.Float alwaysInitializedVar = Float.MIN_VALUE;

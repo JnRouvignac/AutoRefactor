@@ -45,6 +45,14 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(boolean b) {
+        // Keep this comment
+        Boolean alwaysInitializedVar = Boolean.valueOf("true");
+        if (alwaysInitializedVar && b) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(boolean b) {
         // Keep this comment
         java.lang.Boolean alwaysInitializedVar = Boolean.FALSE;

@@ -44,6 +44,14 @@ public class BytePrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsing(byte b) {
+        // Keep this comment
+        byte alwaysInitializedVar = Byte.parseByte("0");
+        if (alwaysInitializedVar > b) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceFullyQualifiedWrapper(byte b) {
         // Keep this comment
         byte alwaysInitializedVar = Byte.MIN_VALUE;
