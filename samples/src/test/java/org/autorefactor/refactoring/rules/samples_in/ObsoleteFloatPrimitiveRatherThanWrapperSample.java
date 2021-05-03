@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Map;
 import java.util.Observable;
 
-public class FloatPrimitiveRatherThanWrapperSample {
+public class ObsoleteFloatPrimitiveRatherThanWrapperSample {
     public Float doNotRefactorFields = Float.MIN_VALUE;
 
     public float floatField;

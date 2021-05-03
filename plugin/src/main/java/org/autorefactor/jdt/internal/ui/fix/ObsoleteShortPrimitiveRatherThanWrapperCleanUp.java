@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -36,25 +37,25 @@ import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
+public class ObsoleteShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.DoublePrimitiveRatherThanWrapperCleanUp_name;
+		return MultiFixMessages.ObsoleteShortPrimitiveRatherThanWrapperCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.DoublePrimitiveRatherThanWrapperCleanUp_description;
+		return MultiFixMessages.ObsoleteShortPrimitiveRatherThanWrapperCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.DoublePrimitiveRatherThanWrapperCleanUp_reason;
+		return MultiFixMessages.ObsoleteShortPrimitiveRatherThanWrapperCleanUp_reason;
 	}
 
 	@Override
 	public String getPrimitiveTypeName() {
-		return double.class.getSimpleName();
+		return short.class.getSimpleName();
 	}
 
 	@Override
@@ -64,16 +65,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
 	@Override
 	public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
-				PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
-	}
-
-	@Override
-	public List<InfixExpression.Operator> getInfixInSafeOperators() {
-		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.DIVIDE,
-				InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.MINUS, InfixExpression.Operator.PLUS,
-				InfixExpression.Operator.REMAINDER, InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
-				InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED, InfixExpression.Operator.TIMES);
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.COMPLEMENT);
 	}
 
 	@Override
@@ -90,10 +82,13 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
 	@Override
 	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.DIVIDE,
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
 				InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
-				InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS,
-				InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER, InfixExpression.Operator.TIMES);
+				InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.LESS,
+				InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
+				InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
+				InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+				InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
 	}
 
 	@Override
@@ -105,11 +100,26 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 	@Override
 	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
 		return Arrays.<Assignment.Operator>asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN, Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
-				Assignment.Operator.REMAINDER_ASSIGN);
+				Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN, Assignment.Operator.LEFT_SHIFT_ASSIGN,
+				Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN);
 	}
 
 	@Override
 	public String[] getSafeInConstants() {
 		return new String[] { "MIN_VALUE", "MAX_VALUE" }; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Override
+	public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
+		ASTNode parentNode= node.getParent();
+
+		switch (parentNode.getNodeType()) {
+		case ASTNode.ARRAY_ACCESS:
+		case ASTNode.SWITCH_STATEMENT:
+			return true;
+
+		default:
+			return false;
+		}
 	}
 }

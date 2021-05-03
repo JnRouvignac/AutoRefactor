@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.Map;
 import java.util.Observable;
 
-public class CharPrimitiveRatherThanWrapperSample {
+public class ObsoleteCharPrimitiveRatherThanWrapperSample {
     public Character doNotRefactorFields = Character.MIN_VALUE;
 
     public char charField;

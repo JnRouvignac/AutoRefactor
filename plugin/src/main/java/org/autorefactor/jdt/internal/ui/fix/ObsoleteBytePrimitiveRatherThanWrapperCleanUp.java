@@ -29,68 +29,77 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
+public class ObsoleteBytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.BooleanPrimitiveRatherThanWrapperCleanUp_name;
+		return MultiFixMessages.ObsoleteBytePrimitiveRatherThanWrapperCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.BooleanPrimitiveRatherThanWrapperCleanUp_description;
+		return MultiFixMessages.ObsoleteBytePrimitiveRatherThanWrapperCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.BooleanPrimitiveRatherThanWrapperCleanUp_reason;
+		return MultiFixMessages.ObsoleteBytePrimitiveRatherThanWrapperCleanUp_reason;
 	}
 
 	@Override
 	public String getPrimitiveTypeName() {
-		return boolean.class.getSimpleName();
+		return byte.class.getSimpleName();
 	}
 
 	@Override
 	public Class<? extends Expression> getLiteralClass() {
-		return BooleanLiteral.class;
+		return NumberLiteral.class;
 	}
 
 	@Override
 	public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+				PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
 	}
 
 	@Override
-	public List<InfixExpression.Operator> getInfixInSafeOperators() {
-		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.EQUALS, InfixExpression.Operator.GREATER,
-				InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.OR, InfixExpression.Operator.XOR);
+	public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
+		return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
+				PostfixExpression.Operator.DECREMENT);
 	}
 
 	@Override
 	public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
+		return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+				PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
 	}
 
 	@Override
 	public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR);
+		return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
+				InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+				InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.LESS,
+				InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
+				InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
+				InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+				InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
 	}
 
 	@Override
-	public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-		return Arrays.<Assignment.Operator>asList(Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN);
+	public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
+		return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
+				PostfixExpression.Operator.DECREMENT);
 	}
 
 	@Override
 	public String[] getSafeInConstants() {
-		return new String[] { "TRUE", "FALSE" }; //$NON-NLS-1$ //$NON-NLS-2$
+		return new String[] { "MIN_VALUE", "MAX_VALUE" }; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -98,9 +107,8 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 		ASTNode parentNode= node.getParent();
 
 		switch (parentNode.getNodeType()) {
-		case ASTNode.IF_STATEMENT:
-		case ASTNode.WHILE_STATEMENT:
-		case ASTNode.DO_STATEMENT:
+		case ASTNode.ARRAY_ACCESS:
+		case ASTNode.SWITCH_STATEMENT:
 			return true;
 
 		default:

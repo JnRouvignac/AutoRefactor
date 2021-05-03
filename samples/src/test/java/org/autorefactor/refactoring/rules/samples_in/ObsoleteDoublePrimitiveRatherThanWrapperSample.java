@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Map;
 import java.util.Observable;
 
-public class DoublePrimitiveRatherThanWrapperSample {
+public class ObsoleteDoublePrimitiveRatherThanWrapperSample {
     public Double doNotRefactorFields = Double.MIN_VALUE;
 
     public double doubleField;

@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Map;
 import java.util.Observable;
 
-public class ShortPrimitiveRatherThanWrapperSample {
+public class ObsoleteShortPrimitiveRatherThanWrapperSample {
     public Short doNotRefactorFields = Short.MIN_VALUE;
 
     public short shortField;

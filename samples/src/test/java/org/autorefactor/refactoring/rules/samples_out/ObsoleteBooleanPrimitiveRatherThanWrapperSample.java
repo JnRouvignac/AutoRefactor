@@ -23,12 +23,12 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_in;
+package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.Map;
 import java.util.Observable;
 
-public class BooleanPrimitiveRatherThanWrapperSample {
+public class ObsoleteBooleanPrimitiveRatherThanWrapperSample {
     public Boolean doNotRefactorFields = Boolean.TRUE;
 
     public boolean booleanField;
@@ -39,7 +39,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapper(boolean b) {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (alwaysInitializedVar && b) {
             System.out.println("True!");
         }
@@ -47,7 +47,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperAndUseParsing(boolean b) {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.valueOf("true");
+        boolean alwaysInitializedVar = Boolean.parseBoolean("true");
         if (alwaysInitializedVar && b) {
             System.out.println("True!");
         }
@@ -55,7 +55,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceFullyQualifiedWrapper(boolean b) {
         // Keep this comment
-        java.lang.Boolean alwaysInitializedVar = Boolean.FALSE;
+        boolean alwaysInitializedVar = Boolean.FALSE;
         if (alwaysInitializedVar && b) {
             System.out.println("True!");
         }
@@ -63,7 +63,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInCast() {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.FALSE;
+        boolean alwaysInitializedVar = Boolean.FALSE;
         if ((boolean) alwaysInitializedVar) {
             System.out.println("True!");
         }
@@ -71,7 +71,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInParenthesis() {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.FALSE;
+        boolean alwaysInitializedVar = Boolean.FALSE;
         if ((alwaysInitializedVar)) {
             System.out.println("True!");
         }
@@ -79,7 +79,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceGreaterWrapper(int i) {
         // Keep this comment
-        Boolean greaterVar = i > 0;
+        boolean greaterVar = i > 0;
         if (greaterVar) {
             System.out.println("True!");
         }
@@ -87,7 +87,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceLesserWrapper(int i) {
         // Keep this comment
-        Boolean lesserVar = i < 0;
+        boolean lesserVar = i < 0;
         if (lesserVar) {
             System.out.println("True!");
         }
@@ -95,7 +95,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceAndWrapper(boolean b1, boolean b2) {
         // Keep this comment
-        Boolean andVar = b1 && b2;
+        boolean andVar = b1 && b2;
         if (andVar) {
             System.out.println("True!");
         }
@@ -103,7 +103,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceOrWrapper(boolean b1, boolean b2) {
         // Keep this comment
-        Boolean orVar = b1 || b2;
+        boolean orVar = b1 || b2;
         if (orVar) {
             System.out.println("True!");
         }
@@ -111,7 +111,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceOppositeWrapper(boolean b) {
         // Keep this comment
-        Boolean oppositeVar = !b;
+        boolean oppositeVar = !b;
         if (oppositeVar) {
             System.out.println("True!");
         }
@@ -119,7 +119,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperFromValueOf(boolean b1) {
         // Keep this comment
-        Boolean varFromValueOf = Boolean.valueOf(b1);
+        boolean varFromValueOf = b1;
         if (varFromValueOf) {
             System.out.println("True!");
         }
@@ -127,7 +127,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceParentherizedWrapper(boolean b1, boolean b2) {
         // Keep this comment
-        Boolean parentherizedVar = (b1 || b2);
+        boolean parentherizedVar = (b1 || b2);
         if (parentherizedVar) {
             System.out.println("True!");
         }
@@ -135,7 +135,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceComplexExprWrapper(boolean b1, boolean b2, boolean b3, boolean b4) {
         // Keep this comment
-        Boolean complexVar = b1 ? !b2 : (b3 || b4);
+        boolean complexVar = b1 ? !b2 : (b3 || b4);
         if (complexVar) {
             System.out.println("True!");
         }
@@ -143,7 +143,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceCastWrapper(Boolean b) {
         // Keep this comment
-        Boolean castVar = (boolean) b;
+        boolean castVar = (boolean) b;
         if (castVar) {
             System.out.println("True!");
         }
@@ -151,7 +151,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInPrefixExpression() {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (!alwaysInitializedVar) {
             System.out.println("True!");
         }
@@ -159,7 +159,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInIf() {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (alwaysInitializedVar) {
             System.out.println("True!");
         }
@@ -167,7 +167,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInWhile() {
         // Keep this comment
-        Boolean alwaysInitializedVar = true;
+        boolean alwaysInitializedVar = true;
         while (alwaysInitializedVar) {
             System.out.println("True!");
         }
@@ -175,7 +175,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceWrapperInDoWhile() {
         // Keep this comment
-        Boolean alwaysInitializedVar = false;
+        boolean alwaysInitializedVar = false;
         do {
             System.out.println("True!");
         } while (alwaysInitializedVar);
@@ -183,13 +183,13 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public String replaceWrapperInConditionalExpression() {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         return alwaysInitializedVar ? "foo" : "bar";
     }
 
     public boolean replaceReturnedWrapper() {
         // Keep this comment
-        Boolean returnedBoolean = Boolean.TRUE;
+        boolean returnedBoolean = Boolean.TRUE;
         return returnedBoolean;
     }
 
@@ -200,7 +200,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public boolean replaceMultiReturnedWrapper(int i) {
         // Keep this comment
-        Boolean returnedBoolean = Boolean.TRUE;
+        boolean returnedBoolean = Boolean.TRUE;
         if (i > 0) {
             System.out.println("Positive");
             return returnedBoolean;
@@ -212,7 +212,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public Boolean replaceReturnedAutoBoxedWrapper(int i) {
         // Keep this comment
-        Boolean returnedBoolean = Boolean.FALSE;
+        boolean returnedBoolean = Boolean.FALSE;
         if (i > 0) {
             System.out.println("Positive");
             return returnedBoolean;
@@ -224,39 +224,39 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public void replaceReassignedWrapper() {
         // Keep this comment
-        Boolean reassignedBoolean = Boolean.TRUE;
+        boolean reassignedBoolean = Boolean.TRUE;
         reassignedBoolean = Boolean.FALSE;
     }
 
     public void replaceMultiReassignedWrapper() {
         // Keep this comment
-        Boolean multiReassignedBoolean = Boolean.TRUE;
+        boolean multiReassignedBoolean = Boolean.TRUE;
         multiReassignedBoolean = Boolean.FALSE;
         multiReassignedBoolean = Boolean.TRUE;
     }
 
     public void replaceAssignedWrapper() {
         // Keep this comment
-        Boolean assignedBoolean = Boolean.TRUE;
+        boolean assignedBoolean = Boolean.TRUE;
         Boolean anotherBoolean = assignedBoolean;
     }
 
     public void replaceWrapperAssignedOnBooleanField() {
         // Keep this comment
-        Boolean assignedBoolean = Boolean.TRUE;
+        boolean assignedBoolean = Boolean.TRUE;
         booleanField = assignedBoolean;
     }
 
     public void replaceWrapperAssignedOnWrapperField() {
         // Keep this comment
-        Boolean assignedBoolean = Boolean.TRUE;
+        boolean assignedBoolean = Boolean.TRUE;
         wrapperField = assignedBoolean;
     }
 
     public void replaceBitAssignedWrapper(Boolean aBoolean, Boolean anotherBoolean,
             Boolean yetAnotherBoolean) {
         // Keep this comment
-        Boolean assignedBoolean = Boolean.TRUE;
+        boolean assignedBoolean = Boolean.TRUE;
         aBoolean &= assignedBoolean;
         anotherBoolean |= assignedBoolean;
         yetAnotherBoolean ^= assignedBoolean;
@@ -264,35 +264,35 @@ public class BooleanPrimitiveRatherThanWrapperSample {
 
     public String replaceWrapperAndToStringMethod(boolean b) {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (alwaysInitializedVar) {
             System.out.println("True!");
         }
 
         // Keep this comment too
-        return alwaysInitializedVar.toString();
+        return Boolean.toString(alwaysInitializedVar);
     }
 
     public int replaceWrapperAndCompareToMethod(boolean b) {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (alwaysInitializedVar) {
             System.out.println("True!");
         }
 
         // Keep this comment too
-        return alwaysInitializedVar.compareTo(b);
+        return Boolean.compare(alwaysInitializedVar, b);
     }
 
     public boolean replaceWrapperAndPrimitiveValueMethod(boolean s) {
         // Keep this comment
-        Boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.TRUE;
         if (alwaysInitializedVar) {
             System.out.println("True!");
         }
 
         // Keep this comment too
-        return alwaysInitializedVar.booleanValue();
+        return alwaysInitializedVar;
     }
 
     public void doNotReplaceNullWrapper() {

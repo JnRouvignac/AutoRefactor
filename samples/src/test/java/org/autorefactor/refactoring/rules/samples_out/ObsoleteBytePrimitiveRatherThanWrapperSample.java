@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.Map;
 import java.util.Observable;
 
-public class BytePrimitiveRatherThanWrapperSample {
+public class ObsoleteBytePrimitiveRatherThanWrapperSample {
     public Byte doNotRefactorFields = Byte.MIN_VALUE;
 
     public byte byteField;

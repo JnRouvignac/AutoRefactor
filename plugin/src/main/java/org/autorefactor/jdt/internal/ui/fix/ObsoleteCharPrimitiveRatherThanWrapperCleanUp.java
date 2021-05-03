@@ -37,20 +37,20 @@ import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
-public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
+public class ObsoleteCharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRatherThanWrapperCleanUp {
 	@Override
 	public String getName() {
-		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_name;
+		return MultiFixMessages.ObsoleteCharPrimitiveRatherThanWrapperCleanUp_name;
 	}
 
 	@Override
 	public String getDescription() {
-		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_description;
+		return MultiFixMessages.ObsoleteCharPrimitiveRatherThanWrapperCleanUp_description;
 	}
 
 	@Override
 	public String getReason() {
-		return MultiFixMessages.CharPrimitiveRatherThanWrapperCleanUp_reason;
+		return MultiFixMessages.ObsoleteCharPrimitiveRatherThanWrapperCleanUp_reason;
 	}
 
 	@Override

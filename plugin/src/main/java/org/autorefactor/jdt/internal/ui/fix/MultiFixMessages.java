@@ -53,15 +53,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String ShortPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteShortPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ShortPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteShortPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String ShortPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteShortPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -77,51 +77,51 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoublePrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteDoublePrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoublePrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteDoublePrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String DoublePrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteDoublePrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FloatPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteFloatPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FloatPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteFloatPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String FloatPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteFloatPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteCharPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteCharPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String CharPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteCharPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BytePrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteBytePrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BytePrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteBytePrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BytePrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteBytePrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
@@ -269,15 +269,15 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
-	public static String BooleanPrimitiveRatherThanWrapperCleanUp_name;
+	public static String ObsoleteBooleanPrimitiveRatherThanWrapperCleanUp_name;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BooleanPrimitiveRatherThanWrapperCleanUp_description;
+	public static String ObsoleteBooleanPrimitiveRatherThanWrapperCleanUp_description;
 	/**
 	 * Automatically filled.
 	 */
-	public static String BooleanPrimitiveRatherThanWrapperCleanUp_reason;
+	public static String ObsoleteBooleanPrimitiveRatherThanWrapperCleanUp_reason;
 	/**
 	 * Automatically filled.
 	 */
