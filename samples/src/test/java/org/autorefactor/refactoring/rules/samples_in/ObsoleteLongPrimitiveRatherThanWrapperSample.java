@@ -53,6 +53,55 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndUseParsingWithRadix(long l) {
+        // Keep this comment
+        Long alwaysInitializedVar = Long.valueOf("0", 10);
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+    }
+
+    public void replaceWrapperAndConstructor(long l) {
+        // Keep this comment
+        Long alwaysInitializedVar = new Long("0");
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+    }
+
+    public String replaceWrapperAndToStringMethod(long l) {
+        // Keep this comment
+        Long alwaysInitializedVar = Long.MIN_VALUE;
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.toString();
+    }
+
+    public int replaceWrapperAndCompareToMethod(long l) {
+        // Keep this comment
+        Long alwaysInitializedVar = Long.MIN_VALUE;
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.compareTo(l);
+    }
+
+    public long replaceWrapperAndPrimitiveValueMethod(long l) {
+        // Keep this comment
+        Long alwaysInitializedVar = Long.MIN_VALUE;
+        if (alwaysInitializedVar > l) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.longValue();
+    }
+
     public void replaceFullyQualifiedWrapper(long l) {
         // Keep this comment
         java.lang.Long alwaysInitializedVar = Long.MIN_VALUE;
@@ -190,11 +239,6 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         return returnedLong;
     }
 
-    public Object doNotBreakAutoboxing() {
-        Long returnedObject = Long.MIN_VALUE;
-        return returnedObject;
-    }
-
     public long replaceMultiReturnedWrapper(long l) {
         // Keep this comment
         Long returnedLong = Long.MIN_VALUE;
@@ -232,16 +276,6 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         multiReassignedLong = 456L;
     }
 
-    public void doNotReplaceNullWrapper() {
-        Long reassignedLong = Long.MIN_VALUE;
-        reassignedLong = null;
-    }
-
-    public void doNotReplaceWrapperPassedAsObject(Map<Long, Observable> obsByLong) {
-        Long reassignedLong = Long.MIN_VALUE;
-        obsByLong.get(reassignedLong).notifyObservers();
-    }
-
     public void replaceAssignedWrapper() {
         // Keep this comment
         Long assignedLong = Long.MIN_VALUE;
@@ -260,17 +294,6 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         wrapperField = assignedLong;
     }
 
-    public void doNotReplaceWrapperAssignedOnObjectField() {
-        Long assignedLong = Long.MIN_VALUE;
-        objectField = assignedLong;
-    }
-
-    public void doNotReplaceMultiAssignedWrapper() {
-        Long assignedLong = Long.MIN_VALUE;
-        Long anotherLong = assignedLong;
-        Long yetAnotherLong = assignedLong;
-    }
-
     public void replaceBitAssignedWrapper(Long aLong, Long anotherLong,
             Long yetAnotherLong) {
         // Keep this comment
@@ -280,37 +303,30 @@ public class ObsoleteLongPrimitiveRatherThanWrapperSample {
         yetAnotherLong ^= assignedLong;
     }
 
-    public String replaceWrapperAndToStringMethod(long l) {
-        // Keep this comment
-        Long alwaysInitializedVar = Long.MIN_VALUE;
-        if (alwaysInitializedVar > l) {
-            System.out.println("True!");
-        }
-
-        // Keep this comment too
-        return alwaysInitializedVar.toString();
+    public Object doNotBreakAutoboxing() {
+        Long returnedObject = Long.MIN_VALUE;
+        return returnedObject;
     }
 
-    public int replaceWrapperAndCompareToMethod(long l) {
-        // Keep this comment
-        Long alwaysInitializedVar = Long.MIN_VALUE;
-        if (alwaysInitializedVar > l) {
-            System.out.println("True!");
-        }
-
-        // Keep this comment too
-        return alwaysInitializedVar.compareTo(l);
+    public void doNotReplaceNullWrapper() {
+        Long reassignedLong = Long.MIN_VALUE;
+        reassignedLong = null;
     }
 
-    public long replaceWrapperAndPrimitiveValueMethod(long l) {
-        // Keep this comment
-        Long alwaysInitializedVar = Long.MIN_VALUE;
-        if (alwaysInitializedVar > l) {
-            System.out.println("True!");
-        }
+    public void doNotReplaceWrapperPassedAsObject(Map<Long, Observable> obsByLong) {
+        Long reassignedLong = Long.MIN_VALUE;
+        obsByLong.get(reassignedLong).notifyObservers();
+    }
 
-        // Keep this comment too
-        return alwaysInitializedVar.longValue();
+    public void doNotReplaceWrapperAssignedOnObjectField() {
+        Long assignedLong = Long.MIN_VALUE;
+        objectField = assignedLong;
+    }
+
+    public void doNotReplaceMultiAssignedWrapper() {
+        Long assignedLong = Long.MIN_VALUE;
+        Long anotherLong = assignedLong;
+        Long yetAnotherLong = assignedLong;
     }
 
     public Long doNotReplaceMultiAutoBoxedWrapper() {

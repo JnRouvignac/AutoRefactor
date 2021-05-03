@@ -53,6 +53,47 @@ public class ObsoleteDoublePrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperAndConstructor(double d) {
+        // Keep this comment
+        Double alwaysInitializedVar = new Double("0");
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+    }
+
+    public String replaceWrapperAndToStringMethod(double d) {
+        // Keep this comment
+        Double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.toString();
+    }
+
+    public int replaceWrapperAndCompareToMethod(double d) {
+        // Keep this comment
+        Double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.compareTo(d);
+    }
+
+    public double replaceWrapperAndPrimitiveValueMethod(double d) {
+        // Keep this comment
+        Double alwaysInitializedVar = Double.MIN_VALUE;
+        if (alwaysInitializedVar > d) {
+            System.out.println("True!");
+        }
+
+        // Keep this comment too
+        return alwaysInitializedVar.doubleValue();
+    }
+
     public void replaceFullyQualifiedWrapper(double d) {
         // Keep this comment
         java.lang.Double alwaysInitializedVar = Double.MIN_VALUE;
@@ -246,39 +287,6 @@ public class ObsoleteDoublePrimitiveRatherThanWrapperSample {
         aDouble -= assignedDouble;
         anotherDouble += assignedDouble;
         yetAnotherDouble *= assignedDouble;
-    }
-
-    public String replaceWrapperAndToStringMethod(double d) {
-        // Keep this comment
-        Double alwaysInitializedVar = Double.MIN_VALUE;
-        if (alwaysInitializedVar > d) {
-            System.out.println("True!");
-        }
-
-        // Keep this comment too
-        return alwaysInitializedVar.toString();
-    }
-
-    public int replaceWrapperAndCompareToMethod(double d) {
-        // Keep this comment
-        Double alwaysInitializedVar = Double.MIN_VALUE;
-        if (alwaysInitializedVar > d) {
-            System.out.println("True!");
-        }
-
-        // Keep this comment too
-        return alwaysInitializedVar.compareTo(d);
-    }
-
-    public double replaceWrapperAndPrimitiveValueMethod(double d) {
-        // Keep this comment
-        Double alwaysInitializedVar = Double.MIN_VALUE;
-        if (alwaysInitializedVar > d) {
-            System.out.println("True!");
-        }
-
-        // Keep this comment too
-        return alwaysInitializedVar.doubleValue();
     }
 
     public Object doNotBreakAutoboxing() {
