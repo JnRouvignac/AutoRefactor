@@ -30,12 +30,26 @@ import java.util.List;
 
 public class CommonIfInIfElseSample {
     public void refactorCommonInnerIf(boolean b1, boolean b2) throws Exception {
+        // Keep this comment
         if (b2) {
             if (b1) {
-                // Keep this comment
+                // Keep this comment too
                 System.out.println(b1);
             } else {
-                // Keep this comment
+                // Keep this comment too
+                System.out.println(!b1);
+            }
+        }
+    }
+
+    public void refactorWithoutBrackets(boolean b1, boolean b2) throws Exception {
+        // Keep this comment
+        if (b2) {
+            if (b1) {
+                // Keep this comment too
+                System.out.println(b1);
+            } else {
+                // Keep this comment too
                 System.out.println(!b1);
             }
         }
