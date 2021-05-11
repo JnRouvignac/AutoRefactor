@@ -33,6 +33,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
@@ -59,36 +60,40 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 
 	@Override
 	public boolean visit(final FieldDeclaration visited) {
-		return visitMultiDeclaration(visited, visited.modifiers(), visited.getType(), visited.fragments(), visited.getJavadoc());
+		List<IExtendedModifier> modifiers= visited.modifiers();
+		List<VariableDeclarationFragment> fragments= visited.fragments();
+		return visitMultiDeclaration(visited, modifiers, visited.getType(), fragments, visited.getJavadoc());
 	}
 
 	@Override
 	public boolean visit(final VariableDeclarationStatement visited) {
-		return visitMultiDeclaration(visited, visited.modifiers(), visited.getType(), visited.fragments(), null);
+		List<IExtendedModifier> modifiers= visited.modifiers();
+		List<VariableDeclarationFragment> fragments= visited.fragments();
+		return visitMultiDeclaration(visited, modifiers, visited.getType(), fragments, null);
 	}
 
-	private boolean visitMultiDeclaration(final ASTNode visited, final List<?> modifiers, final Type type,
-			final List<?> fragments, final Javadoc docComment) {
+	private boolean visitMultiDeclaration(final ASTNode visited, final List<IExtendedModifier> modifiers, final Type type,
+			final List<VariableDeclarationFragment> fragments, final Javadoc docComment) {
 		if (fragments != null && fragments.size() > 1) {
 			refactorMultiDeclaration(visited, modifiers, type, fragments, docComment);
-
 			return false;
 		}
 
 		return true;
 	}
 
-	private void refactorMultiDeclaration(final ASTNode visited, final List<?> modifiers, final Type type,
-			final List<?> fragments, final Javadoc docComment) {
+	private void refactorMultiDeclaration(final ASTNode visited, final List<IExtendedModifier> modifiers, final Type type,
+			final List<VariableDeclarationFragment> fragments, final Javadoc docComment) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.SingleDeclarationsRatherThanMultiDeclarationCleanUp_description);
 
 		for (int i= fragments.size() - 1; 0 <= i; i--) {
-			VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
+			VariableDeclarationFragment fragment= fragments.get(i);
 
 			SimpleName copyOfFragment= ASTNodes.createMoveTarget(rewrite, fragment.getName());
 			Type copyOfType= ast.createCopyTarget(type);
+
 			Expression copyOfInitializer;
 			if (fragment.getInitializer() != null) {
 				copyOfInitializer= ASTNodes.createMoveTarget(rewrite, fragment.getInitializer());
@@ -97,6 +102,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 			}
 
 			VariableDeclarationFragment newFragment= ast.newVariableDeclarationFragment(copyOfFragment, copyOfInitializer);
+			newFragment.extraDimensions().addAll(ASTNodes.createMoveTarget(rewrite, fragment.extraDimensions()));
 			ASTNode newNode;
 			if (visited instanceof VariableDeclarationStatement) {
 				VariableDeclarationStatement newStatement= ast.newVariableDeclarationStatement(copyOfType, newFragment);
@@ -104,9 +110,11 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 				newNode= newStatement;
 			} else {
 				FieldDeclaration newField= ast.newFieldDeclaration(copyOfType, newFragment);
+
 				if (docComment != null) {
 					newField.setJavadoc(ast.createCopyTarget(docComment));
 				}
+
 				updateModifiers(modifiers, newField.modifiers());
 				newNode= newField;
 			}
@@ -119,10 +127,11 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
 		}
 	}
 
-	private void updateModifiers(final List<?> modifiers, final List<ASTNode> newModifiers) {
+	private void updateModifiers(final List<IExtendedModifier> modifiers, final List<ASTNode> newModifiers) {
 		ASTNodeFactory ast= cuRewrite.getASTBuilder();
 
 		newModifiers.clear();
+
 		for (Object modifier : modifiers) {
 			newModifiers.add(ast.createCopyTarget((ASTNode) modifier));
 		}

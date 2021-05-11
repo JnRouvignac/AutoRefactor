@@ -84,6 +84,13 @@ public class SingleDeclarationsRatherThanMultiDeclarationSample {
         final int nine = 9;
     }
 
+    public void refactorMultiDeclWithVariableDimension() {
+        // Keep this comment
+        int ten = 10;
+        int eleven[] = {11};
+        int twelve[][] = {{12}};
+    }
+
     public void doNotRefactorForVar() {
         for (int counter = 0, ten = 10; counter < ten; counter++) {
             System.out.println(counter);
