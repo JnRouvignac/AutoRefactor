@@ -141,10 +141,6 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean visit(final SwitchStatement visited) {
-		if (!ASTNodes.isPassive(visited.getExpression())) {
-			return true;
-		}
-
 		List<?> statements= visited.statements();
 
 		if (statements.isEmpty()) {
@@ -158,7 +154,6 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		List<Statement> caseStatements= new ArrayList<>();
 
 		boolean isPreviousStmtACase= true;
-		int caseNb= 0;
 		int caseIndexWithDefault= -1;
 
 		for (Object object : statements) {
@@ -166,9 +161,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 
 			if (statement instanceof SwitchCase) {
 				if (!isPreviousStmtACase) {
-					caseNb++;
-
-					if (caseNb > 2) {
+					if (switchStructure.size() > 2) {
 						return true;
 					}
 
@@ -181,7 +174,7 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 				}
 
 				if (((SwitchCase) statement).isDefault()) {
-					caseIndexWithDefault= caseNb;
+					caseIndexWithDefault= switchStructure.size();
 				} else {
 					caseExprs.add(((SwitchCase) statement).getExpression());
 				}
@@ -203,15 +196,15 @@ public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRu
 		}
 
 		switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStatements));
-		caseNb++;
-
-		if (caseNb > 2) {
-			return true;
-		}
 
 		if (caseIndexWithDefault != -1) {
 			Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
 			switchStructure.add(caseWithDefault);
+		}
+
+		if (switchStructure.size() > 2
+				|| !switchStructure.get(switchStructure.size() - 1).getFirst().isEmpty() && !ASTNodes.isPassive(visited.getExpression())) {
+			return true;
 		}
 
 		List<BreakStatement> overBreaks= new ArrayList<>();

@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 public class ObsoleteIfRatherThanTwoSwitchCasesSample {
     public int i2 = 0;
@@ -144,6 +145,20 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
         // Keep this comment
         if ((day == java.time.DayOfWeek.MONDAY) || (day == java.time.DayOfWeek.TUESDAY)
                 || (day == java.time.DayOfWeek.WEDNESDAY)) {
+            // Keep this comment too
+            i = 0;
+        } else {
+            if (i2 == 2) {
+                // Keep this comment also
+                i = 150;
+            }
+        }
+    }
+
+    public void replaceSwitchWithActiveDiscriminant(List<String> texts, int j, int k) {
+        int i = 0;
+        // Keep this comment
+        if ((texts.remove("foo") ? j : k) == 10) {
             // Keep this comment too
             i = 0;
         } else {
@@ -301,6 +316,23 @@ public class ObsoleteIfRatherThanTwoSwitchCasesSample {
             if (i2 == 2) {
                 i = 150;
             }
+            break;
+        }
+    }
+
+    public void doNotReplaceSwitchCaseThatDuplicatesActiveDiscriminant(List<String> texts, int j, int k) {
+        int i = 0;
+        switch (texts.remove("foo") ? j : k) {
+        case 10:
+            i = 0;
+            break;
+
+        case 11:
+            i = 1;
+            break;
+
+        default:
+            i = 150;
             break;
         }
     }
