@@ -183,7 +183,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
 		ITypeBinding actualType= ((Expression) methodInvocation.arguments().get(0)).resolveTypeBinding();
 
-		if (expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
+		if (ASTNodes.hasType(actualType, String.class.getCanonicalName()) || expectedType.equals(actualType) || Bindings.getBoxedTypeBinding(expectedType, methodInvocation.getAST()).equals(actualType)) {
 			rewrite.replace(toReplace, ASTNodeFactory.parenthesizeIfNeeded(ast, ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);
 		} else {
 			rewrite.replace(toReplace, ast.newCastExpression(ast.type(expectedType.getQualifiedName()), ASTNodes.createMoveTarget(rewrite, (Expression) methodInvocation.arguments().get(0))), group);

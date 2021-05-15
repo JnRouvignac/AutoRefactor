@@ -140,7 +140,8 @@ public class StringSample {
         String s7 = String.valueOf(42.42f) + " foo";
         String s8 = String.valueOf(42.42) + " foo";
         String s9 = String.valueOf(new Object()) + " foo";
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
+        String s10 = String.valueOf(new String()) + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessValueOfRightOperand(byte b, short s) {

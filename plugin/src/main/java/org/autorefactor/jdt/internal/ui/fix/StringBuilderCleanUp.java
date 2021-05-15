@@ -512,13 +512,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 	private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation methodInvocation) {
 		IMethodBinding expectedType= methodInvocation.resolveMethodBinding();
 
-		if (expectedType == null) {
+		if (expectedType == null || expectedType.getParameterTypes()[0] == null) {
 			return null;
 		}
 
 		Expression argument= (Expression) methodInvocation.arguments().get(0);
 
-		if (ASTNodes.hasType(argument, expectedType.getParameterTypes()[0].getQualifiedName(),
+		if (ASTNodes.hasType(argument, String.class.getCanonicalName(), expectedType.getParameterTypes()[0].getQualifiedName(),
 				Bindings.getBoxedTypeBinding(expectedType.getParameterTypes()[0], methodInvocation.getAST()).getQualifiedName())) {
 			return Pair.<ITypeBinding, Expression>of(null, argument);
 		}

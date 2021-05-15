@@ -176,100 +176,6 @@ public class StringBuilderSample {
         return s1 + s2;
     }
 
-    public int doNotRefactorWithDangerousMethod() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("baz ");
-        buffer.append("bar");
-        int s1 = buffer.capacity();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("baz ");
-        builder.append("bar");
-        int s2 = builder.capacity();
-
-        return s1 + s2;
-    }
-
-    public String doNotRefactorWithoutAppending() {
-        StringBuffer buffer = new StringBuffer();
-        String s1 = buffer.toString();
-
-        StringBuilder builder = new StringBuilder();
-        String s2 = builder.toString();
-
-        return s1 + s2;
-    }
-
-    public String doNotRefactorWithoutUse(String text) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("baz ");
-        buffer.append(text);
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("baz ");
-        builder.append(text);
-
-        return "s1 + s2";
-    }
-
-    public Object doNotRefactorWithVariableEscape(String text) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("baz ");
-        buffer.append(text);
-        String s1 = buffer.toString();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("baz ");
-        builder.append(text);
-        String s2 = builder.toString();
-
-        return Arrays.<Object>asList(buffer, builder);
-    }
-
-    public String doNotRefactorWithLateAppending(String text) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("baz ");
-        buffer.append(text);
-        String s1 = buffer.toString();
-        buffer.append("Wait!");
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("baz ");
-        builder.append(text);
-        String s2 = builder.toString();
-        builder.append("Wait!");
-
-        return s1 + s2;
-    }
-
-    public String doNotRefactorWithSelfAppending(String text) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("baz ");
-        buffer.append(buffer);
-        String s1 = buffer.toString();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("baz ");
-        builder.append(builder);
-        String s2 = builder.toString();
-
-        return s1 + s2;
-    }
-
-    public String doNotRefactorWithSelfAppending(int i) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(i++);
-        buffer.append(i++);
-        String s1 = buffer.toString();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(i++);
-        builder.append(i++);
-        String s2 = builder.toString();
-
-        return s1 + s2;
-    }
-
     public void useConcatenationInsideAppend(StringBuffer sbuf, StringBuilder sbui) {
         // Keep this comment
         String s5 = sbuf.append("foo ").append("bar").toString();
@@ -288,20 +194,11 @@ public class StringBuilderSample {
         sbui.append("<").append(CONSTANT).append(">").append(text);
     }
 
-    public void doNotUseConcatenationWithAnyConstant(StringBuffer sbuf, StringBuilder sbui, String text) {
-        sbuf.append("<").append(Integer.MAX_VALUE).append(">").append(text);
-        sbui.append("<").append(Integer.MAX_VALUE).append(">").append(text);
-    }
-
     public void removeUselessStringConcatenation() {
         // Keep this comment
         String s1 = Integer.toString(42) + "" + "";
         String s2 = "foo " + "" + 0 + "" + "bar " + 1 + "";
         String s3 = 1 + "" + "foo";
-    }
-
-    public void doNotRemoveStringConcatenation() {
-        String s1 = 1 + "";
     }
 
     public void removeUselessCallsToValueOfWithStringBuilderAppend(
@@ -406,6 +303,11 @@ public class StringBuilderSample {
         sb.append(Integer.valueOf(iObject));
     }
 
+    public void removeValueOfCallsWithUselessCast(Object object) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(object));
+    }
+
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
         // Keep this comment
         builder.append("");
@@ -430,10 +332,6 @@ public class StringBuilderSample {
             System.out.println("foo");
         else
             buffer.append("");
-    }
-
-    public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
-        buf.append(o.toString());
     }
 
     public String formatTime(int hour, int min) {
@@ -477,13 +375,6 @@ public class StringBuilderSample {
         // Keep this comment too
         StringBuffer buffer2 = new StringBuffer("foo" + "");
         StringBuffer buffer3 = new StringBuffer("" + "foo");
-    }
-
-    public void doNotReplaceLiteralConcat() {
-        StringBuilder builder = new StringBuilder("Do not " + "replace");
-
-        // Keep this comment too
-        StringBuffer buffer = new StringBuffer("Do not " + "replace");
     }
 
     public void replaceWithInteger() {
@@ -532,5 +423,119 @@ public class StringBuilderSample {
 
         // Keep this comment too
         StringBuffer buffer = new StringBuffer().append("Lorem ipsum");
+    }
+
+    public int doNotRefactorWithDangerousMethod() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append("bar");
+        int s1 = buffer.capacity();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append("bar");
+        int s2 = builder.capacity();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithoutAppending() {
+        StringBuffer buffer = new StringBuffer();
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        String s2 = builder.toString();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithoutUse(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+
+        return "s1 + s2";
+    }
+
+    public Object doNotRefactorWithVariableEscape(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+        String s2 = builder.toString();
+
+        return Arrays.<Object>asList(buffer, builder);
+    }
+
+    public String doNotRefactorWithLateAppending(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(text);
+        String s1 = buffer.toString();
+        buffer.append("Wait!");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(text);
+        String s2 = builder.toString();
+        builder.append("Wait!");
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithSelfAppending(String text) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("baz ");
+        buffer.append(buffer);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("baz ");
+        builder.append(builder);
+        String s2 = builder.toString();
+
+        return s1 + s2;
+    }
+
+    public String doNotRefactorWithSelfAppending(int i) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(i++);
+        buffer.append(i++);
+        String s1 = buffer.toString();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(i++);
+        builder.append(i++);
+        String s2 = builder.toString();
+
+        return s1 + s2;
+    }
+
+    public void doNotUseConcatenationWithAnyConstant(StringBuffer sbuf, StringBuilder sbui, String text) {
+        sbuf.append("<").append(Integer.MAX_VALUE).append(">").append(text);
+        sbui.append("<").append(Integer.MAX_VALUE).append(">").append(text);
+    }
+
+    public void doNotRemoveStringConcatenation() {
+        String s1 = 1 + "";
+    }
+
+    public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
+        buf.append(o.toString());
+    }
+
+    public void doNotReplaceLiteralConcat() {
+        StringBuilder builder = new StringBuilder("Do not " + "replace");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer("Do not " + "replace");
     }
 }
