@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 
 public class LogParametersRatherThanLogMessageSample {
@@ -92,5 +94,9 @@ public class LogParametersRatherThanLogMessageSample {
     public void doNotReplaceConcatenateSplitLiteral(Logger slf4jLog) {
         slf4jLog.debug("This text is very long and it can't be kept on a single line"
                 + " so we have to break it in order to keep readability.");
+    }
+
+    public void doNotReplaceIfLiteralsAreEvaluatedToNullDueToABugInJDTCore(Logger slf4jLog) {
+        slf4jLog.debug("aa" + "aa" + 1);
     }
 }

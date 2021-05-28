@@ -96,7 +96,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 				hasLiteral= true;
 				String literal= (String) string.resolveConstantExpressionValue();
 
-				if (literal != null && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ //$NON-NLS-2$
+				// Due to a bug in JDT Core, the literal may be null
+				if (literal == null || literal.contains("{") || literal.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$
 					return true;
 				}
 
