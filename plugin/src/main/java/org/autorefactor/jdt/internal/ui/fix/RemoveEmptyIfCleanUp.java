@@ -53,27 +53,23 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
 	@Override
 	public boolean visit(final IfStatement visited) {
-		ASTRewrite rewrite= cuRewrite.getASTRewrite();
-		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
-
-		Statement thenStatement= visited.getThenStatement();
 		Statement elseStatement= visited.getElseStatement();
 
 		if (elseStatement != null && ASTNodes.asList(elseStatement).isEmpty()) {
-			rewrite.remove(elseStatement, group);
+			removeElse(elseStatement);
 			return false;
 		}
+
+		Statement thenStatement= visited.getThenStatement();
 
 		if (thenStatement != null && ASTNodes.asList(thenStatement).isEmpty()) {
 			Expression condition= visited.getExpression();
 
 			if (elseStatement != null) {
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-
-				rewrite.replace(condition, ast.negate(condition, true), group);
-				ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
+				replaceThen(visited, elseStatement, condition);
+				return false;
 			} else if (ASTNodes.isPassiveWithoutFallingThrough(condition)) {
-				removeBlock(visited);
+				removeIf(visited);
 				return false;
 			}
 		}
@@ -81,7 +77,23 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 		return true;
 	}
 
-	private void removeBlock(final IfStatement visited) {
+	private void replaceThen(final IfStatement visited, final Statement elseStatement, final Expression condition) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
+
+		rewrite.replace(condition, ast.negate(condition, true), group);
+		ASTNodes.replaceButKeepComment(rewrite, visited.getThenStatement(), ASTNodes.createMoveTarget(rewrite, elseStatement), group);
+	}
+
+	private void removeElse(final Statement elseStatement) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
+
+		rewrite.remove(elseStatement, group);
+	}
+
+	private void removeIf(final IfStatement visited) {
 		ASTRewrite rewrite= cuRewrite.getASTRewrite();
 		TextEditGroup group= new TextEditGroup(MultiFixMessages.RemoveEmptyIfCleanUp_description);
 
