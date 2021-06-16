@@ -273,6 +273,22 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         return concat.toString();
     }
 
+    public String doNotMoveWhenConflictsInLoop(List<Integer> myList) {
+        StringBuilder concat = new StringBuilder();
+
+        for (Integer number : myList) {
+            if (number > 100) {
+                String oneNumber = String.valueOf(number);
+                concat.append(oneNumber);
+            }
+
+            String oneNumber = String.valueOf(number);
+            concat.append(oneNumber);
+        }
+
+        return concat.toString();
+    }
+
     public String doNotMoveDeclFromOtherScope(List<Integer> myList) {
         StringBuilder concat = new StringBuilder();
 

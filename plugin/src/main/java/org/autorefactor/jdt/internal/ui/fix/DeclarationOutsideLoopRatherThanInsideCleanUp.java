@@ -76,14 +76,13 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		List<Statement> blockStatement= ASTNodes.asList(visited);
 		boolean result= true;
 
-		List<Statement> forStatements;
 		for (int i= 0; i < blockStatement.size(); i++) {
 			Statement statement= blockStatement.get(i);
 			ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
 			EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
 			WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
 			DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
-			forStatements= null;
+			List<Statement> forStatements= null;
 
 			if (forStatement != null) {
 				forStatements= ASTNodes.asList(forStatement.getBody());
@@ -96,16 +95,22 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 			}
 
 			if (forStatements != null) {
-				Set<SimpleName> varNames= new HashSet<>();
+				Set<SimpleName> conflictingNamesOutOfTheLoop= new HashSet<>();
 
 				for (int j= 0; j < i; j++) {
 					if (!(blockStatement.get(j) instanceof Block)) {
-						varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
+						conflictingNamesOutOfTheLoop.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
 					}
 				}
 
 				for (int j= i + 1; j < blockStatement.size(); j++) {
-					varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
+					conflictingNamesOutOfTheLoop.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
+				}
+
+				Set<SimpleName> conflictingNamesInLoop= new HashSet<>();
+
+				for (Statement oneStatement : forStatements) {
+					conflictingNamesInLoop.addAll(ASTNodes.getLocalVariableIdentifiers(oneStatement, true));
 				}
 
 				List<VariableDeclarationStatement> candidates= new ArrayList<>();
@@ -119,18 +124,11 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 							&& !isEffectivelyFinalRequired(declaration, fragment)
 							&& !hasAnnotation(declaration.modifiers())) {
 						SimpleName name= fragment.getName();
-						boolean isFound= false;
 
-						for (SimpleName varName : varNames) {
-							if (Utils.equalNotNull(varName.getIdentifier(), name.getIdentifier())) {
-								isFound= true;
-								break;
-							}
-						}
-
-						if (!isFound) {
+						if (isUniqueNameInLoop(name.getIdentifier(), conflictingNamesInLoop)
+								&& isUniqueNameOutOfTheLoop(conflictingNamesOutOfTheLoop, name.getIdentifier())) {
 							candidates.add(declaration);
-							varNames.add(name);
+							conflictingNamesOutOfTheLoop.add(name);
 						}
 					}
 				}
@@ -143,6 +141,33 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 		}
 
 		return result;
+	}
+
+	private boolean isUniqueNameOutOfTheLoop(final Set<SimpleName> conflictingNamesOutOfTheLoop, final String uniqueName) {
+		for (SimpleName varName : conflictingNamesOutOfTheLoop) {
+			if (Utils.equalNotNull(varName.getIdentifier(), uniqueName)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean isUniqueNameInLoop(final String uniqueName, final Set<SimpleName> conflictingNamesInLoop) {
+		int varNb= 0;
+
+		for (SimpleName conflictingName : conflictingNamesInLoop) {
+			if (Utils.equalNotNull(conflictingName.getIdentifier(), uniqueName)) {
+				varNb++;
+
+				if (varNb > 1) {
+					return false;
+				}
+			}
+		}
+
+
+		return varNb == 1;
 	}
 
 	private boolean isEffectivelyFinalRequired(final VariableDeclarationStatement declaration,
