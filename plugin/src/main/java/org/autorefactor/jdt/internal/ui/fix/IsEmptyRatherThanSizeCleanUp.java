@@ -74,32 +74,24 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 					&& !ASTNodes.is(miToReplace.getExpression(), ThisExpression.class)
 					&& (ASTNodes.usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), SIZE_METHOD) || ASTNodes.usesGivenSignature(miToReplace, Map.class.getCanonicalName(), SIZE_METHOD)
 							|| ASTNodes.usesGivenSignature(miToReplace, String.class.getCanonicalName(), LENGTH_METHOD) && getJavaMinorVersion() >= 6)) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.IsEmptyRatherThanSizeCleanUp_description);
-
-				MethodInvocation newMethodInvocation= ast.newMethodInvocation();
-				newMethodInvocation.setExpression(ast.copyExpression(miToReplace));
-				newMethodInvocation.setName(ast.newSimpleName(IS_EMPTY_METHOD));
-
 				if (Long.valueOf(0L).equals(literalSize)) {
 					if (Arrays.asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.NOT_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(visited, ast.not(newMethodInvocation), group);
+						replaceMethod(visited, miToReplace, false);
 						return false;
 					}
 
 					if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.LESS_EQUALS).contains(orderedCondition.getOperator())) {
-						rewrite.replace(visited, newMethodInvocation, group);
+						replaceMethod(visited, miToReplace, true);
 						return false;
 					}
 				} else if (Long.valueOf(1L).equals(literalSize)) {
 					if (InfixExpression.Operator.GREATER_EQUALS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(visited, ast.not(newMethodInvocation), group);
+						replaceMethod(visited, miToReplace, false);
 						return false;
 					}
 
 					if (InfixExpression.Operator.LESS.equals(orderedCondition.getOperator())) {
-						rewrite.replace(visited, newMethodInvocation, group);
+						replaceMethod(visited, miToReplace, true);
 						return false;
 					}
 				}
@@ -107,5 +99,17 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 		}
 
 		return true;
+	}
+
+	private void replaceMethod(final InfixExpression visited, MethodInvocation miToReplace, boolean isEmpty) {
+		ASTRewrite rewrite= cuRewrite.getASTRewrite();
+		ASTNodeFactory ast= cuRewrite.getASTBuilder();
+		TextEditGroup group= new TextEditGroup(MultiFixMessages.IsEmptyRatherThanSizeCleanUp_description);
+
+		MethodInvocation newMethodInvocation= ast.newMethodInvocation();
+		newMethodInvocation.setExpression(ast.copyExpression(miToReplace));
+		newMethodInvocation.setName(ast.newSimpleName(IS_EMPTY_METHOD));
+
+		rewrite.replace(visited, isEmpty ? newMethodInvocation : ast.not(newMethodInvocation), group);
 	}
 }
