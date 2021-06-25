@@ -1049,6 +1049,18 @@ public final class MultiFixMessages extends NLS {
 	/**
 	 * Automatically filled.
 	 */
+	public static String MatchingStreamRatherThanCountCleanUp_name;
+	/**
+	 * Automatically filled.
+	 */
+	public static String MatchingStreamRatherThanCountCleanUp_description;
+	/**
+	 * Automatically filled.
+	 */
+	public static String MatchingStreamRatherThanCountCleanUp_reason;
+	/**
+	 * Automatically filled.
+	 */
 	public static String ObsoleteReduceIndentationCleanUp_name;
 	/**
 	 * Automatically filled.
