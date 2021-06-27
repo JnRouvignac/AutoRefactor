@@ -157,7 +157,7 @@ public class MatchingStreamRatherThanCountSample {
     }
 
     public boolean doNotRefactorMethodOtherThanFilter(LongStream stream) {
-        return stream.takeWhile(i -> i > 0).count() > 0;
+        return stream.skip(1_000).count() > 0;
     }
 
     public boolean doNotRefactorMethodOtherThanCount(LongStream stream) {
