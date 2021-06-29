@@ -115,24 +115,6 @@ public class ObsoleteCollectionCleanUp extends AbstractCleanUpRule {
 			return true;
 		}
 
-		private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
-				final ExpressionStatement nodeToRemove) {
-			ClassInstanceCreation classInstanceCreation= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
-
-			if (canReplaceInitializer(classInstanceCreation, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
-				ASTRewrite rewrite= cuRewrite.getASTRewrite();
-				ASTNodeFactory ast= cuRewrite.getASTBuilder();
-				TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteCollectionCleanUp_description);
-
-				ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, classInstanceCreation.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
-				rewrite.remove(nodeToRemove, group);
-				result= false;
-				return false;
-			}
-
-			return true;
-		}
-
 		private boolean canReplaceInitializer(final ClassInstanceCreation classInstanceCreation, final Expression sourceCollection) {
 			if (classInstanceCreation == null || classInstanceCreation.getAnonymousClassDeclaration() != null) {
 				return false;
@@ -174,6 +156,29 @@ public class ObsoleteCollectionCleanUp extends AbstractCleanUpRule {
 			}
 
 			return false;
+		}
+
+		private boolean maybeReplaceInitializer(final Expression nodeToReplace, final Expression arg0,
+				final ExpressionStatement nodeToRemove) {
+			ClassInstanceCreation classInstanceCreation= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+
+			if (canReplaceInitializer(classInstanceCreation, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
+				replaceInitializer(nodeToReplace, arg0, nodeToRemove, classInstanceCreation);
+				result= false;
+				return false;
+			}
+
+			return true;
+		}
+
+		private void replaceInitializer(final Expression nodeToReplace, final Expression arg0,
+				final ExpressionStatement nodeToRemove, final ClassInstanceCreation classInstanceCreation) {
+			ASTRewrite rewrite= cuRewrite.getASTRewrite();
+			ASTNodeFactory ast= cuRewrite.getASTBuilder();
+			TextEditGroup group= new TextEditGroup(MultiFixMessages.ObsoleteCollectionCleanUp_description);
+
+			ASTNodes.replaceButKeepComment(rewrite, nodeToReplace, ast.newClassInstanceCreation(ASTNodes.createMoveTarget(rewrite, classInstanceCreation.getType()), ASTNodes.createMoveTarget(rewrite, arg0)), group);
+			rewrite.remove(nodeToRemove, group);
 		}
 	}
 }
