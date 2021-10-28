@@ -36,9 +36,9 @@ cache:
 install: true
 
 script:
-- mvn clean install
+- mvn -T 1C clean install
 # TODO Test Coverage
-# - mvn cobertura:cobertura coveralls:cobertura
+# - mvn -T 1C cobertura:cobertura coveralls:cobertura
 notifications:
   email:
     recipients:
