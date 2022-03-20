@@ -70,6 +70,80 @@ public class MatchingStreamRatherThanCountSample {
         System.out.println(1 <= stream.filter(i -> i > 0).count());
     }
 
+    public void replaceChecksOnEmptiness(Stream<Integer> stream) {
+        // Keep this comment
+        if (stream.filter(i -> i > 0).findFirst().isEmpty()) {
+            System.out.println(123);
+        }
+
+        if (stream.filter(i -> i > 0).findFirst().isPresent()) {
+            System.out.println(123);
+        }
+
+        if (stream.filter(i -> i > 0).findAny().isEmpty()) {
+            System.out.println(123);
+        }
+
+        if (stream.filter(i -> i > 0).findAny().isPresent()) {
+            System.out.println(123);
+        }
+
+        if (!stream.filter(i -> i > 0).findFirst().isEmpty()) {
+            System.out.println(123);
+        }
+
+        if (!stream.filter(i -> i > 0).findFirst().isPresent()) {
+            System.out.println(123);
+        }
+
+        if (!stream.filter(i -> i > 0).findAny().isEmpty()) {
+            System.out.println(123);
+        }
+
+        if (!stream.filter(i -> i > 0).findAny().isPresent()) {
+            System.out.println(123);
+        }
+    }
+
+    public void replaceChecksOnIntegerEmptiness(IntStream stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findAny().isPresent());
+
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isPresent());
+    }
+
+    public void replaceChecksOnLongEmptiness(LongStream stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findAny().isPresent());
+
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isPresent());
+    }
+
+    public void replaceChecksOnDoubleEmptiness(DoubleStream stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(stream.filter(i -> i > 0).findAny().isPresent());
+
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findFirst().isPresent());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isEmpty());
+        System.out.println(!stream.filter(i -> i > 0).findAny().isPresent());
+    }
+
     public boolean replaceChecksOnPrimitiveStream(IntStream stream) {
         // Keep this comment
         return stream.filter(i -> i > 0).count() > 0;
@@ -90,6 +164,22 @@ public class MatchingStreamRatherThanCountSample {
         System.out.println(0 >= stream.filter(i -> {return i > 0;}).count());
         System.out.println(1 > stream.filter(i -> {return i > 0;}).count());
         System.out.println(1 <= stream.filter(i -> {return i > 0;}).count());
+    }
+
+    public void doNotRefactorOnOtherOptionalMethods(Stream<Integer> stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).max(Comparator.naturalOrder()).isEmpty());
+        System.out.println(stream.filter(i -> i > 0).min(Comparator.naturalOrder()).isEmpty());
+        System.out.println(stream.filter(i -> i > 0).reduce((a, i) -> a + i).isEmpty());
+
+        System.out.println(stream.filter(i -> i > 0).max(Comparator.naturalOrder()).isPresent());
+        System.out.println(stream.filter(i -> i > 0).min(Comparator.naturalOrder()).isPresent());
+        System.out.println(stream.filter(i -> i > 0).reduce((a, i) -> a + i).isPresent());
+    }
+
+    public void doNotRefactorOnOtherBooleanMethods(Stream<Integer> stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).findFirst().equals(null));
     }
 
     public void doNotRefactorChecksOtherThanEmptiness(Stream<Integer> stream) {

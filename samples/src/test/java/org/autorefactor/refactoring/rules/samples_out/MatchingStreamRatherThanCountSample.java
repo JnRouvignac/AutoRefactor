@@ -70,6 +70,80 @@ public class MatchingStreamRatherThanCountSample {
         System.out.println(stream.anyMatch(i -> i > 0));
     }
 
+    public void replaceChecksOnEmptiness(Stream<Integer> stream) {
+        // Keep this comment
+        if (stream.noneMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.anyMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.noneMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.anyMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.anyMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.noneMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.anyMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+
+        if (stream.noneMatch(i -> i > 0)) {
+            System.out.println(123);
+        }
+    }
+
+    public void replaceChecksOnIntegerEmptiness(IntStream stream) {
+        // Keep this comment
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+    }
+
+    public void replaceChecksOnLongEmptiness(LongStream stream) {
+        // Keep this comment
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+    }
+
+    public void replaceChecksOnDoubleEmptiness(DoubleStream stream) {
+        // Keep this comment
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+        System.out.println(stream.anyMatch(i -> i > 0));
+        System.out.println(stream.noneMatch(i -> i > 0));
+    }
+
     public boolean replaceChecksOnPrimitiveStream(IntStream stream) {
         // Keep this comment
         return stream.anyMatch(i -> i > 0);
@@ -114,6 +188,22 @@ public class MatchingStreamRatherThanCountSample {
         System.out.println(stream.anyMatch(i -> {
             return i > 0;
         }));
+    }
+
+    public void doNotRefactorOnOtherOptionalMethods(Stream<Integer> stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).max(Comparator.naturalOrder()).isEmpty());
+        System.out.println(stream.filter(i -> i > 0).min(Comparator.naturalOrder()).isEmpty());
+        System.out.println(stream.filter(i -> i > 0).reduce((a, i) -> a + i).isEmpty());
+
+        System.out.println(stream.filter(i -> i > 0).max(Comparator.naturalOrder()).isPresent());
+        System.out.println(stream.filter(i -> i > 0).min(Comparator.naturalOrder()).isPresent());
+        System.out.println(stream.filter(i -> i > 0).reduce((a, i) -> a + i).isPresent());
+    }
+
+    public void doNotRefactorOnOtherBooleanMethods(Stream<Integer> stream) {
+        // Keep this comment
+        System.out.println(stream.filter(i -> i > 0).findFirst().equals(null));
     }
 
     public void doNotRefactorChecksOtherThanEmptiness(Stream<Integer> stream) {
