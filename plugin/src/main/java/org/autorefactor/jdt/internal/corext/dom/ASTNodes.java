@@ -703,7 +703,7 @@ public final class ASTNodes {
 	 */
 	public static ASTNode getFirstAncestorOrNull(final ASTNode node, final Class<? extends ASTNode>... ancestorClasses) {
 		if (ancestorClasses.length == 1) {
-			throw new IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Please use ASTNodes.getTypedAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
 		}
 
 		if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
