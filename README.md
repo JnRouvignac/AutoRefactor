@@ -11,8 +11,6 @@ The aim is to fix language/API usage in order to deliver smaller, more maintaina
 
 This is an Eclipse plugin to automatically refactor Java code bases.
 
-You will find much more information on [http://autorefactor.org](http://autorefactor.org): goals, features, usage, samples, installation, links.
-
 ## License
 
 AutoRefactor is distributed under the terms of both the
