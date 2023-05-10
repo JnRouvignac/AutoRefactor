@@ -271,7 +271,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						    <dependency>
 						         <groupId>com.puppycrawl.tools</groupId>
 						         <artifactId>checkstyle</artifactId>
-						         <version>10.10.0</version>
+						         <version>10.11.0</version>
 						    </dependency>
 						</dependencies>
 						<executions>
