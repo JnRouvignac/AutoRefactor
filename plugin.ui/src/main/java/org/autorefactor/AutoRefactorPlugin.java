@@ -164,7 +164,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	private static class JobManagerImpl implements JobManager {
+	private final static class JobManagerImpl implements JobManager {
 		private final Vector<Job> jobs= new Vector<>();
 
 		/**
