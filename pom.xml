@@ -148,8 +148,8 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 				<artifactId>tycho-compiler-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>17</source>
+					<target>17</target>
 					<compilerId>jdt</compilerId>
 					<!--
 					<compilerArgument>-err:nullAnnot,null</compilerArgument> <!- insert your warn/err configuration here ->
@@ -219,14 +219,17 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						</goals>
 						<configuration>
 							<rules>
+								
 								<requireMavenVersion>
-									<version>(,3.7.0)</version>
+									<version>3.9.3</version>
 									<message>Maven 3.7.0 has a bug resolving P2 repositories.</message>
 								</requireMavenVersion>
+								<!--
 								<requireJavaVersion>
 									<version>[1.5.0,1.8.1)</version>
 									<message>Cannot build on JDK higher than 8 due to tests failing on more recent JDK.</message>
 								</requireJavaVersion>
+								-->
 							</rules>
 						</configuration>
 					</execution>
@@ -273,6 +276,11 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						         <artifactId>checkstyle</artifactId>
 						         <version>10.15.0</version>
 						    </dependency>
+							<dependency>
+                  <groupId>org.apache.maven.shared</groupId>
+                  <artifactId>maven-shared-resources</artifactId>
+                  <version>4</version>
+              </dependency>
 						</dependencies>
 						<executions>
 							<execution>

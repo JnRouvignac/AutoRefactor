@@ -54,7 +54,7 @@ public final class ControlWorkflowMatcher implements ControlWorkflowMatcherCompl
 	/**
 	 * Built for each analyzed code.
 	 */
-	private class ControlWorkflowNode {
+	private final class ControlWorkflowNode {
 		/**
 		 * Unique id.
 		 */
