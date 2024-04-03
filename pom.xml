@@ -221,7 +221,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 							<rules>
 								
 								<requireMavenVersion>
-									<version>(,3.9.0)</version>
+									<version>(,3.9.3)</version>
 									<message>Maven 3.7.0 has a bug resolving P2 repositories.</message>
 								</requireMavenVersion>
 								<!--
