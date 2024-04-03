@@ -219,11 +219,12 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						</goals>
 						<configuration>
 							<rules>
+								<!--
 								<requireMavenVersion>
 									<version>(,3.7.0)</version>
 									<message>Maven 3.7.0 has a bug resolving P2 repositories.</message>
 								</requireMavenVersion>
-								<!--
+								
 								<requireJavaVersion>
 									<version>[1.5.0,1.8.1)</version>
 									<message>Cannot build on JDK higher than 8 due to tests failing on more recent JDK.</message>
