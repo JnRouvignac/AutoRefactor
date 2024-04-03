@@ -67,7 +67,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 		super.stop(context);
 	}
 
-	private static class LoggerImpl implements Logger {
+	private final static class LoggerImpl implements Logger {
 		private static void log(int severity, String message, Exception e) {
 			if (getEnvironment().getPreferences().debugModeOn()) {
 				if (e instanceof RuntimeException) {
