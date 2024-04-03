@@ -279,7 +279,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 							<dependency>
                   <groupId>org.apache.maven.shared</groupId>
                   <artifactId>maven-shared-resources</artifactId>
-                  <version>4</version>
+                  <version>5</version>
               </dependency>
 						</dependencies>
 						<executions>
