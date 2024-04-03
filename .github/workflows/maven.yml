@@ -1,0 +1,50 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      DISPLAY: :0
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # required for jgit timestamp provider to work
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - run: |
+        sudo apt-get install xvfb
+        # start xvfb in the background
+        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Set up Maven
+      uses: stCarolas/setup-maven@07fbbe97d97ef44336b7382563d66743297e442f # v4.5
+      with:
+        maven-version: 3.9.3
+    - name: Build with Maven
+      run: xvfb-run --auto-servernum mvn -e -V --batch-mode --global-toolchains ${{ github.workspace }}/.github/workflows/toolchains.xml -Pweb,jacoco clean verify
+    - name: Cleanup xvfb pidx build
+      uses: bcomnes/cleanup-xvfb@v1
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v4
+      if: always() # always run even if the previous step fails
+      with:
+          report_paths: '**/target/surefire-reports/TEST-*.xml'
