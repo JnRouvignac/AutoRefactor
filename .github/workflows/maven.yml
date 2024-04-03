@@ -40,7 +40,7 @@ jobs:
       with:
         maven-version: 3.9.3
     - name: Build with Maven
-      run: xvfb-run --auto-servernum mvn -e -V --batch-mode --global-toolchains ${{ github.workspace }}/.github/workflows/toolchains.xml -Dmaven.test.skip=true clean verify
+      run: xvfb-run --auto-servernum mvn -e -V --batch-mode --global-toolchains ${{ github.workspace }}/.github/workflows/toolchains.xml -Dmaven.test.skip=false clean verify
     - name: Cleanup xvfb pidx build
       uses: bcomnes/cleanup-xvfb@v1
     - name: Publish Test Report
