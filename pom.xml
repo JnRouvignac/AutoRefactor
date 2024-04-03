@@ -44,7 +44,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho-version>2.7.3</tycho-version>
+		<tycho-version>4.0.7</tycho-version>
 	</properties>
 
 	<scm>
@@ -219,17 +219,17 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						</goals>
 						<configuration>
 							<rules>
-								
+								<!--
 								<requireMavenVersion>
 									<version>3.9.3</version>
 									<message>Maven 3.7.0 has a bug resolving P2 repositories.</message>
 								</requireMavenVersion>
-								<!--
+								-->
 								<requireJavaVersion>
-									<version>[1.5.0,1.8.1)</version>
+									<version>17</version>
 									<message>Cannot build on JDK higher than 8 due to tests failing on more recent JDK.</message>
 								</requireJavaVersion>
-								-->
+								
 							</rules>
 						</configuration>
 					</execution>
