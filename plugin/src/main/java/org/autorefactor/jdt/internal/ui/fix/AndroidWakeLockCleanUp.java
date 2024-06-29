@@ -157,7 +157,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 		return null;
 	}
 
-	private static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
+	private final static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
 		@Override
 		public boolean visit(final MethodInvocation node) {
 			if (ASTNodes.usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ //$NON-NLS-2$
