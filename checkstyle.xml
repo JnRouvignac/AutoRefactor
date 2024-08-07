@@ -116,7 +116,7 @@
     
     <!--  Require valid Javadoc for all protected and public members -->
     <module name="JavadocMethod">
-      <property name="scope" value="protected" />
+        <property name="accessModifiers" value="public, protected"/>
     </module>
     <module name="JavadocVariable">
       <property name="scope" value="protected" />
