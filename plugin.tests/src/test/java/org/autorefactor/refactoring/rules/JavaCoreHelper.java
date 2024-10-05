@@ -219,7 +219,9 @@ public final class JavaCoreHelper {
 
 	private static IPath getPathToRtJar() {
 //		final String classPath= System.getProperty("sun.boot.class.path"); //$NON-NLS-1$
-		final String classPath="C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot\\lib\\jrt-fs.jar";
+//		final String classPath="C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot\\lib\\jrt-fs.jar";
+		final String classPath="\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot\\lib\\jrt-fs.jar";
+		
 		final int idx= classPath.indexOf("jrt-fs.jar"); //$NON-NLS-1$
 		if (idx == -1) {
 			throw new RuntimeException("Could not find Java runtime library rt.jar"); //$NON-NLS-1$
