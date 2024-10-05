@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AutoRefactor
 Bundle-SymbolicName: org.autorefactor.plugin;singleton:=true
-Bundle-Version: 1.3.0.qualifier
+Bundle-Version: 1.4.0.qualifier
 Comment1: Upgrade to JDT Core 4.4.1 to support Java 9
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -12,14 +12,14 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Comment2: Need to follow Eclipse's supported JRE unless dictated by
 Comment3: functionalities required from Eclipse or JRE.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 CommentForImportPackage: FIXME JNR can we avoid accessing this internal package?
-Import-Package: org.eclipse.jdt.internal.corext.dom
 Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.environment;x-friends:="org.autorefactor.plugin.tests",
+ org.autorefactor.jdt.core.dom,
  org.autorefactor.jdt.internal.corext.dom;x-friends:="org.autorefactor.plugin.tests",
+ org.autorefactor.jdt.internal.corext.refactoring.structure,
  org.autorefactor.jdt.internal.ui.fix;x-friends:="org.autorefactor.plugin.tests",
- org.autorefactor.refactoring.rules;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.preferences;x-friends:="org.autorefactor.plugin.ui",
  org.autorefactor.util;x-friends:="org.autorefactor.plugin.ui"
 Automatic-Module-Name: org.autorefactor.plugin
