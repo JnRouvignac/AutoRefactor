@@ -95,7 +95,7 @@ public final class Release {
 				return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 13;
 			}
 
-			return 9 <= this.version[0] && this.version[0] <= 13;
+			return 9 <= this.version[0] && this.version[0] <= 21;
 		}
 
 		return false;
