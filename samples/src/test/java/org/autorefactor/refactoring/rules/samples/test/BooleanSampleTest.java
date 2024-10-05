@@ -234,7 +234,7 @@ public class BooleanSampleTest {
         });
     }
 
-//    @Ignore("Does not work")
+    @Ignore("Does not work")
     @Test
     public void assertInvokeEquals() throws Exception {
         assertInvokeEquals(true);
