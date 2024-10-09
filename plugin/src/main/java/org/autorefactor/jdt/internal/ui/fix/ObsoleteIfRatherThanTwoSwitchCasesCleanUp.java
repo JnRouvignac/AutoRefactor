@@ -58,7 +58,7 @@ import org.eclipse.text.edits.TextEditGroup;
 
 /** See {@link #getDescription()} method. */
 public class ObsoleteIfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
-	private static class BreakVisitor extends InterruptibleVisitor {
+	private final static class BreakVisitor extends InterruptibleVisitor {
 		private final List<BreakStatement> breaks= new ArrayList<>();
 		private boolean canBeRefactored= true;
 
