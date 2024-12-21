@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AutoRefactor UI
 Bundle-SymbolicName: org.autorefactor.plugin.ui;singleton:=true
-Bundle-Version: 1.3.0.qualifier
+Bundle-Version: 1.4.0.qualifier
 Bundle-Activator: org.autorefactor.AutoRefactorPlugin
 Comment1: Upgrade to JDT Core 4.4.1 to support Java 9
 Require-Bundle: org.autorefactor.plugin,
@@ -19,6 +19,6 @@ Require-Bundle: org.autorefactor.plugin,
 Bundle-ActivationPolicy: lazy
 Comment2: Need to follow Eclipse's supported JRE unless dictated by
 Comment3: functionalities required from Eclipse or JRE.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: org.autorefactor;x-friends:="org.autorefactor.plugin.tests"
 Automatic-Module-Name: org.autorefactor.plugin.ui
