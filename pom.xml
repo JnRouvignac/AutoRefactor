@@ -184,14 +184,14 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 			        <dependency>
 			            <groupId>org.apache.maven.plugins</groupId>
 			            <artifactId>maven-scm-plugin</artifactId>
-			            <version>2.1.0</version>
+			            <version>2.2.1</version>
 			        </dependency>
 			    </dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-scm-plugin</artifactId>
-				<version>2.1.0</version>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>default-cli</id>
