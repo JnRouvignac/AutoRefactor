@@ -29,7 +29,7 @@
 
   <groupId>org.autorefactor.plugin</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.3.0-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -44,7 +44,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho-version>2.7.3</tycho-version>
+		<tycho-version>4.0.12</tycho-version>
 	</properties>
 
 	<scm>
@@ -55,7 +55,7 @@
 
   <repositories>
 		<repository>
-			<id>Mars</id>
+			<id>2024-06</id>
 			<layout>p2</layout>
 <!--
       <url>http://download.eclipse.org/eclipse/updates/3.7</url>
@@ -70,7 +70,7 @@
       <id>Mars</id>
       <url>http://download.eclipse.org/eclipse/updates/4.5</url>
 -->
-			<url>https://download.eclipse.org/releases/mars</url>
+			<url>https://download.eclipse.org/releases/2024-06</url>
 		</repository>
   </repositories>
 
@@ -148,8 +148,8 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 				<artifactId>tycho-compiler-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>17</source>
+					<target>17</target>
 					<compilerId>jdt</compilerId>
 					<!--
 					<compilerArgument>-err:nullAnnot,null</compilerArgument> <!- insert your warn/err configuration here ->
@@ -219,14 +219,17 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						</goals>
 						<configuration>
 							<rules>
+								<!--
 								<requireMavenVersion>
-									<version>(,3.7.0)</version>
+									<version>3.9.3</version>
 									<message>Maven 3.7.0 has a bug resolving P2 repositories.</message>
 								</requireMavenVersion>
+								-->
 								<requireJavaVersion>
-									<version>[1.5.0,1.8.1)</version>
+									<version>17</version>
 									<message>Cannot build on JDK higher than 8 due to tests failing on more recent JDK.</message>
 								</requireJavaVersion>
+								
 							</rules>
 						</configuration>
 					</execution>
@@ -273,6 +276,11 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						         <artifactId>checkstyle</artifactId>
 						         <version>11.1.0</version>
 						    </dependency>
+							<dependency>
+                  <groupId>org.apache.maven.shared</groupId>
+                  <artifactId>maven-shared-resources</artifactId>
+                  <version>6</version>
+              </dependency>
 						</dependencies>
 						<executions>
 							<execution>
@@ -280,10 +288,10 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 								<phase>validate</phase>
 								<configuration>
 									<configLocation>checkstyle.xml</configLocation>
-									<encoding>UTF-8</encoding>
+									<!--<encoding>UTF-8</encoding>-->
 									<consoleOutput>true</consoleOutput>
 									<failsOnError>true</failsOnError>
-									<linkXRef>false</linkXRef>
+									<!--<linkXRef>false</linkXRef>-->
 								</configuration>
 								<goals>
 									<goal>check</goal>
