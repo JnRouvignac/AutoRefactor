@@ -175,7 +175,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<preparationGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</preparationGoals>
 					<completionGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</completionGoals>
@@ -241,7 +241,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<configuration>
 					<!-- optional: limit format enforcement to just the files changed by this git ref -->
 					<ratchetFrom>d137806a55d49614ec59828984e4b0e57001c058</ratchetFrom>
@@ -274,7 +274,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						    <dependency>
 						         <groupId>com.puppycrawl.tools</groupId>
 						         <artifactId>checkstyle</artifactId>
-						         <version>12.0.1</version>
+						         <version>12.1.2</version>
 						    </dependency>
 							<dependency>
                   <groupId>org.apache.maven.shared</groupId>
