@@ -274,7 +274,7 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 						    <dependency>
 						         <groupId>com.puppycrawl.tools</groupId>
 						         <artifactId>checkstyle</artifactId>
-						         <version>12.3.0</version>
+						         <version>9.3</version>
 						    </dependency>
 							<dependency>
                   <groupId>org.apache.maven.shared</groupId>
